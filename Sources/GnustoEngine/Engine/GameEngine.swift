@@ -1,0 +1,336 @@
+import Foundation
+
+/// The main orchestrator for the interactive fiction game.
+/// This actor manages the game state, handles the game loop, interacts with the parser
+/// and IO handler, and executes player commands using registered ActionHandlers.
+@MainActor
+public class GameEngine {
+
+    // MARK: - Properties
+
+    /// The current state of the game world.
+    public private(set) var gameState: GameState
+
+    /// The parser responsible for understanding player input.
+    private let parser: Parser
+
+    /// The handler for input and output operations.
+    /// Use a nonisolated let for the IOHandler; calls to it must be await ioHandler.method().
+    nonisolated internal let ioHandler: IOHandler
+
+    /// Registered handlers for specific verb commands.
+    private var actionHandlers: [VerbID: ActionHandler]
+
+    /// Flag to control the main game loop.
+    private var shouldQuit: Bool = false
+
+    // MARK: - Initialization
+
+    /// Creates a new GameEngine instance.
+    /// - Parameters:
+    ///   - initialState: The starting state of the game.
+    ///   - parser: The command parser to use.
+    ///   - ioHandler: The I/O handler for player interaction.
+    ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
+    public init(initialState: GameState, parser: Parser, ioHandler: IOHandler, customHandlers: [VerbID: ActionHandler] = [:]) {
+        self.gameState = initialState
+        self.parser = parser
+        self.ioHandler = ioHandler
+        self.actionHandlers = customHandlers // Start with custom handlers
+    }
+
+    /// Registers the default action handlers for common verbs.
+    /// Called from run() after initialization.
+    private func registerDefaultHandlers() {
+        let defaultHandlers: [VerbID: ActionHandler] = [
+            VerbID("look"): LookActionHandler(),
+            VerbID("examine"): LookActionHandler(), // Add synonyms
+            VerbID("x"): LookActionHandler(),       // Add synonyms
+            VerbID("l"): LookActionHandler(),        // Add synonyms
+            VerbID("go"): GoActionHandler()          // Register Go handler
+            // VerbID("take"): TakeActionHandler(),
+            // ... etc.
+        ]
+        // Merge defaults, keeping custom handlers if they exist
+        self.actionHandlers.merge(defaultHandlers) { (custom, _) in custom }
+    }
+
+    // MARK: - Game Loop
+
+    /// Starts and runs the main game loop.
+    public func run() async {
+        // Register handlers *after* actor initialization
+        registerDefaultHandlers()
+
+        await ioHandler.setup()
+        await describeCurrentLocation() // Initial look
+
+        while !shouldQuit {
+            await showStatus()
+            await processTurn()
+        }
+
+        await ioHandler.teardown()
+    }
+
+    /// Processes a single turn of the game.
+    private func processTurn() async {
+        // 1. Get Player Input
+        guard let input = await ioHandler.readLine(prompt: "> ") else {
+            await ioHandler.print("\nGoodbye!")
+            shouldQuit = true
+            return
+        }
+
+        // Basic quit command check (can be expanded)
+        if input.lowercased() == "quit" {
+            shouldQuit = true
+            return
+        }
+
+        // 2. Parse Input
+        // Use the vocabulary stored within the GameState
+        let vocabulary = gameState.vocabulary
+        let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
+
+        // Increment turn counter (typically happens even if command fails)
+        gameState.player.moves += 1
+
+        // 3. Execute Command or Handle Error
+        switch parseResult {
+        case .success(let command):
+            await execute(command: command)
+        case .failure(let error):
+            await report(parseError: error)
+        }
+    }
+
+    // MARK: - Command Execution
+
+    /// Looks up and executes the appropriate ActionHandler for the given command.
+    /// - Parameter command: The command to execute.
+    private func execute(command: Command) async {
+        // Find the handler for the verb
+        guard let handler = actionHandlers[command.verbID] else {
+            // No handler registered for this verb
+            // TODO: Improve default message based on Zork ("You can't...", "I don't know how...")
+            await ioHandler.print("I don't understand how to '\(command.verbID.rawValue)'.")
+            return
+        }
+
+        // Execute the handler
+        do {
+            try await handler.perform(command: command, engine: self)
+            // Optional: Print a default success message like "Done." if the handler didn't?
+            // Often handlers print their own specific success messages (e.g., "Taken.").
+        } catch let actionError as ActionError {
+            // Handle specific action failures
+            await report(actionError: actionError)
+        } catch {
+            // Handle unexpected errors during action execution
+            await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
+            await ioHandler.print("Sorry, something went wrong.")
+        }
+    }
+
+    // MARK: - Output & Error Reporting
+
+    /// Displays the description of the current location.
+    internal func describeCurrentLocation() async {
+        guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else {
+            await ioHandler.print("Error: Current location not found!", style: .debug)
+            return
+        }
+        await ioHandler.print("\n--- \(currentLocation.name) ---", style: .strong)
+        await ioHandler.print(currentLocation.description)
+
+        // List visible items
+        await listItemsInLocation(locationID: gameState.player.currentLocationID)
+    }
+
+    /// Helper to list items visible in a location.
+    private func listItemsInLocation(locationID: LocationID) async {
+        // Use safe snapshot accessor
+        let itemsHere = itemSnapshots(withParent: .location(locationID))
+        // TODO: Add snapshots of items on surfaces within the location
+        // TODO: Add snapshots of items inside transparent containers?
+        // TODO: Filter based on light level?
+
+        if !itemsHere.isEmpty {
+            await ioHandler.print("You can see:")
+            for itemSnapshot in itemsHere { // Iterate through snapshots
+                // TODO: Use item descriptions (firstDesc, subDesc) based on touched state?
+                // TODO: Proper sentence formatting with articles
+                await ioHandler.print("  A \(itemSnapshot.name)") // Use snapshot name
+            }
+        }
+    }
+
+    /// Displays the status line.
+    private func showStatus() async {
+        guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else { return }
+        await ioHandler.showStatusLine(
+            roomName: currentLocation.name,
+            score: gameState.player.score, // Use actual score/turns
+            turns: gameState.player.moves
+        )
+    }
+
+    /// Reports a parsing error to the player.
+    private func report(parseError: ParseError) async {
+        // Provide more user-friendly messages
+        let message: String
+        switch parseError {
+        case .emptyInput:
+            message = "Please enter a command."
+        case .unknownVerb(let verb):
+            message = "I don't know the verb '\(verb)'."
+        case .unknownNoun(let noun):
+            message = "I don't see any '\(noun)' here."
+        case .itemNotInScope(let noun):
+            message = "You can't see any '\(noun)' here."
+        case .modifierMismatch(let noun, let modifiers):
+            message = "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
+        case .ambiguity(let text), .ambiguousPronounReference(let text):
+            message = text // Use the message generated by the parser
+        case .badGrammar(let text):
+            message = text
+        case .pronounNotSet(let pronoun):
+            message = "I don't know what '\(pronoun)' refers to."
+        case .pronounRefersToOutOfScopeItem(let pronoun):
+            message = "You can't see what '\(pronoun)' refers to right now."
+        case .internalError(let details):
+            message = "A weird parsing error occurred: \(details)" // Should be rare
+        }
+        await ioHandler.print(message)
+    }
+
+    /// Reports an action execution error to the player.
+    private func report(actionError: ActionError) async {
+        // Provide user-friendly messages for action failures
+        // TODO: Implement messages for all ActionError cases
+        let message: String
+        switch actionError {
+        case .invalidDirection:
+            message = "You can't go that way."
+        case .directionIsBlocked(let reason):
+            message = reason ?? "Something is blocking the way."
+        case .itemNotTakable:
+            message = "You can't take that."
+        case .containerIsClosed:
+            message = "That is closed."
+        case .itemIsLocked:
+            message = "That is locked."
+        case .playerCannotCarryMore:
+            message = "Your hands are full."
+        case .itemNotHeld(let itemID):
+            // Use safe snapshot accessor for item name
+            let itemName = itemSnapshot(with: itemID)?.name ?? "that item"
+            message = "You aren't holding \(itemName)."
+        // Add more cases here...
+        default:
+            message = "You can't do that right now."
+        }
+        await ioHandler.print(message)
+    }
+
+    // MARK: - Safe State Accessors for Handlers
+
+    /// Safely retrieves a snapshot of an item by its ID from the current game state.
+    /// This method runs on the GameEngine's actor context.
+    /// - Parameter id: The `ItemID` of the item to retrieve.
+    /// - Returns: An `ItemSnapshot` if the item is found, otherwise `nil`.
+    public func itemSnapshot(with id: ItemID) -> ItemSnapshot? {
+        guard let item = gameState.items[id] else { return nil }
+        return ItemSnapshot(item: item)
+    }
+
+    /// Safely retrieves snapshots of items that have a specific parent entity.
+    /// This method runs on the GameEngine's actor context.
+    /// - Parameter parent: The `ParentEntity` to filter by.
+    /// - Returns: An array of `ItemSnapshot`s for items with the specified parent.
+    public func itemSnapshots(withParent parent: ParentEntity) -> [ItemSnapshot] {
+        return gameState.items.values
+            .filter { $0.parent == parent }
+            .map { ItemSnapshot(item: $0) }
+    }
+
+    /// Safely retrieves the player's current location ID.
+    public func playerLocationID() -> LocationID {
+        return gameState.player.currentLocationID
+    }
+
+    /// Safely retrieves the player's score.
+    public func playerScore() -> Int {
+        return gameState.player.score
+    }
+
+    /// Safely retrieves the player's move count.
+    public func playerMoves() -> Int {
+        return gameState.player.moves
+    }
+
+    /// Checks if the player can carry an item of the given size based on current inventory weight and capacity.
+    /// - Parameter itemSize: The size/weight of the item to potentially carry.
+    /// - Returns: `true` if the player can carry the item, `false` otherwise.
+    public func canPlayerCarry(itemSize: Int) -> Bool {
+        let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
+        let playerCapacity = gameState.player.carryingCapacity
+        // ZIL often allowed exactly matching capacity
+        return (currentWeight + itemSize) <= playerCapacity
+    }
+
+    /// Safely retrieves a snapshot of a location by its ID from the current game state.
+    /// This method runs on the GameEngine's actor context.
+    /// - Parameter id: The `LocationID` of the location to retrieve.
+    /// - Returns: A `LocationSnapshot` if the location is found, otherwise `nil`.
+    public func locationSnapshot(with id: LocationID) -> LocationSnapshot? {
+        guard let location = gameState.locations[id] else { return nil }
+        return LocationSnapshot(location: location)
+    }
+
+    // Add other necessary safe accessors here...
+
+    // Note: We also need a way to modify state safely. Example:
+    /// Safely updates the parent of an item.
+    public func updateItemParent(itemID: ItemID, newParent: ParentEntity) {
+        gameState.items[itemID]?.parent = newParent
+    }
+
+    /// Safely adds a property to an item.
+    public func addItemProperty(itemID: ItemID, property: ItemProperty) {
+        gameState.items[itemID]?.addProperty(property)
+    }
+
+    /// Safely removes a property from an item.
+    public func removeItemProperty(itemID: ItemID, property: ItemProperty) {
+        gameState.items[itemID]?.removeProperty(property)
+    }
+
+    /// Safely updates the player's current location ID.
+    public func updatePlayerLocation(newLocationID: LocationID) {
+        // TODO: Add check if newLocationID exists in gameState.locations?
+        gameState.player.currentLocationID = newLocationID
+    }
+
+    // Add other mutation methods as needed (e.g., update score, flags)
+
+    // MARK: - Debug/Testing Helpers
+
+    /// **Testing Only:** Adds an item directly to the game state's item dictionary using its constituent data.
+    /// Use with caution, primarily for setting up test scenarios.
+    /// Creates the item within the actor's context.
+    internal func debugAddItem(id: ItemID, name: String, properties: Set<ItemProperty> = [], size: Int = 5, parent: ParentEntity = .nowhere) {
+        let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent)
+        gameState.items[newItem.id] = newItem
+    }
+}
+
+// Remove the temporary vocabulary extension on GameState
+/*
+extension GameState {
+    var vocabulary: Vocabulary {
+        Vocabulary()
+    }
+}
+*/
