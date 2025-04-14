@@ -1,0 +1,153 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Gnusto Overview
+
+- See [README.md](mdc:README.md) for an overview of the Gnusto project and its goals.
+
+## Components
+
+- Each component has its own file in `/Sources/Models/Components`.
+
+## Command Handlers
+
+- The `processCommand` function in [ActionDispatcher.swift](mdc:Sources/Gnusto/Services/ActionDispatcher.swift) hands off to a command handler.
+- Each handler has its own file in `/Sources/Services/CommandHandlers`.
+
+## Objects
+
+Use public object initializers:
+
+```swift
+// Wrong:
+let world = World()
+var lantern = Object(id: "lantern")
+lantern.add(DescriptionComponent(
+    name: "brass lantern",
+    description: "A sturdy brass lantern that's currently off."
+))
+lantern.add(ObjectComponent(flags: [.device, .takeable]))
+lantern.add(LightSourceComponent(isOn: false))
+lantern.add(LocationComponent(parent: "darkRoom"))
+world.write(lantern)
+
+// Right
+let world = World()
+Object.object(
+    id: "lantern",
+    name: "brass lantern",
+    description: "A sturdy brass lantern that's currently off.",
+    location: "darkRoom",
+    flags: .device, .takeable,
+    synonyms: "lamp",
+    in: world,
+    LightSourceComponent(isOn: false)
+)
+```
+
+## Testing
+
+- ALWAYS use Swift Testing. NEVER use XCTest.
+- Throw `TestFailure`s when something expected isn't found, rather than using optionals:
+
+```swift
+// Wrong:
+let chest = world.object("chest")
+#expect(chest != nil)
+let chestContainer = chest?.get(ContainerComponent.self)
+#expect(chestContainer?.isOpen == false)
+
+// Right:
+guard let chest = world.object("chest") else {
+    throw TestFailure("Failed to get chest")
+}
+guard let chestContainer = chest.get(ContainerComponent.self) else {
+    throw TestFailure("Failed to get chest container component")
+}
+#expect(chestContainer.isOpen == false)
+```
+
+- Use `CustomDump.expectNoDifference` over `#expect(msg == "Hello world")` for string literal comparisons:
+
+```swift
+// Wrong:
+#expect(renderer.flush() == "You turn on brass lantern.")
+
+// Right:
+expectNoDifference(renderer.flush(), "You turn on brass lantern.")
+expectNoDifference(renderer.flush(), """
+    A mysterious room with shimmering walls and a pedestal in the center.
+    Exits: west
+    You can see: Adventurer, stone pedestal
+    """
+)
+```
+
+- Use `Renderer.process(effects)` helper for more concise tests:
+
+```swift
+// Wrong:
+let lookEffects = dispatcher.dispatch(.command(.look), in: world)
+for effect in lookEffects {
+    renderer.render(effect)
+}
+
+let output = renderer.flush()
+#expect(output.contains("A spacious cave with ancient drawings on the walls."))
+
+// Right:
+let lookEffects = dispatcher.dispatch(.command(.look), in: world)
+expectNoDifference(
+    renderer.process(lookEffects),
+    """
+    A spacious cave with ancient drawings on the walls.
+    You can see: wall torch
+    """
+)
+```
+
+## Style Guide
+
+- Multi-parameter functions have one line per named parameter per:
+
+```swift
+// Wrong:
+let playerRoom = Object(id: "room",
+                        DescriptionComponent(name: "Test Room", description: "A simple test room."),
+                        RoomComponent(isLit: false)  // Make it a dark room to test lighting
+)
+
+// Right:
+let playerRoom = Object(
+    id: "room",
+    DescriptionComponent(
+        name: "Test Room",
+        description: "A simple test room."
+    ),
+    RoomComponent(isLit: false)  // Make it a dark room to test lighting
+)
+
+// Exception for short function signatures with unnamed param followed by named param:
+let foo = Bar(.hello, world: true)  // This is fine
+```
+
+- Multiline `guard` conditions:
+
+```swift
+// Wrong:
+guard let updatedLantern = world.object("lantern"),
+      let lightSource = updatedLantern.get(LightSourceComponent.self) else {
+    throw TestFailure("Failed to get lantern or light source component")
+}
+
+`` Right:
+guard
+    let updatedLantern = world.object("lantern"),
+    let lightSource = updatedLantern.get(LightSourceComponent.self)
+else {
+    throw TestFailure("Failed to get lantern or light source component")
+}
+```
