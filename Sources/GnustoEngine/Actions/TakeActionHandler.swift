@@ -57,9 +57,11 @@ public struct TakeActionHandler: ActionHandler {
                     isReachable = true
                 } else {
                     // Trying to take something 'from' an item that is neither a surface nor an open container
-                    // Use a more general message or differentiate based on context if needed later
-                    await engine.ioHandler.print("You can't take things from the \(parentItem.name).")
-                    // isReachable remains false, handled by the guard below
+                    // Print the specific error message for this case
+                    // Use the parent item's name in the message, as expected by the test
+                    await engine.ioHandler.print("You can't take things out of the \(parentItem.name).")
+                    // Return immediately, as the action fails here.
+                    return
                 }
             }
             // If parent item is not accessible, isReachable remains false
@@ -72,7 +74,7 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         guard isReachable else {
-            // Use the item's name in the message
+            // This message should now only trigger if the item (or its parent) is truly out of scope
             await engine.ioHandler.print("You don't see the \(targetItem.name) here.")
             return // Not an error, just out of scope
         }
@@ -91,7 +93,7 @@ public struct TakeActionHandler: ActionHandler {
         await engine.updateItemParent(itemID: targetItemID, newParent: .player)
         await engine.addItemProperty(itemID: targetItemID, property: .touched)
 
-        // 8. Output Message
+        // 8. Output Message (Restore simple message)
         await engine.ioHandler.print("Taken.")
     }
 }
