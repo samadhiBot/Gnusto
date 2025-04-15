@@ -6,7 +6,6 @@ import Testing
 /// This actor runs on the dedicated IOActor.
 @IOActor
 final class MockIOHandler: IOHandler {
-
     // --- Recorded Output ---
     struct OutputCall: Equatable, Sendable {
         let text: String
@@ -20,10 +19,13 @@ final class MockIOHandler: IOHandler {
     public private(set) var teardownCallCount: Int = 0
 
     // --- Input Simulation ---
+    private var inputIndex = 0
     private var inputQueue: [String?] = []
 
     // --- Initialization ---
-    init() {}
+    init(_ lines: String?...) {
+        inputQueue.append(contentsOf: lines)
+    }
 
     // --- Configuration Methods (for tests) ---
     /// Clears all recorded calls and resets input queue.
@@ -33,6 +35,7 @@ final class MockIOHandler: IOHandler {
         clearScreenCallCount = 0
         setupCallCount = 0
         teardownCallCount = 0
+        inputIndex = 0
         inputQueue = []
     }
 
@@ -68,12 +71,14 @@ final class MockIOHandler: IOHandler {
         // Print the prompt using the print method so it can be recorded/verified if needed
         self.print(prompt, style: .input, newline: false)
 
-        guard !inputQueue.isEmpty else {
+//        guard !inputQueue.isEmpty else {
+        guard inputIndex < inputQueue.count else {
             // No more queued input, return nil (simulates EOF or error)
             // Swift.print("[MockIO] ReadLine: No input queued, returning nil")
             return nil
         }
-        let line = inputQueue.removeFirst()
+        let line = inputQueue[inputIndex]
+        inputIndex += 1
         // Swift.print("[MockIO] ReadLine: Returning '\(line ?? "nil")'")
         return line
     }
@@ -96,4 +101,28 @@ final class MockIOHandler: IOHandler {
     func getClearScreenCallCount() async -> Int { return clearScreenCallCount }
     func getSetupCallCount() async -> Int { return setupCallCount }
     func getTeardownCallCount() async -> Int { return teardownCallCount }
+
+    func getTranscript() async -> String {
+        var commandIndex = 0
+        var actualTranscript = ""
+        for call in recordedOutput {
+            if call.style == .input && call.text == "> " && !call.newline {
+                actualTranscript += ">"
+                if commandIndex < inputQueue.count {
+                    if let command = inputQueue[commandIndex] {
+                        actualTranscript += " \(command)"
+                    }
+                    commandIndex += 1
+                }
+                actualTranscript += "\n"
+            } else if call.style != .input {
+                actualTranscript += call.text
+                if call.newline {
+                    actualTranscript += "\n"
+                }
+            }
+        }
+
+        return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
 }

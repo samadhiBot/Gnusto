@@ -32,29 +32,37 @@ public struct TakeActionHandler: ActionHandler {
         switch itemParent {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
-        case .item(let containerID):
-            // Item is in a container. Check if container is accessible and open.
-            guard let containerItem = await engine.itemSnapshot(with: containerID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent container \(containerID).")
+        case .item(let parentItemID): // Renamed from containerID for clarity
+            // Item's parent is another item. Check if that parent is accessible and if the item can be taken from it.
+            guard let parentItem = await engine.itemSnapshot(with: parentItemID) else {
+                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
-            // Is the container itself in the room or held by the player?
-            let containerParent = containerItem.parent
-            let isContainerAccessible = (containerParent == .location(currentLocationID) || containerParent == .player)
+            // Is the parent item itself in the room or held by the player?
+            let parentParent = parentItem.parent
+            let isParentItemAccessible = (parentParent == .location(currentLocationID) || parentParent == .player)
 
-            if isContainerAccessible {
-                // Is it actually an open container?
-                guard containerItem.hasProperty(.container) else {
-                    // Trying to take something 'from' a non-container
-                    await engine.ioHandler.print("You can't take things out of the \(containerItem.name).")
-                    return
+            if isParentItemAccessible {
+                // Check if the parent is a surface (like a table or hook)
+                if parentItem.hasProperty(.surface) {
+                    // Items on accessible surfaces are reachable
+                    isReachable = true
                 }
-                guard containerItem.hasProperty(.open) else {
-                    // Container is closed
-                    throw ActionError.containerIsClosed(containerID)
+                // Check if the parent is an open container
+                else if parentItem.hasProperty(.container) {
+                    guard parentItem.hasProperty(.open) else {
+                        // Container is closed
+                        throw ActionError.containerIsClosed(parentItemID)
+                    }
+                    // If accessible and open, the item within is reachable
+                    isReachable = true
+                } else {
+                    // Trying to take something 'from' an item that is neither a surface nor an open container
+                    // Use a more general message or differentiate based on context if needed later
+                    await engine.ioHandler.print("You can't take things from the \(parentItem.name).")
+                    // isReachable remains false, handled by the guard below
                 }
-                // If accessible and open, the item within is reachable
-                isReachable = true
             }
+            // If parent item is not accessible, isReachable remains false
         case .player:
             // Should have been caught by the "already have" check earlier
             await engine.ioHandler.print("Error: Item parent is player but wasn't caught earlier.", style: .debug)
@@ -80,16 +88,10 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 7. Update State
-        var wasWorn = false // Flag to change output message
         await engine.updateItemParent(itemID: targetItemID, newParent: .player)
         await engine.addItemProperty(itemID: targetItemID, property: .touched)
-        if targetItem.hasProperty(.wearable) {
-            await engine.addItemProperty(itemID: targetItemID, property: .worn)
-            wasWorn = true
-        }
 
         // 8. Output Message
-        let message = wasWorn ? "Taken (and worn)." : "Taken."
-        await engine.ioHandler.print(message)
+        await engine.ioHandler.print("Taken.")
     }
 }
