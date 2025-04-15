@@ -9,8 +9,9 @@ struct WorldSetups {
     /// Includes: Foyer, Cloakroom, Bar locations; Hook, Cloak items;
     /// Verbs: go, look, take, drop, wear, remove (and synonyms).
     ///
-    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, and the `[VerbID: ActionHandler]` dictionary.
-    static func setupCloakOfDarknessWorld() -> (GameState, StandardParser, [VerbID: ActionHandler], ((GameEngine, LocationID) async -> Void)?, ((GameEngine) async -> Void)?, ((GameEngine, ItemID) async -> Bool)?) {
+    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, the `[VerbID: ActionHandler]` dictionary,
+    ///            and the optional `@MainActor @Sendable` custom logic hook closures.
+    static func setupCloakOfDarknessWorld() -> (GameState, StandardParser, [VerbID: ActionHandler], (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?, (@MainActor @Sendable (GameEngine) async -> Void)?, (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?) {
         // Locations
         let foyer = Location(
             id: "foyer",
@@ -121,7 +122,7 @@ struct WorldSetups {
 
         // --- Cloak of Darkness Custom Logic Hooks ---
 
-        let onEnterRoom: (GameEngine, LocationID) async -> Void = { engine, locationID in
+        let onEnterRoom: @MainActor @Sendable (GameEngine, LocationID) async -> Void = { @MainActor @Sendable engine, locationID in
             guard locationID == LocationID("bar") else { return }
 
             // Access state via the engine's accessor
@@ -131,37 +132,31 @@ struct WorldSetups {
             // Use the engine's mutator for state changes
             engine.updateGameState { state in
                 if cloakIsWorn {
-                    state.locations[LocationID("bar")]?.removeProperty(.light)
+                    state.locations[LocationID("bar")]?.removeProperty(.lit)
                 } else {
-                    state.locations[LocationID("bar")]?.addProperty(.light)
+                    state.locations[LocationID("bar")]?.addProperty(.lit)
                 }
             }
         }
 
-        let beforeTurn: (GameEngine) async -> Void = { engine in
+        let beforeTurn: @MainActor @Sendable (GameEngine) async -> Void = { @MainActor @Sendable engine in
             let currentState = engine.getCurrentGameState()
             guard currentState.player.currentLocationID == LocationID("bar") else { return }
 
-            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.light) ?? false
+            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.lit) ?? false
 
             if !barIsLit {
-                // Simplified ZIL logic: If in dark bar, print warning and increment counter.
+                // ZIL logic: Only print the darkness message here.
+                // The disturbed counter should only increment on specific actions (e.g., TAKE, DROP) while in the dark bar,
+                // which would require checks in those specific ActionHandlers.
                 await engine.ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
 
-                engine.updateGameState { state in
-                    let key = "cod_disturbed_counter"
-                    // Ensure gameSpecificState dictionary exists
-                    if state.gameSpecificState == nil {
-                        state.gameSpecificState = [:]
-                    }
-                    // Get current count, default to 0, increment, and store using AnyCodable
-                    let currentCount = state.gameSpecificState?[key]?.value as? Int ?? 0
-                    state.gameSpecificState?[key] = AnyCodable(currentCount + 1)
-                }
+                // --- REMOVED Counter Increment Logic ---
+                // engine.updateGameState { state in ... }
             }
         }
 
-        let onExamineItem: (GameEngine, ItemID) async -> Bool = { engine, itemID in
+        let onExamineItem: @MainActor @Sendable (GameEngine, ItemID) async -> Bool = { @MainActor @Sendable engine, itemID in
             guard itemID == ItemID("message") else { return false } // Not the message, do default action
 
             let currentState = engine.getCurrentGameState()

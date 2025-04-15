@@ -29,18 +29,18 @@ public class GameEngine {
     /// Custom logic called after the player successfully enters a new location.
     /// The closure receives the engine and the ID of the location entered.
     /// It can modify the game state (e.g., change location properties based on player state).
-    public var onEnterRoom: ((GameEngine, LocationID) async -> Void)?
+    public var onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?
 
     /// Custom logic called at the very start of each turn, before command processing.
     /// The closure receives the engine.
     /// It can modify game state or print messages based on the current state.
-    public var beforeTurn: ((GameEngine) async -> Void)?
+    public var beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)?
 
     /// Custom logic called when attempting to examine a specific item.
     /// The closure receives the engine and the ID of the item being examined.
     /// It should return `true` if it handled the examination (e.g., printed a custom description or performed an action),
     /// or `false` to let the default examination logic proceed.
-    public var onExamineItem: ((GameEngine, ItemID) async -> Bool)?
+    public var onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
 
     // MARK: - Initialization
 
@@ -58,9 +58,9 @@ public class GameEngine {
         parser: Parser,
         ioHandler: IOHandler,
         customHandlers: [VerbID: ActionHandler] = [:],
-        onEnterRoom: ((GameEngine, LocationID) async -> Void)? = nil,
-        beforeTurn: ((GameEngine) async -> Void)? = nil,
-        onExamineItem: ((GameEngine, ItemID) async -> Bool)? = nil
+        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
+        beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
+        onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
     ) {
         self.gameState = initialState
         self.parser = parser

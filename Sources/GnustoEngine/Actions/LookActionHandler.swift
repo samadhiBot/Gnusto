@@ -20,7 +20,7 @@ public struct LookActionHandler: ActionHandler {
 
         // --- Custom Hook: On Examine Item ---
         // Check if a custom handler wants to override the default behavior
-        if let handler = engine.onExamineItem {
+        if let handler = await engine.onExamineItem {
             if await handler(engine, targetItemID) {
                 return // Custom handler took care of it, so we are done.
             }

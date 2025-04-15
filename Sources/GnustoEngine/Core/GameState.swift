@@ -1,5 +1,60 @@
 import Foundation // Needed for Codable
 
+/// A type-erasing wrapper that allows storing heterogeneous Codable values.
+/// Note: Using this can sometimes mask type errors until runtime.
+public struct AnyCodable: Codable {
+    public let value: Any
+
+    public init<T>(_ value: T?) {
+        self.value = value ?? ()
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        if let intValue = try? container.decode(Int.self) {
+            self.value = intValue
+        } else if let doubleValue = try? container.decode(Double.self) {
+            self.value = doubleValue
+        } else if let boolValue = try? container.decode(Bool.self) {
+            self.value = boolValue
+        } else if let stringValue = try? container.decode(String.self) {
+            self.value = stringValue
+        } else if let arrayValue = try? container.decode([AnyCodable].self) {
+            self.value = arrayValue.map { $0.value }
+        } else if let dictionaryValue = try? container.decode([String: AnyCodable].self) {
+            self.value = dictionaryValue.mapValues { $0.value }
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable value cannot be decoded")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+
+        // Add cases for all expected types
+        switch value {
+        case let intValue as Int:
+            try container.encode(intValue)
+        case let doubleValue as Double:
+            try container.encode(doubleValue)
+        case let boolValue as Bool:
+            try container.encode(boolValue)
+        case let stringValue as String:
+            try container.encode(stringValue)
+        // Add other concrete types as needed (e.g., Date)
+        case let arrayValue as [Any]:
+            try container.encode(arrayValue.map { AnyCodable($0) })
+        case let dictionaryValue as [String: Any]:
+            try container.encode(dictionaryValue.mapValues { AnyCodable($0) })
+        case is Void, is (): // Handle nil initialization
+            try container.encodeNil()
+        default:
+            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: container.codingPath, debugDescription: "AnyCodable value cannot be encoded"))
+        }
+    }
+}
+
 /// Represents the complete state of the game world at a given point in time.
 public struct GameState: Codable {
 
@@ -28,20 +83,20 @@ public struct GameState: Codable {
 
     /// Optional dictionary for storing arbitrary game-specific state (counters, quest flags, etc.).
     /// Use keys prefixed with game ID (e.g., "cod_counter") to avoid collisions if engine supports multiple games.
-    public var gameSpecificState: [String: AnyCodable]? // Using AnyCodable for Codable conformance
+    public var gameSpecificState: [String: AnyCodable]?
 
     // --- Initialization ---
 
     /// Internal initializer for Codable and factory method.
     /// Keeping this internal, use the static `initial` factory externally.
-    init(locations: [LocationID: Location], items: [ItemID: Item], player: Player, flags: [String: Bool] = [:], pronouns: [String: Set<ItemID>] = [:], vocabulary: Vocabulary, gameSpecificState: [String: AnyCodable]? = nil) { // Added gameSpecificState
+    init(locations: [LocationID: Location], items: [ItemID: Item], player: Player, flags: [String: Bool] = [:], pronouns: [String: Set<ItemID>] = [:], vocabulary: Vocabulary, gameSpecificState: [String: AnyCodable]? = nil) {
         self.locations = locations
         self.items = items
         self.player = player
         self.flags = flags
         self.pronouns = pronouns
         self.vocabulary = vocabulary
-        self.gameSpecificState = gameSpecificState // Added assignment
+        self.gameSpecificState = gameSpecificState
     }
 
     /// Creates an initial game state, typically loaded from game data files.
@@ -114,7 +169,7 @@ public struct GameState: Codable {
         player = try container.decode(Player.self, forKey: .player)
         pronouns = try container.decode([String: Set<ItemID>].self, forKey: .pronouns)
         vocabulary = try container.decode(Vocabulary.self, forKey: .vocabulary)
-        gameSpecificState = try container.decodeIfPresent([String: AnyCodable].self, forKey: .gameSpecificState) // Decode
+        gameSpecificState = try container.decodeIfPresent([String: AnyCodable].self, forKey: .gameSpecificState)
 
         // Decode locations and items from arrays and rebuild dictionaries
         let locationArray = try container.decode([Location].self, forKey: .locations)
@@ -135,7 +190,7 @@ public struct GameState: Codable {
         try container.encode(player, forKey: .player)
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(vocabulary, forKey: .vocabulary)
-        try container.encodeIfPresent(gameSpecificState, forKey: .gameSpecificState) // Encode
+        try container.encodeIfPresent(gameSpecificState, forKey: .gameSpecificState)
 
         // Encode locations and items as arrays
         try container.encode(Array(locations.values), forKey: .locations)
