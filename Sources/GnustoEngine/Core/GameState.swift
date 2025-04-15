@@ -26,17 +26,22 @@ public struct GameState: Codable {
     /// The game's vocabulary.
     public let vocabulary: Vocabulary
 
+    /// Optional dictionary for storing arbitrary game-specific state (counters, quest flags, etc.).
+    /// Use keys prefixed with game ID (e.g., "cod_counter") to avoid collisions if engine supports multiple games.
+    public var gameSpecificState: [String: AnyCodable]? // Using AnyCodable for Codable conformance
+
     // --- Initialization ---
 
     /// Internal initializer for Codable and factory method.
     /// Keeping this internal, use the static `initial` factory externally.
-    init(locations: [LocationID: Location], items: [ItemID: Item], player: Player, flags: [String: Bool] = [:], pronouns: [String: Set<ItemID>] = [:], vocabulary: Vocabulary) {
+    init(locations: [LocationID: Location], items: [ItemID: Item], player: Player, flags: [String: Bool] = [:], pronouns: [String: Set<ItemID>] = [:], vocabulary: Vocabulary, gameSpecificState: [String: AnyCodable]? = nil) { // Added gameSpecificState
         self.locations = locations
         self.items = items
         self.player = player
         self.flags = flags
         self.pronouns = pronouns
         self.vocabulary = vocabulary
+        self.gameSpecificState = gameSpecificState // Added assignment
     }
 
     /// Creates an initial game state, typically loaded from game data files.
@@ -51,6 +56,7 @@ public struct GameState: Codable {
     ///   - initialItemContainers: A dictionary mapping ItemID to the ItemID of the container/surface it starts in/on.
     ///   - flags: Optional initial game flags.
     ///   - pronouns: Optional initial pronoun states.
+    ///   - gameSpecificState: Optional initial game-specific state data.
     /// - Returns: A new `GameState` instance.
     public static func initial(
         initialLocations: [Location],
@@ -61,7 +67,8 @@ public struct GameState: Codable {
         initialItemLocations: [ItemID: LocationID] = [:],
         initialItemContainers: [ItemID: ItemID] = [:],
         flags: [String: Bool] = [:],
-        pronouns: [String: Set<ItemID>] = [:]) -> GameState
+        pronouns: [String: Set<ItemID>] = [:],
+        gameSpecificState: [String: AnyCodable]? = nil) -> GameState
     {
         let locationDict = Dictionary(uniqueKeysWithValues: initialLocations.map { ($0.id, $0) })
         let itemDict = Dictionary(uniqueKeysWithValues: initialItems.map { ($0.id, $0) })
@@ -83,7 +90,7 @@ public struct GameState: Codable {
             }
         }
 
-        return GameState(locations: locationDict, items: itemDict, player: initialPlayer, flags: flags, pronouns: pronouns, vocabulary: vocabulary)
+        return GameState(locations: locationDict, items: itemDict, player: initialPlayer, flags: flags, pronouns: pronouns, vocabulary: vocabulary, gameSpecificState: gameSpecificState)
     }
 
     // --- Codable Conformance ---
@@ -96,6 +103,7 @@ public struct GameState: Codable {
         case player
         case pronouns
         case vocabulary
+        case gameSpecificState // Added for encoding/decoding
     }
 
     // Required init for Codable needs to be public if the struct is public
@@ -106,6 +114,7 @@ public struct GameState: Codable {
         player = try container.decode(Player.self, forKey: .player)
         pronouns = try container.decode([String: Set<ItemID>].self, forKey: .pronouns)
         vocabulary = try container.decode(Vocabulary.self, forKey: .vocabulary)
+        gameSpecificState = try container.decodeIfPresent([String: AnyCodable].self, forKey: .gameSpecificState) // Decode
 
         // Decode locations and items from arrays and rebuild dictionaries
         let locationArray = try container.decode([Location].self, forKey: .locations)
@@ -126,6 +135,7 @@ public struct GameState: Codable {
         try container.encode(player, forKey: .player)
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(vocabulary, forKey: .vocabulary)
+        try container.encodeIfPresent(gameSpecificState, forKey: .gameSpecificState) // Encode
 
         // Encode locations and items as arrays
         try container.encode(Array(locations.values), forKey: .locations)

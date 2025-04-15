@@ -10,7 +10,7 @@ struct WorldSetups {
     /// Verbs: go, look, take, drop, wear, remove (and synonyms).
     ///
     /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, and the `[VerbID: ActionHandler]` dictionary.
-    static func setupCloakOfDarknessWorld() -> (GameState, StandardParser, [VerbID: ActionHandler]) {
+    static func setupCloakOfDarknessWorld() -> (GameState, StandardParser, [VerbID: ActionHandler], ((GameEngine, LocationID) async -> Void)?, ((GameEngine) async -> Void)?, ((GameEngine, ItemID) async -> Bool)?) {
         // Locations
         let foyer = Location(
             id: "foyer",
@@ -49,12 +49,22 @@ struct WorldSetups {
         // Items
         let hook = Item(id: "hook", name: "hook", adjectives: ["brass"], synonyms: ["peg"], properties: [.surface], parent: .location("cloakroom"))
         let cloak = Item(id: "cloak", name: "cloak", adjectives: ["handsome", "velvet"], properties: [.takable, .wearable], parent: .item("hook"))
+        let message = Item(
+            id: "message",
+            name: "message",
+            adjectives: ["scrawled"],
+            synonyms: ["floor", "sawdust", "dust"],
+            description: "The message simply reads... well, you'll need to examine it properly.",
+            firstDescription: "There seems to be some sort of message scrawled in the sawdust on the floor.",
+            properties: [],
+            parent: .location("bar")
+        )
 
         // Player
         let initialPlayer = Player(currentLocationID: "foyer")
 
         // All Items and Locations
-        let allItems = [hook, cloak]
+        let allItems = [hook, cloak, message]
         let allLocations = [foyer, cloakroom, bar]
 
         // Vocabulary
@@ -94,13 +104,10 @@ struct WorldSetups {
         // Parser
         let parser = StandardParser()
 
-        // Action Handlers
+        // Action Handlers (Keep custom ones defined here)
         let customHandlers: [VerbID: ActionHandler] = [
-            VerbID("go"): GoActionHandler(), // Go should be registered too
-            VerbID("look"): LookActionHandler(),
-            VerbID("examine"): LookActionHandler(),
-            VerbID("x"): LookActionHandler(),
-            VerbID("l"): LookActionHandler(),
+            // Default handlers (like go, look) are registered by the Engine itself.
+            // Only list handlers that *override* defaults or add new verbs specific to this game.
             VerbID("take"): TakeActionHandler(),
             VerbID("get"): TakeActionHandler(),
             VerbID("drop"): DropActionHandler(),
@@ -109,9 +116,71 @@ struct WorldSetups {
             VerbID("remove"): RemoveActionHandler(),
             VerbID("doff"): RemoveActionHandler(),
             VerbID("take off"): RemoveActionHandler()
+            // Add other Cloak-specific verbs/overrides here if needed later.
         ]
 
-        return (gameState, parser, customHandlers)
+        // --- Cloak of Darkness Custom Logic Hooks ---
+
+        let onEnterRoom: (GameEngine, LocationID) async -> Void = { engine, locationID in
+            guard locationID == LocationID("bar") else { return }
+
+            // Access state via the engine's accessor
+            let currentState = engine.getCurrentGameState()
+            let cloakIsWorn = currentState.items[ItemID("cloak")]?.hasProperty(.worn) ?? false
+
+            // Use the engine's mutator for state changes
+            engine.updateGameState { state in
+                if cloakIsWorn {
+                    state.locations[LocationID("bar")]?.removeProperty(.light)
+                } else {
+                    state.locations[LocationID("bar")]?.addProperty(.light)
+                }
+            }
+        }
+
+        let beforeTurn: (GameEngine) async -> Void = { engine in
+            let currentState = engine.getCurrentGameState()
+            guard currentState.player.currentLocationID == LocationID("bar") else { return }
+
+            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.light) ?? false
+
+            if !barIsLit {
+                // Simplified ZIL logic: If in dark bar, print warning and increment counter.
+                await engine.ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
+
+                engine.updateGameState { state in
+                    let key = "cod_disturbed_counter"
+                    // Ensure gameSpecificState dictionary exists
+                    if state.gameSpecificState == nil {
+                        state.gameSpecificState = [:]
+                    }
+                    // Get current count, default to 0, increment, and store using AnyCodable
+                    let currentCount = state.gameSpecificState?[key]?.value as? Int ?? 0
+                    state.gameSpecificState?[key] = AnyCodable(currentCount + 1)
+                }
+            }
+        }
+
+        let onExamineItem: (GameEngine, ItemID) async -> Bool = { engine, itemID in
+            guard itemID == ItemID("message") else { return false } // Not the message, do default action
+
+            let currentState = engine.getCurrentGameState()
+            let key = "cod_disturbed_counter"
+            let disturbedCount = currentState.gameSpecificState?[key]?.value as? Int ?? 0
+
+            if disturbedCount > 1 {
+                await engine.ioHandler.print("The message simply reads: \"You lose.\"")
+            } else {
+                await engine.ioHandler.print("The message simply reads: \"You win.\"")
+            }
+            await engine.ioHandler.print("\n*** The End ***") // A more thematic end message
+            engine.quitGame() // Signal engine to stop using the new method
+
+            return true // We handled the examination
+        }
+
+        // Return the initial state, parser, custom handlers, and the specific logic hooks
+        return (gameState, parser, customHandlers, onEnterRoom, beforeTurn, onExamineItem)
     }
 
     // Add setup for Zork world later...

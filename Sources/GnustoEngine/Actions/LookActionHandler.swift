@@ -18,6 +18,15 @@ public struct LookActionHandler: ActionHandler {
             throw ActionError.internalEngineError("LOOK command parsed without direct object, but wasn't caught earlier.")
         }
 
+        // --- Custom Hook: On Examine Item ---
+        // Check if a custom handler wants to override the default behavior
+        if let handler = engine.onExamineItem {
+            if await handler(engine, targetItemID) {
+                return // Custom handler took care of it, so we are done.
+            }
+        }
+        // ----------------------------------
+
         // Use safe snapshot accessor
         guard let targetItemSnapshot = await engine.itemSnapshot(with: targetItemID) else {
             // Should not happen if parser resolved correctly

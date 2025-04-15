@@ -50,8 +50,8 @@ public struct GoActionHandler: ActionHandler {
 
         // --- Movement Successful ---
 
-        // 5. Update Player Location
-        await engine.updatePlayerLocation(newLocationID: exit.destination)
+        // 5. Update Player Location using the engine method that triggers hooks
+        await engine.changePlayerLocation(to: exit.destination)
 
         // 6. Describe New Location
         // The GameEngine loop usually handles describing the location after a successful turn.

@@ -16,7 +16,7 @@ struct CloakOfDarknessWalkthroughTests {
     @MainActor
     func testBasicCloakWalkthrough() async throws {
         // 1. Setup World
-        let (initialState, parser, customHandlers) = WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, customHandlers, onEnterRoom, beforeTurn, onExamineItem) = WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO with commands
         let mockIO = await MockIOHandler(
@@ -30,11 +30,14 @@ struct CloakOfDarknessWalkthroughTests {
         )
 
         // 3. Setup Engine
-        let engine = GameEngine( // Add await
+        let engine = GameEngine(
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
-            customHandlers: customHandlers
+            customHandlers: customHandlers,
+            onEnterRoom: onEnterRoom,
+            beforeTurn: beforeTurn,
+            onExamineItem: onExamineItem
         )
 
         // 4. Run Game Simulation

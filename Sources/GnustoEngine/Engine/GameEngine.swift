@@ -24,6 +24,24 @@ public class GameEngine {
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
 
+    // MARK: - Custom Game Hooks (Closures)
+
+    /// Custom logic called after the player successfully enters a new location.
+    /// The closure receives the engine and the ID of the location entered.
+    /// It can modify the game state (e.g., change location properties based on player state).
+    public var onEnterRoom: ((GameEngine, LocationID) async -> Void)?
+
+    /// Custom logic called at the very start of each turn, before command processing.
+    /// The closure receives the engine.
+    /// It can modify game state or print messages based on the current state.
+    public var beforeTurn: ((GameEngine) async -> Void)?
+
+    /// Custom logic called when attempting to examine a specific item.
+    /// The closure receives the engine and the ID of the item being examined.
+    /// It should return `true` if it handled the examination (e.g., printed a custom description or performed an action),
+    /// or `false` to let the default examination logic proceed.
+    public var onExamineItem: ((GameEngine, ItemID) async -> Bool)?
+
     // MARK: - Initialization
 
     /// Creates a new GameEngine instance.
@@ -32,11 +50,25 @@ public class GameEngine {
     ///   - parser: The command parser to use.
     ///   - ioHandler: The I/O handler for player interaction.
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
-    public init(initialState: GameState, parser: Parser, ioHandler: IOHandler, customHandlers: [VerbID: ActionHandler] = [:]) {
+    ///   - onEnterRoom: Optional closure for custom logic after entering a room.
+    ///   - beforeTurn: Optional closure for custom logic before each turn.
+    ///   - onExamineItem: Optional closure for custom logic when examining an item.
+    public init(
+        initialState: GameState,
+        parser: Parser,
+        ioHandler: IOHandler,
+        customHandlers: [VerbID: ActionHandler] = [:],
+        onEnterRoom: ((GameEngine, LocationID) async -> Void)? = nil,
+        beforeTurn: ((GameEngine) async -> Void)? = nil,
+        onExamineItem: ((GameEngine, ItemID) async -> Bool)? = nil
+    ) {
         self.gameState = initialState
         self.parser = parser
         self.ioHandler = ioHandler
         self.actionHandlers = customHandlers // Start with custom handlers
+        self.onEnterRoom = onEnterRoom
+        self.beforeTurn = beforeTurn
+        self.onExamineItem = onExamineItem
     }
 
     /// Registers the default action handlers for common verbs.
@@ -75,6 +107,12 @@ public class GameEngine {
 
     /// Processes a single turn of the game.
     private func processTurn() async {
+        // --- Custom Hook: Before Turn ---
+        await beforeTurn?(self)
+        // Check if the beforeTurn hook requested a quit
+        guard !shouldQuit else { return }
+        // --------------------------------
+
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
             await ioHandler.print("\nGoodbye!")
@@ -323,6 +361,38 @@ public class GameEngine {
     internal func debugAddItem(id: ItemID, name: String, properties: Set<ItemProperty> = [], size: Int = 5, parent: ParentEntity = .nowhere) {
         let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent)
         gameState.items[newItem.id] = newItem
+    }
+
+    // MARK: - Public Accessors & Mutators (Thread-Safe)
+
+    /// Provides read-only access to the current game state snapshot.
+    public func getCurrentGameState() -> GameState {
+        return gameState
+    }
+
+    /// Allows controlled mutation of the game state.
+    /// Use this for handlers or custom hooks to modify the state.
+    public func updateGameState(_ updateBlock: (inout GameState) -> Void) {
+        updateBlock(&gameState)
+    }
+
+    /// Updates the player's current location and triggers the onEnterRoom hook.
+    public func changePlayerLocation(to locationID: LocationID) async {
+        guard gameState.locations[locationID] != nil else {
+            await ioHandler.print("Error: Attempted to move player to invalid location \(locationID)", style: .debug)
+            return
+        }
+        gameState.player.currentLocationID = locationID
+        // --- Custom Hook: On Enter Room ---
+        await onEnterRoom?(self, locationID)
+        // ----------------------------------
+    }
+
+    /// Sets the flag to end the game loop after the current turn.
+    public func quitGame() {
+        shouldQuit = true
+        // Optionally print a final message immediately or let the loop handle it.
+        // await ioHandler.print("\nGoodbye!") // Can be done here or in run()
     }
 }
 
