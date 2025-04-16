@@ -1,14 +1,13 @@
 import CustomDump
 import Testing
-import Foundation // Needed for NSObject
 
 @testable import GnustoEngine
 
 // Helper class for sharing state with closures in tests
 @MainActor // Ensure properties accessed on main actor
-private class TestStateHolder: NSObject {
-    @objc dynamic var flag: Bool = false
-    @objc dynamic var count: Int = 0
+private class TestStateHolder {
+    var flag = false
+    var count = 0
 }
 
 @Suite("GameEngine Tests")
