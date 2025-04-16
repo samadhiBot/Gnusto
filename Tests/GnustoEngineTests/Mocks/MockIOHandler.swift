@@ -102,15 +102,11 @@ final class MockIOHandler: IOHandler {
     func getSetupCallCount() async -> Int { return setupCallCount }
     func getTeardownCallCount() async -> Int { return teardownCallCount }
 
-    func getTranscript() async -> String {
+    func flush() async -> String {
         var commandIndex = 0
         var actualTranscript = ""
         for call in recordedOutput {
             if call.style == .input && call.text == "> " && !call.newline {
-                // Start prompt line
-                if !actualTranscript.isEmpty && !actualTranscript.hasSuffix("\n") {
-                    actualTranscript += "\n" // Ensure newline before prompt if needed
-                }
                 actualTranscript += ">"
                 if commandIndex < inputQueue.count {
                     if let command = inputQueue[commandIndex] {
@@ -118,18 +114,15 @@ final class MockIOHandler: IOHandler {
                     }
                     commandIndex += 1
                 }
-                actualTranscript += "\n" // Always add one newline after prompt line
+                actualTranscript += "\n" // Original newline logic
             } else if call.style != .input {
-                // Start output line
-                 if !actualTranscript.isEmpty && !actualTranscript.hasSuffix("\n") {
-                    actualTranscript += "\n" // Ensure newline before output if needed
+                actualTranscript += call.text
+                if call.newline { // Original newline logic
+                    actualTranscript += "\n"
                 }
-                actualTranscript += call.text // Add the text
-                actualTranscript += "\n" // Always add one newline after output line, regardless of call.newline
             }
         }
 
-        // Remove leading/trailing whitespace/newlines only
         return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

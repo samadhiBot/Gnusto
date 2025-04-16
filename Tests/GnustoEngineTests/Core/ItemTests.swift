@@ -59,7 +59,6 @@ struct ItemTests {
     @Test("Item Custom Initialization")
     func testItemCustomInitialization() throws {
         let item = createCustomItem()
-        let keyID: ItemID = "key"
 
         #expect(item.id == "customItem")
         #expect(item.name == "lantern")

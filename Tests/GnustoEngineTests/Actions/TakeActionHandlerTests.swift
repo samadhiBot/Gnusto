@@ -54,8 +54,8 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." }, "Expected 'Taken.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.", "Expected 'Taken.' message")
     }
 
     @Test("Take item fails when already held")
@@ -92,8 +92,8 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .player, "Item should still be held by player")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "You already have that." }, "Expected 'You already have that.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You already have that.")
     }
 
     @Test("Take item fails when not present in location")
@@ -130,8 +130,8 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .nowhere, "Item should still be nowhere")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "You don't see the brass key here." }, "Expected 'You don't see the... here.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You don't see any brass key here.")
     }
 
     @Test("Take item fails when not takable")
@@ -168,7 +168,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .location(testData.location.id), "Item should still be in the room")
 
         // Assert: Check NO message was printed by the handler (error is caught by engine)
-        let output = await mockIO.recordedOutput
+        let output = await mockIO.flush()
         #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
@@ -198,11 +198,8 @@ struct TakeActionHandlerTests {
 
         // Assert
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Take what?" }, "Expected 'Take what?' message")
-
-        // Assert: Check no other output occurred
-        #expect(output.count == 1, "Only the 'Take what?' message should be printed")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Take what?")
     }
 
     @Test("Take item successfully from open container in room")
@@ -248,8 +245,8 @@ struct TakeActionHandlerTests {
         #expect(finalContainerState?.hasProperty(.open) == true)
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." }, "Expected 'Taken.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.")
     }
 
     @Test("Take item successfully from open container held by player")
@@ -295,8 +292,8 @@ struct TakeActionHandlerTests {
         #expect(finalContainerState?.hasProperty(.open) == true)
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." }, "Expected 'Taken.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.")
     }
 
     @Test("Take item fails from closed container")
@@ -336,7 +333,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .item("box"), "Item should still be in the box")
 
         // Assert: Check NO message was printed by the handler
-        let output = await mockIO.recordedOutput
+        let output = await mockIO.flush()
         #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
@@ -424,7 +421,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .location(testData.location.id), "Shield should still be in the room")
 
         // Assert: Check NO message was printed by the handler
-        let output = await mockIO.recordedOutput
+        let output = await mockIO.flush()
         #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
@@ -467,8 +464,8 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property after just taking")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." }, "Expected 'Taken.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.")
     }
 
     // Add more tests here for failure cases...

@@ -75,7 +75,7 @@ public struct TakeActionHandler: ActionHandler {
 
         guard isReachable else {
             // This message should now only trigger if the item (or its parent) is truly out of scope
-            await engine.ioHandler.print("You don't see the \(targetItem.name) here.")
+            await engine.ioHandler.print("You don't see any \(targetItem.name) here.")
             return // Not an error, just out of scope
         }
 

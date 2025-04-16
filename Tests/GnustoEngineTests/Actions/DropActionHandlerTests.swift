@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("DropActionHandler Tests")
@@ -54,8 +56,8 @@ struct DropActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Dropped." }, "Expected 'Dropped.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Dropped.")
     }
 
     @Test("Drop fails with no direct object")
@@ -81,9 +83,8 @@ struct DropActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         // Assert
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Drop what?" }, "Expected 'Drop what?' message")
-        #expect(output.count == 1)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Drop what?")
     }
 
     @Test("Drop fails when item not held")
@@ -119,9 +120,8 @@ struct DropActionHandlerTests {
         #expect(finalItemState?.parent == .location(testData.location.id), "Item should still be in the room")
 
         // Assert: Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "You aren't holding that." }, "Expected 'You aren't holding that.' message")
-        #expect(output.count == 1)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You aren't holding that.")
     }
 
     @Test("Drop worn item successfully removes worn property")
@@ -164,8 +164,8 @@ struct DropActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Dropped." }, "Expected 'Dropped.' message")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Dropped.")
     }
 
     // Add more tests here...

@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("GoActionHandler Tests")
@@ -30,8 +32,18 @@ struct GoActionHandlerTests {
     @MainActor
     func testGoSuccessfullyChangesLocation() async throws {
         // Arrange: Create two locations with an exit connecting them
-        let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
-        let loc2 = Location(id: "end", name: "End Room", description: "You went there.")
+        let loc1 = Location(
+            id: "start",
+            name: "Start Room",
+            description: "You are here.",
+            properties: [.inherentlyLit]
+        )
+        let loc2 = Location(
+            id: "end",
+            name: "End Room",
+            description: "You went there.",
+            properties: [.inherentlyLit]
+        )
         loc1.exits[.north] = Exit(destination: "end")
 
         let testData = Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
@@ -59,9 +71,13 @@ struct GoActionHandlerTests {
         let finalPlayerLocation = engine.playerLocationID()
         #expect(finalPlayerLocation == "end", "Player should be in the end room")
 
-        // Check new location was described (implicitly checked by GameEngine loop, but good to verify here)
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text.contains("End Room") }, "Expected description of End Room")
+        // Check new location was described
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            --- End Room ---
+            You went there.
+            """
+        )
     }
 
     @Test("Go fails for invalid direction")

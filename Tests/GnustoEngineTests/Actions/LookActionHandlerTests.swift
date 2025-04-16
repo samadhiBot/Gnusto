@@ -1,5 +1,6 @@
 import Testing
 import CustomDump
+
 @testable import GnustoEngine
 
 @Suite("LookActionHandler Tests")
@@ -15,7 +16,7 @@ struct LookActionHandlerTests {
         itemToExamine: Item? = nil // For LOOK AT tests
     ) async -> (GameEngine, MockIOHandler) {
         let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: locationProperties)
-        var player = Player(currentLocationID: location.id)
+        let player = Player(currentLocationID: location.id)
 
         var allItems: [Item.ID: Item] = [:]
         for item in itemsInLocation {
@@ -66,13 +67,15 @@ struct LookActionHandlerTests {
 
         try await handler.perform(command: command, engine: engine)
 
-        let output = await mockIO.recordedOutput
-        #expect(output.count == 3) // Name, Description, "You can see:" + 2 items? No, list is separate
-        #expect(output.contains { $0.text.contains("--- Test Room ---") })
-        #expect(output.contains { $0.text == "A basic room." })
-        #expect(output.contains { $0.text == "You can see:" })
-        #expect(output.contains { $0.text.contains("A shiny widget") })
-        #expect(output.contains { $0.text.contains("A blue gizmo") })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            --- Test Room ---
+            A basic room.
+            You can see:
+              A shiny widget
+              A blue gizmo
+            """
+        )
     }
 
     @Test("LOOK in dark room prints darkness message")
@@ -84,9 +87,8 @@ struct LookActionHandlerTests {
 
         try await handler.perform(command: command, engine: engine)
 
-        let output = await mockIO.recordedOutput
-        #expect(output.count == 1)
-        #expect(output.first?.text == "It is pitch black. You are likely to be eaten by a grue.")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "It is pitch black. You are likely to be eaten by a grue.")
     }
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
@@ -99,11 +101,14 @@ struct LookActionHandlerTests {
 
         try await handler.perform(command: command, engine: engine)
 
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text.contains("--- Test Room ---") })
-        #expect(output.contains { $0.text == "A basic room." })
-        #expect(output.contains { $0.text == "You can see:" })
-        #expect(output.contains { $0.text.contains("A shiny widget") })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            --- Test Room ---
+            A basic room.
+            You can see:
+              A shiny widget
+            """
+        )
     }
 
     // --- LOOK AT (item) Tests (Less affected by scope changes for now) ---
@@ -117,9 +122,8 @@ struct LookActionHandlerTests {
 
         try await handler.perform(command: command, engine: engine)
 
-        let output = await mockIO.recordedOutput
-        #expect(output.count == 1)
-        #expect(output.first?.text == "It looks like a rock.")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "It looks like a rock.")
     }
 
     @Test("LOOK AT item with no description shows default message")
@@ -131,9 +135,8 @@ struct LookActionHandlerTests {
 
         try await handler.perform(command: command, engine: engine)
 
-        let output = await mockIO.recordedOutput
-        #expect(output.count == 1)
-        #expect(output.first?.text == "You see nothing special about the small pebble.")
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You see nothing special about the small pebble.")
     }
 
     // TODO: Add tests for LOOK AT container (open/closed/transparent) and surface - currently handled in handler, maybe move to engine?

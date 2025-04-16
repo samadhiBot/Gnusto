@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("GameEngine Tests")
@@ -53,10 +55,12 @@ struct GameEngineTests {
         #expect(setupCount == 1)
 
         // Verify initial location description was printed
-        let output = await mockIOHandler.recordedOutput
-        #expect(output.count >= 3) // Should have Room Name, Desc, Prompt
-        #expect(output.contains { $0.text.contains("Void") && $0.style == .strong })
-        #expect(output.contains { $0.text == "An empty void." && $0.style == .normal })
+        let output = await mockIOHandler.flush()
+        expectNoDifference(output, """
+            It is pitch black. You are likely to be eaten by a grue.
+            > quit
+            """)
+
         // TODO: Check for item listing once implemented in describeCurrentLocation
 
         // Verify status line was shown before prompt
@@ -65,11 +69,6 @@ struct GameEngineTests {
         #expect(statuses.first?.roomName == "Void")
         #expect(statuses.first?.score == 0)
         #expect(statuses.first?.turns == 0) // Turn counter not incremented yet
-
-        // Verify the first prompt was printed
-        #expect(output.last?.text == "> ")
-        #expect(output.last?.newline == false)
-        #expect(output.last?.style == .input)
 
         // Verify teardown was called
         let teardownCount = await mockIOHandler.teardownCallCount
@@ -384,13 +383,12 @@ struct GameEngineTests {
         #expect(teardownCount == 1, "Teardown should be called even on nil input")
 
         // Verify initial output occurred (room desc, status, prompt)
-        let output = await mockIOHandler.recordedOutput
-        #expect(output.count >= 3) // Should have Room Name, Desc, Prompt
-        #expect(output.contains { $0.text.contains("Void") && $0.style == .strong })
-        #expect(output.contains { $0.text == "An empty void." && $0.style == .normal })
-        // Check for the "Goodbye!" message as the final output on EOF
-        #expect(output.last?.text == "\nGoodbye!", "Expected Goodbye message on nil input")
-        #expect(output.last?.style == .normal)
+        let output = await mockIOHandler.flush()
+        expectNoDifference(output, """
+            It is pitch black. You are likely to be eaten by a grue.
+            >
+            Goodbye!
+            """)
 
         // Check status line was shown only for the initial state
         let statuses = await mockIOHandler.recordedStatusLines

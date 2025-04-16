@@ -42,7 +42,7 @@ struct CloakOfDarknessWalkthroughTests {
         await engine.run()
 
         // 5. Get Recorded Output and format into a transcript
-        let actualTranscript = await mockIO.getTranscript()
+        let actualTranscript = await mockIO.flush()
 
         // 6. Assert Transcript Matches (No changes expected here as Foyer/Cloakroom are lit)
         expectNoDifference(actualTranscript, """
@@ -105,7 +105,7 @@ struct CloakOfDarknessWalkthroughTests {
         await engine.run()
 
         // 5. Get Transcript
-        let actualTranscript = await mockIO.getTranscript()
+        let actualTranscript = await mockIO.flush()
 
         // 6. Assert Win Message and darkness handling
         expectNoDifference(actualTranscript, """

@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 @Suite("InventoryActionHandler Tests")
@@ -42,12 +44,13 @@ struct InventoryActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         // Assert
-        let output = await mockIO.recordedOutput
-        // Check for header and each item (order might vary)
-        #expect(output.contains { $0.text == "You are carrying:" })
-        #expect(output.contains { $0.text == "  A brass key" })
-        #expect(output.contains { $0.text == "  A brass lamp" })
-        #expect(output.count == 3) // Header + 2 items
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You are carrying:
+              A brass lamp
+              A brass key
+            """
+        )
     }
 
     @Test("Inventory shows empty message")
@@ -74,8 +77,7 @@ struct InventoryActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         // Assert
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "You are empty-handed." })
-        #expect(output.count == 1)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You are empty-handed.")
     }
 }

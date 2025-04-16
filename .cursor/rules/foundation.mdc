@@ -52,3 +52,16 @@ let cloakroom = Location(
     ]
 )
 ```
+
+Testing Game Output:
+
+```swift
+// Wrong:
+let output = await mockIO.recordedOutput
+#expect(output.contains { $0.text == "You can't take things out of the stone statue." }, "Expected non-container message")
+#expect(output.count == 1)
+
+// Right:
+let output = await mockIO.flush()  // 💡 Use `flush()` rather than `output.contains` and `output.count`
+expectNoDifference(output, "You can't take things out of the stone statue.")
+```

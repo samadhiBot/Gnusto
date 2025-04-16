@@ -87,7 +87,7 @@ public struct ScopeResolver: Sendable {
     /// - Returns: A Set of IDs for items reachable by the player.
     public func itemsReachableByPlayer(gameState: GameState) -> Set<Item.ID> {
         var reachableItems = Set<Item.ID>()
-        var queue: [ParentEntity] = [.player, .location(gameState.player.currentLocationID)]
+        // var queue: [ParentEntity] = [.player, .location(gameState.player.currentLocationID)]
         var processedContainers = Set<ItemID>() // Prevent infinite loops with nested containers
 
         // Add initially reachable items (inventory)

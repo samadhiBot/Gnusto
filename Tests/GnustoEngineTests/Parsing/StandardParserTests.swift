@@ -573,7 +573,7 @@ struct StandardParserTests {
     func testDirectInventoryPreferredOverContainer() throws {
         // Create a temporary state where 'key' is both directly held AND inside the open 'backpack'
         var tempGameState = gameState
-        guard let keyItem = tempGameState.items["key"], let backpackItem = tempGameState.items["backpack"] else {
+        guard let keyItem = tempGameState.items["key"] else {
             Issue.record("Required items (key, backpack) not found in temp game state")
             return
         }

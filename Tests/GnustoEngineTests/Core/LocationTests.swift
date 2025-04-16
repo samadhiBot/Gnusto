@@ -48,7 +48,6 @@ struct LocationTests {
     @Test("Location Custom Initialization")
     func testLocationCustomInitialization() throws {
         let location = createCustomLocation()
-        let leafletID: ItemID = "leaflet"
         let rugID: ItemID = "rug"
 
         #expect(location.id == "livingRoom")
