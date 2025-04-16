@@ -2,24 +2,23 @@
 public enum LocationProperty: String, Codable, CaseIterable, Sendable {
     // Alphabetized cases based on common IF needs and ZIL flags
 
-    /// The location is currently illuminated.
-    case lit = "lit"
+    /// The location is inherently lit (like outdoors, or a room with windows).
+    /// Corresponds to ZIL's RLIGHTBIT.
+    /// Rooms without this property are dark unless a light source is present.
+    case inherentlyLit
 
     /// Magic does not function in this location.
-    case noMagic = "noMagic"
+    case noMagic
 
     /// The location is considered outdoors.
-    case outside = "outside"
+    case outside
 
     /// Profanity is discouraged or disallowed here.
-    case sacred = "sacred"
+    case sacred
 
     /// The player has visited this location previously.
-    case visited = "visited"
+    case visited
 
     /// The location contains or is primarily composed of water.
-    case water = "water"
-
-    /// The location is dark unless player has light.
-    case dark = "dark"
+    case water
 }

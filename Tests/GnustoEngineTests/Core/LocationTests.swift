@@ -26,7 +26,7 @@ struct LocationTests {
             name: "Living Room",
             description: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
-            properties: [.lit, .sacred],
+            properties: [.inherentlyLit, .sacred],
             globals: ["rug", "fireplace"]
         )
     }
@@ -57,7 +57,7 @@ struct LocationTests {
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
         #expect(location.exits[.east]?.blockedMessage == "A solid wall blocks your path.")
-        #expect(location.properties == [.lit, .sacred])
+        #expect(location.properties == [.inherentlyLit, .sacred])
         #expect(location.globals.count == 2)
         #expect(location.globals.contains(rugID))
     }
@@ -66,25 +66,25 @@ struct LocationTests {
     func testLocationPropertyManagement() throws {
         let location = createDefaultLocation()
 
-        #expect(!location.hasProperty(.lit))
+        #expect(!location.hasProperty(.inherentlyLit))
 
-        location.addProperty(.lit)
-        #expect(location.hasProperty(.lit))
+        location.addProperty(.inherentlyLit)
+        #expect(location.hasProperty(.inherentlyLit))
         #expect(location.properties.count == 1)
 
-        location.addProperty(.lit) // Adding again should have no effect
+        location.addProperty(.inherentlyLit) // Adding again should have no effect
         #expect(location.properties.count == 1)
 
         location.addProperty(.outside)
         #expect(location.hasProperty(.outside))
         #expect(location.properties.count == 2)
 
-        location.removeProperty(.lit)
-        #expect(!location.hasProperty(.lit))
+        location.removeProperty(.inherentlyLit)
+        #expect(!location.hasProperty(.inherentlyLit))
         #expect(location.hasProperty(.outside))
         #expect(location.properties.count == 1)
 
-        location.removeProperty(.lit) // Removing again should have no effect
+        location.removeProperty(.inherentlyLit) // Removing again should have no effect
         #expect(location.properties.count == 1)
 
         location.removeProperty(.outside)

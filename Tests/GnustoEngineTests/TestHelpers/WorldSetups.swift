@@ -132,9 +132,9 @@ struct WorldSetups {
             // Use the engine's mutator for state changes
             engine.updateGameState { state in
                 if cloakIsWorn {
-                    state.locations[LocationID("bar")]?.removeProperty(.lit)
+                    state.locations[LocationID("bar")]?.removeProperty(.inherentlyLit)
                 } else {
-                    state.locations[LocationID("bar")]?.addProperty(.lit)
+                    state.locations[LocationID("bar")]?.addProperty(.inherentlyLit)
                 }
             }
         }
@@ -143,7 +143,7 @@ struct WorldSetups {
             let currentState = engine.getCurrentGameState()
             guard currentState.player.currentLocationID == LocationID("bar") else { return }
 
-            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.lit) ?? false
+            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.inherentlyLit) ?? false
 
             if !barIsLit {
                 // ZIL logic: Only print the darkness message here.
