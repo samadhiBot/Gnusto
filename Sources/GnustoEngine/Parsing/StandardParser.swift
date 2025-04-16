@@ -31,7 +31,10 @@ public struct StandardParser: Parser {
         let significantTokens = removeNoise(tokens: tokens, noiseWords: vocabulary.noiseWords)
 
         // 3. Handle Single-Word Direction Command (e.g., "NORTH", "N")
-        if significantTokens.count == 1, let directionWord = significantTokens.first, let direction = vocabulary.directions[directionWord] {
+        if significantTokens.count == 1,
+           let directionWord = significantTokens.first,
+           let direction = vocabulary.directions[directionWord]
+        {
             // Assume a default movement verb like 'go'
             // TODO: Make the default movement verb configurable or a constant
             let defaultGoVerbID = VerbID("go") // Placeholder

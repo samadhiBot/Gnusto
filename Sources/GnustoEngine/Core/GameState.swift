@@ -92,7 +92,16 @@ public struct GameState: Codable {
 
     /// Internal initializer for Codable and factory method.
     /// Keeping this internal, use the static `initial` factory externally.
-    init(locations: [LocationID: Location], items: [ItemID: Item], player: Player, flags: [String: Bool] = [:], pronouns: [String: Set<ItemID>] = [:], vocabulary: Vocabulary, activeFuses: [Fuse.ID: Int] = [:], gameSpecificState: [String: AnyCodable]? = nil) {
+    init(
+        locations: [LocationID: Location],
+        items: [ItemID: Item],
+        player: Player,
+        flags: [String: Bool] = [:],
+        pronouns: [String: Set<ItemID>] = [:],
+        vocabulary: Vocabulary,
+        activeFuses: [Fuse.ID: Int] = [:],
+        gameSpecificState: [String: AnyCodable]? = nil
+    ) {
         self.locations = locations
         self.items = items
         self.player = player

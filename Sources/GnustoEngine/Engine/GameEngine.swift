@@ -516,7 +516,13 @@ public class GameEngine {
     /// **Testing Only:** Adds an item directly to the game state's item dictionary using its constituent data.
     /// Use with caution, primarily for setting up test scenarios.
     /// Creates the item within the actor's context.
-    internal func debugAddItem(id: ItemID, name: String, properties: Set<ItemProperty> = [], size: Int = 5, parent: ParentEntity = .nowhere) {
+    internal func debugAddItem(
+        id: ItemID,
+        name: String,
+        properties: Set<ItemProperty> = [],
+        size: Int = 5,
+        parent: ParentEntity = .nowhere
+    ) {
         let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent)
         gameState.items[newItem.id] = newItem
     }

@@ -13,8 +13,10 @@ public struct RemoveActionHandler: ActionHandler {
         }
 
         // 2. Check if the item is held by the player
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID),
-              targetItem.parent == .player else {
+        guard
+            let targetItem = await engine.itemSnapshot(with: targetItemID),
+            targetItem.parent == .player
+        else {
             // If item doesn't exist OR isn't held, throw itemNotHeld
             throw ActionError.itemNotHeld(targetItemID)
         }

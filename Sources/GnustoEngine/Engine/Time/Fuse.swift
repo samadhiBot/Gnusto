@@ -24,7 +24,11 @@ public struct Fuse: Identifiable {
     ///   - turns: The number of turns before the fuse triggers.
     ///   - action: The closure to execute when the fuse triggers.
     @MainActor
-    public init(id: ID, turns: Int, action: @escaping @MainActor (GameEngine) async -> Void) {
+    public init(
+        id: ID,
+        turns: Int,
+        action: @escaping @MainActor (GameEngine) async -> Void
+    ) {
         precondition(turns > 0, "Fuse must have a positive duration.")
         self.id = id
         self.turnsRemaining = turns

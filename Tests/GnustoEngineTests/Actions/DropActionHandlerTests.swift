@@ -38,7 +38,12 @@ struct DropActionHandlerTests {
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
 
         // Arrange: Add item and place it with the player
-        engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .player)
+        engine.debugAddItem(
+            id: testItem.id,
+            name: testItem.name,
+            properties: testItem.properties,
+            parent: .player
+        )
         #expect(engine.itemSnapshot(with: "key")?.parent == .player) // Verify setup
 
         let handler = DropActionHandler()

@@ -1,0 +1,101 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Style Guide
+
+- Break up multiline strings with heredocs and backslashes:
+
+```swift
+// Wrong:
+let cloakroom = Location(
+    id: "cloakroom",
+    name: "Cloakroom",
+    description: "The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.",
+    exits: [
+        .east: Exit(destination: "foyer")
+    ]
+)
+
+// Right:
+let cloakroom = Location(
+    id: "cloakroom",
+    name: "Cloakroom",
+    // 💡 Break up long text before the 100th column
+    description: """
+        The walls of this small room were clearly once lined with hooks, though now only one \
+        remains. The exit is a door to the east.
+        """,
+    exits: [
+        // 💡 Use trailing commas in lists
+        .east: Exit(destination: "foyer"),
+    ]
+)
+```
+
+- Two or more arguments should usually go on multiple lines when defining and calling
+
+```swift
+// Wrong:
+init(id: ID, turns: Int, action: @escaping @MainActor (GameEngine) async -> Void) {...}
+
+func debugAddItem(id: ItemID, name: String, properties: Set<ItemProperty> = [], size: Int = 5, parent: ParentEntity = .nowhere) {...}
+
+engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .player)
+
+// Right:
+init(
+    id: ID,
+    turns: Int,
+    action: @escaping @MainActor (GameEngine) async -> Void
+) {...}
+
+func debugAddItem(
+    id: ItemID,
+    name: String,
+    properties: Set<ItemProperty> = [],
+    size: Int = 5,
+    parent: ParentEntity = .nowhere
+) {...}
+
+engine.debugAddItem(
+    id: testItem.id,
+    name: testItem.name,
+    properties: testItem.properties,
+    parent: .player
+)
+
+// 💡 Exception for short two-argument method signatures
+func print(_ text: String, style: TextStyle)
+
+// 💡 Exception for unnamed parameters, when call still fits on one line
+ioHandler.ioHandler.print("You are likely to be eaten by a grue.", style: .normal)
+```
+
+- Multi-condition if's and guards
+
+```swift
+// Wrong:
+if significantTokens.count == 1, let directionWord = significantTokens.first, let direction = vocabulary.directions[directionWord] {...}
+
+guard let targetItem = await engine.itemSnapshot(with: targetItemID),
+      targetItem.parent == .player else {...}
+
+// Right:
+if significantTokens.count == 1,
+   let directionWord = significantTokens.first,
+   let direction = vocabulary.directions[directionWord]
+{
+    ...
+}
+
+guard
+    let targetItem = await engine.itemSnapshot(with: targetItemID),
+    targetItem.parent == .player
+else {
+    ...
+}
+
+guard let targetItemID = command.directObject else {...}
+```
