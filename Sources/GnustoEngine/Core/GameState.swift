@@ -63,6 +63,9 @@ public struct GameState: Codable {
     /// Active fuses and their remaining turns.
     public var activeFuses: [Fuse.ID: Int]
 
+    /// Set tracking the IDs of currently active daemons.
+    public var activeDaemons: Set<DaemonID>
+
     /// Current value of global variables or flags (e.g., [FlagID: FlagValue]).
     /// Using String for key flexibility, might refine later (e.g., `FlagID` type).
     public var flags: [String: Bool]
@@ -100,6 +103,7 @@ public struct GameState: Codable {
         pronouns: [String: Set<ItemID>] = [:],
         vocabulary: Vocabulary,
         activeFuses: [Fuse.ID: Int] = [:],
+        activeDaemons: Set<DaemonID> = [],
         gameSpecificState: [String: AnyCodable]? = nil
     ) {
         self.locations = locations
@@ -109,6 +113,7 @@ public struct GameState: Codable {
         self.pronouns = pronouns
         self.vocabulary = vocabulary
         self.activeFuses = activeFuses
+        self.activeDaemons = activeDaemons
         self.gameSpecificState = gameSpecificState
     }
 
@@ -125,6 +130,7 @@ public struct GameState: Codable {
     ///   - flags: Optional initial game flags.
     ///   - pronouns: Optional initial pronoun states.
     ///   - initialActiveFuses: Optional initial active fuses.
+    ///   - initialActiveDaemons: Optional initial active daemons.
     ///   - gameSpecificState: Optional initial game-specific state data.
     /// - Returns: A new `GameState` instance.
     public static func initial(
@@ -138,6 +144,7 @@ public struct GameState: Codable {
         flags: [String: Bool] = [:],
         pronouns: [String: Set<ItemID>] = [:],
         initialActiveFuses: [Fuse.ID: Int] = [:],
+        initialActiveDaemons: Set<DaemonID> = [],
         gameSpecificState: [String: AnyCodable]? = nil) -> GameState
     {
         let locationDict = Dictionary(uniqueKeysWithValues: initialLocations.map { ($0.id, $0) })
@@ -160,7 +167,7 @@ public struct GameState: Codable {
             }
         }
 
-        return GameState(locations: locationDict, items: itemDict, player: initialPlayer, flags: flags, pronouns: pronouns, vocabulary: vocabulary, activeFuses: initialActiveFuses, gameSpecificState: gameSpecificState)
+        return GameState(locations: locationDict, items: itemDict, player: initialPlayer, flags: flags, pronouns: pronouns, vocabulary: vocabulary, activeFuses: initialActiveFuses, activeDaemons: initialActiveDaemons, gameSpecificState: gameSpecificState)
     }
 
     // --- Codable Conformance ---
@@ -168,6 +175,7 @@ public struct GameState: Codable {
 
     enum CodingKeys: String, CodingKey {
         case activeFuses
+        case activeDaemons
         case flags
         case items // Store items as an array for simpler encoding/decoding
         case locations // Store locations as an array
@@ -182,6 +190,7 @@ public struct GameState: Codable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
 
         activeFuses = try container.decodeIfPresent([Fuse.ID: Int].self, forKey: .activeFuses) ?? [:]
+        activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []
         flags = try container.decode([String: Bool].self, forKey: .flags)
         player = try container.decode(Player.self, forKey: .player)
         pronouns = try container.decode([String: Set<ItemID>].self, forKey: .pronouns)
@@ -204,6 +213,7 @@ public struct GameState: Codable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(activeFuses, forKey: .activeFuses)
+        try container.encode(activeDaemons, forKey: .activeDaemons)
         try container.encode(flags, forKey: .flags)
         try container.encode(player, forKey: .player)
         try container.encode(pronouns, forKey: .pronouns)

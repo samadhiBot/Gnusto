@@ -45,9 +45,8 @@ struct GameEngineTests {
     // Helper to create a minimal registry for tests
     // Make static as it doesn't depend on instance state
     @MainActor // Needed because FuseDefinition init is @MainActor
-    static func createMinimalRegistry(fuseDefs: [FuseDefinition] = [], daemonDefs: [Daemon] = []) -> GameDefinitionRegistry {
-        // TODO: Add daemon definitions when DaemonDefinition exists
-        return GameDefinitionRegistry(fuseDefinitions: fuseDefs)
+    static func createMinimalRegistry(fuseDefs: [FuseDefinition] = [], daemonDefs: [DaemonDefinition] = []) -> GameDefinitionRegistry {
+        return GameDefinitionRegistry(fuseDefinitions: fuseDefs, daemonDefinitions: daemonDefs) // Add daemonDefs
     }
 
     @Test("Engine Run Initialization and First Prompt in Dark Room")
@@ -579,16 +578,29 @@ struct GameEngineTests {
         let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Registry needed, but no fuse defs
 
-        // Arrange: Define and register the daemon
+        // Arrange: Define the daemon definition
         let stateHolder = TestStateHolder()
-        let testDaemon = Daemon(id: "testDaemon", frequency: 3) { _ in
+        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in // Use DaemonDefinition
             await mockIOHandler.print("Daemon ran!")
             stateHolder.count += 1
         }
-        // Daemons are typically registered, not loaded from state, but pass registry to engine init
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry, initialDaemons: [testDaemon])
+
+        // Pass definition to registry
+        let registry = Self.createMinimalRegistry(daemonDefs: [testDaemonDef])
+
+        // Initialize engine without initialDaemons
+        let engine = GameEngine(
+            initialState: initialState,
+            parser: mockParser,
+            ioHandler: mockIOHandler,
+            registry: registry
+            // Removed initialDaemons: [testDaemon]
+        )
+
+        // Register the daemon dynamically AFTER engine init
+        let registerSuccess = await engine.registerDaemon(id: "testDaemon")
+        #expect(registerSuccess == true, "Daemon registration should succeed")
 
         // Act: Run engine for 7 turns (look x 7, quit)
         let commands = Array(repeating: "look", count: 7) + ["quit"]

@@ -28,10 +28,7 @@ public class GameEngine {
     private var actionHandlers: [VerbID: ActionHandler]
 
     /// Active timed events (Fuses) - Runtime storage with closures.
-    private var activeFuses: [Fuse.ID: Fuse] // Renamed from gameState.activeFuses
-
-    /// Registered background routines (Daemons).
-    private var registeredDaemons: [Daemon.ID: Daemon]
+    private var activeFuses: [FuseID: Fuse] // Use FuseID type alias
 
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
@@ -64,7 +61,6 @@ public class GameEngine {
     ///   - scopeResolver: The resolver for scope checks (defaults to a new instance).
     ///   - registry: The game definition registry to use.
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
-    ///   - initialDaemons: Optional array of initial daemons to add to the registeredDaemons dictionary.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
     ///   - onExamineItem: Optional closure for custom logic when examining an item.
@@ -75,7 +71,6 @@ public class GameEngine {
         scopeResolver: ScopeResolver = ScopeResolver(),
         registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
-        initialDaemons: [Daemon] = [],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
         beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
         onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
@@ -86,7 +81,6 @@ public class GameEngine {
         self.scopeResolver = scopeResolver
         self.registry = registry
         self.actionHandlers = customHandlers
-        self.registeredDaemons = Dictionary(uniqueKeysWithValues: initialDaemons.map { ($0.id, $0) })
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
         self.onExamineItem = onExamineItem
@@ -128,11 +122,11 @@ public class GameEngine {
     /// Adds or updates a fuse based on its definition in the registry.
     /// If a fuse with the same ID already exists, its timer is reset using the provided or default turns.
     /// - Parameters:
-    ///   - id: The `Fuse.ID` of the fuse to add or update.
+    ///   - id: The `FuseID` of the fuse to add or update.
     ///   - overrideTurns: Optional number of turns to set for the fuse. If `nil`, the default turns from the `FuseDefinition` are used.
     /// - Returns: `true` if the fuse was successfully added or updated, `false` if no definition was found for the ID.
     @discardableResult
-    public func addFuse(id: Fuse.ID, overrideTurns: Int? = nil) -> Bool {
+    public func addFuse(id: FuseID, overrideTurns: Int? = nil) -> Bool {
         // 1. Find the definition in the registry.
         guard let definition = registry.fuseDefinition(for: id) else {
             // Log warning or error: Attempting to add an undefined fuse.
@@ -157,25 +151,34 @@ public class GameEngine {
     }
 
     /// Removes a fuse by its ID (runtime and persistent state).
-    public func removeFuse(id: Fuse.ID) {
+    public func removeFuse(id: FuseID) {
         // Remove from runtime dictionary
         activeFuses.removeValue(forKey: id)
         // Remove from persistent state in GameState
         gameState.activeFuses.removeValue(forKey: id)
     }
 
-    /// Registers a daemon to be run periodically.
-    /// If a daemon with the same ID already exists, it is replaced.
-    /// - Parameter daemon: The `Daemon` to register.
-    public func registerDaemon(_ daemon: Daemon) {
-        registeredDaemons[daemon.id] = daemon
+    /// Registers a daemon to run periodically by adding its ID to the active set in GameState.
+    /// The daemon must be defined in the registry.
+    /// - Parameter id: The `DaemonID` of the daemon to register.
+    /// - Returns: `true` if the daemon was successfully registered, `false` if no definition was found for the ID.
+    @discardableResult
+    public func registerDaemon(id: DaemonID) -> Bool {
+        // 1. Verify the definition exists in the registry.
+        guard registry.daemonDefinition(for: id) != nil else {
+            print("Warning: No DaemonDefinition found for daemon ID '\(id)'. Cannot register daemon.")
+            return false
+        }
+        // 2. Add the ID to the active set in GameState.
+        gameState.activeDaemons.insert(id)
+        return true
     }
 
-    /// Unregisters a daemon by its ID.
-    /// Does nothing if no daemon with the given ID is registered.
-    /// - Parameter id: The `Daemon.ID` to unregister.
-    public func unregisterDaemon(id: Daemon.ID) {
-        registeredDaemons.removeValue(forKey: id)
+    /// Unregisters a daemon by removing its ID from the active set in GameState.
+    /// Does nothing if no daemon with the given ID is active.
+    /// - Parameter id: The `DaemonID` to unregister.
+    public func unregisterDaemon(id: DaemonID) {
+        gameState.activeDaemons.remove(id)
     }
 
     // MARK: - Game Loop
@@ -244,7 +247,7 @@ public class GameEngine {
         let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
-        var expiredFuseIDs: [Fuse.ID] = []
+        var expiredFuseIDs: [FuseID] = []
         var fusesToExecute: [Fuse] = []
 
         // Create a copy of keys to iterate over, allowing safe modification
@@ -281,11 +284,21 @@ public class GameEngine {
 
         // --- Process Daemons ---
         // Execute daemons whose frequency matches the current turn
-        for daemon in registeredDaemons.values {
-            if (currentTurn + 1) % daemon.frequency == 0 { // Use currentTurn + 1 for modulo check
-                await daemon.action(self)
-                // Check if a daemon action triggered a quit
-                if shouldQuit { return }
+        for daemonID in gameState.activeDaemons {
+            guard let definition = registry.daemonDefinition(for: daemonID) else {
+                print("Warning: Active daemon ID '\(daemonID)' has no definition in the registry. Skipping.")
+                // Consider removing the orphan ID from gameState.activeDaemons here?
+                continue
+            }
+            // Daemons run based on turns completed *before* this one starts.
+            // Turn 0 (start): runs if freq=1
+            // Turn 1: runs if freq=1, 2
+            // Turn 2: runs if freq=1, 3
+            // Turn n: runs if freq divides (n+1)
+            if (currentTurn + 1) % definition.frequency == 0 {
+                await definition.action(self)
+                // Check if the daemon action requested a quit
+                guard !shouldQuit else { return }
             }
         }
     }
