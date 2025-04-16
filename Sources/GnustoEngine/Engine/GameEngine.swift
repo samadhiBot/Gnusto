@@ -24,6 +24,12 @@ public class GameEngine {
     /// Registered handlers for specific verb commands.
     private var actionHandlers: [VerbID: ActionHandler]
 
+    /// Active timed events (Fuses).
+    private var activeFuses: [Fuse.ID: Fuse]
+
+    /// Registered background routines (Daemons).
+    private var registeredDaemons: [Daemon.ID: Daemon]
+
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
 
@@ -54,6 +60,8 @@ public class GameEngine {
     ///   - ioHandler: The I/O handler for player interaction.
     ///   - scopeResolver: The resolver for scope checks (defaults to a new instance).
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
+    ///   - initialFuses: Optional array of initial fuses to add to the activeFuses dictionary.
+    ///   - initialDaemons: Optional array of initial daemons to add to the registeredDaemons dictionary.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
     ///   - onExamineItem: Optional closure for custom logic when examining an item.
@@ -63,6 +71,8 @@ public class GameEngine {
         ioHandler: IOHandler,
         scopeResolver: ScopeResolver = ScopeResolver(),
         customHandlers: [VerbID: ActionHandler] = [:],
+        initialFuses: [Fuse] = [],
+        initialDaemons: [Daemon] = [],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
         beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
         onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
@@ -71,7 +81,9 @@ public class GameEngine {
         self.parser = parser
         self.ioHandler = ioHandler
         self.scopeResolver = scopeResolver
-        self.actionHandlers = customHandlers // Start with custom handlers
+        self.actionHandlers = customHandlers
+        self.activeFuses = Dictionary(uniqueKeysWithValues: initialFuses.map { ($0.id, $0) })
+        self.registeredDaemons = Dictionary(uniqueKeysWithValues: initialDaemons.map { ($0.id, $0) })
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
         self.onExamineItem = onExamineItem
@@ -91,6 +103,36 @@ public class GameEngine {
         ]
         // Merge defaults, keeping custom handlers if they exist
         self.actionHandlers.merge(defaultHandlers) { (custom, _) in custom }
+    }
+
+    // MARK: - Fuse & Daemon Management
+
+    /// Adds or updates a fuse.
+    /// If a fuse with the same ID already exists, it is replaced.
+    /// - Parameter fuse: The `Fuse` to add or update.
+    public func addFuse(_ fuse: Fuse) {
+        activeFuses[fuse.id] = fuse
+    }
+
+    /// Removes a fuse by its ID.
+    /// Does nothing if no fuse with the given ID exists.
+    /// - Parameter id: The `Fuse.ID` to remove.
+    public func removeFuse(id: Fuse.ID) {
+        activeFuses.removeValue(forKey: id)
+    }
+
+    /// Registers a daemon to be run periodically.
+    /// If a daemon with the same ID already exists, it is replaced.
+    /// - Parameter daemon: The `Daemon` to register.
+    public func registerDaemon(_ daemon: Daemon) {
+        registeredDaemons[daemon.id] = daemon
+    }
+
+    /// Unregisters a daemon by its ID.
+    /// Does nothing if no daemon with the given ID is registered.
+    /// - Parameter id: The `Daemon.ID` to unregister.
+    public func unregisterDaemon(id: Daemon.ID) {
+        registeredDaemons.removeValue(forKey: id)
     }
 
     // MARK: - Game Loop
@@ -115,13 +157,17 @@ public class GameEngine {
     private func processTurn() async {
         // --- Custom Hook: Before Turn ---
         await beforeTurn?(self)
-        // Check if the beforeTurn hook requested a quit
         guard !shouldQuit else { return }
         // --------------------------------
 
+        // --- Tick the Clock (Fuses & Daemons) ---
+        await tickClock()
+        guard !shouldQuit else { return } // Clock tick might trigger quit
+        // -----------------------------------------
+
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
-            await ioHandler.print("Goodbye!")
+            await ioHandler.print("\nGoodbye!")
             shouldQuit = true
             return
         }
@@ -133,11 +179,10 @@ public class GameEngine {
         }
 
         // 2. Parse Input
-        // Use the vocabulary stored within the GameState
         let vocabulary = gameState.vocabulary
         let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
 
-        // Increment turn counter (typically happens even if command fails)
+        // Increment turn counter AFTER clock tick and BEFORE command execution
         gameState.player.moves += 1
 
         // 3. Execute Command or Handle Error
@@ -146,6 +191,52 @@ public class GameEngine {
             await execute(command: command)
         case .failure(let error):
             await report(parseError: error)
+        }
+    }
+
+    // MARK: - Clock Tick Logic
+
+    /// Processes fuses and daemons for the current turn.
+    private func tickClock() async {
+        let currentTurn = gameState.player.moves // Turn count before incrementing for this turn
+
+        // --- Process Fuses ---
+        var expiredFuseIDs: [Fuse.ID] = []
+        var fusesToExecute: [Fuse] = []
+
+        // Decrement and identify expired fuses
+        for id in activeFuses.keys {
+            guard activeFuses[id] != nil else { continue } // Ensure fuse wasn't removed during iteration
+
+            activeFuses[id]?.turnsRemaining -= 1
+            if let remaining = activeFuses[id]?.turnsRemaining, remaining <= 0 {
+                expiredFuseIDs.append(id)
+                if let fuse = activeFuses[id] { // Safely unwrap
+                    fusesToExecute.append(fuse)
+                }
+            }
+        }
+
+        // Remove expired fuses *before* executing actions (to prevent re-entry issues)
+        for id in expiredFuseIDs {
+            activeFuses.removeValue(forKey: id)
+        }
+
+        // Execute actions of expired fuses
+        for fuse in fusesToExecute {
+            await fuse.action(self)
+            // Check if a fuse action triggered a quit
+            if shouldQuit { return }
+        }
+
+        // --- Process Daemons ---
+        // Execute daemons whose frequency matches the current turn
+        for daemon in registeredDaemons.values {
+            if (currentTurn + 1) % daemon.frequency == 0 { // Use currentTurn + 1 for modulo check
+                await daemon.action(self)
+                // Check if a daemon action triggered a quit
+                if shouldQuit { return }
+            }
         }
     }
 

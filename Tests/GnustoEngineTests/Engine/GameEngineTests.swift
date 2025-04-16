@@ -1,7 +1,15 @@
 import CustomDump
 import Testing
+import Foundation // Needed for NSObject
 
 @testable import GnustoEngine
+
+// Helper class for sharing state with closures in tests
+@MainActor // Ensure properties accessed on main actor
+private class TestStateHolder: NSObject {
+    @objc dynamic var flag: Bool = false
+    @objc dynamic var count: Int = 0
+}
 
 @Suite("GameEngine Tests")
 struct GameEngineTests {
@@ -387,6 +395,7 @@ struct GameEngineTests {
         expectNoDifference(output, """
             It is pitch black. You are likely to be eaten by a grue.
             >
+
             Goodbye!
             """)
 
@@ -497,17 +506,104 @@ struct GameEngineTests {
         #expect(output.contains { $0.text == "Taken." })
     }
 
-    // Add more tests here for:
-    // - Processing a simple command (e.g., LOOK)
-    // - Processing a command that fails parsing
-    // - Processing a command that fails execution (ActionError)
-    // - Handling EOF/nil from readLine
-    // - Turn counter incrementing
-    // - Score changes (when implemented)
-    // - State persistence between turns
+    // MARK: - Fuse & Daemon Tests
+
+    @Test("Fuse executes after correct number of turns")
+    @MainActor
+    func testFuseExecution() async throws {
+        let initialState = Self.createMinimalGameState()
+        var mockParser = MockParser() // Changed to var
+        let mockIOHandler = await MockIOHandler()
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+
+        // Arrange: Add a fuse that prints a message after 2 turns
+        let stateHolder = TestStateHolder()
+        let testFuse = Fuse(id: "testFuse", turns: 2) { _ in
+            await mockIOHandler.print("Fuse triggered!")
+            stateHolder.flag = true // Use state holder
+        }
+        engine.addFuse(testFuse)
+
+        // Act: Run engine for 3 turns (look, look, quit)
+        await mockIOHandler.enqueueInput("look", "look", "quit")
+        mockParser.parseHandler = { input, _, _ in
+            if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
+            if input == "quit" { return .failure(.emptyInput) } // Let engine handle quit
+            return .failure(.unknownVerb(input))
+        }
+        await engine.run()
+
+        // Assert
+        // Check fuse message was printed
+        let output = await mockIOHandler.recordedOutput
+        #expect(output.contains { $0.text == "Fuse triggered!" }, "Fuse message not found in output")
+
+        // Check fuse action flag was set
+        #expect(stateHolder.flag == true, "Fuse action flag not set") // Check state holder
+
+        // Check turns taken
+        let finalMoves = engine.playerMoves()
+        #expect(finalMoves == 2) // look, look
+
+        // Optional: Check fuse was removed
+    }
+
+    @Test("Daemon executes at correct frequency")
+    @MainActor
+    func testDaemonExecutionFrequency() async throws {
+        let initialState = Self.createMinimalGameState()
+        var mockParser = MockParser() // Changed to var
+        let mockIOHandler = await MockIOHandler()
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+
+        // Arrange: Add a daemon that prints every 3 turns
+        let stateHolder = TestStateHolder()
+        let testDaemon = Daemon(id: "testDaemon", frequency: 3) { _ in
+            await mockIOHandler.print("Daemon ran!")
+            stateHolder.count += 1 // Use state holder
+        }
+        engine.registerDaemon(testDaemon)
+
+        // Act: Run engine for 7 turns (look x 7, quit)
+        let commands = Array(repeating: "look", count: 7) + ["quit"]
+        // Call enqueueInput for each command individually
+        for command in commands {
+            await mockIOHandler.enqueueInput(command)
+        }
+
+        mockParser.parseHandler = { input, _, _ in
+            if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
+            if input == "quit" { return .failure(.emptyInput) } // Let engine handle quit
+            return .failure(.unknownVerb(input))
+        }
+        await engine.run()
+
+        // Assert
+        // Daemons run at start of turn based on (turn + 1) % freq == 0
+        // Turns: 0, 1, 2, 3, 4, 5, 6
+        // Executes at end of turn 2 (before turn 3 starts, turnCount = 2, 2+1=3 % 3 == 0)
+        // Executes at end of turn 5 (before turn 6 starts, turnCount = 5, 5+1=6 % 3 == 0)
+        let expectedDaemonRuns = 2
+
+        // Check daemon message count
+        let output = await mockIOHandler.recordedOutput
+        let daemonMessages = output.filter { $0.text == "Daemon ran!" }
+        #expect(daemonMessages.count == expectedDaemonRuns, "Daemon message count mismatch")
+
+        // Check daemon action counter
+        #expect(stateHolder.count == expectedDaemonRuns, "Daemon action counter mismatch") // Check state holder
+
+        // Check turns taken
+        let finalMoves = engine.playerMoves()
+        #expect(finalMoves == 7)
+    }
+
+    // TODO: Test removeFuse
+    // TODO: Test unregisterDaemon
+    // TODO: Test fuse/daemon actions triggering quit
 }
 
-// Helper extension for OutputCall checks (optional)
+// Helper extension for OutputCall checks (optional) - Moved outside struct
 extension [MockIOHandler.OutputCall] {
     func contains(text: String, style: TextStyle? = nil, newline: Bool? = nil) -> Bool {
         self.contains { call in

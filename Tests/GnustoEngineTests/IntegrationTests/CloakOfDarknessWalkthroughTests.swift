@@ -67,6 +67,7 @@ struct CloakOfDarknessWalkthroughTests {
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             >
+
             Goodbye!
             """
         )
