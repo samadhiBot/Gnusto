@@ -30,7 +30,7 @@ struct CloakOfDarknessWalkthroughTests {
         )
 
         // 3. Setup Engine
-        let engine = GameEngine( // Add await
+        let engine = GameEngine(
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
@@ -48,11 +48,11 @@ struct CloakOfDarknessWalkthroughTests {
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > look
-            
+
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > w
-            
+
             --- Cloakroom ---
             The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
             You can see:
@@ -62,11 +62,11 @@ struct CloakOfDarknessWalkthroughTests {
             > wear cloak
             You put on the cloak.
             > e
-            
+
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > look
-            
+
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             >
