@@ -599,7 +599,7 @@ struct GameEngineTests {
         )
 
         // Register the daemon dynamically AFTER engine init
-        let registerSuccess = await engine.registerDaemon(id: "testDaemon")
+        let registerSuccess = engine.registerDaemon(id: "testDaemon")
         #expect(registerSuccess == true, "Daemon registration should succeed")
 
         // Act: Run engine for 7 turns (look x 7, quit)
