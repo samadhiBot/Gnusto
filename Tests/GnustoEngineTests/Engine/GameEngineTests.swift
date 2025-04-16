@@ -42,13 +42,23 @@ struct GameEngineTests {
         )
     }
 
-    @Test("Engine Run Initialization and First Prompt")
-    func testEngineRunInitialization() async throws {
+    // Helper to create a minimal registry for tests
+    // Make static as it doesn't depend on instance state
+    @MainActor // Needed because FuseDefinition init is @MainActor
+    static func createMinimalRegistry(fuseDefs: [FuseDefinition] = [], daemonDefs: [Daemon] = []) -> GameDefinitionRegistry {
+        // TODO: Add daemon definitions when DaemonDefinition exists
+        return GameDefinitionRegistry(fuseDefinitions: fuseDefs)
+    }
+
+    @Test("Engine Run Initialization and First Prompt in Dark Room")
+    @MainActor
+    func testEngineRunInitializationInDarkRoom() async throws {
         // Arrange - Declare locally
-        let initialState = Self.createMinimalGameState()
+        let initialState = Self.createMinimalGameState() // Creates a dark room
         let mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
-        let engine = await GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
 
         // Configure Mock IO to provide one input then stop
         await mockIOHandler.enqueueInput("quit")
@@ -83,11 +93,13 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Parse Error")
+    @MainActor
     func testEngineHandlesParseError() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
-        var mockParser = MockParser() // Make var to modify default result
+        var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         // Configure parser to always return an error
         let parseError = ParseError.unknownVerb("xyzzy")
@@ -96,7 +108,7 @@ struct GameEngineTests {
         // Configure IO for one failed command then quit
         await mockIOHandler.enqueueInput("xyzzy", "quit")
 
-        let engine = await GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
 
         // Act
         await engine.run()
@@ -114,16 +126,18 @@ struct GameEngineTests {
         #expect(output.contains { $0.text == expectedMessage }, "Expected parse error message not found in output")
 
         // Check turn counter was incremented despite error
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
     }
 
     @Test("Engine Handles Action Error")
+    @MainActor
     func testEngineHandlesActionError() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         // Make pebble non-takable in this test's state
         initialState.items["startItem"]?.properties.remove(.takable)
@@ -144,11 +158,11 @@ struct GameEngineTests {
         let mockTakeHandler = MockActionHandler(errorToThrow: .itemNotTakable("startItem"))
 
         // Create engine with the mock handler
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIOHandler,
-            // Note: The dictionary stores the handler; it's already initialized.
+            registry: registry, // Pass registry
             customHandlers: [VerbID("take"): mockTakeHandler]
         )
 
@@ -177,16 +191,18 @@ struct GameEngineTests {
         #expect(commandReceived?.directObject == "startItem")
 
         // Check turn counter incremented
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
     }
 
     @Test("Engine Processes Successful Command")
+    @MainActor
     func testEngineProcessesSuccessfulCommand() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
 
@@ -201,10 +217,11 @@ struct GameEngineTests {
         let mockLookHandler = MockActionHandler()
 
         // Create engine with the mock handler
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIOHandler,
+            registry: registry, // Pass registry
             customHandlers: [VerbID("look"): mockLookHandler]
         )
 
@@ -227,16 +244,18 @@ struct GameEngineTests {
         #expect(commandReceived?.verbID == "look", "Handler received incorrect verb")
 
         // Check turn counter incremented
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 1, "Turn counter should increment for successful command")
     }
 
     @Test("Engine Processes Multiple Commands")
+    @MainActor
     func testEngineProcessesMultipleCommands() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
         // Let's use the pebble from the minimal state
@@ -257,10 +276,11 @@ struct GameEngineTests {
         let mockTakeHandler = MockActionHandler()
 
         // Create engine
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIOHandler,
+            registry: registry, // Pass registry
             customHandlers: [
                 VerbID("look"): mockLookHandler,
                 VerbID("take"): mockTakeHandler
@@ -293,7 +313,7 @@ struct GameEngineTests {
         #expect(takeCommandReceived?.directObject == "startItem")
 
         // Check turn counter reflects two successful commands
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
 
         // Check status line was updated for each turn (initial + 2 turns)
@@ -305,11 +325,13 @@ struct GameEngineTests {
     }
 
     @Test("Engine Exits Gracefully on Quit Command")
-    func testEngineExitsOnQuitCommand() async throws {
+    @MainActor
+    func testEngineExitsGracefullyOnQuitCommand() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         let quitCommand = Command(verbID: "quit", rawInput: "quit")
 
@@ -323,10 +345,11 @@ struct GameEngineTests {
         let mockQuitHandler = MockActionHandler()
 
         // Create engine
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIOHandler,
+            registry: registry, // Pass registry
             customHandlers: [VerbID("quit"): mockQuitHandler]
         )
 
@@ -349,7 +372,7 @@ struct GameEngineTests {
         // #expect(quitCommandReceived?.verbID == "quit") <-- Removed
 
         // Check turn counter - should NOT increment if quit happens before increment.
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 0, "Turn counter should not increment for the quit command if exit happens first")
 
         // Verify output - only initial description, status, and prompt, then nothing after quit
@@ -369,12 +392,14 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
+    @MainActor
     func testEngineHandlesNilInputGracefully() async throws {
         // Arrange
         let initialState = Self.createMinimalGameState()
-        let mockParser = MockParser() // Parser won't even be called
+        let mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
-        let engine = await GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
 
         // Configure Mock IO to provide NO input, triggering readLine to return nil immediately after the first prompt
         // No need to call enqueueInput
@@ -404,16 +429,18 @@ struct GameEngineTests {
         #expect(statuses.first?.turns == 0)
 
         // Verify no commands were processed (turn counter remains 0)
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 0, "Turn counter should not increment if no input is read")
     }
 
     @Test("Engine State Persists Between Turns (Take -> Inventory)")
+    @MainActor
     func testEngineStatePersistsBetweenTurns() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState() // Has pebble in startRoom
+        let initialState = Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Create registry
 
         // Ensure pebble is initially takable and in the room
         #expect(initialState.items["startItem"]?.hasProperty(.takable) == true)
@@ -450,10 +477,11 @@ struct GameEngineTests {
         // initialState.vocabulary.addVerb(Verb(id: "inventory"))
         // initialState.vocabulary.addVerb(Verb(id: "quit")) // Ensure quit is known
 
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIOHandler,
+            registry: registry, // Pass registry
             customHandlers: [
                 VerbID("take"): mockTakeHandler,
                 VerbID("inventory"): mockInventoryHandler,
@@ -480,17 +508,17 @@ struct GameEngineTests {
         #expect(inventoryHandlerCalled == true, "Inventory handler should be called")
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = await engine.itemSnapshot(with: "startItem")
+        let finalPebbleSnapshot = engine.itemSnapshot(with: "startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = await engine.itemSnapshots(withParent: .player)
+        let finalInventorySnapshots = engine.itemSnapshots(withParent: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = await engine.itemSnapshots(withParent: .location("startRoom"))
+        let finalRoomSnapshots = engine.itemSnapshots(withParent: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
-        let finalMoves = await engine.playerMoves()
+        let finalMoves = engine.playerMoves()
         #expect(finalMoves == 2, "Turn counter should be 2 after take and inventory commands")
 
         // Check status lines were updated
@@ -510,18 +538,23 @@ struct GameEngineTests {
     @Test("Fuse executes after correct number of turns")
     @MainActor
     func testFuseExecution() async throws {
-        let initialState = Self.createMinimalGameState()
-        var mockParser = MockParser() // Changed to var
+        var initialState = Self.createMinimalGameState() // Needs var to modify activeFuses
+        var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
 
-        // Arrange: Add a fuse that prints a message after 2 turns
+        // Arrange: Define the fuse and its action
         let stateHolder = TestStateHolder()
-        let testFuse = Fuse(id: "testFuse", turns: 2) { _ in
+        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { _ in
             await mockIOHandler.print("Fuse triggered!")
-            stateHolder.flag = true // Use state holder
+            stateHolder.flag = true
         }
-        engine.addFuse(testFuse)
+        // Simulate fuse being active in saved state
+        initialState.activeFuses[fuseDef.id] = 2
+
+        // Create registry containing the definition
+        let registry = Self.createMinimalRegistry(fuseDefs: [fuseDef])
+
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry)
 
         // Act: Run engine for 3 turns (look, look, quit)
         await mockIOHandler.enqueueInput("look", "look", "quit")
@@ -533,48 +566,40 @@ struct GameEngineTests {
         await engine.run()
 
         // Assert
-        // Check fuse message was printed
-        let output = await mockIOHandler.recordedOutput
-        #expect(output.contains { $0.text == "Fuse triggered!" }, "Fuse message not found in output")
-
-        // Check fuse action flag was set
-        #expect(stateHolder.flag == true, "Fuse action flag not set") // Check state holder
-
-        // Check turns taken
-        let finalMoves = engine.playerMoves()
-        #expect(finalMoves == 2) // look, look
-
-        // Optional: Check fuse was removed
+        let output = await mockIOHandler.recordedOutput // Fetch output before assertions
+        #expect(output.contains { $0.text == "Fuse triggered!" }, "Fuse message not found in output") // Check message
+        #expect(stateHolder.flag == true, "Fuse action flag not set") // Check state holder flag
+        #expect(engine.playerMoves() == 2) // Check turns
+        #expect(engine.getCurrentGameState().activeFuses[fuseDef.id] == nil, "Fuse state should be removed after execution") // Check persistent state
     }
 
     @Test("Daemon executes at correct frequency")
     @MainActor
     func testDaemonExecutionFrequency() async throws {
         let initialState = Self.createMinimalGameState()
-        var mockParser = MockParser() // Changed to var
+        var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler)
+        let registry = Self.createMinimalRegistry() // Registry needed, but no fuse defs
 
-        // Arrange: Add a daemon that prints every 3 turns
+        // Arrange: Define and register the daemon
         let stateHolder = TestStateHolder()
         let testDaemon = Daemon(id: "testDaemon", frequency: 3) { _ in
             await mockIOHandler.print("Daemon ran!")
-            stateHolder.count += 1 // Use state holder
+            stateHolder.count += 1
         }
-        engine.registerDaemon(testDaemon)
+        // Daemons are typically registered, not loaded from state, but pass registry to engine init
+        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry, initialDaemons: [testDaemon])
 
         // Act: Run engine for 7 turns (look x 7, quit)
         let commands = Array(repeating: "look", count: 7) + ["quit"]
-        // Call enqueueInput for each command individually
         for command in commands {
             await mockIOHandler.enqueueInput(command)
         }
-
         mockParser.parseHandler = { input, _, _ in
-            if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
-            if input == "quit" { return .failure(.emptyInput) } // Let engine handle quit
-            return .failure(.unknownVerb(input))
-        }
+             if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
+             if input == "quit" { return .failure(.emptyInput) }
+             return .failure(.unknownVerb(input))
+         }
         await engine.run()
 
         // Assert
@@ -590,11 +615,8 @@ struct GameEngineTests {
         #expect(daemonMessages.count == expectedDaemonRuns, "Daemon message count mismatch")
 
         // Check daemon action counter
-        #expect(stateHolder.count == expectedDaemonRuns, "Daemon action counter mismatch") // Check state holder
-
-        // Check turns taken
-        let finalMoves = engine.playerMoves()
-        #expect(finalMoves == 7)
+        #expect(stateHolder.count == expectedDaemonRuns, "Daemon action counter mismatch")
+        #expect(engine.playerMoves() == 7)
     }
 
     // TODO: Test removeFuse

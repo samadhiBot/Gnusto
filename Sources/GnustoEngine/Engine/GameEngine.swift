@@ -21,11 +21,14 @@ public class GameEngine {
     /// The resolver for scope and visibility checks.
     public let scopeResolver: ScopeResolver
 
+    /// The registry holding static game definitions (fuses, daemons, etc.).
+    public let registry: GameDefinitionRegistry
+
     /// Registered handlers for specific verb commands.
     private var actionHandlers: [VerbID: ActionHandler]
 
-    /// Active timed events (Fuses).
-    private var activeFuses: [Fuse.ID: Fuse]
+    /// Active timed events (Fuses) - Runtime storage with closures.
+    private var activeFuses: [Fuse.ID: Fuse] // Renamed from gameState.activeFuses
 
     /// Registered background routines (Daemons).
     private var registeredDaemons: [Daemon.ID: Daemon]
@@ -59,8 +62,8 @@ public class GameEngine {
     ///   - parser: The command parser to use.
     ///   - ioHandler: The I/O handler for player interaction.
     ///   - scopeResolver: The resolver for scope checks (defaults to a new instance).
+    ///   - registry: The game definition registry to use.
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
-    ///   - initialFuses: Optional array of initial fuses to add to the activeFuses dictionary.
     ///   - initialDaemons: Optional array of initial daemons to add to the registeredDaemons dictionary.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
@@ -70,8 +73,8 @@ public class GameEngine {
         parser: Parser,
         ioHandler: IOHandler,
         scopeResolver: ScopeResolver = ScopeResolver(),
+        registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
-        initialFuses: [Fuse] = [],
         initialDaemons: [Daemon] = [],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
         beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
@@ -81,12 +84,27 @@ public class GameEngine {
         self.parser = parser
         self.ioHandler = ioHandler
         self.scopeResolver = scopeResolver
+        self.registry = registry
         self.actionHandlers = customHandlers
-        self.activeFuses = Dictionary(uniqueKeysWithValues: initialFuses.map { ($0.id, $0) })
         self.registeredDaemons = Dictionary(uniqueKeysWithValues: initialDaemons.map { ($0.id, $0) })
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
         self.onExamineItem = onExamineItem
+
+        // Reconstruct runtime fuses from saved state and registry
+        self.activeFuses = [:] // Start with empty runtime fuses
+        for (fuseID, turnsRemaining) in gameState.activeFuses {
+            guard let definition = registry.fuseDefinition(for: fuseID) else {
+                // Log warning: Saved fuse state exists but no definition found
+                print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
+                // Optionally, remove the orphaned state from gameState?
+                // self.gameState.activeFuses.removeValue(forKey: fuseID)
+                continue
+            }
+            // Create runtime Fuse with loaded turns and defined action
+            let runtimeFuse = Fuse(id: fuseID, turns: turnsRemaining, action: definition.action)
+            self.activeFuses[fuseID] = runtimeFuse
+        }
     }
 
     /// Registers the default action handlers for common verbs.
@@ -107,18 +125,43 @@ public class GameEngine {
 
     // MARK: - Fuse & Daemon Management
 
-    /// Adds or updates a fuse.
-    /// If a fuse with the same ID already exists, it is replaced.
-    /// - Parameter fuse: The `Fuse` to add or update.
-    public func addFuse(_ fuse: Fuse) {
-        activeFuses[fuse.id] = fuse
+    /// Adds or updates a fuse based on its definition in the registry.
+    /// If a fuse with the same ID already exists, its timer is reset using the provided or default turns.
+    /// - Parameters:
+    ///   - id: The `Fuse.ID` of the fuse to add or update.
+    ///   - overrideTurns: Optional number of turns to set for the fuse. If `nil`, the default turns from the `FuseDefinition` are used.
+    /// - Returns: `true` if the fuse was successfully added or updated, `false` if no definition was found for the ID.
+    @discardableResult
+    public func addFuse(id: Fuse.ID, overrideTurns: Int? = nil) -> Bool {
+        // 1. Find the definition in the registry.
+        guard let definition = registry.fuseDefinition(for: id) else {
+            // Log warning or error: Attempting to add an undefined fuse.
+            print("Warning: No FuseDefinition found for fuse ID '\(id)'. Cannot add fuse.")
+            // Consider throwing an error or returning a more specific result.
+            return false
+        }
+
+        // 2. Determine the number of turns.
+        let turns = overrideTurns ?? definition.initialTurns
+
+        // 3. Create the runtime Fuse instance.
+        let runtimeFuse = Fuse(id: id, turns: turns, action: definition.action)
+
+        // 4. Update runtime dictionary.
+        activeFuses[id] = runtimeFuse
+
+        // 5. Update persistent state in GameState.
+        gameState.activeFuses[id] = turns
+
+        return true
     }
 
-    /// Removes a fuse by its ID.
-    /// Does nothing if no fuse with the given ID exists.
-    /// - Parameter id: The `Fuse.ID` to remove.
+    /// Removes a fuse by its ID (runtime and persistent state).
     public func removeFuse(id: Fuse.ID) {
+        // Remove from runtime dictionary
         activeFuses.removeValue(forKey: id)
+        // Remove from persistent state in GameState
+        gameState.activeFuses.removeValue(forKey: id)
     }
 
     /// Registers a daemon to be run periodically.
@@ -198,26 +241,34 @@ public class GameEngine {
 
     /// Processes fuses and daemons for the current turn.
     private func tickClock() async {
-        let currentTurn = gameState.player.moves // Turn count before incrementing for this turn
+        let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
         var expiredFuseIDs: [Fuse.ID] = []
         var fusesToExecute: [Fuse] = []
 
-        // Decrement and identify expired fuses
-        for id in activeFuses.keys {
-            guard activeFuses[id] != nil else { continue } // Ensure fuse wasn't removed during iteration
+        // Create a copy of keys to iterate over, allowing safe modification
+        let fuseIDs = Array(activeFuses.keys)
 
-            activeFuses[id]?.turnsRemaining -= 1
-            if let remaining = activeFuses[id]?.turnsRemaining, remaining <= 0 {
+        for id in fuseIDs {
+            guard var fuse = activeFuses[id] else { continue } // Ensure fuse wasn't removed
+
+            fuse.turnsRemaining -= 1
+
+            if fuse.turnsRemaining <= 0 {
                 expiredFuseIDs.append(id)
-                if let fuse = activeFuses[id] { // Safely unwrap
-                    fusesToExecute.append(fuse)
-                }
+                fusesToExecute.append(fuse)
+                // Remove from persistent state now that it has expired
+                gameState.activeFuses.removeValue(forKey: id)
+            } else {
+                // Update runtime fuse state
+                activeFuses[id] = fuse
+                // Update persistent state with new remaining turns
+                gameState.activeFuses[id] = fuse.turnsRemaining
             }
         }
 
-        // Remove expired fuses *before* executing actions (to prevent re-entry issues)
+        // Remove expired fuses from runtime dictionary *before* executing actions
         for id in expiredFuseIDs {
             activeFuses.removeValue(forKey: id)
         }
@@ -225,7 +276,6 @@ public class GameEngine {
         // Execute actions of expired fuses
         for fuse in fusesToExecute {
             await fuse.action(self)
-            // Check if a fuse action triggered a quit
             if shouldQuit { return }
         }
 

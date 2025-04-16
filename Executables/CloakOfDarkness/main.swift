@@ -116,6 +116,7 @@ struct CloakOfDarkness {
             initialState: gameState,
             parser: parser,
             ioHandler: ioHandler,
+            registry: GameDefinitionRegistry(),
             customHandlers: customHandlers
         )
 
