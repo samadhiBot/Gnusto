@@ -1,3 +1,4 @@
+import CustomDump
 import Testing
 @testable import GnustoEngine
 
@@ -427,7 +428,8 @@ struct TakeActionHandlerTests {
         #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
-    @Test("Take wearable item successfully")
+    /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
+    @Test("Take wearable item successfully (not worn)")
     @MainActor
     func testTakeWearableItemSuccessfully() async throws {
         // Arrange: Create a wearable item
@@ -460,13 +462,13 @@ struct TakeActionHandlerTests {
         let finalItemState = engine.itemSnapshot(with: "cloak")
         #expect(finalItemState?.parent == .player, "Item should be held by player")
 
-        // Check item has .touched AND .worn properties
+        // Check item has .touched property but NOT .worn
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-        #expect(finalItemState?.hasProperty(.worn) == true, "Item should have .worn property")
+        #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property after just taking")
 
         // Check output message
         let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken (and worn)." }, "Expected 'Taken (and worn).' message")
+        #expect(output.contains { $0.text == "Taken." }, "Expected 'Taken.' message")
     }
 
     // Add more tests here for failure cases...

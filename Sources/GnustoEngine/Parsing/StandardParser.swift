@@ -213,8 +213,6 @@ public struct StandardParser: Parser {
                  } else {
                      return .failure(.badGrammar("Expected a direction (like north, s, up) but found '\(currentToken)'."))
                  }
-             default:
-                 return .failure(.internalError("Unrecognized SyntaxTokenType in matchRule: \(tokenType)"))
             }
         }
 

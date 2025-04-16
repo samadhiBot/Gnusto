@@ -1,0 +1,54 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Gnusto Engine
+
+- Gnusto enables faithful translations of the original ZIL-based interactive fiction classics, accurately replicating the original gameplay mechanics and stories
+- It provides a clean, elegant and ergonomic foundation for creating new works of interactive fiction
+- It adheres to the highest standards of software craftsmanship, with clean, SOLID, modular, maintainable code
+- All of Gnusto's code is well-tested, with 80-90% coverage
+- It is easy customize and extend any and all of the built-in functionality
+- It utilizes modern Swift standards, features and optimizations under the hood
+- `Docs/References/Zork 1` is ALWAYS the definitive reference for ZIL behavior
+
+## Foundational Rules
+
+- When adding, modifying or reviewing functionality, ALWAYS refer to the original ZIL source code in `Docs/References`
+  - Use `Docs/References/Cloak of Darkness` to quickly learn the fundamentals of how some functionality was handled in ZIL
+  - Use `Docs/References/Zork 1` for the canonical mechanics and phrases, e.g. "It is pitch black. You are likely to be eaten by a grue."
+  - Nostalgia is the heart of the Gnusto engine, so ALWAYS honor the past by using phrases and response from the classics
+  - Use `Docs/References/Hitchhikers Guide to the Galaxy` to study more advanced puzzles and techniques
+  - Use `Docs/References/A Mind Forever Voyaging` to study the later state of the art in the classical era of ZIL programming
+- ALWAYS provide comprehensive tests when adding or modifying functionality
+- NEVER move on to the next task without providing comprehensive tests
+
+## Style Guide
+
+Multiline Strings:
+
+```swift
+// Wrong:
+let cloakroom = Location(
+    id: "cloakroom",
+    name: "Cloakroom",
+    description: "The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.",
+    exits: [
+        .east: Exit(destination: "foyer")
+    ]
+)
+
+// Right:
+let cloakroom = Location(
+    id: "cloakroom",
+    name: "Cloakroom",
+    description: """
+        The walls of this small room were clearly once lined with hooks, though now only one \
+        remains. The exit is a door to the east.
+        """,  // 💡 Break up long text before the 100th column
+    exits: [
+        .east: Exit(destination: "foyer"),  // 💡 Use trailing commas in lists
+    ]
+)
+```
