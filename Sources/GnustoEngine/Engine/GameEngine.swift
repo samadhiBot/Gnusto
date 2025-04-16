@@ -18,6 +18,9 @@ public class GameEngine {
     /// Use a nonisolated let for the IOHandler; calls to it must be await ioHandler.method().
     nonisolated internal let ioHandler: IOHandler
 
+    /// The resolver for scope and visibility checks.
+    public let scopeResolver: ScopeResolver
+
     /// Registered handlers for specific verb commands.
     private var actionHandlers: [VerbID: ActionHandler]
 
@@ -49,6 +52,7 @@ public class GameEngine {
     ///   - initialState: The starting state of the game.
     ///   - parser: The command parser to use.
     ///   - ioHandler: The I/O handler for player interaction.
+    ///   - scopeResolver: The resolver for scope checks (defaults to a new instance).
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
@@ -57,6 +61,7 @@ public class GameEngine {
         initialState: GameState,
         parser: Parser,
         ioHandler: IOHandler,
+        scopeResolver: ScopeResolver = ScopeResolver(),
         customHandlers: [VerbID: ActionHandler] = [:],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
         beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
@@ -65,6 +70,7 @@ public class GameEngine {
         self.gameState = initialState
         self.parser = parser
         self.ioHandler = ioHandler
+        self.scopeResolver = scopeResolver
         self.actionHandlers = customHandlers // Start with custom handlers
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
@@ -115,7 +121,7 @@ public class GameEngine {
 
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
-            await ioHandler.print("\nGoodbye!")
+            await ioHandler.print("Goodbye!")
             shouldQuit = true
             return
         }
@@ -173,33 +179,44 @@ public class GameEngine {
 
     // MARK: - Output & Error Reporting
 
-    /// Displays the description of the current location.
+    /// Displays the description of the current location, considering light level.
     internal func describeCurrentLocation() async {
-        guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else {
+        let locationID = gameState.player.currentLocationID
+
+        // 1. Check for light
+        guard scopeResolver.isLocationLit(locationID: locationID, gameState: gameState) else {
+            // It's dark!
+            await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
+            // Do not describe the room or list items.
+            return
+        }
+
+        // 2. If lit, proceed with description
+        guard let currentLocation = gameState.locations[locationID] else {
             await ioHandler.print("Error: Current location not found!", style: .debug)
             return
         }
-        await ioHandler.print("\n--- \(currentLocation.name) ---", style: .strong)
+        await ioHandler.print("--- \(currentLocation.name) ---", style: .strong)
         await ioHandler.print(currentLocation.description)
 
-        // List visible items
-        await listItemsInLocation(locationID: gameState.player.currentLocationID)
+        // 3. List visible items
+        await listItemsInLocation(locationID: locationID)
     }
 
-    /// Helper to list items visible in a location.
+    /// Helper to list items visible in a location (only called if lit).
     private func listItemsInLocation(locationID: LocationID) async {
-        // Use safe snapshot accessor
-        let itemsHere = itemSnapshots(withParent: .location(locationID))
-        // TODO: Add snapshots of items on surfaces within the location
-        // TODO: Add snapshots of items inside transparent containers?
-        // TODO: Filter based on light level?
+        // 1. Get visible item IDs using ScopeResolver
+        let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID, gameState: gameState)
 
-        if !itemsHere.isEmpty {
+        // 2. Get the actual Item objects/snapshots for the visible IDs
+        let visibleItems = visibleItemIDs.compactMap { gameState.items[$0] } // Fetch full Item objects
+
+        if !visibleItems.isEmpty {
             await ioHandler.print("You can see:")
-            for itemSnapshot in itemsHere { // Iterate through snapshots
+            for item in visibleItems { // Iterate through visible Items
                 // TODO: Use item descriptions (firstDesc, subDesc) based on touched state?
                 // TODO: Proper sentence formatting with articles
-                await ioHandler.print("  A \(itemSnapshot.name)") // Use snapshot name
+                await ioHandler.print("  A \(item.name)")
             }
         }
     }
@@ -392,7 +409,7 @@ public class GameEngine {
     public func quitGame() {
         shouldQuit = true
         // Optionally print a final message immediately or let the loop handle it.
-        // await ioHandler.print("\nGoodbye!") // Can be done here or in run()
+        // await ioHandler.print("Goodbye!") // Can be done here or in run()
     }
 }
 

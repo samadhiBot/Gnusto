@@ -25,7 +25,8 @@ struct WorldSetups {
             exits: [
                 .south: Exit(destination: "bar"),
                 .west: Exit(destination: "cloakroom"),
-            ]
+            ],
+            properties: [.inherentlyLit]
         )
         let cloakroom = Location(
             id: "cloakroom",
@@ -36,7 +37,8 @@ struct WorldSetups {
                 """,
             exits: [
                 .east: Exit(destination: "foyer"),
-            ]
+            ],
+            properties: [.inherentlyLit]
         )
         let bar = Location(
             id: "bar",
@@ -122,52 +124,17 @@ struct WorldSetups {
 
         // --- Cloak of Darkness Custom Logic Hooks ---
 
-        let onEnterRoom: @MainActor @Sendable (GameEngine, LocationID) async -> Void = { @MainActor @Sendable engine, locationID in
-            guard locationID == LocationID("bar") else { return }
+        let onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil // No custom onEnterRoom logic needed now
 
-            // Access state via the engine's accessor
-            let currentState = engine.getCurrentGameState()
-            let cloakIsWorn = currentState.items[ItemID("cloak")]?.hasProperty(.worn) ?? false
-
-            // Use the engine's mutator for state changes
-            engine.updateGameState { state in
-                if cloakIsWorn {
-                    state.locations[LocationID("bar")]?.removeProperty(.inherentlyLit)
-                } else {
-                    state.locations[LocationID("bar")]?.addProperty(.inherentlyLit)
-                }
-            }
-        }
-
-        let beforeTurn: @MainActor @Sendable (GameEngine) async -> Void = { @MainActor @Sendable engine in
-            let currentState = engine.getCurrentGameState()
-            guard currentState.player.currentLocationID == LocationID("bar") else { return }
-
-            let barIsLit = currentState.locations[LocationID("bar")]?.hasProperty(.inherentlyLit) ?? false
-
-            if !barIsLit {
-                // ZIL logic: Only print the darkness message here.
-                // The disturbed counter should only increment on specific actions (e.g., TAKE, DROP) while in the dark bar,
-                // which would require checks in those specific ActionHandlers.
-                await engine.ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
-
-                // --- REMOVED Counter Increment Logic ---
-                // engine.updateGameState { state in ... }
-            }
-        }
+        let beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil // No custom beforeTurn logic needed now
 
         let onExamineItem: @MainActor @Sendable (GameEngine, ItemID) async -> Bool = { @MainActor @Sendable engine, itemID in
             guard itemID == ItemID("message") else { return false } // Not the message, do default action
 
-            let currentState = engine.getCurrentGameState()
-            let key = "cod_disturbed_counter"
-            let disturbedCount = currentState.gameSpecificState?[key]?.value as? Int ?? 0
-
-            if disturbedCount > 1 {
-                await engine.ioHandler.print("The message simply reads: \"You lose.\"")
-            } else {
-                await engine.ioHandler.print("The message simply reads: \"You win.\"")
-            }
+            // Original CoD ZIL didn't have a lose condition based on turns in the dark bar.
+            // The win condition triggers immediately upon examining the message.
+            // Remove the disturbed counter logic.
+            await engine.ioHandler.print("The message simply reads: \"You win.\"")
             await engine.ioHandler.print("\n*** The End ***") // A more thematic end message
             engine.quitGame() // Signal engine to stop using the new method
 

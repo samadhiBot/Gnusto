@@ -4,6 +4,9 @@ import Foundation
 /// primarily considering light conditions.
 public struct ScopeResolver: Sendable {
 
+    /// Public initializer.
+    public init() {}
+
     /// Checks if the specified location is currently lit.
     /// A location is lit if it has the `.inherentlyLit` property, or if the player
     /// (or perhaps an NPC in the same location) is carrying an active light source

@@ -107,6 +107,10 @@ final class MockIOHandler: IOHandler {
         var actualTranscript = ""
         for call in recordedOutput {
             if call.style == .input && call.text == "> " && !call.newline {
+                // Start prompt line
+                if !actualTranscript.isEmpty && !actualTranscript.hasSuffix("\n") {
+                    actualTranscript += "\n" // Ensure newline before prompt if needed
+                }
                 actualTranscript += ">"
                 if commandIndex < inputQueue.count {
                     if let command = inputQueue[commandIndex] {
@@ -114,15 +118,18 @@ final class MockIOHandler: IOHandler {
                     }
                     commandIndex += 1
                 }
-                actualTranscript += "\n"
+                actualTranscript += "\n" // Always add one newline after prompt line
             } else if call.style != .input {
-                actualTranscript += call.text
-                if call.newline {
-                    actualTranscript += "\n"
+                // Start output line
+                 if !actualTranscript.isEmpty && !actualTranscript.hasSuffix("\n") {
+                    actualTranscript += "\n" // Ensure newline before output if needed
                 }
+                actualTranscript += call.text // Add the text
+                actualTranscript += "\n" // Always add one newline after output line, regardless of call.newline
             }
         }
 
+        // Remove leading/trailing whitespace/newlines only
         return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
