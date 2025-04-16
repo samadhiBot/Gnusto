@@ -17,7 +17,7 @@ public struct InventoryActionHandler: ActionHandler {
             // 3. List Items
             // TODO: Check Zork/classic message format
             await engine.ioHandler.print("You are carrying:")
-            for item in inventoryItems {
+            for item in inventoryItems.sorted() {
                 // Basic listing, could be enhanced with articles, descriptions etc.
                 await engine.ioHandler.print("  A \(item.name)")
             }

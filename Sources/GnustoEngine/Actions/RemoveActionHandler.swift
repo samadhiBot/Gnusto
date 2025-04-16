@@ -12,28 +12,27 @@ public struct RemoveActionHandler: ActionHandler {
             return
         }
 
-        // 2. Get target item state
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
+        // 2. Check if the item is held by the player
+        guard let targetItem = await engine.itemSnapshot(with: targetItemID),
+              targetItem.parent == .player else {
+            // If item doesn't exist OR isn't held, throw itemNotHeld
+            throw ActionError.itemNotHeld(targetItemID)
         }
 
-        // 3. Check if item is currently worn (parser should enforce this via .worn condition)
+        // 3. Check if the (held) item is currently worn
         guard targetItem.hasProperty(.worn) else {
             // Zork: "You are not wearing the <noun>!"
-            await engine.ioHandler.print("You aren't wearing the \(targetItem.name).")
+            // Use the correct wording from test failure
+            await engine.ioHandler.print("You are not wearing the \(targetItem.name).")
             return
         }
 
-        // 4. Check if item is actually held by the player (worn items have parent .player)
-        guard targetItem.parent == .player else {
-            throw ActionError.internalEngineError("Item '\(targetItemID)' has .worn property but is not held by player.")
-        }
-
-        // 5. Update State - Remove .worn property (parent remains .player)
+        // 4. Update State - Remove .worn property (parent remains .player)
         await engine.removeItemProperty(itemID: targetItemID, property: .worn)
-        await engine.addItemProperty(itemID: targetItemID, property: .touched) // Mark as touched
+        // Mark as touched (implicitly happens when taken, should happen here too)
+        await engine.addItemProperty(itemID: targetItemID, property: .touched)
 
-        // 6. Output Message
+        // 5. Output Message
         // Zork: "You remove the <noun>."
         await engine.ioHandler.print("You take off the \(targetItem.name).")
     }

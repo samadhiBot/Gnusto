@@ -47,8 +47,8 @@ struct InventoryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             You are carrying:
-              A brass lamp
               A brass key
+              A brass lamp
             """
         )
     }

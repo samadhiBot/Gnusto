@@ -72,8 +72,8 @@ struct LookActionHandlerTests {
             --- Test Room ---
             A basic room.
             You can see:
-              A shiny widget
               A blue gizmo
+              A shiny widget
             """
         )
     }

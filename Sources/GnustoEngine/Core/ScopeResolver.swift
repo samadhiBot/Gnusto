@@ -16,7 +16,7 @@ public struct ScopeResolver: Sendable {
     ///   - locationID: The ID of the location to check.
     ///   - gameState: The current state of the game.
     /// - Returns: `true` if the location is lit, `false` otherwise.
-    public func isLocationLit(locationID: Location.ID, gameState: GameState) -> Bool {
+    public func isLocationLit(locationID: LocationID, gameState: GameState) -> Bool {
         guard let location = gameState.locations[locationID] else {
             // Location not found, cannot determine lit status. Defaulting to dark.
             // Consider logging a warning here if appropriate for the engine's design.
@@ -58,7 +58,7 @@ public struct ScopeResolver: Sendable {
     ///   - locationID: The ID of the location.
     ///   - gameState: The current state of the game.
     /// - Returns: An array of IDs for items visible in the location.
-    public func visibleItemsIn(locationID: Location.ID, gameState: GameState) -> [Item.ID] {
+    public func visibleItemsIn(locationID: LocationID, gameState: GameState) -> [ItemID] {
         // 1. Check if the location is lit.
         guard isLocationLit(locationID: locationID, gameState: gameState) else {
             // If not lit, nothing is visible.
@@ -76,7 +76,7 @@ public struct ScopeResolver: Sendable {
         }
 
         // 4. Return the IDs of the visible items.
-        return visibleItems.map { $0.id }
+        return visibleItems.map(\.id).sorted()
     }
 
     /// Determines all items currently reachable by the player.
@@ -85,8 +85,8 @@ public struct ScopeResolver: Sendable {
     ///
     /// - Parameter gameState: The current state of the game.
     /// - Returns: A Set of IDs for items reachable by the player.
-    public func itemsReachableByPlayer(gameState: GameState) -> Set<Item.ID> {
-        var reachableItems = Set<Item.ID>()
+    public func itemsReachableByPlayer(gameState: GameState) -> Set<ItemID> {
+        var reachableItems = Set<ItemID>()
         // var queue: [ParentEntity] = [.player, .location(gameState.player.currentLocationID)]
         var processedContainers = Set<ItemID>() // Prevent infinite loops with nested containers
 
@@ -129,5 +129,5 @@ public struct ScopeResolver: Sendable {
     }
 
     // Potential recursive helper (alternative implementation strategy)
-    // private func getReachableItems(from parent: ParentEntity, gameState: GameState, processedContainers: inout Set<ItemID>) -> Set<Item.ID> { ... }
+    // private func getReachableItems(from parent: ParentEntity, gameState: GameState, processedContainers: inout Set<ItemID>) -> Set<ItemID> { ... }
 }

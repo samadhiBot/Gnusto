@@ -44,3 +44,9 @@ public struct ItemSnapshot: Identifiable, Sendable {
         properties.contains(property)
     }
 }
+
+extension ItemSnapshot: Comparable {
+    public static func < (lhs: ItemSnapshot, rhs: ItemSnapshot) -> Bool {
+        lhs.id < rhs.id
+    }
+}

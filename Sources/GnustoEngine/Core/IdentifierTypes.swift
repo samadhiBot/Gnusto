@@ -1,5 +1,5 @@
 /// A unique identifier for a location within the game world.
-public struct LocationID: Hashable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct LocationID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String
 
     /// Initializes a `LocationID` using a string literal.
@@ -13,10 +13,14 @@ public struct LocationID: Hashable, Codable, ExpressibleByStringLiteral, Sendabl
     public init(_ rawValue: String) {
         self.rawValue = rawValue
     }
+
+    public static func < (lhs: LocationID, rhs: LocationID) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
 }
 
 /// A unique identifier for an item (GameObject) within the game world.
-public struct ItemID: Hashable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct ItemID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String
 
     /// Initializes an `ItemID` using a string literal.
@@ -30,10 +34,14 @@ public struct ItemID: Hashable, Codable, ExpressibleByStringLiteral, Sendable {
     public init(_ rawValue: String) {
         self.rawValue = rawValue
     }
+
+    public static func < (lhs: ItemID, rhs: ItemID) -> Bool {
+        lhs.rawValue < rhs.rawValue
+    }
 }
 
 /// A unique identifier for a verb within the game's vocabulary.
-public struct VerbID: Hashable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String
 
     /// Initializes a `VerbID` using a string literal.
@@ -46,5 +54,9 @@ public struct VerbID: Hashable, Codable, ExpressibleByStringLiteral, Sendable {
     /// - Parameter rawValue: The string value for the ID.
     public init(_ rawValue: String) {
         self.rawValue = rawValue
+    }
+
+    public static func < (lhs: VerbID, rhs: VerbID) -> Bool {
+        lhs.rawValue < rhs.rawValue
     }
 }
