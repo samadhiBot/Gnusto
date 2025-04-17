@@ -1,7 +1,8 @@
 import Foundation
+import GnustoEngine
 
-/// An example demonstrating how to implement a lantern timer system similar to Zork's.
-/// This provides code examples for:
+/// Implements a lantern timer system similar to Zork's.
+/// This demonstrates:
 /// 1. Creating daemons that track resource consumption
 /// 2. Using fuses for timed warnings
 /// 3. Managing state through game flags and properties

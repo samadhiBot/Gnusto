@@ -15,7 +15,12 @@ let package = Package(
         ),
         .executable(
             name: "CloakOfDarkness",
-            targets: ["CloakOfDarkness"])
+            targets: ["CloakOfDarkness"]
+        ),
+        .executable(
+            name: "GnustoExamples",
+            targets: ["GnustoExamples"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
@@ -27,6 +32,10 @@ let package = Package(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
             path: "Executables/CloakOfDarkness"
+        ),
+        .executableTarget(
+            name: "GnustoExamples",
+            dependencies: ["GnustoEngine"]
         ),
         .testTarget(
             name: "GnustoEngineTests",
