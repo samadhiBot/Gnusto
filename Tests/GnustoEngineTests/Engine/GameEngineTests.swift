@@ -581,7 +581,7 @@ struct GameEngineTests {
 
         // Arrange: Define the daemon definition
         let stateHolder = TestStateHolder()
-        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in // Use DaemonDefinition
+        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in
             await mockIOHandler.print("Daemon ran!")
             stateHolder.count += 1
         }
@@ -595,7 +595,6 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIOHandler,
             registry: registry
-            // Removed initialDaemons: [testDaemon]
         )
 
         // Register the daemon dynamically AFTER engine init
@@ -615,10 +614,11 @@ struct GameEngineTests {
         await engine.run()
 
         // Assert
-        // Daemons run at start of turn based on (turn + 1) % freq == 0
-        // Turns: 0, 1, 2, 3, 4, 5, 6
-        // Executes at end of turn 2 (before turn 3 starts, turnCount = 2, 2+1=3 % 3 == 0)
-        // Executes at end of turn 5 (before turn 6 starts, turnCount = 5, 5+1=6 % 3 == 0)
+        // Daemons run on turns where (turnCount > 0 && turnCount % frequency == 0)
+        // With 7 "look" commands, we process turns 0-7
+        // With frequency 3, daemon executes on:
+        // - Turn 3 (3 % 3 == 0)
+        // - Turn 6 (6 % 3 == 0)
         let expectedDaemonRuns = 2
 
         // Check daemon message count
@@ -629,6 +629,94 @@ struct GameEngineTests {
         // Check daemon action counter
         #expect(stateHolder.count == expectedDaemonRuns, "Daemon action counter mismatch")
         #expect(engine.playerMoves() == 7)
+    }
+
+    @Test("Fuse and Daemon Interaction")
+    @MainActor
+    func testFuseAndDaemonInteraction() async throws {
+        // Arrange
+        var initialState = Self.createMinimalGameState()
+        var mockParser = MockParser()
+        let mockIOHandler = await MockIOHandler()
+
+        // Create a state holder to track events
+        let stateHolder = TestStateHolder()
+
+        // Set up a fuse that will trigger after 3 turns
+        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
+            await mockIOHandler.print("Fuse triggered!")
+            stateHolder.flag = true // Mark that fuse was triggered
+        }
+
+        // Set up a daemon that will run every 2 turns
+        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
+            await mockIOHandler.print("Daemon executed!")
+            stateHolder.count += 1 // Count daemon executions
+        }
+
+        // Create registry with both definitions
+        let registry = Self.createMinimalRegistry(
+            fuseDefs: [testFuse],
+            daemonDefs: [testDaemon]
+        )
+
+        // Add fuse to initial state
+        initialState.activeFuses[testFuse.id] = testFuse.initialTurns
+
+        // Create engine with our test state
+        let engine = GameEngine(
+            initialState: initialState,
+            parser: mockParser,
+            ioHandler: mockIOHandler,
+            registry: registry
+        )
+
+        // Register the daemon after engine creation
+        let registerSuccess = engine.registerDaemon(id: testDaemon.id)
+        #expect(registerSuccess == true, "Daemon registration should succeed")
+
+        // Act: Run for 6 turns with "look" commands
+        let commands = Array(repeating: "look", count: 6) + ["quit"]
+        for command in commands {
+            await mockIOHandler.enqueueInput(command)
+        }
+
+        mockParser.parseHandler = { input, _, _ in
+            if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
+            if input == "quit" { return .failure(.emptyInput) }
+            return .failure(.unknownVerb(input))
+        }
+
+        await engine.run()
+
+        // Assert
+        // For 6 "look" commands, we process 7 turns total (0-6)
+        // With frequency 2, daemon executes when (turn > 0 && turn % 2 == 0)
+        // Executes on turn 2 (2 % 2 == 0)
+        // Executes on turn 4 (4 % 2 == 0)
+        // Executes on turn 6 (6 % 2 == 0)
+        let expectedDaemonRuns = 3
+
+        // Check daemon execution count
+        #expect(stateHolder.count == expectedDaemonRuns, "Daemon should have executed 3 times")
+
+        // The fuse set for 3 turns should have triggered exactly once
+        #expect(stateHolder.flag == true, "Fuse should have triggered")
+
+        // Check that fuse was removed from game state
+        #expect(engine.getCurrentGameState().activeFuses[testFuse.id] == nil,
+              "Fuse should be removed from game state after execution")
+
+        // Check for expected messages in output
+        let output = await mockIOHandler.recordedOutput
+        let fuseMessages = output.filter { $0.text == "Fuse triggered!" }
+        let daemonMessages = output.filter { $0.text == "Daemon executed!" }
+
+        #expect(fuseMessages.count == 1, "Should see exactly one fuse message")
+        #expect(daemonMessages.count == expectedDaemonRuns, "Should see exactly three daemon messages")
+
+        // Verify turn count - we expect 6 turns because we sent 6 "look" commands
+        #expect(engine.playerMoves() == 6, "Game should have run for 6 turns")
     }
 
     // TODO: Test removeFuse

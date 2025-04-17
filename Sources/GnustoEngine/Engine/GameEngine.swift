@@ -285,20 +285,18 @@ public class GameEngine {
         // --- Process Daemons ---
         // Execute daemons whose frequency matches the current turn
         for daemonID in gameState.activeDaemons {
+            // Get definition from registry
             guard let definition = registry.daemonDefinition(for: daemonID) else {
-                print("Warning: Active daemon ID '\(daemonID)' has no definition in the registry. Skipping.")
-                // Consider removing the orphan ID from gameState.activeDaemons here?
+                print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }
-            // Daemons run based on turns completed *before* this one starts.
-            // Turn 0 (start): runs if freq=1
-            // Turn 1: runs if freq=1, 2
-            // Turn 2: runs if freq=1, 3
-            // Turn n: runs if freq divides (n+1)
-            if (currentTurn + 1) % definition.frequency == 0 {
+
+            // Check if it's time for this daemon to run based on frequency
+            // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
+            if currentTurn > 0 && currentTurn % definition.frequency == 0 {
+                // Execute the daemon's action
                 await definition.action(self)
-                // Check if the daemon action requested a quit
-                guard !shouldQuit else { return }
+                if shouldQuit { return }
             }
         }
     }
