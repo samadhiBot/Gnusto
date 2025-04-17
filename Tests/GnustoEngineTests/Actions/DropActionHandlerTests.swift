@@ -8,6 +8,7 @@ struct DropActionHandlerTests {
 
     // Helper function to create data for a basic test setup
     // Adapted from TakeActionHandlerTests
+    @MainActor
     static func createTestData(itemsToAdd: [Item] = [], initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")) -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
         // Include all needed verbs for handler tests in this suite

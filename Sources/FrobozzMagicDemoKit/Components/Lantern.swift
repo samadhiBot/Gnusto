@@ -67,7 +67,7 @@ enum Components {
             }
 
             // Register the daemon to start tracking battery life
-            let _ = engine.registerDaemon(id: Constants.timerDaemonID)
+            let _ = await engine.registerDaemon(id: Constants.timerDaemonID)
 
             // Weather daemon registration is now handled in Weather.setupWeather()
             /*

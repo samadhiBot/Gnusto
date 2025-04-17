@@ -77,7 +77,7 @@ extension Components {
         /// - Parameter engine: The game engine instance.
         static func setupWeather(engine: GameEngine) async {
             // Set initial weather state
-            engine.updateGameState { state in
+            await engine.updateGameState { state in
                 // Initialize gameSpecificState if it doesn't exist
                 if state.gameSpecificState == nil {
                     state.gameSpecificState = [:]
@@ -89,7 +89,7 @@ extension Components {
             }
 
             // Register the weather daemon
-            let _ = engine.registerDaemon(id: Constants.weatherDaemonID)
+            let _ = await engine.registerDaemon(id: Constants.weatherDaemonID)
         }
     }
 }

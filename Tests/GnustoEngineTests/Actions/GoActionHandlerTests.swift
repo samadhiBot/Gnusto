@@ -7,6 +7,7 @@ import Testing
 struct GoActionHandlerTests {
 
     // Helper (adapted from previous tests)
+    @MainActor
     static func createTestData(itemsToAdd: [Item] = [], initialLocations: [Location] = [], initialPlayerLocationID: LocationID? = nil) -> (items: [Item], locations: [Location], player: Player, vocab: Vocabulary) {
         var locations = initialLocations
         if locations.isEmpty {

@@ -3,6 +3,7 @@ import CustomDump
 
 @testable import GnustoEngine
 
+@MainActor
 @Suite("LookActionHandler Tests")
 struct LookActionHandlerTests {
     let handler = LookActionHandler()
@@ -45,7 +46,7 @@ struct LookActionHandlerTests {
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser() // Not used directly by handler
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIO
@@ -58,7 +59,6 @@ struct LookActionHandlerTests {
     // --- LOOK (in location) Tests ---
 
     @Test("LOOK in lit room describes room and lists items")
-    @MainActor
     func testLookInLitRoom() async throws {
         let item1 = Item(id: "widget", name: "shiny widget")
         let item2 = Item(id: "gizmo", name: "blue gizmo")
@@ -79,7 +79,6 @@ struct LookActionHandlerTests {
     }
 
     @Test("LOOK in dark room prints darkness message")
-    @MainActor
     func testLookInDarkRoom() async throws {
         let item1 = Item(id: "widget", name: "shiny widget")
         let (engine, mockIO) = await createTestEngine(itemsInLocation: [item1]) // Dark room
@@ -92,7 +91,6 @@ struct LookActionHandlerTests {
     }
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
-    @MainActor
     func testLookInRoomLitByPlayer() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on, .takable])
         let item1 = Item(id: "widget", name: "shiny widget")
@@ -114,7 +112,6 @@ struct LookActionHandlerTests {
     // --- LOOK AT (item) Tests (Less affected by scope changes for now) ---
 
     @Test("LOOK AT item shows description")
-    @MainActor
     func testLookAtItem() async throws {
         let item = Item(id: "rock", name: "plain rock", description: "It looks like a rock.")
         let (engine, mockIO) = await createTestEngine(locationProperties: [.inherentlyLit], itemToExamine: item)
@@ -127,7 +124,6 @@ struct LookActionHandlerTests {
     }
 
     @Test("LOOK AT item with no description shows default message")
-    @MainActor
     func testLookAtItemNoDescription() async throws {
         let item = Item(id: "pebble", name: "small pebble") // No description
         let (engine, mockIO) = await createTestEngine(locationProperties: [.inherentlyLit], itemToExamine: item)

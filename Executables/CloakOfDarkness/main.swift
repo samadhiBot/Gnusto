@@ -80,7 +80,7 @@ struct CloakOfDarkness {
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.worn])
                  ]),
         ]
-        let vocabulary = Vocabulary.build(items: allItems, verbs: verbs)
+        let vocabulary = await Vocabulary.build(items: allItems, verbs: verbs)
 
         // Game State
         let gameState = GameState.initial(

@@ -66,23 +66,62 @@ public struct Vocabulary: Codable {
         self.pronouns = pronouns
     }
 
-    // MARK: - Default Noise Words & Prepositions
+    // MARK: - Default Definitions
 
     /// Default set of common English noise words.
     public static let defaultNoiseWords: Set<String> = [
         "a", "an", "and", "the", "some", "this", "that", "those", "these",
-        ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")"
-        // Note: "it" removed previously to fix pronoun bug
+        ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")",
+        "at", "in", "on", "to", "of", "with", // Add common prepositions often treated as noise
     ]
 
     /// Default set of common English prepositions.
     public static let defaultPrepositions: Set<String> = [
-        "in", "on", "at", "under", "into", "onto", "through", "behind", "over", "with", "about", "for", "from", "to"
+        "in", "on", "under", "into", "onto", "through", "behind", "over", "with", "about", "for", "from", "to", "up", "down" // Added up/down
+        // Note: Some might also be noise words, parser needs to handle context.
     ]
 
     /// Default set of common English pronouns.
     public static let defaultPronouns: Set<String> = [
         "it", "them"
+    ]
+
+    /// Default verbs common to most IF games.
+    @MainActor public static let defaultVerbs: [Verb] = [
+        // Core Actions
+        Verb(id: "look", synonyms: ["l"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "examine", synonyms: ["x", "inspect"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Examine needs DO
+        Verb(id: "inventory", synonyms: ["i"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "quit", synonyms: ["q"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "score", syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "wait", synonyms: ["z"], syntax: [SyntaxRule(pattern: [.verb])]),
+
+        // Movement
+        Verb(id: "go", synonyms: ["move", "walk", "run", "proceed"], syntax: [SyntaxRule(pattern: [.verb, .direction])]), // Default takes direction
+        // Note: Single directions (N, S, E, W...) handled separately by StandardParser
+
+        // Common Interactions (often need specific handlers, but define verb)
+        Verb(id: "take", synonyms: ["get", "grab", "pick"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "drop", synonyms: ["put", "place", "discard"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Simple drop syntax
+        // TODO: Add rules for DROP X ON Y, PUT X IN Y, etc.
+        Verb(id: "open", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "close", synonyms: ["shut"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "read", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "wear", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "remove", synonyms: ["take off"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // For worn items
+
+        // Sensory / Non-committal
+        Verb(id: "smell", synonyms: ["sniff"], syntax: [SyntaxRule(pattern: [.verb]), SyntaxRule(pattern: [.verb, .directObject])]), // Smell or Smell X
+        Verb(id: "listen", syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "taste", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "touch", synonyms: ["feel"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+
+        // Meta
+        Verb(id: "help", syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "save", syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "restore", synonyms:["load"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "verbose", syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "brief", syntax: [SyntaxRule(pattern: [.verb])]), // Often used for description detail
     ]
 
     // MARK: - Building Vocabulary (Example Methods)
@@ -114,16 +153,28 @@ public struct Vocabulary: Codable {
         }
     }
 
-    /// Builds a basic vocabulary from arrays of items and verbs, including standard directions.
+    /// Builds a basic vocabulary from arrays of items and verbs, including standard directions
+    /// and optionally including default verbs.
     /// - Parameters:
-    ///   - items: An array of `Item` objects.
-    ///   - verbs: An array of `Verb` objects.
+    ///   - items: An array of `Item` objects specific to the game.
+    ///   - verbs: An array of `Verb` objects specific to the game (can override defaults).
+    ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
-    public static func build(items: [Item], verbs: [Verb]) -> Vocabulary {
+    @MainActor public static func build(items: [Item], verbs: [Verb], useDefaultVerbs: Bool = true) -> Vocabulary {
         var vocab = Vocabulary()
+
+        // Add default verbs first if requested
+        if useDefaultVerbs {
+            for verb in Vocabulary.defaultVerbs {
+                vocab.add(verb: verb)
+            }
+        }
+
+        // Add game-specific items
         for item in items {
             vocab.add(item: item)
         }
+        // Add game-specific verbs (allowing overrides of defaults)
         for verb in verbs {
             vocab.add(verb: verb)
         }

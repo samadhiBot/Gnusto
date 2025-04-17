@@ -1,7 +1,9 @@
 import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
+@MainActor
 @Suite("TakeActionHandler Tests")
 struct TakeActionHandlerTests {
 
@@ -18,7 +20,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item successfully")
-    @MainActor
     func testTakeItemSuccessfully() async throws {
         // Arrange: Create data
         let testItem = Item(id: "key", name: "brass key", properties: [.takable], size: 3) // Give size
@@ -59,7 +60,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails when already held")
-    @MainActor
     func testTakeItemFailsWhenAlreadyHeld() async throws {
         // Arrange: Create data
         let testItem = Item(id: "key", name: "brass key", properties: [.takable])
@@ -97,7 +97,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails when not present in location")
-    @MainActor
     func testTakeItemFailsWhenNotPresent() async throws {
         // Arrange: Create data for an item that exists but isn't in the room
         let testItem = Item(id: "key", name: "brass key", properties: [.takable])
@@ -135,7 +134,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails when not takable")
-    @MainActor
     func testTakeItemFailsWhenNotTakable() async throws {
         // Arrange: Create item *without* .takable property
         let testItem = Item(id: "rock", name: "heavy rock", properties: []) // No .takable
@@ -173,7 +171,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take fails with no direct object")
-    @MainActor
     func testTakeFailsWithNoObject() async throws {
         // Arrange: Minimal setup, no specific items needed
         let testData = Self.createTestData()
@@ -203,7 +200,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item successfully from open container in room")
-    @MainActor
     func testTakeItemSuccessfullyFromOpenContainerInRoom() async throws {
         // Arrange: Create container and item inside it
         let container = Item(id: "box", name: "wooden box", properties: [.container, .open]) // Open container
@@ -250,7 +246,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item successfully from open container held by player")
-    @MainActor
     func testTakeItemSuccessfullyFromOpenContainerHeld() async throws {
         // Arrange: Create container and item inside it
         let container = Item(id: "pouch", name: "leather pouch", properties: [.container, .open, .takable]) // Open & Takable
@@ -297,7 +292,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails from closed container")
-    @MainActor
     func testTakeItemFailsFromClosedContainer() async throws {
         // Arrange: Create a CLOSED container and item inside it
         let container = Item(id: "box", name: "wooden box", properties: [.container]) // Closed by default
@@ -338,7 +332,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails from non-container item")
-    @MainActor
     func testTakeItemFailsFromNonContainer() async throws {
         // Arrange: Create a non-container and an item 'inside' it (logically impossible but test setup)
         let nonContainer = Item(id: "statue", name: "stone statue", properties: [.takable]) // Not a container
@@ -381,7 +374,6 @@ struct TakeActionHandlerTests {
     }
 
     @Test("Take item fails when capacity exceeded")
-    @MainActor
     func testTakeItemFailsWhenCapacityExceeded() async throws {
         // Arrange: Items with specific sizes
         let itemHeld = Item(id: "sword", name: "heavy sword", properties: [.takable], size: 8)
@@ -427,7 +419,6 @@ struct TakeActionHandlerTests {
 
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
     @Test("Take wearable item successfully (not worn)")
-    @MainActor
     func testTakeWearableItemSuccessfully() async throws {
         // Arrange: Create a wearable item
         let testItem = Item(id: "cloak", name: "dark cloak", properties: [.takable, .wearable], size: 2)

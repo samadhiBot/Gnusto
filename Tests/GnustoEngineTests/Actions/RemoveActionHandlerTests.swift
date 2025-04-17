@@ -1,7 +1,9 @@
 import Testing
 import CustomDump
+
 @testable import GnustoEngine
 
+@MainActor
 @Suite("RemoveActionHandler Tests")
 struct RemoveActionHandlerTests {
     let handler = RemoveActionHandler()
@@ -35,7 +37,7 @@ struct RemoveActionHandlerTests {
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIO
@@ -47,7 +49,6 @@ struct RemoveActionHandlerTests {
     // --- Tests ---
 
     @Test("Remove worn item successfully")
-    @MainActor
     func testRemoveItemSuccess() async throws {
         let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable, .worn]) // Held, wearable, worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
@@ -69,7 +70,6 @@ struct RemoveActionHandlerTests {
     }
 
     @Test("Remove fails if item not worn (but held)")
-    @MainActor
     func testRemoveItemNotWorn() async throws {
         let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable]) // Held, wearable, NOT worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
@@ -90,7 +90,6 @@ struct RemoveActionHandlerTests {
     }
 
     @Test("Remove fails if item not held")
-    @MainActor
     func testRemoveItemNotHeld() async throws {
         // Cloak is not in inventory in this setup
         let (engine, _) = await createTestEngine()
@@ -105,7 +104,6 @@ struct RemoveActionHandlerTests {
     }
 
     @Test("Remove fails with no direct object")
-    @MainActor
     func testRemoveNoObject() async throws {
         let (engine, mockIO) = await createTestEngine()
         // Command with nil directObject

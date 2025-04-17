@@ -3,9 +3,9 @@ import Testing
 
 @testable import GnustoEngine
 
+@MainActor
 @Suite("InventoryActionHandler Tests")
 struct InventoryActionHandlerTests {
-
     // Helper function (adapted from Drop/Take tests)
     static func createTestData(itemsToAdd: [Item] = [], initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")) -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
@@ -15,7 +15,6 @@ struct InventoryActionHandlerTests {
     }
 
     @Test("Inventory shows items held")
-    @MainActor
     func testInventoryShowsItemsHeld() async throws {
         // Arrange: Items held by player
         let item1 = Item(id: "key", name: "brass key")
@@ -54,7 +53,6 @@ struct InventoryActionHandlerTests {
     }
 
     @Test("Inventory shows empty message")
-    @MainActor
     func testInventoryShowsEmptyMessage() async throws {
         // Arrange: No items held by player
         let testData = Self.createTestData()

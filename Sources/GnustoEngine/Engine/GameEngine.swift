@@ -104,18 +104,69 @@ public class GameEngine {
     /// Registers the default action handlers for common verbs.
     /// Called from run() after initialization.
     private func registerDefaultHandlers() {
+        // Define default handlers corresponding to Vocabulary.defaultVerbs
+        // Use VerbID("verbName") for clarity
         let defaultHandlers: [VerbID: ActionHandler] = [
+            // Core
             VerbID("look"): LookActionHandler(),
-            VerbID("examine"): LookActionHandler(), // Add synonyms
-            VerbID("x"): LookActionHandler(),       // Add synonyms
-            VerbID("l"): LookActionHandler(),        // Add synonyms
-            VerbID("go"): GoActionHandler()          // Register Go handler
-            // VerbID("take"): TakeActionHandler(),
-            // ... etc.
+            VerbID("examine"): LookActionHandler(), // Handles both LOOK and EXAMINE X
+            VerbID("inventory"): InventoryActionHandler(), // Need to create this
+            VerbID("quit"): QuitActionHandler(),
+            VerbID("score"): ScoreActionHandler(),
+            VerbID("wait"): WaitActionHandler(),
+
+            // Movement
+            VerbID("go"): GoActionHandler(),
+
+            // Common Interactions (Placeholders for now, need actual handlers)
+            VerbID("take"): PlaceholderActionHandler(verb: "take"), // Placeholder
+            VerbID("drop"): PlaceholderActionHandler(verb: "drop"), // Placeholder
+            VerbID("open"): PlaceholderActionHandler(verb: "open"), // Placeholder
+            VerbID("close"): PlaceholderActionHandler(verb: "close"), // Placeholder
+            VerbID("read"): PlaceholderActionHandler(verb: "read"), // Placeholder
+            VerbID("wear"): PlaceholderActionHandler(verb: "wear"), // Placeholder
+            VerbID("remove"): PlaceholderActionHandler(verb: "remove"), // Placeholder
+
+            // Sensory
+            VerbID("smell"): SmellActionHandler(),
+            VerbID("listen"): ListenActionHandler(),
+            VerbID("taste"): TasteActionHandler(),
+            VerbID("touch"): PlaceholderActionHandler(verb: "touch"), // Placeholder
+
+            // Meta
+            VerbID("help"): PlaceholderActionHandler(verb: "help"), // Placeholder
+            VerbID("save"): PlaceholderActionHandler(verb: "save"), // Placeholder
+            VerbID("restore"): PlaceholderActionHandler(verb: "restore"), // Placeholder
+            VerbID("verbose"): PlaceholderActionHandler(verb: "verbose"), // Placeholder
+            VerbID("brief"): PlaceholderActionHandler(verb: "brief"), // Placeholder
         ]
-        // Merge defaults, keeping custom handlers if they exist
+
+        // Merge defaults, keeping custom handlers provided during init if they exist
         self.actionHandlers.merge(defaultHandlers) { (custom, _) in custom }
     }
+
+    // Add Placeholder Handler Struct (Temporary)
+    fileprivate struct PlaceholderActionHandler: ActionHandler {
+        let verb: String
+        func perform(command: Command, engine: GameEngine) async throws {
+            await engine.output("Sorry, the default handler for '\(verb)' is not implemented yet.")
+        }
+    }
+
+    // Need InventoryActionHandler
+    fileprivate struct InventoryActionHandler: ActionHandler {
+         func perform(command: Command, engine: GameEngine) async throws {
+             let heldItems = await engine.itemSnapshots(withParent: .player)
+             if heldItems.isEmpty {
+                 await engine.output("You aren't carrying anything.")
+             } else {
+                 await engine.output("You are carrying:")
+                 for item in heldItems {
+                     await engine.output("  A \(item.name)") // TODO: Proper article/listing
+                 }
+             }
+         }
+     }
 
     // MARK: - Fuse & Daemon Management
 
