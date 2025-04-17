@@ -41,36 +41,40 @@ enum Components {
             engine: GameEngine,
             initialBatteryLife: Int = Constants.defaultBatteryLife
         ) async {
-            // Make sure the lantern exists
-            guard engine.getCurrentGameState().items[Constants.itemID] != nil else {
+            // Make sure the lantern exists using itemSnapshot for safety
+            guard await engine.itemSnapshot(with: Constants.itemID) != nil else {
                 // Use Swift.print for simple logging in demo/examples
                 Swift.print("Cannot setup lantern timer: lantern item '\(Constants.itemID)' not found")
                 return
             }
 
             // Set initial battery life in game state
-            engine.updateGameState { state in
+            await engine.updateGameState { state in
                 // Initialize gameSpecificState if it doesn't exist
                 if state.gameSpecificState == nil {
                     state.gameSpecificState = [:]
                 }
                 state.gameSpecificState?[Constants.batteryLifeKey] = AnyCodable(initialBatteryLife)
 
+                // Weather initialization is now handled in Weather.setupWeather()
+                /*
                 // TODO: Move Weather initialization to Weather component
                 // Set initial weather
                 if state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] == nil {
                      state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
                 }
+                */
             }
 
             // Register the daemon to start tracking battery life
             let _ = engine.registerDaemon(id: Constants.timerDaemonID)
 
+            // Weather daemon registration is now handled in Weather.setupWeather()
+            /*
             // TODO: Move Weather daemon registration to Weather component
-            // Register the weather daemon
-             if !engine.isDaemonRegistered(id: Components.Weather.Constants.weatherDaemonID) {
-                 let _ = engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
-             }
+            // Register the weather daemon (Remove isDaemonRegistered check)
+            let _ = engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
+            */
         }
 
         // MARK: - Daemon Definition
@@ -146,8 +150,8 @@ enum Components {
 
         /// Creates a fuse definition for the lantern's low battery warning.
         /// - Returns: A `FuseDefinition` that will trigger a final warning before the lantern dies
-        static func createLanternWarningFuse() -> FuseDefinition {
-            return FuseDefinition(
+        @MainActor static func createLanternWarningFuse() -> FuseDefinition {
+            FuseDefinition(
                 id: Constants.lowBatteryWarningFuseID,
                 initialTurns: Constants.lowBatteryThreshold / 2
             ) { engine in

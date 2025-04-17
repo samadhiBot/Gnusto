@@ -1,11 +1,11 @@
 import GnustoEngine
 
 /// Defines locations and items found within the cave system.
-enum CaveRegion {
+@MainActor enum CaveRegion {
     /// Locations within the cave system.
     static let locations: [Location] = [
         // Starting location
-        LocationDefinition(
+        Location(
             id: "startRoom",
             name: "Cave Entrance",
             description: """
@@ -20,7 +20,7 @@ enum CaveRegion {
         ),
 
         // Main cave areas
-        LocationDefinition(
+        Location(
             id: "darkChamber",
             name: "Dark Chamber",
             description: """
@@ -34,7 +34,7 @@ enum CaveRegion {
                 .west: Exit(destination: "crystalGrotto"),
             ]
         ),
-        LocationDefinition(
+        Location(
             id: "treasureRoom",
             name: "Treasure Room",
             description: """
@@ -48,7 +48,7 @@ enum CaveRegion {
         ),
 
         // Additional cave sections
-        LocationDefinition(
+        Location(
             id: "narrowPassage",
             name: "Narrow Passage",
             description: """
@@ -61,7 +61,7 @@ enum CaveRegion {
                 .east: Exit(destination: "ironDoorRoom"),
             ]
         ),
-        LocationDefinition(
+        Location(
             id: "ironDoorRoom",
             name: "Iron Door Chamber",
             description: """
@@ -73,7 +73,7 @@ enum CaveRegion {
                 // East exit is added dynamically by hooks based on door state
             ]
         ),
-        LocationDefinition(
+        Location(
             id: "hiddenVault",
             name: "Hidden Vault",
             description: """
@@ -85,7 +85,7 @@ enum CaveRegion {
                 .west: Exit(destination: "ironDoorRoom"), // Assumes door is open
             ]
         ),
-        LocationDefinition(
+        Location(
             id: "crystalGrotto",
             name: "Crystal Grotto",
             description: """
@@ -98,7 +98,7 @@ enum CaveRegion {
                 .down: Exit(destination: "undergroundPool"),
             ]
         ),
-        LocationDefinition(
+        Location(
             id: "undergroundPool",
             name: "Underground Pool",
             description: """
@@ -114,9 +114,9 @@ enum CaveRegion {
     ]
 
     /// Items found within the cave system or related to it.
-    static let items: [ItemDefinition] = [
+    static let items: [Item] = [
         // Player tool found at start
-        ItemDefinition(
+        Item(
             id: Components.Lantern.Constants.itemID, // Use constant from Lantern component
             name: "lantern",
             adjectives: ["brass"],
@@ -127,7 +127,7 @@ enum CaveRegion {
         ),
 
         // Treasure room items
-        ItemDefinition(
+        Item(
             id: "goldCrown",
             name: "crown",
             adjectives: ["gold", "golden"],
@@ -135,17 +135,17 @@ enum CaveRegion {
             properties: [.takable],
             parent: .item("stonePedestal") // Placed on the pedestal
         ),
-        ItemDefinition(
+        Item(
             id: "stonePedestal",
             name: "pedestal",
             adjectives: ["stone"],
             description: "A weathered stone pedestal in the center of the room.",
-            properties: [.surface, .scenery], // Scenery: can't be taken
+            properties: [.surface, .ndesc], // Use .ndesc instead of .scenery, imply !takable
             parent: .location("treasureRoom")
         ),
 
         // Iron Door puzzle items (door itself)
-        ItemDefinition(
+        Item(
             id: Components.IronDoorPuzzle.Constants.doorID, // Use constant
             name: "door",
             adjectives: ["iron", "massive"],
@@ -158,15 +158,15 @@ enum CaveRegion {
         ),
 
         // Crystal Grotto items
-        ItemDefinition(
+        Item(
             id: "woodenChest",
             name: "chest",
             adjectives: ["wooden", "old"],
             description: "An old wooden chest with brass fittings. The lid is currently closed.",
-            properties: [.container, .openable, .closed], // Starts closed
+            properties: [.container, .openable], // Starts closed (no .open property)
             parent: .location("crystalGrotto")
         ),
-        ItemDefinition(
+        Item(
             id: "silverCoin",
             name: "coin",
             adjectives: ["silver", "ancient"],
@@ -176,7 +176,7 @@ enum CaveRegion {
         ),
 
         // Hidden Vault items
-        ItemDefinition(
+        Item(
             id: "mysteriousAltar",
             name: "altar",
             adjectives: ["mysterious", "stone"],
@@ -184,10 +184,10 @@ enum CaveRegion {
                 A stone altar with intricate carvings. A shallow basin on top contains an \
                 iridescent liquid that seems to shift colors as you watch.
                 """,
-            properties: [.scenery], // Can't take altar
+            properties: [.ndesc], // Use .ndesc instead of .scenery
             parent: .location("hiddenVault")
         ),
-        ItemDefinition(
+        Item(
             id: "largeGem",
             name: "gem",
             adjectives: ["large", "glowing"],
@@ -201,7 +201,7 @@ enum CaveRegion {
         ),
 
         // Underground Pool items
-        ItemDefinition(
+        Item(
             id: "darkPool",
             name: "pool",
             adjectives: ["dark", "still"],
@@ -210,7 +210,7 @@ enum CaveRegion {
                 The water is perfectly still and incredibly clear. Looking down, you can see \
                 small, strange artifacts scattered on the bottom, just out of reach.
                 """,
-            properties: [.scenery], // Can't take the pool itself
+            properties: [.ndesc], // Use .ndesc instead of .scenery
             parent: .location("undergroundPool")
         )
     ]

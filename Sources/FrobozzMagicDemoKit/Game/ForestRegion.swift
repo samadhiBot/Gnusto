@@ -1,11 +1,11 @@
 import GnustoEngine
 
 /// Defines locations and items found within the forest region.
-enum ForestRegion {
+@MainActor enum ForestRegion {
     /// Locations within the forest.
-    static let locations: [LocationDefinition] = [
+    static let locations: [Location] = [
         // Outdoor areas
-        LocationDefinition(
+        Location(
             id: "outside",
             name: "Forest Path",
             description: """
@@ -18,7 +18,7 @@ enum ForestRegion {
             ],
             properties: [.inherentlyLit, .outside]
         ),
-        LocationDefinition(
+        Location(
             id: "streamBank",
             name: "Stream Bank",
             description: """
@@ -33,9 +33,9 @@ enum ForestRegion {
     ]
 
     /// Items found within the forest region.
-    static let items: [ItemDefinition] = [
+    static let items: [Item] = [
         // Iron Door puzzle items (key)
-        ItemDefinition(
+        Item(
             id: Components.IronDoorPuzzle.Constants.keyID, // Use constant
             name: "key",
             adjectives: ["rusty", "iron"],
@@ -45,13 +45,13 @@ enum ForestRegion {
         ),
 
         // Atmospheric items
-        ItemDefinition(
+        Item(
             id: "clearWater",
             name: "water",
             adjectives: ["clear", "cold"],
             synonyms: ["stream", "liquid"],
             description: "Clear, cold water that looks refreshing.",
-            properties: [.scenery], // Can't take the stream itself
+            properties: [.ndesc], // Use .ndesc instead of .scenery
             parent: .location("streamBank")
         ),
     ]

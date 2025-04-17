@@ -32,12 +32,12 @@ enum GameDataSetup {
         // Create registry with fuses and daemons (defined in Timers/* and Components/*)
         let registry = GameDefinitionRegistry(
             fuseDefinitions: [
-                Components.Lantern.createLanternWarningFuse() // Reference placeholder
+                Components.Lantern.createLanternWarningFuse()
                 // Add other fuses here if any
             ],
             daemonDefinitions: [
-                Components.Lantern.createLanternTimerDaemon(), // Reference placeholder
-                Components.Weather.createWeatherDaemon()      // Reference placeholder
+                Components.Lantern.createLanternTimerDaemon(),
+                Components.Weather.createWeatherDaemon()
                 // Add other daemons here if any
             ]
         )

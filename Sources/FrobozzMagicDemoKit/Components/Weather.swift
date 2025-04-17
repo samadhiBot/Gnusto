@@ -71,8 +71,25 @@ extension Components {
             }
         }
 
-        // TODO: Add setup function to initialize weather state and register daemon,
-        //       to be called from FrobozzMagicDemoKit.init
-        // static func setupWeather(engine: GameEngine) async { ... }
+        // MARK: - Setup
+
+        /// Initializes the weather system: sets initial state and registers the daemon.
+        /// - Parameter engine: The game engine instance.
+        static func setupWeather(engine: GameEngine) async {
+            // Set initial weather state
+            engine.updateGameState { state in
+                // Initialize gameSpecificState if it doesn't exist
+                if state.gameSpecificState == nil {
+                    state.gameSpecificState = [:]
+                }
+                // Set initial weather only if not already set
+                if state.gameSpecificState?[Constants.weatherStateKey] == nil {
+                    state.gameSpecificState?[Constants.weatherStateKey] = AnyCodable("sunny")
+                }
+            }
+
+            // Register the weather daemon
+            let _ = engine.registerDaemon(id: Constants.weatherDaemonID)
+        }
     }
 }
