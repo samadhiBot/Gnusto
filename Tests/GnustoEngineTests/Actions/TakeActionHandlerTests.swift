@@ -8,7 +8,10 @@ import Testing
 struct TakeActionHandlerTests {
 
     // Helper function to create data for a basic test setup
-    static func createTestData(itemsToAdd: [Item] = [], initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")) -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
+    static func createTestData(
+        itemsToAdd: [Item] = [],
+        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+    ) async -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
         // Include all needed verbs for handler tests in this suite
         let verbs = [
@@ -23,7 +26,7 @@ struct TakeActionHandlerTests {
     func testTakeItemSuccessfully() async throws {
         // Arrange: Create data
         let testItem = Item(id: "key", name: "brass key", properties: [.takable], size: 3) // Give size
-        var testData = Self.createTestData(itemsToAdd: [testItem])
+        var testData = await Self.createTestData(itemsToAdd: [testItem])
         testData.player.carryingCapacity = 10 // Set capacity
 
         // Arrange: Create engine and mocks within the test function context
@@ -63,7 +66,7 @@ struct TakeActionHandlerTests {
     func testTakeItemFailsWhenAlreadyHeld() async throws {
         // Arrange: Create data
         let testItem = Item(id: "key", name: "brass key", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks within the test function context
         let mockIO = await MockIOHandler()
@@ -100,7 +103,7 @@ struct TakeActionHandlerTests {
     func testTakeItemFailsWhenNotPresent() async throws {
         // Arrange: Create data for an item that exists but isn't in the room
         let testItem = Item(id: "key", name: "brass key", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -137,7 +140,7 @@ struct TakeActionHandlerTests {
     func testTakeItemFailsWhenNotTakable() async throws {
         // Arrange: Create item *without* .takable property
         let testItem = Item(id: "rock", name: "heavy rock", properties: []) // No .takable
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -173,7 +176,7 @@ struct TakeActionHandlerTests {
     @Test("Take fails with no direct object")
     func testTakeFailsWithNoObject() async throws {
         // Arrange: Minimal setup, no specific items needed
-        let testData = Self.createTestData()
+        let testData = await Self.createTestData()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let initialState = GameState.initial(
@@ -204,7 +207,7 @@ struct TakeActionHandlerTests {
         // Arrange: Create container and item inside it
         let container = Item(id: "box", name: "wooden box", properties: [.container, .open]) // Open container
         let itemInContainer = Item(id: "gem", name: "ruby gem", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [container, itemInContainer])
+        let testData = await Self.createTestData(itemsToAdd: [container, itemInContainer])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -250,7 +253,7 @@ struct TakeActionHandlerTests {
         // Arrange: Create container and item inside it
         let container = Item(id: "pouch", name: "leather pouch", properties: [.container, .open, .takable]) // Open & Takable
         let itemInContainer = Item(id: "coin", name: "gold coin", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [container, itemInContainer])
+        let testData = await Self.createTestData(itemsToAdd: [container, itemInContainer])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -296,7 +299,7 @@ struct TakeActionHandlerTests {
         // Arrange: Create a CLOSED container and item inside it
         let container = Item(id: "box", name: "wooden box", properties: [.container]) // Closed by default
         let itemInContainer = Item(id: "gem", name: "ruby gem", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [container, itemInContainer])
+        let testData = await Self.createTestData(itemsToAdd: [container, itemInContainer])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -336,7 +339,7 @@ struct TakeActionHandlerTests {
         // Arrange: Create a non-container and an item 'inside' it (logically impossible but test setup)
         let nonContainer = Item(id: "statue", name: "stone statue", properties: [.takable]) // Not a container
         let itemInside = Item(id: "chip", name: "stone chip", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [nonContainer, itemInside])
+        let testData = await Self.createTestData(itemsToAdd: [nonContainer, itemInside])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -378,7 +381,7 @@ struct TakeActionHandlerTests {
         // Arrange: Items with specific sizes
         let itemHeld = Item(id: "sword", name: "heavy sword", properties: [.takable], size: 8)
         let itemToTake = Item(id: "shield", name: "large shield", properties: [.takable], size: 7)
-        var testData = Self.createTestData(itemsToAdd: [itemHeld, itemToTake])
+        var testData = await Self.createTestData(itemsToAdd: [itemHeld, itemToTake])
         testData.player.carryingCapacity = 10 // Capacity lower than combined size
 
         // Arrange: Create engine and mocks
@@ -422,7 +425,7 @@ struct TakeActionHandlerTests {
     func testTakeWearableItemSuccessfully() async throws {
         // Arrange: Create a wearable item
         let testItem = Item(id: "cloak", name: "dark cloak", properties: [.takable, .wearable], size: 2)
-        var testData = Self.createTestData(itemsToAdd: [testItem])
+        var testData = await Self.createTestData(itemsToAdd: [testItem])
         testData.player.carryingCapacity = 10
 
         // Arrange: Create engine and mocks

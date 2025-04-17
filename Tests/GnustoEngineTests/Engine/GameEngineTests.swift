@@ -4,24 +4,18 @@ import Testing
 @testable import GnustoEngine
 
 // Helper class for sharing state with closures in tests
-@MainActor // Ensure properties accessed on main actor
+@MainActor
 private class TestStateHolder {
     var flag = false
     var count = 0
 }
 
+@MainActor
 @Suite("GameEngine Tests")
 struct GameEngineTests {
-
-    // Removed instance properties - will declare locally in tests
-    // var mockIOHandler: MockIOHandler!
-    // var mockParser: MockParser!
-    // var engine: GameEngine!
-    // var initialState: GameState!
-
     // Helper to create a minimal game state for testing
     // Make static as it doesn't depend on instance state
-    static func createMinimalGameState() -> GameState {
+    static func createMinimalGameState() async -> GameState {
         let items = [Item(id: "startItem", name: "pebble", properties: [.takable])]
         let locations = [Location(id: "startRoom", name: "Void", description: "An empty void.")]
         let player = Player(currentLocationID: "startRoom")
@@ -44,16 +38,14 @@ struct GameEngineTests {
 
     // Helper to create a minimal registry for tests
     // Make static as it doesn't depend on instance state
-    @MainActor // Needed because FuseDefinition init is @MainActor
     static func createMinimalRegistry(fuseDefs: [FuseDefinition] = [], daemonDefs: [DaemonDefinition] = []) -> GameDefinitionRegistry {
         return GameDefinitionRegistry(fuseDefinitions: fuseDefs, daemonDefinitions: daemonDefs) // Add daemonDefs
     }
 
     @Test("Engine Run Initialization and First Prompt in Dark Room")
-    @MainActor
     func testEngineRunInitializationInDarkRoom() async throws {
         // Arrange - Declare locally
-        let initialState = Self.createMinimalGameState() // Creates a dark room
+        let initialState = await Self.createMinimalGameState() // Creates a dark room
         let mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -92,10 +84,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Parse Error")
-    @MainActor
     func testEngineHandlesParseError() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -130,10 +121,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Action Error")
-    @MainActor
     func testEngineHandlesActionError() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -195,10 +185,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Processes Successful Command")
-    @MainActor
     func testEngineProcessesSuccessfulCommand() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -248,10 +237,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Processes Multiple Commands")
-    @MainActor
     func testEngineProcessesMultipleCommands() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -324,10 +312,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Exits Gracefully on Quit Command")
-    @MainActor
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -391,10 +378,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
-    @MainActor
     func testEngineHandlesNilInputGracefully() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         let mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -433,10 +419,9 @@ struct GameEngineTests {
     }
 
     @Test("Engine State Persists Between Turns (Take -> Inventory)")
-    @MainActor
     func testEngineStatePersistsBetweenTurns() async throws {
         // Arrange
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
@@ -535,9 +520,8 @@ struct GameEngineTests {
     // MARK: - Fuse & Daemon Tests
 
     @Test("Fuse executes after correct number of turns")
-    @MainActor
     func testFuseExecution() async throws {
-        var initialState = Self.createMinimalGameState() // Needs var to modify activeFuses
+        var initialState = await Self.createMinimalGameState() // Needs var to modify activeFuses
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
 
@@ -573,9 +557,8 @@ struct GameEngineTests {
     }
 
     @Test("Daemon executes at correct frequency")
-    @MainActor
     func testDaemonExecutionFrequency() async throws {
-        let initialState = Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
 
@@ -632,10 +615,9 @@ struct GameEngineTests {
     }
 
     @Test("Fuse and Daemon Interaction")
-    @MainActor
     func testFuseAndDaemonInteraction() async throws {
         // Arrange
-        var initialState = Self.createMinimalGameState()
+        var initialState = await Self.createMinimalGameState()
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
 

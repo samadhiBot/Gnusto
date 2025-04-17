@@ -9,14 +9,14 @@ extension Tag {
     @Tag static var walkthrough: Tag
 }
 
+@MainActor
 @Suite("Cloak of Darkness Walkthrough Tests")
 struct CloakOfDarknessWalkthroughTests {
     /// Performs a basic walkthrough: look, go west, take cloak, wear cloak, go east, look.
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
-    @MainActor
     func testBasicCloakWalkthrough() async throws {
         // 1. Setup World
-        let (initialState, parser, customHandlers, _, _, _) = WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, customHandlers, _, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO with commands
         let mockIO = await MockIOHandler(
@@ -75,10 +75,9 @@ struct CloakOfDarknessWalkthroughTests {
 
     /// Tests the win condition: get cloak, wear it, enter bar (dark), look, examine message.
     @Test("Bar Win Condition", .tags(.integration, .walkthrough)) // Renamed test
-    @MainActor
     func testBarWinCondition() async throws {
         // 1. Setup World
-        let (initialState, parser, customHandlers, _, _, onExamineItem) = WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, customHandlers, _, _, onExamineItem) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO: get cloak, wear it, go bar, look, examine message
         let mockIO = await MockIOHandler(

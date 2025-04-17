@@ -7,7 +7,10 @@ import Testing
 @Suite("InventoryActionHandler Tests")
 struct InventoryActionHandlerTests {
     // Helper function (adapted from Drop/Take tests)
-    static func createTestData(itemsToAdd: [Item] = [], initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")) -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
+    static func createTestData(
+        itemsToAdd: [Item] = [],
+        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+    ) async -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
         let verbs = [Verb(id: "inventory")] // Ensure INVENTORY verb exists
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
@@ -19,7 +22,7 @@ struct InventoryActionHandlerTests {
         // Arrange: Items held by player
         let item1 = Item(id: "key", name: "brass key")
         let item2 = Item(id: "lamp", name: "brass lamp")
-        let testData = Self.createTestData(itemsToAdd: [item1, item2])
+        let testData = await Self.createTestData(itemsToAdd: [item1, item2])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -55,7 +58,7 @@ struct InventoryActionHandlerTests {
     @Test("Inventory shows empty message")
     func testInventoryShowsEmptyMessage() async throws {
         // Arrange: No items held by player
-        let testData = Self.createTestData()
+        let testData = await Self.createTestData()
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()

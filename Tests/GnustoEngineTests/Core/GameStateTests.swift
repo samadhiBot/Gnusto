@@ -2,9 +2,9 @@ import Testing
 import Foundation // For JSONEncoder/Decoder
 @testable import GnustoEngine
 
+@MainActor
 @Suite("GameState Struct Tests")
 struct GameStateTests {
-
     // --- Test Setup ---
     // Define IDs for clarity
     static let locWOH: LocationID = "westOfHouse"
@@ -51,7 +51,7 @@ struct GameStateTests {
     }
 
     // 4. Helper to create the GameState with defined placements
-    func createSampleGameState() -> GameState {
+    func createSampleGameState() async -> GameState {
         let items = createSampleItems()
         let locations = createSampleLocations()
         let player = createSamplePlayer()
@@ -85,8 +85,8 @@ struct GameStateTests {
     // --- Tests ---
 
     @Test("GameState Initial Factory and Parent Setting")
-    func testGameStateInitialFactory() throws {
-        let state = createSampleGameState()
+    func testGameStateInitialFactory() async throws {
+        let state = await createSampleGameState()
 
         // Check locations exist
         #expect(state.locations.count == 2)
@@ -119,8 +119,8 @@ struct GameStateTests {
     }
 
     @Test("GameState Property Modification")
-    func testGameStatePropertyModification() throws {
-        var state = createSampleGameState() // Must be var
+    func testGameStatePropertyModification() async throws {
+        var state = await createSampleGameState() // Must be var
 
         // Modify Player (value type within struct)
         state.player.score = 10
@@ -155,8 +155,8 @@ struct GameStateTests {
     }
 
     @Test("GameState Codable Conformance")
-    func testGameStateCodable() throws {
-        let originalState = createSampleGameState()
+    func testGameStateCodable() async throws {
+        let originalState = await createSampleGameState()
 
         // Modify an item *before* encoding to check reference persistence & parent encoding
         originalState.items[Self.itemLantern]?.addProperty(.on)
@@ -196,8 +196,8 @@ struct GameStateTests {
     }
 
     @Test("GameState Value Semantics (Mixed with Reference)")
-    func testGameStateValueSemantics() throws {
-        let state1 = createSampleGameState()
+    func testGameStateValueSemantics() async throws {
+        let state1 = await createSampleGameState()
         var state2 = state1 // Creates a copy of the struct
 
         // Modify value types in state2

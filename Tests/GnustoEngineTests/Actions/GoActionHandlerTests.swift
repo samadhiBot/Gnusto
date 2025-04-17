@@ -3,12 +3,15 @@ import Testing
 
 @testable import GnustoEngine
 
+@MainActor
 @Suite("GoActionHandler Tests")
 struct GoActionHandlerTests {
-
     // Helper (adapted from previous tests)
-    @MainActor
-    static func createTestData(itemsToAdd: [Item] = [], initialLocations: [Location] = [], initialPlayerLocationID: LocationID? = nil) -> (items: [Item], locations: [Location], player: Player, vocab: Vocabulary) {
+    static func createTestData(
+        itemsToAdd: [Item] = [],
+        initialLocations: [Location] = [],
+        initialPlayerLocationID: LocationID? = nil
+    ) async -> (items: [Item], locations: [Location], player: Player, vocab: Vocabulary) {
         var locations = initialLocations
         if locations.isEmpty {
             locations.append(Location(id: "room1", name: "Room 1", description: "First room."))
@@ -30,7 +33,6 @@ struct GoActionHandlerTests {
     }
 
     @Test("Go successfully changes location")
-    @MainActor
     func testGoSuccessfullyChangesLocation() async throws {
         // Arrange: Create two locations with an exit connecting them
         let loc1 = Location(
@@ -47,7 +49,7 @@ struct GoActionHandlerTests {
         )
         loc1.exits[.north] = Exit(destination: "end")
 
-        let testData = Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
@@ -82,13 +84,12 @@ struct GoActionHandlerTests {
     }
 
     @Test("Go fails for invalid direction")
-    @MainActor
     func testGoFailsInvalidDirection() async throws {
         // Arrange: Location with no exit to the south
         let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
         #expect(loc1.exits[.south] == nil) // Verify no south exit
 
-        let testData = Self.createTestData(initialLocations: [loc1], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(initialLocations: [loc1], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
@@ -115,14 +116,13 @@ struct GoActionHandlerTests {
     }
 
     @Test("Go fails for closed door")
-    @MainActor
     func testGoFailsClosedDoor() async throws {
         // Arrange: Locations with a closed door exit
         let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
         let loc2 = Location(id: "end", name: "End Room", description: "You went there.")
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: false) // Door, explicitly closed
 
-        let testData = Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
@@ -150,7 +150,6 @@ struct GoActionHandlerTests {
     }
 
     @Test("Go fails for locked door")
-    @MainActor
     func testGoFailsLockedDoor() async throws {
         // Arrange: Locations with a locked (but potentially open) door exit
         let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
@@ -158,7 +157,7 @@ struct GoActionHandlerTests {
         // Note: A door can be locked but technically open (e.g., gate)
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: true, isLocked: true)
 
-        let testData = Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
@@ -185,7 +184,6 @@ struct GoActionHandlerTests {
     }
 
     @Test("Go fails with specific blocked message")
-    @MainActor
     func testGoFailsBlockedMessage() async throws {
         // Arrange: Locations with an exit having a blockedMessage
         let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
@@ -193,7 +191,7 @@ struct GoActionHandlerTests {
         let blockMsg = "A chasm blocks your path."
         loc1.exits[.north] = Exit(destination: "end", blockedMessage: blockMsg)
 
-        let testData = Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()

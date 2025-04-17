@@ -2,6 +2,7 @@ import Testing
 import CustomDump
 @testable import GnustoEngine
 
+@MainActor
 @Suite("WearActionHandler Tests")
 struct WearActionHandlerTests {
     let handler = WearActionHandler()
@@ -34,7 +35,7 @@ struct WearActionHandlerTests {
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: initialState,
             parser: mockParser,
             ioHandler: mockIO
@@ -46,7 +47,6 @@ struct WearActionHandlerTests {
     // --- Tests ---
 
     @Test("Wear held, wearable item successfully")
-    @MainActor
     func testWearItemSuccess() async throws {
         let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable]) // Held, wearable
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
@@ -68,7 +68,6 @@ struct WearActionHandlerTests {
     }
 
     @Test("Wear fails if item not held")
-    @MainActor
     func testWearItemNotHeld() async throws {
         // Cloak is not in inventory in this setup
         let (engine, _) = await createTestEngine()
@@ -84,7 +83,6 @@ struct WearActionHandlerTests {
     }
 
     @Test("Wear fails if item not wearable")
-    @MainActor
     func testWearItemNotWearable() async throws {
         let rock = Item(id: "rock", name: "rock", properties: [.takable]) // Held, but not wearable
         let (engine, _) = await createTestEngine(itemsInInventory: [rock])
@@ -100,7 +98,6 @@ struct WearActionHandlerTests {
     }
 
     @Test("Wear fails if item already worn")
-    @MainActor
     func testWearItemAlreadyWorn() async throws {
         let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable, .worn]) // Held, wearable, already worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
@@ -118,7 +115,6 @@ struct WearActionHandlerTests {
     }
 
     @Test("Wear fails with no direct object")
-    @MainActor
     func testWearNoObject() async throws {
         let (engine, mockIO) = await createTestEngine()
         // Command with nil directObject

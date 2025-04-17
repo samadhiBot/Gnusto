@@ -2,6 +2,7 @@ import Foundation
 @testable import GnustoEngine
 
 /// Contains helper functions for setting up standard game worlds for testing.
+@MainActor
 struct WorldSetups {
 
     /// Sets up the minimal "Cloak of Darkness" world state for testing.
@@ -11,7 +12,14 @@ struct WorldSetups {
     ///
     /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, the `[VerbID: ActionHandler]` dictionary,
     ///            and the optional `@MainActor @Sendable` custom logic hook closures.
-    static func setupCloakOfDarknessWorld() -> (GameState, StandardParser, [VerbID: ActionHandler], (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?, (@MainActor @Sendable (GameEngine) async -> Void)?, (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?) {
+    static func setupCloakOfDarknessWorld() async -> (
+        GameState,
+        StandardParser,
+        [VerbID: ActionHandler],
+        (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?,
+        (@MainActor @Sendable (GameEngine) async -> Void)?,
+        (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
+    ) {
         // Locations
         let foyer = Location(
             id: "foyer",

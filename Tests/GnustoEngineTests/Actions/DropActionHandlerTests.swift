@@ -3,13 +3,20 @@ import Testing
 
 @testable import GnustoEngine
 
+@MainActor
 @Suite("DropActionHandler Tests")
 struct DropActionHandlerTests {
-
     // Helper function to create data for a basic test setup
     // Adapted from TakeActionHandlerTests
-    @MainActor
-    static func createTestData(itemsToAdd: [Item] = [], initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")) -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
+    static func createTestData(
+        itemsToAdd: [Item] = [],
+        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+    ) async -> (
+        items: [Item],
+        location: Location,
+        player: Player,
+        vocab: Vocabulary
+    ) {
         let player = Player(currentLocationID: initialLocation.id)
         // Include all needed verbs for handler tests in this suite
         let verbs = [
@@ -21,11 +28,10 @@ struct DropActionHandlerTests {
     }
 
     @Test("Drop item successfully")
-    @MainActor
     func testDropItemSuccessfully() async throws {
         // Arrange: Create item
         let testItem = Item(id: "key", name: "brass key", properties: [.takable]) // Size not needed for drop
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -67,10 +73,9 @@ struct DropActionHandlerTests {
     }
 
     @Test("Drop fails with no direct object")
-    @MainActor
     func testDropFailsWithNoObject() async throws {
         // Arrange: Minimal setup
-        let testData = Self.createTestData()
+        let testData = await Self.createTestData()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let initialState = GameState.initial(
@@ -94,11 +99,10 @@ struct DropActionHandlerTests {
     }
 
     @Test("Drop fails when item not held")
-    @MainActor
     func testDropFailsWhenNotHeld() async throws {
         // Arrange: Item exists but is in the room
         let testItem = Item(id: "key", name: "brass key", properties: [.takable])
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
@@ -131,11 +135,10 @@ struct DropActionHandlerTests {
     }
 
     @Test("Drop worn item successfully removes worn property")
-    @MainActor
     func testDropWornItemSuccessfully() async throws {
         // Arrange: Create a wearable item
         let testItem = Item(id: "cloak", name: "dark cloak", properties: [.takable, .wearable, .worn]) // Start worn
-        let testData = Self.createTestData(itemsToAdd: [testItem])
+        let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()

@@ -3,7 +3,7 @@ import Foundation
 
 /// Main entry point for the Cloak of Darkness replica.
 struct CloakOfDarkness {
-
+    @MainActor 
     static func main() async {
         print("Initializing Cloak of Darkness...\n")
 
@@ -80,7 +80,7 @@ struct CloakOfDarkness {
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.worn])
                  ]),
         ]
-        let vocabulary = await Vocabulary.build(items: allItems, verbs: verbs)
+        let vocabulary = Vocabulary.build(items: allItems, verbs: verbs)
 
         // Game State
         let gameState = GameState.initial(
@@ -112,7 +112,7 @@ struct CloakOfDarkness {
 
         // --- Engine Setup ---
         let ioHandler = await ConsoleIOHandler()
-        let engine = await GameEngine(
+        let engine = GameEngine(
             initialState: gameState,
             parser: parser,
             ioHandler: ioHandler,

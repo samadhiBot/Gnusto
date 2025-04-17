@@ -19,9 +19,9 @@ extension Tag {
     @Tag static var surface: Tag // Added tag for surface tests
 }
 
+@MainActor
 @Suite("StandardParser Tests")
 struct StandardParserTests {
-
     // --- Test Setup ---
     let parser = StandardParser()
     let vocabulary: Vocabulary
@@ -33,7 +33,7 @@ struct StandardParserTests {
     let lampID: ItemID = "lantern" // Correct ID to match item list
     let boxID: ItemID = "box"
 
-    init() {
+    init() async {
         // 1. Define all possible Items
         let allItems = [
             Item(id: "lantern", name: "lantern", adjectives: ["brass"], synonyms: ["lamp"], properties: [.lightSource, .openable]),
