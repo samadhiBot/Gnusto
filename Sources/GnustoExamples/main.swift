@@ -1,12 +1,11 @@
 import Foundation
 import GnustoEngine
 
-// This is the entry point for the GnustoExamples executable.
-// It demonstrates how to set up and run a game using the Gnusto engine.
-
+/// This is the entry point for the GnustoExamples executable.
+/// It demonstrates how to set up and run a game using the Gnusto engine.
 struct GnustoExamplesApp {
     static func main() async throws {
-        print("=== Welcome to the Gnusto Examples ===")
+        print("=== Welcome to the Gnusto Example Game ===")
         print("A demonstration of the Gnusto Interactive Fiction Engine")
         print("----------------------------------------")
 
@@ -27,3 +26,6 @@ extension GnustoExamplesApp {
         RunLoop.main.run()
     }
 }
+
+// Call the main function
+GnustoExamplesApp.main()
