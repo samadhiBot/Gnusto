@@ -569,6 +569,23 @@ public class GameEngine {
         // Optionally print a final message immediately or let the loop handle it.
         // await ioHandler.print("Goodbye!") // Can be done here or in run()
     }
+
+    // MARK: - Output Helpers
+
+    /// Displays text to the player using the configured IOHandler.
+    /// - Parameters:
+    ///   - text: The text to display.
+    ///   - style: The desired text style.
+    ///   - newline: Whether to append a newline (defaults to true).
+    public func output(_ text: String, style: TextStyle, newline: Bool = true) async {
+        await ioHandler.print(text, style: style, newline: newline)
+    }
+
+    /// Convenience method to print text with the normal style.
+    /// - Parameter text: The text to display.
+    public func output(_ text: String) async {
+        await ioHandler.print(text, style: .normal, newline: true)
+    }
 }
 
 // Remove the temporary vocabulary extension on GameState

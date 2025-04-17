@@ -73,11 +73,11 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
         case LanternConstants.lowBatteryThreshold:
             // When we hit the threshold, add a fuse for the final warning
             let _ = engine.addFuse(id: LanternConstants.lowBatteryWarningFuseID)
-            await engine.print("Your lantern is getting dim.", style: .strong)
+            await engine.output("Your lantern is getting dim.", style: .strong)
 
         case 0:
             // Battery is fully depleted
-            await engine.print("Your lantern has run out of power and is now dark.", style: .strong)
+            await engine.output("Your lantern has run out of power and is now dark.", style: .strong)
 
             // Turn off the lantern
             engine.removeItemProperty(itemID: LanternConstants.lanternID, property: .on)
@@ -102,7 +102,7 @@ public func createLanternWarningFuse() -> FuseDefinition {
         initialTurns: LanternConstants.lowBatteryThreshold / 2
     ) { engine in
         // This runs when the fuse triggers (halfway through the remaining battery life)
-        await engine.print("Your lantern is getting very dim and will soon run out of power!", style: .strong)
+        await engine.output("Your lantern is getting very dim and will soon run out of power!", style: .strong)
     }
 }
 

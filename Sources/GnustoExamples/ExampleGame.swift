@@ -448,7 +448,7 @@ public class ExampleGame {
             let hasVisited = engine.getCurrentGameState().flags[flag] ?? false
 
             if !hasVisited {
-                await printMessage(engine: engine, "You've discovered the legendary treasure room!", style: .strong)
+                await engine.output("You've discovered the legendary treasure room!", style: .strong)
                 engine.updateGameState { state in
                     state.flags[flag] = true
                     state.player.score += 10 // Award points for discovery
@@ -457,7 +457,7 @@ public class ExampleGame {
 
         case "undergroundPool":
             // Special atmosphere for the underground pool
-            await printMessage(engine: engine, """
+            await engine.output("""
                 The water in the pool ripples slightly as you enter, \
                 disrupting the perfect mirror-like surface.
                 """, style: .emphasis)
@@ -468,7 +468,7 @@ public class ExampleGame {
             let hasVisited = engine.getCurrentGameState().flags[flag] ?? false
 
             if !hasVisited {
-                await printMessage(engine: engine, """
+                await engine.output("""
                     As you enter, the runes on the walls pulse with energy. \
                     You feel you've discovered something truly ancient and powerful.
                     """, style: .strong)
@@ -501,7 +501,7 @@ public class ExampleGame {
             let hasLight = await hasActiveLight(engine: engine)
 
             if !hasLight {
-                await printMessage(engine: engine, """
+                await engine.output("""
                     It is pitch black. You are likely to be eaten by a grue.
                     """, style: .strong)
             }
@@ -514,7 +514,7 @@ public class ExampleGame {
     private static func beforeEachTurn(engine: GameEngine) async {
         // Check for pending messages from daemons or fuses
         if let pendingMessage = engine.getCurrentGameState().gameSpecificState?[LanternConstants.pendingMessageKey]?.value as? String {
-            await printMessage(engine: engine, pendingMessage)
+            await engine.output(pendingMessage)
 
             // Clear the pending message
             engine.updateGameState { state in
@@ -524,11 +524,8 @@ public class ExampleGame {
 
         // Process any custom commands
         // Get current input as processed by the parser
-        let command = engine.getCurrentGameState().parser.currentCommand
-        if await processCustomCommands(engine: engine, command: command) {
-            // If we handled it, don't proceed with normal messages
-            return
-        }
+        // Removed incorrect access to parser and call to processCustomCommands
+        // Custom commands should be handled via registered ActionHandlers
 
         // Example: Add atmospheric messages based on location
         let locationID = engine.getCurrentGameState().player.currentLocationID
@@ -539,27 +536,27 @@ public class ExampleGame {
 
         switch locationID {
         case "darkChamber":
-            await printMessage(engine: engine, "A faint dripping sound echoes in the darkness.", style: .emphasis)
+            await engine.output("A faint dripping sound echoes in the darkness.", style: .emphasis)
         case "treasureRoom":
-            await printMessage(engine: engine, "The gems in the walls glitter mysteriously.", style: .emphasis)
+            await engine.output("The gems in the walls glitter mysteriously.", style: .emphasis)
         case "outside", "streamBank":
             // Weather effects for outside areas
             if let weatherState = engine.getCurrentGameState().gameSpecificState?[WeatherConstants.weatherStateKey]?.value as? String {
                 switch weatherState {
                 case "sunny":
-                    await printMessage(engine: engine, "Sunlight filters through the trees above you.", style: .emphasis)
+                    await engine.output("Sunlight filters through the trees above you.", style: .emphasis)
                 case "cloudy":
-                    await printMessage(engine: engine, "Gray clouds drift overhead, dimming the light.", style: .emphasis)
+                    await engine.output("Gray clouds drift overhead, dimming the light.", style: .emphasis)
                 case "rainy":
-                    await printMessage(engine: engine, "Raindrops patter on the leaves around you.", style: .emphasis)
+                    await engine.output("Raindrops patter on the leaves around you.", style: .emphasis)
                 default:
                     break
                 }
             }
         case "crystalGrotto":
-            await printMessage(engine: engine, "The crystals around you shimmer with refracted light.", style: .emphasis)
+            await engine.output("The crystals around you shimmer with refracted light.", style: .emphasis)
         case "undergroundPool":
-            await printMessage(engine: engine, "The water in the pool is eerily still, like black glass.", style: .emphasis)
+            await engine.output("The water in the pool is eerily still, like black glass.", style: .emphasis)
         default:
             break
         }
@@ -586,13 +583,13 @@ public class ExampleGame {
                     \(batteryLife) turns of battery life remaining.
                     """
 
-                await printMessage(engine: engine, description)
+                await engine.output(description)
                 return true
             }
 
         case "darkPool":
             // Custom pool examination
-            await printMessage(engine: engine, """
+            await engine.output("""
                 Looking into the clear, dark water, you can see what look like ancient \
                 artifacts resting on the bottom. They're just out of reach, but seem \
                 to be made of precious metals.
@@ -604,12 +601,12 @@ public class ExampleGame {
             let isUnlocked = engine.getCurrentGameState().flags[PuzzleConstants.doorUnlockedFlag] == true
 
             if isUnlocked {
-                await printMessage(engine: engine, """
+                await engine.output("""
                     A massive iron door that stands open now, revealing a passage to the east. \
                     The ancient runes around its frame glow with a faint blue light.
                     """)
             } else {
-                await printMessage(engine: engine, """
+                await engine.output("""
                     A massive iron door, firmly shut. Ancient runes are inscribed around its \
                     frame, and there's a keyhole below the heavy handle. It appears to be locked.
                     """)
@@ -618,7 +615,7 @@ public class ExampleGame {
 
         case "mysteriousAltar":
             // Custom altar examination
-            await printMessage(engine: engine, """
+            await engine.output("""
                 The altar is carved from a single piece of dark stone. The basin on top \
                 contains a swirling, iridescent liquid that seems to change colors as you watch. \
                 The liquid gives off a faint, pleasant aroma.
@@ -632,122 +629,22 @@ public class ExampleGame {
         return false
     }
 
-    /// Process custom commands like "help" or special actions
-    /// - Parameters:
-    ///   - engine: The game engine
-    ///   - command: The current command
-    /// - Returns: `true` if command was handled, `false` otherwise
-    @MainActor
-    private static func processCustomCommands(engine: GameEngine, command: Command?) async -> Bool {
-        // Process special verbs
-        guard let command = command, let verbID = command.verbID else { return false }
-
-        switch verbID {
-        case "help":
-            await printMessage(engine: engine, """
-                Gnusto Example Game Help:
-                - Try exploring the cave with a lantern
-                - Look for items that can be picked up and used
-                - The iron door requires a key to unlock
-                - The lantern has limited battery life
-                - Weather changes affect outdoor locations
-
-                Sample commands to try:
-                "take lantern", "light lantern", "examine pool",
-                "open chest", "unlock door with key"
-                """, style: .strong)
-            return true
-
-        case "unlock":
-            // Handle unlocking the iron door
-            if command.directObject == "ironDoor" && command.indirectObject == "rustyKey" {
-                // Get player's held items
-                let gameState = engine.getCurrentGameState()
-                let playerItems = gameState.player.inventory
-                let hasKey = playerItems.contains(PuzzleConstants.keyID)
-
-                if !hasKey {
-                    await printMessage(engine: engine, "You don't have the key.")
-                    return true
-                }
-
-                // Check if already unlocked
-                if engine.getCurrentGameState().flags[PuzzleConstants.doorUnlockedFlag] == true {
-                    await printMessage(engine: engine, "The door is already unlocked.")
-                    return true
-                }
-
-                // Unlock the door
-                await printMessage(engine: engine, """
-                    You insert the rusty key into the lock. With effort, it turns with a \
-                    heavy clunk. The door swings open, revealing a passage to the east.
-                    """, style: .strong)
-
-                engine.updateGameState { state in
-                    state.flags[PuzzleConstants.doorUnlockedFlag] = true
-                    state.locations["ironDoorRoom"]?.exits[.east] = Exit(destination: "hiddenVault")
-                    state.player.score += 20 // Award points for solving puzzle
-                }
-                return true
-            }
-            return false
-
-        case "drink":
-            // Handle drinking from various water sources
-            if command.directObject == "clearWater" {
-                await printMessage(engine: engine, "You take a drink of the cold, clear water. It's refreshing!")
-                return true
-            } else if command.directObject == "darkPool" {
-                await printMessage(engine: engine, """
-                    You consider drinking from the dark pool, but something tells you \
-                    that might not be wise.
-                    """)
-                return true
-            }
-            return false
-
-        case "touch":
-            // Handle touching the crystals in the grotto
-            if let directObject = command.directObject,
-               directObject == "crystal" &&
-               engine.getCurrentGameState().player.currentLocationID == "crystalGrotto" {
-                await printMessage(engine: engine, """
-                    As your fingers brush against the crystal, it emits a clear, pure tone \
-                    that echoes through the grotto. Other crystals seem to respond with \
-                    harmonizing tones of their own.
-                    """, style: .emphasis)
-                return true
-            }
-            return false
-
-        default:
-            return false
-        }
-    }
-
-    /// Helper function to print messages using the engine's IOHandler
-    @MainActor
-    private static func printMessage(engine: GameEngine, _ text: String, style: TextStyle = .normal) async {
-        await engine.print(text, style: style)
-    }
-
     /// Check if the player has an active light source
     @MainActor
     private static func hasActiveLight(engine: GameEngine) async -> Bool {
-        // Get player's inventory
-        let gameState = engine.getCurrentGameState()
-        let playerItems = gameState.player.inventory
+        // Get player's held items
+        let playerItemIDs = engine.itemSnapshots(withParent: .player).map { $0.id }
 
         // Check each item to see if it's a light source and turned on
-        for itemID in playerItems {
-            let item = gameState.items[itemID]
+        for itemID in playerItemIDs {
+            let item = engine.itemSnapshot(with: itemID)
             if item?.hasProperty(.lightSource) == true && item?.hasProperty(.on) == true {
                 return true
             }
         }
 
         // Also check if the player is holding the glowing gem
-        if playerItems.contains("largeGem") {
+        if playerItemIDs.contains("largeGem") {
             return true
         }
 
