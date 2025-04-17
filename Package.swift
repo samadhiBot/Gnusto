@@ -18,8 +18,8 @@ let package = Package(
             targets: ["CloakOfDarkness"]
         ),
         .executable(
-            name: "GnustoExamples",
-            targets: ["GnustoExamples"]
+            name: "FrobozzMagicDemoKit",
+            targets: ["FrobozzMagicDemoKit"]
         )
     ],
     dependencies: [
@@ -34,7 +34,7 @@ let package = Package(
             path: "Executables/CloakOfDarkness"
         ),
         .executableTarget(
-            name: "GnustoExamples",
+            name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"]
         ),
         .testTarget(

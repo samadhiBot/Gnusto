@@ -10,8 +10,8 @@ struct GnustoExamplesApp {
         print("----------------------------------------")
 
         // Create and run the example game
-        let game = await ExampleGame()
-        await game.run()
+        let game = await FrobozzMagicDemoKit()
+        await game.engine.run()
     }
 }
 

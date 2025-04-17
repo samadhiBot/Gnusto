@@ -4,17 +4,14 @@ import GnustoEngine
 /// A simple example game that demonstrates various Gnusto engine features.
 /// This serves as both documentation and a reference implementation.
 @MainActor
-public class ExampleGame {
+final class FrobozzMagicDemoKit {
     // MARK: - Properties
 
     /// The game engine instance that manages the game state.
-    private let engine: GameEngine
+    let engine: GameEngine
 
     /// The IO handler for printing messages
-    private let ioHandler: IOHandler
-
-    /// Flag to track if the game is currently running.
-    private var isRunning = false
+    let ioHandler: IOHandler
 
     // MARK: - Constants
 
@@ -69,7 +66,7 @@ public class ExampleGame {
     /// - Parameter customIOHandler: An optional custom IO handler. If nil, a ConsoleIOHandler is used.
     public init(customIOHandler: IOHandler? = nil) async {
         // Set up the game data
-        let (initialState, registry) = ExampleGame.createGameData()
+        let (initialState, registry) = FrobozzMagicDemoKit.createGameData()
 
         // Create the parser
         let parser = StandardParser()
@@ -93,9 +90,9 @@ public class ExampleGame {
             ioHandler: ioHandler,
             scopeResolver: scopeResolver,
             registry: registry,
-            onEnterRoom: ExampleGame.onEnterRoom,
-            beforeTurn: ExampleGame.beforeEachTurn,
-            onExamineItem: ExampleGame.onExamineItem
+            onEnterRoom: FrobozzMagicDemoKit.onEnterRoom,
+            beforeTurn: FrobozzMagicDemoKit.beforeEachTurn,
+            onExamineItem: FrobozzMagicDemoKit.onExamineItem
         )
 
         // Set up the lantern timer
@@ -828,33 +825,5 @@ public class ExampleGame {
 
         // Register the weather daemon
         let _ = engine.registerDaemon(id: WeatherConstants.weatherDaemonID)
-    }
-
-    // MARK: - Helper Methods
-
-    /// Print a message to the player
-    @MainActor
-    public func print(_ text: String, style: TextStyle = .normal) async {
-        await ioHandler.print(text, style: style)
-    }
-
-    /// Print a blank line
-    @MainActor
-    public func printBlankLine() async {
-        await ioHandler.print("", style: .normal)
-    }
-
-    // MARK: - Game Execution
-
-    /// Runs the game.
-    public func run() async {
-        if isRunning {
-            Swift.print("Game is already running")
-            return
-        }
-
-        isRunning = true
-        await engine.run()
-        isRunning = false
     }
 }

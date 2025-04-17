@@ -1,26 +1,28 @@
-# Gnusto Example Game
+# Frobozz Magic Demo Kit
 
-This folder contains an example game that demonstrates how to use the GnustoEngine. The goal is to provide a clear, approachable reference implementation that helps new developers understand how to create games with Gnusto.
+Welcome, aspiring Implementor! This folder contains the genuine Frobozz Magic Demo Kit, guaranteed\* to demonstrate the wondrous capabilities of the Gnusto Interactive Fiction Engine. Its goal is to provide a clear, approachable reference implementation to help new developers understand how to create magical interactive adventures with Gnusto.
+
+\*Guarantee void if used near grues, volcanoes, or during Implementor Incantations.
 
 ## Design Philosophy
 
-The `ExampleGame` class demonstrates:
+The `FrobozzMagicDemoKit` class (the heart of the Demo Kit) demonstrates:
 
-1. Setting up a complete game with the engine
-2. Defining game content (locations, items, verbs)
-3. Implementing custom behavior through game hooks
-4. Managing time-based events with fuses and daemons
-5. Testing client-side ergonomics of the engine
+1. Setting up a complete game with the engine (some assembly required)
+2. Defining magical game content (locations, items, verbs)
+3. Implementing custom spell-like behavior through game hooks
+4. Managing time-based enchantments with fuses and daemons
+5. Testing the user-friendliness (ergonomics) of the engine for client games
 
-### Adding to the Gnusto Example Game
+### Adding More Magic to the Demo Kit
 
-- Everything in the example game should be intentional, and should serve to demonstrate some piece of functionality that the engine provides.
-- The Example Game is the proving ground for functionality and ergonomics.
-- The Gnusto Interactive Fiction Engine is still under active development, and remains pre 0.0.1, so we are free to enhance and improve the game engine whenever we find missing functionality or ergonomics in need of improvement.
+- Everything in the Demo Kit should be intentional, serving to demonstrate some piece of engine functionality (or "magic").
+- The Demo Kit is the proving ground for engine functionality and ease-of-use.
+- The Gnusto Interactive Fiction Engine is still under active development (pre 0.0.1!), so feel free to enhance and improve the engine whenever you find missing functionality or awkward enchantments.
 
-## Example Features
+## Demonstrated Features
 
-The example game showcases several important engine features:
+The Demo Kit showcases several important engine features:
 
 ### Location and Item Setup
 
@@ -51,9 +53,9 @@ Item(
 )
 ```
 
-### Game Hooks
+### Game Hooks (Incantations)
 
-The example demonstrates how to implement custom behavior for specific game events:
+The Demo Kit demonstrates how to implement custom behavior for specific game events:
 
 ```swift
 // Custom logic when player enters a room
@@ -82,9 +84,9 @@ private static func onExamineItem(engine: GameEngine, itemID: ItemID) async -> B
 }
 ```
 
-### Time-Based Events
+### Time-Based Events (Fuses & Daemons)
 
-The example includes a complete implementation of a lantern timer system similar to Zork's:
+The Demo Kit includes a complete implementation of a lantern timer system similar to Zork's:
 
 ```swift
 // Create a daemon that runs every turn
@@ -110,16 +112,16 @@ private static func createLanternWarningFuse() -> FuseDefinition {
 }
 ```
 
-## Running the Example
+## Running the Demo Kit
 
-To run the example game, simply build and execute the GnustoExamples target. The game will start in the console and guide you through exploring a small cave system with a lantern and treasure.
+To run the Demo Kit, simply build and execute the `FrobozzMagicDemoKit` target. The demonstration will start in the console and guide you through exploring a small cave system with a lantern and treasure (standard adventuring gear).
 
 ## Using This as a Template
 
-You can use `ExampleGame.swift` as a starting point for your own games. Key points to understand:
+You can use `FrobozzMagicDemoKit.swift` as a starting point for your own magical creations. Key points to understand:
 
 1. The `createGameData()` method sets up your game world
 2. The game hooks (`onEnterRoom`, etc.) provide custom behavior
 3. The main `run()` method starts the game
 
-Feel free to modify and extend this example to create your own interactive fiction adventures!
+Feel free to modify and extend this Demo Kit to create your own interactive fiction adventures!
