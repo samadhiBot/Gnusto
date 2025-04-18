@@ -21,8 +21,8 @@ public struct DropActionHandler: ActionHandler {
 
         // 3. Check if player is holding the item
         guard targetItem.parent == .player else {
-            // TODO: Check Zork/classic message for this
-            await engine.ioHandler.print("You aren't holding that.")
+            // Use Zork 1 message
+            await engine.output("You don't have the \(targetItem.name).")
             return
         }
 

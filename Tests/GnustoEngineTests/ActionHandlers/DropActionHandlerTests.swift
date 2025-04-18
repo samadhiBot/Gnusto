@@ -131,7 +131,7 @@ struct DropActionHandlerTests {
 
         // Assert: Check output message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding that.")
+        expectNoDifference(output, "You don't have the brass key.")
     }
 
     @Test("Drop worn item successfully removes worn property")
