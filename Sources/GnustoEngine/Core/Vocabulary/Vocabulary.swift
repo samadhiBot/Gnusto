@@ -71,8 +71,8 @@ public struct Vocabulary: Codable, Sendable {
     /// Default set of common English noise words.
     public static let defaultNoiseWords: Set<String> = [
         "a", "an", "and", "the", "some", "this", "that", "those", "these",
-        ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")",
-        "at", "in", "on", "to", "of", "with", // Add common prepositions often treated as noise
+        ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")"
+        // Removed: "at", "in", "on", "to", "of", "with" - These are often important prepositions/directions
     ]
 
     /// Default set of common English prepositions.
@@ -89,7 +89,11 @@ public struct Vocabulary: Codable, Sendable {
     /// Default verbs common to most IF games.
     @MainActor public static let defaultVerbs: [Verb] = [
         // Core Actions
-        Verb(id: "look", synonyms: ["l"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(id: "look", synonyms: ["l"],
+             syntax: [
+                SyntaxRule(pattern: [.verb]),
+                SyntaxRule(pattern: [.verb, .directObject]) // Added rule for look <item>
+             ]),
         Verb(id: "examine", synonyms: ["x", "inspect"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Examine needs DO
         Verb(id: "inventory", synonyms: ["i"], syntax: [SyntaxRule(pattern: [.verb])]),
         Verb(id: "quit", synonyms: ["q"], syntax: [SyntaxRule(pattern: [.verb])]),
@@ -102,8 +106,27 @@ public struct Vocabulary: Codable, Sendable {
 
         // Common Interactions (often need specific handlers, but define verb)
         Verb(id: "take", synonyms: ["get", "grab", "pick"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "drop", synonyms: ["put", "place", "discard"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Simple drop syntax
-        // TODO: Add rules for DROP X ON Y, PUT X IN Y, etc.
+        Verb(id: "put", synonyms: ["place"], // Corrected: Only place is a reasonable synonym
+             syntax: [
+                // Define rules for PUT/PLACE: V+DO+PREP+IO
+                // put <DO> in <IO> - DO must be reachable, IO must be a container
+                SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
+                           directObjectConditions: [], // Must be reachable (default), .takable checked by action
+                           indirectObjectConditions: [.container], // IO must be a container
+                           requiredPreposition: "in"),
+                // put <DO> on <IO> - DO must be reachable, IO must be a surface (checked by action)
+                 SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
+                            directObjectConditions: [],
+                            indirectObjectConditions: [], // IO must be reachable surface (action checks property)
+                            requiredPreposition: "on"),
+                // put <DO> into <IO> - Same as 'in'
+                SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
+                           directObjectConditions: [],
+                           indirectObjectConditions: [.container],
+                           requiredPreposition: "into")
+             ]),
+        Verb(id: "drop", synonyms: ["discard"], // Corrected: Removed put, place
+             syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Simple drop syntax
         Verb(id: "open", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "close", synonyms: ["shut"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "read", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),

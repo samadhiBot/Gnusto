@@ -154,10 +154,12 @@ public struct StandardParser: Parser {
                 // Ran out of input tokens but pattern expected more
                 // Check if remaining expected tokens are optional (e.g., only objects)
                 let remainingPattern = rule.pattern[patternIndex...]
+                // Allow ending early only if *all* remaining are object types
                 let onlyObjectsRemain = remainingPattern.allSatisfy { $0 == .directObject || $0 == .indirectObject }
                 if onlyObjectsRemain {
                      break // Okay to end early if only optional objects remain
                 } else {
+                    // More specific error if we know what was expected
                     return .failure(.badGrammar("Command seems incomplete, expected more input like '\(tokenType)'."))
                 }
             }
@@ -167,7 +169,13 @@ public struct StandardParser: Parser {
 
             case .directObject:
                 // Consume tokens until next expected pattern element (preposition?) or end
-                let phraseEndIndex = findEndOfNounPhrase(startIndex: tokenCursor, tokens: tokens, pattern: rule.pattern, patternIndex: patternIndex, vocabulary: vocabulary)
+                let phraseEndIndex = findEndOfNounPhrase(
+                    startIndex: tokenCursor,
+                    tokens: tokens,
+                    pattern: rule.pattern,
+                    patternIndex: patternIndex,
+                    vocabulary: vocabulary // Reverted: Removed rule argument
+                )
 
                 // Ensure we consume at least one token if DO is expected.
                 guard phraseEndIndex > tokenCursor else {
@@ -199,7 +207,13 @@ public struct StandardParser: Parser {
 
             case .indirectObject:
                 // Consume remaining tokens until the end
-                 let phraseEndIndex = findEndOfNounPhrase(startIndex: tokenCursor, tokens: tokens, pattern: rule.pattern, patternIndex: patternIndex, vocabulary: vocabulary)
+                 let phraseEndIndex = findEndOfNounPhrase(
+                    startIndex: tokenCursor,
+                    tokens: tokens,
+                    pattern: rule.pattern,
+                    patternIndex: patternIndex,
+                    vocabulary: vocabulary // Reverted: Removed rule argument
+                 )
                  // Ensure we consume at least one token if IO is expected.
                  guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
@@ -224,7 +238,6 @@ public struct StandardParser: Parser {
         if tokenCursor < tokens.count {
             return .failure(.badGrammar("Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"))
         }
-
 
         // --- Object Resolution ---
         // Use the extracted token arrays
@@ -320,20 +333,31 @@ public struct StandardParser: Parser {
         // 3. Determine the primary noun (assume last known noun)
         guard let lastNounIndex = knownNounIndices.last else {
             // No known noun found. Maybe it's just modifiers? Or an unknown word?
-            // For now, return no noun and all significant words as potential modifiers.
-            // This might be wrong if the input was just "xyzzy".
-            // TODO: Consider returning an error or handling unknown single words?
-            return (nil, significantPhrase)
+            // Return nil noun and filter the phrase for valid modifiers only.
+            let potentialMods = significantPhrase.filter { word in
+                // A word is a potential modifier if it's NOT a known noun, verb, prep, or direction
+                !vocabulary.items.keys.contains(word) &&
+                !vocabulary.verbs.keys.contains(word) &&
+                !vocabulary.prepositions.contains(word) &&
+                !vocabulary.directions.keys.contains(word)
+                // Note: Pronouns are implicitly handled as they'd be caught by knownNounIndices check
+            }
+            return (nil, potentialMods)
         }
         let noun = significantPhrase[lastNounIndex]
 
-        // 4. Collect modifiers (words before the last noun that aren't other known nouns)
+        // 4. Collect modifiers (words before the last noun that aren't other known words)
         var mods: [String] = []
         for index in 0..<lastNounIndex {
-            // Only include words that are *not* identified as known nouns themselves.
-            // Avoids treating "small box key" as noun=key, mods=["small", "box"]
-            if !knownNounIndices.contains(index) {
-                mods.append(significantPhrase[index])
+            let word = significantPhrase[index]
+            // Exclude other known nouns, verbs, prepositions, and directions from being modifiers
+            let isKnownNoun = knownNounIndices.contains(index)
+            let isKnownVerb = vocabulary.verbs.keys.contains(word)
+            let isKnownPrep = vocabulary.prepositions.contains(word)
+            let isKnownDirection = vocabulary.directions.keys.contains(word)
+
+            if !isKnownNoun && !isKnownVerb && !isKnownPrep && !isKnownDirection {
+                mods.append(word)
             }
         }
 
@@ -525,58 +549,50 @@ public struct StandardParser: Parser {
     /// - Returns: The index marking the end of the noun phrase (exclusive). If no valid phrase
     ///            is found, returns `startIndex`.
     private func findEndOfNounPhrase(startIndex: Int, tokens: [String], pattern: [SyntaxTokenType], patternIndex: Int, vocabulary: Vocabulary) -> Int {
-        var endIndex = startIndex
+        var boundaryIndex = startIndex // Use a separate index for the boundary
         let nextPatternIndex = patternIndex + 1
-        let nextExpectedType: SyntaxTokenType? = (nextPatternIndex < pattern.count) ? pattern[nextPatternIndex] : nil
 
-        while endIndex < tokens.count {
-            let currentToken = tokens[endIndex]
+        while boundaryIndex < tokens.count {
+            let currentToken = tokens[boundaryIndex]
 
-            // Check if the current token signals the start of the *next* pattern element.
-            if let nextType = nextExpectedType {
-                var stop = false
-                switch nextType {
+            // Check if the current token signals the start of the *next* non-object pattern element.
+            if nextPatternIndex < pattern.count {
+                let nextExpectedType = pattern[nextPatternIndex]
+                var isBoundaryToken = false
+
+                switch nextExpectedType {
                 case .preposition:
+                    // Is the current token a preposition that marks the boundary?
                     if vocabulary.prepositions.contains(currentToken) {
-                        // Check if the specific preposition required by the rule is found *later*
-                        // This is tricky. For now, simplest: stop if *any* preposition is found
-                        // when a preposition is expected next.
-                        stop = true
+                        isBoundaryToken = true
+                    }
+                case .direction:
+                    // Is the current token a direction?
+                    if vocabulary.directions.keys.contains(currentToken) {
+                        isBoundaryToken = true
+                    }
+                case .verb:
+                    // Is the current token a verb?
+                    if vocabulary.verbs.keys.contains(currentToken) {
+                        isBoundaryToken = true
                     }
                 case .directObject, .indirectObject:
-                    // If the next element is another object, how do we separate them?
-                    // Usually by a conjunction ("and") or context.
-                    // Simple approach: Assume the current noun phrase ends here if we encounter
-                    // something that looks like the start of the *next* object phrase.
-                    // Requires smarter noun identification. Deferring this complexity.
-                    break // Continue consuming for now
-                case .verb:
-                     // Seeing a verb likely ends the current noun phrase.
-                     if vocabulary.verbs.keys.contains(currentToken) {
-                         stop = true
-                     }
-                case .direction:
-                    // If the next expected token is a direction, and the current token IS a direction,
-                    // then the noun phrase ends here.
-                    if vocabulary.directions.keys.contains(currentToken) {
-                        stop = true
-                    }
+                    // We don't automatically stop for subsequent objects.
+                    break
                 }
-                if stop {
-                    return endIndex // Stop *before* the token that matches the next pattern element type.
+
+                if isBoundaryToken {
+                    // Found the boundary. The noun phrase ends *before* this token.
+                    return boundaryIndex
                 }
             }
 
-            // TODO: Add more sophisticated checks? Stop if currentToken is clearly
-            // not an adjective or noun suitable for the current phrase?
-            // E.g., if we see a preposition here but the *next* expected type isn't preposition.
-
-            // Consume the current token as part of the noun phrase
-            endIndex += 1
+            // Haven't found the boundary; this token is part of the noun phrase.
+            boundaryIndex += 1
         }
 
-        // If we reach the end, the phrase extends to the end of the tokens.
-        return endIndex
+        // Reached the end of the input tokens.
+        return boundaryIndex // which is now tokens.count
     }
 
     /// Determines if a ParseError is related to object resolution issues.

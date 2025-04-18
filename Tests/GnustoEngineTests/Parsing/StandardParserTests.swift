@@ -20,7 +20,6 @@ extension Tag {
 }
 
 @MainActor
-@Suite("StandardParser Tests")
 struct StandardParserTests {
     // --- Test Setup ---
     let parser = StandardParser()
@@ -56,65 +55,14 @@ struct StandardParserTests {
             Item(id: "orb", name: "orb", adjectives: ["glowing"], properties: [.takable, .lightSource]) // Starts nowhere
         ]
 
-        // 2. Define all Verbs
-        let verbs = [
-            // Define rules for TAKE/GET: V+DO (needs object)
-            Verb(id: "take", synonyms: ["get"],
-                 syntax: [
-                    // Generally, take implies item must be reachable (default scope), not specifically held.
-                    // .takable property checked by TAKE action, not parser.
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [])
-                 ]),
-            // Define rules for LOOK: V, V+DO, V+PREP+DO (e.g., look in box)
-            Verb(id: "look", synonyms: ["l", "examine", "x"],
-                 syntax: [
-                    SyntaxRule(pattern: [.verb]), // look (at room)
-                    SyntaxRule(pattern: [.verb, .directObject]), // look <item>
-                    // look in <container> - requires the DO to be a container
-                    SyntaxRule(pattern: [.verb, .preposition, .directObject], directObjectConditions: [.container], requiredPreposition: "in"),
-                    // look on <surface> - requires the DO to have surface property (via action), parser just needs object resolution
-                    // Let's treat 'look on X' like 'look X' for parsing, action handles 'surface' check.
-                    // Or, if we add .surface to ObjectCondition, we could use it here.
-                    // For now, omit 'look on' specific rule unless .surface is added to ObjectCondition.
-                    // Alternative: Make the action for 'look' handle 'look on X' by checking the preposition and item property.
-                    // Let's stick to 'look in' for now.
-                 ]),
-            // GO should now accept a direction
-            Verb(id: "go", // TODO: Add synonyms like 'walk'?
-                 syntax: [
-                    // SyntaxRule(pattern: [.verb]) // Old rule: Direction handled by action
-                    SyntaxRule(pattern: [.verb, .direction]) // New rule: Expect verb followed by direction
-                 ]),
-            // Define rules for PUT/PLACE: V+DO+PREP+IO
-            Verb(id: "put", synonyms: ["place"],
-                 syntax: [
-                    // put <DO> in <IO> - DO must be reachable, IO must be a container
-                    SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                               directObjectConditions: [], // Must be reachable (default), .takable checked by action
-                               indirectObjectConditions: [.container], // IO must be a container
-                               requiredPreposition: "in"),
-                    // put <DO> on <IO> - DO must be reachable, IO must be a surface (checked by action)
-                     SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                                directObjectConditions: [],
-                                indirectObjectConditions: [], // IO must be reachable surface (action checks property)
-                                requiredPreposition: "on"),
-                    // put <DO> into <IO> - Same as 'in'
-                    SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                               directObjectConditions: [],
-                               indirectObjectConditions: [.container],
-                               requiredPreposition: "into")
-                 ]),
-            // Define rules for DROP: V+DO
-            Verb(id: "drop",
-                 syntax: [
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.held]) // Can only drop held things
-                 ]),
-             // Define rules for EAT: V+DO
-             Verb(id: "eat",
-                 syntax: [
-                     // Action checks .edible property
-                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [])
-                 ])
+        // 2. Define Game-Specific Verbs (if any) - Most verbs are now defaults
+        let gameSpecificVerbs: [Verb] = [
+            // Example: Add back a verb if its specific syntax/conditions ARE needed for a test
+            // and differ from the default (unlikely for most basic tests now).
+            // Verb(id: "eat", syntax: [ SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: []) ])
+            // NOTE: The test setup previously defined verbs like 'take', 'look', 'go', 'put', 'drop', 'eat'.
+            // These are now provided by Vocabulary.defaultVerbs and should NOT be redefined here
+            // unless a specific test requires overriding a default rule.
         ]
 
         // 3. Define all Locations
@@ -154,13 +102,14 @@ struct StandardParserTests {
             "it": ["box"] // Let's say "it" initially refers to the box in the room
         ]
 
-        // 6. Build Vocabulary
-        var builtVocabulary = Vocabulary.build(items: allItems, verbs: verbs)
+        // 6. Build Vocabulary using defaults + game-specific items/verbs
+        var builtVocabulary = Vocabulary.build(items: allItems, verbs: gameSpecificVerbs)
+        // Add test-specific noise/prepositions if needed (defaults are usually sufficient)
         builtVocabulary.noiseWords.insert("the")
-        builtVocabulary.noiseWords.insert("at")
-        builtVocabulary.prepositions.insert("in")
-        builtVocabulary.prepositions.insert("on")
-        builtVocabulary.prepositions.insert("into")
+        // builtVocabulary.noiseWords.insert("at") // Removed from noise
+        // builtVocabulary.prepositions.insert("in") // Already in defaultPrepositions
+        // builtVocabulary.prepositions.insert("on") // Already in defaultPrepositions
+        // builtVocabulary.prepositions.insert("into") // Already in defaultPrepositions
         self.vocabulary = builtVocabulary // Store for parser tests
 
         // 7. Build GameState using the new factory method
@@ -210,14 +159,22 @@ struct StandardParserTests {
 
     @Test("Parse Simple Verb - Known", .tags(.parser, .verbOnly))
     func testParseSimpleVerbKnown() throws {
-        let inputs = ["look", "LOOK", "l", "  examine ", "the x"]
-        for input in inputs {
+        // Test LOOK variations (no DO expected)
+        let lookInputs = ["look", "LOOK", "l"]
+        for input in lookInputs {
             let result = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
             let command = try result.get()
             #expect(command.verbID == "look")
             #expect(command.directObject == nil)
             #expect(command.indirectObject == nil)
             #expect(command.rawInput == input)
+        }
+
+        // Test EXAMINE variations (should fail without DO)
+        let examineInputs = ["examine", "x"]
+        for input in examineInputs {
+            let result = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
+            #expect(result.isFailure(matching: .badGrammar("Missing direct object phrase for verb \'examine\'.")))
         }
     }
 
@@ -252,11 +209,10 @@ struct StandardParserTests {
 
     @Test("Parse Verb + Direct Object + Multiple Modifiers", .tags(.parser, .directObject, .modifiers, .resolution, .scope))
     func testParseVerbDirectObjectMultiMods() throws {
-        // "key" is now in scope (in inventory)
+        // Input uses "examine"
         let result = parser.parse(input: "examine the rusty small key", vocabulary: vocabulary, gameState: gameState)
-        // Revert to expecting success
         let command = try result.get()
-        #expect(command.verbID == "look")
+        #expect(command.verbID == "examine") // Expect examine, not look
         #expect(command.directObject == "key")
         #expect(Set(command.directObjectModifiers) == Set(["rusty", "small"]))
         #expect(command.indirectObject == nil)
@@ -358,10 +314,10 @@ struct StandardParserTests {
 
     @Test("Parse Find Direct Object in Location (Global)", .tags(.parser, .resolution, .scope))
     func testParseDirectObjectInLocationGlobal() throws {
-        // Location has global 'rug'
+        // Input uses "examine"
         let result = parser.parse(input: "examine rug", vocabulary: vocabulary, gameState: gameState)
         let command = try result.get()
-        #expect(command.verbID == "look")
+        #expect(command.verbID == "examine") // Expect examine, not look
         #expect(command.directObject == "rug")
         #expect(command.indirectObject == nil)
     }
@@ -380,10 +336,10 @@ struct StandardParserTests {
 
     @Test("Filter by Different Single Adjective", .tags(.parser, .resolution, .modifiers))
     func testFilterDifferentAdjective() throws {
-        // Both lanterns are in scope, but only one is rusty
+        // Input uses "examine"
         let result = parser.parse(input: "examine rusty lantern", vocabulary: vocabulary, gameState: gameState)
         let command = try result.get()
-        #expect(command.verbID == "look")
+        #expect(command.verbID == "examine") // Expect examine, not look
         #expect(command.directObject == "lantern2") // Should resolve to the rusty one
         #expect(command.directObjectModifiers == ["rusty"])
     }
@@ -456,9 +412,10 @@ struct StandardParserTests {
     func testPronounItInScope() throws {
         var tempGameState = gameState
         tempGameState.pronouns["it"] = ["sword"] // Set refers to sword in room
+        // Input uses "examine"
         let result = parser.parse(input: "examine it", vocabulary: vocabulary, gameState: tempGameState)
         let command = try result.get()
-        #expect(command.verbID == "look")
+        #expect(command.verbID == "examine") // Expect examine, not look
         #expect(command.directObject == "sword")
     }
 
@@ -732,19 +689,14 @@ struct StandardParserTests {
 
     @Test("Extract Noun/Mods - Only Unknown Word", .tags(.parser, .errorHandling))
     func testExtractNounModsOnlyUnknown() throws {
-        // "look xyzzy"
-        // extractNounAndMods returns (nil, ["xyzzy"])
-        // resolveObject then fails because "xyzzy" is not a known noun or pronoun
+        // "look xyzzy" - Should now parse with look verb and attempt resolution
         let result = parser.parse(input: "look xyzzy", vocabulary: vocabulary, gameState: gameState)
         #expect(result.isFailure(matching: .unknownNoun("xyzzy")))
     }
 
     @Test("Extract Noun/Mods - Only Modifier", .tags(.parser, .errorHandling))
     func testExtractNounModsOnlyModifier() throws {
-        // "look brass"
-        // extractNounAndMods returns (nil, ["brass"])
-        // resolveObject fails because "brass" is not a known noun or pronoun
-        // Note: ZIL might have handled this differently (e.g., assuming any item)
+        // "look brass" - Should now parse with look verb and attempt resolution
         let result = parser.parse(input: "look brass", vocabulary: vocabulary, gameState: gameState)
         #expect(result.isFailure(matching: .unknownNoun("brass")))
     }
