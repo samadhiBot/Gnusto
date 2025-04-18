@@ -119,7 +119,7 @@ public class GameEngine {
             VerbID("go"): GoActionHandler(),
 
             // Common Interactions (Placeholders for now, need actual handlers)
-            VerbID("take"): PlaceholderActionHandler(verb: "take"), // Placeholder
+            VerbID("take"): TakeActionHandler(), // Use the real handler
             VerbID("drop"): PlaceholderActionHandler(verb: "drop"), // Placeholder
             VerbID("open"): PlaceholderActionHandler(verb: "open"), // Placeholder
             VerbID("close"): PlaceholderActionHandler(verb: "close"), // Placeholder

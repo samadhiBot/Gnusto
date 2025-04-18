@@ -10,7 +10,8 @@ struct TakeActionHandlerTests {
     // Helper function to create data for a basic test setup
     static func createTestData(
         itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing."),
+        pronouns: [String: [String]] = [:]
     ) async -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
         // Include all needed verbs for handler tests in this suite
@@ -101,39 +102,35 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when not present in location")
     func testTakeItemFailsWhenNotPresent() async throws {
-        // Arrange: Create data for an item that exists but isn't in the room
-        let testItem = Item(id: "key", name: "brass key", properties: [.takable])
-        let testData = await Self.createTestData(itemsToAdd: [testItem])
+        // Arrange: Create item that *won't* be added to location
+        let nonexistentItem = Item(id: "ghost", name: "ghostly apparition", properties: [.takable])
+        var testData = await Self.createTestData()
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let initialState = GameState.initial(
             initialLocations: [testData.location],
             initialItems: [],
             initialPlayer: testData.player,
             vocabulary: testData.vocab
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
-
-        // Arrange: Add item but set parent to .nowhere (or another room if we had one)
-        engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .nowhere)
+        let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
 
         let handler = TakeActionHandler()
-        let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+        let command = Command(verbID: "take", directObject: "ghost", rawInput: "take ghost")
 
-        // Act
-        // Expect no throw, just a message
-        try await handler.perform(command: command, engine: engine)
+        // Act & Assert: Expect ActionError.itemNotFound
+        await #expect(throws: ActionError.itemNotFound(itemDescription: "ghost")) {
+            try await handler.perform(command: command, engine: engine)
+        }
 
-        // Assert
-        // Check item parent DID NOT change
-        let finalItemState = engine.itemSnapshot(with: "key")
-        #expect(finalItemState?.parent == .nowhere, "Item should still be nowhere")
+        // Assert: Check that the player is still holding nothing
+        let finalPlayerState = engine.gameState.playerSnapshot()
+        #expect(finalPlayerState.items.isEmpty == true)
 
-        // Check output message
+        // Assert: Check NO message was printed by the handler
         let output = await mockIO.flush()
-        expectNoDifference(output, "You don't see any brass key here.")
+        #expect(output.isEmpty == true)
     }
 
     @Test("Take item fails when not takable")
@@ -339,18 +336,17 @@ struct TakeActionHandlerTests {
         // Arrange: Create a non-container and an item 'inside' it (logically impossible but test setup)
         let nonContainer = Item(id: "statue", name: "stone statue", properties: [.takable]) // Not a container
         let itemInside = Item(id: "chip", name: "stone chip", properties: [.takable])
-        let testData = await Self.createTestData(itemsToAdd: [nonContainer, itemInside])
+        var testData = await Self.createTestData(itemsToAdd: [nonContainer, itemInside])
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let initialState = GameState.initial(
             initialLocations: [testData.location],
             initialItems: [],
             initialPlayer: testData.player,
             vocabulary: testData.vocab
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
+        let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
 
         // Arrange: Add items and set up hierarchy
         engine.debugAddItem(id: nonContainer.id, name: nonContainer.name, properties: nonContainer.properties, parent: .location(testData.location.id)) // Statue in room
@@ -360,20 +356,18 @@ struct TakeActionHandlerTests {
         let handler = TakeActionHandler()
         let command = Command(verbID: "take", directObject: "chip", rawInput: "take chip from statue") // Target the chip
 
-        // Act
-        // Expect no throw, just a message
-        try await handler.perform(command: command, engine: engine)
+        // Act & Assert: Expect ActionError.prerequisiteNotMet
+        await #expect(throws: ActionError.prerequisiteNotMet("You can't take things out of the stone statue.")) {
+             try await handler.perform(command: command, engine: engine)
+        }
 
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.itemSnapshot(with: "chip")
         #expect(finalItemState?.parent == .item("statue"), "Chip should still be parented to statue")
 
-        // Assert: Check specific message was printed
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "You can't take things out of the stone statue." }, "Expected non-container message")
-
-        // Assert: Check no other output
-        #expect(output.count == 1)
+        // Assert: Check NO message was printed by the handler
+        let output = await mockIO.flush()
+        #expect(output.isEmpty == true)
     }
 
     @Test("Take item fails when capacity exceeded")
@@ -458,6 +452,75 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property after just taking")
 
         // Check output message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.")
+    }
+
+    @Test("Take updates 'it' pronoun")
+    func testTakeUpdatesPronoun() async throws {
+        // Arrange
+        let testItem = Item(id: "widget", name: "shiny widget", properties: [.takable])
+        var testData = await Self.createTestData(itemsToAdd: [testItem])
+        let mockIO = await MockIOHandler()
+        let initialState = GameState.initial(
+            initialLocations: [testData.location],
+            initialItems: [],
+            initialPlayer: testData.player,
+            vocabulary: testData.vocab,
+            pronouns: ["it": ["someOtherItem"]] // Pre-set 'it'
+        )
+        let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
+        engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .location(testData.location.id))
+
+        let handler = TakeActionHandler()
+        let command = Command(verbID: "take", directObject: testItem.id, rawInput: "take widget")
+
+        // Act
+        try await handler.perform(command: command, engine: engine)
+
+        // Assert
+        let finalPronounIt = engine.getCurrentGameState().pronouns["it"]
+        #expect(finalPronounIt == [testItem.id], "'it' pronoun should refer to the taken item")
+        let output = await mockIO.flush()
+        #expect(output == "Taken.")
+    }
+
+    @Test("Take item successfully from surface in room")
+    func testTakeItemSuccessfullyFromSurface() async throws {
+        // Arrange: Create surface and item on it
+        let surfaceItem = Item(id: "table", name: "wooden table", properties: [.surface])
+        let itemOnSurface = Item(id: "book", name: "old book", properties: [.takable, .read])
+        var testData = await Self.createTestData(itemsToAdd: [surfaceItem, itemOnSurface])
+        testData.player.carryingCapacity = 10
+
+        // Arrange: Engine and mocks
+        let mockIO = await MockIOHandler()
+        let initialState = GameState.initial(
+            initialLocations: [testData.location],
+            initialItems: [],
+            initialPlayer: testData.player,
+            vocabulary: testData.vocab
+        )
+        let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
+
+        // Arrange: Set up hierarchy
+        engine.debugAddItem(id: surfaceItem.id, name: surfaceItem.name, properties: surfaceItem.properties, parent: .location(testData.location.id))
+        engine.debugAddItem(id: itemOnSurface.id, name: itemOnSurface.name, properties: itemOnSurface.properties, parent: .item(surfaceItem.id))
+
+        let handler = TakeActionHandler()
+        let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
+
+        // Act
+        try await handler.perform(command: command, engine: engine)
+
+        // Assert
+        let finalItemState = engine.itemSnapshot(with: itemOnSurface.id)
+        #expect(finalItemState?.parent == .player, "Item should be held by player")
+        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
+
+        let finalSurfaceState = engine.itemSnapshot(with: surfaceItem.id)
+        #expect(finalSurfaceState?.parent == .location(testData.location.id))
+
         let output = await mockIO.flush()
         expectNoDifference(output, "Taken.")
     }

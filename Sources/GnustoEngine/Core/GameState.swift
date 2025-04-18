@@ -264,4 +264,34 @@ public struct GameState: Codable {
     }
 
     // TODO: Add other state mutation helpers (e.g., setFlag, addProperty).
+
+    // MARK: - State Mutation Helpers
+
+    /// Updates the referent(s) for a given pronoun.
+    /// - Parameters:
+    ///   - pronoun: The pronoun string (e.g., "it", "them").
+    ///   - referringTo: A single ItemID the pronoun should now refer to.
+    public mutating func updatePronoun(_ pronoun: String, referringTo itemID: ItemID) {
+        // For singular pronouns like "it", overwrite the existing set.
+        self.pronouns[pronoun.lowercased()] = [itemID]
+        // TODO: Handle plural pronouns ("them")? Append or replace?
+    }
+
+    /// Updates the referent(s) for a given pronoun.
+    /// - Parameters:
+    ///   - pronoun: The pronoun string (e.g., "it", "them").
+    ///   - referringTo: A set of ItemIDs the pronoun should now refer to.
+    public mutating func updatePronoun(_ pronoun: String, referringTo itemIDs: Set<ItemID>) {
+        self.pronouns[pronoun.lowercased()] = itemIDs
+    }
+
+    /// Removes all references for a given pronoun.
+    /// - Parameter pronoun: The pronoun string to clear.
+    public mutating func clearPronoun(_ pronoun: String) {
+        self.pronouns.removeValue(forKey: pronoun.lowercased())
+    }
+
+    // MARK: - Convenience Accessors
+
+    // ... existing accessors ...
 }

@@ -59,4 +59,5 @@ struct TasteActionHandler: ActionHandler {
 }
 
 // TODO: Add handlers for HELP, SAVE, RESTORE, VERBOSE, BRIEF (meta commands)
-// TODO: Add basic handlers for TAKE, DROP, OPEN, CLOSE, READ, WEAR, REMOVE?
+// TODO: Add basic handlers for DROP, OPEN, CLOSE, READ, WEAR, REMOVE?
+// TODO: Add basic handler for TOUCH?
