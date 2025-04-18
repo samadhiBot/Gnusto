@@ -47,6 +47,12 @@ public final class Item: Codable, Identifiable {
     /// Text displayed when the item is read (`READ`, requires `ItemProperty.read`).
     public var text: String?
 
+    /// The text content if the item is `.readable`.
+    public var readableText: String? = nil
+
+    /// The key needed to lock/unlock this item (if `.lockable`).
+    public var lockKey: ItemID? = nil
+
     // --- Initialization ---
     public init(
         id: ItemID,
@@ -61,7 +67,9 @@ public final class Item: Codable, Identifiable {
         properties: Set<ItemProperty> = [],
         size: Int = 5,
         capacity: Int = -1,
-        parent: ParentEntity = .nowhere // Default parent to .nowhere
+        parent: ParentEntity = .nowhere, // Default parent to .nowhere
+        readableText: String? = nil,
+        lockKey: ItemID? = nil
         // actionHandlerID: String? = nil
     ) {
         self.id = id
@@ -77,6 +85,8 @@ public final class Item: Codable, Identifiable {
         self.size = size
         self.capacity = capacity
         self.parent = parent
+        self.readableText = readableText
+        self.lockKey = lockKey
         // self.actionHandlerID = actionHandlerID
     }
 
@@ -97,6 +107,8 @@ public final class Item: Codable, Identifiable {
         case subsequentDescription
         case synonyms
         case text
+        case readableText
+        case lockKey
     }
 
     public required init(from decoder: Decoder) throws {
@@ -114,6 +126,8 @@ public final class Item: Codable, Identifiable {
         subsequentDescription = try container.decodeIfPresent(String.self, forKey: .subsequentDescription)
         synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
         text = try container.decodeIfPresent(String.self, forKey: .text)
+        readableText = try container.decodeIfPresent(String.self, forKey: .readableText)
+        lockKey = try container.decodeIfPresent(ItemID.self, forKey: .lockKey)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -131,6 +145,8 @@ public final class Item: Codable, Identifiable {
         try container.encodeIfPresent(subsequentDescription, forKey: .subsequentDescription)
         try container.encode(synonyms, forKey: .synonyms)
         try container.encodeIfPresent(text, forKey: .text)
+        try container.encodeIfPresent(readableText, forKey: .readableText)
+        try container.encodeIfPresent(lockKey, forKey: .lockKey)
     }
 
     // --- Convenience Accessors ---

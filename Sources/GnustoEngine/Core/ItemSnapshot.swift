@@ -17,6 +17,7 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public let size: Int
     public let capacity: Int
     public let parent: ParentEntity
+    public let readableText: String?
 
     // --- Initialization ---
 
@@ -35,6 +36,7 @@ public struct ItemSnapshot: Identifiable, Sendable {
         self.size = item.size
         self.capacity = item.capacity
         self.parent = item.parent // ParentEntity is a value type
+        self.readableText = item.readableText // Copy readableText
     }
 
     // --- Convenience Accessors (Similar to Item) ---

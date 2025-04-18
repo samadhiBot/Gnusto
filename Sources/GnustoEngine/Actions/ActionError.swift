@@ -38,6 +38,7 @@ public enum ActionError: Error, Equatable, Sendable {
     case playerCannotCarryMore
     case itemNotHeld(ItemID)       // Player isn't holding an item they need to be (e.g., for drop, wear)
     case itemNotAccessible(ItemID) // Item exists but is not in reach (not in inv, not visible in loc)
+    case roomIsDark                // Action requires light, but the room is dark
 
     // Add more specific errors as needed...
 }

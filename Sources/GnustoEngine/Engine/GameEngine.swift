@@ -19,7 +19,7 @@ public class GameEngine {
     nonisolated internal let ioHandler: IOHandler
 
     /// The resolver for scope and visibility checks.
-    public let scopeResolver: ScopeResolver
+    lazy var scopeResolver: ScopeResolver = ScopeResolver(engine: self)
 
     /// The registry holding static game definitions (fuses, daemons, etc.).
     public let registry: GameDefinitionRegistry
@@ -58,7 +58,6 @@ public class GameEngine {
     ///   - initialState: The starting state of the game.
     ///   - parser: The command parser to use.
     ///   - ioHandler: The I/O handler for player interaction.
-    ///   - scopeResolver: The resolver for scope checks (defaults to a new instance).
     ///   - registry: The game definition registry to use.
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
@@ -68,7 +67,6 @@ public class GameEngine {
         initialState: GameState,
         parser: Parser,
         ioHandler: IOHandler,
-        scopeResolver: ScopeResolver = ScopeResolver(),
         registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
@@ -78,7 +76,6 @@ public class GameEngine {
         self.gameState = initialState
         self.parser = parser
         self.ioHandler = ioHandler
-        self.scopeResolver = scopeResolver
         self.registry = registry
         self.actionHandlers = customHandlers
         self.onEnterRoom = onEnterRoom
@@ -387,7 +384,7 @@ public class GameEngine {
         let locationID = gameState.player.currentLocationID
 
         // 1. Check for light
-        guard scopeResolver.isLocationLit(locationID: locationID, gameState: gameState) else {
+        guard scopeResolver.isLocationLit(locationID: locationID) else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
             // Do not describe the room or list items.
@@ -409,7 +406,7 @@ public class GameEngine {
     /// Helper to list items visible in a location (only called if lit).
     private func listItemsInLocation(locationID: LocationID) async {
         // 1. Get visible item IDs using ScopeResolver
-        let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID, gameState: gameState)
+        let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID)
 
         // 2. Get the actual Item objects/snapshots for the visible IDs
         let visibleItems = visibleItemIDs.compactMap { gameState.items[$0] } // Fetch full Item objects
@@ -583,9 +580,10 @@ public class GameEngine {
         name: String,
         properties: Set<ItemProperty> = [],
         size: Int = 5,
-        parent: ParentEntity = .nowhere
+        parent: ParentEntity = .nowhere,
+        readableText: String? = nil
     ) {
-        let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent)
+        let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent, readableText: readableText)
         gameState.items[newItem.id] = newItem
     }
 

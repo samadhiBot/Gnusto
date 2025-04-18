@@ -25,4 +25,6 @@ public enum ItemProperty: String, Codable, CaseIterable, Sendable {
     case vowel = "vowel"              // VOWELBIT: Name starts with vowel (for "an")
     case wearable = "wearable"        // WEARBIT: Can be worn
     case worn = "worn"                // WORNBIT: Is currently being worn
+    case readable = "readable"        // Can be read (implies text content)
+    case lockable = "lockable"        // Can be locked/unlocked (needs `lockKey`)
 }

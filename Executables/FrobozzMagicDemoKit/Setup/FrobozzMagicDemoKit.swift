@@ -34,15 +34,11 @@ final class FrobozzMagicDemoKit {
         }
         self.ioHandler = resolvedIOHandler
 
-        // Create a scope resolver
-        let scopeResolver = ScopeResolver()
-
         // Create the engine with the initial components
         engine = GameEngine(
             initialState: initialState,
             parser: parser,
             ioHandler: resolvedIOHandler,
-            scopeResolver: scopeResolver,
             registry: registry,
             onEnterRoom: Hooks.onEnterRoom, // Reference actual Hooks
             beforeTurn: Hooks.beforeEachTurn, // Reference actual Hooks
