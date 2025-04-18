@@ -578,12 +578,21 @@ public class GameEngine {
     internal func debugAddItem(
         id: ItemID,
         name: String,
+        description: String? = nil,
         properties: Set<ItemProperty> = [],
         size: Int = 5,
         parent: ParentEntity = .nowhere,
         readableText: String? = nil
     ) {
-        let newItem = Item(id: id, name: name, properties: properties, size: size, parent: parent, readableText: readableText)
+        let newItem = Item(
+            id: id,
+            name: name,
+            description: description,
+            properties: properties,
+            size: size,
+            parent: parent,
+            readableText: readableText
+        )
         gameState.items[newItem.id] = newItem
     }
 
@@ -636,12 +645,3 @@ public class GameEngine {
         await ioHandler.print(text, style: .normal, newline: true)
     }
 }
-
-// Remove the temporary vocabulary extension on GameState
-/*
-extension GameState {
-    var vocabulary: Vocabulary {
-        Vocabulary()
-    }
-}
-*/
