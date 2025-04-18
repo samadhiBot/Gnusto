@@ -35,7 +35,8 @@ let package = Package(
         ),
         .executableTarget(
             name: "FrobozzMagicDemoKit",
-            dependencies: ["GnustoEngine"]
+            dependencies: ["GnustoEngine"],
+            path: "Executables/FrobozzMagicDemoKit"
         ),
         .testTarget(
             name: "GnustoEngineTests",

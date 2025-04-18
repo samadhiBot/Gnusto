@@ -21,7 +21,7 @@ public struct TakeActionHandler: ActionHandler {
 
         // 3. Check if player already has the item
         if targetItem.parent == .player {
-            await engine.output("(already taken)")
+            await engine.output("You already have that.")
             return
         }
 
@@ -62,9 +62,8 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         guard isReachable else {
-            // Throw error instead of just printing
-            throw ActionError.itemNotHeld(targetItemID) // Or a new .itemNotReachable?
-            // Old code: await engine.ioHandler.print("..."); return
+            // Throw the correct error for existing but unreachable items
+            throw ActionError.itemNotAccessible(targetItemID)
         }
 
         // 5. Check if the item is takable
