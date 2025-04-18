@@ -65,11 +65,65 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
 }
 
 /// Represents the type of element expected at a position in a SyntaxRule pattern.
-public enum SyntaxTokenType: String, Sendable, Equatable, Codable {
+public enum SyntaxTokenType: Sendable, Equatable, Codable {
     case verb
     case directObject
     case indirectObject
     case preposition // Matches any known preposition unless SyntaxRule specifies one
     case direction   // Matches a known direction word (e.g., "north", "n")
-    // Add others like .topic, .string, .number later?
+    case particle(String) // Matches a specific particle word (e.g., "on", "off")
+
+    // Manual Equatable for associated value
+    public static func == (lhs: SyntaxTokenType, rhs: SyntaxTokenType) -> Bool {
+        switch (lhs, rhs) {
+        case (.verb, .verb),
+             (.directObject, .directObject),
+             (.indirectObject, .indirectObject),
+             (.preposition, .preposition),
+             (.direction, .direction):
+            return true
+        case (.particle(let lhsValue), .particle(let rhsValue)):
+            return lhsValue == rhsValue
+        default:
+            return false
+        }
+    }
+
+    // Manual Codable implementation due to associated value
+    enum CodingKeys: String, CodingKey {
+        case caseName
+        case associatedValue
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let caseName = try container.decode(String.self, forKey: .caseName)
+
+        switch caseName {
+        case "verb": self = .verb
+        case "directObject": self = .directObject
+        case "indirectObject": self = .indirectObject
+        case "preposition": self = .preposition
+        case "direction": self = .direction
+        case "particle":
+            let value = try container.decode(String.self, forKey: .associatedValue)
+            self = .particle(value)
+        default:
+            throw DecodingError.dataCorruptedError(forKey: .caseName, in: container, debugDescription: "Unknown SyntaxTokenType case name: \(caseName)")
+        }
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .verb: try container.encode("verb", forKey: .caseName)
+        case .directObject: try container.encode("directObject", forKey: .caseName)
+        case .indirectObject: try container.encode("indirectObject", forKey: .caseName)
+        case .preposition: try container.encode("preposition", forKey: .caseName)
+        case .direction: try container.encode("direction", forKey: .caseName)
+        case .particle(let value):
+            try container.encode("particle", forKey: .caseName)
+            try container.encode(value, forKey: .associatedValue)
+        }
+    }
 }

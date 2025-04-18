@@ -174,7 +174,7 @@ struct StandardParserTests {
         let examineInputs = ["examine", "x"]
         for input in examineInputs {
             let result = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
-            #expect(result.isFailure(matching: .badGrammar("Missing direct object phrase for verb \'examine\'.")))
+            #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb 'examine'.")))
         }
     }
 
@@ -183,7 +183,7 @@ struct StandardParserTests {
         let result = parser.parse(input: "get", vocabulary: vocabulary, gameState: gameState)
         // "get" (take) requires a DO according to its SyntaxRule.
         // Expect failure because no DO was provided.
-        #expect(result.isFailure(matching: .badGrammar("Missing direct object phrase for verb \'take\'.")))
+        #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb 'take'.")))
     }
 
     @Test("Parse Verb + Direct Object (Ambiguous)", .tags(.parser, .directObject, .resolution, .ambiguity, .errorHandling))
@@ -432,7 +432,7 @@ struct StandardParserTests {
         var tempGameState = gameState
         tempGameState.pronouns["it"] = ["key"] // Set refers to key
         let result = parser.parse(input: "take rusty it", vocabulary: vocabulary, gameState: tempGameState)
-        #expect(result.isFailure(matching: .badGrammar("Pronouns like \'it\' usually cannot be modified.")))
+        #expect(result.isFailure(matching: .badGrammar("Pronouns like 'it' usually cannot be modified.")))
     }
 
     @Test("Pronoun 'it' as Indirect Object", .tags(.parser, .resolution, .pronouns, .indirectObject))

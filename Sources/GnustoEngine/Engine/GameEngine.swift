@@ -115,14 +115,21 @@ public class GameEngine {
             // Movement
             VerbID("go"): GoActionHandler(),
 
-            // Common Interactions (Placeholders for now, need actual handlers)
+            // Common Interactions
             VerbID("take"): TakeActionHandler(), // Use the real handler
-            VerbID("drop"): PlaceholderActionHandler(verb: "drop"), // Placeholder
-            VerbID("open"): PlaceholderActionHandler(verb: "open"), // Placeholder
-            VerbID("close"): PlaceholderActionHandler(verb: "close"), // Placeholder
-            VerbID("read"): PlaceholderActionHandler(verb: "read"), // Placeholder
-            VerbID("wear"): PlaceholderActionHandler(verb: "wear"), // Placeholder
-            VerbID("remove"): PlaceholderActionHandler(verb: "remove"), // Placeholder
+            VerbID("drop"): DropActionHandler(), // Use the real handler
+            VerbID("open"): OpenActionHandler(), // Use the real handler
+            VerbID("close"): CloseActionHandler(), // Use the real handler
+            VerbID("read"): ReadActionHandler(), // Use the real handler
+            VerbID("wear"): WearActionHandler(), // Use the real handler
+            VerbID("remove"): RemoveActionHandler(), // Use the real handler
+            // Removed incorrect direct mappings for turn/switch
+            // Register specific turn_on/turn_off IDs
+            VerbID("turn_on"): TurnOnActionHandler(),
+            VerbID("light"): TurnOnActionHandler(), // Direct mapping for LIGHT verb
+            VerbID("turn_off"): TurnOffActionHandler(),
+            VerbID("extinguish"): TurnOffActionHandler(), // Direct mapping for EXTINGUISH verb
+            VerbID("blow out"): TurnOffActionHandler(), // Direct mapping for BLOW OUT verb
 
             // Sensory
             VerbID("smell"): SmellActionHandler(),

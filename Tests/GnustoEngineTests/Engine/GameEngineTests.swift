@@ -112,7 +112,7 @@ struct GameEngineTests {
 
         // Check that the specific error message was printed
         let output = await mockIOHandler.recordedOutput
-        let expectedMessage = "I don\'t know the verb 'xyzzy'."
+        let expectedMessage = "I don't know the verb 'xyzzy'."
         #expect(output.contains { $0.text == expectedMessage }, "Expected parse error message not found in output")
 
         // Check turn counter was incremented despite error

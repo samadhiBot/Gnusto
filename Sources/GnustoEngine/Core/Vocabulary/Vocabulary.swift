@@ -73,6 +73,7 @@ public struct Vocabulary: Codable, Sendable {
         "a", "an", "and", "the", "some", "this", "that", "those", "these",
         ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")"
         // Removed: "at", "in", "on", "to", "of", "with" - These are often important prepositions/directions
+        // Note: "on" and "off" are NOT noise words here as they are significant particles.
     ]
 
     /// Default set of common English prepositions.
@@ -104,7 +105,7 @@ public struct Vocabulary: Codable, Sendable {
         Verb(id: "go", synonyms: ["move", "walk", "run", "proceed"], syntax: [SyntaxRule(pattern: [.verb, .direction])]), // Default takes direction
         // Note: Single directions (N, S, E, W...) handled separately by StandardParser
 
-        // Common Interactions (often need specific handlers, but define verb)
+        // Common Interactions
         Verb(id: "take", synonyms: ["get", "grab", "pick"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "put", synonyms: ["place"], // Corrected: Only place is a reasonable synonym
              syntax: [
@@ -132,6 +133,30 @@ public struct Vocabulary: Codable, Sendable {
         Verb(id: "read", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "wear", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "remove", synonyms: ["take off"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // For worn items
+        // Light/Device Verbs (Note: Synonyms handle mapping multiple words to the same VerbID)
+        Verb(id: "light", synonyms: ["illuminate"], // Direct mapping to turn_on
+             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "extinguish", synonyms: ["douse"], // Direct mapping to turn_off
+             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "blow", // Requires "out" particle
+             syntax: [
+                SyntaxRule(pattern: [.verb, .particle("out"), .directObject]),
+                SyntaxRule(pattern: [.verb, .directObject, .particle("out")])
+             ]),
+        Verb(id: "turn", // Requires "on"/"off" particle
+             syntax: [
+                SyntaxRule(pattern: [.verb, .particle("on"), .directObject]),
+                SyntaxRule(pattern: [.verb, .directObject, .particle("on")]),
+                SyntaxRule(pattern: [.verb, .particle("off"), .directObject]),
+                SyntaxRule(pattern: [.verb, .directObject, .particle("off")])
+             ]),
+        Verb(id: "switch", // Requires "on"/"off" particle
+             syntax: [
+                SyntaxRule(pattern: [.verb, .particle("on"), .directObject]),
+                SyntaxRule(pattern: [.verb, .directObject, .particle("on")]),
+                SyntaxRule(pattern: [.verb, .particle("off"), .directObject]),
+                SyntaxRule(pattern: [.verb, .directObject, .particle("off")])
+             ]),
 
         // Sensory / Non-committal
         Verb(id: "smell", synonyms: ["sniff"], syntax: [SyntaxRule(pattern: [.verb]), SyntaxRule(pattern: [.verb, .directObject])]), // Smell or Smell X
@@ -152,10 +177,13 @@ public struct Vocabulary: Codable, Sendable {
     /// Adds a verb, its synonyms, and its syntax rules to the vocabulary.
     /// - Parameter verb: The `Verb` object to add.
     public mutating func add(verb: Verb) {
-        self.verbs[verb.id.rawValue] = verb.id
+        // Always map the verb's primary ID
+        self.verbs[verb.id.rawValue.lowercased()] = verb.id
+        // Map all synonyms
         for synonym in verb.synonyms {
             self.verbs[synonym.lowercased()] = verb.id
         }
+        // Store syntax rules under the primary VerbID
         if !verb.syntax.isEmpty {
             self.syntaxRules[verb.id, default: []].append(contentsOf: verb.syntax)
         }

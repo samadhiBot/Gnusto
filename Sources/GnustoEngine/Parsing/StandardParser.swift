@@ -137,14 +137,15 @@ public struct StandardParser: Parser {
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
     private func matchRule(rule: SyntaxRule, tokens: [String], verbIndex: Int, vocabulary: Vocabulary, gameState: GameState, originalInput: String) -> Result<Command, ParseError> {
 
-        let verbWord = tokens[verbIndex]
-        guard let verbID = vocabulary.verbs[verbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
+        let initialVerbWord = tokens[verbIndex]
+        guard let initialVerbID = vocabulary.verbs[initialVerbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
 
         var tokenCursor = verbIndex + 1
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
-        var matchedDirection: Direction? = nil // Store the matched direction
+        var matchedDirection: Direction? = nil
+        var matchedParticle: String? = nil // Added to store the matched particle
 
         // Iterate through the expected pattern *after* the verb. Assumes pattern[0] is .verb
         for patternIndex in 1..<rule.pattern.count {
@@ -152,9 +153,7 @@ public struct StandardParser: Parser {
 
             guard tokenCursor < tokens.count else {
                 // Ran out of input tokens but pattern expected more
-                // Check if remaining expected tokens are optional (e.g., only objects)
                 let remainingPattern = rule.pattern[patternIndex...]
-                // Allow ending early only if *all* remaining are object types
                 let onlyObjectsRemain = remainingPattern.allSatisfy { $0 == .directObject || $0 == .indirectObject }
                 if onlyObjectsRemain {
                      break // Okay to end early if only optional objects remain
@@ -168,56 +167,47 @@ public struct StandardParser: Parser {
             case .verb: continue // Should be pattern[0], skipped by loop start
 
             case .directObject:
-                // Consume tokens until next expected pattern element (preposition?) or end
                 let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
                     tokens: tokens,
                     pattern: rule.pattern,
                     patternIndex: patternIndex,
-                    vocabulary: vocabulary // Reverted: Removed rule argument
+                    vocabulary: vocabulary
                 )
-
-                // Ensure we consume at least one token if DO is expected.
                 guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(initialVerbID.rawValue)', but found \(context)."))
                 }
                 directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
 
             case .preposition:
                 let currentToken = tokens[tokenCursor]
-                let expectedPrep = rule.requiredPreposition // May be nil
+                let expectedPrep = rule.requiredPreposition
                 let isKnownPrep = vocabulary.prepositions.contains(currentToken)
-
-                // Check if the rule requires a specific preposition
                 if let required = expectedPrep {
                     guard currentToken == required else {
                         return .failure(.badGrammar("Expected preposition '\(required)' but found '\(currentToken)'."))
                     }
                 } else {
-                    // Rule expects *any* preposition here
                     guard isKnownPrep else {
                          return .failure(.badGrammar("Expected a preposition but found '\(currentToken)'."))
                     }
                 }
-                // If we reach here, the preposition is valid for the rule.
                 matchedPreposition = currentToken
-                tokenCursor += 1 // Consume the preposition token
+                tokenCursor += 1
 
             case .indirectObject:
-                // Consume remaining tokens until the end
                  let phraseEndIndex = findEndOfNounPhrase(
                     startIndex: tokenCursor,
                     tokens: tokens,
                     pattern: rule.pattern,
                     patternIndex: patternIndex,
-                    vocabulary: vocabulary // Reverted: Removed rule argument
+                    vocabulary: vocabulary
                  )
-                 // Ensure we consume at least one token if IO is expected.
                  guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(initialVerbID.rawValue)', but found \(context)."))
                  }
                 indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -226,25 +216,30 @@ public struct StandardParser: Parser {
                  let currentToken = tokens[tokenCursor]
                  if let direction = vocabulary.directions[currentToken] {
                      matchedDirection = direction
-                     tokenCursor += 1 // Consume the direction token
+                     tokenCursor += 1
                  } else {
                      return .failure(.badGrammar("Expected a direction (like north, s, up) but found '\(currentToken)'."))
                  }
+
+            case .particle(let expectedParticle):
+                let currentToken = tokens[tokenCursor]
+                guard currentToken == expectedParticle else {
+                    return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(initialVerbWord)' but found '\(currentToken)'."))
+                }
+                matchedParticle = currentToken
+                tokenCursor += 1 // Consume the particle token
             }
         }
 
         // After iterating through the pattern, check if any input tokens remain unconsumed.
-        // This indicates extra words that didn't fit the pattern.
         if tokenCursor < tokens.count {
             return .failure(.badGrammar("Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"))
         }
 
         // --- Object Resolution ---
-        // Use the extracted token arrays
         let (doNounExtracted, doModsExtracted) = extractNounAndMods(from: directObjectPhraseTokens, vocabulary: vocabulary)
         let (ioNounExtracted, ioModsExtracted) = extractNounAndMods(from: indirectObjectPhraseTokens, vocabulary: vocabulary)
 
-        // Determine the noun/mods to use for resolution, falling back to last word if no known noun found
         let nounToResolveDO = doNounExtracted ?? directObjectPhraseTokens.last
         let modsToUseDO = (doNounExtracted != nil) ? doModsExtracted : Array(directObjectPhraseTokens.dropLast())
 
@@ -254,7 +249,6 @@ public struct StandardParser: Parser {
         // Resolve Direct Object
         let resolvedDirectObjectResult: Result<ItemID?, ParseError>
         if rule.pattern.contains(.directObject) {
-             // Attempt resolution if a potential noun was identified for the DO slot
              if let actualNoun = nounToResolveDO {
                  resolvedDirectObjectResult = resolveObject(
                      noun: actualNoun,
@@ -265,17 +259,16 @@ public struct StandardParser: Parser {
                      requiredConditions: rule.directObjectConditions
                  )
              } else {
-                 // No phrase tokens were consumed for the DO slot by findEndOfNounPhrase
-                 return .failure(.badGrammar("Missing direct object phrase for verb '\(verbID.rawValue)'."))
+                 // Return the more user-friendly badGrammar error
+                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(initialVerbID.rawValue)'."))
              }
         } else {
-             resolvedDirectObjectResult = .success(nil) // Rule doesn't expect DO
+             resolvedDirectObjectResult = .success(nil)
         }
 
         // Resolve Indirect Object
         let resolvedIndirectObjectResult: Result<ItemID?, ParseError>
         if rule.pattern.contains(.indirectObject) {
-            // Attempt resolution if a potential noun was identified for the IO slot
             if let actualNoun = nounToResolveIO {
                 resolvedIndirectObjectResult = resolveObject(
                     noun: actualNoun,
@@ -286,18 +279,48 @@ public struct StandardParser: Parser {
                     requiredConditions: rule.indirectObjectConditions
                 )
             } else {
-                // No phrase tokens were consumed for the IO slot by findEndOfNounPhrase
-                return .failure(.badGrammar("Missing indirect object phrase for verb '\(verbID.rawValue)'."))
+                // Return the more user-friendly badGrammar error
+                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(initialVerbID.rawValue)'."))
             }
         } else {
-            resolvedIndirectObjectResult = .success(nil) // Rule doesn't expect IO
+            resolvedIndirectObjectResult = .success(nil)
+        }
+
+        // --- Determine Final Verb ID based on Particles ---
+        var finalVerbID = initialVerbID
+        switch initialVerbID.rawValue {
+        case "turn", "switch":
+            if matchedParticle == "on" {
+                finalVerbID = VerbID("turn_on")
+            } else if matchedParticle == "off" {
+                finalVerbID = VerbID("turn_off")
+            } else {
+                // If pattern expected a particle but none was matched (or wrong one)
+                // this should have failed earlier in the .particle case.
+                // If pattern *didn't* expect a particle, it shouldn't match these verbs.
+                // However, as a safeguard:
+                return .failure(.badGrammar("Verb '\(initialVerbID.rawValue)' requires 'on' or 'off'."))
+            }
+        case "blow":
+            if matchedParticle == "out" {
+                finalVerbID = VerbID("turn_off") // Map "blow out" to the turn_off action
+            } else {
+                return .failure(.badGrammar("Verb 'blow' requires 'out'."))
+            }
+        case "light":
+             finalVerbID = VerbID("turn_on") // Explicitly map 'light' verb
+        case "extinguish":
+            finalVerbID = VerbID("turn_off") // Explicitly map 'extinguish' verb
+        default:
+            // For other verbs, the initialVerbID is the final one.
+            break
         }
 
         // --- Build Command ---
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
         case (.success(let doID), .success(let ioID)):
             let command = Command(
-                verbID: verbID,
+                verbID: finalVerbID, // Use the potentially modified verbID
                 directObject: doID,
                 directObjectModifiers: doModsExtracted,
                 indirectObject: ioID,
@@ -574,6 +597,11 @@ public struct StandardParser: Parser {
                 case .verb:
                     // Is the current token a verb?
                     if vocabulary.verbs.keys.contains(currentToken) {
+                        isBoundaryToken = true
+                    }
+                case .particle(let expectedParticle):
+                    // Is the current token the specific particle expected?
+                    if currentToken == expectedParticle {
                         isBoundaryToken = true
                     }
                 case .directObject, .indirectObject:
