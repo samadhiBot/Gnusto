@@ -489,6 +489,9 @@ public class GameEngine {
             // Use safe snapshot accessor for item name
             let itemName = itemSnapshot(with: itemID)?.name ?? "that item"
             message = "You aren't holding \(itemName)."
+        case .itemNotWearable(let itemID):
+            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
+            message = "You can't wear \(itemName)."
         // Add more cases here...
         default:
             message = "You can't do that right now."

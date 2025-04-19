@@ -131,8 +131,10 @@ public struct Vocabulary: Codable, Sendable {
         Verb(id: "open", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "close", synonyms: ["shut"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
         Verb(id: "read", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "wear", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "remove", synonyms: ["take off"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // For worn items
+        Verb(id: "wear", synonyms: ["don", "put on"], // Added "put on"
+             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(id: "remove", synonyms: ["take off", "doff"], // Added "doff"
+             syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // For worn items
         // Light/Device Verbs (Note: Synonyms handle mapping multiple words to the same VerbID)
         Verb(id: "light", synonyms: ["illuminate"], // Direct mapping to turn_on
              syntax: [SyntaxRule(pattern: [.verb, .directObject])]),

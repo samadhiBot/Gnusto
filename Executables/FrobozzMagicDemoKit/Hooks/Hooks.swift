@@ -153,7 +153,7 @@ enum Hooks {
         let gameState = engine.getCurrentGameState()
 
         switch itemID {
-        case Components.Lantern.Constants.itemID:
+        case CaveRegion.brassLantern.id:
             // Custom lantern examination
             let item = engine.itemSnapshot(with: itemID)
 
@@ -182,7 +182,7 @@ enum Hooks {
             )
             return true // Handled
 
-        case Components.IronDoorPuzzle.Constants.doorID:
+        case CaveRegion.ironDoor.id:
             // Custom door examination
             let isUnlocked = gameState.flags[Components.IronDoorPuzzle.Constants.doorUnlockedFlag] == true
             let item = engine.itemSnapshot(with: itemID)

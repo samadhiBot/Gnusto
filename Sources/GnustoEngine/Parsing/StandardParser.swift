@@ -47,25 +47,51 @@ public struct StandardParser: Parser {
             return .failure(.emptyInput)
         }
 
-        // 5. Identify Verb
-        guard let verbIndex = significantTokens.firstIndex(where: { vocabulary.verbs.keys.contains($0) }) else {
-            // If no verb found, *maybe* it's an implicit direction?
-            // Consider if "NORTH HOUSE" should imply "GO NORTH HOUSE"? ZIL often did.
-            // For now, stick to explicit verbs or single-word directions.
-            return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word if available
-        }
-        let verbWord = significantTokens[verbIndex]
-        guard let verbID = vocabulary.verbs[verbWord] else {
-            return .failure(.internalError("Verb word '\(verbWord)' found in keys but not dictionary."))
+        // 5. Identify Verb (handling multi-word synonyms)
+        var matchedVerbID: VerbID? = nil
+        var verbTokenCount = 0
+        var verbStartIndex = 0
+
+        // Iterate through possible starting positions for the verb
+        for i in 0..<significantTokens.count {
+            var longestMatchLength = 0
+            var potentialMatchID: VerbID? = nil
+
+            // Check token sequences starting from index i
+            for length in (1...min(4, significantTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
+                let subSequence = significantTokens[i..<(i + length)]
+                let verbPhrase = subSequence.joined(separator: " ")
+
+                if let foundVerbID = vocabulary.verbs[verbPhrase] {
+                    // Found a potential match
+                    if length > longestMatchLength {
+                        longestMatchLength = length
+                        potentialMatchID = foundVerbID
+                        // Don't break yet, continue checking shorter phrases from this start index
+                        // in case a shorter phrase is also a verb (though less likely with longest-first check)
+                    }
+                }
+            }
+
+            // If we found the longest possible match starting at index i, use it and stop searching
+            if longestMatchLength > 0 {
+                matchedVerbID = potentialMatchID
+                verbTokenCount = longestMatchLength
+                verbStartIndex = i
+                break // Found the first (and longest) verb match, stop outer loop
+            }
         }
 
-        // 5. Get Syntax Rules for the Verb
+        guard let verbID = matchedVerbID else {
+             // No known single or multi-word verb/synonym found
+             return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
+        }
+
+        // 5b. Get Syntax Rules for the Verb
         guard let rules = vocabulary.syntaxRules[verbID], !rules.isEmpty else {
             // If no rules defined, assume simple V or V+DO (like original basic parser)
-            // TODO: Or should this be an error? Requires verbs to have syntax.
-            // Let's try basic V+DO fallback for now.
-            let phrase = significantTokens[(verbIndex + 1)...]
-            let (noun, mods) = extractNounAndMods(from: Array(phrase), vocabulary: vocabulary)
+            let phraseTokens = significantTokens.suffix(from: verbStartIndex + verbTokenCount)
+            let (noun, mods) = extractNounAndMods(from: Array(phraseTokens), vocabulary: vocabulary)
             if let noun = noun {
                 let resolveResult = resolveObject(noun: noun, modifiers: mods, isPronoun: vocabulary.isPronoun(noun), in: gameState, using: vocabulary, requiredConditions: .none)
                 switch resolveResult {
@@ -84,10 +110,11 @@ public struct StandardParser: Parser {
 
         // 6. Match Tokens Against Syntax Rules
         var successfulParse: Command? = nil
-        var bestError: ParseError? = nil // Keep track of the most informative error
+        var bestError: ParseError? = nil
 
+        // Pass the verbStartIndex to matchRule
         for rule in rules {
-            let matchResult = matchRule(rule: rule, tokens: significantTokens, verbIndex: verbIndex, vocabulary: vocabulary, gameState: gameState, originalInput: input)
+            let matchResult = matchRule(rule: rule, tokens: significantTokens, verbStartIndex: verbStartIndex, vocabulary: vocabulary, gameState: gameState, originalInput: input)
 
             switch matchResult {
             case .success(let command):
@@ -135,12 +162,12 @@ public struct StandardParser: Parser {
     // MARK: - Syntax Matching Logic (New)
 
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
-    private func matchRule(rule: SyntaxRule, tokens: [String], verbIndex: Int, vocabulary: Vocabulary, gameState: GameState, originalInput: String) -> Result<Command, ParseError> {
+    private func matchRule(rule: SyntaxRule, tokens: [String], verbStartIndex: Int, vocabulary: Vocabulary, gameState: GameState, originalInput: String) -> Result<Command, ParseError> {
 
-        let initialVerbWord = tokens[verbIndex]
+        let initialVerbWord = tokens[verbStartIndex]
         guard let initialVerbID = vocabulary.verbs[initialVerbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
 
-        var tokenCursor = verbIndex + 1
+        var tokenCursor = verbStartIndex + 1
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
