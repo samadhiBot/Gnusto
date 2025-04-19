@@ -30,7 +30,12 @@ public struct RemoveActionHandler: ActionHandler {
         }
 
         // 4. Update State - Remove .worn property (parent remains .player)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched, removing: .worn)
+        // Mark as touched (implicitly happens when taken, should happen here too)
+        await engine.updateItemProperties(
+            itemID: targetItemID,
+            adding: .touched,
+            removing: .worn
+        )
 
         // 5. Output Message
         // Zork: "You remove the <noun>."

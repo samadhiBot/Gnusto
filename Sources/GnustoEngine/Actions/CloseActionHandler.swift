@@ -57,7 +57,11 @@ public struct CloseActionHandler: ActionHandler {
         }
 
         // 5. Perform Close Action
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched, removing: .open)
+        await engine.updateItemProperties(
+            itemID: targetItemID,
+            adding: .touched,
+            removing: .open
+        )
 
         // 6. Output Message
         // If an object handler handled the action (returned true), execute won't call this.

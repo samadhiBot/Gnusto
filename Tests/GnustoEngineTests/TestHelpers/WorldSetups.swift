@@ -10,15 +10,13 @@ struct WorldSetups {
     /// Includes: Foyer, Cloakroom, Bar locations; Hook, Cloak items;
     /// Verbs: go, look, take, drop, wear, remove (and synonyms).
     ///
-    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`,
-    ///            the `[ItemID: ObjectActionHandler]` dictionary,
-    ///            the `[LocationID: RoomActionHandler]` dictionary,
-    ///            and the optional hook closures.
+    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, the `[VerbID: ActionHandler]` dictionary,
+    ///            the `[ItemID: ObjectActionHandler]` dictionary, and the optional `@MainActor @Sendable` custom logic hook closures.
     static func setupCloakOfDarknessWorld() async -> (
         GameState,
         StandardParser,
+        [VerbID: ActionHandler],
         [ItemID: ObjectActionHandler],
-        [LocationID: RoomActionHandler],
         (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?,
         (@MainActor @Sendable (GameEngine) async -> Void)?
     ) {
@@ -104,17 +102,30 @@ struct WorldSetups {
         let vocabulary = Vocabulary.build(items: allItems, verbs: verbs)
 
         // Game State
-        let disturbedKey = "cod_disturbed"
         let gameState = GameState.initial(
             initialLocations: allLocations,
             initialItems: allItems,
             initialPlayer: initialPlayer,
-            vocabulary: vocabulary,
-            gameSpecificState: [disturbedKey: AnyCodable(0)]
+            vocabulary: vocabulary
         )
 
         // Parser
         let parser = StandardParser()
+
+        // Action Handlers (Keep custom ones defined here)
+        let customHandlers: [VerbID: ActionHandler] = [
+            // Default handlers (like go, look) are registered by the Engine itself.
+            // Only list handlers that *override* defaults or add new verbs specific to this game.
+            VerbID("take"): TakeActionHandler(),
+            VerbID("get"): TakeActionHandler(),
+            VerbID("drop"): DropActionHandler(),
+            VerbID("wear"): WearActionHandler(),
+            VerbID("don"): WearActionHandler(),
+            VerbID("remove"): RemoveActionHandler(),
+            VerbID("doff"): RemoveActionHandler(),
+            VerbID("take off"): RemoveActionHandler()
+            // Add other Cloak-specific verbs/overrides here if needed later.
+        ]
 
         // --- Define Object Action Handlers ---
         let objectActionHandlers: [ItemID: ObjectActionHandler] = [
@@ -134,50 +145,14 @@ struct WorldSetups {
             }
         ]
 
-        // Define Room-Specific Action Handler for the Bar (BAR-R)
-        let barActionHandler: RoomActionHandler = { engine, message in
-            switch message {
-            case .onEnter:
-                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
-                let isCloakWorn = cloakSnapshot?.parent == .player
-                let barShouldBeLit = !isCloakWorn
-                let currentBar = await engine.locationSnapshot(with: "bar")
-                let isBarCurrentlyLit = currentBar?.properties.contains(.inherentlyLit) ?? false
-                if barShouldBeLit && !isBarCurrentlyLit {
-                    await engine.updateLocationProperties(id: "bar", adding: [.inherentlyLit])
-                } else if !barShouldBeLit && isBarCurrentlyLit {
-                    await engine.updateLocationProperties(id: "bar", removing: [.inherentlyLit])
-                }
-                return false
-
-            case .beforeTurn(let command):
-                let currentBar = await engine.locationSnapshot(with: "bar")
-                let isBarDark = !(currentBar?.properties.contains(.inherentlyLit) ?? true)
-                guard isBarDark else { return false }
-                let nonInteractiveVerbs: Set<VerbID> = [
-                    "go", "look", "examine", "x", "l", "inventory", "quit", "score", "wait"
-                ]
-                guard !nonInteractiveVerbs.contains(command.verbID) else { return false }
-                await engine.output("You grope around clumsily in the dark. Better be careful.")
-                await engine.incrementGameSpecificStateCounter(key: disturbedKey)
-                return false
-
-            case .afterTurn:
-                return false
-            }
-        }
-        let roomActionHandlers: [LocationID: RoomActionHandler] = [
-            "bar": barActionHandler
-        ]
-
         // --- Cloak of Darkness Custom Logic Hooks ---
 
         let onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil // No custom onEnterRoom logic needed now
 
         let beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil // No custom beforeTurn logic needed now
 
-        // Return the initial state, parser, handlers, and hooks
-        return (gameState, parser, objectActionHandlers, roomActionHandlers, onEnterRoom, beforeTurn)
+        // Return the initial state, parser, custom handlers, and the specific logic hooks
+        return (gameState, parser, customHandlers, objectActionHandlers, onEnterRoom, beforeTurn)
     }
 
     // Add setup for Zork world later...

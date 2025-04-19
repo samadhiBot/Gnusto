@@ -49,22 +49,16 @@ enum Components {
             }
 
             // Set initial battery life in game state
-            await engine.updateGameState { state in
-                // Initialize gameSpecificState if it doesn't exist
-                if state.gameSpecificState == nil {
-                    state.gameSpecificState = [:]
-                }
-                state.gameSpecificState?[Constants.batteryLifeKey] = AnyCodable(initialBatteryLife)
+            await engine.updateGameSpecificState(key: Constants.batteryLifeKey, value: AnyCodable(initialBatteryLife))
 
-                // Weather initialization is now handled in Weather.setupWeather()
-                /*
-                // TODO: Move Weather initialization to Weather component
-                // Set initial weather
-                if state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] == nil {
-                     state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
-                }
-                */
+            // Weather initialization is now handled in Weather.setupWeather()
+            /*
+            // TODO: Move Weather initialization to Weather component
+            // Set initial weather
+            if state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] == nil {
+                 state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
             }
+            */
 
             // Register the daemon to start tracking battery life
             let _ = await engine.registerDaemon(id: Constants.timerDaemonID)
@@ -87,35 +81,23 @@ enum Components {
                 frequency: 1 // Run every turn
             ) { engine in
                 // Closure runs every turn to update lantern battery
-                let gameState = engine.getCurrentGameState()
+                let batteryLifeValue = await engine.getGameSpecificStateValue(key: Constants.batteryLifeKey)?.value as? Int
+                    ?? Constants.defaultBatteryLife
 
-                // Precondition: Lantern exists in the game
-                guard let lantern = gameState.items[Constants.itemID] else {
+                // Check lantern state directly via snapshot to avoid direct gameState access
+                guard let lantern = await engine.itemSnapshot(with: Constants.itemID) else {
                     Swift.print("Warning: Lantern item '\(Constants.itemID)' not found in game state for daemon.")
                     return
                 }
-
-                // Only proceed if lantern is lit
                 guard lantern.hasProperty(.lightSource) && lantern.hasProperty(.on) else {
                     return
                 }
-
-                // Get current battery life from game state
-                // Default to defaultBatteryLife if not set
-                let batteryLifeValue = gameState.gameSpecificState?[Constants.batteryLifeKey]?.value as? Int
-                    ?? Constants.defaultBatteryLife
 
                 // Decrement battery life by 1
                 let newBatteryLife = max(0, batteryLifeValue - 1)
 
                 // Update game state with new battery life
-                engine.updateGameState { state in
-                    // Ensure gameSpecificState exists
-                    if state.gameSpecificState == nil {
-                        state.gameSpecificState = [:]
-                    }
-                    state.gameSpecificState?[Constants.batteryLifeKey] = AnyCodable(newBatteryLife)
-                }
+                await engine.updateGameSpecificState(key: Constants.batteryLifeKey, value: AnyCodable(newBatteryLife))
 
                 // Handle different battery states
                 switch newBatteryLife {
@@ -124,21 +106,21 @@ enum Components {
                     let _ = engine.addFuse(id: Constants.lowBatteryWarningFuseID)
 
                     // Store message to be displayed on next turn
-                    engine.updateGameState { state in
-                        if state.gameSpecificState == nil { state.gameSpecificState = [:] }
-                        state.gameSpecificState?[Constants.pendingMessageKey] = AnyCodable("Your lantern is getting dim.")
-                    }
+                    await engine.updateGameSpecificState(
+                        key: Constants.pendingMessageKey,
+                        value: AnyCodable("Your lantern is getting dim.")
+                    )
 
                 case 0:
                     // Battery is fully depleted
                     // Store message to be displayed on next turn
-                    engine.updateGameState { state in
-                        if state.gameSpecificState == nil { state.gameSpecificState = [:] }
-                        state.gameSpecificState?[Constants.pendingMessageKey] = AnyCodable("Your lantern has run out of power and is now dark.")
-                    }
+                    await engine.updateGameSpecificState(
+                        key: Constants.pendingMessageKey,
+                        value: AnyCodable("Your lantern has run out of power and is now dark.")
+                    )
 
                     // Turn off the lantern
-                    engine.removeItemProperty(itemID: Constants.itemID, property: .on)
+                    await engine.updateItemProperties(itemID: Constants.itemID, removing: .on)
 
                 default:
                     break // No action needed for other battery levels
@@ -157,10 +139,10 @@ enum Components {
             ) { engine in
                 // This runs when the fuse triggers (halfway through the remaining battery life)
                 // Store message to be displayed on next turn
-                engine.updateGameState { state in
-                    if state.gameSpecificState == nil { state.gameSpecificState = [:] }
-                    state.gameSpecificState?[Constants.pendingMessageKey] = AnyCodable("Your lantern is getting very dim and will soon run out of power!")
-                }
+                await engine.updateGameSpecificState(
+                    key: Constants.pendingMessageKey,
+                    value: AnyCodable("Your lantern is getting very dim and will soon run out of power!")
+                )
             }
         }
     }

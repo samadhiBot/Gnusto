@@ -68,6 +68,7 @@ public struct TouchActionHandler: ActionHandler {
         // 3. Perform the action
         // Set the touched property, even if no other action occurs.
         await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+
         // TODO: Allow item-specific touch actions to override this default.
         // This might involve calling a function on the item or checking for
         // a specific property/component in a more advanced component system.

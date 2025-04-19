@@ -155,22 +155,22 @@ public class GameEngine {
     }
 
     // Need InventoryActionHandler
-    fileprivate struct InventoryActionHandler: ActionHandler {
-        func perform(
-            command: Command,
-            engine: GameEngine
-        ) async throws {
-             let heldItems = await engine.itemSnapshots(withParent: .player)
-             if heldItems.isEmpty {
-                 await engine.output("You aren't carrying anything.")
-             } else {
-                 await engine.output("You are carrying:")
-                 for item in heldItems {
-                     await engine.output("  A \(item.name)") // TODO: Proper article/listing
-                 }
-             }
-         }
-     }
+//    fileprivate struct InventoryActionHandler: ActionHandler {
+//        func perform(
+//            command: Command,
+//            engine: GameEngine
+//        ) async throws {
+//             let heldItems = await engine.itemSnapshots(withParent: .player)
+//             if heldItems.isEmpty {
+//                 await engine.output("You aren't carrying anything.")
+//             } else {
+//                 await engine.output("You are carrying:")
+//                 for item in heldItems {
+//                     await engine.output("  A \(item.name)") // TODO: Proper article/listing
+//                 }
+//             }
+//         }
+//     }
 
     // MARK: - Fuse & Daemon Management
 
@@ -371,8 +371,8 @@ public class GameEngine {
         let currentLocationID = playerLocationID()
         if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
             do {
-                // Call handler, pass command
-                let handledByRoom = try await roomHandler(self, .beforeTurn(command))
+                // Call handler, pass command using correct enum case syntax
+                let handledByRoom = try await roomHandler(self, RoomActionMessage.beforeTurn(command))
                 if handledByRoom {
                     // Room handler blocked further action, return immediately.
                     // We don't increment moves or run afterTurn hook here.
@@ -448,8 +448,8 @@ public class GameEngine {
         // --- Room AfterTurn Hook ---
         if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
             do {
-                // Call handler, ignore return value
-                _ = try await roomHandler(self, .afterTurn(command))
+                // Call handler, ignore return value, use correct enum case syntax
+                _ = try await roomHandler(self, RoomActionMessage.afterTurn(command))
             } catch {
                 await ioHandler.print("Error in room afterTurn handler: \(error)", style: .debug)
             }
@@ -782,6 +782,33 @@ public class GameEngine {
         return gameState.gameSpecificState?[key]?.value as? String
     }
 
+    /// Safely retrieves the value of a boolean flag from the game state.
+    /// - Parameter key: The key for the flag.
+    /// - Returns: The `Bool` value if the flag exists, otherwise `nil`.
+    public func getFlagValue(key: String) -> Bool? {
+        return gameState.flags[key]
+    }
+
+    /// Safely sets the value of a boolean flag in the game state.
+    /// - Parameters:
+    ///   - key: The key for the flag.
+    ///   - value: The `Bool` value to set.
+    public func setFlagValue(key: String, value: Bool) {
+        gameState.flags[key] = value
+    }
+
+    /// Safely removes a key-value pair from the game-specific state dictionary.
+    /// - Parameter key: The key to remove.
+    public func removeGameSpecificStateValue(key: String) {
+        gameState.gameSpecificState?.removeValue(forKey: key)
+    }
+
+    /// Safely updates the player's score by a given delta.
+    /// - Parameter delta: The amount to add to the score (can be negative).
+    public func updatePlayerScore(delta: Int) {
+        gameState.player.score += delta
+    }
+
     // MARK: - Debug/Testing Helpers
 
     /// Adds an item directly to the game state's item dictionary using its constituent data.
@@ -790,7 +817,7 @@ public class GameEngine {
     ///
     /// - Warning: Use with caution! This function is only intended to be used when setting up
     ///            test scenarios.
-    internal func debugAddItem(
+    func debugAddItem(
         id: ItemID,
         name: String,
         description: String? = nil,
@@ -803,7 +830,7 @@ public class GameEngine {
             id: id,
             name: name,
             description: description,
-            properties: Set(properties),
+            properties: properties,
             size: size,
             parent: parent,
             readableText: readableText
@@ -824,8 +851,8 @@ public class GameEngine {
         // --- Call RoomActionHandler: On Enter Room ---
         if let roomHandler = registry.roomActionHandler(for: locationID) {
             do {
-                // Call handler, ignore return value for onEnter
-                _ = try await roomHandler(self, .onEnter)
+                // Call handler, ignore return value for onEnter, use correct enum case syntax
+                _ = try await roomHandler(self, RoomActionMessage.onEnter)
             } catch {
                 await ioHandler.print("Error in room onEnter handler: \(error)", style: .debug)
             }

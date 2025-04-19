@@ -80,7 +80,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
             await engine.output("Your lantern has run out of power and is now dark.", style: .strong)
 
             // Turn off the lantern
-            engine.removeItemProperty(itemID: LanternConstants.lanternID, property: .on)
+            engine.updateItemProperties(itemID: LanternConstants.lanternID, removing: .on)
 
             // Optional: Add darkness-related consequences here
             // (e.g., being eaten by a grue if in a dungeon location)

@@ -12,21 +12,18 @@ enum Hooks {
     ///   - engine: The game engine.
     ///   - locationID: The ID of the location being entered.
     static func onEnterRoom(engine: GameEngine, locationID: LocationID) async {
-        let gameState = engine.getCurrentGameState()
+        // Use safe accessors
+        let flagKey = "visited_treasure_room"
+        let hasVisitedTreasure = await engine.getFlagValue(key: flagKey) ?? false
 
         // Check for special room behaviors
         switch locationID {
         case "treasureRoom":
-            // First-time treasure room discovery
-            let flag = "visited_treasure_room"
-            let hasVisited = gameState.flags[flag] ?? false
-
-            if !hasVisited {
+            if !hasVisitedTreasure {
                 await engine.output("You've discovered the legendary treasure room!", style: .strong)
-                engine.updateGameState { state in
-                    state.flags[flag] = true
-                    state.player.score += 10 // Award points for discovery
-                }
+                // Use safe mutators
+                await engine.setFlagValue(key: flagKey, value: true)
+                await engine.updatePlayerScore(delta: 10) // Award points for discovery
             }
 
         case "undergroundPool":
@@ -40,11 +37,11 @@ enum Hooks {
             )
 
         case "hiddenVault":
-            // First-time vault discovery
-            let flag = "visited_vault"
-            let hasVisited = gameState.flags[flag] ?? false
+            // Use safe accessors
+            let vaultFlag = "visited_vault"
+            let hasVisitedVault = await engine.getFlagValue(key: vaultFlag) ?? false
 
-            if !hasVisited {
+            if !hasVisitedVault {
                 await engine.output(
                     """
                     As you enter, the runes on the walls pulse with energy. \
@@ -52,10 +49,9 @@ enum Hooks {
                     """,
                     style: .strong
                 )
-                engine.updateGameState { state in
-                    state.flags[flag] = true
-                    state.player.score += 15 // Award points for discovery
-                }
+                // Use safe mutators
+                await engine.setFlagValue(key: vaultFlag, value: true)
+                await engine.updatePlayerScore(delta: 15) // Award points for discovery
             }
 
         default:
@@ -66,22 +62,20 @@ enum Hooks {
     /// Custom logic that runs at the start of each turn.
     /// - Parameter engine: The game engine.
     static func beforeEachTurn(engine: GameEngine) async {
-        let gameState = engine.getCurrentGameState()
+        // Use safe accessors
+        let messageValue = await engine.getGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 
         // Check for pending messages from daemons or fuses
-        // TODO: Use a more robust pending message system if multiple sources exist
-        if let pendingMessage = gameState.gameSpecificState?[Components.Lantern.Constants.pendingMessageKey]?.value as? String {
+        if let pendingMessage = messageValue?.value as? String {
             await engine.output(pendingMessage)
 
-            // Clear the pending message
-            engine.updateGameState { state in
-                state.gameSpecificState?[Components.Lantern.Constants.pendingMessageKey] = nil
-            }
+            // Clear the pending message by removing the key
+            await engine.removeGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
         }
 
         // Add atmospheric messages based on location
-        let locationID = gameState.player.currentLocationID
-        let turnCount = gameState.player.moves
+        let locationID = await engine.playerLocationID() // Safe accessor
+        let turnCount = await engine.playerMoves()      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
         guard turnCount % 5 == 0 else { return }
@@ -93,7 +87,7 @@ enum Hooks {
             await engine.output("The gems in the walls glitter mysteriously.", style: .emphasis)
         case "outside", "streamBank":
             // Weather effects for outside areas
-            if let weatherState = gameState.gameSpecificState?[Components.Weather.Constants.weatherStateKey]?.value as? String {
+            if let weatherState = await engine.getGameSpecificStateString(key: Components.Weather.Constants.weatherStateKey) {
                 switch weatherState {
                 case "sunny":
                     await engine.output("Sunlight filters through the trees above you.", style: .emphasis)

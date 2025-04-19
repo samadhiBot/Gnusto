@@ -64,7 +64,11 @@ public struct OpenActionHandler: ActionHandler {
         }
 
         // 6. Perform Open Action
-        await engine.updateItemProperties(itemID: targetItemID, adding: .open, .touched)
+        await engine.updateItemProperties(
+            itemID: targetItemID,
+            adding: .open,
+            .touched
+        )
 
         // 7. Output Message
         // ObjectActionHandlers now control if default message is suppressed

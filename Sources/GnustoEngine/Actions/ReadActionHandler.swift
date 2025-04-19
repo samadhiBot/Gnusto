@@ -58,16 +58,14 @@ public struct ReadActionHandler: ActionHandler {
             throw ActionError.itemNotReadable(targetItemID)
         }
 
-        // 5. Check if item has text
+        // 5. Perform Read Action
+        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+
+        // 6. Check if item has text
         guard let textToRead = targetItem.readableText, !textToRead.isEmpty else {
-            // Invented message for readable items with no text
             await engine.output("There's nothing written on the \(targetItem.name).")
-            await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
             return
         }
-
-        // 6. Perform Read Action
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched) // Reading implies touching
 
         // 7. Output Message (the actual text)
         await engine.output(textToRead) // Print the text directly

@@ -17,7 +17,7 @@ public struct GameDefinitionRegistry {
     public let objectActionHandlers: [ItemID: ObjectActionHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
-    public let roomActionHandlers: [LocationID: RoomActionHandler] // New property
+    public let roomActionHandlers: [LocationID: RoomActionHandler]
 
     /// Initializes the registry with definitions and handlers.
     /// - Parameters:
@@ -35,7 +35,7 @@ public struct GameDefinitionRegistry {
         self.fuseDefinitions = Dictionary(uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) })
         self.daemonDefinitions = Dictionary(uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) })
         self.objectActionHandlers = objectActionHandlers
-        self.roomActionHandlers = roomActionHandlers // New assignment
+        self.roomActionHandlers = roomActionHandlers
     }
 
     /// Retrieves a `FuseDefinition` by its ID.
@@ -55,7 +55,7 @@ public struct GameDefinitionRegistry {
     /// Retrieves a `RoomActionHandler` by its ID.
     /// - Parameter id: The `LocationID` to look up.
     /// - Returns: The `RoomActionHandler` if found, otherwise `nil`.
-    internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? { // New method
+    internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? {
         roomActionHandlers[id]
     }
 }

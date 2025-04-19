@@ -78,9 +78,9 @@ public struct TakeActionHandler: ActionHandler {
 
         // 7. Update State
         await engine.updateItemParent(itemID: targetItemID, newParent: .player)
-        // Pass property directly as variadic args
         await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
-        // Add pronoun update using the dedicated engine method
+
+        // Add pronoun update
         await engine.updatePronounReference(pronoun: "it", itemID: targetItemID)
 
         // 8. Output Message
