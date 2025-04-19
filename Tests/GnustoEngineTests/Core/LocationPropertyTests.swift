@@ -17,7 +17,7 @@ struct LocationPropertyTests {
     @Test("LocationProperty CaseIterable")
     func testCaseIterable() throws {
         // This test ensures that if we add/remove cases, we remember to update it.
-        let expectedCount = 6
+        let expectedCount = 7
         #expect(LocationProperty.allCases.count == expectedCount, "Mismatch in expected LocationProperty count. Update this test or check the enum.")
     }
 

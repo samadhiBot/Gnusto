@@ -7,6 +7,10 @@ public enum LocationProperty: String, Codable, CaseIterable, Sendable {
     /// Rooms without this property are dark unless a light source is present.
     case inherentlyLit
 
+    /// The location is currently lit (set/cleared by engine/hooks based on light sources or `inherentlyLit`).
+    /// Analogous to the runtime check in ZIL, but stored as a flag for easier access.
+    case isLit
+
     /// Magic does not function in this location.
     case noMagic
 

@@ -61,7 +61,8 @@ enum Hooks {
 
     /// Custom logic that runs at the start of each turn.
     /// - Parameter engine: The game engine.
-    static func beforeEachTurn(engine: GameEngine) async {
+    /// - Parameter command: The command about to be executed.
+    static func beforeEachTurn(engine: GameEngine, command: Command) async {
         // Use safe accessors
         let messageValue = engine.getGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 

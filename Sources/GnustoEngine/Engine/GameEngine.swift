@@ -41,9 +41,9 @@ public class GameEngine {
     public var onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?
 
     /// Custom logic called at the very start of each turn, before command processing.
-    /// The closure receives the engine.
+    /// The closure receives the engine and the command.
     /// It can modify game state or print messages based on the current state.
-    public var beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)?
+    public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)?
 
     // MARK: - Initialization
 
@@ -63,7 +63,7 @@ public class GameEngine {
         registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
-        beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil
+        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)? = nil
     ) {
         self.gameState = initialState
         self.parser = parser
@@ -260,8 +260,9 @@ public class GameEngine {
     /// Processes a single turn of the game.
     private func processTurn() async {
         // --- Custom Hook: Before Turn ---
-        await beforeTurn?(self)
-        guard !shouldQuit else { return }
+        // Moved hook call to *after* successful parsing
+        // await beforeTurn?(self)
+        // guard !shouldQuit else { return }
         // --------------------------------
 
         // --- Tick the Clock (Fuses & Daemons) ---
@@ -292,6 +293,10 @@ public class GameEngine {
         // 3. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
+            // --- Custom Hook: Before Turn (called only on success) ---
+            await beforeTurn?(self, command)
+            guard !shouldQuit else { return } // Hook might quit
+            // ---------------------------------------------------------
             await execute(command: command)
         case .failure(let error):
             await report(parseError: error)

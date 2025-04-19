@@ -59,11 +59,9 @@ struct CloakOfDarkness {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            adjectives: "handsome",
-            "velvet",
-            properties: .takable,
-            .wearable,
-            parent: .item("hook")
+            adjectives: "handsome", "velvet",
+            properties: .takable, .wearable, .worn,
+            parent: .player
         )
 
         let message = Item(
@@ -98,21 +96,73 @@ struct CloakOfDarkness {
         // Define Object-Specific Action Handlers
         let objectActionHandlers: [ItemID: ObjectActionHandler] = [
             "message": { engine, command in
+                // Ensure we are examining the message in the bar
                 guard
                     command.verbID == "examine",
                     engine.playerLocationID() == "bar"
-                else { return false }
+                else { return false } // Not the right action/location
 
-                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
-                guard cloakSnapshot?.parent == .player else {
-                    return false
+                // Retrieve the disturbed counter from game-specific state
+                // ZIL DISTURBED global: 0=safe, 1=safe(warning given), 2+=lose
+                let disturbedCount = engine.getGameSpecificStateValue(key: "disturbedCounter")?.value as? Int ?? 0
+
+                await engine.output("The message simply reads: \"You ")
+
+                if disturbedCount > 1 {
+                    await engine.output("lose.\"", style: .normal, newline: false)
+                    engine.quitGame()
+                } else {
+                    await engine.output("win.\"", style: .normal, newline: false)
+                    engine.quitGame()
                 }
-
-                await engine.output("\n*** You have won ***")
-                engine.quitGame()
+                // finishGame signals the engine loop should stop, but we still handled the action.
                 return true
             }
         ]
+
+        // --- Hooks ---
+        // Define beforeTurn hook to handle disturbing things in the dark
+        let beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)? = { engine, command in
+            let locationID = engine.playerLocationID()
+            // Only apply in the bar
+            guard locationID == "bar" else { return }
+
+            // Check if the bar is currently dark using the correct property and check method
+            let isLit = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
+            guard !isLit else { return } // Only apply if dark
+
+            // Check if the command is one that disturbs things in the dark
+            // ZIL logic: Increment if NOT LOOK, THINK-ABOUT, or WALK NORTH
+            let verb = command.verbID
+            let isSafeVerb = verb == "look" || verb == "think-about"
+            // Special check for WALK NORTH (leaving the bar)
+            let isLeavingNorth = verb == "go" && command.preposition == "north" // Direct comparison
+                                                                                  // Or adjust based on how GO handler sets Command fields
+
+            if !isSafeVerb && !isLeavingNorth {
+                await engine.output("You grope around clumsily in the dark. Better be careful.", style: .normal)
+                // Increment the counter
+                engine.incrementGameSpecificStateCounter(key: "disturbedCounter")
+            }
+        }
+
+        // Define onEnterRoom hook to handle lighting in the bar
+        let onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = { engine, enteredLocationID in
+            // Only apply when entering the bar
+            guard enteredLocationID == "bar" else { return }
+
+            // Check if cloak is worn
+            let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
+
+            // Update bar's light status
+            if cloakIsWorn {
+                // Cloak worn: Make bar dark by removing .isLit
+                engine.updateLocationProperties(id: "bar", removing: .isLit)
+            } else {
+                // Cloak not worn: Make bar lit by adding .isLit
+                engine.updateLocationProperties(id: "bar", adding: .isLit)
+            }
+        }
 
         // --- Engine Setup ---
         let ioHandler = await ConsoleIOHandler()
@@ -122,7 +172,9 @@ struct CloakOfDarkness {
             ioHandler: ioHandler,
             registry: GameDefinitionRegistry(
                 objectActionHandlers: objectActionHandlers
-            )
+            ),
+            onEnterRoom: onEnterRoom,
+            beforeTurn: beforeTurn
         )
 
         // --- Run Game ---
