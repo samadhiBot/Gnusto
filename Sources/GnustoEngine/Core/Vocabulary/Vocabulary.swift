@@ -72,7 +72,7 @@ public struct Vocabulary: Codable, Sendable {
     public static let defaultNoiseWords: Set<String> = [
         "a", "an", "and", "the", "some", "this", "that", "those", "these",
         ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")"
-        // Removed: "at", "in", "on", "to", "of", "with" - These are often important prepositions/directions
+        // Removed: "at", "in", "on", "to", "of", "with" - These are important prepositions/directions
         // Note: "on" and "off" are NOT noise words here as they are significant particles.
     ]
 
@@ -90,88 +90,203 @@ public struct Vocabulary: Codable, Sendable {
     /// Default verbs common to most IF games.
     @MainActor public static let defaultVerbs: [Verb] = [
         // Core Actions
-        Verb(id: "look", synonyms: ["l"],
-             syntax: [
-                SyntaxRule(pattern: [.verb]),
-                SyntaxRule(pattern: [.verb, .directObject]) // Added rule for look <item>
-             ]),
-        Verb(id: "examine", synonyms: ["x", "inspect"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Examine needs DO
-        Verb(id: "inventory", synonyms: ["i"], syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "quit", synonyms: ["q"], syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "score", syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "wait", synonyms: ["z"], syntax: [SyntaxRule(pattern: [.verb])]),
+        Verb(
+            id: "look",
+            synonyms: ["l"],
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject) // Added rule for look <item>
+            ]
+        ),
+        Verb(
+            id: "examine",
+            synonyms: ["x", "inspect"],
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ), // Examine needs DO
+        Verb(
+            id: "inventory",
+            synonyms: ["i"],
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "quit",
+            synonyms: ["q"],
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "score",
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "wait",
+            synonyms: ["z"],
+            syntax: [SyntaxRule(.verb)]
+        ),
 
         // Movement
-        Verb(id: "go", synonyms: ["move", "walk", "run", "proceed"], syntax: [SyntaxRule(pattern: [.verb, .direction])]), // Default takes direction
+        Verb(
+            id: "go",
+            synonyms: ["move", "walk", "run", "proceed"],
+            syntax: [SyntaxRule(.verb, .direction)]
+        ), // Default takes direction
         // Note: Single directions (N, S, E, W...) handled separately by StandardParser
 
         // Common Interactions
-        Verb(id: "take", synonyms: ["get", "grab", "pick"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "put", synonyms: ["place"], // Corrected: Only place is a reasonable synonym
-             syntax: [
+        Verb(
+            id: "take",
+            synonyms: ["get", "grab", "pick"],
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "put",
+            synonyms: ["place"],
+            // Corrected: Only place is a reasonable synonym
+            syntax: [
                 // Define rules for PUT/PLACE: V+DO+PREP+IO
                 // put <DO> in <IO> - DO must be reachable, IO must be a container
-                SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                           directObjectConditions: [], // Must be reachable (default), .takable checked by action
-                           indirectObjectConditions: [.container], // IO must be a container
-                           requiredPreposition: "in"),
-                // put <DO> on <IO> - DO must be reachable, IO must be a surface (checked by action)
-                 SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                            directObjectConditions: [],
-                            indirectObjectConditions: [], // IO must be reachable surface (action checks property)
-                            requiredPreposition: "on"),
                 // put <DO> into <IO> - Same as 'in'
-                SyntaxRule(pattern: [.verb, .directObject, .preposition, .indirectObject],
-                           directObjectConditions: [],
-                           indirectObjectConditions: [.container],
-                           requiredPreposition: "into")
-             ]),
-        Verb(id: "drop", synonyms: ["discard"], // Corrected: Removed put, place
-             syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // Simple drop syntax
-        Verb(id: "open", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "close", synonyms: ["shut"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "read", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "wear", synonyms: ["don", "put on"], // Added "put on"
-             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "remove", synonyms: ["take off", "doff"], // Added "doff"
-             syntax: [SyntaxRule(pattern: [.verb, .directObject])]), // For worn items
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    // Must be reachable (default), .takable checked by action
+                    indirectObjectConditions: [.container],
+                    // IO must be a container
+                    requiredPreposition: "in"
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    // Must be reachable (default), .takable checked by action
+                    indirectObjectConditions: [.container],
+                    // IO must be a container
+                    requiredPreposition: "into"
+                ),
+                // put <DO> on <IO> - DO must be reachable, IO must be a surface (checked by action)
+                // put <DO> into <IO> - Same as 'in'
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    // IO must be reachable surface (action checks property)
+                    requiredPreposition: "on"
+                ),
+            ]
+        ),
+        // put <DO> into <IO> - Same as 'in'
+        Verb(
+            id: "drop",
+            synonyms: ["discard"],
+            // Corrected: Removed put, place
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ), // Simple drop syntax
+        Verb(
+            id: "open",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "close",
+            synonyms: ["shut"],
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "read",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "wear",
+            synonyms: ["don", "put on"],
+            // Added "put on"
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "remove",
+            synonyms: ["take off", "doff"],
+            // Added "doff"
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ), // For worn items
         // Light/Device Verbs (Note: Synonyms handle mapping multiple words to the same VerbID)
-        Verb(id: "light", synonyms: ["illuminate"], // Direct mapping to turn_on
-             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "extinguish", synonyms: ["douse"], // Direct mapping to turn_off
-             syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "blow", // Requires "out" particle
-             syntax: [
-                SyntaxRule(pattern: [.verb, .particle("out"), .directObject]),
-                SyntaxRule(pattern: [.verb, .directObject, .particle("out")])
-             ]),
-        Verb(id: "turn", // Requires "on"/"off" particle
-             syntax: [
-                SyntaxRule(pattern: [.verb, .particle("on"), .directObject]),
-                SyntaxRule(pattern: [.verb, .directObject, .particle("on")]),
-                SyntaxRule(pattern: [.verb, .particle("off"), .directObject]),
-                SyntaxRule(pattern: [.verb, .directObject, .particle("off")])
-             ]),
-        Verb(id: "switch", // Requires "on"/"off" particle
-             syntax: [
-                SyntaxRule(pattern: [.verb, .particle("on"), .directObject]),
-                SyntaxRule(pattern: [.verb, .directObject, .particle("on")]),
-                SyntaxRule(pattern: [.verb, .particle("off"), .directObject]),
-                SyntaxRule(pattern: [.verb, .directObject, .particle("off")])
-             ]),
+        Verb(
+            id: "light",
+            synonyms: ["illuminate"],
+            // Direct mapping to turn_on
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "extinguish",
+            synonyms: ["douse"],
+            // Direct mapping to turn_off
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "blow",
+            // Requires "out" particle
+            syntax: [
+                SyntaxRule(.verb, .particle("out"), .directObject),
+                SyntaxRule(.verb, .directObject, .particle("out"))
+            ]
+        ),
+        Verb(
+            id: "turn",
+            // Requires "on"/"off" particle
+            syntax: [
+                SyntaxRule(.verb, .particle("on"), .directObject),
+                SyntaxRule(.verb, .directObject, .particle("on")),
+                SyntaxRule(.verb, .particle("off"), .directObject),
+                SyntaxRule(.verb, .directObject, .particle("off"))
+            ]
+        ),
+        Verb(
+            id: "switch",
+            // Requires "on"/"off" particle
+            syntax: [
+                SyntaxRule(.verb, .particle("on"), .directObject),
+                SyntaxRule(.verb, .directObject, .particle("on")),
+                SyntaxRule(.verb, .particle("off"), .directObject),
+                SyntaxRule(.verb, .directObject, .particle("off"))
+            ]
+        ),
 
         // Sensory / Non-committal
-        Verb(id: "smell", synonyms: ["sniff"], syntax: [SyntaxRule(pattern: [.verb]), SyntaxRule(pattern: [.verb, .directObject])]), // Smell or Smell X
-        Verb(id: "listen", syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "taste", syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
-        Verb(id: "touch", synonyms: ["feel"], syntax: [SyntaxRule(pattern: [.verb, .directObject])]),
+        Verb(
+            id: "smell",
+            synonyms: ["sniff"],
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ]
+        ), // Smell or Smell X
+        Verb(
+            id: "listen",
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "taste",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: "touch",
+            synonyms: ["feel"],
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
 
         // Meta
-        Verb(id: "help", syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "save", syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "restore", synonyms:["load"], syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "verbose", syntax: [SyntaxRule(pattern: [.verb])]),
-        Verb(id: "brief", syntax: [SyntaxRule(pattern: [.verb])]), // Often used for description detail
+        Verb(
+            id: "help",
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "save",
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "restore",
+            synonyms:["load"],
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "verbose",
+            syntax: [SyntaxRule(.verb)]
+        ),
+        Verb(
+            id: "brief",
+            syntax: [SyntaxRule(.verb)]
+        ), // Often used for description detail
     ]
 
     // MARK: - Building Vocabulary (Example Methods)
@@ -225,6 +340,8 @@ public struct Vocabulary: Codable, Sendable {
             for verb in Vocabulary.defaultVerbs {
                 vocab.add(verb: verb)
             }
+            // DEBUG: Verify rules for 'turn'
+            print("DEBUG Vocab: Rules for 'turn': \(vocab.syntaxRules[VerbID("turn")] ?? [])")
         }
 
         // Add game-specific items

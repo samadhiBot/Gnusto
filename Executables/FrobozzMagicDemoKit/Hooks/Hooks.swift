@@ -73,24 +73,6 @@ enum Hooks {
         default:
             break
         }
-
-        // Dynamic darkness handling for rooms without inherent light
-        let currentLocation = gameState.locations[locationID]
-        if currentLocation?.hasProperty(.inherentlyLit) != true {
-            // Check if player has a light source
-            let hasLight = await hasActiveLight(engine: engine)
-
-            if !hasLight {
-                // Use classic Grue message
-                await engine.output(
-                    """
-                    It is pitch black. You are likely to be eaten by a grue.
-                    """,
-                    style: .strong
-                )
-                // TODO: Implement Grue logic (e.g., end game after a turn)
-            }
-        }
     }
 
     /// Custom logic that runs at the start of each turn.

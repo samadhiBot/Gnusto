@@ -43,6 +43,10 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
         try container.encodeIfPresent(requiredPreposition, forKey: .requiredPreposition)
     }
 
+    public init(_ pattern: SyntaxTokenType...) {
+        self = .init(pattern: pattern)
+    }
+
     public init(
         pattern: [SyntaxTokenType],
         directObjectConditions: ObjectCondition = .none,
