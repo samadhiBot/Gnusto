@@ -3,7 +3,6 @@ import Foundation
 /// A standard implementation of the Parser protocol.
 /// Aims to replicate common ZIL parser behaviors.
 public struct StandardParser: Parser {
-
     /// Parses a raw input string into a structured `Command`.
     ///
     /// Follows a ZIL-inspired process:
@@ -63,6 +62,7 @@ public struct StandardParser: Parser {
                 let verbPhrase = subSequence.joined(separator: " ")
 
                 if let foundVerbID = vocabulary.verbs[verbPhrase] {
+                    print("DEBUG: Vocab lookup success: '\(verbPhrase)' maps to \(foundVerbID)")
                     // Found a potential match
                     if length > longestMatchLength {
                         longestMatchLength = length
@@ -88,60 +88,58 @@ public struct StandardParser: Parser {
         }
 
         // 5b. Get Syntax Rules for the Verb
-        guard let rules = vocabulary.syntaxRules[verbID], !rules.isEmpty else {
-            // If no rules defined, assume simple V or V+DO (like original basic parser)
-            let phraseTokens = significantTokens.suffix(from: verbStartIndex + verbTokenCount)
-            let (noun, mods) = extractNounAndMods(from: Array(phraseTokens), vocabulary: vocabulary)
-            if let noun = noun {
-                let resolveResult = resolveObject(noun: noun, modifiers: mods, isPronoun: vocabulary.isPronoun(noun), in: gameState, using: vocabulary, requiredConditions: .none)
-                switch resolveResult {
-                case .success(let objID):
-                    let command = Command(verbID: verbID, directObject: objID, directObjectModifiers: mods, rawInput: input)
-                    return .success(command)
-                case .failure(let error):
-                    return .failure(error)
-                }
+        let rules = vocabulary.syntaxRules[verbID] ?? [] // Get rules or empty array
+        print("DEBUG: Rules fetched for \(verbID): \(rules)")
+
+        if rules.isEmpty {
+            // No explicit rules defined for this verb.
+            // Succeed ONLY if the input was just the verb phrase.
+            if significantTokens.count == verbTokenCount {
+                let command = Command(verbID: verbID, rawInput: input)
+                return .success(command)
             } else {
-                 // Just the verb
-                 let command = Command(verbID: verbID, rawInput: input)
-                 return .success(command)
+                // Verb found, but has extra words and no defined syntax rules.
+                return .failure(.badGrammar("I understand the verb '\(verbID.rawValue)', but not the rest of that sentence."))
             }
         }
 
-        // 6. Match Tokens Against Syntax Rules
+        // 6. Match Tokens Against Syntax Rules (using the non-empty `rules` array)
         var successfulParse: Command? = nil
         var bestError: ParseError? = nil
 
-        // Pass the verbStartIndex to matchRule
         for rule in rules {
-            let matchResult = matchRule(rule: rule, tokens: significantTokens, verbStartIndex: verbStartIndex, vocabulary: vocabulary, gameState: gameState, originalInput: input)
+            let matchResult = matchRule(
+                rule: rule,
+                tokens: significantTokens,
+                verbStartIndex: verbStartIndex,
+                vocabulary: vocabulary,
+                gameState: gameState,
+                originalInput: input
+            )
 
-            switch matchResult {
-            case .success(let command):
-                // Found a successful match! (Could potentially find multiple? ZIL prioritized)
-                // For now, take the first success.
+            if case .success(let command) = matchResult {
                 successfulParse = command
-                bestError = nil // Clear any previous error if we find success
-                break // Exit loop on first success
-            case .failure(let currentError):
-                // Prioritize resolution errors over grammar errors
+                bestError = nil // Clear error on success
+                break // Found a match, exit the rule loop immediately
+            } else if case .failure(let currentError) = matchResult {
+                // Update bestError based on priority
                 if bestError == nil || (isResolutionError(currentError) && !isResolutionError(bestError!)) {
                      bestError = currentError
                 }
-                // Continue trying other rules
+                // Continue to the next rule
             }
-            if successfulParse != nil { break } // Exit outer loop if success found
+            // Removed the potentially problematic extra break check here
         }
 
         // 7. Return Result
         if let command = successfulParse {
-            return .success(command)
+            return .success(command) // Return success if a rule matched
         } else if let error = bestError {
-            // Return the best error encountered if no rule matched successfully
-            return .failure(error)
+             return .failure(error) // Return the best error if no rule matched
         } else {
-            // Should not happen if rules exist but none matched and no error recorded
-            return .failure(.internalError("Syntax rules existed but none matched and no error recorded for input: \(input)"))
+             // This should only happen if 'rules' was empty AND the initial checks failed.
+             // Or if matchRule somehow returned neither success nor failure.
+             return .failure(.internalError("Parsing failed unexpectedly for input: \(input)"))
         }
     }
 
@@ -155,14 +153,25 @@ public struct StandardParser: Parser {
     }
 
     /// Filters out noise words from a token list.
-    internal func removeNoise(tokens: [String], noiseWords: Set<String>) -> [String] {
+    internal func removeNoise(
+        tokens: [String],
+        noiseWords: Set<String>
+    ) -> [String] {
         tokens.filter { !noiseWords.contains($0) }
     }
 
     // MARK: - Syntax Matching Logic (New)
 
     /// Attempts to match a sequence of tokens against a specific SyntaxRule.
-    private func matchRule(rule: SyntaxRule, tokens: [String], verbStartIndex: Int, vocabulary: Vocabulary, gameState: GameState, originalInput: String) -> Result<Command, ParseError> {
+    private func matchRule(
+        rule: SyntaxRule,
+        tokens: [String],
+        verbStartIndex: Int,
+        vocabulary: Vocabulary,
+        gameState: GameState,
+        originalInput: String
+    ) -> Result<Command, ParseError> {
+        print("DEBUG: Attempting matchRule with rule: \(rule.pattern) against tokens: \(tokens)")
 
         let initialVerbWord = tokens[verbStartIndex]
         guard let initialVerbID = vocabulary.verbs[initialVerbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
@@ -254,6 +263,7 @@ public struct StandardParser: Parser {
                     return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(initialVerbWord)' but found '\(currentToken)'."))
                 }
                 matchedParticle = currentToken
+                print("DEBUG: Matched particle '\(currentToken)' for initial verb '\(initialVerbWord)'")
                 tokenCursor += 1 // Consume the particle token
             }
         }
@@ -314,33 +324,55 @@ public struct StandardParser: Parser {
         }
 
         // --- Determine Final Verb ID based on Particles ---
-        var finalVerbID = initialVerbID
+        print("DEBUG: Reached final verb ID check. initialVerbID=\(initialVerbID), matchedParticle=\(matchedParticle ?? "nil") for rule: \(rule.pattern)") // DEBUG PRINT
+        var finalVerbID = initialVerbID // Default to the initial verb
+
         switch initialVerbID.rawValue {
         case "turn", "switch":
-            if matchedParticle == "on" {
-                finalVerbID = VerbID("turn_on")
-            } else if matchedParticle == "off" {
-                finalVerbID = VerbID("turn_off")
-            } else {
-                // If pattern expected a particle but none was matched (or wrong one)
-                // this should have failed earlier in the .particle case.
-                // If pattern *didn't* expect a particle, it shouldn't match these verbs.
-                // However, as a safeguard:
-                return .failure(.badGrammar("Verb '\(initialVerbID.rawValue)' requires 'on' or 'off'."))
+            // These verbs REQUIRE a particle ("on" or "off")
+            guard let particle = matchedParticle else {
+                // This *shouldn't* happen if rule matching worked, as all rules have particles.
+                // Indicates internal inconsistency or bad rule match.
+                return .failure(.internalError("Verb '\(initialVerbID.rawValue)' matched rule but particle missing."))
             }
+            guard particle == "on" || particle == "off" else {
+                // Matched a particle, but it wasn't "on" or "off"
+                return .failure(.badGrammar("Expected 'on' or 'off' after '\(initialVerbID.rawValue)', not '\(particle)'."))
+            }
+            // Set the specific final ID based on the matched particle
+            finalVerbID = (particle == "on") ? VerbID("turn_on") : VerbID("turn_off")
+
         case "blow":
-            if matchedParticle == "out" {
-                finalVerbID = VerbID("turn_off") // Map "blow out" to the turn_off action
-            } else {
-                return .failure(.badGrammar("Verb 'blow' requires 'out'."))
+            // This verb REQUIRES the "out" particle
+            guard let particle = matchedParticle else {
+                return .failure(.internalError("Verb 'blow' matched rule but particle missing."))
             }
+            guard particle == "out" else {
+                return .failure(.badGrammar("Expected 'out' after 'blow', not '\(particle)'."))
+            }
+            // Map "blow out" to "turn_off"
+            finalVerbID = VerbID("turn_off")
+
         case "light":
-             finalVerbID = VerbID("turn_on") // Explicitly map 'light' verb
+            // This verb maps directly and should NOT have a particle
+            guard matchedParticle == nil else {
+                return .failure(.badGrammar("Verb 'light' doesn't take a particle like '\(matchedParticle!)'."))
+            }
+            finalVerbID = VerbID("turn_on")
+
         case "extinguish":
-            finalVerbID = VerbID("turn_off") // Explicitly map 'extinguish' verb
+            // This verb maps directly and should NOT have a particle
+            guard matchedParticle == nil else {
+                return .failure(.badGrammar("Verb 'extinguish' doesn't take a particle like '\(matchedParticle!)'."))
+            }
+            finalVerbID = VerbID("turn_off")
+
         default:
-            // For other verbs, the initialVerbID is the final one.
-            break
+            // Any other verb. Ensure no unexpected particle was matched.
+            guard matchedParticle == nil else {
+                return .failure(.badGrammar("Verb '\(initialVerbID.rawValue)' doesn't take a particle like '\(matchedParticle!)'."))
+            }
+            // finalVerbID remains the initialVerbID
         }
 
         // --- Build Command ---
@@ -356,6 +388,8 @@ public struct StandardParser: Parser {
                 direction: matchedDirection,
                 rawInput: originalInput
             )
+            // ADD DEBUG PRINT HERE to see which rule actually succeeded
+            print("DEBUG: matchRule SUCCESS. Matched rule: \(rule.pattern), finalVerbID: \(finalVerbID), particle: \(matchedParticle ?? "nil")")
             return .success(command)
         case (.failure(let error), _): return .failure(error)
         case (_, .failure(let error)): return .failure(error)
@@ -364,7 +398,10 @@ public struct StandardParser: Parser {
 
     /// Extracts the likely noun and preceding modifiers from a phrase.
     /// Filters noise words, identifies known nouns, and assumes the last known noun is primary.
-    private func extractNounAndMods(from phrase: [String], vocabulary: Vocabulary) -> (noun: String?, mods: [String]) {
+    private func extractNounAndMods(
+        from phrase: [String],
+        vocabulary: Vocabulary
+    ) -> (noun: String?, mods: [String]) {
         // 1. Filter out noise words
         let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
         guard !significantPhrase.isEmpty else { return (nil, []) }
@@ -418,7 +455,14 @@ public struct StandardParser: Parser {
 
     /// Resolves a noun phrase (noun + modifiers) to a specific ItemID within the game context.
     /// Incorporates checking required conditions based on the SyntaxRule.
-    internal func resolveObject(noun: String, modifiers: [String], isPronoun: Bool, in gameState: GameState, using vocabulary: Vocabulary, requiredConditions: ObjectCondition) -> Result<ItemID?, ParseError> { // Added conditions
+    internal func resolveObject(
+        noun: String,
+        modifiers: [String],
+        isPronoun: Bool,
+        in gameState: GameState,
+        using vocabulary: Vocabulary,
+        requiredConditions: ObjectCondition
+    ) -> Result<ItemID?, ParseError> { // Added conditions
 
         // --- Pronoun Handling (remains largely the same, but might check conditions?) ---
         if isPronoun {
@@ -482,7 +526,10 @@ public struct StandardParser: Parser {
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.
-    internal func gatherCandidates(in gameState: GameState, requiredConditions: ObjectCondition) -> [ItemID: Item] { // Added conditions
+    internal func gatherCandidates(
+        in gameState: GameState,
+        requiredConditions: ObjectCondition
+    ) -> [ItemID: Item] { // Added conditions
         var candidates: [ItemID: Item] = [:]
         let currentLocationID = gameState.player.currentLocationID
         let allItems = gameState.items
@@ -565,7 +612,11 @@ public struct StandardParser: Parser {
     }
 
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
-    internal func filterCandidates(ids: Set<ItemID>, modifiers: [String], candidates: [ItemID: Item]) -> Set<ItemID> {
+    internal func filterCandidates(
+        ids: Set<ItemID>,
+        modifiers: [String],
+        candidates: [ItemID: Item]
+    ) -> Set<ItemID> {
         guard !modifiers.isEmpty else {
             return ids // No modifiers to filter by
         }
@@ -598,7 +649,13 @@ public struct StandardParser: Parser {
     ///   - vocabulary: The game vocabulary.
     /// - Returns: The index marking the end of the noun phrase (exclusive). If no valid phrase
     ///            is found, returns `startIndex`.
-    private func findEndOfNounPhrase(startIndex: Int, tokens: [String], pattern: [SyntaxTokenType], patternIndex: Int, vocabulary: Vocabulary) -> Int {
+    private func findEndOfNounPhrase(
+        startIndex: Int,
+        tokens: [String],
+        pattern: [SyntaxTokenType],
+        patternIndex: Int,
+        vocabulary: Vocabulary
+    ) -> Int {
         var boundaryIndex = startIndex // Use a separate index for the boundary
         let nextPatternIndex = patternIndex + 1
 
