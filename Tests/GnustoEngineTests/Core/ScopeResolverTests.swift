@@ -4,9 +4,6 @@ import Testing
 @MainActor
 @Suite("ScopeResolver Tests")
 struct ScopeResolverTests {
-    // Now needs an engine instance to initialize the resolver.
-    var engine: GameEngine! // Implicitly unwrapped optional
-    var resolver: ScopeResolver! // Implicitly unwrapped optional
     let testLocationID = Location.ID("testRoom") // Define once
 
     // --- Helper Setup ---
@@ -27,111 +24,115 @@ struct ScopeResolverTests {
         return gameState
     }
 
-    /// Test setup method to initialize engine and resolver.
-    mutating func setupTest() async {
-        // Create minimal necessary components for GameEngine
-        let mockParser = MockParser()
-        let mockIO = await MockIOHandler()
-        // Start with an empty initial state; tests will set the actual state.
-        let emptyInitialState = GameState(
-            locations: [:],
-            items: [:],
-            player: Player(currentLocationID: "nowhere"), // Placeholder location
-            vocabulary: Vocabulary()
-        )
-        engine = GameEngine(
-            initialState: emptyInitialState,
-            parser: mockParser,
-            ioHandler: mockIO
-            // registry and hooks use defaults
-        )
-        // Initialize resolver using the created engine
-        resolver = engine.scopeResolver // Access the lazily initialized resolver
-    }
-
     // --- isLocationLit Tests ---
 
     @Test("Location is lit if inherentlyLit property is present")
-    mutating func testIsLitInherentlyLit() async throws {
-        await setupTest() // Initialize engine/resolver
+    func testIsLitInherentlyLit() async throws {
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [])
-        engine.updateGameState { $0 = gameState } // Update engine's state
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == true)
     }
 
     @Test("Location is dark if not inherentlyLit and no light source")
-    mutating func testIsLitDarkNoSource() async throws {
-        await setupTest()
+    func testIsLitDarkNoSource() async throws {
         let gameState = createTestGameState(items: [])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == false)
     }
 
     @Test("Location is lit if player holds active light source")
-    mutating func testIsLitPlayerActiveLight() async throws {
-        await setupTest()
+    func testIsLitPlayerActiveLight() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on, .takable], parent: .player)
         let gameState = createTestGameState(items: [activeLamp])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == true)
     }
 
     @Test("Location is dark if player holds inactive light source")
-    mutating func testIsLitPlayerInactiveLight() async throws {
-        await setupTest()
+    func testIsLitPlayerInactiveLight() async throws {
         let inactiveLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .takable], parent: .player)
         let gameState = createTestGameState(items: [inactiveLamp])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == false)
     }
 
     @Test("Location is lit if active light source is in room")
-    mutating func testIsLitRoomActiveLight() async throws {
-        await setupTest()
+    func testIsLitRoomActiveLight() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on], parent: .location(testLocationID))
         let gameState = createTestGameState(items: [activeLamp])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == true)
     }
 
     @Test("Location is dark if inactive light source is in room")
-    mutating func testIsLitRoomInactiveLight() async throws {
-        await setupTest()
+    func testIsLitRoomInactiveLight() async throws {
         let inactiveLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource], parent: .location(testLocationID))
         let gameState = createTestGameState(items: [inactiveLamp])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == false)
     }
 
     @Test("Location is lit if inherentlyLit and player holds active light (inherentlyLit takes precedence)")
-    mutating func testIsLitInherentlyLitWithPlayerLight() async throws {
-        await setupTest()
+    func testIsLitInherentlyLitWithPlayerLight() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on, .takable], parent: .player)
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [activeLamp])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: testLocationID) == true)
     }
 
     @Test("Location is dark if location ID does not exist")
-    mutating func testIsLitNonExistentLocation() async throws {
-        await setupTest()
+    func testIsLitNonExistentLocation() async throws {
         let gameState = createTestGameState(items: [])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         #expect(resolver.isLocationLit(locationID: "badRoom") == false)
     }
 
     // --- visibleItemsIn Tests ---
 
     @Test("Visible items in inherently lit room")
-    mutating func testVisibleItemsInherentlyLit() async throws {
-        await setupTest()
+    func testVisibleItemsInherentlyLit() async throws {
         let visibleItem = Item(id: "key", name: "key", parent: .location(testLocationID))
         let invisibleItem = Item(id: "dust", name: "dust", properties: [.invisible], parent: .location(testLocationID))
         let gameState = createTestGameState(
             locationProperties: [.inherentlyLit],
             items: [visibleItem, invisibleItem]
         )
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: testLocationID)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
@@ -139,28 +140,32 @@ struct ScopeResolverTests {
     }
 
     @Test("No items visible in dark room")
-    mutating func testVisibleItemsDarkRoom() async throws {
-        await setupTest()
+    func testVisibleItemsDarkRoom() async throws {
         let item = Item(id: "key", name: "key", parent: .location(testLocationID))
         let gameState = createTestGameState(
             items: [item] // Room is dark by default
         )
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: testLocationID)
         #expect(visibleIDs.isEmpty)
     }
 
     @Test("Visible items in room lit by player light")
-    mutating func testVisibleItemsPlayerLight() async throws {
-        await setupTest()
+    func testVisibleItemsPlayerLight() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on, .takable], parent: .player)
         let visibleItem = Item(id: "key", name: "key", parent: .location(testLocationID))
         let invisibleItem = Item(id: "dust", name: "dust", properties: [.invisible], parent: .location(testLocationID))
         let gameState = createTestGameState(
             items: [activeLamp, visibleItem, invisibleItem]
         )
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: testLocationID)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
@@ -168,15 +173,17 @@ struct ScopeResolverTests {
     }
 
     @Test("Visible items in room lit by room light")
-    mutating func testVisibleItemsRoomLight() async throws {
-        await setupTest()
+    func testVisibleItemsRoomLight() async throws {
         let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on], parent: .location(testLocationID))
         let visibleItem = Item(id: "key", name: "key", parent: .location(testLocationID))
         let invisibleItem = Item(id: "dust", name: "dust", properties: [.invisible], parent: .location(testLocationID))
         let gameState = createTestGameState(
             items: [activeLamp, visibleItem, invisibleItem]
         )
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: testLocationID)
         #expect(Set(visibleIDs) == Set([activeLamp.id, visibleItem.id]))
@@ -184,10 +191,13 @@ struct ScopeResolverTests {
     }
 
     @Test("No items visible if location ID does not exist")
-    mutating func testVisibleItemsNonExistentLocation() async throws {
-        await setupTest()
+    func testVisibleItemsNonExistentLocation() async throws {
         let gameState = createTestGameState(items: [])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let visibleIDs = resolver.visibleItemsIn(locationID: "badRoom")
         #expect(visibleIDs.isEmpty)
     }
@@ -195,33 +205,39 @@ struct ScopeResolverTests {
     // --- itemsReachableByPlayer Tests ---
 
     @Test("Reachable includes inventory")
-    mutating func testReachableInventory() async throws {
-        await setupTest()
+    func testReachableInventory() async throws {
         let inventoryItem = Item(id: "invItem", name: "Inventory Item", properties: [.takable], parent: .player)
         let gameState = createTestGameState(items: [inventoryItem])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(inventoryItem.id))
     }
 
     @Test("Reachable includes visible items in lit room")
-    mutating func testReachableVisibleLitRoom() async throws {
-        await setupTest()
+    func testReachableVisibleLitRoom() async throws {
         let locationItem = Item(id: "locItem", name: "Location Item", parent: .location(testLocationID))
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [locationItem])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(locationItem.id))
     }
 
     @Test("Reachable excludes items in dark room")
-    mutating func testReachableDarkRoom() async throws {
-        await setupTest()
+    func testReachableDarkRoom() async throws {
         let locationItem = Item(id: "locItem", name: "Location Item", parent: .location(testLocationID))
         let gameState = createTestGameState(items: [locationItem]) // Dark room
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(!reachable.contains(locationItem.id))
@@ -236,23 +252,29 @@ struct ScopeResolverTests {
     let baseItemInBox = Item(id: "itemInBox", name: "item in box")
 
     @Test("Reachable includes item in open container (inventory)")
-    mutating func testReachableOpenContainerInventory() async throws {
-        await setupTest()
+    func testReachableOpenContainerInventory() async throws {
         let openBox = self.baseOpenBox.withParent(.player)
         let itemInBox = self.baseItemInBox.withParent(.item(openBox.id))
         let gameState = createTestGameState(items: [openBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
     }
 
     @Test("Reachable excludes item in closed container (inventory)")
-    mutating func testReachableClosedContainerInventory() async throws {
-        await setupTest()
+    func testReachableClosedContainerInventory() async throws {
         let closedBox = self.baseClosedBox.withParent(.player)
         let itemInBox = self.baseItemInBox.withParent(.item(closedBox.id))
         let gameState = createTestGameState(items: [closedBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
         #expect(!reachable.contains(itemInBox.id))
@@ -260,34 +282,43 @@ struct ScopeResolverTests {
     }
 
     @Test("Reachable includes item in transparent container (inventory)")
-    mutating func testReachableTransparentContainerInventory() async throws {
-        await setupTest()
+    func testReachableTransparentContainerInventory() async throws {
         let transparentBox = self.baseTransparentBox.withParent(.player)
         let itemInBox = self.baseItemInBox.withParent(.item(transparentBox.id))
         let gameState = createTestGameState(items: [transparentBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
     }
 
     @Test("Reachable includes item in open container (lit room)")
-    mutating func testReachableOpenContainerLitRoom() async throws {
-        await setupTest()
+    func testReachableOpenContainerLitRoom() async throws {
         let openBox = self.baseOpenBox.withParent(.location(testLocationID))
         let itemInBox = self.baseItemInBox.withParent(.item(openBox.id))
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [openBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
     }
 
     @Test("Reachable excludes item in closed container (lit room)")
-    mutating func testReachableClosedContainerLitRoom() async throws {
-        await setupTest()
+    func testReachableClosedContainerLitRoom() async throws {
         let closedBox = self.baseClosedBox.withParent(.location(testLocationID))
         let itemInBox = self.baseItemInBox.withParent(.item(closedBox.id))
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [closedBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
         #expect(!reachable.contains(itemInBox.id))
@@ -295,23 +326,29 @@ struct ScopeResolverTests {
     }
 
     @Test("Reachable includes item in transparent container (lit room)")
-    mutating func testReachableTransparentContainerLitRoom() async throws {
-        await setupTest()
+    func testReachableTransparentContainerLitRoom() async throws {
         let transparentBox = self.baseTransparentBox.withParent(.location(testLocationID))
         let itemInBox = self.baseItemInBox.withParent(.item(transparentBox.id))
         let gameState = createTestGameState(locationProperties: [.inherentlyLit], items: [transparentBox, itemInBox])
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
     }
 
     @Test("Reachable excludes container and item in dark room")
-    mutating func testReachableContainerDarkRoom() async throws {
-        await setupTest()
+    func testReachableContainerDarkRoom() async throws {
         let openBox = self.baseOpenBox.withParent(.location(testLocationID))
         let itemInBox = self.baseItemInBox.withParent(.item(openBox.id))
         let gameState = createTestGameState(items: [openBox, itemInBox]) // Dark room
-        engine.updateGameState { $0 = gameState }
+        let mockParser = MockParser()
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(initialState: gameState, parser: mockParser, ioHandler: mockIO)
+        let resolver = engine.scopeResolver
+
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.isEmpty) // Neither box nor item inside should be reachable in dark
     }

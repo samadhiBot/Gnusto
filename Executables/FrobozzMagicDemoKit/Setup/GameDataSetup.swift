@@ -35,21 +35,18 @@ enum GameDataSetup {
             "ironDoor": { engine, command in
                 switch command.verbID {
                 case "open":
-                    engine.updateGameState { state in
-                        let ironDoorRoomID: LocationID = "ironDoorRoom"
-                        let vaultID: LocationID = "hiddenVault"
-                        if state.locations[ironDoorRoomID] != nil {
-                            state.locations[ironDoorRoomID]?.exits[.east] = Exit(destination: vaultID)
-                        }
-                    }
+                    // Use updateLocationExits to modify the state
+                    engine.updateLocationExits(
+                        id: "ironDoorRoom",
+                        adding: [.east: Exit(destination: "hiddenVault")]
+                    )
                     return false // Allow default message
                 case "close":
-                    engine.updateGameState { state in
-                        let ironDoorRoomID: LocationID = "ironDoorRoom"
-                        if state.locations[ironDoorRoomID] != nil {
-                            state.locations[ironDoorRoomID]?.exits.removeValue(forKey: .east)
-                        }
-                    }
+                    // Use updateLocationExits to modify the state
+                    engine.updateLocationExits(
+                        id: "ironDoorRoom",
+                        removing: .east
+                    )
                     return false // Allow default message
                 case "examine":
                     let item = engine.itemSnapshot(with: "ironDoor") // We know the ID
@@ -74,9 +71,10 @@ enum GameDataSetup {
                 switch command.verbID {
                 case "examine":
                     guard let itemID = command.directObject else { return false } // Should have DO for examine
-                    let gameState = engine.getCurrentGameState()
+                    // Access game specific state directly via engine helper
                     let item = engine.itemSnapshot(with: itemID)
-                    if let batteryLife = gameState.gameSpecificState?[Components.Lantern.Constants.batteryLifeKey]?.value as? Int {
+                    // Use getGameSpecificStateValue to get the value safely
+                    if let batteryLife = engine.getGameSpecificStateValue(key: Components.Lantern.Constants.batteryLifeKey)?.value as? Int {
                         let status = item?.hasProperty(.on) == true ? "lit" : "unlit"
                         await engine.output(
                             """

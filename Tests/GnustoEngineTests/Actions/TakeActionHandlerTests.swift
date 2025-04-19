@@ -128,7 +128,7 @@ struct TakeActionHandlerTests {
         }
 
         // Assert: Check that the player is still holding nothing
-        #expect(engine.getCurrentGameState().itemsInInventory().isEmpty == true) // Use GameState helper
+        #expect(engine.itemSnapshots(withParent: .player).isEmpty == true)
 
         // Assert: Check NO message was printed by the handler
         let output = await mockIO.flush()
@@ -481,7 +481,7 @@ struct TakeActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         // Assert
-        let finalPronounIt = engine.getCurrentGameState().pronouns["it"]
+        let finalPronounIt = engine.gameState.pronouns["it"]
         #expect(finalPronounIt == [testItem.id], "'it' pronoun should refer to the taken item")
         let output = await mockIO.flush()
         #expect(output == "Taken.")

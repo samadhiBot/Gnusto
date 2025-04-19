@@ -688,7 +688,7 @@ public class GameEngine {
         adding: ItemProperty...,
         removing: ItemProperty...
     ) {
-        guard var item = gameState.items[itemID] else {
+        guard let item = gameState.items[itemID] else {
             print("Warning: Attempted to update properties for non-existent item '\(itemID)'.")
             return
         }
@@ -711,7 +711,7 @@ public class GameEngine {
         adding: [Direction: Exit] = [:],
         removing: Direction...
     ) {
-        guard var location = gameState.locations[id] else {
+        guard let location = gameState.locations[id] else {
             print("Warning: Attempted to update exits for non-existent location '\(id)'.")
             return
         }

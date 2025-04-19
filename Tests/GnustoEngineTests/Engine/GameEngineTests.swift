@@ -553,7 +553,7 @@ struct GameEngineTests {
         #expect(output.contains { $0.text == "Fuse triggered!" }, "Fuse message not found in output") // Check message
         #expect(stateHolder.flag == true, "Fuse action flag not set") // Check state holder flag
         #expect(engine.playerMoves() == 2) // Check turns
-        #expect(engine.getCurrentGameState().activeFuses[fuseDef.id] == nil, "Fuse state should be removed after execution") // Check persistent state
+        #expect(engine.gameState.activeFuses[fuseDef.id] == nil, "Fuse state should be removed after execution") // Check persistent state
     }
 
     @Test("Daemon executes at correct frequency")
@@ -686,7 +686,7 @@ struct GameEngineTests {
         #expect(stateHolder.flag == true, "Fuse should have triggered")
 
         // Check that fuse was removed from game state
-        #expect(engine.getCurrentGameState().activeFuses[testFuse.id] == nil,
+        #expect(engine.gameState.activeFuses[testFuse.id] == nil,
               "Fuse should be removed from game state after execution")
 
         // Check for expected messages in output

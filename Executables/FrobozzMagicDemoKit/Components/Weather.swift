@@ -24,13 +24,12 @@ extension Components {
                 frequency: 10 // Change every 10 turns
             ) { engine in
                 // Only affects outdoor locations
-                let gameState = engine.getCurrentGameState()
-                let locationID = gameState.player.currentLocationID
-                let location = gameState.locations[locationID]
+                let locationID = engine.playerLocationID()
+                let location = engine.locationSnapshot(with: locationID)
 
                 // Randomly change the weather
                 let weatherStates = ["sunny", "cloudy", "rainy"]
-                let currentWeather = gameState.gameSpecificState?[Constants.weatherStateKey]?.value as? String ?? "sunny"
+                let currentWeather = engine.getGameSpecificStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
 
                 // Choose a different weather state
                 var newWeather = currentWeather
@@ -39,15 +38,10 @@ extension Components {
                 }
 
                 // Update the weather state
-                engine.updateGameState { state in
-                    if state.gameSpecificState == nil {
-                        state.gameSpecificState = [:]
-                    }
-                    state.gameSpecificState?[Constants.weatherStateKey] = AnyCodable(newWeather)
-                }
+                engine.updateGameSpecificState(key: Constants.weatherStateKey, value: AnyCodable(newWeather))
 
                 // Show weather change message if player is outside
-                if location?.hasProperty(.outside) == true {
+                if location?.properties.contains(.outside) == true {
                     var message = ""
                     switch newWeather {
                     case "sunny":
@@ -63,9 +57,11 @@ extension Components {
                     if !message.isEmpty {
                         // Use the shared pending message key (defined in Lantern for now)
                         // TODO: Define pendingMessageKey in a shared location
-                        engine.updateGameState { state in
-                            state.gameSpecificState?[Components.Lantern.Constants.pendingMessageKey] = AnyCodable(message)
-                        }
+                        // Use updateGameSpecificState to set the pending message
+                        engine.updateGameSpecificState(
+                            key: Components.Lantern.Constants.pendingMessageKey,
+                            value: AnyCodable(message)
+                        )
                     }
                 }
             }
@@ -75,21 +71,18 @@ extension Components {
 
         /// Initializes the weather system: sets initial state and registers the daemon.
         /// - Parameter engine: The game engine instance.
+        @MainActor
         static func setupWeather(engine: GameEngine) async {
-            // Set initial weather state
-            await engine.updateGameState { state in
-                // Initialize gameSpecificState if it doesn't exist
-                if state.gameSpecificState == nil {
-                    state.gameSpecificState = [:]
-                }
-                // Set initial weather only if not already set
-                if state.gameSpecificState?[Constants.weatherStateKey] == nil {
-                    state.gameSpecificState?[Constants.weatherStateKey] = AnyCodable("sunny")
-                }
+            // Set initial weather state using updateGameSpecificState
+            // It safely handles nil dictionary and existing keys
+            // Needs await for MainActor isolated call
+            if engine.getGameSpecificStateValue(key: Constants.weatherStateKey) == nil {
+                engine.updateGameSpecificState(key: Constants.weatherStateKey, value: AnyCodable("sunny"))
             }
 
             // Register the weather daemon
-            let _ = await engine.registerDaemon(id: Constants.weatherDaemonID)
+            // Needs await for MainActor isolated call
+            let _ = engine.registerDaemon(id: Constants.weatherDaemonID)
         }
     }
 }

@@ -42,11 +42,9 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
     ) { engine in
         // Closure runs every turn to update lantern battery
 
-        let gameState = engine.getCurrentGameState()
-
         // Precondition: Lantern exists in the game
-        guard let lantern = gameState.items[LanternConstants.lanternID] else {
-            print("Warning: Lantern item not found in game state")
+        guard let lantern = engine.itemSnapshot(with: LanternConstants.lanternID) else {
+            print("Warning: Lantern item \(LanternConstants.lanternID) not found in game state")
             return
         }
 
@@ -57,16 +55,14 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
         // Get current battery life from game state
         // Default to defaultBatteryLife if not set
-        let batteryLifeValue = gameState.gameSpecificState?[LanternConstants.batteryLifeKey]?.value as? Int
+        let batteryLifeValue = engine.getGameSpecificStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
             ?? LanternConstants.defaultBatteryLife
 
         // Decrement battery life by 1
         let newBatteryLife = max(0, batteryLifeValue - 1)
 
         // Update game state with new battery life
-        engine.updateGameState { state in
-            state.gameSpecificState?[LanternConstants.batteryLifeKey] = AnyCodable(newBatteryLife)
-        }
+        engine.updateGameSpecificState(key: LanternConstants.batteryLifeKey, value: AnyCodable(newBatteryLife))
 
         // Handle different battery states
         switch newBatteryLife {
@@ -120,19 +116,13 @@ public func setupLanternTimer(
     initialBatteryLife: Int = LanternConstants.defaultBatteryLife
 ) -> Bool {
     // Make sure the lantern exists
-    guard engine.getCurrentGameState().items[LanternConstants.lanternID] != nil else {
-        print("Cannot setup lantern timer: lantern item not found")
+    guard engine.itemSnapshot(with: LanternConstants.lanternID) != nil else {
+        print("Cannot setup lantern timer: lantern item \(LanternConstants.lanternID) not found")
         return false
     }
 
     // Set initial battery life in game state
-    engine.updateGameState { state in
-        // Initialize gameSpecificState if it doesn't exist
-        if state.gameSpecificState == nil {
-            state.gameSpecificState = [:]
-        }
-        state.gameSpecificState?[LanternConstants.batteryLifeKey] = AnyCodable(initialBatteryLife)
-    }
+    engine.updateGameSpecificState(key: LanternConstants.batteryLifeKey, value: AnyCodable(initialBatteryLife))
 
     // Register the daemon to start tracking battery life
     return engine.registerDaemon(id: LanternConstants.timerDaemonID)
@@ -145,7 +135,7 @@ public func setupLanternTimer(
 /// - Returns: The remaining battery life in turns, or nil if not set
 @MainActor
 public func getLanternBatteryLife(engine: GameEngine) -> Int? {
-    return engine.getCurrentGameState().gameSpecificState?[LanternConstants.batteryLifeKey]?.value as? Int
+    return engine.getGameSpecificStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
 }
 
 /// Recharges the lantern to the specified battery life.
@@ -157,13 +147,7 @@ public func rechargeLantern(
     engine: GameEngine,
     amount: Int = LanternConstants.defaultBatteryLife
 ) {
-    engine.updateGameState { state in
-        // Ensure gameSpecificState exists
-        if state.gameSpecificState == nil {
-            state.gameSpecificState = [:]
-        }
-        state.gameSpecificState?[LanternConstants.batteryLifeKey] = AnyCodable(amount)
-    }
+    engine.updateGameSpecificState(key: LanternConstants.batteryLifeKey, value: AnyCodable(amount))
 
     // Also ensure the lantern daemon is registered
     engine.registerDaemon(id: LanternConstants.timerDaemonID)

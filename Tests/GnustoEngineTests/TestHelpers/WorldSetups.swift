@@ -132,10 +132,10 @@ struct WorldSetups {
             "message": { engine, command in
                 guard
                     command.verbID == "examine",
-                    await engine.playerLocationID() == "bar"
+                    engine.playerLocationID() == "bar"
                 else { return false }
 
-                let cloakSnapshot = await engine.itemSnapshot(with: "cloak")
+                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
                 guard cloakSnapshot?.parent == .player else { return false }
 
                 // Match the output in main.swift

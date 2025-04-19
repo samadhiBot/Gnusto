@@ -81,11 +81,11 @@ enum Components {
                 frequency: 1 // Run every turn
             ) { engine in
                 // Closure runs every turn to update lantern battery
-                let batteryLifeValue = await engine.getGameSpecificStateValue(key: Constants.batteryLifeKey)?.value as? Int
+                let batteryLifeValue = engine.getGameSpecificStateValue(key: Constants.batteryLifeKey)?.value as? Int
                     ?? Constants.defaultBatteryLife
 
                 // Check lantern state directly via snapshot to avoid direct gameState access
-                guard let lantern = await engine.itemSnapshot(with: Constants.itemID) else {
+                guard let lantern = engine.itemSnapshot(with: Constants.itemID) else {
                     Swift.print("Warning: Lantern item '\(Constants.itemID)' not found in game state for daemon.")
                     return
                 }
@@ -97,7 +97,7 @@ enum Components {
                 let newBatteryLife = max(0, batteryLifeValue - 1)
 
                 // Update game state with new battery life
-                await engine.updateGameSpecificState(key: Constants.batteryLifeKey, value: AnyCodable(newBatteryLife))
+                engine.updateGameSpecificState(key: Constants.batteryLifeKey, value: AnyCodable(newBatteryLife))
 
                 // Handle different battery states
                 switch newBatteryLife {
@@ -106,7 +106,7 @@ enum Components {
                     let _ = engine.addFuse(id: Constants.lowBatteryWarningFuseID)
 
                     // Store message to be displayed on next turn
-                    await engine.updateGameSpecificState(
+                    engine.updateGameSpecificState(
                         key: Constants.pendingMessageKey,
                         value: AnyCodable("Your lantern is getting dim.")
                     )
@@ -114,13 +114,13 @@ enum Components {
                 case 0:
                     // Battery is fully depleted
                     // Store message to be displayed on next turn
-                    await engine.updateGameSpecificState(
+                    engine.updateGameSpecificState(
                         key: Constants.pendingMessageKey,
                         value: AnyCodable("Your lantern has run out of power and is now dark.")
                     )
 
                     // Turn off the lantern
-                    await engine.updateItemProperties(itemID: Constants.itemID, removing: .on)
+                    engine.updateItemProperties(itemID: Constants.itemID, removing: .on)
 
                 default:
                     break // No action needed for other battery levels
@@ -139,7 +139,7 @@ enum Components {
             ) { engine in
                 // This runs when the fuse triggers (halfway through the remaining battery life)
                 // Store message to be displayed on next turn
-                await engine.updateGameSpecificState(
+                engine.updateGameSpecificState(
                     key: Constants.pendingMessageKey,
                     value: AnyCodable("Your lantern is getting very dim and will soon run out of power!")
                 )
