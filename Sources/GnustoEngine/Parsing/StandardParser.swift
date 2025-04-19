@@ -62,7 +62,6 @@ public struct StandardParser: Parser {
                 let verbPhrase = subSequence.joined(separator: " ")
 
                 if let foundVerbID = vocabulary.verbs[verbPhrase] {
-                    print("DEBUG: Vocab lookup success: '\(verbPhrase)' maps to \(foundVerbID)")
                     // Found a potential match
                     if length > longestMatchLength {
                         longestMatchLength = length
@@ -89,7 +88,6 @@ public struct StandardParser: Parser {
 
         // 5b. Get Syntax Rules for the Verb
         let rules = vocabulary.syntaxRules[verbID] ?? [] // Get rules or empty array
-        print("DEBUG: Rules fetched for \(verbID): \(rules)")
 
         if rules.isEmpty {
             // No explicit rules defined for this verb.
@@ -171,8 +169,6 @@ public struct StandardParser: Parser {
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
-        print("DEBUG: Attempting matchRule with rule: \(rule.pattern) against tokens: \(tokens)")
-
         let initialVerbWord = tokens[verbStartIndex]
         guard let initialVerbID = vocabulary.verbs[initialVerbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
 
@@ -263,7 +259,6 @@ public struct StandardParser: Parser {
                     return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(initialVerbWord)' but found '\(currentToken)'."))
                 }
                 matchedParticle = currentToken
-                print("DEBUG: Matched particle '\(currentToken)' for initial verb '\(initialVerbWord)'")
                 tokenCursor += 1 // Consume the particle token
             }
         }
@@ -324,7 +319,6 @@ public struct StandardParser: Parser {
         }
 
         // --- Determine Final Verb ID based on Particles ---
-        print("DEBUG: Reached final verb ID check. initialVerbID=\(initialVerbID), matchedParticle=\(matchedParticle ?? "nil") for rule: \(rule.pattern)") // DEBUG PRINT
         var finalVerbID = initialVerbID // Default to the initial verb
 
         switch initialVerbID.rawValue {
@@ -388,8 +382,6 @@ public struct StandardParser: Parser {
                 direction: matchedDirection,
                 rawInput: originalInput
             )
-            // ADD DEBUG PRINT HERE to see which rule actually succeeded
-            print("DEBUG: matchRule SUCCESS. Matched rule: \(rule.pattern), finalVerbID: \(finalVerbID), particle: \(matchedParticle ?? "nil")")
             return .success(command)
         case (.failure(let error), _): return .failure(error)
         case (_, .failure(let error)): return .failure(error)

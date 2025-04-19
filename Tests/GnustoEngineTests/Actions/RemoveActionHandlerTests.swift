@@ -24,7 +24,12 @@ struct RemoveActionHandlerTests {
         }
 
         // Add relevant verbs to vocabulary
-        let removeVerb = Verb(id: "remove", synonyms: "doff", "take off", syntax: [SyntaxRule(pattern: [.verb, .directObject])])
+        let removeVerb = Verb(
+            id: "remove",
+            synonyms: "doff",
+            "take off",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        )
         let verbs = [removeVerb]
         let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
 

@@ -22,7 +22,11 @@ struct WearActionHandlerTests {
         }
 
         // Add relevant verbs to vocabulary
-        let wearVerb = Verb(id: "wear", synonyms: "don", syntax: [SyntaxRule(pattern: [.verb, .directObject])])
+        let wearVerb = Verb(
+            id: "wear",
+            synonyms: "don",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        )
         let verbs = [wearVerb]
         let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
 

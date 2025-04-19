@@ -36,8 +36,9 @@ extension CaveRegion {
         id: "startRoom",
         name: "Cave Entrance",
         description: """
-                You stand at the entrance to a dark cave. Sunlight streams in from the \
-                opening behind you, but the passage ahead quickly disappears into darkness.
+                You stand at the entrance to a dark cave. Sunlight streams in from the
+                opening to the south behind you, but the passage ahead to the north quickly
+                disappears into darkness. A narrow passage leads east.
                 """,
         exits: [
             .north: Exit(destination: "darkChamber"),
@@ -52,9 +53,9 @@ extension CaveRegion {
         id: "darkChamber",
         name: "Dark Chamber",
         description: """
-                This is a large cavern with walls that disappear into darkness overhead. \
-                Strange echoes bounce around as you move. The cave continues to the north, \
-                and the entrance is to the south.
+                This is a large cavern with walls that disappear into darkness overhead.
+                Strange echoes bounce around as you move. The cave continues to the north,
+                and the entrance is back to the south. Another passage leads west.
                 """,
         exits: [
             .north: Exit(destination: "treasureRoom"),
@@ -67,9 +68,9 @@ extension CaveRegion {
         id: "treasureRoom",
         name: "Treasure Room",
         description: """
-                This small chamber sparkles with reflections from numerous precious gems \
-                embedded in the walls. A stone pedestal in the center of the room holds \
-                what appears to be a golden crown.
+                This small chamber sparkles with reflections from numerous precious gems
+                embedded in the walls. A stone pedestal in the center of the room holds
+                what appears to be a golden crown. The only obvious exit is south.
                 """,
         exits: [
             .south: Exit(destination: "darkChamber"),
@@ -81,8 +82,8 @@ extension CaveRegion {
         id: "narrowPassage",
         name: "Narrow Passage",
         description: """
-                The walls close in here, forming a tight corridor that slopes downward. \
-                You have to duck to avoid hitting your head on the low ceiling. The passage \
+                The walls close in here, forming a tight corridor that slopes downward.
+                You have to duck to avoid hitting your head on the low ceiling. The passage
                 continues east, and the cave entrance is to the west.
                 """,
         exits: [
@@ -95,7 +96,7 @@ extension CaveRegion {
         id: "ironDoorRoom",
         name: "Iron Door Chamber",
         description: """
-                This small chamber appears to be a dead end. The narrow passage leads back \
+                This small chamber appears to be a dead end. The narrow passage leads back
                 to the west. The eastern wall is dominated by a massive iron door.
                 """,
         exits: [
@@ -108,9 +109,10 @@ extension CaveRegion {
         id: "hiddenVault",
         name: "Hidden Vault",
         description: """
-                Beyond the iron door lies a secret vault. The walls are lined with carvings \
-                of ancient runes that seem to glow with a faint, otherworldly light. A small \
-                altar stands in the center of the room.
+                Beyond the iron door lies a secret vault. The walls are lined with carvings
+                of ancient runes that seem to glow with a faint, otherworldly light. A small
+                altar stands in the center of the room. The only way out is back through
+                the iron door to the west.
                 """,
         exits: [
             .west: Exit(destination: "ironDoorRoom"), // Assumes door is open
@@ -121,9 +123,10 @@ extension CaveRegion {
         id: "crystalGrotto",
         name: "Crystal Grotto",
         description: """
-                This spectacular cavern is filled with towering crystal formations that \
-                catch and reflect any light in dazzling patterns. The floor is studded with \
-                smaller crystals in various hues. The dark chamber lies to the east.
+                This spectacular cavern is filled with towering crystal formations that
+                catch and reflect any light in dazzling patterns. The floor is studded with
+                smaller crystals in various hues. The dark chamber lies to the east, and a hole
+                in the floor leads down.
                 """,
         exits: [
             .east: Exit(destination: "darkChamber"),
@@ -135,9 +138,9 @@ extension CaveRegion {
         id: "undergroundPool",
         name: "Underground Pool",
         description: """
-                A still, dark pool of water occupies most of this chamber. The water is so \
-                clear and still that it mirrors the ceiling perfectly. Faint phosphorescent \
-                fungi on the walls cast everything in a ghostly blue glow.
+                A still, dark pool of water occupies most of this chamber. The water is so
+                clear and still that it mirrors the ceiling perfectly. Faint phosphorescent
+                fungi on the walls cast everything in a ghostly blue glow. A passage leads back up.
                 """,
         exits: [
             .up: Exit(destination: "crystalGrotto"),

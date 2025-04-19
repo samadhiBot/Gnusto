@@ -340,8 +340,6 @@ public struct Vocabulary: Codable, Sendable {
             for verb in Vocabulary.defaultVerbs {
                 vocab.add(verb: verb)
             }
-            // DEBUG: Verify rules for 'turn'
-            print("DEBUG Vocab: Rules for 'turn': \(vocab.syntaxRules[VerbID("turn")] ?? [])")
         }
 
         // Add game-specific items

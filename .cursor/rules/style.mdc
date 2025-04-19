@@ -34,7 +34,7 @@ let cloakroom = Location(
 )
 ```
 
-- Two or more arguments should usually go on multiple lines when defining and calling
+- Two or more arguments should go on multiple lines when defining and calling functions an initializers, unless the full method signature is less than 80 characters.
 
 ```swift
 // Wrong:
