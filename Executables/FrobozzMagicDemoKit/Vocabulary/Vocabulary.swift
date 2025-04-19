@@ -6,21 +6,26 @@ import GnustoEngine
     /// Game-specific verbs.
     static let verbs: [Verb] = [
         // Light interaction (Needs custom logic beyond simple on/off)
-        Verb(id: "light", synonyms: ["turn on"]),      // Needs specific ActionHandler
-        Verb(id: "extinguish", synonyms: ["turn off"]), // Needs specific ActionHandler
 
-        // Container interaction (Open/Close defaults exist, but might need override)
-        // Verb(id: "open", synonyms: ["unlock"]), // Default exists, synonym handled?
-        // Verb(id: "close", synonyms: ["shut"]),   // Default exists
+        Verb(
+            id: "light",
+            synonyms: "turn on"
+        ),
+        Verb(
+            id: "extinguish",
+            synonyms: "turn off"
+        ),
 
         // Puzzle-specific / Custom Actions
-        Verb(id: "unlock", synonyms: []), // Specific action handler needed for iron door
+
+        Verb(id: "unlock"),
 
         // Other interactions (Taste/Touch defaults exist)
-        Verb(id: "drink", synonyms: ["sip", "taste"]), // Taste synonym might clash? Keep custom for now.
-        // Verb(id: "touch", synonyms: ["feel"]), // Default exists
 
-        // Verb(id: "help", synonyms: ["hint", "info"]), // Default exists (placeholder)
+        Verb(
+            id: "drink",
+            synonyms: "sip", "taste"
+        ),
     ]
 
     // Note: The actual Vocabulary object is built in GameDataSetup using these verbs

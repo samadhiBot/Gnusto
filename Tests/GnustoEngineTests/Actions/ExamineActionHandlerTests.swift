@@ -10,11 +10,11 @@ struct ExamineActionHandlerTests {
     // Helper to setup engine and mocks, adding examine verb
     static func setupTestEnvironment(
         itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.", properties: [.inherentlyLit]) // Assume lit
+        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.", properties: .inherentlyLit) // Assume lit
     ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
         let player = Player(currentLocationID: initialLocation.id)
         let verbs = [
-            Verb(id: "examine", synonyms: ["look at", "x", "describe"])
+            Verb(id: "examine", synonyms: "look at", "x", "describe")
         ]
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
         let mockIO = await MockIOHandler()
@@ -66,7 +66,7 @@ struct ExamineActionHandlerTests {
             id: "key",
             name: "brass key",
             description: "A small brass key.",
-            properties: [.takable]
+            properties: .takable
         )
         let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [key])
         engine.debugAddItem(
@@ -97,7 +97,7 @@ struct ExamineActionHandlerTests {
             id: "scroll",
             name: "ancient scroll",
             description: "A rolled up scroll.",
-            properties: [.readable],
+            properties: .readable,
             readableText: "FROBOZZ"
         )
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [scroll])
@@ -130,7 +130,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: [.container, .openable, .open]
+            properties: .container, .openable, .open
         )
         let gem = Item(
             id: "gem",
@@ -175,7 +175,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: [.container, .openable, .open]
+            properties: .container, .openable, .open
         )
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [box])
         engine.debugAddItem(
@@ -208,7 +208,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: [.container, .openable]
+            properties: .container, .openable
         ) // Closed by default
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [box])
         engine.debugAddItem(
@@ -241,7 +241,7 @@ struct ExamineActionHandlerTests {
             id: "bottle",
             name: "glass bottle",
             description: "A clear glass bottle.",
-            properties: [.container, .transparent]
+            properties: .container, .transparent
         ) // Closed by default, but transparent
         let water = Item(
             id: "water",
@@ -284,7 +284,7 @@ struct ExamineActionHandlerTests {
             id: "table",
             name: "wooden table",
             description: "A sturdy table.",
-            properties: [.surface]
+            properties: .surface
         )
         let book = Item(
             id: "book",

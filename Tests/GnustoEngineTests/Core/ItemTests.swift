@@ -19,14 +19,14 @@ struct ItemTests {
         Item(
             id: "customItem",
             name: "lantern",
-            adjectives: ["brass", "shiny"],
-            synonyms: ["lamp", "light"],
+            adjectives: "brass", "shiny",
+            synonyms: "lamp", "light",
             description: "A sturdy brass lantern.",
             firstDescription: "A shiny brass lantern rests here.",
             subsequentDescription: "The brass lantern is here.",
             text: "Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"",
             heldText: "It feels warm.",
-            properties: [.takable, .lightSource, .on, .openable],
+            properties: .takable, .lightSource, .on, .openable,
             size: 10,
             capacity: 5,
             // contents: ["key", "match"], // Removed

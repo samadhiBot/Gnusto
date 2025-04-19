@@ -30,7 +30,7 @@ struct DropActionHandlerTests {
     @Test("Drop item successfully")
     func testDropItemSuccessfully() async throws {
         // Arrange: Create item
-        let testItem = Item(id: "key", name: "brass key", properties: [.takable]) // Size not needed for drop
+        let testItem = Item(id: "key", name: "brass key", properties: .takable) // Size not needed for drop
         let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
@@ -101,7 +101,7 @@ struct DropActionHandlerTests {
     @Test("Drop fails when item not held")
     func testDropFailsWhenNotHeld() async throws {
         // Arrange: Item exists but is in the room
-        let testItem = Item(id: "key", name: "brass key", properties: [.takable])
+        let testItem = Item(id: "key", name: "brass key", properties: .takable)
         let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks
@@ -137,7 +137,7 @@ struct DropActionHandlerTests {
     @Test("Drop worn item successfully removes worn property")
     func testDropWornItemSuccessfully() async throws {
         // Arrange: Create a wearable item
-        let testItem = Item(id: "cloak", name: "dark cloak", properties: [.takable, .wearable, .worn]) // Start worn
+        let testItem = Item(id: "cloak", name: "dark cloak", properties: .takable, .wearable, .worn) // Start worn
         let testData = await Self.createTestData(itemsToAdd: [testItem])
 
         // Arrange: Create engine and mocks

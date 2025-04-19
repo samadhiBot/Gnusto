@@ -211,7 +211,11 @@ public struct Vocabulary: Codable, Sendable {
     ///   - verbs: An array of `Verb` objects specific to the game (can override defaults).
     ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
-    @MainActor public static func build(items: [Item], verbs: [Verb], useDefaultVerbs: Bool = true) -> Vocabulary {
+    @MainActor public static func build(
+        items: [Item],
+        verbs: [Verb] = [],
+        useDefaultVerbs: Bool = true
+    ) -> Vocabulary {
         var vocab = Vocabulary()
 
         // Add default verbs first if requested

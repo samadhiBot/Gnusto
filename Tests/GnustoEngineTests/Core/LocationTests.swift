@@ -26,7 +26,7 @@ struct LocationTests {
             name: "Living Room",
             description: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
-            properties: [.inherentlyLit, .sacred],
+            properties: .inherentlyLit, .sacred,
             globals: ["rug", "fireplace"]
         )
     }

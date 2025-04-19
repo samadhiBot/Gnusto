@@ -591,11 +591,11 @@ public class GameEngine {
         parent: ParentEntity = .nowhere,
         readableText: String? = nil
     ) {
-        let newItem = Item(
+        let newItem = Item.init(
             id: id,
             name: name,
             description: description,
-            properties: properties,
+            properties: Set(properties),
             size: size,
             parent: parent,
             readableText: readableText

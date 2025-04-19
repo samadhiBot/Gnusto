@@ -35,24 +35,24 @@ struct StandardParserTests {
     init() async {
         // 1. Define all possible Items
         let allItems = [
-            Item(id: "lantern", name: "lantern", adjectives: ["brass"], synonyms: ["lamp"], properties: [.lightSource, .openable]),
-            Item(id: "lantern2", name: "lantern", adjectives: ["rusty"], properties: [.lightSource]),
-            Item(id: "key", name: "key", adjectives: ["rusty", "small"], properties: [.takable]),
-            Item(id: "box", name: "box", adjectives: ["wooden"], properties: [.container, .openable]), // Starts closed in room
-            Item(id: "leaflet", name: "leaflet", properties: [.takable, .read]),
-            Item(id: "sword", name: "sword", properties: [.takable]),
+            Item(id: "lantern", name: "lantern", adjectives: "brass", synonyms: "lamp", properties: .lightSource, .openable),
+            Item(id: "lantern2", name: "lantern", adjectives: "rusty", properties: .lightSource),
+            Item(id: "key", name: "key", adjectives: "rusty", "small", properties: .takable),
+            Item(id: "box", name: "box", adjectives: "wooden", properties: .container, .openable), // Starts closed in room
+            Item(id: "leaflet", name: "leaflet", properties: .takable, .read),
+            Item(id: "sword", name: "sword", properties: .takable),
             Item(id: "rug", name: "rug", properties: []), // Global
-            Item(id: "backpack", name: "backpack", properties: [.container, .open, .takable], capacity: 20),
-            Item(id: "chest", name: "chest", properties: [.container, .takable, .openable, .locked], capacity: 50), // Starts closed & locked in inv
-            Item(id: "coin", name: "coin", adjectives: ["gold"], properties: [.takable]),
-            Item(id: "note", name: "note", properties: [.takable, .read]),
-            Item(id: "widget", name: "widget", properties: [.takable]),
+            Item(id: "backpack", name: "backpack", properties: .container, .open, .takable, capacity: 20),
+            Item(id: "chest", name: "chest", properties: .container, .takable, .openable, .locked, capacity: 50), // Starts closed & locked in inv
+            Item(id: "coin", name: "coin", adjectives: "gold", properties: .takable),
+            Item(id: "note", name: "note", properties: .takable, .read),
+            Item(id: "widget", name: "widget", properties: .takable),
             // New items for surface/scope tests
-            Item(id: "table", name: "table", adjectives: ["sturdy"], properties: [.surface]), // Surface in room
-            Item(id: "book", name: "book", adjectives: ["dusty"], properties: [.takable, .read]), // On table
-            Item(id: "tray", name: "tray", adjectives: ["silver"], properties: [.surface, .takable]), // Surface in inventory
-            Item(id: "apple", name: "apple", adjectives: ["red"], properties: [.takable, .edible]), // On tray
-            Item(id: "orb", name: "orb", adjectives: ["glowing"], properties: [.takable, .lightSource]) // Starts nowhere
+            Item(id: "table", name: "table", adjectives: "sturdy", properties: .surface), // Surface in room
+            Item(id: "book", name: "book", adjectives: "dusty", properties: .takable, .read), // On table
+            Item(id: "tray", name: "tray", adjectives: "silver", properties: .surface, .takable), // Surface in inventory
+            Item(id: "apple", name: "apple", adjectives: "red", properties: .takable, .edible), // On tray
+            Item(id: "orb", name: "orb", adjectives: "glowing", properties: .takable, .lightSource) // Starts nowhere
         ]
 
         // 2. Define Game-Specific Verbs (if any) - Most verbs are now defaults
@@ -542,7 +542,7 @@ struct StandardParserTests {
         // without fully changing the model, we'll create a second, temporary key item
         // that has the backpack as its parent. This isn't perfect but tests the parser's
         // likely resolution order if `gatherCandidates` were to find both somehow.
-        let tempKeyInBackpack = Item(id: "tempKeyInBackpack", name: "key", adjectives: ["temp"], parent: .item("backpack"))
+        let tempKeyInBackpack = Item(id: "tempKeyInBackpack", name: "key", adjectives: "temp", parent: .item("backpack"))
         tempGameState.items[tempKeyInBackpack.id] = tempKeyInBackpack
 
         // Update vocab temporarily ONLY for this test's state

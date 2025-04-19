@@ -45,7 +45,7 @@ struct OpenActionHandlerTests {
     @Test("Open item successfully")
     func testOpenItemSuccessfully() async throws {
         // Arrange
-        let closedBox = Item(id: "box", name: "wooden box", properties: [.container, .openable]) // Starts closed
+        let closedBox = Item(id: "box", name: "wooden box", properties: .container, .openable) // Starts closed
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [closedBox])
         engine.debugAddItem(id: closedBox.id, name: closedBox.name, properties: closedBox.properties, parent: .location(location.id))
         #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == false)
@@ -82,7 +82,7 @@ struct OpenActionHandlerTests {
     @Test("Open fails item not accessible")
     func testOpenFailsItemNotAccessible() async throws {
         // Arrange
-        let closedBox = Item(id: "box", name: "wooden box", properties: [.container, .openable])
+        let closedBox = Item(id: "box", name: "wooden box", properties: .container, .openable)
         let (engine, _, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [closedBox])
         engine.debugAddItem(id: closedBox.id, name: closedBox.name, properties: closedBox.properties, parent: .nowhere) // Inaccessible
 
@@ -114,7 +114,7 @@ struct OpenActionHandlerTests {
     @Test("Open fails item already open")
     func testOpenFailsItemAlreadyOpen() async throws {
         // Arrange
-        let openBox = Item(id: "box", name: "wooden box", properties: [.container, .openable, .open]) // Starts open
+        let openBox = Item(id: "box", name: "wooden box", properties: .container, .openable, .open) // Starts open
         let (engine, _, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [openBox])
         engine.debugAddItem(id: openBox.id, name: openBox.name, properties: openBox.properties, parent: .location(location.id))
 
@@ -130,7 +130,7 @@ struct OpenActionHandlerTests {
     @Test("Open fails item is locked")
     func testOpenFailsItemIsLocked() async throws {
         // Arrange
-        let lockedChest = Item(id: "chest", name: "iron chest", properties: [.container, .openable, .locked]) // Locked
+        let lockedChest = Item(id: "chest", name: "iron chest", properties: .container, .openable, .locked) // Locked
         let (engine, _, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [lockedChest])
         engine.debugAddItem(id: lockedChest.id, name: lockedChest.name, properties: lockedChest.properties, parent: .location(location.id))
 

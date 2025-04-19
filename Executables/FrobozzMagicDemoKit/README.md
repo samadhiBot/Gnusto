@@ -45,10 +45,10 @@ Location(
 Item(
     id: "brassLantern",
     name: "lantern",
-    adjectives: ["brass"],
-    synonyms: ["lamp", "light"],
+    adjectives: "brass",
+    synonyms: "lamp", "light",
     description: "A sturdy brass lantern, useful for exploring dark places.",
-    properties: [.takable, .lightSource],
+    properties: .takable, .lightSource,
     parent: .location("startRoom")
 )
 ```

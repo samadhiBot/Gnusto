@@ -18,7 +18,7 @@ struct TouchActionHandlerTests {
     ) {
         let player = Player(currentLocationID: initialLocation.id)
         let verbs = [
-            Verb(id: "touch", synonyms: ["feel", "rub", "pat", "pet"])
+            Verb(id: "touch", synonyms: "feel", "rub", "pat", "pet")
         ]
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
         return (items: itemsToAdd, location: initialLocation, player: player, vocab: vocabulary)
@@ -65,7 +65,7 @@ struct TouchActionHandlerTests {
     @Test("Touch item successfully held")
     func testTouchItemSuccessfullyHeld() async throws {
         // Arrange
-        let testItem = Item(id: "key", name: "brass key", properties: [.takable])
+        let testItem = Item(id: "key", name: "brass key", properties: .takable)
         let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [testItem])
         engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .player) // Held by player
 
@@ -117,7 +117,7 @@ struct TouchActionHandlerTests {
     @Test("Touch item successfully in open container")
     func testTouchItemInOpenContainer() async throws {
         // Arrange
-        let container = Item(id: "box", name: "wooden box", properties: [.container, .open])
+        let container = Item(id: "box", name: "wooden box", properties: .container, .open)
         let itemInside = Item(id: "gem", name: "ruby gem")
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [container, itemInside])
         engine.debugAddItem(id: container.id, name: container.name, properties: container.properties, parent: .location(location.id))
@@ -139,7 +139,7 @@ struct TouchActionHandlerTests {
     @Test("Touch item successfully on surface")
     func testTouchItemOnSurface() async throws {
         // Arrange
-        let surface = Item(id: "table", name: "wooden table", properties: [.surface])
+        let surface = Item(id: "table", name: "wooden table", properties: .surface)
         let itemOnTop = Item(id: "book", name: "dusty book")
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [surface, itemOnTop])
         engine.debugAddItem(id: surface.id, name: surface.name, properties: surface.properties, parent: .location(location.id))
@@ -161,7 +161,7 @@ struct TouchActionHandlerTests {
     @Test("Touch fails item in closed container")
     func testTouchFailsItemInClosedContainer() async throws {
         // Arrange
-        let container = Item(id: "chest", name: "locked chest", properties: [.container]) // Closed by default
+        let container = Item(id: "chest", name: "locked chest", properties: .container) // Closed by default
         let itemInside = Item(id: "coin", name: "gold coin")
         let (engine, _, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [container, itemInside])
         engine.debugAddItem(id: container.id, name: container.name, properties: container.properties, parent: .location(location.id))

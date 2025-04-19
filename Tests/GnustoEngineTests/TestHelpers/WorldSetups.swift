@@ -34,7 +34,7 @@ struct WorldSetups {
                 .south: Exit(destination: "bar"),
                 .west: Exit(destination: "cloakroom"),
             ],
-            properties: [.inherentlyLit]
+            properties: .inherentlyLit
         )
         let cloakroom = Location(
             id: "cloakroom",
@@ -46,7 +46,7 @@ struct WorldSetups {
             exits: [
                 .east: Exit(destination: "foyer"),
             ],
-            properties: [.inherentlyLit]
+            properties: .inherentlyLit
         )
         let bar = Location(
             id: "bar",
@@ -58,16 +58,16 @@ struct WorldSetups {
         )
 
         // Items
-        let hook = Item(id: "hook", name: "hook", adjectives: ["brass"], synonyms: ["peg"], properties: [.surface], parent: .location("cloakroom"))
-        let cloak = Item(id: "cloak", name: "cloak", adjectives: ["handsome", "velvet"], properties: [.takable, .wearable], parent: .item("hook"))
+        let hook = Item(id: "hook", name: "hook", adjectives: "brass", synonyms: "peg", properties: .surface, parent: .location("cloakroom"))
+        let cloak = Item(id: "cloak", name: "cloak", adjectives: "handsome", "velvet", properties: .takable, .wearable, parent: .item("hook"))
         let message = Item(
             id: "message",
             name: "message",
-            adjectives: ["scrawled"],
-            synonyms: ["floor", "sawdust", "dust"],
+            adjectives: "scrawled",
+            synonyms: "floor", "sawdust", "dust",
             description: "The message simply reads... well, you'll need to examine it properly.",
             firstDescription: "There seems to be some sort of message scrawled in the sawdust on the floor.",
-            properties: [],
+            properties: .readable,
             parent: .location("bar")
         )
 
@@ -81,11 +81,11 @@ struct WorldSetups {
         // Vocabulary
         let verbs = [
             Verb(id: "go", syntax: [SyntaxRule(pattern: [.verb, .direction])]),
-            Verb(id: "look", synonyms: ["l", "x", "examine"], syntax: [
+            Verb(id: "look", synonyms: "l", "x", "examine", syntax: [
                 SyntaxRule(pattern: [.verb]),
                 SyntaxRule(pattern: [.verb, .directObject])
             ]),
-            Verb(id: "take", synonyms: ["get"],
+            Verb(id: "take", synonyms: "get",
                  syntax: [
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [])
                  ]),
@@ -93,11 +93,11 @@ struct WorldSetups {
                  syntax: [
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.held])
                  ]),
-            Verb(id: "wear", synonyms: ["don"],
+            Verb(id: "wear", synonyms: "don",
                  syntax: [
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.held])
                  ]),
-            Verb(id: "remove", synonyms: ["doff", "take off"],
+            Verb(id: "remove", synonyms: "doff", "take off",
                  syntax: [
                     SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.worn])
                  ]),

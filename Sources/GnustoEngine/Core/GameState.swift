@@ -167,7 +167,17 @@ public struct GameState: Codable {
             }
         }
 
-        return GameState(locations: locationDict, items: itemDict, player: initialPlayer, flags: flags, pronouns: pronouns, vocabulary: vocabulary, activeFuses: initialActiveFuses, activeDaemons: initialActiveDaemons, gameSpecificState: gameSpecificState)
+        return GameState(
+            locations: locationDict,
+            items: itemDict,
+            player: initialPlayer,
+            flags: flags,
+            pronouns: pronouns,
+            vocabulary: vocabulary,
+            activeFuses: initialActiveFuses,
+            activeDaemons: initialActiveDaemons,
+            gameSpecificState: gameSpecificState
+        )
     }
 
     // --- Codable Conformance ---

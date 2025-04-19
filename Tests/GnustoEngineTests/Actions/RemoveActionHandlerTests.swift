@@ -13,7 +13,7 @@ struct RemoveActionHandlerTests {
     func createTestEngine(
         itemsInInventory: [Item] = []
     ) async -> (GameEngine, MockIOHandler) {
-        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: [.inherentlyLit])
+        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: .inherentlyLit)
         let player = Player(currentLocationID: location.id)
 
         var allItems: [Item.ID: Item] = [:]
@@ -24,7 +24,7 @@ struct RemoveActionHandlerTests {
         }
 
         // Add relevant verbs to vocabulary
-        let removeVerb = Verb(id: "remove", synonyms: ["doff", "take off"], syntax: [SyntaxRule(pattern: [.verb, .directObject])])
+        let removeVerb = Verb(id: "remove", synonyms: "doff", "take off", syntax: [SyntaxRule(pattern: [.verb, .directObject])])
         let verbs = [removeVerb]
         let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
 
@@ -50,7 +50,7 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove worn item successfully")
     func testRemoveItemSuccess() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable, .worn]) // Held, wearable, worn
+        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable, .worn) // Held, wearable, worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
 
@@ -71,7 +71,7 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails if item not worn (but held)")
     func testRemoveItemNotWorn() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable]) // Held, wearable, NOT worn
+        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable) // Held, wearable, NOT worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "take off cloak")
 

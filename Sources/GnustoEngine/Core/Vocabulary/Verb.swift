@@ -11,7 +11,21 @@ public struct Verb: Codable, Identifiable {
     public var syntax: [SyntaxRule]
 
     // --- Initialization ---
-    public init(id: VerbID, synonyms: Set<String> = [], syntax: [SyntaxRule] = []) {
+    public init(
+        id: VerbID,
+        synonyms: String...,
+        syntax: [SyntaxRule] = []
+    ) {
+        self.id = id
+        self.synonyms = Set(synonyms)
+        self.syntax = syntax
+    }
+
+    init(
+        id: VerbID,
+        synonyms: Set<String> = [],
+        syntax: [SyntaxRule] = []
+    ) {
         self.id = id
         self.synonyms = synonyms
         self.syntax = syntax

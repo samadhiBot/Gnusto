@@ -1,5 +1,5 @@
-import GnustoEngine
 import Foundation
+import GnustoEngine
 
 /// Main entry point for the Cloak of Darkness replica.
 struct CloakOfDarkness {
@@ -46,8 +46,22 @@ struct CloakOfDarkness {
         )
 
         // Items
-        let hook = Item(id: "hook", name: "hook", adjectives: ["brass"], synonyms: ["peg"], parent: .location("cloakroom"))
-        let cloak = Item(id: "cloak", name: "cloak", adjectives: ["handsome", "velvet"], properties: [.takable, .wearable], parent: .item("hook"))
+        let hook = Item(
+            id: "hook",
+            name: "hook",
+            adjectives: "brass",
+            synonyms: "peg",
+            parent: .location("cloakroom")
+        )
+        let cloak = Item(
+            id: "cloak",
+            name: "cloak",
+            adjectives: "handsome",
+            "velvet",
+            properties: .takable,
+            .wearable,
+            parent: .item("hook")
+        )
 
         // Player
         let initialPlayer = Player(currentLocationID: "foyer")
@@ -57,30 +71,7 @@ struct CloakOfDarkness {
         let allLocations = [foyer, cloakroom, bar]
 
         // Vocabulary
-        let verbs = [
-            Verb(id: "go", syntax: [SyntaxRule(pattern: [.verb, .direction])]),
-            Verb(id: "look", synonyms: ["l", "x", "examine"], syntax: [
-                SyntaxRule(pattern: [.verb]),
-                SyntaxRule(pattern: [.verb, .directObject])
-            ]),
-            Verb(id: "take", synonyms: ["get"],
-                 syntax: [
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [])
-                 ]),
-            Verb(id: "drop",
-                 syntax: [
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.held])
-                 ]),
-            Verb(id: "wear", synonyms: ["don"],
-                 syntax: [
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.held])
-                 ]),
-            Verb(id: "remove", synonyms: ["doff", "take off"],
-                 syntax: [
-                    SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: [.worn])
-                 ]),
-        ]
-        let vocabulary = Vocabulary.build(items: allItems, verbs: verbs)
+        let vocabulary = Vocabulary.build(items: allItems)
 
         // Game State
         let gameState = GameState.initial(

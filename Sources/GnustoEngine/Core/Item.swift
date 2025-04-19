@@ -54,7 +54,44 @@ public final class Item: Codable, Identifiable {
     public var lockKey: ItemID? = nil
 
     // --- Initialization ---
+
     public init(
+        id: ItemID,
+        name: String,
+        adjectives: String...,
+        synonyms: String...,
+        description: String? = nil,
+        firstDescription: String? = nil,
+        subsequentDescription: String? = nil,
+        text: String? = nil,
+        heldText: String? = nil,
+        properties: ItemProperty...,
+        size: Int = 5,
+        capacity: Int = -1,
+        parent: ParentEntity = .nowhere, // Default parent to .nowhere
+        readableText: String? = nil,
+        lockKey: ItemID? = nil
+        // actionHandlerID: String? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.adjectives = Set(adjectives)
+        self.synonyms = Set(synonyms)
+        self.description = description
+        self.firstDescription = firstDescription
+        self.subsequentDescription = subsequentDescription
+        self.text = text
+        self.heldText = heldText
+        self.properties = Set(properties)
+        self.size = size
+        self.capacity = capacity
+        self.parent = parent
+        self.readableText = readableText
+        self.lockKey = lockKey
+        // self.actionHandlerID = actionHandlerID
+    }
+
+    init(
         id: ItemID,
         name: String,
         adjectives: Set<String> = [],

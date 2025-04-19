@@ -19,7 +19,7 @@ struct TurnOnActionHandlerTests {
     /// - Returns: A tuple containing the configured engine, mock IO, test item ID, and test location ID.
     static func setupTestEnvironment(
         itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room", name: "Test Room", description: "A room.", properties: [.inherentlyLit]), // Lit by default
+        initialLocation: Location = Location(id: "room", name: "Test Room", description: "A room.", properties: .inherentlyLit), // Lit by default
         initialProperties: Set<ItemProperty> = [.device, .lightSource, .takable],
         initialItemParent: ParentEntity = .location("room"),
         makeRoomDark: Bool = false

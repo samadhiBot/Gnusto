@@ -16,7 +16,7 @@ import GnustoEngine
                 .north: Exit(destination: "startRoom"), // Exit to CaveRegion
                 .west: Exit(destination: "streamBank"),
             ],
-            properties: [.inherentlyLit, .outside]
+            properties: .inherentlyLit, .outside
         ),
         Location(
             id: "streamBank",
@@ -28,7 +28,7 @@ import GnustoEngine
             exits: [
                 .east: Exit(destination: "outside"),
             ],
-            properties: [.inherentlyLit, .outside]
+            properties: .inherentlyLit, .outside
         ),
     ]
 
@@ -38,9 +38,9 @@ import GnustoEngine
         Item(
             id: Components.IronDoorPuzzle.Constants.keyID, // Use constant
             name: "key",
-            adjectives: ["rusty", "iron"],
+            adjectives: "rusty", "iron",
             description: "An old, rusty iron key. It looks heavy and ornate.",
-            properties: [.takable],
+            properties: .takable,
             parent: .location("streamBank") // Key is found here
         ),
 
@@ -48,10 +48,10 @@ import GnustoEngine
         Item(
             id: "clearWater",
             name: "water",
-            adjectives: ["clear", "cold"],
-            synonyms: ["stream", "liquid"],
+            adjectives: "clear", "cold",
+            synonyms: "stream", "liquid",
             description: "Clear, cold water that looks refreshing.",
-            properties: [.ndesc], // Use .ndesc instead of .scenery
+            properties: .ndesc, // Use .ndesc instead of .scenery
             parent: .location("streamBank")
         ),
     ]

@@ -33,6 +33,24 @@ public final class Location: Codable, Identifiable {
         name: String,
         description: String,
         exits: [Direction : Exit] = [:],
+        properties: LocationProperty...,
+        globals: [ItemID] = []
+        // actionHandlerID: String? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.description = description
+        self.exits = exits
+        self.properties = Set(properties)
+        self.globals = globals
+        // self.actionHandlerID = actionHandlerID
+    }
+
+    init(
+        id: LocationID,
+        name: String,
+        description: String,
+        exits: [Direction : Exit] = [:],
         properties: Set<LocationProperty> = [],
         globals: [ItemID] = []
         // actionHandlerID: String? = nil

@@ -34,7 +34,7 @@ struct LookActionHandlerTests {
         }
 
         // Build vocabulary from items and the LOOK verb
-        let lookVerb = Verb(id: "look", synonyms: ["l", "examine", "x"])
+        let lookVerb = Verb(id: "look", synonyms: "l", "examine", "x")
         let vocab = Vocabulary.build(items: Array(allItems.values), verbs: [lookVerb])
 
         let initialState = GameState(
@@ -92,7 +92,7 @@ struct LookActionHandlerTests {
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
     func testLookInRoomLitByPlayer() async throws {
-        let activeLamp = Item(id: "lamp", name: "lamp", properties: [.lightSource, .on, .takable])
+        let activeLamp = Item(id: "lamp", name: "lamp", properties: .lightSource, .on, .takable)
         let item1 = Item(id: "widget", name: "shiny widget")
         let (engine, mockIO) = await createTestEngine(itemsInLocation: [item1], itemsInInventory: [activeLamp])
         let command = Command(verbID: "look", rawInput: "look")

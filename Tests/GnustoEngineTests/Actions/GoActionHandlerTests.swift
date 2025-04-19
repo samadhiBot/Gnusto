@@ -22,10 +22,10 @@ struct GoActionHandlerTests {
         // Add movement verbs to vocab
         let verbs = [
             Verb(id: "go"), // Assuming "go" itself is a verb
-            Verb(id: "north", synonyms: ["n"]),
-            Verb(id: "south", synonyms: ["s"]),
-            Verb(id: "east", synonyms: ["e"]),
-            Verb(id: "west", synonyms: ["w"])
+            Verb(id: "north", synonyms: "n"),
+            Verb(id: "south", synonyms: "s"),
+            Verb(id: "east", synonyms: "e"),
+            Verb(id: "west", synonyms: "w")
             // Add other directions/verbs as needed
         ]
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
@@ -39,13 +39,13 @@ struct GoActionHandlerTests {
             id: "start",
             name: "Start Room",
             description: "You are here.",
-            properties: [.inherentlyLit]
+            properties: .inherentlyLit
         )
         let loc2 = Location(
             id: "end",
             name: "End Room",
             description: "You went there.",
-            properties: [.inherentlyLit]
+            properties: .inherentlyLit
         )
         loc1.exits[.north] = Exit(destination: "end")
 

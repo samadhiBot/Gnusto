@@ -45,7 +45,7 @@ struct CloseActionHandlerTests {
     @Test("Close item successfully")
     func testCloseItemSuccessfully() async throws {
         // Arrange
-        let openBox = Item(id: "box", name: "wooden box", properties: [.container, .openable, .open]) // Starts open
+        let openBox = Item(id: "box", name: "wooden box", properties: .container, .openable, .open) // Starts open
         let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [openBox])
         engine.debugAddItem(id: openBox.id, name: openBox.name, properties: openBox.properties, parent: .location(location.id))
         #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == true)
@@ -82,7 +82,7 @@ struct CloseActionHandlerTests {
     @Test("Close fails item not accessible")
     func testCloseFailsItemNotAccessible() async throws {
         // Arrange
-        let openBox = Item(id: "box", name: "wooden box", properties: [.container, .openable, .open])
+        let openBox = Item(id: "box", name: "wooden box", properties: .container, .openable, .open)
         let (engine, _, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [openBox])
         engine.debugAddItem(id: openBox.id, name: openBox.name, properties: openBox.properties, parent: .nowhere) // Inaccessible
 
@@ -115,7 +115,7 @@ struct CloseActionHandlerTests {
     @Test("Close fails item already closed")
     func testCloseFailsItemAlreadyClosed() async throws {
         // Arrange
-        let closedBox = Item(id: "box", name: "wooden box", properties: [.container, .openable]) // Starts closed
+        let closedBox = Item(id: "box", name: "wooden box", properties: .container, .openable) // Starts closed
         let (engine, _, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [closedBox])
         engine.debugAddItem(id: closedBox.id, name: closedBox.name, properties: closedBox.properties, parent: .location(location.id))
 

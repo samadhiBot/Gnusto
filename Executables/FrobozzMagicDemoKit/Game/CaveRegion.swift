@@ -109,7 +109,7 @@ import GnustoEngine
             exits: [
                 .up: Exit(destination: "crystalGrotto"),
             ],
-            properties: [.inherentlyLit] // Fungi provide light
+            properties: .inherentlyLit // Fungi provide light
         ),
     ]
 
@@ -119,10 +119,10 @@ import GnustoEngine
         Item(
             id: Components.Lantern.Constants.itemID, // Use constant from Lantern component
             name: "lantern",
-            adjectives: ["brass"],
-            synonyms: ["lamp", "light"],
+            adjectives: "brass",
+            synonyms: "lamp", "light",
             description: "A sturdy brass lantern, useful for exploring dark places.",
-            properties: [.takable, .lightSource], // Initially off? Logic might set .on
+            properties: .takable, .lightSource, .device, // Initially off? Logic might set .on
             parent: .location("startRoom")
         ),
 
@@ -130,17 +130,17 @@ import GnustoEngine
         Item(
             id: "goldCrown",
             name: "crown",
-            adjectives: ["gold", "golden"],
+            adjectives: "gold", "golden",
             description: "A magnificent golden crown, adorned with precious jewels.",
-            properties: [.takable],
+            properties: .takable,
             parent: .item("stonePedestal") // Placed on the pedestal
         ),
         Item(
             id: "stonePedestal",
             name: "pedestal",
-            adjectives: ["stone"],
+            adjectives: "stone",
             description: "A weathered stone pedestal in the center of the room.",
-            properties: [.surface, .ndesc], // Use .ndesc instead of .scenery, imply !takable
+            properties: .surface, .ndesc, // Use .ndesc instead of .scenery, imply !takable
             parent: .location("treasureRoom")
         ),
 
@@ -148,12 +148,12 @@ import GnustoEngine
         Item(
             id: Components.IronDoorPuzzle.Constants.doorID, // Use constant
             name: "door",
-            adjectives: ["iron", "massive"],
+            adjectives: "iron", "massive",
             description: """
                 A massive door made of solid iron. Ancient runes are inscribed around its \
                 frame. There's a keyhole below the handle.
                 """,
-            properties: [.door], // Initially closed and locked? Logic might handle state.
+            properties: .door, // Initially closed and locked? Logic might handle state.
             parent: .location("ironDoorRoom")
         ),
 
@@ -161,17 +161,17 @@ import GnustoEngine
         Item(
             id: "woodenChest",
             name: "chest",
-            adjectives: ["wooden", "old"],
+            adjectives: "wooden", "old",
             description: "An old wooden chest with brass fittings. The lid is currently closed.",
-            properties: [.container, .openable], // Starts closed (no .open property)
+            properties: .container, .openable, // Starts closed (no .open property)
             parent: .location("crystalGrotto")
         ),
         Item(
             id: "silverCoin",
             name: "coin",
-            adjectives: ["silver", "ancient"],
+            adjectives: "silver", "ancient",
             description: "An ancient silver coin with unfamiliar markings.",
-            properties: [.takable],
+            properties: .takable,
             parent: .item("woodenChest") // Inside the chest
         ),
 
@@ -179,24 +179,24 @@ import GnustoEngine
         Item(
             id: "mysteriousAltar",
             name: "altar",
-            adjectives: ["mysterious", "stone"],
+            adjectives: "mysterious", "stone",
             description: """
                 A stone altar with intricate carvings. A shallow basin on top contains an \
                 iridescent liquid that seems to shift colors as you watch.
                 """,
-            properties: [.ndesc], // Use .ndesc instead of .scenery
+            properties: .ndesc, // Use .ndesc instead of .scenery
             parent: .location("hiddenVault")
         ),
         Item(
             id: "largeGem",
             name: "gem",
-            adjectives: ["large", "glowing"],
-            synonyms: ["crystal", "stone"],
+            adjectives: "large", "glowing",
+            synonyms: "crystal", "stone",
             description: """
                 A large gem that seems to pulse with an inner light. As you examine it, \
                 the color shifts between deep blue and violet.
                 """,
-            properties: [.takable, .lightSource], // Provides light, might not need .on
+            properties: .takable, .lightSource, // Provides light, might not need .on
             parent: .location("hiddenVault") // On the altar? Or just in the room?
         ),
 
@@ -204,13 +204,13 @@ import GnustoEngine
         Item(
             id: "darkPool",
             name: "pool",
-            adjectives: ["dark", "still"],
-            synonyms: ["water"],
+            adjectives: "dark", "still",
+            synonyms: "water",
             description: """
                 The water is perfectly still and incredibly clear. Looking down, you can see \
                 small, strange artifacts scattered on the bottom, just out of reach.
                 """,
-            properties: [.ndesc], // Use .ndesc instead of .scenery
+            properties: .ndesc, // Use .ndesc instead of .scenery
             parent: .location("undergroundPool")
         )
     ]

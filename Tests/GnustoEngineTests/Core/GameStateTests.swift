@@ -19,10 +19,10 @@ struct GameStateTests {
     // 1. Define all potential Items
     func createSampleItems() -> [Item] {
         [
-            Item(id: Self.itemLantern, name: "lantern", properties: [.takable, .lightSource]),
-            Item(id: Self.itemMailbox, name: "mailbox", properties: [.container, .openable]), // Starts in locWOH
-            Item(id: Self.itemLeaflet, name: "leaflet", properties: [.takable, .read]), // Starts inside mailbox
-            Item(id: Self.itemSword, name: "sword", properties: [.takable]) // Starts in player inventory
+            Item(id: Self.itemLantern, name: "lantern", properties: .takable, .lightSource),
+            Item(id: Self.itemMailbox, name: "mailbox", properties: .container, .openable), // Starts in locWOH
+            Item(id: Self.itemLeaflet, name: "leaflet", properties: .takable, .read), // Starts inside mailbox
+            Item(id: Self.itemSword, name: "sword", properties: .takable) // Starts in player inventory
         ]
     }
 

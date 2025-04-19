@@ -12,7 +12,7 @@ struct WearActionHandlerTests {
     func createTestEngine(
         itemsInInventory: [Item] = []
     ) async -> (GameEngine, MockIOHandler) {
-        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: [.inherentlyLit])
+        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: .inherentlyLit)
         let player = Player(currentLocationID: location.id)
 
         var allItems: [Item.ID: Item] = [:]
@@ -22,7 +22,7 @@ struct WearActionHandlerTests {
         }
 
         // Add relevant verbs to vocabulary
-        let wearVerb = Verb(id: "wear", synonyms: ["don"], syntax: [SyntaxRule(pattern: [.verb, .directObject])])
+        let wearVerb = Verb(id: "wear", synonyms: "don", syntax: [SyntaxRule(pattern: [.verb, .directObject])])
         let verbs = [wearVerb]
         let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
 
@@ -48,7 +48,7 @@ struct WearActionHandlerTests {
 
     @Test("Wear held, wearable item successfully")
     func testWearItemSuccess() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable]) // Held, wearable
+        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable) // Held, wearable
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
@@ -84,7 +84,7 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item not wearable")
     func testWearItemNotWearable() async throws {
-        let rock = Item(id: "rock", name: "rock", properties: [.takable]) // Held, but not wearable
+        let rock = Item(id: "rock", name: "rock", properties: .takable) // Held, but not wearable
         let (engine, _) = await createTestEngine(itemsInInventory: [rock])
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
 
@@ -99,7 +99,7 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item already worn")
     func testWearItemAlreadyWorn() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: [.takable, .wearable, .worn]) // Held, wearable, already worn
+        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable, .worn) // Held, wearable, already worn
         let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
