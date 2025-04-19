@@ -17,8 +17,7 @@ struct WorldSetups {
         StandardParser,
         [VerbID: ActionHandler],
         (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?,
-        (@MainActor @Sendable (GameEngine) async -> Void)?,
-        (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
+        (@MainActor @Sendable (GameEngine) async -> Void)?
     ) {
         // Locations
         let foyer = Location(
@@ -136,21 +135,8 @@ struct WorldSetups {
 
         let beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil // No custom beforeTurn logic needed now
 
-        let onExamineItem: @MainActor @Sendable (GameEngine, ItemID) async -> Bool = { @MainActor @Sendable engine, itemID in
-            guard itemID == ItemID("message") else { return false } // Not the message, do default action
-
-            // Original CoD ZIL didn't have a lose condition based on turns in the dark bar.
-            // The win condition triggers immediately upon examining the message.
-            // Remove the disturbed counter logic.
-            await engine.ioHandler.print("The message simply reads: \"You win.\"")
-            await engine.ioHandler.print("\n*** The End ***") // A more thematic end message
-            engine.quitGame() // Signal engine to stop using the new method
-
-            return true // We handled the examination
-        }
-
         // Return the initial state, parser, custom handlers, and the specific logic hooks
-        return (gameState, parser, customHandlers, onEnterRoom, beforeTurn, onExamineItem)
+        return (gameState, parser, customHandlers, onEnterRoom, beforeTurn)
     }
 
     // Add setup for Zork world later...

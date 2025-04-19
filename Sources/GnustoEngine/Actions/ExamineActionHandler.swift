@@ -23,11 +23,6 @@ public struct ExamineActionHandler: ActionHandler {
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // 3. Check for custom game-specific handler hook
-        if let handled = await engine.onExamineItem?(engine, targetItemID), handled {
-            return // Custom hook handled the examination
-        }
-
         // Mark as touched regardless of what happens next (standard Zork behavior)
         await engine.addItemProperty(itemID: targetItemID, property: .touched)
 

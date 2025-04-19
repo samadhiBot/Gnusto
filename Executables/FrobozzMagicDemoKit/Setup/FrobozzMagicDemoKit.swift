@@ -40,11 +40,11 @@ final class FrobozzMagicDemoKit {
             parser: parser,
             ioHandler: resolvedIOHandler,
             registry: registry,
-            onEnterRoom: Hooks.onEnterRoom, // Reference actual Hooks
-            beforeTurn: Hooks.beforeEachTurn, // Reference actual Hooks
-            onExamineItem: Hooks.onExamineItem, // Reference actual Hooks
-            onOpenItem: Hooks.onOpenItem, // Added hook
-            onCloseItem: Hooks.onCloseItem // Added hook
+            onEnterRoom: Hooks.onEnterRoom,       // Reference actual Hooks
+            beforeTurn: Hooks.beforeEachTurn    // Reference actual Hooks
+            // Removed onExamineItem registration
+            // Removed onOpenItem registration
+            // Removed onCloseItem registration
             // Note: Other hooks might be added here later if needed
         )
 

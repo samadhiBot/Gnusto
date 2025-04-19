@@ -1,5 +1,4 @@
 import Foundation
-import GnustoEngine
 
 /// Handles the "UNLOCK <DO> WITH <IO>" command.
 public struct UnlockActionHandler: ActionHandler {

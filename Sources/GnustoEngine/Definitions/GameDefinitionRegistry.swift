@@ -12,17 +12,24 @@ public struct GameDefinitionRegistry {
     /// Dictionary mapping Daemon IDs to their definitions.
     private let daemonDefinitions: [DaemonID: DaemonDefinition]
 
+    /// Handlers triggered when an action targets a specific item ID.
+    /// Public access needed for game setup to register handlers.
+    public let objectActionHandlers: [ItemID: ObjectActionHandler]
+
     /// Initializes the registry with fuse and daemon definitions.
     /// - Parameters:
     ///   - fuseDefinitions: An array of `FuseDefinition`s.
     ///   - daemonDefinitions: An array of `DaemonDefinition`s. Defaults to empty.
+    ///   - objectActionHandlers: A dictionary of item-specific action handlers.
     public init(
         fuseDefinitions: [FuseDefinition] = [],
-        daemonDefinitions: [DaemonDefinition] = []
+        daemonDefinitions: [DaemonDefinition] = [],
+        objectActionHandlers: [ItemID: ObjectActionHandler] = [:]
     ) {
         // Build dictionaries from arrays for efficient lookup
         self.fuseDefinitions = Dictionary(uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) })
         self.daemonDefinitions = Dictionary(uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) })
+        self.objectActionHandlers = objectActionHandlers
     }
 
     /// Retrieves a `FuseDefinition` by its ID.

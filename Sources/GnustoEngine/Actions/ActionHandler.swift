@@ -1,20 +1,15 @@
 import Foundation
 
-/// Defines the requirements for an object that handles the execution of a specific verb command.
-// Removed @MainActor - Isolation handled by GameEngine/IOHandler calls
+/// Defines the protocol for objects that can handle specific game actions.
 public protocol ActionHandler: Sendable {
-
-    /// Performs the action associated with the command.
-    ///
-    /// Implementations should:
-    /// 1. Validate preconditions (e.g., is the object takable? is the container open?).
-    /// 2. Modify the `engine.gameState` if validation passes.
-    /// 3. Use `engine.ioHandler` to print appropriate messages to the player.
-    /// 4. Throw an `ActionError` if a precondition fails or an execution error occurs.
-    ///
+    /// Executes the action logic.
     /// - Parameters:
-    ///   - command: The parsed command to execute.
-    ///   - engine: A reference to the `GameEngine` to access game state and I/O.
-    /// - Throws: An `ActionError` if the action cannot be performed.
+    ///   - command: The parsed player command.
+    ///   - engine: The game engine instance for accessing and modifying game state.
+    /// - Throws: `ActionError` if the action cannot be performed.
     func perform(command: Command, engine: GameEngine) async throws
 }
+
+/// A closure that handles a specific action potentially targeting a specific item.
+/// Return `true` if the action was fully handled (preventing default verb handler), `false` otherwise.
+public typealias ObjectActionHandler = @MainActor @Sendable (GameEngine, Command) async throws -> Bool

@@ -45,20 +45,6 @@ public class GameEngine {
     /// It can modify game state or print messages based on the current state.
     public var beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)?
 
-    /// Custom logic called when attempting to examine a specific item.
-    /// The closure receives the engine and the ID of the item being examined.
-    /// It should return `true` if it handled the examination (e.g., printed a custom description or performed an action),
-    /// or `false` to let the default examination logic proceed.
-    public var onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
-
-    /// Custom logic called after an item is successfully opened, before the default message.
-    /// Return `true` to suppress the default "You open..." message.
-    public var onOpenItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
-
-    /// Custom logic called after an item is successfully closed, before the default message.
-    /// Return `true` to suppress the default "You close..." message.
-    public var onCloseItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
-
     // MARK: - Initialization
 
     /// Creates a new GameEngine instance.
@@ -70,9 +56,6 @@ public class GameEngine {
     ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
-    ///   - onExamineItem: Optional closure for custom logic when examining an item.
-    ///   - onOpenItem: Optional closure for custom logic when opening an item.
-    ///   - onCloseItem: Optional closure for custom logic when closing an item.
     public init(
         initialState: GameState,
         parser: Parser,
@@ -80,10 +63,7 @@ public class GameEngine {
         registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
-        beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
-        onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil,
-        onOpenItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil,
-        onCloseItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
+        beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil
     ) {
         self.gameState = initialState
         self.parser = parser
@@ -92,9 +72,6 @@ public class GameEngine {
         self.actionHandlers = customHandlers
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
-        self.onExamineItem = onExamineItem
-        self.onOpenItem = onOpenItem
-        self.onCloseItem = onCloseItem
 
         // Reconstruct runtime fuses from saved state and registry
         self.activeFuses = [:] // Start with empty runtime fuses
@@ -377,27 +354,66 @@ public class GameEngine {
     /// Looks up and executes the appropriate ActionHandler for the given command.
     /// - Parameter command: The command to execute.
     private func execute(command: Command) async {
-        // Find the handler for the verb
-        guard let handler = actionHandlers[command.verbID] else {
-            // No handler registered for this verb
-            // TODO: Improve default message based on Zork ("You can't...", "I don't know how...")
-            await ioHandler.print("I don't understand how to '\(command.verbID.rawValue)'.")
-            return
+        var actionHandled = false
+        var actionError: Error? = nil // To store error from object handlers
+
+        // --- Try Object Action Handlers ---
+
+        // 1. Check Direct Object Handler
+        if let doID = command.directObject,
+           let objectHandler = registry.objectActionHandlers[doID] {
+            do {
+                // Pass the engine and the full command to the handler
+                actionHandled = try await objectHandler(self, command)
+            } catch {
+                actionError = error // Store the error
+                actionHandled = true // Treat error as handled to prevent default handler
+            }
         }
 
-        // Execute the handler
-        do {
-            try await handler.perform(command: command, engine: self)
-            // Optional: Print a default success message like "Done." if the handler didn't?
-            // Often handlers print their own specific success messages (e.g., "Taken.").
-        } catch let actionError as ActionError {
-            // Handle specific action failures
-            await report(actionError: actionError)
-        } catch {
-            // Handle unexpected errors during action execution
-            await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
-            await ioHandler.print("Sorry, something went wrong.")
+        // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
+        // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
+        if !actionHandled, actionError == nil, let ioID = command.indirectObject,
+           let objectHandler = registry.objectActionHandlers[ioID] {
+            do {
+                actionHandled = try await objectHandler(self, command)
+            } catch {
+                actionError = error
+                actionHandled = true
+            }
         }
+
+        // --- Execute Default Handler or Report Error ---
+
+        if let error = actionError {
+            // An object handler threw an error
+            if let specificError = error as? ActionError {
+                await report(actionError: specificError)
+            } else {
+                await ioHandler.print("An unexpected error occurred in an object handler: \(error)", style: .debug)
+                await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
+            }
+        } else if !actionHandled {
+            // No object handler took charge, run the default verb handler
+            guard let verbHandler = actionHandlers[command.verbID] else {
+                // No handler registered for this verb
+                await ioHandler.print("I don't understand how to '\(command.verbID.rawValue)'.")
+                return
+            }
+
+            // Execute the default handler
+            do {
+                try await verbHandler.perform(command: command, engine: self)
+            } catch let actionError as ActionError {
+                // Handle specific action failures
+                await report(actionError: actionError)
+            } catch {
+                // Handle unexpected errors during action execution
+                await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
+                await ioHandler.print("Sorry, something went wrong.")
+            }
+        }
+        // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
     }
 
     // MARK: - Output & Error Reporting

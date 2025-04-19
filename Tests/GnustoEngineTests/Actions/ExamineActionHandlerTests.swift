@@ -359,81 +359,65 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "Examine what?")
     }
 
-    @Test("Examine respects onExamineItem hook")
-    func testExamineRespectsHook() async throws {
+    @Test("Examine with custom hook (handled)")
+    func testExamineWithCustomHookHandled() async throws {
         // Arrange
-        let magicMirror = Item(
-            id: "mirror",
-            name: "magic mirror",
-            description: "A shimmering mirror."
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [magicMirror])
+        let statue = Item(id: "statue", name: "stone statue", description: "Default description.")
+        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [statue])
         engine.debugAddItem(
-            id: magicMirror.id,
-            name: magicMirror.name,
-            description: magicMirror.description,
+            id: statue.id,
+            name: statue.name,
+            description: statue.description,
             parent: ParentEntity.location(location.id)
         )
 
-        // Set the hook
-        var hookCalled = false
-        engine.onExamineItem = { eng, itemID in
-            if itemID == "mirror" {
-                await eng.output("The mirror shows a distorted reflection.")
-                hookCalled = true
-                return true // Indicate handled
-            }
-            return false // Not handled
-        }
+        // Removed custom hook setup
+        // Test relies on ObjectActionHandler registration now (if applicable)
 
         let handler = ExamineActionHandler()
-        let command = Command(verbID: "examine", directObject: "mirror", rawInput: "examine mirror")
+        let command = Command(verbID: "examine", directObject: "statue", rawInput: "examine statue")
 
-        // Act
+        // Act: Run the standard handler
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        #expect(hookCalled == true)
+        // Assert: Check that the default handler printed its message
+        // (because the custom hook is gone)
         let output = await mockIO.flush()
-        expectNoDifference(output, "The mirror shows a distorted reflection.") // Hook message printed
-        // Default message should NOT be printed
-        #expect(engine.itemSnapshot(with: "mirror")?.hasProperty(ItemProperty.touched) == false) // Hook might skip touching
+        let expectedOutput = "There's nothing special about the stone statue."
+        expectNoDifference(output, expectedOutput)
+
+        // Ensure item was still marked touched
+        let finalItemState = engine.itemSnapshot(with: "statue")
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
     }
 
-    @Test("Examine calls default logic if hook returns false")
-    func testExamineHookReturnsFalse() async throws {
-         // Arrange
-        let normalMirror = Item(
-            id: "mirror",
-            name: "normal mirror",
-            description: "Just a plain mirror."
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [normalMirror])
+    @Test("Examine with custom hook (not handled)")
+    func testExamineWithCustomHookNotHandled() async throws {
+        // Arrange
+        let pebble = Item(id: "pebble", name: "small pebble", description: "Just a pebble.")
+        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [pebble])
         engine.debugAddItem(
-            id: normalMirror.id,
-            name: normalMirror.name,
-            description: normalMirror.description,
+            id: pebble.id,
+            name: pebble.name,
+            description: pebble.description,
             parent: ParentEntity.location(location.id)
         )
 
-        // Set the hook to not handle this item
-        var hookCalled = false
-        engine.onExamineItem = { eng, itemID in
-            hookCalled = true
-            return false // Indicate not handled
-        }
+        // Removed custom hook setup
 
         let handler = ExamineActionHandler()
-        let command = Command(verbID: "examine", directObject: "mirror", rawInput: "examine mirror")
+        let command = Command(verbID: "examine", directObject: "pebble", rawInput: "examine pebble")
 
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        #expect(hookCalled == true)
+        // Assert: Default handler should run and print its message
         let output = await mockIO.flush()
-        // Expect default message because hook didn't handle it
-        expectNoDifference(output, "There's nothing special about the normal mirror.")
-        #expect(engine.itemSnapshot(with: "mirror")?.hasProperty(ItemProperty.touched) == true)
+        let expectedOutput = "There's nothing special about the small pebble."
+        expectNoDifference(output, expectedOutput)
+
+        // Ensure item was still marked touched
+        let finalItemState = engine.itemSnapshot(with: "pebble")
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
     }
 }

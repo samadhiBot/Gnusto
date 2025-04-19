@@ -1,5 +1,4 @@
 import Foundation
-import GnustoEngine
 
 /// Handles the "LOCK <DO> WITH <IO>" command.
 public struct LockActionHandler: ActionHandler {

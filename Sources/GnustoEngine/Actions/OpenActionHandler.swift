@@ -67,13 +67,11 @@ public struct OpenActionHandler: ActionHandler {
         await engine.addItemProperty(itemID: targetItemID, property: .open)
         await engine.addItemProperty(itemID: targetItemID, property: .touched) // Opening implies touching
 
-        // Call the hook, if any
-        let hookHandled = await engine.onOpenItem?(engine, targetItemID) ?? false
-
-        // 7. Output Message (if not handled by hook)
-        if !hookHandled {
-            await engine.output("You open the \(targetItem.name).")
-        }
+        // 7. Output Message
+        // ObjectActionHandlers now control if default message is suppressed
+        // If an object handler handled the action (returned true), execute won't call this.
+        // If it returned false, we *always* print the default message.
+        await engine.output("You open the \(targetItem.name).")
     }
 }
 
