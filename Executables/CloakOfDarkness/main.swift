@@ -23,7 +23,8 @@ struct CloakOfDarkness {
             exits: [
                 .south: Exit(destination: "bar"),
                 .west: Exit(destination: "cloakroom"),
-            ]
+            ],
+            properties: .inherentlyLit
         )
 
         let cloakroom = Location(
@@ -183,3 +184,17 @@ struct CloakOfDarkness {
         print("\nThank you for playing Cloak of Darkness!")
     }
 }
+
+// Manually handle async main
+extension CloakOfDarkness {
+    static func main() {
+        Task {
+            await main() // Call the async main function
+        }
+        // Keep the process alive until all tasks complete
+        RunLoop.main.run()
+    }
+}
+
+// Call the main function to start the process
+CloakOfDarkness.main()

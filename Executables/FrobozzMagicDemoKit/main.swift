@@ -3,7 +3,7 @@ import GnustoEngine
 
 /// This is the entry point for the GnustoExamples executable.
 /// It demonstrates how to set up and run a game using the Gnusto engine.
-struct GnustoExamplesApp {
+struct FrobozzMagicDemoKitApp {
     static func main() async throws {
         print("=== Welcome to the Gnusto Example Game ===")
         print("A demonstration of the Gnusto Interactive Fiction Engine")
@@ -16,7 +16,7 @@ struct GnustoExamplesApp {
 }
 
 // Manually handle async main since Swift doesn't support it directly yet
-extension GnustoExamplesApp {
+extension FrobozzMagicDemoKitApp {
     static func main() {
         Task {
             try await main()
@@ -28,4 +28,4 @@ extension GnustoExamplesApp {
 }
 
 // Call the main function
-GnustoExamplesApp.main()
+FrobozzMagicDemoKitApp.main()
