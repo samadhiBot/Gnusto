@@ -10,12 +10,12 @@ struct WorldSetups {
     /// Includes: Foyer, Cloakroom, Bar locations; Hook, Cloak items;
     /// Verbs: go, look, take, drop, wear, remove (and synonyms).
     ///
-    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`, the `[VerbID: ActionHandler]` dictionary,
-    ///            and the optional `@MainActor @Sendable` custom logic hook closures.
+    /// - Returns: A tuple containing the initial `GameState`, a `StandardParser`,
+    ///            the `[ItemID: ObjectActionHandler]` dictionary, and the optional hook closures.
     static func setupCloakOfDarknessWorld() async -> (
         GameState,
         StandardParser,
-        [VerbID: ActionHandler],
+        [ItemID: ObjectActionHandler],
         (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?,
         (@MainActor @Sendable (GameEngine) async -> Void)?
     ) {
@@ -62,12 +62,9 @@ struct WorldSetups {
         let message = Item(
             id: "message",
             name: "message",
-            adjectives: "scrawled",
-            synonyms: "floor", "sawdust", "dust",
-            description: "The message simply reads... well, you'll need to examine it properly.",
-            firstDescription: "There seems to be some sort of message scrawled in the sawdust on the floor.",
-            properties: .readable,
-            parent: .location("bar")
+            properties: .ndesc, .read,
+            parent: .location("bar"),
+            readableText: "You have won!"
         )
 
         // Player
@@ -114,19 +111,22 @@ struct WorldSetups {
         // Parser
         let parser = StandardParser()
 
-        // Action Handlers (Keep custom ones defined here)
-        let customHandlers: [VerbID: ActionHandler] = [
-            // Default handlers (like go, look) are registered by the Engine itself.
-            // Only list handlers that *override* defaults or add new verbs specific to this game.
-            VerbID("take"): TakeActionHandler(),
-            VerbID("get"): TakeActionHandler(),
-            VerbID("drop"): DropActionHandler(),
-            VerbID("wear"): WearActionHandler(),
-            VerbID("don"): WearActionHandler(),
-            VerbID("remove"): RemoveActionHandler(),
-            VerbID("doff"): RemoveActionHandler(),
-            VerbID("take off"): RemoveActionHandler()
-            // Add other Cloak-specific verbs/overrides here if needed later.
+        // --- Define Object Action Handlers ---
+        let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+            "message": { engine, command in
+                guard
+                    command.verbID == "examine",
+                    await engine.playerLocationID() == "bar"
+                else { return false }
+
+                let cloakSnapshot = await engine.itemSnapshot(with: "cloak")
+                guard cloakSnapshot?.parent == .player else { return false }
+
+                // Match the output in main.swift
+                await engine.output("\n*** You have won ***")
+                engine.quitGame()
+                return true
+            }
         ]
 
         // --- Cloak of Darkness Custom Logic Hooks ---
@@ -135,8 +135,8 @@ struct WorldSetups {
 
         let beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil // No custom beforeTurn logic needed now
 
-        // Return the initial state, parser, custom handlers, and the specific logic hooks
-        return (gameState, parser, customHandlers, onEnterRoom, beforeTurn)
+        // Return the initial state, parser, object handlers, and hooks
+        return (gameState, parser, objectActionHandlers, onEnterRoom, beforeTurn)
     }
 
     // Add setup for Zork world later...

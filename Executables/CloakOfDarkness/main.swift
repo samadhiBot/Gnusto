@@ -3,7 +3,7 @@ import GnustoEngine
 
 /// Main entry point for the Cloak of Darkness replica.
 struct CloakOfDarkness {
-    @MainActor 
+    @MainActor
     static func main() async {
         print("Initializing Cloak of Darkness...\n")
 
@@ -25,6 +25,7 @@ struct CloakOfDarkness {
                 .west: Exit(destination: "cloakroom"),
             ]
         )
+
         let cloakroom = Location(
             id: "cloakroom",
             name: "Cloakroom",
@@ -36,6 +37,7 @@ struct CloakOfDarkness {
                 .east: Exit(destination: "foyer"),
             ]
         )
+
         let bar = Location(
             id: "bar",
             name: "Bar",
@@ -53,6 +55,7 @@ struct CloakOfDarkness {
             synonyms: "peg",
             parent: .location("cloakroom")
         )
+
         let cloak = Item(
             id: "cloak",
             name: "cloak",
@@ -63,11 +66,19 @@ struct CloakOfDarkness {
             parent: .item("hook")
         )
 
+        let message = Item(
+            id: "message",
+            name: "message",
+            properties: .ndesc, .read,
+            parent: .location("bar"),
+            readableText: "You have won!"
+        )
+
         // Player
         let initialPlayer = Player(currentLocationID: "foyer")
 
         // All Items and Locations
-        let allItems = [hook, cloak]
+        let allItems = [hook, cloak, message]
         let allLocations = [foyer, cloakroom, bar]
 
         // Vocabulary
@@ -84,21 +95,23 @@ struct CloakOfDarkness {
         // Parser
         let parser = StandardParser()
 
-        // Action Handlers
-        let customHandlers: [VerbID: ActionHandler] = [
-            VerbID("go"): GoActionHandler(),
-            VerbID("look"): LookActionHandler(),
-            VerbID("examine"): LookActionHandler(),
-            VerbID("x"): LookActionHandler(),
-            VerbID("l"): LookActionHandler(),
-            VerbID("take"): TakeActionHandler(),
-            VerbID("get"): TakeActionHandler(),
-            VerbID("drop"): DropActionHandler(),
-            VerbID("wear"): WearActionHandler(),
-            VerbID("don"): WearActionHandler(),
-            VerbID("remove"): RemoveActionHandler(),
-            VerbID("doff"): RemoveActionHandler(),
-            VerbID("take off"): RemoveActionHandler()
+        // Define Object-Specific Action Handlers
+        let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+            "message": { engine, command in
+                guard
+                    command.verbID == "examine",
+                    engine.playerLocationID() == "bar"
+                else { return false }
+
+                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
+                guard cloakSnapshot?.parent == .player else {
+                    return false
+                }
+
+                await engine.output("\n*** You have won ***")
+                engine.quitGame()
+                return true
+            }
         ]
 
         // --- Engine Setup ---
@@ -107,8 +120,9 @@ struct CloakOfDarkness {
             initialState: gameState,
             parser: parser,
             ioHandler: ioHandler,
-            registry: GameDefinitionRegistry(),
-            customHandlers: customHandlers
+            registry: GameDefinitionRegistry(
+                objectActionHandlers: objectActionHandlers
+            )
         )
 
         // --- Run Game ---

@@ -16,7 +16,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
     func testBasicCloakWalkthrough() async throws {
         // 1. Setup World
-        let (initialState, parser, customHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, objectActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO with commands
         let mockIO = await MockIOHandler(
@@ -34,8 +34,8 @@ struct CloakOfDarknessWalkthroughTests {
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
-            customHandlers: customHandlers
-            // No custom hooks needed for this test
+            // Create registry with object handlers
+            registry: GameDefinitionRegistry(objectActionHandlers: objectActionHandlers)
         )
 
         // 4. Run Game Simulation
@@ -77,7 +77,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Win Condition", .tags(.integration, .walkthrough)) // Renamed test
     func testBarWinCondition() async throws {
         // 1. Setup World
-        let (initialState, parser, customHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, objectActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO: get cloak, wear it, go bar, look, examine message
         let mockIO = await MockIOHandler(
@@ -96,7 +96,8 @@ struct CloakOfDarknessWalkthroughTests {
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
-            customHandlers: customHandlers
+            // Create registry with object handlers
+            registry: GameDefinitionRegistry(objectActionHandlers: objectActionHandlers)
         )
 
         // 4. Run Game Simulation
@@ -126,9 +127,11 @@ struct CloakOfDarknessWalkthroughTests {
             > look
             It is pitch black. You are likely to be eaten by a grue.
             > x message
-            The message simply reads: "You win."
 
-            *** The End ***
+            *** You have won ***
+            >
+
+            Goodbye!
             """
         )
     }
