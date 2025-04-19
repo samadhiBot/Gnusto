@@ -28,12 +28,12 @@ public struct DropActionHandler: ActionHandler {
 
         // 4. Update State
         await engine.updateItemParent(itemID: targetItemID, newParent: .location(currentLocationID))
-        // If item was worn, it is no longer worn when dropped
+        // Use updateItemProperties to remove .worn (if present) and add .touched
         if targetItem.hasProperty(.worn) {
-            await engine.removeItemProperty(itemID: targetItemID, property: .worn)
+            await engine.updateItemProperties(itemID: targetItemID, adding: .touched, removing: .worn)
+        } else {
+            await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
         }
-        // Ensure item is marked touched after dropping
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
 
         // 5. Output Message
         // TODO: Check Zork/classic message for this

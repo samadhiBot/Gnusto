@@ -24,7 +24,7 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // Mark as touched regardless of what happens next (standard Zork behavior)
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
 
         // 4. Check if item is readable (Zork V-EXAMINE prioritizes P?TEXT)
         if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {

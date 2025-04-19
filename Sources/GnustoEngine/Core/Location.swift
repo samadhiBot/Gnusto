@@ -34,8 +34,7 @@ public final class Location: Codable, Identifiable {
         description: String,
         exits: [Direction : Exit] = [:],
         properties: LocationProperty...,
-        globals: [ItemID] = []
-        // actionHandlerID: String? = nil
+        globals: ItemID...
     ) {
         self.id = id
         self.name = name
@@ -43,7 +42,6 @@ public final class Location: Codable, Identifiable {
         self.exits = exits
         self.properties = Set(properties)
         self.globals = globals
-        // self.actionHandlerID = actionHandlerID
     }
 
     init(
@@ -53,7 +51,6 @@ public final class Location: Codable, Identifiable {
         exits: [Direction : Exit] = [:],
         properties: Set<LocationProperty> = [],
         globals: [ItemID] = []
-        // actionHandlerID: String? = nil
     ) {
         self.id = id
         self.name = name
@@ -61,7 +58,6 @@ public final class Location: Codable, Identifiable {
         self.exits = exits
         self.properties = properties
         self.globals = globals
-        // self.actionHandlerID = actionHandlerID
     }
 
     // --- Codable Conformance ---

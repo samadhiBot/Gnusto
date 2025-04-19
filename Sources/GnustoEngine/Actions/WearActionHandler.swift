@@ -33,8 +33,7 @@ public struct WearActionHandler: ActionHandler {
         }
 
         // 5. Update State - Add .worn property (parent remains .player)
-        await engine.addItemProperty(itemID: targetItemID, property: .worn)
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .worn, .touched)
 
         // 6. Output Message
         await engine.ioHandler.print("You put on the \(targetItem.name).")

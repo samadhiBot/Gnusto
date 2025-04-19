@@ -141,9 +141,9 @@ struct CloakOfDarkness {
                 let isBarCurrentlyLit = currentBar?.properties.contains(.inherentlyLit) ?? false
 
                 if barShouldBeLit && !isBarCurrentlyLit {
-                    await engine.updateLocationProperties(id: "bar", adding: [.inherentlyLit])
+                    await engine.updateLocationProperties(id: "bar", adding: .inherentlyLit)
                 } else if !barShouldBeLit && isBarCurrentlyLit {
-                    await engine.updateLocationProperties(id: "bar", removing: [.inherentlyLit])
+                    await engine.updateLocationProperties(id: "bar", removing: .inherentlyLit)
                 }
                 return false // Do not block further actions
 

@@ -46,7 +46,7 @@ struct TurnOnActionHandler: ActionHandler {
         }
 
         // Mark as touched regardless of outcome (standard Zork behavior)
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
 
         // 4. Check if the item has the `.device` property.
         // Zork V-LAMP-ON checks LIGHTBIT first, but let's check device for broader applicability.
@@ -71,7 +71,7 @@ struct TurnOnActionHandler: ActionHandler {
         let wasLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
 
         // 7. Add the `.on` property to the item.
-        await engine.addItemProperty(itemID: targetItemID, property: .on)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .on)
 
         // 8. Print "You turn the [item name] on."
         // Zork V-LAMP-ON: "The brass lantern is now on."

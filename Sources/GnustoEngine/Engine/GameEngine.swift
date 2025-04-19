@@ -145,14 +145,21 @@ public class GameEngine {
     // Add Placeholder Handler Struct (Temporary)
     fileprivate struct PlaceholderActionHandler: ActionHandler {
         let verb: String
-        func perform(command: Command, engine: GameEngine) async throws {
+
+        func perform(
+            command: Command,
+            engine: GameEngine
+        ) async throws {
             await engine.output("Sorry, the default handler for '\(verb)' is not implemented yet.")
         }
     }
 
     // Need InventoryActionHandler
     fileprivate struct InventoryActionHandler: ActionHandler {
-         func perform(command: Command, engine: GameEngine) async throws {
+        func perform(
+            command: Command,
+            engine: GameEngine
+        ) async throws {
              let heldItems = await engine.itemSnapshots(withParent: .player)
              if heldItems.isEmpty {
                  await engine.output("You aren't carrying anything.")
@@ -174,7 +181,10 @@ public class GameEngine {
     ///   - overrideTurns: Optional number of turns to set for the fuse. If `nil`, the default turns from the `FuseDefinition` are used.
     /// - Returns: `true` if the fuse was successfully added or updated, `false` if no definition was found for the ID.
     @discardableResult
-    public func addFuse(id: FuseID, overrideTurns: Int? = nil) -> Bool {
+    public func addFuse(
+        id: FuseID,
+        overrideTurns: Int? = nil
+    ) -> Bool {
         // 1. Find the definition in the registry.
         guard let definition = registry.fuseDefinition(for: id) else {
             // Log warning or error: Attempting to add an undefined fuse.
@@ -636,19 +646,105 @@ public class GameEngine {
     ///   - id: The `LocationID` of the location to update.
     ///   - adding: A set of `LocationProperty` to add. Pass `nil` to ignore.
     ///   - removing: A set of `LocationProperty` to remove. Pass `nil` to ignore.
-    public func updateLocationProperties(id: LocationID, adding: Set<LocationProperty>? = nil, removing: Set<LocationProperty>? = nil) {
-        guard var location = gameState.locations[id] else {
+    public func updateLocationProperties(
+        id: LocationID,
+        adding: LocationProperty...,
+        removing: LocationProperty...
+    ) {
+        guard let location = gameState.locations[id] else {
             // Log warning: Location not found
             print("Warning: Attempted to update properties for non-existent location '\(id)'.")
             return
         }
-        if let propsToAdd = adding {
-            location.properties.formUnion(propsToAdd)
+        location.properties.formUnion(adding)
+        location.properties.subtract(removing)
+        gameState.locations[id] = location
+    }
+
+    /// Updates the parent entity of a specific item.
+    /// - Parameters:
+    ///   - itemID: The ID of the item to move.
+    ///   - newParent: The new `ParentEntity` for the item.
+    public func updateItemParent(
+        itemID: ItemID,
+        newParent: ParentEntity
+    ) {
+        guard let item = gameState.items[itemID] else {
+            print("Warning: Attempted to update parent for non-existent item '\(itemID)'.")
+            return
         }
-        if let propsToRemove = removing {
-            location.properties.subtract(propsToRemove)
+        // TODO: Add checks? (e.g., prevent moving item inside itself?)
+        item.parent = newParent
+        gameState.items[itemID] = item
+    }
+
+    /// Updates the properties of a specific item.
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item to update.
+    ///   - adding: A set of `ItemProperty` to add. Pass `nil` to ignore.
+    ///   - removing: A set of `ItemProperty` to remove. Pass `nil` to ignore.
+    public func updateItemProperties(
+        itemID: ItemID,
+        adding: ItemProperty...,
+        removing: ItemProperty...
+    ) {
+        guard var item = gameState.items[itemID] else {
+            print("Warning: Attempted to update properties for non-existent item '\(itemID)'.")
+            return
+        }
+        if !adding.isEmpty {
+            item.properties.formUnion(adding)
+        }
+        if !removing.isEmpty {
+            item.properties.subtract(removing)
+        }
+        gameState.items[itemID] = item
+    }
+
+    /// Updates the exits of a specific location.
+    /// - Parameters:
+    ///   - id: The `LocationID` of the location to update.
+    ///   - adding: A dictionary of `[Direction: Exit]` to add/update. Pass `nil` to ignore.
+    ///   - removing: An array of `Direction`s whose exits should be removed. Pass `nil` to ignore.
+    public func updateLocationExits(
+        id: LocationID,
+        adding: [Direction: Exit] = [:],
+        removing: Direction...
+    ) {
+        guard var location = gameState.locations[id] else {
+            print("Warning: Attempted to update exits for non-existent location '\(id)'.")
+            return
+        }
+        for (direction, exit) in adding {
+            location.exits[direction] = exit
+        }
+        for direction in removing {
+            location.exits.removeValue(forKey: direction)
         }
         gameState.locations[id] = location
+    }
+
+    /// Updates the referent for a specific pronoun (e.g., "it").
+    /// - Parameters:
+    ///   - pronoun: The pronoun string (e.g., "it", "them").
+    ///   - itemID: The ID of the item the pronoun now refers to.
+    public func updatePronounReference(
+        pronoun: String,
+        itemID: ItemID
+    ) {
+        // Assumes single item reference for now, like ZIL default
+        gameState.updatePronoun(pronoun.lowercased(), referringTo: itemID)
+    }
+
+    /// Updates the referents for a specific pronoun (e.g., "them").
+    /// - Parameters:
+    ///   - pronoun: The pronoun string (e.g., "it", "them").
+    ///   - itemIDs: The set of item IDs the pronoun now refers to.
+    public func updatePronounReference(
+        pronoun: String,
+        itemIDs: Set<ItemID>
+    ) {
+        gameState.updatePronoun(pronoun.lowercased(), referringTo: itemIDs)
     }
 
     /// Updates a value in the game-specific state dictionary.
@@ -671,11 +767,29 @@ public class GameEngine {
         updateGameSpecificState(key: key, value: AnyCodable(currentValue + 1))
     }
 
+    /// Safely retrieves a value from the game-specific state dictionary as AnyCodable.
+    /// - Parameter key: The key for the state value.
+    /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
+    public func getGameSpecificStateValue(key: String) -> AnyCodable? {
+        return gameState.gameSpecificState?[key]
+    }
+
+    /// Safely retrieves a String value from the game-specific state dictionary.
+    /// Performs the type casting within the MainActor context.
+    /// - Parameter key: The key for the state value.
+    /// - Returns: The `String` value if found and castable, otherwise `nil`.
+    public func getGameSpecificStateString(key: String) -> String? {
+        return gameState.gameSpecificState?[key]?.value as? String
+    }
+
     // MARK: - Debug/Testing Helpers
 
-    /// **Testing Only:** Adds an item directly to the game state's item dictionary using its constituent data.
-    /// Use with caution, primarily for setting up test scenarios.
+    /// Adds an item directly to the game state's item dictionary using its constituent data.
+    ///
     /// Creates the item within the actor's context.
+    ///
+    /// - Warning: Use with caution! This function is only intended to be used when setting up
+    ///            test scenarios.
     internal func debugAddItem(
         id: ItemID,
         name: String,
@@ -734,7 +848,11 @@ public class GameEngine {
     ///   - text: The text to display.
     ///   - style: The desired text style.
     ///   - newline: Whether to append a newline (defaults to true).
-    public func output(_ text: String, style: TextStyle, newline: Bool = true) async {
+    public func output(
+        _ text: String,
+        style: TextStyle,
+        newline: Bool = true
+    ) async {
         await ioHandler.print(text, style: style, newline: newline)
     }
 

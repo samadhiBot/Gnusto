@@ -99,3 +99,23 @@ else {
 
 guard let targetItemID = command.directObject else {...}
 ```
+
+- Public functions should use variadic arguments for simple collections
+
+```swift
+// Wrong:
+public init(
+    name: String,
+    exits: [Direction : Exit] = [:],
+    properties: Set<LocationProperty> = [],
+    globals: [ItemID] = []
+) {...}
+
+// Right:
+public init(
+    name: String,
+    exits: [Direction : Exit] = [:],
+    properties: LocationProperty...,
+    globals: ItemID...
+) {...}
+```

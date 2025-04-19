@@ -36,8 +36,8 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         // Mark items as touched
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
-        await engine.addItemProperty(itemID: keyItemID, property: .touched)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+        await engine.updateItemProperties(itemID: keyItemID, adding: .touched)
 
         // 4. Check item properties
         guard targetItem.hasProperty(.lockable) else {
@@ -55,7 +55,7 @@ public struct UnlockActionHandler: ActionHandler {
         // --- Unlock Successful ---
 
         // 6. Update State
-        await engine.removeItemProperty(itemID: targetItemID, property: .locked)
+        await engine.updateItemProperties(itemID: targetItemID, removing: .locked)
 
         // 7. Output Message
         // Zork: "The <door> is now unlocked."

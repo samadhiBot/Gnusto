@@ -25,7 +25,7 @@ struct TurnOffActionHandler: ActionHandler {
         }
 
         // Mark as touched
-        await engine.addItemProperty(itemID: targetItemID, property: .touched)
+        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
 
         // 4. Check if the item has the `.device` property.
         // Similar to TURN ON, check .device for general applicability.
@@ -49,7 +49,7 @@ struct TurnOffActionHandler: ActionHandler {
         let wasLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
 
         // 7. Remove the `.on` property from the item.
-        await engine.removeItemProperty(itemID: targetItemID, property: .on)
+        await engine.updateItemProperties(itemID: targetItemID, removing: .on)
 
         // 8. Print "You turn the [item name] off."
         // Zork V-LAMP-OFF: "The brass lantern is now off."
