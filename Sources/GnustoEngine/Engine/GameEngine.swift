@@ -357,6 +357,26 @@ public class GameEngine {
         var actionHandled = false
         var actionError: Error? = nil // To store error from object handlers
 
+        // --- Room BeforeTurn Hook ---
+        let currentLocationID = playerLocationID()
+        if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
+            do {
+                // Call handler, pass command
+                let handledByRoom = try await roomHandler(self, .beforeTurn(command))
+                if handledByRoom {
+                    // Room handler blocked further action, return immediately.
+                    // We don't increment moves or run afterTurn hook here.
+                    return
+                }
+            } catch {
+                // Log error and potentially halt turn?
+                await ioHandler.print("Error in room beforeTurn handler: \(error)", style: .debug)
+                // Decide if this error should block the turn. For now, let's continue.
+            }
+            // Check if handler quit the game
+            if shouldQuit { return }
+        }
+
         // --- Try Object Action Handlers ---
 
         // 1. Check Direct Object Handler
@@ -414,6 +434,18 @@ public class GameEngine {
             }
         }
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
+
+        // --- Room AfterTurn Hook ---
+        if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
+            do {
+                // Call handler, ignore return value
+                _ = try await roomHandler(self, .afterTurn(command))
+            } catch {
+                await ioHandler.print("Error in room afterTurn handler: \(error)", style: .debug)
+            }
+            // Check if handler quit the game
+            if shouldQuit { return }
+        }
     }
 
     // MARK: - Output & Error Reporting
@@ -537,7 +569,7 @@ public class GameEngine {
         await ioHandler.print(message)
     }
 
-    // MARK: - Safe State Accessors for Handlers
+    // MARK: - State Access Helpers (Public but @MainActor isolated)
 
     /// Safely retrieves a snapshot of an item by its ID from the current game state.
     /// This method runs on the GameEngine's actor context.
@@ -561,6 +593,11 @@ public class GameEngine {
     /// Safely retrieves the player's current location ID.
     public func playerLocationID() -> LocationID {
         return gameState.player.currentLocationID
+    }
+
+    /// Safely retrieves a snapshot of the player's current location.
+    public func playerLocationSnapshot() -> LocationSnapshot? {
+        locationSnapshot(with: gameState.player.currentLocationID)
     }
 
     /// Safely retrieves the player's score.
@@ -592,31 +629,47 @@ public class GameEngine {
         return LocationSnapshot(location: location)
     }
 
-    // Add other necessary safe accessors here...
+    // MARK: - State Mutation Helpers (Public but @MainActor isolated)
 
-    // Note: We also need a way to modify state safely. Example:
-    /// Safely updates the parent of an item.
-    public func updateItemParent(itemID: ItemID, newParent: ParentEntity) {
-        gameState.items[itemID]?.parent = newParent
+    /// Updates the properties of a specific location.
+    /// - Parameters:
+    ///   - id: The `LocationID` of the location to update.
+    ///   - adding: A set of `LocationProperty` to add. Pass `nil` to ignore.
+    ///   - removing: A set of `LocationProperty` to remove. Pass `nil` to ignore.
+    public func updateLocationProperties(id: LocationID, adding: Set<LocationProperty>? = nil, removing: Set<LocationProperty>? = nil) {
+        guard var location = gameState.locations[id] else {
+            // Log warning: Location not found
+            print("Warning: Attempted to update properties for non-existent location '\(id)'.")
+            return
+        }
+        if let propsToAdd = adding {
+            location.properties.formUnion(propsToAdd)
+        }
+        if let propsToRemove = removing {
+            location.properties.subtract(propsToRemove)
+        }
+        gameState.locations[id] = location
     }
 
-    /// Safely adds a property to an item.
-    public func addItemProperty(itemID: ItemID, property: ItemProperty) {
-        gameState.items[itemID]?.addProperty(property)
+    /// Updates a value in the game-specific state dictionary.
+    /// Creates the dictionary if it doesn't exist.
+    /// - Parameters:
+    ///   - key: The key for the state value.
+    ///   - value: The `AnyCodable` value to set.
+    public func updateGameSpecificState(key: String, value: AnyCodable) {
+        if gameState.gameSpecificState == nil {
+            gameState.gameSpecificState = [:]
+        }
+        gameState.gameSpecificState?[key] = value
     }
 
-    /// Safely removes a property from an item.
-    public func removeItemProperty(itemID: ItemID, property: ItemProperty) {
-        gameState.items[itemID]?.removeProperty(property)
+    /// Increments an integer value stored in the game-specific state.
+    /// Initializes the value to 1 if the key doesn't exist or the current value is not an Int.
+    /// - Parameter key: The key for the integer counter.
+    public func incrementGameSpecificStateCounter(key: String) {
+        let currentValue = gameState.gameSpecificState?[key]?.value as? Int ?? 0
+        updateGameSpecificState(key: key, value: AnyCodable(currentValue + 1))
     }
-
-    /// Safely updates the player's current location ID.
-    public func updatePlayerLocation(newLocationID: LocationID) {
-        // TODO: Add check if newLocationID exists in gameState.locations?
-        gameState.player.currentLocationID = newLocationID
-    }
-
-    // Add other mutation methods as needed (e.g., update score, flags)
 
     // MARK: - Debug/Testing Helpers
 
@@ -646,17 +699,6 @@ public class GameEngine {
 
     // MARK: - Public Accessors & Mutators (Thread-Safe)
 
-    /// Provides read-only access to the current game state snapshot.
-    public func getCurrentGameState() -> GameState {
-        return gameState
-    }
-
-    /// Allows controlled mutation of the game state.
-    /// Use this for handlers or custom hooks to modify the state.
-    public func updateGameState(_ updateBlock: (inout GameState) -> Void) {
-        updateBlock(&gameState)
-    }
-
     /// Updates the player's current location and triggers the onEnterRoom hook.
     public func changePlayerLocation(to locationID: LocationID) async {
         guard gameState.locations[locationID] != nil else {
@@ -664,9 +706,18 @@ public class GameEngine {
             return
         }
         gameState.player.currentLocationID = locationID
-        // --- Custom Hook: On Enter Room ---
-        await onEnterRoom?(self, locationID)
-        // ----------------------------------
+
+        // --- Call RoomActionHandler: On Enter Room ---
+        if let roomHandler = registry.roomActionHandler(for: locationID) {
+            do {
+                // Call handler, ignore return value for onEnter
+                _ = try await roomHandler(self, .onEnter)
+            } catch {
+                await ioHandler.print("Error in room onEnter handler: \(error)", style: .debug)
+            }
+            // Check if handler quit the game
+            if shouldQuit { return }
+        }
     }
 
     /// Sets the flag to end the game loop after the current turn.

@@ -23,7 +23,8 @@ struct CloakOfDarkness {
             exits: [
                 .south: Exit(destination: "bar"),
                 .west: Exit(destination: "cloakroom"),
-            ]
+            ],
+            properties: .inherentlyLit
         )
 
         let cloakroom = Location(
@@ -35,7 +36,8 @@ struct CloakOfDarkness {
                 """,
             exits: [
                 .east: Exit(destination: "foyer"),
-            ]
+            ],
+            properties: .inherentlyLit
         )
 
         let bar = Location(
@@ -53,6 +55,7 @@ struct CloakOfDarkness {
             name: "hook",
             adjectives: "brass",
             synonyms: "peg",
+            properties: .surface,
             parent: .location("cloakroom")
         )
 
@@ -69,6 +72,9 @@ struct CloakOfDarkness {
         let message = Item(
             id: "message",
             name: "message",
+            adjectives: "scrawled",
+            synonyms: "floor", "sawdust", "dust",
+            firstDescription: "There seems to be some sort of message scrawled in the sawdust on the floor.",
             properties: .ndesc, .read,
             parent: .location("bar"),
             readableText: "You have won!"
@@ -85,11 +91,15 @@ struct CloakOfDarkness {
         let vocabulary = Vocabulary.build(items: allItems)
 
         // Game State
-        let gameState = GameState.initial(
+        // Define key for disturbed state
+        let disturbedKey = "cod_disturbed"
+        let initialGameState = GameState.initial(
             initialLocations: allLocations,
             initialItems: allItems,
             initialPlayer: initialPlayer,
-            vocabulary: vocabulary
+            vocabulary: vocabulary,
+            // Initialize disturbed state to 0
+            gameSpecificState: [disturbedKey: AnyCodable(0)]
         )
 
         // Parser
@@ -97,32 +107,82 @@ struct CloakOfDarkness {
 
         // Define Object-Specific Action Handlers
         let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+            "cloak": { engine, command in
+                guard command.verbID == "examine" else { return false }
+                await engine.output("The cloak is unnaturally dark.")
+                return true // Handled
+            },
             "message": { engine, command in
-                guard
-                    command.verbID == "examine",
-                    engine.playerLocationID() == "bar"
-                else { return false }
+                guard command.verbID == "examine" else { return false }
 
-                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
-                guard cloakSnapshot?.parent == .player else {
-                    return false
-                }
+                // Get disturbed count from game state
+                let disturbedCount = engine.gameState.gameSpecificState?[disturbedKey]?.value as? Int ?? 0
 
-                await engine.output("\n*** You have won ***")
-                engine.quitGame()
-                return true
+                // Determine win/lose message based on ZIL logic
+                let outcome = disturbedCount > 1 ? "lose." : "win."
+                let output = "The message simply reads: \"You \(outcome)\""
+
+                await engine.output(output)
+                engine.quitGame() // Mimics V-QUIT
+                return true // Action handled
             }
         ]
+
+        // Define Room-Specific Action Handler for the Bar (BAR-R)
+        let barActionHandler: RoomActionHandler = { engine, message in
+            switch message {
+            case .onEnter:
+                // Update Bar light based on cloak status
+                let cloakSnapshot = engine.itemSnapshot(with: "cloak")
+                let isCloakWorn = cloakSnapshot?.parent == .player
+                let barShouldBeLit = !isCloakWorn
+
+                let currentBar = await engine.locationSnapshot(with: "bar")
+                let isBarCurrentlyLit = currentBar?.properties.contains(.inherentlyLit) ?? false
+
+                if barShouldBeLit && !isBarCurrentlyLit {
+                    await engine.updateLocationProperties(id: "bar", adding: [.inherentlyLit])
+                } else if !barShouldBeLit && isBarCurrentlyLit {
+                    await engine.updateLocationProperties(id: "bar", removing: [.inherentlyLit])
+                }
+                return false // Do not block further actions
+
+            case .beforeTurn(let command):
+                // Handle groping message if Bar is dark and command is interactive
+                let currentBar = await engine.locationSnapshot(with: "bar")
+                let isBarDark = !(currentBar?.properties.contains(.inherentlyLit) ?? true)
+
+                guard isBarDark else { return false } // Only act if dark
+
+                let nonInteractiveVerbs: Set<VerbID> = [
+                    "go", "look", "examine", "x", "l", "inventory", "quit", "score", "wait"
+                    // Add other non-disturbing verbs as needed
+                ]
+                guard !nonInteractiveVerbs.contains(command.verbID) else { return false }
+
+                // Print groping message and increment counter
+                await engine.output("You grope around clumsily in the dark. Better be careful.")
+                await engine.incrementGameSpecificStateCounter(key: disturbedKey)
+                return false // Do not block the actual command
+
+            case .afterTurn:
+                // No action needed for M-END equivalent in BAR-R
+                return false
+            }
+        }
 
         // --- Engine Setup ---
         let ioHandler = await ConsoleIOHandler()
         let engine = GameEngine(
-            initialState: gameState,
+            initialState: initialGameState,
             parser: parser,
             ioHandler: ioHandler,
             registry: GameDefinitionRegistry(
-                objectActionHandlers: objectActionHandlers
+                // Register both object and room handlers
+                objectActionHandlers: objectActionHandlers,
+                roomActionHandlers: ["bar": barActionHandler]
             )
+            // No custom hooks needed (onEnterRoom, beforeTurn are replaced by RoomActionHandler)
         )
 
         // --- Run Game ---

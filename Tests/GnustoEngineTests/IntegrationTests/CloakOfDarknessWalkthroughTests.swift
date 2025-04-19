@@ -16,7 +16,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
     func testBasicCloakWalkthrough() async throws {
         // 1. Setup World
-        let (initialState, parser, objectActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, objectActionHandlers, roomActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO with commands
         let mockIO = await MockIOHandler(
@@ -34,8 +34,11 @@ struct CloakOfDarknessWalkthroughTests {
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
-            // Create registry with object handlers
-            registry: GameDefinitionRegistry(objectActionHandlers: objectActionHandlers)
+            // Create registry with object and room handlers
+            registry: GameDefinitionRegistry(
+                objectActionHandlers: objectActionHandlers,
+                roomActionHandlers: roomActionHandlers
+            )
         )
 
         // 4. Run Game Simulation
@@ -77,7 +80,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Win Condition", .tags(.integration, .walkthrough)) // Renamed test
     func testBarWinCondition() async throws {
         // 1. Setup World
-        let (initialState, parser, objectActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
+        let (initialState, parser, objectActionHandlers, roomActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
         // 2. Setup Mock IO: get cloak, wear it, go bar, look, examine message
         let mockIO = await MockIOHandler(
@@ -96,8 +99,11 @@ struct CloakOfDarknessWalkthroughTests {
             initialState: initialState,
             parser: parser,
             ioHandler: mockIO,
-            // Create registry with object handlers
-            registry: GameDefinitionRegistry(objectActionHandlers: objectActionHandlers)
+            // Create registry with object and room handlers
+            registry: GameDefinitionRegistry(
+                objectActionHandlers: objectActionHandlers,
+                roomActionHandlers: roomActionHandlers
+            )
         )
 
         // 4. Run Game Simulation
@@ -123,15 +129,73 @@ struct CloakOfDarknessWalkthroughTests {
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > s
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can't see a thing.
             > look
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can't see a thing.
             > x message
+            The message simply reads: "You win."
+            """
+        )
+    }
 
-            *** You have won ***
-            >
+    /// Tests the lose condition: get cloak, wear it, enter bar, try to interact, examine message.
+    @Test("Bar Lose Condition", .tags(.integration, .walkthrough))
+    func testBarLoseCondition() async throws {
+        // 1. Setup World
+        let (initialState, parser, objectActionHandlers, roomActionHandlers, _, _) = await WorldSetups.setupCloakOfDarknessWorld()
 
-            Goodbye!
+        // 2. Setup Mock IO: get cloak, wear it, go bar, try TAKE HOOK (trigger grope), examine message
+        let mockIO = await MockIOHandler(
+            "w",           // Go to Cloakroom
+            "take cloak",  // Take the cloak
+            "wear cloak",  // Wear the cloak
+            "e",           // Back to Foyer
+            "s",           // Enter the Bar (should be dark)
+            "take hook",   // Try an interactive command in the dark
+            "x message",   // Examine message (should trigger lose)
+            nil // End input
+        )
+
+        // 3. Setup Engine
+        let engine = GameEngine(
+            initialState: initialState,
+            parser: parser,
+            ioHandler: mockIO,
+            registry: GameDefinitionRegistry(
+                objectActionHandlers: objectActionHandlers,
+                roomActionHandlers: roomActionHandlers
+            )
+        )
+
+        // 4. Run Game Simulation
+        await engine.run()
+
+        // 5. Get Transcript
+        let actualTranscript = await mockIO.flush()
+
+        // 6. Assert Lose Message and darkness handling
+        expectNoDifference(actualTranscript, """
+            --- Foyer of the Opera House ---
+            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            > w
+            --- Cloakroom ---
+            The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
+            You can see:
+              A hook
+            > take cloak
+            Taken.
+            > wear cloak
+            You put on the cloak.
+            > e
+            --- Foyer of the Opera House ---
+            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            > s
+            It is pitch black. You can't see a thing.
+            > take hook
+            You grope around clumsily in the dark. Better be careful.
+            It is pitch black. You can't see a thing.
+            > x message
+            The message simply reads: "You lose."
             """
         )
     }
