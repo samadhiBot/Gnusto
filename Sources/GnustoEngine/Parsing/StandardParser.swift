@@ -145,8 +145,13 @@ public struct StandardParser: Parser {
     internal func tokenize(input: String) -> [String] {
         // Simple whitespace and punctuation separation, converts to lowercase.
         // ZIL tokenization was more complex (e.g., dictionary separators).
-        input.lowercased()
-             .components(separatedBy: .whitespacesAndNewlines.union(.punctuationCharacters))
+
+        // Filter out non-alphanumeric characters (except spaces used for separation)
+        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces)
+        let sanitizedInput = String(input.unicodeScalars.filter { allowedChars.contains($0) })
+
+        return sanitizedInput.lowercased()
+             .components(separatedBy: .whitespacesAndNewlines)
              .filter { !$0.isEmpty }
     }
 

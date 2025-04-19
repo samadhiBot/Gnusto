@@ -188,11 +188,12 @@ extension CaveRegion {
         name: "door",
         adjectives: "iron", "massive",
         description: """
-                A massive door made of solid iron. Ancient runes are inscribed around its \
+                A massive door made of solid iron. Ancient runes are inscribed around its
                 frame. There's a keyhole below the handle.
                 """,
-        properties: .door, // Initially closed and locked? Logic might handle state.
-        parent: .location("ironDoorRoom")
+        properties: .door, .lockable, .locked, .openable, // Added .openable
+        parent: .location("ironDoorRoom"),
+        lockKey: "rustyKey" // Set the key required
     )
 
     // Crystal Grotto items

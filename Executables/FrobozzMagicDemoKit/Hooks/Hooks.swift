@@ -58,18 +58,6 @@ enum Hooks {
                 }
             }
 
-        case "ironDoorRoom":
-            // Check if door should be added as an exit
-            if gameState.flags[Components.IronDoorPuzzle.Constants.doorUnlockedFlag] == true {
-                // Door is unlocked, ensure the exit exists
-                let location = gameState.locations[locationID]
-                if location?.exits[.east] == nil {
-                    engine.updateGameState { state in
-                        state.locations[locationID]?.exits[.east] = Exit(destination: "hiddenVault")
-                    }
-                }
-            }
-
         default:
             break
         }
@@ -207,6 +195,51 @@ enum Hooks {
 
         default:
             return false // Not handled, use default engine behavior
+        }
+    }
+
+    /// Custom logic called after an item is successfully opened.
+    /// - Parameters:
+    ///   - engine: The game engine.
+    ///   - itemID: The ID of the item being opened.
+    /// - Returns: `true` to suppress the default "You open..." message, `false` otherwise.
+    static func onOpenItem(engine: GameEngine, itemID: ItemID) async -> Bool {
+        switch itemID {
+        case "ironDoor":
+            await engine.updateGameState { state in
+                let ironDoorRoomID: LocationID = "ironDoorRoom"
+                let vaultID: LocationID = "hiddenVault"
+                // Ensure the room exists before modifying
+                if state.locations[ironDoorRoomID] != nil {
+                    state.locations[ironDoorRoomID]?.exits[.east] = Exit(destination: vaultID)
+                    // print("HOOK DEBUG: Added east exit to ironDoorRoom.") // Debug print
+                }
+            }
+            return false // Still print default message "You open the door."
+        default:
+            return false // Use default behavior for other items
+        }
+    }
+
+    /// Custom logic called after an item is successfully closed.
+    /// - Parameters:
+    ///   - engine: The game engine.
+    ///   - itemID: The ID of the item being closed.
+    /// - Returns: `true` to suppress the default "You close..." message, `false` otherwise.
+    static func onCloseItem(engine: GameEngine, itemID: ItemID) async -> Bool {
+        switch itemID {
+        case "ironDoor":
+            await engine.updateGameState { state in
+                let ironDoorRoomID: LocationID = "ironDoorRoom"
+                // Ensure the room exists before modifying
+                if state.locations[ironDoorRoomID] != nil {
+                    state.locations[ironDoorRoomID]?.exits.removeValue(forKey: .east)
+                    // print("HOOK DEBUG: Removed east exit from ironDoorRoom.") // Debug print
+                }
+            }
+            return false // Still print default message "You close the door."
+        default:
+            return false // Use default behavior for other items
         }
     }
 

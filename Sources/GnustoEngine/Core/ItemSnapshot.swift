@@ -18,6 +18,7 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public let capacity: Int
     public let parent: ParentEntity
     public let readableText: String?
+    public let lockKey: ItemID?
 
     // --- Initialization ---
 
@@ -37,6 +38,7 @@ public struct ItemSnapshot: Identifiable, Sendable {
         self.capacity = item.capacity
         self.parent = item.parent // ParentEntity is a value type
         self.readableText = item.readableText // Copy readableText
+        self.lockKey = item.lockKey // Copy lockKey
     }
 
     // --- Convenience Accessors (Similar to Item) ---
@@ -44,6 +46,31 @@ public struct ItemSnapshot: Identifiable, Sendable {
     /// Checks if the snapshot indicates the item had a specific property.
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
+    }
+
+    // --- Matching Logic ---
+
+    /// Checks if the provided noun matches the item's name or synonyms.
+    /// Case-insensitive comparison.
+    func matches(noun: String) -> Bool {
+        let lowerNoun = noun.lowercased()
+        if self.name.lowercased() == lowerNoun {
+            return true
+        }
+        return self.synonyms.contains { $0.lowercased() == lowerNoun }
+    }
+
+    /// Checks if the provided set of adjectives is a subset of the item's adjectives.
+    /// Case-insensitive comparison.
+    func matches(adjectives: Set<String>) -> Bool {
+        guard !adjectives.isEmpty else {
+            // If no adjectives are provided, it's considered a match
+            // (we are only checking the noun in this case).
+            return true
+        }
+        let lowerAdjectives = Set(self.adjectives.map { $0.lowercased() })
+        let lowerInputAdjectives = Set(adjectives.map { $0.lowercased() })
+        return lowerInputAdjectives.isSubset(of: lowerAdjectives)
     }
 }
 

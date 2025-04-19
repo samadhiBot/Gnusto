@@ -42,7 +42,9 @@ final class FrobozzMagicDemoKit {
             registry: registry,
             onEnterRoom: Hooks.onEnterRoom, // Reference actual Hooks
             beforeTurn: Hooks.beforeEachTurn, // Reference actual Hooks
-            onExamineItem: Hooks.onExamineItem // Reference actual Hooks
+            onExamineItem: Hooks.onExamineItem, // Reference actual Hooks
+            onOpenItem: Hooks.onOpenItem, // Added hook
+            onCloseItem: Hooks.onCloseItem // Added hook
             // Note: Other hooks might be added here later if needed
         )
 
@@ -60,6 +62,8 @@ final class FrobozzMagicDemoKit {
             style: .emphasis
         )
         await ioHandler.print("", style: .normal)
+
+        await engine.run()
     }
 
     // Game data setup is handled in GameDataSetup.swift

@@ -8,11 +8,11 @@ extension Components {
 
         /// Constants for puzzle elements
         enum Constants {
-//            /// ID for the locked door item
-//            static let doorID: ItemID = "ironDoor"
-//
-//            /// ID for the key item
-//            static let keyID: ItemID = "rustyKey"
+            /// ID for the locked door item
+            static let doorID: ItemID = "ironDoor"
+
+            /// ID for the key item
+            static let keyID: ItemID = "rustyKey"
 
             /// Flag for door unlocked state in game state flags
             static let doorUnlockedFlag = "iron_door_unlocked"

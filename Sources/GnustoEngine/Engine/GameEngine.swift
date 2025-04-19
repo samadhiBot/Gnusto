@@ -51,6 +51,14 @@ public class GameEngine {
     /// or `false` to let the default examination logic proceed.
     public var onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
 
+    /// Custom logic called after an item is successfully opened, before the default message.
+    /// Return `true` to suppress the default "You open..." message.
+    public var onOpenItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
+
+    /// Custom logic called after an item is successfully closed, before the default message.
+    /// Return `true` to suppress the default "You close..." message.
+    public var onCloseItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)?
+
     // MARK: - Initialization
 
     /// Creates a new GameEngine instance.
@@ -63,6 +71,8 @@ public class GameEngine {
     ///   - onEnterRoom: Optional closure for custom logic after entering a room.
     ///   - beforeTurn: Optional closure for custom logic before each turn.
     ///   - onExamineItem: Optional closure for custom logic when examining an item.
+    ///   - onOpenItem: Optional closure for custom logic when opening an item.
+    ///   - onCloseItem: Optional closure for custom logic when closing an item.
     public init(
         initialState: GameState,
         parser: Parser,
@@ -71,7 +81,9 @@ public class GameEngine {
         customHandlers: [VerbID: ActionHandler] = [:],
         onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
         beforeTurn: (@MainActor @Sendable (GameEngine) async -> Void)? = nil,
-        onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
+        onExamineItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil,
+        onOpenItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil,
+        onCloseItem: (@MainActor @Sendable (GameEngine, ItemID) async -> Bool)? = nil
     ) {
         self.gameState = initialState
         self.parser = parser
@@ -81,6 +93,8 @@ public class GameEngine {
         self.onEnterRoom = onEnterRoom
         self.beforeTurn = beforeTurn
         self.onExamineItem = onExamineItem
+        self.onOpenItem = onOpenItem
+        self.onCloseItem = onCloseItem
 
         // Reconstruct runtime fuses from saved state and registry
         self.activeFuses = [:] // Start with empty runtime fuses
@@ -130,6 +144,8 @@ public class GameEngine {
             VerbID("turn_off"): TurnOffActionHandler(),
             VerbID("extinguish"): TurnOffActionHandler(), // Direct mapping for EXTINGUISH verb
             VerbID("blow out"): TurnOffActionHandler(), // Direct mapping for BLOW OUT verb
+            VerbID("lock"): LockActionHandler(),          // Added lock handler
+            VerbID("unlock"): UnlockActionHandler(),      // Added unlock handler
 
             // Sensory
             VerbID("smell"): SmellActionHandler(),
@@ -444,7 +460,7 @@ public class GameEngine {
         let message: String
         switch parseError {
         case .emptyInput:
-            message = "Please enter a command."
+            message = "I beg your pardon?" // More classic response
         case .unknownVerb(let verb):
             message = "I don't know the verb '\(verb)'."
         case .unknownNoun(let noun):
@@ -492,6 +508,12 @@ public class GameEngine {
         case .itemNotWearable(let itemID):
             let itemName = itemSnapshot(with: itemID)?.name ?? "that"
             message = "You can't wear \(itemName)."
+        case .itemNotOpenable(let itemID):
+            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
+            message = "You can't open the \(itemName)."
+        case .itemNotCloseable(let itemID):
+            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
+            message = "You can't close the \(itemName)."
         // Add more cases here...
         default:
             message = "You can't do that right now."

@@ -60,9 +60,13 @@ public struct CloseActionHandler: ActionHandler {
         await engine.removeItemProperty(itemID: targetItemID, property: .open)
         await engine.addItemProperty(itemID: targetItemID, property: .touched) // Closing implies touching
 
-        // 6. Output Message
-        // Using a generic default message.
-        await engine.output("You close the \(targetItem.name).")
+        // Call the hook, if any
+        let hookHandled = await engine.onCloseItem?(engine, targetItemID) ?? false
+
+        // 6. Output Message (if not handled by hook)
+        if !hookHandled {
+            await engine.output("You close the \(targetItem.name).")
+        }
     }
 }
 

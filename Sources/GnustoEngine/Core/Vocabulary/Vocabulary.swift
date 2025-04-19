@@ -287,6 +287,26 @@ public struct Vocabulary: Codable, Sendable {
             id: "brief",
             syntax: [SyntaxRule(.verb)]
         ), // Often used for description detail
+
+        // Lock/Unlock Verbs
+        Verb(
+            id: "lock",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ]
+        ),
+        Verb(
+            id: "unlock",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ]
+        ),
     ]
 
     // MARK: - Building Vocabulary (Example Methods)
