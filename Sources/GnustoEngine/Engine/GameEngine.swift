@@ -554,72 +554,85 @@ public class GameEngine {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
         case .containerIsFull(let item):
-            ""
+            "The \(theThat(item)) is full."
         case .containerIsOpen(let item):
-            ""
+            "\(theThat(item).capitalizedFirst) is already open."
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
-        case .internalEngineError(let item):
-            ""
+        case .internalEngineError(let msg):
+            // User-facing generic message; more details could be logged.
+            "A strange buzzing sound indicates something is wrong.\n  • \(msg)"
         case .invalidDirection:
             "You can't go that way."
         case .itemAlreadyClosed(let item):
-            ""
+            "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
-            ""
+            "\(theThat(item).capitalizedFirst) is already open."
         case .itemIsLocked(let item):
-            "That is locked."
+            "\(theThat(item).capitalizedFirst) is locked."
         case .itemIsUnlocked(let item):
-            ""
+            "\(theThat(item).capitalizedFirst) is already unlocked."
         case .itemNotAccessible(let item):
-            ""
+            // This often implies visibility/reachability issues.
+            "You don't see \(theThat(item, alternate: "any")) here."
         case .itemNotCloseable(let item):
             "You can't close \(theThat(item))."
         case .itemNotDroppable(let item):
-            ""
+            "You can't drop \(theThat(item))."
         case .itemNotEdible(let item):
-            ""
+            "You can't eat \(theThat(item))."
         case .itemNotHeld(let item):
             "You aren't holding \(theThat(item))."
         case .itemNotInContainer(item: let item, container: let container):
-            ""
+            "\(theThat(item).capitalizedFirst) isn't in \(theThat(container))."
         case .itemNotLockable(let item):
-            ""
+            "You can't lock \(theThat(item))."
         case .itemNotOnSurface(item: let item, surface: let surface):
-            ""
+            "\(theThat(item).capitalizedFirst) isn't on \(theThat(surface))."
         case .itemNotOpenable(let item):
             "You can't open \(theThat(item))."
         case .itemNotReadable(let item):
-            ""
+            "\(theThat(item).capitalizedFirst) isn't something you can read."
         case .itemNotRemovable(let item):
-            ""
+            "You can't remove \(theThat(item))."
         case .itemNotTakable(let item):
             "You can't take \(theThat(item))."
         case .itemNotUnlockable(let item):
-            ""
+            "You can't unlock \(theThat(item))."
         case .itemNotWearable(let item):
             "You can't wear \(theThat(item))."
         case .playerCannotCarryMore:
             "Your hands are full."
-        case .prerequisiteNotMet(let item):
-            ""
+        case .prerequisiteNotMet(let customMessage):
+            // Use the custom message if provided, otherwise a generic one.
+            customMessage.isEmpty ? "You can't do that." : customMessage
         case .roomIsDark:
-            ""
+            // Usually handled by describeCurrentLocation, but a fallback action error.
+            "It's too dark to do that."
         case .targetIsNotAContainer(let item):
-            ""
+            "You can't put things in \(theThat(item))."
         case .targetIsNotASurface(let item):
-            ""
+            "You can't put things on \(theThat(item))."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            ""
+            "The \(theThat(keyID)) doesn't fit \(theThat(lockID))."
         }
-        await ioHandler.print(message)
+        // Only print if the message isn't empty (some errors might be handled silently)
+        if !message.isEmpty {
+            await ioHandler.print(message)
+        }
     }
-    
-    /// <#Description#>
-    /// - Parameter itemID: <#itemID description#>
-    /// - Returns: <#description#>
-    private func theThat(_ itemID: ItemID) -> String {
-        itemSnapshot(with: itemID)?.theName ?? "that"
+
+    /// Returns `the {name}` of an item, or an alternate reference if the name is unknown.
+    ///
+    /// - Parameters:
+    ///   - itemID: The item identifier.
+    ///   - alternate: An alternate reference to the item.
+    /// - Returns: `the {name}` of an item, or `that` if name is unknown.
+    private func theThat(
+        _ itemID: ItemID,
+        alternate: String = "that"
+    ) -> String {
+        itemSnapshot(with: itemID)?.theName ?? alternate
     }
 
     // MARK: - State Access Helpers (Public but @MainActor isolated)

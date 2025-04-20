@@ -169,8 +169,11 @@ struct GameEngineTests {
 
         // Check that the specific action error message was printed
         let output = await mockIOHandler.recordedOutput
-        let expectedMessage = "You can't take that."
-        #expect(output.contains { $0.text == expectedMessage }, "Expected action error message not found")
+        let expectedMessage = "You can't take the pebble."
+        #expect(
+            output.contains { $0.text == expectedMessage },
+            "Expected action error message not found"
+        )
 
         // Verify the handler was called (optional but good practice)
         let handlerCalled = await mockTakeHandler.getPerformCalled()
@@ -704,6 +707,260 @@ struct GameEngineTests {
     // TODO: Test removeFuse
     // TODO: Test unregisterDaemon
     // TODO: Test fuse/daemon actions triggering quit
+}
+
+// MARK: - Error Reporting Tests
+
+extension GameEngineTests {
+    /// Helper to run the engine for one command and capture output.
+    private func runCommandAndCaptureOutput(
+        initialState: GameState,
+        commandInput: String,
+        commandToParse: Command
+    ) async -> String {
+        var mockParser = MockParser()
+        let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry() // Use minimal registry for these
+
+        mockParser.parseHandler = { input, _, _ in
+            if input == commandInput { return .success(commandToParse) }
+            if input == "quit" { return .failure(.emptyInput) } // Allow quit
+            return .failure(.unknownVerb(input))
+        }
+
+        let engine = GameEngine(
+            initialState: initialState,
+            parser: mockParser,
+            ioHandler: mockIOHandler,
+            registry: registry
+            // Use default handlers registered by engine.run()
+        )
+
+        await mockIOHandler.enqueueInput(commandInput, "quit")
+        await engine.run()
+
+        // Filter output to get only the error message (ignore room desc, prompt, etc.)
+        let outputCalls = await mockIOHandler.recordedOutput
+        // Find the first non-prompt, non-status line after the command prompt
+        var commandOutput = ""
+        var foundPrompt = false
+        for call in outputCalls {
+            if call.style == .input && call.text == "> " {
+                foundPrompt = true
+                continue // Skip the prompt itself
+            }
+            if foundPrompt && call.style != .statusLine {
+                commandOutput = call.text // Assuming error is the next output
+                break
+            }
+        }
+        return commandOutput
+    }
+
+    @Test("ReportActionError: .invalidDirection")
+    func testReportErrorInvalidDirection() async throws {
+        let initialState = await Self.createMinimalGameState()
+        let command = Command(
+            verbID: "go",
+            preposition: "xyzzy",
+            rawInput: "go xyzzy"
+        ) // Invalid direction
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "go xyzzy",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, """
+            A strange buzzing sound indicates something is wrong.
+              • Go command processed without a direction.
+            """)
+    }
+
+    @Test("ReportActionError: .itemNotTakable")
+    func testReportErrorItemNotTakable() async throws {
+        let initialState = await Self.createMinimalGameState()
+        // Ensure item exists but is NOT takable
+        initialState.items["startItem"]?.properties.remove(.takable)
+        #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
+
+        let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "take pebble",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't take the pebble.")
+    }
+
+    @Test("ReportActionError: .itemNotHeld")
+    func testReportErrorItemNotHeld() async throws {
+        let initialState = await Self.createMinimalGameState()
+        // Ensure pebble is in the room, not held
+        #expect(initialState.items["startItem"]?.parent == .location("startRoom"))
+
+        let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "wear pebble",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You aren't holding the pebble.")
+    }
+
+    @Test("ReportActionError: .containerIsClosed")
+    func testReportErrorContainerIsClosed() async throws {
+        // Arrange: Closed container in room, item inside
+        let container = Item(id: "box", name: "box", properties: [.container]) // Closed by default
+        let itemIn = Item(id: "gem", name: "gem", parent: .item("box"))
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[container.id] = container
+        initialState.items[itemIn.id] = itemIn
+        initialState.player.currentLocationID = "startRoom" // Ensure player is where box is
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        initialState.items[container.id]?.parent = .location("startRoom") // Box in room
+
+        // Command: Try to take item from closed container (will fail in Take handler)
+        // OR simpler: Try to put something IN the closed container
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        initialState.items[itemToPut.id] = itemToPut
+
+        let command = Command(
+            verbID: "put",
+            directObject: "key",
+            indirectObject: "box",
+            preposition: "in",
+            rawInput: "put key in box"
+        )
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "put key in box",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "The box is closed.")
+    }
+
+    @Test("ReportActionError: .itemNotOpenable")
+    func testReportErrorItemNotOpenable() async throws {
+        // Arrange: Item that is not openable
+        let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[item.id] = item
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+
+        let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "open rock",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't open the rock.")
+    }
+
+    @Test("ReportActionError: .itemNotWearable")
+    func testReportErrorItemNotWearable() async throws {
+        // Arrange: Item that is takable but not wearable, held by player
+        let item = Item(id: "rock", name: "rock", properties: [.takable], parent: .player)
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[item.id] = item
+
+        let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "wear rock",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't wear the rock.")
+    }
+
+    @Test("ReportActionError: .playerCannotCarryMore")
+    func testReportErrorPlayerCannotCarryMore() async throws {
+        // Arrange: Player holds item, capacity is low, try to take another
+        let itemHeld = Item(id: "sword", name: "sword", properties: [.takable], size: 8, parent: .player)
+        let itemToTake = Item(id: "shield", name: "shield", properties: [.takable], size: 7, parent: .location("startRoom"))
+        var initialState = await Self.createMinimalGameState()
+        initialState.player.carryingCapacity = 10 // Low capacity
+        initialState.items[itemHeld.id] = itemHeld
+        initialState.items[itemToTake.id] = itemToTake
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "take shield",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "Your hands are full.")
+    }
+
+    @Test("ReportActionError: .targetIsNotAContainer")
+    func testReportErrorTargetIsNotContainer() async throws {
+        // Arrange: Try putting item IN something that's not a container
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom")) // Not a container
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[itemToPut.id] = itemToPut
+        initialState.items[target.id] = target
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(
+            verbID: "put",
+            directObject: "key",
+            indirectObject: "rock",
+            preposition: "in",
+            rawInput: "put key in rock"
+        )
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "put key in rock",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't put things in the rock.")
+    }
+
+    @Test("ReportActionError: .targetIsNotASurface")
+    func testReportErrorTargetIsNotSurface() async throws {
+        // Arrange: Try putting item ON something that's not a surface
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom")) // Not a surface
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[itemToPut.id] = itemToPut
+        initialState.items[target.id] = target
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(
+            verbID: "put",
+            directObject: "key",
+            indirectObject: "rock",
+            preposition: "on",
+            rawInput: "put key on rock"
+        )
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "put key on rock",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't put things on the rock.")
+    }
+
+
 }
 
 // Helper extension for OutputCall checks (optional) - Moved outside struct
