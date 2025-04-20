@@ -614,7 +614,8 @@ public class GameEngine {
         case .targetIsNotASurface(let item):
             "You can't put things on \(theThat(item))."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            "The \(theThat(keyID)) doesn't fit \(theThat(lockID))."
+            // Correct: Calculate keyDesc inline to fix switch expression structure
+            "The \(itemSnapshot(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
         }
         // Only print if the message isn't empty (some errors might be handled silently)
         if !message.isEmpty {
@@ -943,5 +944,17 @@ public class GameEngine {
         newline: Bool = true
     ) async {
         await ioHandler.print(text, style: style, newline: newline)
+    }
+
+    // MARK: - State Query Helpers
+
+    /// Checks if the player currently holds the specified item.
+    /// - Parameter itemID: The ID of the item to check for.
+    /// - Returns: `true` if the player holds the item, `false` otherwise.
+    public func playerHasItem(itemID: ItemID) -> Bool {
+        // Access gameState safely within the MainActor context
+        return gameState.items[itemID]?.parent == .player
+        // Alternative, if itemsInInventory is efficient:
+        // return gameState.itemsInInventory().contains(itemID)
     }
 }

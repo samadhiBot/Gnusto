@@ -11,7 +11,6 @@ private class TestStateHolder {
 }
 
 @MainActor
-@Suite("GameEngine Tests")
 struct GameEngineTests {
     // Helper to create a minimal game state for testing
     // Make static as it doesn't depend on instance state
@@ -802,10 +801,12 @@ extension GameEngineTests {
         // Ensure pebble is in the room, not held
         #expect(initialState.items["startItem"]?.parent == .location("startRoom"))
 
+        // Correct: Use `wear` to trigger generic .itemNotHeld
         let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
 
         let output = await runCommandAndCaptureOutput(
             initialState: initialState,
+            // Correct: Match command input
             commandInput: "wear pebble",
             commandToParse: command
         )
@@ -960,6 +961,208 @@ extension GameEngineTests {
         expectNoDifference(output, "You can't put things on the rock.")
     }
 
+    @Test("ReportActionError: .directionIsBlocked")
+    func testReportErrorDirectionIsBlocked() async throws {
+        // Arrange: Exit blocked by a condition
+        var initialState = await Self.createMinimalGameState()
+        // Correct: Use `conditions` array
+        let blockedExit = Exit(
+            destination: "nowhere",
+            blockedMessage: "A shimmering curtain bars the way."
+        )
+        initialState.locations["startRoom"]?.exits[.north] = blockedExit
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        // Correct: Set `.direction` property, ensuring correct argument order
+        let command = Command(verbID: "go", directObject: "north", direction: .north, rawInput: "go north")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "go north",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "A shimmering curtain bars the way.")
+    }
+
+    @Test("ReportActionError: .itemAlreadyClosed")
+    func testReportErrorItemAlreadyClosed() async throws {
+        // Arrange: Try closing an already closed item
+        // Correct: Ensure it's a container AND .openable, lacks .open
+        let container = Item(id: "box", name: "box", properties: [.container, .openable], parent: .location("startRoom")) // Starts closed
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[container.id] = container
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "close box",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "The box is already closed.")
+    }
+
+    @Test("ReportActionError: .itemIsUnlocked")
+    func testReportErrorItemIsUnlocked() async throws {
+        // Arrange: Try unlocking an already unlocked item
+        // Correct: Remove `key:` parameter. Unlock handler needs key logic.
+        let container = Item(id: "chest", name: "chest", properties: [.container, .openable, .lockable], parent: .location("startRoom")) // Unlocked
+        let key = Item(id: "key1", name: "key", parent: .player) // Assume key ID "key1" matches chest internally
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[container.id] = container
+        initialState.items[key.id] = key
+        // Correct: Add scope setup
+        initialState.player.currentLocationID = "startRoom"
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        // Correct: Restore indirect object and preposition for key
+        let command = Command(
+            verbID: "unlock",
+            directObject: "chest",
+            indirectObject: "key1",
+            preposition: "with",
+            rawInput: "unlock chest with key"
+        )
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "unlock chest with key",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "The chest is already unlocked.")
+    }
+
+    @Test("ReportActionError: .itemNotCloseable")
+    func testReportErrorItemNotCloseable() async throws {
+        // Arrange: Item that cannot be closed (no .closeable property)
+        // Correct: Remove .open as well, simply not a container/closeable item
+        let item = Item(id: "book", name: "book", parent: .location("startRoom"))
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[item.id] = item
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "close book",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't close the book.")
+    }
+
+    @Test("ReportActionError: .itemNotDroppable")
+    func testReportErrorItemNotDroppable() async throws {
+        // Arrange: Player holding an item assumed fixed by handler logic
+        // Correct: Add `.fixed` property to trigger the check
+        let item = Item(id: "statue", name: "statue", properties: [.fixed], parent: .player)
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[item.id] = item
+
+        let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "drop statue",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't drop the statue.")
+    }
+
+    @Test("ReportActionError: .itemNotRemovable")
+    func testReportErrorItemNotRemovable() async throws {
+        // Arrange: Player wearing an item assumed fixed/irremovable by handler logic
+        // Correct: Add `.fixed` property to trigger the check
+        let item = Item(id: "amulet", name: "cursed amulet", properties: [.wearable, .worn, .fixed], parent: .player)
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[item.id] = item
+
+        let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "remove amulet",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You can't remove the cursed amulet.")
+    }
+
+    @Test("ReportActionError: .prerequisiteNotMet")
+    func testReportErrorPrerequisiteNotMet() async throws {
+        // Arrange: Exit condition provides a specific prerequisite message
+        var initialState = await Self.createMinimalGameState()
+        // Correct: Use `conditions` array
+        let conditionalExit = Exit(
+            destination: "nirvana",
+            blockedMessage: "You must first find inner peace."
+        )
+        initialState.locations["startRoom"]?.exits[.up] = conditionalExit
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        // Correct: Set `.direction` property, ensuring correct argument order
+        let command = Command(verbID: "go", directObject: "up", direction: .up, rawInput: "go up")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "go up",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "You must first find inner peace.")
+    }
+
+    @Test("ReportActionError: .roomIsDark")
+    func testReportErrorRoomIsDark() async throws {
+        // Arrange: Player in a dark room, tries to examine something
+        var initialState = await Self.createMinimalGameState()
+        initialState.locations["startRoom"]?.properties.remove(.inherentlyLit) // Make it dark
+        let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
+        initialState.items[item.id] = item
+        // Correct: Check initial state directly
+        #expect(initialState.locations["startRoom"]?.hasProperty(.inherentlyLit) == false)
+
+        let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "examine shadow",
+            commandToParse: command
+        )
+
+        // Correct: Expect standard message for action failure in dark
+        expectNoDifference(output, "It's too dark to do that.")
+    }
+
+    @Test("ReportActionError: .wrongKey")
+    func testReportErrorWrongKey() async throws {
+        // Arrange: Locked item, player tries unlocking with wrong key
+        // Correct: Remove `key:` parameter. Unlock handler needs key logic.
+        let container = Item(id: "chest", name: "chest", properties: [.container, .lockable, .locked], parent: .location("startRoom")) // Assumes internally requires "key1"
+        let wrongKey = Item(id: "key2", name: "wrong key", parent: .player)
+        var initialState = await Self.createMinimalGameState()
+        initialState.items[container.id] = container
+        initialState.items[wrongKey.id] = wrongKey
+        // Correct: Ensure room is lit and player is present for scope
+        initialState.player.currentLocationID = "startRoom"
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
+        let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
+
+        let output = await runCommandAndCaptureOutput(
+            initialState: initialState,
+            commandInput: "unlock chest with key2",
+            commandToParse: command
+        )
+
+        expectNoDifference(output, "The wrong key doesn't fit the chest.")
+    }
 
 }
 

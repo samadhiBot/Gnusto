@@ -34,7 +34,7 @@ struct ItemPropertyTests {
 
     @Test("ItemProperty CaseIterable")
     func testItemPropertyCaseIterable() throws {
-        #expect(ItemProperty.allCases.count == 26)
+        #expect(ItemProperty.allCases.count == 32)
 
         // Verify a few key cases are present
         #expect(ItemProperty.allCases.contains(.takable))

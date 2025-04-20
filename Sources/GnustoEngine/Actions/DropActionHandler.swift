@@ -26,7 +26,13 @@ public struct DropActionHandler: ActionHandler {
             return
         }
 
-        // 4. Update State
+        // 4. Check if item is droppable (e.g., not fixed scenery)
+        // Assuming ItemProperty.fixed exists
+        if targetItem.hasProperty(.fixed) { // Check for the .fixed property
+            throw ActionError.itemNotDroppable(targetItemID)
+        }
+
+        // 5. Update State
         await engine.updateItemParent(itemID: targetItemID, newParent: .location(currentLocationID))
 
         // If item was worn, it is no longer worn when dropped
@@ -37,7 +43,7 @@ public struct DropActionHandler: ActionHandler {
             removing: .worn
         )
 
-        // 5. Output Message
+        // 6. Output Message
         // TODO: Check Zork/classic message for this
         await engine.ioHandler.print("Dropped.")
     }

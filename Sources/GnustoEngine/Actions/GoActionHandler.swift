@@ -24,28 +24,32 @@ public struct GoActionHandler: ActionHandler {
         }
 
         // 4. Check Exit Conditions
-        if exit.isDoor {
-            if !exit.isOpen {
-                 // Maybe use exit.blockedMessage if available?
-                throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
-            }
-            if exit.isLocked {
-                throw ActionError.directionIsBlocked("The \(direction.rawValue) door seems to be locked.")
+
+        // Check for static blocked message first (highest priority override)
+        if let staticBlockedMessage = exit.blockedMessage {
+            throw ActionError.directionIsBlocked(staticBlockedMessage)
+        }
+
+        // Check required key
+        if let keyID = exit.requiredKey {
+            // Correct: Use an engine method to check inventory for concurrency safety
+            let playerHasKey = await engine.playerHasItem(itemID: keyID)
+            if !playerHasKey {
+                // TODO: Check Zork message for lacking a key for a passage
+                throw ActionError.directionIsBlocked("You lack the key required to pass.")
             }
         }
 
-        // TODO: Check requiredKey
-        // if let keyID = exit.requiredKey {
-        //     guard await engine.playerHasItem(keyID) else {
-        //         throw ActionError.directionIsBlocked(exit.blockedMessage ?? "You lack the required key.")
-        //     }
-        // }
-
-        // Use generic blocked message if provided and conditions not met otherwise
-        if let blockedMessage = exit.blockedMessage {
-            // TODO: Add more sophisticated condition checking here if needed
-            // For now, assume if message exists, it blocks unless handled above
-            throw ActionError.directionIsBlocked(blockedMessage)
+        // Check door status if applicable
+        if exit.isDoor {
+            if !exit.isOpen {
+                // Standard message for closed door
+                throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
+            }
+            if exit.isLocked {
+                // Standard message for locked door
+                throw ActionError.directionIsBlocked("The \(direction.rawValue) door seems to be locked.")
+            }
         }
 
         // --- Movement Successful ---

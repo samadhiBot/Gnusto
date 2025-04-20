@@ -20,6 +20,12 @@ public enum LocationProperty: String, Codable, CaseIterable, Sendable {
     /// Profanity is discouraged or disallowed here.
     case sacred
 
+    /// Room description has been changed (Zork 1 RMUNGBIT).
+    case rmung
+
+    /// Room is land, not water/air (Zork 1 RLANDBIT).
+    case rland
+
     /// The player has visited this location previously.
     case visited
 

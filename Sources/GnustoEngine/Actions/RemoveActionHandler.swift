@@ -29,6 +29,11 @@ public struct RemoveActionHandler: ActionHandler {
             return
         }
 
+        // Check if the item is fixed (e.g., cursed amulet)
+        if targetItem.hasProperty(.fixed) {
+            throw ActionError.itemNotRemovable(targetItemID)
+        }
+
         // 4. Update State - Remove .worn property (parent remains .player)
         // Mark as touched (implicitly happens when taken, should happen here too)
         await engine.updateItemProperties(
