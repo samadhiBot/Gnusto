@@ -61,7 +61,7 @@ public struct StandardParser: Parser {
                 let subSequence = significantTokens[i..<(i + length)]
                 let verbPhrase = subSequence.joined(separator: " ")
 
-                if let foundVerbID = vocabulary.verbs[verbPhrase] {
+                if let foundVerbID = vocabulary.verbSynonyms[verbPhrase] {
                     // Found a potential match
                     if length > longestMatchLength {
                         longestMatchLength = length
@@ -87,7 +87,7 @@ public struct StandardParser: Parser {
         }
 
         // 5b. Get Syntax Rules for the Verb
-        let rules = vocabulary.syntaxRules[verbID] ?? [] // Get rules or empty array
+        let rules = vocabulary.verbDefinitions[verbID]?.syntax ?? [] // Get rules or empty array
 
         if rules.isEmpty {
             // No explicit rules defined for this verb.
@@ -110,6 +110,7 @@ public struct StandardParser: Parser {
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
+                verbID: verbID,
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
@@ -170,38 +171,36 @@ public struct StandardParser: Parser {
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
+        verbID: VerbID,
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
-        let initialVerbWord = tokens[verbStartIndex]
-        guard let initialVerbID = vocabulary.verbs[initialVerbWord] else { return .failure(.internalError("Verb disappeared?")) } // Should be safe
-
         var tokenCursor = verbStartIndex + 1
+        let verbWordCount = vocabulary.verbDefinitions[verbID]?.id.rawValue.split(separator: " ").count ?? 1
+        tokenCursor = verbStartIndex + 1
+
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
         var matchedDirection: Direction? = nil
-        var matchedParticle: String? = nil // Added to store the matched particle
+        var matchedParticle: String? = nil
 
-        // Iterate through the expected pattern *after* the verb. Assumes pattern[0] is .verb
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
 
             guard tokenCursor < tokens.count else {
-                // Ran out of input tokens but pattern expected more
                 let remainingPattern = rule.pattern[patternIndex...]
                 let onlyObjectsRemain = remainingPattern.allSatisfy { $0 == .directObject || $0 == .indirectObject }
                 if onlyObjectsRemain {
-                     break // Okay to end early if only optional objects remain
+                     break
                 } else {
-                    // More specific error if we know what was expected
                     return .failure(.badGrammar("Command seems incomplete, expected more input like '\(tokenType)'."))
                 }
             }
 
             switch tokenType {
-            case .verb: continue // Should be pattern[0], skipped by loop start
+            case .verb: continue
 
             case .directObject:
                 let phraseEndIndex = findEndOfNounPhrase(
@@ -213,7 +212,7 @@ public struct StandardParser: Parser {
                 )
                 guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(initialVerbID.rawValue)', but found \(context)."))
+                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)', but found \(context)."))
                 }
                 directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -244,7 +243,7 @@ public struct StandardParser: Parser {
                  )
                  guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(initialVerbID.rawValue)', but found \(context)."))
+                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)', but found \(context)."))
                  }
                 indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -261,19 +260,17 @@ public struct StandardParser: Parser {
             case .particle(let expectedParticle):
                 let currentToken = tokens[tokenCursor]
                 guard currentToken == expectedParticle else {
-                    return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(initialVerbWord)' but found '\(currentToken)'."))
+                    return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(tokens[verbStartIndex])' but found '\(currentToken)'."))
                 }
                 matchedParticle = currentToken
-                tokenCursor += 1 // Consume the particle token
+                tokenCursor += 1
             }
         }
 
-        // After iterating through the pattern, check if any input tokens remain unconsumed.
         if tokenCursor < tokens.count {
             return .failure(.badGrammar("Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"))
         }
 
-        // --- Object Resolution ---
         let (doNounExtracted, doModsExtracted) = extractNounAndMods(from: directObjectPhraseTokens, vocabulary: vocabulary)
         let (ioNounExtracted, ioModsExtracted) = extractNounAndMods(from: indirectObjectPhraseTokens, vocabulary: vocabulary)
 
@@ -283,7 +280,6 @@ public struct StandardParser: Parser {
         let nounToResolveIO = ioNounExtracted ?? indirectObjectPhraseTokens.last
         let modsToUseIO = (ioNounExtracted != nil) ? ioModsExtracted : Array(indirectObjectPhraseTokens.dropLast())
 
-        // Resolve Direct Object
         let resolvedDirectObjectResult: Result<ItemID?, ParseError>
         if rule.pattern.contains(.directObject) {
              if let actualNoun = nounToResolveDO {
@@ -296,14 +292,12 @@ public struct StandardParser: Parser {
                      requiredConditions: rule.directObjectConditions
                  )
              } else {
-                 // Return the more user-friendly badGrammar error
-                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(initialVerbID.rawValue)'."))
+                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)'."))
              }
         } else {
              resolvedDirectObjectResult = .success(nil)
         }
 
-        // Resolve Indirect Object
         let resolvedIndirectObjectResult: Result<ItemID?, ParseError>
         if rule.pattern.contains(.indirectObject) {
             if let actualNoun = nounToResolveIO {
@@ -316,69 +310,55 @@ public struct StandardParser: Parser {
                     requiredConditions: rule.indirectObjectConditions
                 )
             } else {
-                // Return the more user-friendly badGrammar error
-                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(initialVerbID.rawValue)'."))
+                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)'."))
             }
         } else {
             resolvedIndirectObjectResult = .success(nil)
         }
 
-        // --- Determine Final Verb ID based on Particles ---
-        var finalVerbID = initialVerbID // Default to the initial verb
+        var finalVerbID = verbID
 
-        switch initialVerbID.rawValue {
+        switch verbID.rawValue {
         case "turn", "switch":
-            // These verbs REQUIRE a particle ("on" or "off")
             guard let particle = matchedParticle else {
-                // This *shouldn't* happen if rule matching worked, as all rules have particles.
-                // Indicates internal inconsistency or bad rule match.
-                return .failure(.internalError("Verb '\(initialVerbID.rawValue)' matched rule but particle missing."))
+                return .failure(.internalError("Verb '\(verbID.rawValue)' matched rule but particle missing."))
             }
             guard particle == "on" || particle == "off" else {
-                // Matched a particle, but it wasn't "on" or "off"
-                return .failure(.badGrammar("Expected 'on' or 'off' after '\(initialVerbID.rawValue)', not '\(particle)'."))
+                return .failure(.badGrammar("Expected 'on' or 'off' after '\(verbID.rawValue)', not '\(particle)'."))
             }
-            // Set the specific final ID based on the matched particle
             finalVerbID = (particle == "on") ? VerbID("turn_on") : VerbID("turn_off")
 
         case "blow":
-            // This verb REQUIRES the "out" particle
             guard let particle = matchedParticle else {
                 return .failure(.internalError("Verb 'blow' matched rule but particle missing."))
             }
             guard particle == "out" else {
                 return .failure(.badGrammar("Expected 'out' after 'blow', not '\(particle)'."))
             }
-            // Map "blow out" to "turn_off"
             finalVerbID = VerbID("turn_off")
 
         case "light":
-            // This verb maps directly and should NOT have a particle
             guard matchedParticle == nil else {
                 return .failure(.badGrammar("Verb 'light' doesn't take a particle like '\(matchedParticle!)'."))
             }
             finalVerbID = VerbID("turn_on")
 
         case "extinguish":
-            // This verb maps directly and should NOT have a particle
             guard matchedParticle == nil else {
                 return .failure(.badGrammar("Verb 'extinguish' doesn't take a particle like '\(matchedParticle!)'."))
             }
             finalVerbID = VerbID("turn_off")
 
         default:
-            // Any other verb. Ensure no unexpected particle was matched.
             guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb '\(initialVerbID.rawValue)' doesn't take a particle like '\(matchedParticle!)'."))
+                return .failure(.badGrammar("Verb '\(verbID.rawValue)' doesn't take a particle like '\(matchedParticle!)'."))
             }
-            // finalVerbID remains the initialVerbID
         }
 
-        // --- Build Command ---
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
         case (.success(let doID), .success(let ioID)):
             let command = Command(
-                verbID: finalVerbID, // Use the potentially modified verbID
+                verbID: finalVerbID,
                 directObject: doID,
                 directObjectModifiers: doModsExtracted,
                 indirectObject: ioID,
@@ -399,14 +379,11 @@ public struct StandardParser: Parser {
         from phrase: [String],
         vocabulary: Vocabulary
     ) -> (noun: String?, mods: [String]) {
-        // 1. Filter out noise words
         let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
         guard !significantPhrase.isEmpty else { return (nil, []) }
 
-        // 2. Identify known nouns and their indices
         var knownNounIndices: [Int] = []
         for (index, word) in significantPhrase.enumerated() {
-            // Check if word is known item noun OR a known pronoun
             let isItemNoun = vocabulary.items.keys.contains(word)
             let isPronoun = (vocabulary.pronouns.contains(word))
             if isItemNoun || isPronoun {
@@ -414,29 +391,22 @@ public struct StandardParser: Parser {
             }
         }
 
-        // 3. Determine the primary noun (assume last known noun)
         guard let lastNounIndex = knownNounIndices.last else {
-            // No known noun found. Maybe it's just modifiers? Or an unknown word?
-            // Return nil noun and filter the phrase for valid modifiers only.
             let potentialMods = significantPhrase.filter { word in
-                // A word is a potential modifier if it's NOT a known noun, verb, prep, or direction
                 !vocabulary.items.keys.contains(word) &&
-                !vocabulary.verbs.keys.contains(word) &&
+                !vocabulary.verbSynonyms.keys.contains(word) &&
                 !vocabulary.prepositions.contains(word) &&
                 !vocabulary.directions.keys.contains(word)
-                // Note: Pronouns are implicitly handled as they'd be caught by knownNounIndices check
             }
             return (nil, potentialMods)
         }
         let noun = significantPhrase[lastNounIndex]
 
-        // 4. Collect modifiers (words before the last noun that aren't other known words)
         var mods: [String] = []
         for index in 0..<lastNounIndex {
             let word = significantPhrase[index]
-            // Exclude other known nouns, verbs, prepositions, and directions from being modifiers
             let isKnownNoun = knownNounIndices.contains(index)
-            let isKnownVerb = vocabulary.verbs.keys.contains(word)
+            let isKnownVerb = vocabulary.verbSynonyms.keys.contains(word)
             let isKnownPrep = vocabulary.prepositions.contains(word)
             let isKnownDirection = vocabulary.directions.keys.contains(word)
 
@@ -459,12 +429,8 @@ public struct StandardParser: Parser {
         in gameState: GameState,
         using vocabulary: Vocabulary,
         requiredConditions: ObjectCondition
-    ) -> Result<ItemID?, ParseError> { // Added conditions
-
-        // --- Pronoun Handling (remains largely the same, but might check conditions?) ---
+    ) -> Result<ItemID?, ParseError> {
         if isPronoun {
-            // TODO: Should pronoun resolution also check conditions like .held, .inRoom?
-            // ZIL likely did this. For now, we check basic pronoun logic.
             guard modifiers.isEmpty else {
                 return .failure(.badGrammar("Pronouns like '\(noun)' usually cannot be modified."))
             }
@@ -474,7 +440,7 @@ public struct StandardParser: Parser {
             guard !referredIDs.isEmpty else {
                  return .failure(.pronounNotSet(pronoun: noun))
             }
-            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions) // Pass conditions
+            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
             let resolvedIDsInScope = referredIDs.filter { candidatesInScope.keys.contains($0) }
             if resolvedIDsInScope.isEmpty {
                 return .failure(.pronounRefersToOutOfScopeItem(pronoun: noun))
@@ -485,23 +451,17 @@ public struct StandardParser: Parser {
             }
         }
 
-        // --- Regular Noun Handling ---
         guard let potentialItemIDs = vocabulary.items[noun] else {
             return .failure(.unknownNoun(noun))
         }
 
-        // Gather candidates IN SCOPE and matching CONDITIONS
         let candidatesMatchingScopeAndConditions = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
         let relevantCandidateIDs = potentialItemIDs.filter { candidatesMatchingScopeAndConditions.keys.contains($0) }
 
         guard !relevantCandidateIDs.isEmpty else {
-             // No items for this noun match the required scope/conditions (e.g., need .held but it's on ground)
-             // This could be .itemNotInScope or a more specific error based on conditions.
-             // For now, stick with .itemNotInScope.
-            return .failure(.itemNotInScope(noun: noun))
+             return .failure(.itemNotInScope(noun: noun))
         }
 
-        // Filter by Modifiers
         if modifiers.isEmpty {
             if relevantCandidateIDs.count > 1 {
                 return .failure(.ambiguity("Which \(noun) do you mean?"))
@@ -509,7 +469,6 @@ public struct StandardParser: Parser {
                 return .success(relevantCandidateIDs.first!)
             }
         } else {
-            // Pass the relevant candidates (already scoped/conditioned) to filter by adjectives
             let matchingIDs = filterCandidates(ids: relevantCandidateIDs, modifiers: modifiers, candidates: candidatesMatchingScopeAndConditions)
 
             if matchingIDs.isEmpty {
@@ -526,52 +485,45 @@ public struct StandardParser: Parser {
     internal func gatherCandidates(
         in gameState: GameState,
         requiredConditions: ObjectCondition
-    ) -> [ItemID: Item] { // Added conditions
+    ) -> [ItemID: Item] {
         var candidates: [ItemID: Item] = [:]
         let currentLocationID = gameState.player.currentLocationID
         let allItems = gameState.items
 
-        // --- Filter Logic based on requiredConditions ---
         let mustBeHeld = requiredConditions.contains(.held)
-        let mustBeInRoom = requiredConditions.contains(.inRoom) // Explicitly in room (incl globals)
-        let mustBeOnGround = requiredConditions.contains(.onGround) // Only directly in room
+        let mustBeInRoom = requiredConditions.contains(.inRoom)
+        let mustBeOnGround = requiredConditions.contains(.onGround)
         let mustBePerson = requiredConditions.contains(.person)
         let mustBeContainer = requiredConditions.contains(.container)
-        // TODO: Handle .allowsMultiple? Maybe return Set instead?
 
         func checkItemConditions(_ item: Item) -> Bool {
             if mustBePerson && !item.hasProperty(.person) { return false }
             if mustBeContainer && !item.hasProperty(.container) { return false }
-            // ... add checks for other boolean conditions ...
             return true
         }
 
-        // Function to recursively gather items meeting base scope and conditions
         func gatherRecursive(parentEntity: ParentEntity, currentDepth: Int = 0, maxDepth: Int = 5) {
-            guard currentDepth <= maxDepth else { return } // Prevent infinite loops
+            guard currentDepth <= maxDepth else { return }
 
             for item in allItems.values where item.parent == parentEntity {
-                if checkItemConditions(item) { // Check basic property conditions first
-
-                    // Check scope conditions based on requirement
+                if checkItemConditions(item) {
                     var meetsScopeCondition = false
                     if mustBeHeld { meetsScopeCondition = (item.parent == .player) }
                     else if mustBeOnGround { meetsScopeCondition = (item.parent == .location(currentLocationID)) }
-                    else if mustBeInRoom { // In room OR global
+                    else if mustBeInRoom {
                         let isGlobal = gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false
                         meetsScopeCondition = (item.parent == .location(currentLocationID) || isGlobal)
                     }
-                    else { // No specific location condition, just needs to be reachable (basic scope)
-                         // This part re-implements the basic scope check from previous version
+                    else {
                          if item.parent == .player || item.parent == .location(currentLocationID) { meetsScopeCondition = true }
                          else if case .item(let containerID) = item.parent {
                              if let container = allItems[containerID],
                                 (container.parent == .player || container.parent == .location(currentLocationID)),
                                 (container.hasProperty(.container) && container.hasProperty(.open)) || container.hasProperty(.surface) {
-                                 meetsScopeCondition = true // Reachable inside/on accessible container/surface
+                                 meetsScopeCondition = true
                              }
                          } else if gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false {
-                              meetsScopeCondition = true // Global in room
+                              meetsScopeCondition = true
                          }
                     }
 
@@ -580,31 +532,25 @@ public struct StandardParser: Parser {
                     }
                 }
 
-                // Recurse into open containers/surfaces regardless of item meeting conditions,
-                // as children might meet conditions.
                 if (item.hasProperty(.container) && item.hasProperty(.open)) || item.hasProperty(.surface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }
             }
         }
 
-        // Start gathering from player inventory and current location
         gatherRecursive(parentEntity: .player)
         gatherRecursive(parentEntity: .location(currentLocationID))
 
-        // Explicitly add globals if condition is .inRoom or no condition
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
              if let location = gameState.locations[currentLocationID] {
                 for itemID in location.globals {
                     if let globalItem = allItems[itemID], checkItemConditions(globalItem) {
-                         // Check conditions again for the global item itself
-                        candidates[itemID] = globalItem
+                         candidates[itemID] = globalItem
                     }
                 }
             }
         }
 
-        // TODO: Consider light source / darkness
         return candidates
     }
 
@@ -615,14 +561,13 @@ public struct StandardParser: Parser {
         candidates: [ItemID: Item]
     ) -> Set<ItemID> {
         guard !modifiers.isEmpty else {
-            return ids // No modifiers to filter by
+            return ids
         }
 
         let lowercasedModifiers = Set(modifiers.map { $0.lowercased() })
 
         return ids.filter { itemID in
             guard let item = candidates[itemID] else { return false }
-            // Check if all provided modifiers are present in the item's adjectives
             return lowercasedModifiers.isSubset(of: Set(item.adjectives.map { $0.lowercased() }))
         }
     }
@@ -653,55 +598,46 @@ public struct StandardParser: Parser {
         patternIndex: Int,
         vocabulary: Vocabulary
     ) -> Int {
-        var boundaryIndex = startIndex // Use a separate index for the boundary
+        var boundaryIndex = startIndex
         let nextPatternIndex = patternIndex + 1
 
         while boundaryIndex < tokens.count {
             let currentToken = tokens[boundaryIndex]
 
-            // Check if the current token signals the start of the *next* non-object pattern element.
             if nextPatternIndex < pattern.count {
                 let nextExpectedType = pattern[nextPatternIndex]
                 var isBoundaryToken = false
 
                 switch nextExpectedType {
                 case .preposition:
-                    // Is the current token a preposition that marks the boundary?
                     if vocabulary.prepositions.contains(currentToken) {
                         isBoundaryToken = true
                     }
                 case .direction:
-                    // Is the current token a direction?
                     if vocabulary.directions.keys.contains(currentToken) {
                         isBoundaryToken = true
                     }
                 case .verb:
-                    // Is the current token a verb?
-                    if vocabulary.verbs.keys.contains(currentToken) {
+                    if vocabulary.verbSynonyms.keys.contains(currentToken) {
                         isBoundaryToken = true
                     }
                 case .particle(let expectedParticle):
-                    // Is the current token the specific particle expected?
                     if currentToken == expectedParticle {
                         isBoundaryToken = true
                     }
                 case .directObject, .indirectObject:
-                    // We don't automatically stop for subsequent objects.
                     break
                 }
 
                 if isBoundaryToken {
-                    // Found the boundary. The noun phrase ends *before* this token.
                     return boundaryIndex
                 }
             }
 
-            // Haven't found the boundary; this token is part of the noun phrase.
             boundaryIndex += 1
         }
 
-        // Reached the end of the input tokens.
-        return boundaryIndex // which is now tokens.count
+        return boundaryIndex
     }
 
     /// Determines if a ParseError is related to object resolution issues.

@@ -2,9 +2,8 @@
 public struct Vocabulary: Codable, Sendable {
     // MARK: - Properties
 
-    /// Maps known verbs (including synonyms) to their canonical VerbID.
-    /// Example: `["take": "take", "get": "take", "look": "look"]`
-    public var verbs: [String: VerbID]
+    /// Maps VerbIDs to their full definitions (including synonyms, syntax, requiresLight).
+    public var verbDefinitions: [VerbID: Verb]
 
     /// Maps known nouns (including synonyms) to the Set of ItemIDs they can refer to.
     /// Example: `["lantern": ["lantern", "lantern2"], "lamp": ["lantern", "lantern2"]]`
@@ -24,42 +23,50 @@ public struct Vocabulary: Codable, Sendable {
     /// Common pronouns handled by the parser.
     public var pronouns: Set<String>
 
-    /// Maps VerbIDs to the list of syntax rules they accept.
-    public var syntaxRules: [VerbID: [SyntaxRule]]
-
     /// Maps direction words (and abbreviations) to their canonical Direction.
     /// Example: `["north": .north, "n": .north, "up": .up]`
     public var directions: [String: Direction]
+
+    /// Computed property to get the verb synonym mapping needed by the parser.
+    public var verbSynonyms: [String: VerbID] {
+        var mapping: [String: VerbID] = [:]
+        for verb in verbDefinitions.values {
+            // Map the primary ID
+            mapping[verb.id.rawValue.lowercased()] = verb.id
+            // Map all synonyms
+            for synonym in verb.synonyms {
+                mapping[synonym.lowercased()] = verb.id
+            }
+        }
+        return mapping
+    }
 
     // MARK: - Initialization
 
     /// Initializes an empty vocabulary, using default noise words, prepositions, and pronouns.
     public init() {
-        self.verbs = [:]
+        self.verbDefinitions = [:] // Initialize new dictionary
         self.items = [:]
         self.adjectives = [:]
         self.noiseWords = Vocabulary.defaultNoiseWords
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
-        self.syntaxRules = [:]
         self.directions = [:]
     }
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
     public init(
-        verbs: [String: VerbID] = [:],
+        verbDefinitions: [VerbID: Verb] = [:], // Use verbDefinitions
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
-        syntaxRules: [VerbID: [SyntaxRule]] = [:],
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
         pronouns: Set<String> = Vocabulary.defaultPronouns
     ) {
-        self.verbs = verbs
+        self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
         self.adjectives = adjectives
-        self.syntaxRules = syntaxRules
         self.directions = directions
         self.noiseWords = noiseWords
         self.prepositions = prepositions
@@ -96,38 +103,45 @@ public struct Vocabulary: Codable, Sendable {
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject) // Added rule for look <item>
-            ]
+            ],
+            requiresLight: false // LOOK works in the dark (prints dark message)
         ),
         Verb(
             id: "examine",
             synonyms: ["x", "inspect"],
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true // EXAMINE requires light
         ), // Examine needs DO
         Verb(
             id: "inventory",
             synonyms: ["i"],
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false // Inventory check works in the dark
         ),
         Verb(
             id: "quit",
             synonyms: ["q"],
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false // Quitting works in the dark
         ),
         Verb(
             id: "score",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false // Checking score works in the dark
         ),
         Verb(
             id: "wait",
             synonyms: ["z"],
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false // Waiting works in the dark
         ),
 
         // Movement
         Verb(
             id: "go",
             synonyms: ["move", "walk", "run", "proceed"],
-            syntax: [SyntaxRule(.verb, .direction)]
+            syntax: [SyntaxRule(.verb, .direction)],
+            requiresLight: false // Movement attempt works in dark (might fail)
         ), // Default takes direction
         // Note: Single directions (N, S, E, W...) handled separately by StandardParser
 
@@ -249,43 +263,55 @@ public struct Vocabulary: Codable, Sendable {
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
-            ]
+            ],
+            requiresLight: false // Smelling works in the dark
         ), // Smell or Smell X
         Verb(
             id: "listen",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .particle("to"), .directObject) // listen to <item>
+            ],
+            requiresLight: false // Listening works in the dark
         ),
         Verb(
             id: "taste",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true // Tasting requires light (to see what you're tasting)
         ),
         Verb(
             id: "touch",
             synonyms: ["feel"],
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true // Touching likely requires seeing the item
         ),
 
         // Meta
         Verb(
             id: "help",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ),
         Verb(
             id: "save",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ),
         Verb(
             id: "restore",
             synonyms:["load"],
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ),
         Verb(
             id: "verbose",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ),
         Verb(
             id: "brief",
-            syntax: [SyntaxRule(.verb)]
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ), // Often used for description detail
 
         // Lock/Unlock Verbs
@@ -309,21 +335,13 @@ public struct Vocabulary: Codable, Sendable {
         ),
     ]
 
-    // MARK: - Building Vocabulary (Example Methods)
+    // MARK: - Building Vocabulary
 
-    /// Adds a verb, its synonyms, and its syntax rules to the vocabulary.
+    /// Adds a verb definition to the vocabulary.
     /// - Parameter verb: The `Verb` object to add.
     public mutating func add(verb: Verb) {
-        // Always map the verb's primary ID
-        self.verbs[verb.id.rawValue.lowercased()] = verb.id
-        // Map all synonyms
-        for synonym in verb.synonyms {
-            self.verbs[synonym.lowercased()] = verb.id
-        }
-        // Store syntax rules under the primary VerbID
-        if !verb.syntax.isEmpty {
-            self.syntaxRules[verb.id, default: []].append(contentsOf: verb.syntax)
-        }
+        // Store the full verb definition under its ID
+        self.verbDefinitions[verb.id] = verb
     }
 
     /// Adds an item, its synonyms, and its adjectives to the vocabulary.
@@ -358,7 +376,7 @@ public struct Vocabulary: Codable, Sendable {
         // Add default verbs first if requested
         if useDefaultVerbs {
             for verb in Vocabulary.defaultVerbs {
-                vocab.add(verb: verb)
+                vocab.add(verb: verb) // Uses the updated add(verb:)
             }
         }
 
@@ -368,7 +386,7 @@ public struct Vocabulary: Codable, Sendable {
         }
         // Add game-specific verbs (allowing overrides of defaults)
         for verb in verbs {
-            vocab.add(verb: verb)
+            vocab.add(verb: verb) // Uses the updated add(verb:)
         }
 
         // Add standard directions
@@ -403,6 +421,39 @@ public struct Vocabulary: Codable, Sendable {
         return pronouns.contains(word.lowercased())
     }
 
-    // Codable conformance
-    // Synthesized conformance should work if all properties are Codable.
+    // MARK: - Codable Conformance
+
+    enum CodingKeys: String, CodingKey {
+        case verbDefinitions // Updated key
+        case items
+        case adjectives
+        case noiseWords
+        case prepositions
+        case pronouns
+        case directions
+        // Removed verbs, syntaxRules
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        // Decode verbDefinitions or default to empty
+        verbDefinitions = try container.decodeIfPresent([VerbID: Verb].self, forKey: .verbDefinitions) ?? [:]
+        items = try container.decode([String: Set<ItemID>].self, forKey: .items)
+        adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
+        noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
+        prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
+        pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
+        directions = try container.decode([String: Direction].self, forKey: .directions)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(verbDefinitions, forKey: .verbDefinitions)
+        try container.encode(items, forKey: .items)
+        try container.encode(adjectives, forKey: .adjectives)
+        try container.encode(noiseWords, forKey: .noiseWords)
+        try container.encode(prepositions, forKey: .prepositions)
+        try container.encode(pronouns, forKey: .pronouns)
+        try container.encode(directions, forKey: .directions)
+    }
 }

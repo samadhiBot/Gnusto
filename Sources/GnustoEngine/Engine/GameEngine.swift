@@ -431,23 +431,44 @@ public class GameEngine {
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {
-            // No object handler took charge, run the default verb handler
-            guard let verbHandler = actionHandlers[command.verbID] else {
-                // No handler registered for this verb
-                await ioHandler.print("I don't understand how to '\(command.verbID.rawValue)'.")
+            // No object handler took charge, check for darkness before running default verb handler
+
+            let isLit = scopeResolver.isLocationLit(locationID: currentLocationID)
+
+            // Retrieve verb definition to check requiresLight property
+            // Note: Parser should ensure command.verbID exists in vocabulary
+            // Correct: Look up the Verb definition directly
+            guard let verb = gameState.vocabulary.verbDefinitions[command.verbID] else {
+                // This case should ideally not be reached if parser validates verbs
+                await ioHandler.print("Internal Error: Unknown verb ID '\(command.verbID)' reached execution.", style: .debug)
+                await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                 return
             }
 
-            // Execute the default handler
-            do {
-                try await verbHandler.perform(command: command, engine: self)
-            } catch let actionError as ActionError {
-                // Handle specific action failures
-                await report(actionError: actionError)
-            } catch {
-                // Handle unexpected errors during action execution
-                await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
-                await ioHandler.print("Sorry, something went wrong.")
+            // If the room is dark and the verb requires light, report the error and stop.
+            if !isLit && verb.requiresLight {
+                await report(actionError: .roomIsDark)
+                // Do not proceed to execute the handler
+            } else {
+                // Room is lit OR verb doesn't require light, proceed with default handler execution.
+                guard let verbHandler = actionHandlers[command.verbID] else {
+                    // No handler registered for this verb (should match vocabulary definition)
+                    await ioHandler.print("Internal Error: No ActionHandler registered for verb ID '\(command.verbID)'.", style: .debug)
+                    await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
+                    return
+                }
+
+                // Execute the default handler
+                do {
+                    try await verbHandler.perform(command: command, engine: self)
+                } catch let actionError as ActionError {
+                    // Handle specific action failures
+                    await report(actionError: actionError)
+                } catch {
+                    // Handle unexpected errors during action execution
+                    await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
+                    await ioHandler.print("Sorry, something went wrong.")
+                }
             }
         }
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).

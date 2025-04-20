@@ -130,6 +130,8 @@ struct GameEngineTests {
         // Make pebble non-takable in this test's state
         initialState.items["startItem"]?.properties.remove(.takable)
         #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
+        // Ensure room is lit for this test
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Command for "take pebble"
         let takeCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
@@ -193,6 +195,8 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
+        // Ensure room is lit
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
 
@@ -245,6 +249,8 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
+        // Ensure room is lit
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
         // Let's use the pebble from the minimal state
@@ -427,6 +433,8 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let mockIOHandler = await MockIOHandler()
         let registry = Self.createMinimalRegistry() // Create registry
+        // Ensure room is lit
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Ensure pebble is initially takable and in the room
         #expect(initialState.items["startItem"]?.hasProperty(.takable) == true)
@@ -706,71 +714,23 @@ struct GameEngineTests {
     // TODO: Test removeFuse
     // TODO: Test unregisterDaemon
     // TODO: Test fuse/daemon actions triggering quit
-}
 
-// MARK: - Error Reporting Tests
-
-extension GameEngineTests {
-    /// Helper to run the engine for one command and capture output.
-    private func runCommandAndCaptureOutput(
-        initialState: GameState,
-        commandInput: String,
-        commandToParse: Command
-    ) async -> String {
-        var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Use minimal registry for these
-
-        mockParser.parseHandler = { input, _, _ in
-            if input == commandInput { return .success(commandToParse) }
-            if input == "quit" { return .failure(.emptyInput) } // Allow quit
-            return .failure(.unknownVerb(input))
-        }
-
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry
-            // Use default handlers registered by engine.run()
-        )
-
-        await mockIOHandler.enqueueInput(commandInput, "quit")
-        await engine.run()
-
-        // Filter output to get only the error message (ignore room desc, prompt, etc.)
-        let outputCalls = await mockIOHandler.recordedOutput
-        // Find the first non-prompt, non-status line after the command prompt
-        var commandOutput = ""
-        var foundPrompt = false
-        for call in outputCalls {
-            if call.style == .input && call.text == "> " {
-                foundPrompt = true
-                continue // Skip the prompt itself
-            }
-            if foundPrompt && call.style != .statusLine {
-                commandOutput = call.text // Assuming error is the next output
-                break
-            }
-        }
-        return commandOutput
-    }
+    // MARK: - Helper Functions & Error Tests
 
     @Test("ReportActionError: .invalidDirection")
     func testReportErrorInvalidDirection() async throws {
         let initialState = await Self.createMinimalGameState()
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(
             verbID: "go",
             preposition: "xyzzy",
             rawInput: "go xyzzy"
-        ) // Invalid direction
-
+        )
         let output = await runCommandAndCaptureOutput(
             initialState: initialState,
             commandInput: "go xyzzy",
             commandToParse: command
         )
-
         expectNoDifference(output, """
             A strange buzzing sound indicates something is wrong.
               • Go command processed without a direction.
@@ -779,38 +739,30 @@ extension GameEngineTests {
 
     @Test("ReportActionError: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
-        let initialState = await Self.createMinimalGameState()
-        // Ensure item exists but is NOT takable
+        var initialState = await Self.createMinimalGameState()
         initialState.items["startItem"]?.properties.remove(.takable)
         #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
-
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
-
         let output = await runCommandAndCaptureOutput(
             initialState: initialState,
             commandInput: "take pebble",
             commandToParse: command
         )
-
         expectNoDifference(output, "You can't take the pebble.")
     }
 
     @Test("ReportActionError: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
-        let initialState = await Self.createMinimalGameState()
-        // Ensure pebble is in the room, not held
+        var initialState = await Self.createMinimalGameState()
         #expect(initialState.items["startItem"]?.parent == .location("startRoom"))
-
-        // Correct: Use `wear` to trigger generic .itemNotHeld
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
-
         let output = await runCommandAndCaptureOutput(
             initialState: initialState,
-            // Correct: Match command input
             commandInput: "wear pebble",
             commandToParse: command
         )
-
         expectNoDifference(output, "You aren't holding the pebble.")
     }
 
@@ -1120,23 +1072,17 @@ extension GameEngineTests {
 
     @Test("ReportActionError: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
-        // Arrange: Player in a dark room, tries to examine something
         var initialState = await Self.createMinimalGameState()
-        initialState.locations["startRoom"]?.properties.remove(.inherentlyLit) // Make it dark
+        initialState.locations["startRoom"]?.properties.remove(.inherentlyLit)
         let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
         initialState.items[item.id] = item
-        // Correct: Check initial state directly
         #expect(initialState.locations["startRoom"]?.hasProperty(.inherentlyLit) == false)
-
         let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
-
         let output = await runCommandAndCaptureOutput(
             initialState: initialState,
             commandInput: "examine shadow",
             commandToParse: command
         )
-
-        // Correct: Expect standard message for action failure in dark
         expectNoDifference(output, "It's too dark to do that.")
     }
 
@@ -1164,9 +1110,16 @@ extension GameEngineTests {
         expectNoDifference(output, "The wrong key doesn't fit the chest.")
     }
 
-}
+    @Test("ReportActionError: .containerIsFull")
+    func testReportErrorContainerIsFull() async throws {
+        // ... implementation ...
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        // ... run command ...
+    }
 
-// Helper extension for OutputCall checks (optional) - Moved outside struct
+} // End of extension GameEngineTests
+
+// Helper extension for OutputCall checks (optional)
 extension [MockIOHandler.OutputCall] {
     func contains(text: String, style: TextStyle? = nil, newline: Bool? = nil) -> Bool {
         self.contains { call in
@@ -1175,5 +1128,47 @@ extension [MockIOHandler.OutputCall] {
             if let newline = newline { match = match && call.newline == newline }
             return match
         }
+    }
+}
+
+// MARK: - Helper Functions
+
+extension GameEngineTests {
+    /// Helper to run the engine for one command and capture output.
+    private func runCommandAndCaptureOutput(
+        initialState: GameState,
+        commandInput: String,
+        commandToParse: Command
+    ) async -> String {
+        var mockParser = MockParser()
+        let mockIOHandler = await MockIOHandler()
+        let registry = Self.createMinimalRegistry()
+        mockParser.parseHandler = { input, _, _ in
+            if input == commandInput { return .success(commandToParse) }
+            if input == "quit" { return .failure(.emptyInput) }
+            return .failure(.unknownVerb(input))
+        }
+        let engine = GameEngine(
+            initialState: initialState,
+            parser: mockParser,
+            ioHandler: mockIOHandler,
+            registry: registry
+        )
+        await mockIOHandler.enqueueInput(commandInput, "quit")
+        await engine.run()
+        let outputCalls = await mockIOHandler.recordedOutput
+        var commandOutput = ""
+        var foundPrompt = false
+        for call in outputCalls {
+            if call.style == .input && call.text == "> " {
+                foundPrompt = true
+                continue
+            }
+            if foundPrompt && call.style != .statusLine {
+                commandOutput = call.text
+                break
+            }
+        }
+        return commandOutput
     }
 }
