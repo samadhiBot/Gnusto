@@ -109,6 +109,8 @@ public class GameEngine {
             // Common Interactions
             VerbID("take"): TakeActionHandler(), // Use the real handler
             VerbID("drop"): DropActionHandler(), // Use the real handler
+            VerbID("put"): PutActionHandler(),    // <--- Add Put Handler
+            VerbID("hang"): PutActionHandler(),   // <--- Alias Hang to Put
             VerbID("open"): OpenActionHandler(), // Use the real handler
             VerbID("close"): CloseActionHandler(), // Use the real handler
             VerbID("read"): ReadActionHandler(), // Use the real handler
@@ -546,42 +548,78 @@ public class GameEngine {
         await ioHandler.print(message)
     }
 
-    /// Reports an action execution error to the player.
+    /// Reports user-friendly messages for action failures to the player.
     private func report(actionError: ActionError) async {
-        // Provide user-friendly messages for action failures
-        // TODO: Implement messages for all ActionError cases
-        let message: String
-        switch actionError {
-        case .invalidDirection:
-            message = "You can't go that way."
+        let message = switch actionError {
+        case .containerIsClosed(let item):
+            "\(theThat(item).capitalizedFirst) is closed."
+        case .containerIsFull(let item):
+            ""
+        case .containerIsOpen(let item):
+            ""
         case .directionIsBlocked(let reason):
-            message = reason ?? "Something is blocking the way."
-        case .itemNotTakable:
-            message = "You can't take that."
-        case .containerIsClosed:
-            message = "That is closed."
-        case .itemIsLocked:
-            message = "That is locked."
+            reason ?? "Something is blocking the way."
+        case .internalEngineError(let item):
+            ""
+        case .invalidDirection:
+            "You can't go that way."
+        case .itemAlreadyClosed(let item):
+            ""
+        case .itemAlreadyOpen(let item):
+            ""
+        case .itemIsLocked(let item):
+            "That is locked."
+        case .itemIsUnlocked(let item):
+            ""
+        case .itemNotAccessible(let item):
+            ""
+        case .itemNotCloseable(let item):
+            "You can't close \(theThat(item))."
+        case .itemNotDroppable(let item):
+            ""
+        case .itemNotEdible(let item):
+            ""
+        case .itemNotHeld(let item):
+            "You aren't holding \(theThat(item))."
+        case .itemNotInContainer(item: let item, container: let container):
+            ""
+        case .itemNotLockable(let item):
+            ""
+        case .itemNotOnSurface(item: let item, surface: let surface):
+            ""
+        case .itemNotOpenable(let item):
+            "You can't open \(theThat(item))."
+        case .itemNotReadable(let item):
+            ""
+        case .itemNotRemovable(let item):
+            ""
+        case .itemNotTakable(let item):
+            "You can't take \(theThat(item))."
+        case .itemNotUnlockable(let item):
+            ""
+        case .itemNotWearable(let item):
+            "You can't wear \(theThat(item))."
         case .playerCannotCarryMore:
-            message = "Your hands are full."
-        case .itemNotHeld(let itemID):
-            // Use safe snapshot accessor for item name
-            let itemName = itemSnapshot(with: itemID)?.name ?? "that item"
-            message = "You aren't holding \(itemName)."
-        case .itemNotWearable(let itemID):
-            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
-            message = "You can't wear \(itemName)."
-        case .itemNotOpenable(let itemID):
-            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
-            message = "You can't open the \(itemName)."
-        case .itemNotCloseable(let itemID):
-            let itemName = itemSnapshot(with: itemID)?.name ?? "that"
-            message = "You can't close the \(itemName)."
-        // Add more cases here...
-        default:
-            message = "You can't do that right now."
+            "Your hands are full."
+        case .prerequisiteNotMet(let item):
+            ""
+        case .roomIsDark:
+            ""
+        case .targetIsNotAContainer(let item):
+            ""
+        case .targetIsNotASurface(let item):
+            ""
+        case .wrongKey(keyID: let keyID, lockID: let lockID):
+            ""
         }
         await ioHandler.print(message)
+    }
+    
+    /// <#Description#>
+    /// - Parameter itemID: <#itemID description#>
+    /// - Returns: <#description#>
+    private func theThat(_ itemID: ItemID) -> String {
+        itemSnapshot(with: itemID)?.theName ?? "that"
     }
 
     // MARK: - State Access Helpers (Public but @MainActor isolated)
@@ -663,6 +701,7 @@ public class GameEngine {
         }
         location.properties.formUnion(adding)
         location.properties.subtract(removing)
+        // Reassign the modified location object back to the dictionary
         gameState.locations[id] = location
     }
 
@@ -853,6 +892,11 @@ public class GameEngine {
         }
         gameState.player.currentLocationID = locationID
 
+        // --- Call the general onEnterRoom hook ---
+        await onEnterRoom?(self, locationID)
+        // Check if hook quit the game
+        if shouldQuit { return }
+
         // --- Call RoomActionHandler: On Enter Room ---
         if let roomHandler = registry.roomActionHandler(for: locationID) {
             do {
@@ -882,15 +926,9 @@ public class GameEngine {
     ///   - newline: Whether to append a newline (defaults to true).
     public func output(
         _ text: String,
-        style: TextStyle,
+        style: TextStyle = .normal,
         newline: Bool = true
     ) async {
         await ioHandler.print(text, style: style, newline: newline)
-    }
-
-    /// Convenience method to print text with the normal style.
-    /// - Parameter text: The text to display.
-    public func output(_ text: String) async {
-        await ioHandler.print(text, style: .normal, newline: true)
     }
 }

@@ -47,6 +47,11 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
     }
+    
+    /// Returns `the {name}` for the item.
+    public var theName: String {
+        "the \(name)"
+    }
 
     // --- Matching Logic ---
 

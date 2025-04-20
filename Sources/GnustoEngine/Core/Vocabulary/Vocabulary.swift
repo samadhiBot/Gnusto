@@ -139,7 +139,7 @@ public struct Vocabulary: Codable, Sendable {
         ),
         Verb(
             id: "put",
-            synonyms: ["place"],
+            synonyms: ["place", "hang"],
             // Corrected: Only place is a reasonable synonym
             syntax: [
                 // Define rules for PUT/PLACE: V+DO+PREP+IO
