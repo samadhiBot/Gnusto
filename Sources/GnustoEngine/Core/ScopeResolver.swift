@@ -34,7 +34,12 @@ public struct ScopeResolver: Sendable {
             return true
         }
 
-        // 2. Check if the player is carrying an active light source.
+        // 2. Check if the location has the dynamic .isLit flag set (e.g., by hooks).
+        if location.hasProperty(.isLit) {
+            return true
+        }
+
+        // 3. Check if the player is carrying an active light source.
         let playerInventory = gameState.items.values.filter { $0.parent == .player }
         let playerHasActiveLight = playerInventory.contains { item in
             item.hasProperty(.lightSource) && item.hasProperty(.on)
@@ -43,7 +48,7 @@ public struct ScopeResolver: Sendable {
             return true
         }
 
-        // 3. Check if there is an active light source directly in the location.
+        // 4. Check if there is an active light source directly in the location.
         let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
         let locationHasActiveLight = itemsInLocation.contains { item in
             item.hasProperty(.lightSource) && item.hasProperty(.on)
@@ -52,7 +57,7 @@ public struct ScopeResolver: Sendable {
             return true
         }
 
-        // 4. Otherwise, the location is dark.
+        // 5. Otherwise, the location is dark.
         return false
     }
 

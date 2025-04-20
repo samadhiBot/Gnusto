@@ -36,7 +36,8 @@ struct CloakOfDarkness {
                 """,
             exits: [
                 .east: Exit(destination: "foyer"),
-            ]
+            ],
+            properties: .inherentlyLit
         )
 
         let bar = Location(
@@ -96,6 +97,11 @@ struct CloakOfDarkness {
 
         // Define Object-Specific Action Handlers
         let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+            "cloak": { engine, command in
+                guard command.verbID == "examine" else { return false }
+                await engine.output("The cloak is unnaturally dark.")
+                return true
+            },
             "message": { engine, command in
                 // Ensure we are examining the message in the bar
                 guard
@@ -128,9 +134,21 @@ struct CloakOfDarkness {
             // Only apply in the bar
             guard locationID == "bar" else { return }
 
-            // Check if the bar is currently dark using the correct property and check method
-            let isLit = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
-            guard !isLit else { return } // Only apply if dark
+            // --- Dynamic Light Check for Bar ---
+            // Check cloak status *every* turn while in the bar
+            let cloakIsWorn = await engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
+            if cloakIsWorn {
+                // Ensure bar is dark if cloak is worn
+                await engine.updateLocationProperties(id: "bar", removing: .isLit)
+            } else {
+                // Ensure bar is lit if cloak is not worn
+                await engine.updateLocationProperties(id: "bar", adding: .isLit)
+            }
+            // -------------------------------------
+
+            // Now, check if the bar is *currently* dark for the groping message
+            let isLit = await engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
+            guard !isLit else { return } // Only apply groping check if still dark
 
             // Check if the command is one that disturbs things in the dark
             // ZIL logic: Increment if NOT LOOK, THINK-ABOUT, or WALK NORTH
