@@ -1,5 +1,6 @@
 import Foundation
 import GnustoEngine
+import CloakOfDarknessGameData
 
 /// Main entry point for the Cloak of Darkness replica.
 struct CloakOfDarkness {
@@ -7,125 +8,17 @@ struct CloakOfDarkness {
     static func main() async {
         print("Initializing Cloak of Darkness...\n")
 
-        // Player
-        let initialPlayer = Player(currentLocationID: "foyer")
-
-        // All Items and Locations
-        let allItems = [hook, cloak, message]
-        let allLocations = [foyer, cloakroom, bar]
-
-        // Vocabulary
-        let vocabulary = Vocabulary.build(items: allItems)
-
-        // Game State
-        let gameState = GameState.initial(
-            initialLocations: allLocations,
-            initialItems: allItems,
-            initialPlayer: initialPlayer,
-            vocabulary: vocabulary
-        )
-
-        // Parser
-        let parser = StandardParser()
-
-        // Define Object-Specific Action Handlers
-        let objectActionHandlers: [ItemID: ObjectActionHandler] = [
-            "cloak": { engine, command in
-                guard command.verbID == "examine" else { return false }
-                await engine.output("The cloak is unnaturally dark.")
-                return true
-            },
-            "message": { engine, command in
-                // Ensure we are examining the message in the bar
-                guard
-                    command.verbID == "examine",
-                    engine.playerLocationID() == "bar"
-                else { return false } // Not the right action/location
-
-                // Retrieve the disturbed counter from game-specific state
-                // ZIL DISTURBED global: 0=safe, 1=safe(warning given), 2+=lose
-                let disturbedCount = engine.getGameSpecificStateValue(key: "disturbedCounter")?.value as? Int ?? 0
-
-                await engine.output("The message simply reads: \"You ", newline: false)
-
-                if disturbedCount > 1 {
-                    await engine.output("lose.\"", style: .normal, newline: false)
-                    engine.quitGame()
-                } else {
-                    await engine.output("win.\"", style: .normal, newline: false)
-                    engine.quitGame()
-                }
-                // finishGame signals the engine loop should stop, but we still handled the action.
-                return true
-            }
-        ]
-
-        // --- Hooks ---
-        // Define beforeTurn hook to handle disturbing things in the dark
-        let beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)? = { engine, command in
-            let locationID = engine.playerLocationID()
-            // Only apply in the bar
-            guard locationID == "bar" else { return }
-
-            // --- Dynamic Light Check for Bar ---
-            // Check cloak status *every* turn while in the bar
-            let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
-            if cloakIsWorn {
-                // Ensure bar is dark if cloak is worn
-                engine.updateLocationProperties(id: "bar", removing: .isLit)
-            } else {
-                // Ensure bar is lit if cloak is not worn
-                engine.updateLocationProperties(id: "bar", adding: .isLit)
-            }
-            // -------------------------------------
-
-            // Now, check if the bar is *currently* dark for the groping message
-            let isLit = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
-            guard !isLit else { return } // Only apply groping check if still dark
-
-            // Check if the command is one that disturbs things in the dark
-            // ZIL logic: Increment if NOT LOOK, THINK-ABOUT, or WALK NORTH
-            let verb = command.verbID
-            let isSafeVerb = verb == "look" || verb == "think-about"
-            // Special check for WALK NORTH (leaving the bar)
-            let isLeavingNorth = verb == "go" && command.preposition == "north" // Direct comparison
-                                                                                  // Or adjust based on how GO handler sets Command fields
-
-            if !isSafeVerb && !isLeavingNorth {
-                await engine.output("You grope around clumsily in the dark. Better be careful.", style: .normal)
-                // Increment the counter
-                engine.incrementGameSpecificStateCounter(key: "disturbedCounter")
-            }
-        }
-
-        // Define onEnterRoom hook to handle lighting in the bar
-        let onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = { engine, enteredLocationID in
-            // Only apply when entering the bar
-            guard enteredLocationID == "bar" else { return }
-
-            // Check if cloak is worn
-            let cloakSnapshot = engine.itemSnapshot(with: "cloak")
-            let cloakIsWorn = cloakSnapshot?.hasProperty(.worn) ?? false
-
-            // Update bar's light status
-            if cloakIsWorn {
-                // Cloak worn: Make bar dark by removing .isLit
-                engine.updateLocationProperties(id: "bar", removing: .isLit)
-            } else {
-                // Cloak not worn: Make bar lit by adding .isLit
-                engine.updateLocationProperties(id: "bar", adding: .isLit)
-            }
-        }
+        // --- Setup using the shared game data library ---
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
 
         // --- Engine Setup ---
+        let parser = StandardParser()
         let ioHandler = await ConsoleIOHandler()
         let engine = GameEngine(
-            initialState: gameState,
+            initialState: initialState,
             parser: parser,
             ioHandler: ioHandler,
-            registry: GameDefinitionRegistry(
-                objectActionHandlers: objectActionHandlers
-            ),
+            registry: registry,
             onEnterRoom: onEnterRoom,
             beforeTurn: beforeTurn
         )
