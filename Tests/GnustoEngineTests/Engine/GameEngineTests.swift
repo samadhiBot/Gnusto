@@ -739,7 +739,7 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
-        var initialState = await Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         initialState.items["startItem"]?.properties.remove(.takable)
         #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
         initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
@@ -754,7 +754,7 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
-        var initialState = await Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         #expect(initialState.items["startItem"]?.parent == .location("startRoom"))
         initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
@@ -825,6 +825,7 @@ struct GameEngineTests {
         let item = Item(id: "rock", name: "rock", properties: [.takable], parent: .player)
         var initialState = await Self.createMinimalGameState()
         initialState.items[item.id] = item
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
 
@@ -916,7 +917,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .directionIsBlocked")
     func testReportErrorDirectionIsBlocked() async throws {
         // Arrange: Exit blocked by a condition
-        var initialState = await Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         // Correct: Use `conditions` array
         let blockedExit = Exit(
             destination: "nowhere",
@@ -1015,6 +1016,7 @@ struct GameEngineTests {
         let item = Item(id: "statue", name: "statue", properties: [.fixed], parent: .player)
         var initialState = await Self.createMinimalGameState()
         initialState.items[item.id] = item
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
 
@@ -1034,6 +1036,7 @@ struct GameEngineTests {
         let item = Item(id: "amulet", name: "cursed amulet", properties: [.wearable, .worn, .fixed], parent: .player)
         var initialState = await Self.createMinimalGameState()
         initialState.items[item.id] = item
+        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
 
@@ -1049,7 +1052,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .prerequisiteNotMet")
     func testReportErrorPrerequisiteNotMet() async throws {
         // Arrange: Exit condition provides a specific prerequisite message
-        var initialState = await Self.createMinimalGameState()
+        let initialState = await Self.createMinimalGameState()
         // Correct: Use `conditions` array
         let conditionalExit = Exit(
             destination: "nirvana",
@@ -1113,7 +1116,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .containerIsFull")
     func testReportErrorContainerIsFull() async throws {
         // ... implementation ...
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+//        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
         // ... run command ...
     }
 

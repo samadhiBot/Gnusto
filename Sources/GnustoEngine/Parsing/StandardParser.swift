@@ -177,9 +177,6 @@ public struct StandardParser: Parser {
         originalInput: String
     ) -> Result<Command, ParseError> {
         var tokenCursor = verbStartIndex + 1
-        let verbWordCount = vocabulary.verbDefinitions[verbID]?.id.rawValue.split(separator: " ").count ?? 1
-        tokenCursor = verbStartIndex + 1
-
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil

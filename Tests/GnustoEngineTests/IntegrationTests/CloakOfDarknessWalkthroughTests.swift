@@ -128,13 +128,10 @@ struct CloakOfDarknessWalkthroughTests {
             > s
             It is pitch black. You are likely to be eaten by a grue.
             > look
-            It is pitch black. You are likely to be eaten by a grue.
+            It's too dark to do that.
             > x message
 
             *** You have won ***
-            >
-
-            Goodbye!
             """
         )
     }
