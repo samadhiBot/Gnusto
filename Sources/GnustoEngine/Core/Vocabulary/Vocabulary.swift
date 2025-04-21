@@ -212,7 +212,8 @@ public struct Vocabulary: Codable, Sendable {
             id: "remove",
             synonyms: ["take off", "doff"],
             // Added "doff"
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: false // ADDED: Removing items works in the dark
         ), // For worn items
         // Light/Device Verbs (Note: Synonyms handle mapping multiple words to the same VerbID)
         Verb(
@@ -284,6 +285,14 @@ public struct Vocabulary: Codable, Sendable {
             synonyms: ["feel"],
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: true // Touching likely requires seeing the item
+        ),
+
+        // Think About (from Cloak of Darkness)
+        Verb(
+            id: "think-about", // Use hyphenated ID for consistency
+            synonyms: ["contemplate", "think about"], // Add synonym from CoD and the multi-word phrase itself
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: false // Thinking works in the dark
         ),
 
         // Meta

@@ -132,6 +132,9 @@ public class GameEngine {
             VerbID("taste"): TasteActionHandler(),
             VerbID("touch"): PlaceholderActionHandler(verb: "touch"), // Placeholder
 
+            // Added based on Cloak of Darkness
+            VerbID("think-about"): ThinkAboutActionHandler(),
+
             // Meta
             VerbID("help"): PlaceholderActionHandler(verb: "help"), // Placeholder
             VerbID("save"): PlaceholderActionHandler(verb: "save"), // Placeholder
