@@ -96,55 +96,42 @@ public class GameEngine {
     /// Registers the default action handlers for common verbs.
     /// Called from run() after initialization.
     private func registerDefaultHandlers() {
-        // Define default handlers corresponding to Vocabulary.defaultVerbs
-        // Use VerbID("verbName") for clarity
         let defaultHandlers: [VerbID: ActionHandler] = [
-            // Core
-            VerbID("look"): LookActionHandler(),
-            VerbID("examine"): LookActionHandler(), // Handles both LOOK and EXAMINE X
-            VerbID("inventory"): InventoryActionHandler(), // Need to create this
-            VerbID("quit"): QuitActionHandler(),
-            VerbID("score"): ScoreActionHandler(),
-            VerbID("wait"): WaitActionHandler(),
-
-            // Movement
-            VerbID("go"): GoActionHandler(),
-
-            // Common Interactions
-            VerbID("take"): TakeActionHandler(), // Use the real handler
-            VerbID("drop"): DropActionHandler(), // Use the real handler
-            VerbID("put"): PutActionHandler(),    // <--- Add Put Handler
-            VerbID("hang"): PutActionHandler(),   // <--- Alias Hang to Put
-            VerbID("open"): OpenActionHandler(), // Use the real handler
-            VerbID("close"): CloseActionHandler(), // Use the real handler
-            VerbID("read"): ReadActionHandler(), // Use the real handler
-            VerbID("wear"): WearActionHandler(), // Use the real handler
-            VerbID("remove"): RemoveActionHandler(), // Use the real handler
-            // Removed incorrect direct mappings for turn/switch
-            // Register specific turn_on/turn_off IDs
-            VerbID("turn_on"): TurnOnActionHandler(),
-            VerbID("light"): TurnOnActionHandler(), // Direct mapping for LIGHT verb
-            VerbID("turn_off"): TurnOffActionHandler(),
-            VerbID("extinguish"): TurnOffActionHandler(), // Direct mapping for EXTINGUISH verb
-            VerbID("blow out"): TurnOffActionHandler(), // Direct mapping for BLOW OUT verb
-            VerbID("lock"): LockActionHandler(),          // Added lock handler
-            VerbID("unlock"): UnlockActionHandler(),      // Added unlock handler
-
-            // Sensory
-            VerbID("smell"): SmellActionHandler(),
-            VerbID("listen"): ListenActionHandler(),
-            VerbID("taste"): TasteActionHandler(),
-            VerbID("touch"): PlaceholderActionHandler(verb: "touch"), // Placeholder
-
-            // Added based on Cloak of Darkness
-            VerbID("think-about"): ThinkAboutActionHandler(),
+            "blow out": TurnOffActionHandler(),
+            "close": CloseActionHandler(),
+            "drop": DropActionHandler(),
+            "examine": LookActionHandler(),
+            "extinguish": TurnOffActionHandler(),
+            "go": GoActionHandler(),
+            "hang": PutActionHandler(),
+            "light": TurnOnActionHandler(),
+            "listen": ListenActionHandler(),
+            "lock": LockActionHandler(),
+            "look": LookActionHandler(),
+            "open": OpenActionHandler(),
+            "put": PutActionHandler(),
+            "read": ReadActionHandler(),
+            "remove": RemoveActionHandler(),
+            "smell": SmellActionHandler(),
+            "take": TakeActionHandler(),
+            "taste": TasteActionHandler(),
+            "think-about": ThinkAboutActionHandler(),
+            "touch": PlaceholderActionHandler(verb: "touch"),
+            "turn_off": TurnOffActionHandler(),
+            "turn_on": TurnOnActionHandler(),
+            "unlock": UnlockActionHandler(),
+            "wait": WaitActionHandler(),
+            "wear": WearActionHandler(),
 
             // Meta
-            VerbID("help"): PlaceholderActionHandler(verb: "help"), // Placeholder
-            VerbID("save"): PlaceholderActionHandler(verb: "save"), // Placeholder
-            VerbID("restore"): PlaceholderActionHandler(verb: "restore"), // Placeholder
-            VerbID("verbose"): PlaceholderActionHandler(verb: "verbose"), // Placeholder
-            VerbID("brief"): PlaceholderActionHandler(verb: "brief"), // Placeholder
+            "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
+            "help": PlaceholderActionHandler(verb: "help"), // Placeholder
+            "inventory": InventoryActionHandler(), // Need to create this
+            "quit": QuitActionHandler(),
+            "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
+            "save": PlaceholderActionHandler(verb: "save"), // Placeholder
+            "score": ScoreActionHandler(),
+            "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
         ]
 
         // Merge defaults, keeping custom handlers provided during init if they exist
