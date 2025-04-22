@@ -36,14 +36,18 @@ public class GameEngine {
     // MARK: - Custom Game Hooks (Closures)
 
     /// Custom logic called after the player successfully enters a new location.
-    /// The closure receives the engine and the ID of the location entered.
-    /// It can modify the game state (e.g., change location properties based on player state).
-    public var onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?
+    ///
+    /// The closure receives the engine and the ID of the location entered. It can modify the
+    /// game state (e.g., change location properties based on player state). The closure returns
+    /// `true` if the hook handled the situation, and no further action is required.
+    public var onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)?
 
     /// Custom logic called at the very start of each turn, before command processing.
-    /// The closure receives the engine and the command.
-    /// It can modify game state or print messages based on the current state.
-    public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)?
+    ///
+    /// The closure receives the engine and the command. It can modify game state or print messages
+    /// based on the current state. The closure returns `true` if the hook handled the command,
+    /// and no further action is required.
+    public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
@@ -62,8 +66,8 @@ public class GameEngine {
         ioHandler: IOHandler,
         registry: GameDefinitionRegistry = GameDefinitionRegistry(),
         customHandlers: [VerbID: ActionHandler] = [:],
-        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = nil,
-        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)? = nil
+        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)? = nil,
+        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)? = nil
     ) {
         self.gameState = initialState
         self.parser = parser
@@ -299,9 +303,12 @@ public class GameEngine {
         switch parseResult {
         case .success(let command):
             // --- Custom Hook: Before Turn (called only on success) ---
-            await beforeTurn?(self, command)
-            guard !shouldQuit else { return } // Hook might quit
-            // ---------------------------------------------------------
+            if await beforeTurn?(self, command) ?? false {
+                return
+            }
+            guard !shouldQuit else {
+                return // Hook might quit
+            }
             await execute(command: command)
         case .failure(let error):
             await report(parseError: error)
@@ -382,8 +389,7 @@ public class GameEngine {
         if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, pass command using correct enum case syntax
-                let handledByRoom = try await roomHandler(self, RoomActionMessage.beforeTurn(command))
-                if handledByRoom {
+                if try await roomHandler(self, RoomActionMessage.beforeTurn(command)) {
                     // Room handler blocked further action, return immediately.
                     // We don't increment moves or run afterTurn hook here.
                     return
@@ -931,7 +937,8 @@ public class GameEngine {
         gameState.player.currentLocationID = locationID
 
         // --- Call the general onEnterRoom hook ---
-        await onEnterRoom?(self, locationID)
+        if await onEnterRoom?(self, locationID) ?? false { return }
+
         // Check if hook quit the game
         if shouldQuit { return }
 

@@ -11,7 +11,7 @@ enum Hooks {
     /// - Parameters:
     ///   - engine: The game engine.
     ///   - locationID: The ID of the location being entered.
-    static func onEnterRoom(engine: GameEngine, locationID: LocationID) async {
+    static func onEnterRoom(engine: GameEngine, locationID: LocationID) async -> Bool {
         // Use safe accessors
         let flagKey = "visited_treasure_room"
         let hasVisitedTreasure = engine.getFlagValue(key: flagKey) ?? false
@@ -57,12 +57,14 @@ enum Hooks {
         default:
             break
         }
+
+        return false
     }
 
     /// Custom logic that runs at the start of each turn.
     /// - Parameter engine: The game engine.
     /// - Parameter command: The command about to be executed.
-    static func beforeEachTurn(engine: GameEngine, command: Command) async {
+    static func beforeEachTurn(engine: GameEngine, command: Command) async -> Bool {
         // Use safe accessors
         let messageValue = engine.getGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 
@@ -79,7 +81,7 @@ enum Hooks {
         let turnCount = engine.playerMoves()      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
-        guard turnCount % 5 == 0 else { return }
+        guard turnCount % 5 == 0 else { return false }
 
         switch locationID {
         case "darkChamber":
@@ -107,6 +109,8 @@ enum Hooks {
         default:
             break
         }
+
+        return false
     }
 
     // MARK: - Helper Functions

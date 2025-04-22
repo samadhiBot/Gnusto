@@ -206,18 +206,19 @@ struct CloakOfDarknessWalkthroughTests {
         )
     }
 
-    /// Tests the lose condition: wear cloak, enter bar (dark), fumble around, examine message.
-    @Test("Bar Lose Condition (Wearing Cloak)", .tags(.integration, .walkthrough))
-    func testBarLoseConditionWearingCloak() async throws {
+    /// Tests the lose condition: wear cloak, enter bar (dark), disturb things twice, remove cloak, examine message.
+    @Test("Bar Lose Condition", .tags(.integration, .walkthrough))
+    func testBarLoseCondition() async throws {
         // 1. Setup World
         let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
 
-        // 2. Setup Mock IO: Keep cloak on, go bar, fumble (e.g., try take), examine message
+        // 2. Setup Mock IO: Keep cloak on, go bar, disturb twice, remove cloak, examine message
         let mockIO = await MockIOHandler(
-            "s",
-            "take hook",
-            "x message",
-            "x message",
+            "s",           // Enter the Bar (dark)
+            "take hook",   // First disturbance (unsafe action)
+            "take hook",   // Second disturbance (unsafe action)
+            "remove cloak",// Make the room lit
+            "x message",   // Examine message (triggers lose condition)
             nil
         )
 
@@ -238,68 +239,24 @@ struct CloakOfDarknessWalkthroughTests {
         // 5. Get Transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Lose Message and darkness handling (Updated for correct darkness, fumble, lose msg)
+        // 6. Assert Lose Message
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > s
             It is pitch black. You are likely to be eaten by a grue.
             > take hook
-            You can't see any 'hook' here.
+            You grope around clumsily in the dark. Better be careful.
+            > take hook
+            You grope around clumsily in the dark. Better be careful.
+            > remove cloak
+            You take off the cloak.
             > x message
-            It's too dark to do that.
-            > x message
-            It's too dark to do that.
-            >
+            The message simply reads: "You lose."
+
 
             Goodbye!
-            """
-        )
-    }
-
-    /// Tests the lose condition: wear cloak, enter bar (dark), fumble around, examine message.
-    @Test("Bar Lose Condition Wearing Cloak With Verbose Fumble", .tags(.integration, .walkthrough))
-    func testBarLoseConditionWearingCloakVerboseFumble() async throws {
-        // 1. Setup World
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
-
-        // 2. Setup Mock IO: Keep cloak on, go bar, fumble (e.g., try take), examine message
-        let mockIO = await MockIOHandler(
-            "s",
-            "take hook",
-            "x message",
-            nil
-        )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: registry,
-            onEnterRoom: onEnterRoom,
-            beforeTurn: beforeTurn
-        )
-
-        // 4. Run Game Simulation
-        await engine.run()
-
-        // 5. Get Transcript
-        let actualTranscript = await mockIO.flush()
-
-        // 6. Assert Lose Message and darkness handling (Updated for correct darkness, fumble, lose msg)
-        expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
-            > s
-            It is pitch black. You are likely to be eaten by a grue.
-            > take hook
-            You can't see any 'hook' here.
-            > x message
-            You grope around clumsily in the dark. Better be careful.
-            The message simply reads: "You win."
-            """
+            """ // Updated expected transcript for implemented lose condition
         )
     }
 

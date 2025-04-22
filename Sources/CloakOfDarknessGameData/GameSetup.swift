@@ -32,34 +32,55 @@ public struct CloakOfDarknessGameData {
     ]
 
     // MARK: - Hooks (Static is okay)
-    static let beforeTurnHook: (@MainActor @Sendable (GameEngine, Command) async -> Void)? = { engine, command in
+    /// Before turn hook for Cloak of Darkness game logic.
+    /// - Returns: `true` if the hook handled the command and normal processing should stop, `false` otherwise.
+    static let beforeTurnHook: (@MainActor @Sendable (GameEngine, Command) async -> Bool)? = { engine, command in
         let locationID = engine.playerLocationID()
-        guard locationID == "bar" else { return }
+        guard locationID == "bar" else { return false } // Only care about the bar
+
         let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
+
         if cloakIsWorn {
+            // Ensure bar is dark if cloak is worn
             engine.updateLocationProperties(id: "bar", removing: .isLit)
+
+            // Now check for unsafe actions IN THE DARK
+            // Re-check lit status *after* potentially removing it
+            let isLitNow = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
+            if !isLitNow { // Should definitely be false here if update worked
+                 let verb = command.verbID
+
+                 // Original ZIL safe verbs in dark Bar: LOOK, GAME-VERB?, THINK-ABOUT, GO NORTH
+                 // GAME-VERB? includes meta verbs like QUIT, SCORE, VERBOSE, etc.
+                 // Let's assume INVENTORY is also implicitly safe as a game state query.
+                 let isMetaVerb = verb == "quit" || verb == "score" || verb == "save" || verb == "restore" || verb == "verbose" || verb == "brief" || verb == "help" || verb == "inventory"
+                 let isSafeVerb = verb == "look" || verb == "examine" || verb == "think-about" || isMetaVerb
+                 let isLeavingNorth = verb == "go" && command.direction == .north
+
+                 if !isSafeVerb && !isLeavingNorth {
+                     await engine.output("You grope around clumsily in the dark. Better be careful.", style: .normal)
+                     engine.incrementGameSpecificStateCounter(key: "disturbedCounter")
+                     return true // Handled
+                 }
+            }
+            // If we get here, either the room was somehow still lit, or the verb was safe/leaving.
+            return false
         } else {
+            // Cloak is not worn, ensure bar is lit
             engine.updateLocationProperties(id: "bar", adding: .isLit)
-        }
-        let isLit = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
-        guard !isLit else { return }
-        let verb = command.verbID
-        let isSafeVerb = verb == "look" || verb == "examine" || verb == "drop" || verb == "inventory" || verb == "remove"
-        let isLeavingNorth = verb == "go" && command.direction == .north
-        if !isSafeVerb && !isLeavingNorth {
-            await engine.output("You grope around clumsily in the dark. Better be careful.", style: .normal)
-            engine.incrementGameSpecificStateCounter(key: "disturbedCounter")
+            return false // Hook didn't handle the command itself
         }
     }
 
-    static let onEnterRoomHook: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)? = { engine, enteredLocationID in
-        guard enteredLocationID == "bar" else { return }
+    static let onEnterRoomHook: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)? = { engine, enteredLocationID in
+        guard enteredLocationID == "bar" else { return false }
         let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
         if cloakIsWorn {
             engine.updateLocationProperties(id: "bar", removing: .isLit)
         } else {
             engine.updateLocationProperties(id: "bar", adding: .isLit)
         }
+        return false
     }
 
     // MARK: - Public Setup Function
@@ -69,8 +90,8 @@ public struct CloakOfDarknessGameData {
     @MainActor public static func setup() -> (
         initialState: GameState,
         registry: GameDefinitionRegistry,
-        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Void)?,
-        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Void)?
+        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)?,
+        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
     ) {
         // --- Define Locations INSIDE setup ---
         let foyer = Location(
