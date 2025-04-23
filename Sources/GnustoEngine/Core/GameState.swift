@@ -1,65 +1,7 @@
-import Foundation // Needed for Codable
-
-/// A type-erasing wrapper that allows storing heterogeneous Codable values.
-/// Note: Using this can sometimes mask type errors until runtime.
-public struct AnyCodable: Codable {
-    public let value: Any
-
-    public init<T>(_ value: T?) {
-        self.value = value ?? ()
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        if let intValue = try? container.decode(Int.self) {
-            self.value = intValue
-        } else if let doubleValue = try? container.decode(Double.self) {
-            self.value = doubleValue
-        } else if let boolValue = try? container.decode(Bool.self) {
-            self.value = boolValue
-        } else if let stringValue = try? container.decode(String.self) {
-            self.value = stringValue
-        } else if let arrayValue = try? container.decode([AnyCodable].self) {
-            self.value = arrayValue.map { $0.value }
-        } else if let dictionaryValue = try? container.decode([String: AnyCodable].self) {
-            self.value = dictionaryValue.mapValues { $0.value }
-        } else {
-            throw DecodingError.dataCorruptedError(in: container, debugDescription: "AnyCodable value cannot be decoded")
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        // Add cases for all expected types
-        switch value {
-        case let intValue as Int:
-            try container.encode(intValue)
-        case let doubleValue as Double:
-            try container.encode(doubleValue)
-        case let boolValue as Bool:
-            try container.encode(boolValue)
-        case let stringValue as String:
-            try container.encode(stringValue)
-        // Add other concrete types as needed (e.g., Date)
-        case let arrayValue as [Any]:
-            try container.encode(arrayValue.map { AnyCodable($0) })
-        case let dictionaryValue as [String: Any]:
-            try container.encode(dictionaryValue.mapValues { AnyCodable($0) })
-        case is Void, is (): // Handle nil initialization
-            try container.encodeNil()
-        default:
-            throw EncodingError.invalidValue(value, EncodingError.Context(codingPath: container.codingPath, debugDescription: "AnyCodable value cannot be encoded"))
-        }
-    }
-}
+import Foundation
 
 /// Represents the complete state of the game world at a given point in time.
 public struct GameState: Codable {
-
-    // --- Stored Properties (Alphabetical) ---
-
     /// Active fuses and their remaining turns.
     public var activeFuses: [Fuse.ID: Int]
 
@@ -89,7 +31,7 @@ public struct GameState: Codable {
 
     /// Optional dictionary for storing arbitrary game-specific state (counters, quest flags, etc.).
     /// Use keys prefixed with game ID (e.g., "cod_counter") to avoid collisions if engine supports multiple games.
-    public var gameSpecificState: [String: AnyCodable]?
+    public var gameSpecificState: [String: AnyCodable]
 
     // --- Initialization ---
 
@@ -104,7 +46,7 @@ public struct GameState: Codable {
         vocabulary: Vocabulary,
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [String: AnyCodable]? = nil
+        gameSpecificState: [String: AnyCodable] = [:]
     ) {
         self.locations = locations
         self.items = items
@@ -117,68 +59,91 @@ public struct GameState: Codable {
         self.gameSpecificState = gameSpecificState
     }
 
-    /// Creates an initial game state, typically loaded from game data files.
-    /// Sets the initial parent for each item based on starting locations and inventory.
-    /// - Parameters:
-    ///   - initialLocations: An array of initial `Location` objects.
-    ///   - initialItems: An array of initial `Item` objects (their `parent` property will be overwritten).
-    ///   - initialPlayer: The initial `Player` state, including starting location.
-    ///   - vocabulary: The game's vocabulary.
-    ///   - initialInventoryIDs: IDs of items the player starts holding directly.
-    ///   - initialItemLocations: A dictionary mapping ItemID to the LocationID where it starts.
-    ///   - initialItemContainers: A dictionary mapping ItemID to the ItemID of the container/surface it starts in/on.
-    ///   - flags: Optional initial game flags.
-    ///   - pronouns: Optional initial pronoun states.
-    ///   - initialActiveFuses: Optional initial active fuses.
-    ///   - initialActiveDaemons: Optional initial active daemons.
-    ///   - gameSpecificState: Optional initial game-specific state data.
-    /// - Returns: A new `GameState` instance.
-    public static func initial(
-        initialLocations: [Location],
-        initialItems: [Item],
-        initialPlayer: Player,
-        vocabulary: Vocabulary,
-        initialInventoryIDs: Set<ItemID> = [],
-        initialItemLocations: [ItemID: LocationID] = [:],
-        initialItemContainers: [ItemID: ItemID] = [:],
+    public init(
+        locations: [Location],
+        items: [Item],
+        player: Player,
         flags: [String: Bool] = [:],
         pronouns: [String: Set<ItemID>] = [:],
-        initialActiveFuses: [Fuse.ID: Int] = [:],
-        initialActiveDaemons: Set<DaemonID> = [],
-        gameSpecificState: [String: AnyCodable]? = nil) -> GameState
-    {
-        let locationDict = Dictionary(uniqueKeysWithValues: initialLocations.map { ($0.id, $0) })
-        let itemDict = Dictionary(uniqueKeysWithValues: initialItems.map { ($0.id, $0) })
-
-        // Set initial parent for each item
-        for itemID in itemDict.keys {
-            if initialInventoryIDs.contains(itemID) {
-                itemDict[itemID]?.parent = .player
-            } else if let locationID = initialItemLocations[itemID] {
-                itemDict[itemID]?.parent = .location(locationID)
-            } else if let containerID = initialItemContainers[itemID] {
-                itemDict[itemID]?.parent = .item(containerID)
-            } else {
-                // Item doesn't start in inventory, a location, or a container.
-                // It defaults to .nowhere (set by Item initializer)
-                // We could optionally check if it's a global in a location here, but
-                // globals might not have a parent in the same way.
-                // Let's assume globals are defined in Location.globals and don't need parent set here.
-            }
-        }
-
-        return GameState(
-            locations: locationDict,
-            items: itemDict,
-            player: initialPlayer,
-            flags: flags,
-            pronouns: pronouns,
-            vocabulary: vocabulary,
-            activeFuses: initialActiveFuses,
-            activeDaemons: initialActiveDaemons,
-            gameSpecificState: gameSpecificState
-        )
+        vocabulary: Vocabulary,
+        activeFuses: [Fuse.ID: Int] = [:],
+        activeDaemons: Set<DaemonID> = [],
+        gameSpecificState: [String: AnyCodable] = [:]
+    ) {
+        self.locations = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
+        self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+        self.player = player
+        self.flags = flags
+        self.pronouns = pronouns
+        self.vocabulary = vocabulary
+        self.activeFuses = activeFuses
+        self.activeDaemons = activeDaemons
+        self.gameSpecificState = gameSpecificState
     }
+
+
+//    /// Creates an initial game state, typically loaded from game data files.
+//    /// Sets the initial parent for each item based on starting locations and inventory.
+//    /// - Parameters:
+//    ///   - locations: An array of initial `Location` objects.
+//    ///   - items: An array of initial `Item` objects (their `parent` property will be overwritten).
+//    ///   - player: The initial `Player` state, including starting location.
+//    ///   - vocabulary: The game's vocabulary.
+//    ///   - inventory: IDs of items the player starts holding directly.
+//    ///   - itemLocations: A dictionary mapping ItemID to the LocationID where it starts.
+//    ///   - itemContainers: A dictionary mapping ItemID to the ItemID of the container/surface it starts in/on.
+//    ///   - flags: Optional initial game flags.
+//    ///   - pronouns: Optional initial pronoun states.
+//    ///   - activeFuses: Optional initial active fuses.
+//    ///   - activeDaemons: Optional initial active daemons.
+//    ///   - gameSpecificState: Optional initial game-specific state data.
+//    /// - Returns: A new `GameState` instance.
+//    public static func initial(
+//        locations: [Location],
+//        items: [Item],
+//        player: Player,
+//        vocabulary: Vocabulary,
+//        inventory: Set<ItemID> = [],
+//        itemLocations: [ItemID: LocationID] = [:],
+//        itemContainers: [ItemID: ItemID] = [:],
+//        flags: [String: Bool] = [:],
+//        pronouns: [String: Set<ItemID>] = [:],
+//        activeFuses: [Fuse.ID: Int] = [:],
+//        activeDaemons: Set<DaemonID> = [],
+//        gameSpecificState: [String: AnyCodable]? = nil) -> GameState
+//    {
+//        let locationDict = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
+//        let itemDict = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+//
+//        // Set initial parent for each item
+//        for itemID in itemDict.keys {
+//            if inventory.contains(itemID) {
+//                itemDict[itemID]?.parent = .player
+//            } else if let locationID = itemLocations[itemID] {
+//                itemDict[itemID]?.parent = .location(locationID)
+//            } else if let containerID = itemContainers[itemID] {
+//                itemDict[itemID]?.parent = .item(containerID)
+//            } else {
+//                // Item doesn't start in inventory, a location, or a container.
+//                // It defaults to .nowhere (set by Item initializer)
+//                // We could optionally check if it's a global in a location here, but
+//                // globals might not have a parent in the same way.
+//                // Let's assume globals are defined in Location.globals and don't need parent set here.
+//            }
+//        }
+//
+//        return GameState(
+//            locations: locationDict,
+//            items: itemDict,
+//            player: player,
+//            flags: flags,
+//            pronouns: pronouns,
+//            vocabulary: vocabulary,
+//            activeFuses: activeFuses,
+//            activeDaemons: activeDaemons,
+//            gameSpecificState: gameSpecificState
+//        )
+//    }
 
     // --- Codable Conformance ---
     // Explicit implementation needed due to dictionaries of classes
@@ -205,7 +170,7 @@ public struct GameState: Codable {
         player = try container.decode(Player.self, forKey: .player)
         pronouns = try container.decode([String: Set<ItemID>].self, forKey: .pronouns)
         vocabulary = try container.decode(Vocabulary.self, forKey: .vocabulary)
-        gameSpecificState = try container.decodeIfPresent([String: AnyCodable].self, forKey: .gameSpecificState)
+        gameSpecificState = try container.decode([String: AnyCodable].self, forKey: .gameSpecificState)
 
         // Decode locations and items from arrays and rebuild dictionaries
         let locationArray = try container.decode([Location].self, forKey: .locations)

@@ -1,6 +1,6 @@
 import CustomDump
 import Testing
-import CloakOfDarknessGameData
+import CloakOfDarknessGame
 
 @testable import GnustoEngine
 
@@ -19,7 +19,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
     func testBasicCloakWalkthrough() async throws {
         // 1. Setup World using shared library
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGame.setup()
 
         // 2. Setup Mock IO with commands (Adjusted for cloak starting worn)
         let mockIO = await MockIOHandler(
@@ -99,7 +99,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Win Condition (Removing Cloak in Bar)", .tags(.integration, .walkthrough))
     func testBarWinConditionCloakRemovedInBar() async throws {
         // 1. Setup World
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGame.setup()
 
         // 2. Setup Mock IO: Go south, remove cloak, drop cloak, look, examine message
         let mockIO = await MockIOHandler(
@@ -153,7 +153,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Win Condition (Removing Cloak before Bar)", .tags(.integration, .walkthrough))
     func testBarWinConditionRemovingCloakBeforeBar() async throws {
         // 1. Setup World
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGame.setup()
 
         // 2. Setup Mock IO: Remove cloak, drop cloak, go bar, look, examine message
         let mockIO = await MockIOHandler(
@@ -210,7 +210,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Lose Condition", .tags(.integration, .walkthrough))
     func testBarLoseCondition() async throws {
         // 1. Setup World
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGame.setup()
 
         // 2. Setup Mock IO: Keep cloak on, go bar, disturb twice, remove cloak, examine message
         let mockIO = await MockIOHandler(
@@ -264,7 +264,7 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Hang Cloak on Hook", .tags(.integration, .walkthrough))
     func testHangCloak() async throws {
         // 1. Setup World
-        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGameData.setup()
+        let (initialState, registry, onEnterRoom, beforeTurn) = CloakOfDarknessGame.setup()
 
         // 2. Setup Mock IO (Adjusted: must remove cloak first)
         let mockIO = await MockIOHandler(

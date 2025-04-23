@@ -1,7 +1,5 @@
 /// Represents the state of the player character.
 public struct Player: Codable, Equatable {
-    // --- Stored Properties (Alphabetical) ---
-
     /// The maximum weight/size the player can carry.
     public var carryingCapacity: Int = 100 // Example, could be based on SIZE props
 
@@ -16,12 +14,17 @@ public struct Player: Codable, Equatable {
 
     /// The player's current score.
     public var score: Int = 0
-
-    // --- Initialization ---
-    // Need a public initializer if the struct is public
+    
+    /// <#Description#>
+    /// - Parameters:
+    ///   - currentLocationID: <#currentLocationID description#>
+    ///   - carryingCapacity: <#carryingCapacity description#>
+    ///   - health: <#health description#>
+    ///   - moves: <#moves description#>
+    ///   - score: <#score description#>
     public init(
+        in currentLocationID: LocationID,
         carryingCapacity: Int = 100,
-        currentLocationID: LocationID,
         health: Int = 100,
         moves: Int = 0,
         score: Int = 0

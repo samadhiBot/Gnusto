@@ -14,17 +14,17 @@ let package = Package(
             targets: ["GnustoEngine"]
         ),
         .library(
-            name: "CloakOfDarknessGameData",
-            targets: ["CloakOfDarknessGameData"]
+            name: "CloakOfDarknessGame",
+            targets: ["CloakOfDarknessGame"]
         ),
         .executable(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
         ),
-        .executable(
-            name: "FrobozzMagicDemoKit",
-            targets: ["FrobozzMagicDemoKit"]
-        )
+//        .executable(
+//            name: "FrobozzMagicDemoKit",
+//            targets: ["FrobozzMagicDemoKit"]
+//        )
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
@@ -33,28 +33,28 @@ let package = Package(
         .target(
             name: "GnustoEngine"),
         .target(
-            name: "CloakOfDarknessGameData",
+            name: "CloakOfDarknessGame",
             dependencies: ["GnustoEngine"],
-            path: "Sources/CloakOfDarknessGameData"
+            path: "Sources/CloakOfDarknessGame"
         ),
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: [
                 "GnustoEngine",
-                "CloakOfDarknessGameData"
+                "CloakOfDarknessGame"
             ],
             path: "Executables/CloakOfDarkness"
         ),
-        .executableTarget(
-            name: "FrobozzMagicDemoKit",
-            dependencies: ["GnustoEngine"],
-            path: "Executables/FrobozzMagicDemoKit"
-        ),
+//        .executableTarget(
+//            name: "FrobozzMagicDemoKit",
+//            dependencies: ["GnustoEngine"],
+//            path: "Executables/FrobozzMagicDemoKit"
+//        ),
         .testTarget(
             name: "GnustoEngineTests",
             dependencies: [
                 "GnustoEngine",
-                "CloakOfDarknessGameData",
+                "CloakOfDarknessGame",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),

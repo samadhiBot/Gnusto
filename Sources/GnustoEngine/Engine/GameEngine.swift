@@ -828,17 +828,14 @@ public class GameEngine {
     ///   - key: The key for the state value.
     ///   - value: The `AnyCodable` value to set.
     public func updateGameSpecificState(key: String, value: AnyCodable) {
-        if gameState.gameSpecificState == nil {
-            gameState.gameSpecificState = [:]
-        }
-        gameState.gameSpecificState?[key] = value
+        gameState.gameSpecificState[key] = value
     }
 
     /// Increments an integer value stored in the game-specific state.
     /// Initializes the value to 1 if the key doesn't exist or the current value is not an Int.
     /// - Parameter key: The key for the integer counter.
     public func incrementGameSpecificStateCounter(key: String) {
-        let currentValue = gameState.gameSpecificState?[key]?.value as? Int ?? 0
+        let currentValue = gameState.gameSpecificState[key]?.value as? Int ?? 0
         updateGameSpecificState(key: key, value: AnyCodable(currentValue + 1))
     }
 
@@ -846,7 +843,7 @@ public class GameEngine {
     /// - Parameter key: The key for the state value.
     /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
     public func getGameSpecificStateValue(key: String) -> AnyCodable? {
-        return gameState.gameSpecificState?[key]
+        return gameState.gameSpecificState[key]
     }
 
     /// Safely retrieves a String value from the game-specific state dictionary.
@@ -854,7 +851,7 @@ public class GameEngine {
     /// - Parameter key: The key for the state value.
     /// - Returns: The `String` value if found and castable, otherwise `nil`.
     public func getGameSpecificStateString(key: String) -> String? {
-        return gameState.gameSpecificState?[key]?.value as? String
+        return gameState.gameSpecificState[key]?.value as? String
     }
 
     /// Safely retrieves the value of a boolean flag from the game state.
@@ -875,7 +872,7 @@ public class GameEngine {
     /// Safely removes a key-value pair from the game-specific state dictionary.
     /// - Parameter key: The key to remove.
     public func removeGameSpecificStateValue(key: String) {
-        gameState.gameSpecificState?.removeValue(forKey: key)
+        gameState.gameSpecificState.removeValue(forKey: key)
     }
 
     /// Safely updates the player's score by a given delta.
