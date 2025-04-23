@@ -25,12 +25,12 @@ struct StandardParserTests {
     let parser = StandardParser()
     let vocabulary: Vocabulary
     let gameState: GameState
-    // Define some Location IDs for clarity
-    static let roomID: LocationID = "room"
-    // Define items used in tests
-    let keyID: ItemID = "key"
-    let lampID: ItemID = "lantern" // Correct ID to match item list
-    let boxID: ItemID = "box"
+
+    // Optionally define location IDs for clarity
+    let roomID: LocationID = "room"
+
+    // Optionally define items used in tests
+    let lampID: ItemID = "lantern"
 
     init() async {
         // 1. Define all possible Items
@@ -61,7 +61,7 @@ struct StandardParserTests {
                 name: "box",
                 adjectives: "wooden",
                 properties: .container, .openable,
-                parent: .location(Self.roomID)
+                parent: .location(roomID)
             ),
             Item(
                 id: "chest",
@@ -91,14 +91,14 @@ struct StandardParserTests {
                 adjectives: "brass",
                 synonyms: "lamp",
                 properties: .lightSource, .openable,
-                parent: .location(Self.roomID)
+                parent: .location(roomID)
             ),
             Item(
                 id: "lantern2",
                 name: "lantern",
                 adjectives: "rusty",
                 properties: .lightSource,
-                parent: .location(Self.roomID)
+                parent: .location(roomID)
             ),
             Item(
                 id: "leaflet",
@@ -127,14 +127,14 @@ struct StandardParserTests {
                 id: "sword",
                 name: "sword",
                 properties: .takable,
-                parent: .location(Self.roomID)
+                parent: .location(roomID)
             ),
             Item(
                 id: "table",
                 name: "table",
                 adjectives: "sturdy",
                 properties: .surface,
-                parent: .location(Self.roomID)
+                parent: .location(roomID)
             ),
             Item(
                 id: "tray",
@@ -164,7 +164,7 @@ struct StandardParserTests {
         // 3. Define all Locations
         let locations = [
             Location(
-                id: Self.roomID,
+                id: roomID,
                 name: "Room",
                 description: "A room.",
                 // items: // Removed
@@ -174,7 +174,7 @@ struct StandardParserTests {
         ]
 
         // 4. Define initial Player state
-        let player = Player(in: Self.roomID)
+        let player = Player(in: roomID)
 
         // 5. Define initial pronouns
         let initialPronouns: [String: Set<ItemID>] = [
@@ -196,7 +196,7 @@ struct StandardParserTests {
         // --- Sanity Checks (Optional but Recommended) ---
         // Check if parents were set correctly
         #expect(self.gameState.items["leaflet"]?.parent == .player)
-        #expect(self.gameState.items["sword"]?.parent == .location(Self.roomID))
+        #expect(self.gameState.items["sword"]?.parent == .location(roomID))
         #expect(self.gameState.items["coin"]?.parent == .item("backpack"))
         #expect(self.gameState.items["book"]?.parent == .item("table"))
         #expect(self.gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
@@ -453,7 +453,7 @@ struct StandardParserTests {
         var tempGameState = gameState
         tempGameState.pronouns["it"] = [lampID] // "it" is the lamp
         // Ensure lamp IS IN SCOPE (room) for setup, the test checks parser result
-        #expect(tempGameState.items[lampID]?.parent == .location(Self.roomID))
+        #expect(tempGameState.items[lampID]?.parent == .location(roomID))
         // --- Removed incorrect assertion: #expect(tempGameState.items[lampID]?.parent == .nowhere) ---
 
         let result = parser.parse(input: "examine it", vocabulary: vocabulary, gameState: tempGameState)
