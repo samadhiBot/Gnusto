@@ -35,24 +35,120 @@ struct StandardParserTests {
     init() async {
         // 1. Define all possible Items
         let allItems = [
-            Item(id: "lantern", name: "lantern", adjectives: "brass", synonyms: "lamp", properties: .lightSource, .openable),
-            Item(id: "lantern2", name: "lantern", adjectives: "rusty", properties: .lightSource),
-            Item(id: "key", name: "key", adjectives: "rusty", "small", properties: .takable),
-            Item(id: "box", name: "box", adjectives: "wooden", properties: .container, .openable), // Starts closed in room
-            Item(id: "leaflet", name: "leaflet", properties: .takable, .read),
-            Item(id: "sword", name: "sword", properties: .takable),
-            Item(id: "rug", name: "rug", properties: []), // Global
-            Item(id: "backpack", name: "backpack", properties: .container, .open, .takable, capacity: 20),
-            Item(id: "chest", name: "chest", properties: .container, .takable, .openable, .locked, capacity: 50), // Starts closed & locked in inv
-            Item(id: "coin", name: "coin", adjectives: "gold", properties: .takable),
-            Item(id: "note", name: "note", properties: .takable, .read),
-            Item(id: "widget", name: "widget", properties: .takable),
-            // New items for surface/scope tests
-            Item(id: "table", name: "table", adjectives: "sturdy", properties: .surface), // Surface in room
-            Item(id: "book", name: "book", adjectives: "dusty", properties: .takable, .read), // On table
-            Item(id: "tray", name: "tray", adjectives: "silver", properties: .surface, .takable), // Surface in inventory
-            Item(id: "apple", name: "apple", adjectives: "red", properties: .takable, .edible), // On tray
-            Item(id: "orb", name: "orb", adjectives: "glowing", properties: .takable, .lightSource) // Starts nowhere
+            Item(
+                id: "apple",
+                name: "apple",
+                adjectives: "red",
+                properties: .takable, .edible,
+                parent: .item("tray")
+            ),
+            Item(
+                id: "backpack",
+                name: "backpack",
+                properties: .container, .open, .takable,
+                capacity: 20,
+                parent: .player
+            ),
+            Item(
+                id: "book",
+                name: "book",
+                adjectives: "dusty",
+                properties: .takable, .read,
+                parent: .item("table")
+            ),
+            Item(
+                id: "box",
+                name: "box",
+                adjectives: "wooden",
+                properties: .container, .openable,
+                parent: .location(Self.roomID)
+            ),
+            Item(
+                id: "chest",
+                name: "chest",
+                properties: .container, .takable, .openable, .locked,
+                capacity: 50,
+                parent: .player
+            ), // Starts closed & locked in inv
+            Item(
+                id: "coin",
+                name: "coin",
+                adjectives: "gold",
+                properties: .takable,
+                parent: .item("backpack")
+            ),
+            Item(
+                id: "key",
+                name: "key",
+                adjectives: "rusty",
+                "small",
+                properties: .takable,
+                parent: .player
+            ),
+            Item(
+                id: "lantern",
+                name: "lantern",
+                adjectives: "brass",
+                synonyms: "lamp",
+                properties: .lightSource, .openable,
+                parent: .location(Self.roomID)
+            ),
+            Item(
+                id: "lantern2",
+                name: "lantern",
+                adjectives: "rusty",
+                properties: .lightSource,
+                parent: .location(Self.roomID)
+            ),
+            Item(
+                id: "leaflet",
+                name: "leaflet",
+                properties: .takable, .read,
+                parent: .player
+            ),
+            Item(
+                id: "note",
+                name: "note",
+                properties: .takable, .read,
+                parent: .item("chest")
+            ),
+            Item(
+                id: "orb",
+                name: "orb",
+                adjectives: "glowing",
+                properties: .takable, .lightSource,
+                parent: .nowhere
+            ),
+            Item(
+                id: "rug",
+                name: "rug"
+            ), // Global
+            Item(
+                id: "sword",
+                name: "sword",
+                properties: .takable,
+                parent: .location(Self.roomID)
+            ),
+            Item(
+                id: "table",
+                name: "table",
+                adjectives: "sturdy",
+                properties: .surface,
+                parent: .location(Self.roomID)
+            ),
+            Item(
+                id: "tray",
+                name: "tray",
+                adjectives: "silver",
+                properties: .surface, .takable,
+                parent: .player
+            ),
+            Item(
+                id: "widget",
+                name: "widget",
+                properties: .takable,
+                parent: .item("box")
+            ),
         ]
 
         // 2. Define Game-Specific Verbs (if any) - Most verbs are now defaults
@@ -78,50 +174,23 @@ struct StandardParserTests {
         ]
 
         // 4. Define initial Player state
-        let initialPlayer = Player(currentLocationID: Self.roomID)
+        let player = Player(in: Self.roomID)
 
-        // 5. Define initial item placements
-        let initialInventory: Set<ItemID> = ["leaflet", "key", "backpack", "chest", "tray"]
-        let initialItemLocs: [ItemID: LocationID] = [
-            "sword": Self.roomID,
-            "lantern": Self.roomID,
-            "lantern2": Self.roomID,
-            "box": Self.roomID,
-            "table": Self.roomID
-        ]
-        let initialItemContainers: [ItemID: ItemID] = [
-            "coin": "backpack", // coin is inside backpack
-            "note": "chest", // note is inside chest
-            "widget": "box", // widget is inside box (which is in room)
-            "book": "table",
-            "apple": "tray"
-        ]
-
-        // Define initial pronouns
+        // 5. Define initial pronouns
         let initialPronouns: [String: Set<ItemID>] = [
             "it": ["box"] // Let's say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
-        var builtVocabulary = Vocabulary.build(items: allItems, verbs: gameSpecificVerbs)
-        // Add test-specific noise/prepositions if needed (defaults are usually sufficient)
-        builtVocabulary.noiseWords.insert("the")
-        // builtVocabulary.noiseWords.insert("at") // Removed from noise
-        // builtVocabulary.prepositions.insert("in") // Already in defaultPrepositions
-        // builtVocabulary.prepositions.insert("on") // Already in defaultPrepositions
-        // builtVocabulary.prepositions.insert("into") // Already in defaultPrepositions
-        self.vocabulary = builtVocabulary // Store for parser tests
+        self.vocabulary = .build(items: allItems)
 
         // 7. Build GameState using the new factory method
-        self.gameState = GameState.initial(
-            initialLocations: locations,
-            initialItems: allItems,
-            initialPlayer: initialPlayer,
-            vocabulary: self.vocabulary, // Pass the built vocabulary
-            initialInventoryIDs: initialInventory,
-            initialItemLocations: initialItemLocs,
-            initialItemContainers: initialItemContainers,
-            pronouns: initialPronouns // Pass initial pronouns
+        self.gameState = GameState(
+            locations: locations,
+            items: allItems,
+            player: player,
+            pronouns: initialPronouns,
+            vocabulary: .build(items: allItems)
         )
 
         // --- Sanity Checks (Optional but Recommended) ---

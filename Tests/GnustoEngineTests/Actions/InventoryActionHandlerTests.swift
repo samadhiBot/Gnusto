@@ -11,7 +11,7 @@ struct InventoryActionHandlerTests {
         itemsToAdd: [Item] = [],
         initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
     ) async -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
-        let player = Player(currentLocationID: initialLocation.id)
+        let player = Player(in: initialLocation.id)
         let verbs = [Verb(id: "inventory")] // Ensure INVENTORY verb exists
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
         return (items: itemsToAdd, location: initialLocation, player: player, vocab: vocabulary)
@@ -27,10 +27,10 @@ struct InventoryActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -63,10 +63,10 @@ struct InventoryActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)

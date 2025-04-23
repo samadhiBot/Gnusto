@@ -5,7 +5,8 @@ public protocol ItemDefinitions {
 }
 
 extension ItemDefinitions {
-    /// Returns all items defined in the Items struct, validating for duplicate IDs.
+    /// Returns all items defined in a conforming struct, validating for duplicate IDs.
+    ///
     /// - Returns: Array of all defined Items
     /// - Throws: Fatal error if duplicate item IDs are found
     public static func all() -> [Item] {

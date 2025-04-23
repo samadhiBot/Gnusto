@@ -16,16 +16,16 @@ enum GameDataSetup {
         let verbs = VocabularySetup.verbs // Assuming verbs are defined here
 
         // Create player
-        let player = Player(currentLocationID: "startRoom") // Start room ID
+        let player = Player(in: "startRoom") // Start room ID
 
         // Build vocabulary
         let vocabulary = Vocabulary.build(items: items, verbs: verbs)
 
         // Create state
-        let initialState = GameState.initial(
-            initialLocations: locations,
-            initialItems: items,
-            initialPlayer: player,
+        let initialState = GameState(
+            locations: locations,
+            items: items,
+            player: player,
             vocabulary: vocabulary
         )
 

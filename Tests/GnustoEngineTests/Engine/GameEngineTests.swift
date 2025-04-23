@@ -15,23 +15,28 @@ struct GameEngineTests {
     // Helper to create a minimal game state for testing
     // Make static as it doesn't depend on instance state
     static func createMinimalGameState() async -> GameState {
-        let items = [Item(id: "startItem", name: "pebble", properties: .takable)]
-        let locations = [Location(id: "startRoom", name: "Void", description: "An empty void.")]
-        let player = Player(currentLocationID: "startRoom")
-        // Include necessary verbs for tests
-        let verbs = [
-            Verb(id: "look"),
-            Verb(id: "take"),
-            Verb(id: "inventory"),
-            Verb(id: "quit")
+        let items = [
+            Item(
+                id: "startItem",
+                name: "pebble",
+                properties: .takable,
+                parent: .location("startRoom")
+            )
         ]
-        let vocabulary = Vocabulary.build(items: items, verbs: verbs)
-        return GameState.initial(
-            initialLocations: locations,
-            initialItems: items,
-            initialPlayer: player,
-            vocabulary: vocabulary,
-            initialItemLocations: ["startItem": "startRoom"]
+        let locations = [
+            Location(
+                id: "startRoom",
+                name: "Void",
+                description: "An empty void."
+            )
+        ]
+        let player = Player(in: "startRoom")
+
+        return GameState(
+            locations: locations,
+            items: items,
+            player: player,
+            vocabulary: .build(items: items)
         )
     }
 

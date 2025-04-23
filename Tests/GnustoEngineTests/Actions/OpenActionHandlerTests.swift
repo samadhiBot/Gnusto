@@ -16,7 +16,7 @@ struct OpenActionHandlerTests {
         player: Player,
         vocab: Vocabulary
     ) {
-        let player = Player(currentLocationID: initialLocation.id)
+        let player = Player(in: initialLocation.id)
         let verbs = [
             Verb(id: "open")
         ]
@@ -32,10 +32,10 @@ struct OpenActionHandlerTests {
         let testData = await Self.createTestData(itemsToAdd: itemsToAdd, initialLocation: initialLocation)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)

@@ -5,7 +5,8 @@ public protocol LocationDefinitions {
 }
 
 extension LocationDefinitions {
-    /// Returns all items defined in the Locations struct, validating for duplicate IDs.
+    /// Returns all items defined in a conforming struct, validating for duplicate IDs.
+    ///
     /// - Returns: Array of all defined Locations
     /// - Throws: Fatal error if duplicate item IDs are found
     public static func all() -> [Location] {

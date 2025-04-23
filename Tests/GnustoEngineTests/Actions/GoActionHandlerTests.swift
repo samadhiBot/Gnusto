@@ -9,15 +9,15 @@ struct GoActionHandlerTests {
     // Helper (adapted from previous tests)
     static func createTestData(
         itemsToAdd: [Item] = [],
-        initialLocations: [Location] = [],
+        locations: [Location] = [],
         initialPlayerLocationID: LocationID? = nil
     ) async -> (items: [Item], locations: [Location], player: Player, vocab: Vocabulary) {
-        var locations = initialLocations
+        var locations = locations
         if locations.isEmpty {
             locations.append(Location(id: "room1", name: "Room 1", description: "First room."))
         }
         let playerLocation = initialPlayerLocationID ?? locations[0].id
-        let player = Player(currentLocationID: playerLocation)
+        let player = Player(in: playerLocation)
 
         // Add movement verbs to vocab
         let verbs = [
@@ -49,15 +49,15 @@ struct GoActionHandlerTests {
         )
         loc1.exits[.north] = Exit(destination: "end")
 
-        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: testData.locations,
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: testData.locations,
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -89,15 +89,15 @@ struct GoActionHandlerTests {
         let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
         #expect(loc1.exits[.south] == nil) // Verify no south exit
 
-        let testData = await Self.createTestData(initialLocations: [loc1], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(locations: [loc1], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: testData.locations,
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: testData.locations,
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -122,15 +122,15 @@ struct GoActionHandlerTests {
         let loc2 = Location(id: "end", name: "End Room", description: "You went there.")
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: false) // Door, explicitly closed
 
-        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: testData.locations,
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: testData.locations,
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -157,15 +157,15 @@ struct GoActionHandlerTests {
         // Note: A door can be locked but technically open (e.g., gate)
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: true, isLocked: true)
 
-        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: testData.locations,
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: testData.locations,
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -191,15 +191,15 @@ struct GoActionHandlerTests {
         let blockMsg = "A chasm blocks your path."
         loc1.exits[.north] = Exit(destination: "end", blockedMessage: blockMsg)
 
-        let testData = await Self.createTestData(initialLocations: [loc1, loc2], initialPlayerLocationID: "start")
+        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: testData.locations,
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: testData.locations,
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)

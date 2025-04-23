@@ -11,7 +11,7 @@ struct PlayerTests {
     let item2: ItemID = "leaflet"
 
     func createDefaultPlayer() -> Player {
-        Player(currentLocationID: startLocation)
+        Player(in: startLocation)
     }
 
     // --- Tests ---

@@ -12,17 +12,17 @@ struct ReadActionHandlerTests {
         itemsToAdd: [Item] = [],
         initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.", properties: .inherentlyLit) // Assume lit by default
     ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
-        let player = Player(currentLocationID: initialLocation.id)
+        let player = Player(in: initialLocation.id)
         let verbs = [
             Verb(id: "read")
         ]
         let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [initialLocation], // Use potentially modified location
-            initialItems: [],
-            initialPlayer: player,
+        let initialState = GameState(
+            locations: [initialLocation], // Use potentially modified location
+            items: [],
+            player: player,
             vocabulary: vocabulary
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)

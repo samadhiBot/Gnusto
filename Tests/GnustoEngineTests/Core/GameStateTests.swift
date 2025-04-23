@@ -5,7 +5,6 @@ import Foundation // For JSONEncoder/Decoder
 @MainActor
 @Suite("GameState Struct Tests")
 struct GameStateTests {
-    // --- Test Setup ---
     // Define IDs for clarity
     static let locWOH: LocationID = "westOfHouse"
     static let locNorth: LocationID = "northOfHouse"
@@ -14,15 +13,34 @@ struct GameStateTests {
     static let itemLantern: ItemID = "lantern"
     static let itemMailbox: ItemID = "mailbox"
     static let itemLeaflet: ItemID = "leaflet"
-    static let itemSword: ItemID = "sword" // Added for testing
+    static let itemSword: ItemID = "sword"
 
     // 1. Define all potential Items
     func createSampleItems() -> [Item] {
         [
-            Item(id: Self.itemLantern, name: "lantern", properties: .takable, .lightSource),
-            Item(id: Self.itemMailbox, name: "mailbox", properties: .container, .openable), // Starts in locWOH
-            Item(id: Self.itemLeaflet, name: "leaflet", properties: .takable, .read), // Starts inside mailbox
-            Item(id: Self.itemSword, name: "sword", properties: .takable) // Starts in player inventory
+            Item(
+                id: Self.itemLantern,
+                name: "lantern",
+                properties: .takable, .lightSource
+            ),
+            Item(
+                id: Self.itemMailbox,
+                name: "mailbox",
+                properties: .container, .openable,
+                parent: .location(Self.locWOH)
+            ),
+            Item(
+                id: Self.itemLeaflet,
+                name: "leaflet",
+                properties: .takable, .read,
+                parent: .item(Self.itemMailbox)
+            ),
+            Item(
+                id: Self.itemSword,
+                name: "sword",
+                properties: .takable,
+                parent: .player
+            )
         ]
     }
 
@@ -47,7 +65,7 @@ struct GameStateTests {
 
     // 3. Define initial Player
     func createSamplePlayer() -> Player {
-        Player(currentLocationID: Self.locWOH)
+        Player(in: Self.locWOH)
     }
 
     // 4. Helper to create the GameState with defined placements
@@ -58,27 +76,13 @@ struct GameStateTests {
         let flags = ["gameStarted": true]
         let pronouns: [String: Set<ItemID>] = ["it": [Self.itemMailbox]]
 
-        // Create vocabulary (could be a separate helper)
-        let itemsForVocab = createSampleItems()
-        let verbsForVocab = [Verb(id: "look"), Verb(id: "take")] // minimal for testing
-        let vocabulary = Vocabulary.build(items: itemsForVocab, verbs: verbsForVocab)
-
-        // Define initial placements
-        let initialInventory: Set<ItemID> = [Self.itemSword]
-        let initialItemLocs: [ItemID: LocationID] = [Self.itemMailbox: Self.locWOH]
-        let initialItemContainers: [ItemID: ItemID] = [Self.itemLeaflet: Self.itemMailbox]
-
-        // Use the new factory method
-        return GameState.initial(
-            initialLocations: locations,
-            initialItems: items,
-            initialPlayer: player,
-            vocabulary: vocabulary,
-            initialInventoryIDs: initialInventory,
-            initialItemLocations: initialItemLocs,
-            initialItemContainers: initialItemContainers,
+        return GameState(
+            locations: locations,
+            items: items,
+            player: player,
             flags: flags,
-            pronouns: pronouns
+            pronouns: pronouns,
+            vocabulary: .build(items: items)
         )
     }
 

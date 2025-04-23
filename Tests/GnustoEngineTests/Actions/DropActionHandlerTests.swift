@@ -17,7 +17,7 @@ struct DropActionHandlerTests {
         player: Player,
         vocab: Vocabulary
     ) {
-        let player = Player(currentLocationID: initialLocation.id)
+        let player = Player(in: initialLocation.id)
         // Include all needed verbs for handler tests in this suite
         let verbs = [
             Verb(id: "drop")
@@ -36,10 +36,10 @@ struct DropActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser() // Not used directly
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -78,10 +78,10 @@ struct DropActionHandlerTests {
         let testData = await Self.createTestData()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -107,10 +107,10 @@ struct DropActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -143,10 +143,10 @@ struct DropActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)

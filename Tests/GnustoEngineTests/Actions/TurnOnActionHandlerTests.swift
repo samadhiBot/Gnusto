@@ -49,12 +49,12 @@ struct TurnOnActionHandlerTests {
         var allItems = itemsToAdd
         allItems.append(testItem)
 
-        let player = Player(currentLocationID: finalLocation.id)
+        let player = Player(in: finalLocation.id)
         let vocabulary = Vocabulary.build(items: allItems, verbs: [Verb(id: "turn on")]) // Basic vocab
-        let initialGameState = GameState.initial(
-            initialLocations: [finalLocation],
-            initialItems: allItems,
-            initialPlayer: player,
+        let initialGameState = GameState(
+            locations: [finalLocation],
+            items: allItems,
+            player: player,
             vocabulary: vocabulary
         )
 

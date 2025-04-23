@@ -17,7 +17,7 @@ struct LookActionHandlerTests {
         itemToExamine: Item? = nil // For LOOK AT tests
     ) async -> (GameEngine, MockIOHandler) {
         let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: locationProperties)
-        let player = Player(currentLocationID: location.id)
+        let player = Player(in: location.id)
 
         var allItems: [Item.ID: Item] = [:]
         for item in itemsInLocation {

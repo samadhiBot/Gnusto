@@ -13,7 +13,7 @@ struct ScopeResolverTests {
         items: [Item]
     ) -> GameState {
         let testLocation = Location(id: testLocationID, name: "Test Room", description: "A room.", properties: locationProperties)
-        let player = Player(currentLocationID: testLocation.id)
+        let player = Player(in: testLocation.id)
         let allItems = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
         let gameState = GameState(
             locations: [testLocation.id: testLocation],

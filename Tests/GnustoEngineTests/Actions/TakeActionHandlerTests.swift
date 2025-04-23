@@ -13,7 +13,7 @@ struct TakeActionHandlerTests {
         initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing."),
         pronouns: [String: [String]] = [:]
     ) async -> (items: [Item], location: Location, player: Player, vocab: Vocabulary) {
-        let player = Player(currentLocationID: initialLocation.id)
+        let player = Player(in: initialLocation.id)
         // Include all needed verbs for handler tests in this suite
         let verbs = [
             Verb(id: "take")
@@ -33,10 +33,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks within the test function context
         let mockIO = await MockIOHandler()
         let mockParser = MockParser() // Not used directly
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [], // Start empty, add via debugAddItem
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [], // Start empty, add via debugAddItem
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -72,10 +72,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks within the test function context
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -108,10 +108,10 @@ struct TakeActionHandlerTests {
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
@@ -144,10 +144,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -178,10 +178,10 @@ struct TakeActionHandlerTests {
         let testData = await Self.createTestData()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -211,10 +211,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -257,10 +257,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -303,10 +303,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -342,10 +342,10 @@ struct TakeActionHandlerTests {
 
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
@@ -383,10 +383,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -427,10 +427,10 @@ struct TakeActionHandlerTests {
         // Arrange: Create engine and mocks
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
@@ -464,12 +464,12 @@ struct TakeActionHandlerTests {
         let testItem = Item(id: "widget", name: "shiny widget", properties: .takable)
         let testData = await Self.createTestData(itemsToAdd: [testItem])
         let mockIO = await MockIOHandler()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
-            vocabulary: testData.vocab,
-            pronouns: ["it": ["someOtherItem"]] // Pre-set 'it'
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
+            pronouns: ["it": ["someOtherItem"]],
+            vocabulary: testData.vocab // Pre-set 'it'
         )
         let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
         engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .location(testData.location.id))
@@ -497,10 +497,10 @@ struct TakeActionHandlerTests {
 
         // Arrange: Engine and mocks
         let mockIO = await MockIOHandler()
-        let initialState = GameState.initial(
-            initialLocations: [testData.location],
-            initialItems: [],
-            initialPlayer: testData.player,
+        let initialState = GameState(
+            locations: [testData.location],
+            items: [],
+            player: testData.player,
             vocabulary: testData.vocab
         )
         let engine = GameEngine(initialState: initialState, parser: MockParser(), ioHandler: mockIO)
