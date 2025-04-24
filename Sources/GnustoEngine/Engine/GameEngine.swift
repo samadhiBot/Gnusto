@@ -50,7 +50,7 @@ public class GameEngine {
     public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
-    
+
     /// Creates a new `GameEngine` instance from a game definition.
     ///
     /// - Parameters:
