@@ -1,13 +1,13 @@
 import GnustoEngine
 
-struct MinimalGame: GameDefinition {
+struct MinimalGame: GameBlueprint {
     var state: GameState
-    var registry: GameDefinitionRegistry
+    var registry: DefinitionRegistry
 
     init(
         locations: [Location] = [Self.startRoom],
         items: [Item] = [Self.pebble],
-        registry: GameDefinitionRegistry = GameDefinitionRegistry()
+        registry: DefinitionRegistry = DefinitionRegistry()
     ) {
         self.registry = registry
         self.state = GameState(

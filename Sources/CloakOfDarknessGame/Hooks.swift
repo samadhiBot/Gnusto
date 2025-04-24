@@ -1,6 +1,6 @@
 import GnustoEngine
 
-extension CloakOfDarknessGame {
+struct Hooks {
     @MainActor
     public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
         guard location == "bar" else { return false }

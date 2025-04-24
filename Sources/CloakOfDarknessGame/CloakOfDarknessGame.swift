@@ -1,16 +1,16 @@
 import GnustoEngine
 
 /// Provides the setup components for the Cloak of Darkness game.
-public struct CloakOfDarknessGame: GameDefinition {
+public struct CloakOfDarknessGame: GameBlueprint {
     public var state: GameState
 
-    public let registry: GameDefinitionRegistry
+    public let registry: DefinitionRegistry
 
     @MainActor
     public init() {
         let items = OperaHouse.items
 
-        registry = GameDefinitionRegistry(
+        registry = DefinitionRegistry(
             objectActionHandlers: [
                 "cloak": Handlers().cloakHandler,
                 "message": Handlers().messageHandler

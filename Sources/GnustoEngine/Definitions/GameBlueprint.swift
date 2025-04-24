@@ -1,13 +1,13 @@
 import Foundation
 
 @MainActor
-public protocol GameDefinition {
+public protocol GameBlueprint {
     /// The complete state of the world at the start of the game.
     var state: GameState { get }
     
     /// The registry stores definitions for various game elements like Fuses, Daemons,
     /// and custom action handlers.
-    var registry: GameDefinitionRegistry { get }
+    var registry: DefinitionRegistry { get }
 
     /// Called when entering a new room.
     /// 
@@ -18,13 +18,11 @@ public protocol GameDefinition {
     ///
     /// Returns `true` if no further action handling is required, otherwise `false`.
     var beforeTurn: @MainActor @Sendable (GameEngine, Command) async -> Bool { get }
-
-//    init()
 }
 
 // MARK: - Default implementations
 
-extension GameDefinition {
+extension GameBlueprint {
     public var onEnterRoom: @MainActor @Sendable (GameEngine, LocationID) async -> Bool {
         { _, _ in false }
     }

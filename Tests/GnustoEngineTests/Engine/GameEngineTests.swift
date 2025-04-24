@@ -98,7 +98,7 @@ struct GameEngineTests {
             errorToThrow: .itemNotTakable("startItem")
         )
         let game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 customActionHandlers: [VerbID("take"): mockTakeHandler]
             )
         )
@@ -163,7 +163,7 @@ struct GameEngineTests {
     func testEngineProcessesSuccessfulCommand() async throws {
         let mockLookHandler = MockActionHandler()
         let game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 customActionHandlers: [VerbID("look"): mockLookHandler]
             )
         )
@@ -215,7 +215,7 @@ struct GameEngineTests {
         let mockLookHandler = MockActionHandler()
         let mockTakeHandler = MockActionHandler()
         let game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 customActionHandlers: [
                     VerbID("look"): mockLookHandler,
                     VerbID("take"): mockTakeHandler
@@ -288,7 +288,7 @@ struct GameEngineTests {
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         let mockQuitHandler = MockActionHandler()
         let game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 customActionHandlers: [VerbID("quit"): mockQuitHandler]
             )
         )
@@ -394,7 +394,7 @@ struct GameEngineTests {
             await engine.ioHandler.print("Taken.")
         })
         let game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 customActionHandlers: [
                     VerbID("take"): mockTakeHandler,
                     VerbID("inventory"): mockInventoryHandler,
@@ -486,7 +486,7 @@ struct GameEngineTests {
             stateHolder.flag = true
         }
         var game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 fuseDefinitions: [fuseDef]
             )
         )
@@ -526,7 +526,7 @@ struct GameEngineTests {
             stateHolder.count += 1
         }
         var game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 daemonDefinitions: [testDaemonDef]
             )
         )
@@ -589,7 +589,7 @@ struct GameEngineTests {
         }
 
         var game = MinimalGame(
-            registry: GameDefinitionRegistry(
+            registry: DefinitionRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )
@@ -1102,7 +1102,7 @@ extension [MockIOHandler.OutputCall] {
 extension GameEngineTests {
     /// Helper to run the engine for one command and capture output.
     private func runCommandAndCaptureOutput(
-        game: GameDefinition,
+        game: GameBlueprint,
         commandInput: String,
         commandToParse: Command
     ) async -> String {

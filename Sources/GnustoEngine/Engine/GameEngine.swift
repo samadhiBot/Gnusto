@@ -22,7 +22,7 @@ public class GameEngine {
     lazy var scopeResolver: ScopeResolver = ScopeResolver(engine: self)
 
     /// The registry holding static game definitions (fuses, daemons, etc.).
-    public let registry: GameDefinitionRegistry
+    public let registry: DefinitionRegistry
 
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: ActionHandler]()
@@ -58,7 +58,7 @@ public class GameEngine {
     ///   - parser: The command parser.
     ///   - ioHandler: The I/O handler for player interaction.
     public init(
-        game: GameDefinition,
+        game: GameBlueprint,
         parser: Parser,
         ioHandler: IOHandler
     ) {
@@ -70,40 +70,9 @@ public class GameEngine {
             .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
-        self.activeFuses = initializeFuses(from: game.state, registry: game.registry)
-    }
 
-//    /// Creates a new `GameEngine` instance.
-//    ///
-//    /// - Parameters:
-//    ///   - initialState: The starting state of the game.
-//    ///   - parser: The command parser.
-//    ///   - ioHandler: The I/O handler for player interaction.
-//    ///   - registry: The game definition registry.
-//    ///   - onEnterRoom: Optional closure for custom logic after entering a room.
-//    ///   - beforeTurn: Optional closure for custom logic before each turn.
-//    init(
-//        initialState: GameState,
-//        parser: Parser,
-//        ioHandler: IOHandler,
-//        registry: GameDefinitionRegistry = GameDefinitionRegistry(),
-//        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)? = nil,
-//        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)? = nil
-//    ) {
-//        self.gameState = initialState
-//        self.parser = parser
-//        self.ioHandler = ioHandler
-//        self.registry = registry
-//        self.actionHandlers = registry.customActionHandlers
-//            .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
-//        self.onEnterRoom = onEnterRoom
-//        self.beforeTurn = beforeTurn
-//        self.activeFuses = initializeFuses(from: initialState, registry: registry)
-//    }
-
-    private func initializeFuses(from state: GameState, registry: GameDefinitionRegistry) -> [Fuse.ID: Fuse] {
         var fuses: [Fuse.ID: Fuse] = [:]
-        for (fuseID, turnsRemaining) in state.activeFuses {
+        for (fuseID, turnsRemaining) in game.state.activeFuses {
             guard let definition = registry.fuseDefinition(for: fuseID) else {
                 print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
                 continue
@@ -111,7 +80,7 @@ public class GameEngine {
             let runtimeFuse = Fuse(id: fuseID, turns: turnsRemaining, action: definition.action)
             fuses[fuseID] = runtimeFuse
         }
-        return fuses
+        self.activeFuses = fuses
     }
 
     // Add Placeholder Handler Struct (Temporary)

@@ -1,6 +1,6 @@
 import GnustoEngine
 
-struct OperaHouse: ItemDefinitions, LocationDefinitions {
+struct OperaHouse: AreaContents {
     // MARK: - Bar
 
     let bar = Location(
@@ -72,11 +72,4 @@ struct OperaHouse: ItemDefinitions, LocationDefinitions {
         properties: .takable, .wearable, .worn,
         parent: .player
     )
-
-//    let playerItem = Item(
-//        id: "player",
-//        name: "yourself",
-//        synonyms: "me", "myself",
-//        properties: .person
-//    )
 }

@@ -7,40 +7,40 @@ import Testing
 @Suite("TouchActionHandler Tests")
 struct TouchActionHandlerTests {
     // Helper function to create data for a basic test setup
-    static func createTestData(
-        itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
-    ) async -> (
-        items: [Item],
-        location: Location,
-        player: Player,
-        vocab: Vocabulary
-    ) {
-        let player = Player(in: initialLocation.id)
-        let verbs = [
-            Verb(id: "touch", synonyms: "feel", "rub", "pat", "pet")
-        ]
-        let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
-        return (items: itemsToAdd, location: initialLocation, player: player, vocab: vocabulary)
-    }
+//    static func createTestData(
+//        itemsToAdd: [Item] = [],
+//        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+//    ) async -> (
+//        items: [Item],
+//        location: Location,
+//        player: Player,
+//        vocab: Vocabulary
+//    ) {
+//        let player = Player(in: initialLocation.id)
+//        let verbs = [
+//            Verb(id: "touch", synonyms: "feel", "rub", "pat", "pet")
+//        ]
+//        let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
+//        return (items: itemsToAdd, location: initialLocation, player: player, vocab: vocabulary)
+//    }
 
     // Helper to setup engine and mocks
-    static func setupTestEnvironment(
-        itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
-    ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
-        let testData = await Self.createTestData(itemsToAdd: itemsToAdd, initialLocation: initialLocation)
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let initialState = GameState(
-            locations: [testData.location],
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
-        )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
-        return (engine, mockIO, testData.location, testData.player, testData.vocab)
-    }
+//    static func setupTestEnvironment(
+//        itemsToAdd: [Item] = [],
+//        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.")
+//    ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
+//        let testData = await Self.createTestData(itemsToAdd: itemsToAdd, initialLocation: initialLocation)
+//        let mockIO = await MockIOHandler()
+//        let mockParser = MockParser()
+//        let initialState = GameState(
+//            locations: [testData.location],
+//            items: [],
+//            player: testData.player,
+//            vocabulary: testData.vocab
+//        )
+//        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
+//        return (engine, mockIO, testData.location, testData.player, testData.vocab)
+//    }
 
     @Test("Touch item successfully in location")
     func testTouchItemSuccessfullyInLocation() async throws {
