@@ -58,6 +58,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(
+            player: Player(in: "litRoom"),
             locations: [litRoom],
             items: [sign]
         )
@@ -178,6 +179,7 @@ struct ReadActionHandlerTests {
         ) // No .inherentlyLit
 
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
             locations: [darkRoom],
             items: [map]
         )
@@ -248,6 +250,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
             locations: [darkRoom],
             items: [glowingTablet]
         )

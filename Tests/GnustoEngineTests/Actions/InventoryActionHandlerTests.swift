@@ -8,14 +8,14 @@ import Testing
 struct InventoryActionHandlerTests {
     @Test("Inventory shows items held")
     func testInventoryShowsItemsHeld() async throws {
-        var game = MinimalGame(
+        let game = MinimalGame(
             items: [
                 Item(id: "key", name: "brass key", parent: .player),
                 Item(id: "lamp", name: "brass lamp", parent: .player),
             ]
         )
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -40,14 +40,14 @@ struct InventoryActionHandlerTests {
 
     @Test("Inventory shows empty message")
     func testInventoryShowsEmptyMessage() async throws {
-        var game = MinimalGame(
+        let game = MinimalGame(
             items: [
-                Item(id: "key", name: "brass key", parent: .player),
-                Item(id: "lamp", name: "brass lamp", parent: .player),
+                Item(id: "key", name: "brass key", parent: .location("startRoom")),
+                Item(id: "lamp", name: "brass lamp", parent: .location("startRoom")),
             ]
         )
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,

@@ -189,8 +189,7 @@ struct StandardParserTests {
             locations: locations,
             items: allItems,
             player: player,
-            pronouns: initialPronouns,
-            vocabulary: .build(items: allItems)
+            pronouns: initialPronouns
         )
 
         // --- Sanity Checks (Optional but Recommended) ---

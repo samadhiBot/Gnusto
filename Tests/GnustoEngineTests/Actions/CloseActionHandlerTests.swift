@@ -8,13 +8,15 @@ import Testing
 struct CloseActionHandlerTests {
     @Test("Close item successfully")
     func testCloseItemSuccessfully() async throws {
-        var game = MinimalGame(
-            items: [
-                Item(id: "box", name: "wooden box", properties: .container, .openable, .open),
-            ]
+        let box = Item(
+            id: "box",
+            name: "wooden box",
+            properties: .container, .openable, .open,
+            parent: .location("startRoom")
         )
+        let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -39,9 +41,9 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
-        var game = MinimalGame()
+        let game = MinimalGame()
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -61,13 +63,13 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails item not accessible")
     func testCloseFailsItemNotAccessible() async throws {
-        var game = MinimalGame(
+        let game = MinimalGame(
             items: [
                 Item(id: "box", name: "wooden box", properties: .container, .openable, .open),
             ]
         )
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -85,13 +87,14 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails item not closeable")
     func testCloseFailsItemNotCloseable() async throws {
-        var game = MinimalGame(
-            items: [
-                Item(id: "rock", name: "heavy rock"), // Not .openable
-            ]
-        )
+        let rock = Item(
+            id: "rock",
+            name: "heavy rock",
+            parent: .location("startRoom")
+        ) // Not .openable
+        let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -110,13 +113,15 @@ struct CloseActionHandlerTests {
 
     @Test("Close fails item already closed")
     func testCloseFailsItemAlreadyClosed() async throws {
-        var game = MinimalGame(
-            items: [
-                Item(id: "box", name: "wooden box", properties: .container, .openable), // Starts closed
-            ]
+        let box = Item(
+            id: "box",
+            name: "wooden box",
+            properties: .container, .openable, // Starts closed
+            parent: .location("startRoom")
         )
+        let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,

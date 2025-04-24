@@ -14,7 +14,8 @@ struct OpenActionHandlerTests {
         let closedBox = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable // Starts closed
+            properties: .container, .openable, // Starts closed
+            parent: .location("startRoom")
         )
 
         let game = MinimalGame(items: [closedBox])

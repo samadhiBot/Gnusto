@@ -7,54 +7,24 @@ import CustomDump
 @Suite("WearActionHandler Tests")
 struct WearActionHandlerTests {
     let handler = WearActionHandler()
-    let testLocationID = Location.ID("testRoom")
 
-    // --- Helper Setup ---
-    func createTestEngine(
-        itemsInInventory: [Item] = []
-    ) async -> (GameEngine, MockIOHandler) {
-        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: .inherentlyLit)
-        let player = Player(in: location.id)
-
-        var allItems: [Item.ID: Item] = [:]
-        for item in itemsInInventory {
-            // Assume items passed are intended to be in inventory
-            allItems[item.id] = Item(id: item.id, name: item.name, properties: item.properties, parent: .player)
-        }
-
-        // Add relevant verbs to vocabulary
-        let wearVerb = Verb(
-            id: "wear",
-            synonyms: "don",
-            syntax: [SyntaxRule(.verb, .directObject)]
+    @Test("Wear held, wearable item successfully")
+    func testWearItemSuccess() async throws {
+        let cloak = Item(
+            id: "cloak",
+            name: "cloak",
+            properties: .takable, .wearable, // Held, wearable
+            parent: .player
         )
-        let verbs = [wearVerb]
-        let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
-
-        let initialState = GameState(
-            locations: [location.id: location],
-            items: allItems,
-            player: player,
-            vocabulary: vocab
-        )
-
+        let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
-            initialState: initialState,
+            game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        return (engine, mockIO)
-    }
-
-    // --- Tests ---
-
-    @Test("Wear held, wearable item successfully")
-    func testWearItemSuccess() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable) // Held, wearable
-        let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
         // Initial state check
@@ -75,7 +45,15 @@ struct WearActionHandlerTests {
     @Test("Wear fails if item not held")
     func testWearItemNotHeld() async throws {
         // Cloak is not in inventory in this setup
-        let (engine, _) = await createTestEngine()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         // We assume parser resolved "cloak" to an ID, even if not held,
         // but the handler must verify it *is* held.
@@ -89,8 +67,21 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item not wearable")
     func testWearItemNotWearable() async throws {
-        let rock = Item(id: "rock", name: "rock", properties: .takable) // Held, but not wearable
-        let (engine, _) = await createTestEngine(itemsInInventory: [rock])
+        let rock = Item(
+            id: "rock",
+            name: "rock",
+            properties: .takable, // Held, but not wearable
+            parent: .player
+        )
+        let game = MinimalGame(items: [rock])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
 
         // Act & Assert Error
@@ -104,8 +95,21 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item already worn")
     func testWearItemAlreadyWorn() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable, .worn) // Held, wearable, already worn
-        let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
+        let cloak = Item(
+            id: "cloak",
+            name: "cloak",
+            properties: .takable, .wearable, .worn, // Held, wearable, already worn
+            parent: .player
+        )
+        let game = MinimalGame(items: [cloak])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
         // Act
@@ -121,7 +125,15 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails with no direct object")
     func testWearNoObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         // Command with nil directObject
         let command = Command(verbID: "wear", rawInput: "wear")
 

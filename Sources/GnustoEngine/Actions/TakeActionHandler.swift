@@ -2,7 +2,6 @@ import Foundation
 
 /// Handles the "TAKE" command and its synonyms (e.g., "GET").
 public struct TakeActionHandler: ActionHandler {
-
     public init() {}
 
     public func perform(command: Command, engine: GameEngine) async throws {

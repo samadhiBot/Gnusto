@@ -15,7 +15,6 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
-            size: 10,
             parent: .player
         )
         let game = MinimalGame(items: [lamp])
@@ -54,10 +53,10 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
-            size: 10,
             parent: .location(darkRoom.id)
         )
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
             locations: [darkRoom],
             items: [lamp]
         )
@@ -103,7 +102,6 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
-            size: 10,
             parent: .player
         )
         let game = MinimalGame(items: [lamp])
@@ -137,7 +135,6 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .takable,
-            size: 10,
             parent: .player
         )
         let game = MinimalGame(items: [lamp])
@@ -178,7 +175,6 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
-            size: 10,
             parent: .item("box")
         )
         let game = MinimalGame(items: [container, lamp])
@@ -218,10 +214,10 @@ struct TurnOnActionHandlerTests {
             name: "brass lantern",
             description: "A brass lantern.",
             properties: .device, .takable,
-            size: 10,
-            parent: .location(darkRoom.id)
+            parent: .player
         )
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
             locations: [darkRoom],
             items: [lamp]
         )

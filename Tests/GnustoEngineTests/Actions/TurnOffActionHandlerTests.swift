@@ -7,64 +7,6 @@ import CustomDump
 struct TurnOffActionHandlerTests {
     let handler = TurnOffActionHandler()
 
-    // MARK: - Test Setup Helpers
-
-    /// Shared setup logic, adapted from TurnOnActionHandlerTests.
-//    static func setupTestEnvironment(
-//        itemsToAdd: [Item] = [],
-//        initialLocation: Location = Location(id: "room", name: "Test Room", description: "A room.", properties: [.inherentlyLit]), // Lit by default
-//        initialProperties: Set<ItemProperty> = [.device, .lightSource, .takable, .on], // Start with .on by default for turning off
-//        initialItemParent: ParentEntity = .location("room"),
-//        makeRoomDarkInitially: Bool = false // To test going from lit to dark
-//    ) async -> (
-//        engine: GameEngine,
-//        mockIO: MockIOHandler,
-//        "lamp": ItemID,
-//        testLocationID: LocationID
-//    ) {
-//        var finalLocation = initialLocation
-//        if makeRoomDarkInitially {
-//            let darkRoom = initialLocation
-//            darkRoom.properties.remove(.inherentlyLit)
-//            finalLocation = darkRoom
-//            // We rely on the lamp being ON initially to light the room
-//        }
-//
-//        let "lamp": ItemID = "lamp"
-//        let testItem = Item(
-//            id: "lamp",
-//            name: "brass lantern",
-//            description: "A brass lantern.",
-//            properties: initialProperties,
-//            size: 10
-//        )
-//
-//        var allItems = itemsToAdd
-//        allItems.append(testItem)
-//
-//        let player = Player(in: finalLocation.id)
-//        let vocabulary = Vocabulary.build(items: allItems, verbs: [Verb(id: "turn off")])
-//        let initialGameState = GameState(
-//            locations: [finalLocation],
-//            items: allItems,
-//            player: player,
-//            vocabulary: vocabulary
-//        )
-//
-//        let mockIO = await MockIOHandler()
-//        let engine = GameEngine(
-//            initialState: initialGameState,
-//            parser: StandardParser(),
-//            ioHandler: mockIO
-//        )
-//
-//        engine.updateItemParent(itemID: "lamp", newParent: initialItemParent)
-//
-//        return (engine, mockIO, "lamp", finalLocation.id)
-//    }
-
-    // MARK: - Tests
-
     @Test("Successfully turn off a light source in inventory")
     func testTurnOffLightSourceInInventory() async throws {
         // Arrange
@@ -72,7 +14,7 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
+            properties: .device, .lightSource, .takable, .on,
             size: 10,
             parent: .player
         )
@@ -110,11 +52,12 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
+            properties: .device, .lightSource, .takable, .on,
             size: 10,
             parent: .location(darkRoom.id)
         )
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
             locations: [darkRoom],
             items: [lamp]
         )
@@ -142,9 +85,9 @@ struct TurnOffActionHandlerTests {
 
         let output = await mockIO.flush()
         let expectedOutput = """
-        The brass lantern is now off.
-        It is now pitch black. You are likely to be eaten by a grue.
-        """
+            The brass lantern is now off.
+            It is now pitch black. You are likely to be eaten by a grue.
+            """
         expectNoDifference(output, expectedOutput)
 
         // Verify room is now dark
@@ -281,6 +224,7 @@ struct TurnOffActionHandlerTests {
             parent: .location(lightRoom.id)
         )
         let game = MinimalGame(
+            player: Player(in: "lightRoom"),
             locations: [lightRoom],
             items: [lamp]
         )

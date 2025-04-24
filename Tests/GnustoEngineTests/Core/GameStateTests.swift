@@ -81,8 +81,7 @@ struct GameStateTests {
             items: items,
             player: player,
             flags: flags,
-            pronouns: pronouns,
-            vocabulary: .build(items: items)
+            pronouns: pronouns
         )
     }
 

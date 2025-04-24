@@ -10,10 +10,26 @@ struct LookActionHandlerTests {
 
     @Test("LOOK in lit room describes room and lists items")
     func testLookInLitRoom() async throws {
-        let item1 = Item(id: "widget", name: "shiny widget")
-        let item2 = Item(id: "gizmo", name: "blue gizmo")
+        let litRoom = Location(
+            id: "litRoom",
+            name: "Test Room",
+            description: "A basic room.",
+            properties: .inherentlyLit
+        )
+        let item1 = Item(
+            id: "widget",
+            name: "shiny widget",
+            parent: .location("litRoom")
+        )
+        let item2 = Item(
+            id: "gizmo",
+            name: "blue gizmo",
+            parent: .location("litRoom")
+        )
 
         let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: [litRoom],
             items: [item1, item2]
         )
         let mockIO = await MockIOHandler()
@@ -41,9 +57,20 @@ struct LookActionHandlerTests {
 
     @Test("LOOK in dark room prints darkness message")
     func testLookInDarkRoom() async throws {
-        let item1 = Item(id: "widget", name: "shiny widget")
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Test Room",
+            description: "A basic room."
+        )
+        let item1 = Item(
+            id: "widget",
+            name: "shiny widget",
+            parent: .location("darkRoom")
+        )
 
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: [darkRoom],
             items: [item1]
         )
         let mockIO = await MockIOHandler()
@@ -64,10 +91,26 @@ struct LookActionHandlerTests {
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
     func testLookInRoomLitByPlayer() async throws {
-        let activeLamp = Item(id: "lamp", name: "lamp", properties: .lightSource, .on, .takable)
-        let item1 = Item(id: "widget", name: "shiny widget")
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Test Room",
+            description: "A basic room."
+        )
+        let activeLamp = Item(
+            id: "lamp",
+            name: "lamp",
+            properties: .lightSource, .on, .takable,
+            parent: .player
+        )
+        let item1 = Item(
+            id: "widget",
+            name: "shiny widget",
+            parent: .location(darkRoom.id)
+        )
 
         let game = MinimalGame(
+            player: Player(in: "darkRoom"),
+            locations: [darkRoom],
             items: [activeLamp, item1]
         )
         let mockIO = await MockIOHandler()

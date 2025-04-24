@@ -57,7 +57,7 @@ struct TakeActionHandlerTests {
             parent: .player
         )
 
-        var game = MinimalGame(items: [testItem])
+        let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -377,6 +377,8 @@ struct TakeActionHandlerTests {
         )
 
         var game = MinimalGame(items: [itemHeld, itemToTake])
+        game.state.player.carryingCapacity = 10 // Capacity lower than combined size
+
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -384,8 +386,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-
-        game.state.player.carryingCapacity = 10 // Capacity lower than combined size
 
         // Verify initial weight calculation is correct (optional but good)
         let initialWeight = engine.gameState.player.currentInventoryWeight(allItems: engine.gameState.items)
