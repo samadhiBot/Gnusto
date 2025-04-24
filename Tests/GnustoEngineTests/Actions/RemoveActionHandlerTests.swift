@@ -7,56 +7,25 @@ import CustomDump
 @Suite("RemoveActionHandler Tests")
 struct RemoveActionHandlerTests {
     let handler = RemoveActionHandler()
-    let testLocationID = Location.ID("testRoom")
 
-    // --- Helper Setup (Adapted from WearActionHandlerTests) ---
-    func createTestEngine(
-        itemsInInventory: [Item] = []
-    ) async -> (GameEngine, MockIOHandler) {
-        let location = Location(id: testLocationID, name: "Test Room", description: "A basic room.", properties: .inherentlyLit)
-        let player = Player(in: location.id)
-
-        var allItems: [Item.ID: Item] = [:]
-        for item in itemsInInventory {
-            // Assume items passed are intended to be in inventory (parent = .player)
-            // Use the full initializer to ensure parentage is correct if Item becomes a struct
-            allItems[item.id] = Item(id: item.id, name: item.name, properties: item.properties, parent: .player)
-        }
-
-        // Add relevant verbs to vocabulary
-        let removeVerb = Verb(
-            id: "remove",
-            synonyms: "doff",
-            "take off",
-            syntax: [SyntaxRule(.verb, .directObject)]
-        )
-        let verbs = [removeVerb]
-        let vocab = Vocabulary.build(items: Array(allItems.values), verbs: verbs)
-
-        let initialState = GameState(
-            locations: [location.id: location],
-            items: allItems,
-            player: player,
-            vocabulary: vocab
+    @Test("Remove worn item successfully")
+    func testRemoveItemSuccess() async throws {
+        let cloak = Item(
+            id: "cloak",
+            name: "cloak",
+            properties: .takable, .wearable, .worn, // Held, wearable, worn
+            parent: .player
         )
 
+        let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
-            initialState: initialState,
+            game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        return (engine, mockIO)
-    }
-
-    // --- Tests ---
-
-    @Test("Remove worn item successfully")
-    func testRemoveItemSuccess() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable, .worn) // Held, wearable, worn
-        let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
 
         // Initial state check
@@ -76,8 +45,22 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails if item not worn (but held)")
     func testRemoveItemNotWorn() async throws {
-        let cloak = Item(id: "cloak", name: "cloak", properties: .takable, .wearable) // Held, wearable, NOT worn
-        let (engine, mockIO) = await createTestEngine(itemsInInventory: [cloak])
+        let cloak = Item(
+            id: "cloak",
+            name: "cloak",
+            properties: .takable, .wearable, // Held, wearable, NOT worn
+            parent: .player
+        )
+
+        let game = MinimalGame(items: [cloak])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "take off cloak")
 
         // Initial state check
@@ -97,7 +80,15 @@ struct RemoveActionHandlerTests {
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
         // Cloak is not in inventory in this setup
-        let (engine, _) = await createTestEngine()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
         // Assume parser resolved "cloak", handler must verify it's held (or worn, implicitly meaning held)
 
@@ -110,7 +101,15 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         // Command with nil directObject
         let command = Command(verbID: "remove", rawInput: "remove")
 

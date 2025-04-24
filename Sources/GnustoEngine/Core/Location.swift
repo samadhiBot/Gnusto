@@ -113,5 +113,3 @@ public final class Location: Codable, Identifiable {
         properties.remove(property)
     }
 }
-
-/// Represents a potential exit from a location in a specific direction.

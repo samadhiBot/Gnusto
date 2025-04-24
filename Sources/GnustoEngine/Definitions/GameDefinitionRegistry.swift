@@ -12,8 +12,12 @@ public struct GameDefinitionRegistry {
     /// Dictionary mapping Daemon IDs to their definitions.
     private let daemonDefinitions: [DaemonID: DaemonDefinition]
 
+    /// Custom handlers for specific verb commands.
+    ///
+    /// These can augment and override the default verb handlers.
+    public let customActionHandlers: [VerbID: ActionHandler]
+
     /// Handlers triggered when an action targets a specific item ID.
-    /// Public access needed for game setup to register handlers.
     public let objectActionHandlers: [ItemID: ObjectActionHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
@@ -21,41 +25,59 @@ public struct GameDefinitionRegistry {
 
     /// Initializes the registry with definitions and handlers.
     /// - Parameters:
-    ///   - fuseDefinitions: An array of `FuseDefinition`s. Defaults to empty.
-    ///   - daemonDefinitions: An array of `DaemonDefinition`s. Defaults to empty.
-    ///   - objectActionHandlers: A dictionary of item-specific action handlers. Defaults to empty.
-    ///   - roomActionHandlers: A dictionary of location-specific action handlers. Defaults to empty.
+    ///   - fuseDefinitions: An array of `FuseDefinition`s.
+    ///   - daemonDefinitions: An array of `DaemonDefinition`s.
+    ///   - customActionHandlers: A dictionary of verb-specific custom action handlers.
+    ///   - objectActionHandlers: A dictionary of item-specific action handlers.
+    ///   - roomActionHandlers: A dictionary of location-specific action handlers.
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
+        customActionHandlers: [VerbID: ActionHandler] = [:],
         objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
         roomActionHandlers: [LocationID: RoomActionHandler] = [:]
     ) {
         // Build dictionaries from arrays for efficient lookup
-        self.fuseDefinitions = Dictionary(uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) })
-        self.daemonDefinitions = Dictionary(uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) })
+        self.fuseDefinitions = Dictionary(
+            uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
+        )
+        self.daemonDefinitions = Dictionary(
+            uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
+        )
+        self.customActionHandlers = customActionHandlers
         self.objectActionHandlers = objectActionHandlers
         self.roomActionHandlers = roomActionHandlers
     }
 
-    /// Retrieves a `FuseDefinition` by its ID.
-    /// - Parameter id: The `FuseID` to look up.
-    /// - Returns: The `FuseDefinition` if found, otherwise `nil`.
-    internal func fuseDefinition(for id: FuseID) -> FuseDefinition? {
-        fuseDefinitions[id]
-    }
-
-    /// Retrieves a `DaemonDefinition` by its ID.
+    /// Fetches a `DaemonDefinition` by its ID.
+    ///
     /// - Parameter id: The `DaemonID` to look up.
     /// - Returns: The `DaemonDefinition` if found, otherwise `nil`.
     internal func daemonDefinition(for id: DaemonID) -> DaemonDefinition? {
         daemonDefinitions[id]
     }
 
-    /// Retrieves a `RoomActionHandler` by its ID.
+    /// Fetches a `FuseDefinition` by its ID.
+    ///
+    /// - Parameter id: The `FuseID` to look up.
+    /// - Returns: The `FuseDefinition` if found, otherwise `nil`.
+    internal func fuseDefinition(for id: FuseID) -> FuseDefinition? {
+        fuseDefinitions[id]
+    }
+
+    /// Fetches a `RoomActionHandler` by its ID.
+    ///
     /// - Parameter id: The `LocationID` to look up.
     /// - Returns: The `RoomActionHandler` if found, otherwise `nil`.
     internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? {
         roomActionHandlers[id]
+    }
+
+    /// Fetches an `ActionHandler` by its associated `VerbID`.
+    ///
+    /// - Parameter id: The `VerbID` to look up.
+    /// - Returns: The `ActionHandler` if found, otherwise `nil`.
+    internal func verbActionHandler(for id: VerbID) -> ActionHandler? {
+        customActionHandlers[id]
     }
 }

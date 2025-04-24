@@ -12,62 +12,30 @@ private class TestStateHolder {
 
 @MainActor
 struct GameEngineTests {
-    // Helper to create a minimal game state for testing
-    // Make static as it doesn't depend on instance state
-    static func createMinimalGameState() async -> GameState {
-        let items = [
-            Item(
-                id: "startItem",
-                name: "pebble",
-                properties: .takable,
-                parent: .location("startRoom")
-            )
-        ]
-        let locations = [
-            Location(
-                id: "startRoom",
-                name: "Void",
-                description: "An empty void."
-            )
-        ]
-        let player = Player(in: "startRoom")
-
-        return GameState(
-            locations: locations,
-            items: items,
-            player: player,
-            vocabulary: .build(items: items)
-        )
-    }
-
-    // Helper to create a minimal registry for tests
-    // Make static as it doesn't depend on instance state
-    static func createMinimalRegistry(fuseDefs: [FuseDefinition] = [], daemonDefs: [DaemonDefinition] = []) -> GameDefinitionRegistry {
-        return GameDefinitionRegistry(fuseDefinitions: fuseDefs, daemonDefinitions: daemonDefs) // Add daemonDefs
-    }
 
     @Test("Engine Run Initialization and First Prompt in Dark Room")
     func testEngineRunInitializationInDarkRoom() async throws {
-        // Arrange - Declare locally
-        let initialState = await Self.createMinimalGameState() // Creates a dark room
-        let mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
+        let mockIO = await MockIOHandler()
+        var mockParser = MockParser()
+        let engine = GameEngine(
+            game: MinimalGame(),
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         // Configure Mock IO to provide one input then stop
-        await mockIOHandler.enqueueInput("quit")
+        await mockIO.enqueueInput("quit")
 
         // Act
         await engine.run()
 
         // Assert
         // Verify setup was called
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
 
         // Verify initial location description was printed
-        let output = await mockIOHandler.flush()
+        let output = await mockIO.flush()
         expectNoDifference(output, """
             It is pitch black. You are likely to be eaten by a grue.
             > quit
@@ -76,46 +44,46 @@ struct GameEngineTests {
         // TODO: Check for item listing once implemented in describeCurrentLocation
 
         // Verify status line was shown before prompt
-        let statuses = await mockIOHandler.recordedStatusLines
+        let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 1)
         #expect(statuses.first?.roomName == "Void")
         #expect(statuses.first?.score == 0)
         #expect(statuses.first?.turns == 0) // Turn counter not incremented yet
 
         // Verify teardown was called
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
     }
 
     @Test("Engine Handles Parse Error")
     func testEngineHandlesParseError() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: MinimalGame(),
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         // Configure parser to always return an error
         let parseError = ParseError.unknownVerb("xyzzy")
         mockParser.defaultParseResult = .failure(parseError)
 
         // Configure IO for one failed command then quit
-        await mockIOHandler.enqueueInput("xyzzy", "quit")
-
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
+        await mockIO.enqueueInput("xyzzy", "quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1, "IOHandler setup should be called once")
 
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1, "IOHandler teardown should be called once")
 
         // Check that the specific error message was printed
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         let expectedMessage = "I don't know the verb 'xyzzy'."
         #expect(output.contains { $0.text == expectedMessage }, "Expected parse error message not found in output")
 
@@ -126,17 +94,28 @@ struct GameEngineTests {
 
     @Test("Engine Handles Action Error")
     func testEngineHandlesActionError() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockTakeHandler = MockActionHandler(
+            errorToThrow: .itemNotTakable("startItem")
+        )
+        let game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                customActionHandlers: [VerbID("take"): mockTakeHandler]
+            )
+        )
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        game.state.items["startItem"]?.properties.remove(.takable)
 
         // Make pebble non-takable in this test's state
-        initialState.items["startItem"]?.properties.remove(.takable)
-        #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
+        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
         // Ensure room is lit for this test
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Command for "take pebble"
         let takeCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
@@ -148,33 +127,20 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        // Configure mock action handler to throw error
-        // Must await actor initialization
-        let mockTakeHandler = MockActionHandler(errorToThrow: .itemNotTakable("startItem"))
-
-        // Create engine with the mock handler
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry, // Pass registry
-            customHandlers: [VerbID("take"): mockTakeHandler]
-        )
-
         // Configure IO
-        await mockIOHandler.enqueueInput("take pebble", "quit")
+        await mockIO.enqueueInput("take pebble", "quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
         // Check that the specific action error message was printed
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         let expectedMessage = "You can't take the pebble."
         #expect(
             output.contains { $0.text == expectedMessage },
@@ -195,13 +161,22 @@ struct GameEngineTests {
 
     @Test("Engine Processes Successful Command")
     func testEngineProcessesSuccessfulCommand() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockLookHandler = MockActionHandler()
+        let game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                customActionHandlers: [VerbID("look"): mockLookHandler]
+            )
+        )
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         // Ensure room is lit
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
 
@@ -212,28 +187,16 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        // Configure mock LOOK handler to just record the call
-        let mockLookHandler = MockActionHandler()
-
-        // Create engine with the mock handler
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry, // Pass registry
-            customHandlers: [VerbID("look"): mockLookHandler]
-        )
-
         // Configure IO
-        await mockIOHandler.enqueueInput("look", "quit")
+        await mockIO.enqueueInput("look", "quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
         // Verify the handler was called with the correct command
@@ -249,13 +212,26 @@ struct GameEngineTests {
 
     @Test("Engine Processes Multiple Commands")
     func testEngineProcessesMultipleCommands() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockLookHandler = MockActionHandler()
+        let mockTakeHandler = MockActionHandler()
+        let game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                customActionHandlers: [
+                    VerbID("look"): mockLookHandler,
+                    VerbID("take"): mockTakeHandler
+                ]
+            )
+        )
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         // Ensure room is lit
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let lookCommand = Command(verbID: "look", rawInput: "look")
         // Let's use the pebble from the minimal state
@@ -271,32 +247,16 @@ struct GameEngineTests {
             }
         }
 
-        // Configure mock handlers
-        let mockLookHandler = MockActionHandler()
-        let mockTakeHandler = MockActionHandler()
-
-        // Create engine
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry, // Pass registry
-            customHandlers: [
-                VerbID("look"): mockLookHandler,
-                VerbID("take"): mockTakeHandler
-            ]
-        )
-
         // Configure IO for the command sequence
-        await mockIOHandler.enqueueInput("look", "take pebble", "quit")
+        await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
         // Verify handlers were called
@@ -317,7 +277,7 @@ struct GameEngineTests {
         #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
 
         // Check status line was updated for each turn (initial + 2 turns)
-        let statuses = await mockIOHandler.recordedStatusLines
+        let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 3) // Initial state + 2 turns
         #expect(statuses[0].turns == 0)
         #expect(statuses[1].turns == 1)
@@ -326,11 +286,19 @@ struct GameEngineTests {
 
     @Test("Engine Exits Gracefully on Quit Command")
     func testEngineExitsGracefullyOnQuitCommand() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockQuitHandler = MockActionHandler()
+        let game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                customActionHandlers: [VerbID("quit"): mockQuitHandler]
+            )
+        )
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let quitCommand = Command(verbID: "quit", rawInput: "quit")
 
@@ -340,28 +308,16 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        // Configure mock QUIT handler - it does nothing, signalling successful handling
-        let mockQuitHandler = MockActionHandler()
-
-        // Create engine
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry, // Pass registry
-            customHandlers: [VerbID("quit"): mockQuitHandler]
-        )
-
         // Configure IO for just the quit command
-        await mockIOHandler.enqueueInput("quit")
+        await mockIO.enqueueInput("quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1, "Teardown should be called on graceful exit")
 
         // Verify the quit handler was NOT called (engine handles quit internally)
@@ -375,7 +331,7 @@ struct GameEngineTests {
         #expect(finalMoves == 0, "Turn counter should not increment for the quit command if exit happens first")
 
         // Verify output - only initial description, status, and prompt, then nothing after quit
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         let quitPromptIndex = output.lastIndex { $0.text == "> " && $0.style == .input }
         #expect(quitPromptIndex != nil, "Expected a prompt before quit")
 
@@ -385,35 +341,34 @@ struct GameEngineTests {
         }
 
          // Check status line was shown only for initial state
-        let statuses = await mockIOHandler.recordedStatusLines
+        let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 1) // Only initial state, loop exits before turn 1 status
         #expect(statuses[0].turns == 0)
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
     func testEngineHandlesNilInputGracefully() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
-        let mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry) // Pass registry
-
-        // Configure Mock IO to provide NO input, triggering readLine to return nil immediately after the first prompt
-        // No need to call enqueueInput
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        var mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         // Act
         await engine.run()
 
         // Assert
         // Verify setup and teardown were called
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1, "Teardown should be called even on nil input")
 
         // Verify initial output occurred (room desc, status, prompt)
-        let output = await mockIOHandler.flush()
+        let output = await mockIO.flush()
         expectNoDifference(output, """
             It is pitch black. You are likely to be eaten by a grue.
             >
@@ -422,7 +377,7 @@ struct GameEngineTests {
             """)
 
         // Check status line was shown only for the initial state
-        let statuses = await mockIOHandler.recordedStatusLines
+        let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 1)
         #expect(statuses.first?.turns == 0)
 
@@ -433,18 +388,34 @@ struct GameEngineTests {
 
     @Test("Engine State Persists Between Turns (Take -> Inventory)")
     func testEngineStatePersistsBetweenTurns() async throws {
-        // Arrange
-        let initialState = await Self.createMinimalGameState()
+        let mockInventoryHandler = MockActionHandler()
+        let mockTakeHandler = MockActionHandler(performHandler: { command, engine in
+            await engine.updateItemParent(itemID: "startItem", newParent: .player)
+            await engine.ioHandler.print("Taken.")
+        })
+        let game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                customActionHandlers: [
+                    VerbID("take"): mockTakeHandler,
+                    VerbID("inventory"): mockInventoryHandler,
+                ]
+            )
+        )
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry() // Create registry
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         // Ensure room is lit
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Ensure pebble is initially takable and in the room
-        #expect(initialState.items["startItem"]?.hasProperty(.takable) == true)
-        #expect(initialState.itemLocation(id: "startItem") == .location("startRoom"))
-        #expect(initialState.itemsInInventory().isEmpty == true) // No player ID needed
+        #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
+        #expect(game.state.itemLocation(id: "startItem") == .location("startRoom"))
+        #expect(game.state.itemsInInventory().isEmpty == true) // No player ID needed
 
         let takePebbleCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
         let inventoryCommand = Command(verbID: "inventory", rawInput: "inventory")
@@ -459,45 +430,16 @@ struct GameEngineTests {
             }
         }
 
-        // Configure mock TAKE handler to modify game state
-        let mockTakeHandler = MockActionHandler(performHandler: { command, engine in
-            // Simulate taking the pebble using direct engine methods
-            await engine.updateItemParent(itemID: "startItem", newParent: .player)
-            // Add a success message
-            await engine.ioHandler.print("Taken.")
-        })
-
-        // Configure mock INVENTORY handler to just record call (state check done later)
-        let mockInventoryHandler = MockActionHandler()
-
-        // Create engine with necessary verbs in vocabulary & handlers
-        // No longer needed - verbs added in createMinimalGameState
-        // initialState.vocabulary.addVerb(Verb(id: "take"))
-        // initialState.vocabulary.addVerb(Verb(id: "inventory"))
-        // initialState.vocabulary.addVerb(Verb(id: "quit")) // Ensure quit is known
-
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry, // Pass registry
-            customHandlers: [
-                VerbID("take"): mockTakeHandler,
-                VerbID("inventory"): mockInventoryHandler,
-                // No Quit handler needed - handled internally
-            ]
-        )
-
         // Configure IO for the command sequence
-        await mockIOHandler.enqueueInput("take pebble", "inventory", "quit")
+        await mockIO.enqueueInput("take pebble", "inventory", "quit")
 
         // Act
         await engine.run()
 
         // Assert
-        let setupCount = await mockIOHandler.setupCallCount
+        let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
-        let teardownCount = await mockIOHandler.teardownCallCount
+        let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
         // Verify handlers were called
@@ -521,14 +463,14 @@ struct GameEngineTests {
         #expect(finalMoves == 2, "Turn counter should be 2 after take and inventory commands")
 
         // Check status lines were updated
-        let statuses = await mockIOHandler.recordedStatusLines
+        let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 3) // Initial + take + inventory
         #expect(statuses[0].turns == 0)
         #expect(statuses[1].turns == 1)
         #expect(statuses[2].turns == 2)
 
          // Verify output included "Taken."
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         #expect(output.contains { $0.text == "Taken." })
     }
 
@@ -536,26 +478,28 @@ struct GameEngineTests {
 
     @Test("Fuse executes after correct number of turns")
     func testFuseExecution() async throws {
-        var initialState = await Self.createMinimalGameState() // Needs var to modify activeFuses
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-
-        // Arrange: Define the fuse and its action
         let stateHolder = TestStateHolder()
         let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { _ in
-            await mockIOHandler.print("Fuse triggered!")
+            await mockIO.print("Fuse triggered!")
             stateHolder.flag = true
         }
-        // Simulate fuse being active in saved state
-        initialState.activeFuses[fuseDef.id] = 2
+        var game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                fuseDefinitions: [fuseDef]
+            )
+        )
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
-        // Create registry containing the definition
-        let registry = Self.createMinimalRegistry(fuseDefs: [fuseDef])
-
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIOHandler, registry: registry)
+        game.state.activeFuses[fuseDef.id] = 2
 
         // Act: Run engine for 3 turns (look, look, quit)
-        await mockIOHandler.enqueueInput("look", "look", "quit")
+        await mockIO.enqueueInput("look", "look", "quit")
         mockParser.parseHandler = { input, _, _ in
             if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
             if input == "quit" { return .failure(.emptyInput) } // Let engine handle quit
@@ -564,7 +508,7 @@ struct GameEngineTests {
         await engine.run()
 
         // Assert
-        let output = await mockIOHandler.recordedOutput // Fetch output before assertions
+        let output = await mockIO.recordedOutput // Fetch output before assertions
         #expect(output.contains { $0.text == "Fuse triggered!" }, "Fuse message not found in output") // Check message
         #expect(stateHolder.flag == true, "Fuse action flag not set") // Check state holder flag
         #expect(engine.playerMoves() == 2) // Check turns
@@ -573,26 +517,23 @@ struct GameEngineTests {
 
     @Test("Daemon executes at correct frequency")
     func testDaemonExecutionFrequency() async throws {
-        let initialState = await Self.createMinimalGameState()
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-
-        // Arrange: Define the daemon definition
         let stateHolder = TestStateHolder()
+
         let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in
-            await mockIOHandler.print("Daemon ran!")
+            await mockIO.print("Daemon ran!")
             stateHolder.count += 1
         }
-
-        // Pass definition to registry
-        let registry = Self.createMinimalRegistry(daemonDefs: [testDaemonDef])
-
-        // Initialize engine without initialDaemons
+        var game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                daemonDefinitions: [testDaemonDef]
+            )
+        )
         let engine = GameEngine(
-            initialState: initialState,
+            game: game,
             parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry
+            ioHandler: mockIO
         )
 
         // Register the daemon dynamically AFTER engine init
@@ -602,7 +543,7 @@ struct GameEngineTests {
         // Act: Run engine for 7 turns (look x 7, quit)
         let commands = Array(repeating: "look", count: 7) + ["quit"]
         for command in commands {
-            await mockIOHandler.enqueueInput(command)
+            await mockIO.enqueueInput(command)
         }
         mockParser.parseHandler = { input, _, _ in
              if input == "look" { return .success(Command(verbID: "look", rawInput: "look")) }
@@ -620,7 +561,7 @@ struct GameEngineTests {
         let expectedDaemonRuns = 2
 
         // Check daemon message count
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         let daemonMessages = output.filter { $0.text == "Daemon ran!" }
         #expect(daemonMessages.count == expectedDaemonRuns, "Daemon message count mismatch")
 
@@ -631,42 +572,39 @@ struct GameEngineTests {
 
     @Test("Fuse and Daemon Interaction")
     func testFuseAndDaemonInteraction() async throws {
-        // Arrange
-        var initialState = await Self.createMinimalGameState()
+        let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-
-        // Create a state holder to track events
         let stateHolder = TestStateHolder()
 
         // Set up a fuse that will trigger after 3 turns
         let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
-            await mockIOHandler.print("Fuse triggered!")
+            await mockIO.print("Fuse triggered!")
             stateHolder.flag = true // Mark that fuse was triggered
         }
 
         // Set up a daemon that will run every 2 turns
         let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
-            await mockIOHandler.print("Daemon executed!")
+            await mockIO.print("Daemon executed!")
             stateHolder.count += 1 // Count daemon executions
         }
 
-        // Create registry with both definitions
-        let registry = Self.createMinimalRegistry(
-            fuseDefs: [testFuse],
-            daemonDefs: [testDaemon]
+        var game = MinimalGame(
+            registry: GameDefinitionRegistry(
+                fuseDefinitions: [testFuse],
+                daemonDefinitions: [testDaemon]
+            )
         )
+
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        // Create a state holder to track events
 
         // Add fuse to initial state
-        initialState.activeFuses[testFuse.id] = testFuse.initialTurns
-
-        // Create engine with our test state
-        let engine = GameEngine(
-            initialState: initialState,
-            parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry
-        )
+        game.state.activeFuses[testFuse.id] = testFuse.initialTurns
 
         // Register the daemon after engine creation
         let registerSuccess = engine.registerDaemon(id: testDaemon.id)
@@ -675,7 +613,7 @@ struct GameEngineTests {
         // Act: Run for 6 turns with "look" commands
         let commands = Array(repeating: "look", count: 6) + ["quit"]
         for command in commands {
-            await mockIOHandler.enqueueInput(command)
+            await mockIO.enqueueInput(command)
         }
 
         mockParser.parseHandler = { input, _, _ in
@@ -705,7 +643,7 @@ struct GameEngineTests {
               "Fuse should be removed from game state after execution")
 
         // Check for expected messages in output
-        let output = await mockIOHandler.recordedOutput
+        let output = await mockIO.recordedOutput
         let fuseMessages = output.filter { $0.text == "Fuse triggered!" }
         let daemonMessages = output.filter { $0.text == "Daemon executed!" }
 
@@ -724,15 +662,16 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .invalidDirection")
     func testReportErrorInvalidDirection() async throws {
-        let initialState = await Self.createMinimalGameState()
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        var game = MinimalGame()
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
+
         let command = Command(
             verbID: "go",
             preposition: "xyzzy",
             rawInput: "go xyzzy"
         )
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "go xyzzy",
             commandToParse: command
         )
@@ -744,13 +683,15 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
-        let initialState = await Self.createMinimalGameState()
-        initialState.items["startItem"]?.properties.remove(.takable)
-        #expect(initialState.items["startItem"]?.hasProperty(.takable) == false)
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        var game = MinimalGame()
+        game.state.items["startItem"]?.properties.remove(.takable)
+
+        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
+
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "take pebble",
             commandToParse: command
         )
@@ -759,12 +700,14 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
-        let initialState = await Self.createMinimalGameState()
-        #expect(initialState.items["startItem"]?.parent == .location("startRoom"))
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        var game = MinimalGame()
+
+        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
         let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
+
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "wear pebble",
             commandToParse: command
         )
@@ -773,20 +716,21 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .containerIsClosed")
     func testReportErrorContainerIsClosed() async throws {
+        var game = MinimalGame()
+
         // Arrange: Closed container in room, item inside
         let container = Item(id: "box", name: "box", properties: [.container]) // Closed by default
         let itemIn = Item(id: "gem", name: "gem", parent: .item("box"))
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[container.id] = container
-        initialState.items[itemIn.id] = itemIn
-        initialState.player.currentLocationID = "startRoom" // Ensure player is where box is
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
-        initialState.items[container.id]?.parent = .location("startRoom") // Box in room
+        game.state.items[container.id] = container
+        game.state.items[itemIn.id] = itemIn
+        game.state.player.currentLocationID = "startRoom" // Ensure player is where box is
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        game.state.items[container.id]?.parent = .location("startRoom") // Box in room
 
         // Command: Try to take item from closed container (will fail in Take handler)
         // OR simpler: Try to put something IN the closed container
         let itemToPut = Item(id: "key", name: "key", parent: .player)
-        initialState.items[itemToPut.id] = itemToPut
+        game.state.items[itemToPut.id] = itemToPut
 
         let command = Command(
             verbID: "put",
@@ -797,7 +741,7 @@ struct GameEngineTests {
         )
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "put key in box",
             commandToParse: command
         )
@@ -807,16 +751,17 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotOpenable")
     func testReportErrorItemNotOpenable() async throws {
+        var game = MinimalGame()
+
         // Arrange: Item that is not openable
         let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[item.id] = item
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        game.state.items[item.id] = item
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "open rock",
             commandToParse: command
         )
@@ -826,16 +771,17 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotWearable")
     func testReportErrorItemNotWearable() async throws {
+        var game = MinimalGame()
+
         // Arrange: Item that is takable but not wearable, held by player
         let item = Item(id: "rock", name: "rock", properties: [.takable], parent: .player)
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[item.id] = item
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        game.state.items[item.id] = item
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "wear rock",
             commandToParse: command
         )
@@ -844,20 +790,22 @@ struct GameEngineTests {
     }
 
     @Test("ReportActionError: .playerCannotCarryMore")
+
     func testReportErrorPlayerCannotCarryMore() async throws {
+        var game = MinimalGame()
+
         // Arrange: Player holds item, capacity is low, try to take another
         let itemHeld = Item(id: "sword", name: "sword", properties: [.takable], size: 8, parent: .player)
         let itemToTake = Item(id: "shield", name: "shield", properties: [.takable], size: 7, parent: .location("startRoom"))
-        var initialState = await Self.createMinimalGameState()
-        initialState.player.carryingCapacity = 10 // Low capacity
-        initialState.items[itemHeld.id] = itemHeld
-        initialState.items[itemToTake.id] = itemToTake
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.player.carryingCapacity = 10 // Low capacity
+        game.state.items[itemHeld.id] = itemHeld
+        game.state.items[itemToTake.id] = itemToTake
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "take shield",
             commandToParse: command
         )
@@ -867,13 +815,14 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .targetIsNotAContainer")
     func testReportErrorTargetIsNotContainer() async throws {
+        var game = MinimalGame()
+
         // Arrange: Try putting item IN something that's not a container
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom")) // Not a container
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[itemToPut.id] = itemToPut
-        initialState.items[target.id] = target
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.items[itemToPut.id] = itemToPut
+        game.state.items[target.id] = target
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(
             verbID: "put",
@@ -884,7 +833,7 @@ struct GameEngineTests {
         )
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "put key in rock",
             commandToParse: command
         )
@@ -894,13 +843,13 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .targetIsNotASurface")
     func testReportErrorTargetIsNotSurface() async throws {
+        var game = MinimalGame()
         // Arrange: Try putting item ON something that's not a surface
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom")) // Not a surface
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[itemToPut.id] = itemToPut
-        initialState.items[target.id] = target
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.items[itemToPut.id] = itemToPut
+        game.state.items[target.id] = target
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(
             verbID: "put",
@@ -911,7 +860,7 @@ struct GameEngineTests {
         )
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "put key on rock",
             commandToParse: command
         )
@@ -921,21 +870,22 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .directionIsBlocked")
     func testReportErrorDirectionIsBlocked() async throws {
+        var game = MinimalGame()
+
         // Arrange: Exit blocked by a condition
-        let initialState = await Self.createMinimalGameState()
         // Correct: Use `conditions` array
         let blockedExit = Exit(
             destination: "nowhere",
             blockedMessage: "A shimmering curtain bars the way."
         )
-        initialState.locations["startRoom"]?.exits[.north] = blockedExit
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.exits[.north] = blockedExit
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Correct: Set `.direction` property, ensuring correct argument order
         let command = Command(verbID: "go", directObject: "north", direction: .north, rawInput: "go north")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "go north",
             commandToParse: command
         )
@@ -945,17 +895,18 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemAlreadyClosed")
     func testReportErrorItemAlreadyClosed() async throws {
+        var game = MinimalGame()
+
         // Arrange: Try closing an already closed item
         // Correct: Ensure it's a container AND .openable, lacks .open
         let container = Item(id: "box", name: "box", properties: [.container, .openable], parent: .location("startRoom")) // Starts closed
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[container.id] = container
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.items[container.id] = container
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "close box",
             commandToParse: command
         )
@@ -965,16 +916,17 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemIsUnlocked")
     func testReportErrorItemIsUnlocked() async throws {
+        var game = MinimalGame()
+
         // Arrange: Try unlocking an already unlocked item
         // Correct: Remove `key:` parameter. Unlock handler needs key logic.
         let container = Item(id: "chest", name: "chest", properties: [.container, .openable, .lockable], parent: .location("startRoom")) // Unlocked
         let key = Item(id: "key1", name: "key", parent: .player) // Assume key ID "key1" matches chest internally
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[container.id] = container
-        initialState.items[key.id] = key
+        game.state.items[container.id] = container
+        game.state.items[key.id] = key
         // Correct: Add scope setup
-        initialState.player.currentLocationID = "startRoom"
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.player.currentLocationID = "startRoom"
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Correct: Restore indirect object and preposition for key
         let command = Command(
@@ -986,7 +938,7 @@ struct GameEngineTests {
         )
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "unlock chest with key",
             commandToParse: command
         )
@@ -996,17 +948,18 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotCloseable")
     func testReportErrorItemNotCloseable() async throws {
+        var game = MinimalGame()
+
         // Arrange: Item that cannot be closed (no .closeable property)
         // Correct: Remove .open as well, simply not a container/closeable item
         let item = Item(id: "book", name: "book", parent: .location("startRoom"))
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[item.id] = item
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.items[item.id] = item
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "close book",
             commandToParse: command
         )
@@ -1016,17 +969,18 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotDroppable")
     func testReportErrorItemNotDroppable() async throws {
+        var game = MinimalGame()
+
         // Arrange: Player holding an item assumed fixed by handler logic
         // Correct: Add `.fixed` property to trigger the check
         let item = Item(id: "statue", name: "statue", properties: [.fixed], parent: .player)
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[item.id] = item
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        game.state.items[item.id] = item
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "drop statue",
             commandToParse: command
         )
@@ -1036,17 +990,18 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotRemovable")
     func testReportErrorItemNotRemovable() async throws {
+        var game = MinimalGame()
+
         // Arrange: Player wearing an item assumed fixed/irremovable by handler logic
         // Correct: Add `.fixed` property to trigger the check
         let item = Item(id: "amulet", name: "cursed amulet", properties: [.wearable, .worn, .fixed], parent: .player)
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[item.id] = item
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
+        game.state.items[item.id] = item
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "remove amulet",
             commandToParse: command
         )
@@ -1056,21 +1011,22 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .prerequisiteNotMet")
     func testReportErrorPrerequisiteNotMet() async throws {
+        var game = MinimalGame()
+
         // Arrange: Exit condition provides a specific prerequisite message
-        let initialState = await Self.createMinimalGameState()
         // Correct: Use `conditions` array
         let conditionalExit = Exit(
             destination: "nirvana",
             blockedMessage: "You must first find inner peace."
         )
-        initialState.locations["startRoom"]?.exits[.up] = conditionalExit
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.locations["startRoom"]?.exits[.up] = conditionalExit
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         // Correct: Set `.direction` property, ensuring correct argument order
         let command = Command(verbID: "go", directObject: "up", direction: .up, rawInput: "go up")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "go up",
             commandToParse: command
         )
@@ -1080,14 +1036,15 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
-        var initialState = await Self.createMinimalGameState()
-        initialState.locations["startRoom"]?.properties.remove(.inherentlyLit)
+        var game = MinimalGame()
+
+        game.state.locations["startRoom"]?.properties.remove(.inherentlyLit)
         let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
-        initialState.items[item.id] = item
-        #expect(initialState.locations["startRoom"]?.hasProperty(.inherentlyLit) == false)
+        game.state.items[item.id] = item
+        #expect(game.state.locations["startRoom"]?.hasProperty(.inherentlyLit) == false)
         let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "examine shadow",
             commandToParse: command
         )
@@ -1096,21 +1053,22 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .wrongKey")
     func testReportErrorWrongKey() async throws {
+        var game = MinimalGame()
+
         // Arrange: Locked item, player tries unlocking with wrong key
         // Correct: Remove `key:` parameter. Unlock handler needs key logic.
         let container = Item(id: "chest", name: "chest", properties: [.container, .lockable, .locked], parent: .location("startRoom")) // Assumes internally requires "key1"
         let wrongKey = Item(id: "key2", name: "wrong key", parent: .player)
-        var initialState = await Self.createMinimalGameState()
-        initialState.items[container.id] = container
-        initialState.items[wrongKey.id] = wrongKey
+        game.state.items[container.id] = container
+        game.state.items[wrongKey.id] = wrongKey
         // Correct: Ensure room is lit and player is present for scope
-        initialState.player.currentLocationID = "startRoom"
-        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        game.state.player.currentLocationID = "startRoom"
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
 
         let output = await runCommandAndCaptureOutput(
-            initialState: initialState,
+            game: game,
             commandInput: "unlock chest with key2",
             commandToParse: command
         )
@@ -1121,7 +1079,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .containerIsFull")
     func testReportErrorContainerIsFull() async throws {
         // ... implementation ...
-//        initialState.locations["startRoom"]?.properties.insert(.inherentlyLit)
+//        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
         // ... run command ...
     }
 
@@ -1144,27 +1102,28 @@ extension [MockIOHandler.OutputCall] {
 extension GameEngineTests {
     /// Helper to run the engine for one command and capture output.
     private func runCommandAndCaptureOutput(
-        initialState: GameState,
+        game: GameDefinition,
         commandInput: String,
         commandToParse: Command
     ) async -> String {
         var mockParser = MockParser()
-        let mockIOHandler = await MockIOHandler()
-        let registry = Self.createMinimalRegistry()
+        let mockIO = await MockIOHandler()
+
         mockParser.parseHandler = { input, _, _ in
             if input == commandInput { return .success(commandToParse) }
             if input == "quit" { return .failure(.emptyInput) }
             return .failure(.unknownVerb(input))
         }
+
         let engine = GameEngine(
-            initialState: initialState,
+            game: game,
             parser: mockParser,
-            ioHandler: mockIOHandler,
-            registry: registry
+            ioHandler: mockIO
         )
-        await mockIOHandler.enqueueInput(commandInput, "quit")
+
+        await mockIO.enqueueInput(commandInput, "quit")
         await engine.run()
-        let outputCalls = await mockIOHandler.recordedOutput
+        let outputCalls = await mockIO.recordedOutput
         var commandOutput = ""
         var foundPrompt = false
         for call in outputCalls {

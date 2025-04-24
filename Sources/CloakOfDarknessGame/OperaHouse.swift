@@ -1,6 +1,8 @@
 import GnustoEngine
 
-struct Locations: LocationDefinitions {
+struct OperaHouse: ItemDefinitions, LocationDefinitions {
+    // MARK: - Bar
+
     let bar = Location(
         id: "bar",
         name: "Bar",
@@ -10,7 +12,17 @@ struct Locations: LocationDefinitions {
         ]
         // Note: Bar lighting is handled dynamically by hooks
     )
-    
+
+    let message = Item(
+        id: "message",
+        name: "message",
+        properties: .ndesc, .read,
+        parent: .location("bar"),
+        readableText: "You have won!"
+    )
+
+    // MARK: - Cloakroom
+
     let cloakroom = Location(
         id: "cloakroom",
         name: "Cloakroom",
@@ -23,7 +35,18 @@ struct Locations: LocationDefinitions {
         ],
         properties: .inherentlyLit
     )
-    
+
+    let hook = Item(
+        id: "hook",
+        name: "hook",
+        adjectives: "brass",
+        synonyms: "peg",
+        properties: .surface,
+        parent: .location("cloakroom")
+    )
+
+    // MARK: - Foyer of the Opera House
+
     let foyer = Location(
         id: "foyer",
         name: "Foyer of the Opera House",
@@ -39,4 +62,21 @@ struct Locations: LocationDefinitions {
         ],
         properties: .inherentlyLit
     )
+
+    // MARK: - Items
+
+    let cloak = Item(
+        id: "cloak",
+        name: "cloak",
+        adjectives: "handsome", "velvet",
+        properties: .takable, .wearable, .worn,
+        parent: .player
+    )
+
+//    let playerItem = Item(
+//        id: "player",
+//        name: "yourself",
+//        synonyms: "me", "myself",
+//        properties: .person
+//    )
 }

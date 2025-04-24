@@ -32,55 +32,56 @@ public struct GameState: Codable {
     /// Optional dictionary for storing arbitrary game-specific state (counters, quest flags, etc.).
     /// Use keys prefixed with game ID (e.g., "cod_counter") to avoid collisions if engine supports multiple games.
     public var gameSpecificState: [String: AnyCodable]
+}
 
-    // --- Initialization ---
-
-    /// Internal initializer for Codable and factory method.
-    /// Keeping this internal, use the static `initial` factory externally.
-    init(
-        locations: [LocationID: Location],
-        items: [ItemID: Item],
-        player: Player,
-        flags: [String: Bool] = [:],
-        pronouns: [String: Set<ItemID>] = [:],
-        vocabulary: Vocabulary,
-        activeFuses: [Fuse.ID: Int] = [:],
-        activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [String: AnyCodable] = [:]
-    ) {
-        self.locations = locations
-        self.items = items
-        self.player = player
-        self.flags = flags
-        self.pronouns = pronouns
-        self.vocabulary = vocabulary
-        self.activeFuses = activeFuses
-        self.activeDaemons = activeDaemons
-        self.gameSpecificState = gameSpecificState
-    }
+extension GameState {
+    //    // --- Initialization ---
+    //
+    //    /// Internal initializer for Codable and factory method.
+    //    init(
+    //        locations: [LocationID: Location],
+    //        items: [ItemID: Item],
+    //        player: Player,
+    //        vocabulary: Vocabulary,
+    //        flags: [String: Bool] = [:],
+    //        pronouns: [String: Set<ItemID>] = [:],
+    //        activeFuses: [Fuse.ID: Int] = [:],
+    //        activeDaemons: Set<DaemonID> = [],
+    //        gameSpecificState: [String: AnyCodable] = [:]
+    //    ) {
+    //        self.activeDaemons = activeDaemons
+    //        self.activeFuses = activeFuses
+    //        self.flags = flags
+    //        self.gameSpecificState = gameSpecificState
+    //        self.items = items
+    //        self.locations = locations
+    //        self.player = player
+    //        self.pronouns = pronouns
+    //        self.vocabulary = vocabulary
+    //    }
 
     public init(
         locations: [Location],
         items: [Item],
         player: Player,
+        vocabulary: Vocabulary,
         flags: [String: Bool] = [:],
         pronouns: [String: Set<ItemID>] = [:],
-        vocabulary: Vocabulary,
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         gameSpecificState: [String: AnyCodable] = [:]
     ) {
-        self.locations = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
-        self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
-        self.player = player
+        self.activeDaemons = activeDaemons
+        self.activeFuses = activeFuses
         self.flags = flags
+        self.gameSpecificState = gameSpecificState
+        self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
+        self.locations = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
+        self.player = player
         self.pronouns = pronouns
         self.vocabulary = vocabulary
-        self.activeFuses = activeFuses
-        self.activeDaemons = activeDaemons
-        self.gameSpecificState = gameSpecificState
     }
-
+}
 
 //    /// Creates an initial game state, typically loaded from game data files.
 //    /// Sets the initial parent for each item based on starting locations and inventory.
@@ -145,6 +146,9 @@ public struct GameState: Codable {
 //        )
 //    }
 
+// MARK: - Codable Conformance
+
+extension GameState {
     // --- Codable Conformance ---
     // Explicit implementation needed due to dictionaries of classes
 
@@ -199,9 +203,11 @@ public struct GameState: Codable {
         try container.encode(Array(locations.values), forKey: .locations)
         try container.encode(Array(items.values), forKey: .items)
     }
+}
 
-    // MARK: - Computed Properties & Helpers
+// MARK: - Computed Properties & Helpers
 
+extension GameState {
     /// Returns the parent entity of a specific item.
     public func itemLocation(id: ItemID) -> ParentEntity? {
         items[id]?.parent

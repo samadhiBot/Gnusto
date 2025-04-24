@@ -19,7 +19,7 @@ public protocol GameDefinition {
     /// Returns `true` if no further action handling is required, otherwise `false`.
     var beforeTurn: @MainActor @Sendable (GameEngine, Command) async -> Bool { get }
 
-    init()
+//    init()
 }
 
 // MARK: - Default implementations

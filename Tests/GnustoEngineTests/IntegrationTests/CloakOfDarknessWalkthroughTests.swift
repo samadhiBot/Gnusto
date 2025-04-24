@@ -18,10 +18,6 @@ struct CloakOfDarknessWalkthroughTests {
     /// Performs a basic walkthrough: look, go west, take cloak, wear cloak, go east, look.
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
     func testBasicCloakWalkthrough() async throws {
-        // 1. Setup World using shared library
-        let game = CloakOfDarknessGame()
-
-        // 2. Setup Mock IO with commands (Adjusted for cloak starting worn)
         let mockIO = await MockIOHandler(
             "look",
             "w",         // Go to Cloakroom
@@ -35,25 +31,15 @@ struct CloakOfDarknessWalkthroughTests {
             "look",
             nil // Signal end of input
         )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: mockIO
         )
-
-        // 4. Run Game Simulation
         await engine.run()
 
-        // 5. Get Recorded Output and format into a transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Transcript Matches (Updated for correct initial state & actions)
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
@@ -98,10 +84,6 @@ struct CloakOfDarknessWalkthroughTests {
     /// Tests the win condition: enter bar (dark), remove cloak, drop it, look, examine message.
     @Test("Bar Win Condition (Removing Cloak in Bar)", .tags(.integration, .walkthrough))
     func testBarWinConditionCloakRemovedInBar() async throws {
-        // 1. Setup World
-        let game = CloakOfDarknessGame()
-
-        // 2. Setup Mock IO: Go south, remove cloak, drop cloak, look, examine message
         let mockIO = await MockIOHandler(
             "s",           // Enter the Bar (dark)
             "remove cloak", // Remove cloak (room becomes lit before next command)
@@ -110,25 +92,15 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",   // Examine message (should trigger win)
             nil
         )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: mockIO
         )
-
-        // 4. Run Game Simulation
         await engine.run()
 
-        // 5. Get Transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Win Message and darkness handling (Updated for removing cloak in bar)
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
@@ -152,10 +124,6 @@ struct CloakOfDarknessWalkthroughTests {
     /// Tests the win condition: remove cloak, drop it, enter bar (lit), look, examine message.
     @Test("Bar Win Condition (Removing Cloak before Bar)", .tags(.integration, .walkthrough))
     func testBarWinConditionRemovingCloakBeforeBar() async throws {
-        // 1. Setup World
-        let game = CloakOfDarknessGame()
-
-        // 2. Setup Mock IO: Remove cloak, drop cloak, go bar, look, examine message
         let mockIO = await MockIOHandler(
             "remove cloak",
             "drop cloak",
@@ -164,25 +132,15 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",
             nil
         )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: mockIO
         )
-
-        // 4. Run Game Simulation
         await engine.run()
 
-        // 5. Get Transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Win Message and darkness handling (Updated for correct remove & win msg)
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
@@ -209,10 +167,6 @@ struct CloakOfDarknessWalkthroughTests {
     /// Tests the lose condition: wear cloak, enter bar (dark), disturb things twice, remove cloak, examine message.
     @Test("Bar Lose Condition", .tags(.integration, .walkthrough))
     func testBarLoseCondition() async throws {
-        // 1. Setup World
-        let game = CloakOfDarknessGame()
-
-        // 2. Setup Mock IO: Keep cloak on, go bar, disturb twice, remove cloak, examine message
         let mockIO = await MockIOHandler(
             "s",           // Enter the Bar (dark)
             "take hook",   // First disturbance (unsafe action)
@@ -221,25 +175,15 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",   // Examine message (triggers lose condition)
             nil
         )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: mockIO
         )
-
-        // 4. Run Game Simulation
         await engine.run()
 
-        // 5. Get Transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Lose Message
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
@@ -263,10 +207,6 @@ struct CloakOfDarknessWalkthroughTests {
     /// Tests 'hang cloak on hook' functionality.
     @Test("Hang Cloak on Hook", .tags(.integration, .walkthrough))
     func testHangCloak() async throws {
-        // 1. Setup World
-        let game = CloakOfDarknessGame()
-
-        // 2. Setup Mock IO (Adjusted: must remove cloak first)
         let mockIO = await MockIOHandler(
             "w",                 // Go to Cloakroom
             "remove cloak",      // Remove the cloak first
@@ -274,25 +214,15 @@ struct CloakOfDarknessWalkthroughTests {
             "look",
             nil
         )
-
-        // 3. Setup Engine
-        let parser = StandardParser() // Added local instance
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: mockIO,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: mockIO
         )
-
-        // 4. Run Game Simulation
         await engine.run()
 
-        // 5. Get Transcript
         let actualTranscript = await mockIO.flush()
 
-        // 6. Assert Hang Cloak on Hook (Updated for correct sequence and output)
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.

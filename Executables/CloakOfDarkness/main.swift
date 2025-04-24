@@ -7,20 +7,12 @@ struct CloakOfDarkness {
     static func main() async {
         print("Initializing Cloak of Darkness...\n")
 
-        let game = CloakOfDarknessGame()
-        let ioHandler = await ConsoleIOHandler()
-        let parser = StandardParser()
-
         let engine = GameEngine(
-            initialState: game.state,
-            parser: parser,
-            ioHandler: ioHandler,
-            registry: game.registry,
-            onEnterRoom: game.onEnterRoom,
-            beforeTurn: game.beforeTurn
+            game: CloakOfDarknessGame(),
+            parser: StandardParser(),
+            ioHandler: await ConsoleIOHandler()
         )
 
-        // --- Run Game ---
         await engine.run()
 
         print("\nThank you for playing Cloak of Darkness!")

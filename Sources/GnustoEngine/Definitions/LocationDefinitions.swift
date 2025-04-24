@@ -9,7 +9,7 @@ extension LocationDefinitions {
     ///
     /// - Returns: Array of all defined Locations
     /// - Throws: Fatal error if duplicate item IDs are found
-    public static func all() -> [Location] {
+    public static var locations: [Location] {
         let items = Self()
         var seenIds = Set<LocationID>()
 

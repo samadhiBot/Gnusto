@@ -6,35 +6,26 @@ import Testing
 @MainActor
 @Suite("ReadActionHandler Tests")
 struct ReadActionHandlerTests {
-
-    // Helper to setup engine and mocks, adding a read verb
-    static func setupTestEnvironment(
-        itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.", properties: .inherentlyLit) // Assume lit by default
-    ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
-        let player = Player(in: initialLocation.id)
-        let verbs = [
-            Verb(id: "read")
-        ]
-        let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let initialState = GameState(
-            locations: [initialLocation], // Use potentially modified location
-            items: [],
-            player: player,
-            vocabulary: vocabulary
-        )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
-        return (engine, mockIO, initialLocation, player, vocabulary)
-    }
-
     @Test("Read item successfully (held)")
     func testReadItemSuccessfullyHeld() async throws {
         // Arrange
-        let book = Item(id: "book", name: "dusty book", properties: .takable, .readable, readableText: "It reads: \"Beware the Grue!\"")
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [book])
-        engine.debugAddItem(id: book.id, name: book.name, properties: book.properties, parent: .player, readableText: book.readableText)
+        let book = Item(
+            id: "book",
+            name: "dusty book",
+            properties: .takable,
+            .readable,
+            parent: .player,
+            readableText: "It reads: \"Beware the Grue!\""
+        )
+
+        let game = MinimalGame(items: [book])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
@@ -52,10 +43,31 @@ struct ReadActionHandlerTests {
     @Test("Read item successfully (in lit room)")
     func testReadItemSuccessfullyInLitRoom() async throws {
         // Arrange
-        let sign = Item(id: "sign", name: "warning sign", properties: .readable, readableText: "DANGER AHEAD")
-        let litRoom = Location(id: "litRoom", name: "Bright Room", description: "It's bright here.", properties: .inherentlyLit)
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [sign], initialLocation: litRoom)
-        engine.debugAddItem(id: sign.id, name: sign.name, properties: sign.properties, parent: .location(litRoom.id), readableText: sign.readableText)
+        let sign = Item(
+            id: "sign",
+            name: "warning sign",
+            properties: .readable,
+            parent: .location("litRoom"),
+            readableText: "DANGER AHEAD"
+        )
+        let litRoom = Location(
+            id: "litRoom",
+            name: "Bright Room",
+            description: "It's bright here.",
+            properties: .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            locations: [litRoom],
+            items: [sign]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "sign", rawInput: "read sign")
@@ -73,7 +85,15 @@ struct ReadActionHandlerTests {
     @Test("Read fails with no direct object")
     func testReadFailsWithNoObject() async throws {
         // Arrange
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", rawInput: "read")
 
@@ -88,9 +108,22 @@ struct ReadActionHandlerTests {
     @Test("Read fails item not accessible")
     func testReadFailsItemNotAccessible() async throws {
         // Arrange
-        let scroll = Item(id: "scroll", name: "ancient scroll", properties: .readable, readableText: "Secrets within")
-        let (engine, _, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [scroll])
-        engine.debugAddItem(id: scroll.id, name: scroll.name, properties: scroll.properties, parent: .nowhere, readableText: scroll.readableText)
+        let scroll = Item(
+            id: "scroll",
+            name: "ancient scroll",
+            properties: .readable,
+            parent: .nowhere,
+            readableText: "Secrets within"
+        )
+
+        let game = MinimalGame(items: [scroll])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
@@ -104,9 +137,20 @@ struct ReadActionHandlerTests {
     @Test("Read fails item not readable")
     func testReadFailsItemNotReadable() async throws {
         // Arrange
-        let rock = Item(id: "rock", name: "plain rock", properties: []) // No .readable
-        let (engine, _, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [rock])
-        engine.debugAddItem(id: rock.id, name: rock.name, properties: rock.properties, parent: .location(location.id))
+        let rock = Item(
+            id: "rock",
+            name: "plain rock",
+            parent: .location("startRoom")
+        ) // No .readable
+
+        let game = MinimalGame(items: [rock])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "rock", rawInput: "read rock")
@@ -120,10 +164,30 @@ struct ReadActionHandlerTests {
     @Test("Read fails in dark room (item not lit)")
     func testReadFailsInDarkRoom() async throws {
         // Arrange
-        let map = Item(id: "map", name: "folded map", properties: .takable, .readable, readableText: "X marks the spot")
-        let darkRoom = Location(id: "darkRoom", name: "Pitch Black Room", description: "It's dark.") // No .inherentlyLit
-        let (engine, _, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [map], initialLocation: darkRoom)
-        engine.debugAddItem(id: map.id, name: map.name, properties: map.properties, parent: .player, readableText: map.readableText) // Held by player
+        let map = Item(
+            id: "map",
+            name: "folded map",
+            properties: .takable, .readable,
+            parent: .location("darkRoom"),
+            readableText: "X marks the spot"
+        )
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            description: "It's dark."
+        ) // No .inherentlyLit
+
+        let game = MinimalGame(
+            locations: [darkRoom],
+            items: [map]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "map", rawInput: "read map")
@@ -137,9 +201,22 @@ struct ReadActionHandlerTests {
      @Test("Read readable item with no text")
     func testReadReadableItemWithNoText() async throws {
         // Arrange
-        let blankPaper = Item(id: "paper", name: "blank paper", properties: .takable, .readable, readableText: "") // Readable but empty string
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [blankPaper])
-        engine.debugAddItem(id: blankPaper.id, name: blankPaper.name, properties: blankPaper.properties, parent: .player, readableText: blankPaper.readableText)
+        let blankPaper = Item(
+            id: "paper",
+            name: "blank paper",
+            properties: .takable, .readable,
+            parent: .player,
+            readableText: "" // Readable but empty string
+        )
+
+        let game = MinimalGame(items: [blankPaper])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "paper", rawInput: "read paper")
@@ -157,10 +234,30 @@ struct ReadActionHandlerTests {
     @Test("Read lit item successfully in dark room")
     func testReadLitItemInDarkRoom() async throws {
         // Arrange
-        let glowingTablet = Item(id: "tablet", name: "glowing tablet", properties: .lightSource, .on, .readable, readableText: "Ancient Runes")
-        let darkRoom = Location(id: "darkRoom", name: "Pitch Black Room", description: "It's dark.")
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [glowingTablet], initialLocation: darkRoom)
-        engine.debugAddItem(id: glowingTablet.id, name: glowingTablet.name, properties: glowingTablet.properties, parent: .player, readableText: glowingTablet.readableText)
+        let glowingTablet = Item(
+            id: "tablet",
+            name: "glowing tablet",
+            properties: .lightSource, .on, .readable,
+            parent: .location("darkRoom"),
+            readableText: "Ancient Runes"
+        )
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            description: "It's dark."
+        )
+
+        let game = MinimalGame(
+            locations: [darkRoom],
+            items: [glowingTablet]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
         let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")

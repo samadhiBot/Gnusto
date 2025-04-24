@@ -6,28 +6,7 @@ import Testing
 @MainActor
 @Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
-
-    // Helper to setup engine and mocks, adding examine verb
-    static func setupTestEnvironment(
-        itemsToAdd: [Item] = [],
-        initialLocation: Location = Location(id: "room1", name: "Test Room", description: "A room for testing.", properties: .inherentlyLit) // Assume lit
-    ) async -> (GameEngine, MockIOHandler, Location, Player, Vocabulary) {
-        let player = Player(in: initialLocation.id)
-        let verbs = [
-            Verb(id: "examine", synonyms: "look at", "x", "describe")
-        ]
-        let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let initialState = GameState(
-            locations: [initialLocation],
-            items: [],
-            player: player,
-            vocabulary: vocabulary
-        )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
-        return (engine, mockIO, initialLocation, player, vocabulary)
-    }
+    let handler = ExamineActionHandler()
 
     @Test("Examine simple object (in room)")
     func testExamineSimpleObjectInRoom() async throws {
@@ -35,17 +14,19 @@ struct ExamineActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            description: "It's just a rock."
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [rock])
-        engine.debugAddItem(
-            id: rock.id,
-            name: rock.name,
-            description: rock.description,
-            parent: ParentEntity.location(location.id)
+            description: "It's just a rock.",
+            parent: .location("startRoom")
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [rock])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
 
         // Act
@@ -66,18 +47,19 @@ struct ExamineActionHandlerTests {
             id: "key",
             name: "brass key",
             description: "A small brass key.",
-            properties: .takable
-        )
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [key])
-        engine.debugAddItem(
-            id: key.id,
-            name: key.name,
-            description: key.description,
-            properties: key.properties,
-            parent: ParentEntity.player
+            properties: .takable,
+            parent: .player
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [key])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "key", rawInput: "examine key")
 
         // Act
@@ -98,19 +80,19 @@ struct ExamineActionHandlerTests {
             name: "ancient scroll",
             description: "A rolled up scroll.",
             properties: .readable,
+            parent: .location("startRoom"),
             readableText: "FROBOZZ"
         )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [scroll])
-        engine.debugAddItem(
-            id: scroll.id,
-            name: scroll.name,
-            description: scroll.description,
-            properties: scroll.properties,
-            parent: ParentEntity.location(location.id),
-            readableText: scroll.readableText
+
+        let game = MinimalGame(items: [scroll])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
 
-        let handler = ExamineActionHandler()
         let command = Command(verbID: "examine", directObject: "scroll", rawInput: "examine scroll")
 
         // Act
@@ -130,27 +112,24 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: .container, .openable, .open
+            properties: .container, .openable, .open,
+            parent: .location("startRoom")
         )
         let gem = Item(
             id: "gem",
-            name: "ruby gem"
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [box, gem])
-        engine.debugAddItem(
-            id: box.id,
-            name: box.name,
-            description: box.description,
-            properties: box.properties,
-            parent: ParentEntity.location(location.id)
-        )
-        engine.debugAddItem(
-            id: gem.id,
-            name: gem.name,
-            parent: ParentEntity.item(box.id)
+            name: "ruby gem",
+            parent: .item("box")
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [box, gem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
 
         // Act
@@ -175,18 +154,19 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: .container, .openable, .open
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [box])
-        engine.debugAddItem(
-            id: box.id,
-            name: box.name,
-            description: box.description,
-            properties: box.properties,
-            parent: ParentEntity.location(location.id)
+            properties: .container, .openable, .open,
+            parent: .location("startRoom")
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [box])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
 
         // Act
@@ -208,18 +188,19 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             description: "A plain wooden box.",
-            properties: .container, .openable
-        ) // Closed by default
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [box])
-        engine.debugAddItem(
-            id: box.id,
-            name: box.name,
-            description: box.description,
-            properties: box.properties,
-            parent: ParentEntity.location(location.id)
+            properties: .container, .openable, // Closed by default
+            parent: .location("startRoom")
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [box])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
 
         // Act
@@ -241,27 +222,24 @@ struct ExamineActionHandlerTests {
             id: "bottle",
             name: "glass bottle",
             description: "A clear glass bottle.",
-            properties: .container, .transparent
-        ) // Closed by default, but transparent
+            properties: .container, .transparent, // Closed by default, but transparent
+            parent: .location("startRoom")
+        )
         let water = Item(
             id: "water",
-            name: "water"
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [bottle, water])
-        engine.debugAddItem(
-            id: bottle.id,
-            name: bottle.name,
-            description: bottle.description,
-            properties: bottle.properties,
-            parent: ParentEntity.location(location.id)
-        )
-        engine.debugAddItem(
-            id: water.id,
-            name: water.name,
-            parent: ParentEntity.item(bottle.id)
+            name: "water",
+            parent: .item(bottle.id)
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [bottle, water])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "bottle", rawInput: "examine bottle")
 
         // Act
@@ -284,27 +262,24 @@ struct ExamineActionHandlerTests {
             id: "table",
             name: "wooden table",
             description: "A sturdy table.",
-            properties: .surface
+            properties: .surface,
+            parent: .location("startRoom")
         )
         let book = Item(
             id: "book",
-            name: "heavy book"
-        )
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [table, book])
-        engine.debugAddItem(
-            id: table.id,
-            name: table.name,
-            description: table.description,
-            properties: table.properties,
-            parent: ParentEntity.location(location.id)
-        )
-        engine.debugAddItem(
-            id: book.id,
-            name: book.name,
-            parent: ParentEntity.item(table.id)
+            name: "heavy book",
+            parent: .item(table.id)
         )
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [table, book])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "table", rawInput: "examine table")
 
         // Act
@@ -325,17 +300,19 @@ struct ExamineActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            description: "It's just a rock."
+            description: "It's just a rock.",
+            parent: .nowhere // Inaccessible
         )
-        let (engine, _, _, _, _) = await Self.setupTestEnvironment(itemsToAdd: [rock])
-        engine.debugAddItem(
-            id: rock.id,
-            name: rock.name,
-            description: rock.description,
-            parent: .nowhere
-        ) // Inaccessible
 
-        let handler = ExamineActionHandler()
+        let game = MinimalGame(items: [rock])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
 
         // Act & Assert
@@ -347,8 +324,14 @@ struct ExamineActionHandlerTests {
     @Test("Examine fails no direct object")
     func testExamineFailsNoObject() async throws {
         // Arrange
-        let (engine, mockIO, _, _, _) = await Self.setupTestEnvironment()
-        let handler = ExamineActionHandler()
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
         let command = Command(verbID: "examine", rawInput: "examine")
 
         // Act
@@ -362,19 +345,22 @@ struct ExamineActionHandlerTests {
     @Test("Examine with custom hook (handled)")
     func testExamineWithCustomHookHandled() async throws {
         // Arrange
-        let statue = Item(id: "statue", name: "stone statue", description: "Default description.")
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [statue])
-        engine.debugAddItem(
-            id: statue.id,
-            name: statue.name,
-            description: statue.description,
-            parent: ParentEntity.location(location.id)
+        let statue = Item(
+            id: "statue",
+            name: "stone statue",
+            description: "Default description.",
+            parent: .location("startRoom")
         )
 
-        // Removed custom hook setup
-        // Test relies on ObjectActionHandler registration now (if applicable)
+        let game = MinimalGame(items: [statue])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
-        let handler = ExamineActionHandler()
         let command = Command(verbID: "examine", directObject: "statue", rawInput: "examine statue")
 
         // Act: Run the standard handler
@@ -394,18 +380,22 @@ struct ExamineActionHandlerTests {
     @Test("Examine with custom hook (not handled)")
     func testExamineWithCustomHookNotHandled() async throws {
         // Arrange
-        let pebble = Item(id: "pebble", name: "small pebble", description: "Just a pebble.")
-        let (engine, mockIO, location, _, _) = await Self.setupTestEnvironment(itemsToAdd: [pebble])
-        engine.debugAddItem(
-            id: pebble.id,
-            name: pebble.name,
-            description: pebble.description,
-            parent: ParentEntity.location(location.id)
+        let pebble = Item(
+            id: "pebble",
+            name: "small pebble",
+            description: "Just a pebble.",
+            parent: .location("startRoom")
         )
 
-        // Removed custom hook setup
+        let game = MinimalGame(items: [pebble])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
 
-        let handler = ExamineActionHandler()
         let command = Command(verbID: "examine", directObject: "pebble", rawInput: "examine pebble")
 
         // Act

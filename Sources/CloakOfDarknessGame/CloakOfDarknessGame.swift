@@ -8,8 +8,7 @@ public struct CloakOfDarknessGame: GameDefinition {
 
     @MainActor
     public init() {
-        let items = Items.all()
-        let locations = Locations.all()
+        let items = OperaHouse.items
 
         registry = GameDefinitionRegistry(
             objectActionHandlers: [
@@ -19,7 +18,7 @@ public struct CloakOfDarknessGame: GameDefinition {
         )
 
         state = GameState(
-            locations: locations,
+            locations: OperaHouse.locations,
             items: items,
             player: Player(in: "foyer"),
             vocabulary: .build(items: items)

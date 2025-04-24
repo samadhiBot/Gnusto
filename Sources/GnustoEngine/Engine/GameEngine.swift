@@ -25,10 +25,10 @@ public class GameEngine {
     public let registry: GameDefinitionRegistry
 
     /// Registered handlers for specific verb commands.
-    private var actionHandlers: [VerbID: ActionHandler]
+    private var actionHandlers = [VerbID: ActionHandler]()
 
     /// Active timed events (Fuses) - Runtime storage with closures.
-    private var activeFuses: [FuseID: Fuse] // Use FuseID type alias
+    private var activeFuses = [FuseID: Fuse]()
 
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
@@ -50,92 +50,68 @@ public class GameEngine {
     public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
-
-    /// Creates a new GameEngine instance.
+    
+    /// Creates a new `GameEngine` instance from a game definition.
+    ///
     /// - Parameters:
-    ///   - initialState: The starting state of the game.
-    ///   - parser: The command parser to use.
+    ///   - game: The game definition.
+    ///   - parser: The command parser.
     ///   - ioHandler: The I/O handler for player interaction.
-    ///   - registry: The game definition registry to use.
-    ///   - customHandlers: Optional dictionary of custom action handlers to override or supplement defaults.
-    ///   - onEnterRoom: Optional closure for custom logic after entering a room.
-    ///   - beforeTurn: Optional closure for custom logic before each turn.
     public init(
-        initialState: GameState,
+        game: GameDefinition,
         parser: Parser,
-        ioHandler: IOHandler,
-        registry: GameDefinitionRegistry = GameDefinitionRegistry(),
-        customHandlers: [VerbID: ActionHandler] = [:],
-        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)? = nil,
-        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)? = nil
+        ioHandler: IOHandler
     ) {
-        self.gameState = initialState
+        self.gameState = game.state
         self.parser = parser
         self.ioHandler = ioHandler
-        self.registry = registry
-        self.actionHandlers = customHandlers
-        self.onEnterRoom = onEnterRoom
-        self.beforeTurn = beforeTurn
-
-        // Reconstruct runtime fuses from saved state and registry
-        self.activeFuses = [:] // Start with empty runtime fuses
-        for (fuseID, turnsRemaining) in gameState.activeFuses {
-            guard let definition = registry.fuseDefinition(for: fuseID) else {
-                // Log warning: Saved fuse state exists but no definition found
-                print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
-                // Optionally, remove the orphaned state from gameState?
-                // self.gameState.activeFuses.removeValue(forKey: fuseID)
-                continue
-            }
-            // Create runtime Fuse with loaded turns and defined action
-            let runtimeFuse = Fuse(id: fuseID, turns: turnsRemaining, action: definition.action)
-            self.activeFuses[fuseID] = runtimeFuse
-        }
+        self.registry = game.registry
+        self.actionHandlers = game.registry.customActionHandlers
+            .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
+        self.onEnterRoom = game.onEnterRoom
+        self.beforeTurn = game.beforeTurn
+        self.activeFuses = initializeFuses(from: game.state, registry: game.registry)
     }
 
-    /// Registers the default action handlers for common verbs.
-    /// Called from run() after initialization.
-    private func registerDefaultHandlers() {
-        let defaultHandlers: [VerbID: ActionHandler] = [
-            "blow out": TurnOffActionHandler(),
-            "close": CloseActionHandler(),
-            "drop": DropActionHandler(),
-            "examine": LookActionHandler(),
-            "extinguish": TurnOffActionHandler(),
-            "go": GoActionHandler(),
-            "hang": PutActionHandler(),
-            "light": TurnOnActionHandler(),
-            "listen": ListenActionHandler(),
-            "lock": LockActionHandler(),
-            "look": LookActionHandler(),
-            "open": OpenActionHandler(),
-            "put": PutActionHandler(),
-            "read": ReadActionHandler(),
-            "remove": RemoveActionHandler(),
-            "smell": SmellActionHandler(),
-            "take": TakeActionHandler(),
-            "taste": TasteActionHandler(),
-            "think-about": ThinkAboutActionHandler(),
-            "touch": PlaceholderActionHandler(verb: "touch"),
-            "turn_off": TurnOffActionHandler(),
-            "turn_on": TurnOnActionHandler(),
-            "unlock": UnlockActionHandler(),
-            "wait": WaitActionHandler(),
-            "wear": WearActionHandler(),
+//    /// Creates a new `GameEngine` instance.
+//    ///
+//    /// - Parameters:
+//    ///   - initialState: The starting state of the game.
+//    ///   - parser: The command parser.
+//    ///   - ioHandler: The I/O handler for player interaction.
+//    ///   - registry: The game definition registry.
+//    ///   - onEnterRoom: Optional closure for custom logic after entering a room.
+//    ///   - beforeTurn: Optional closure for custom logic before each turn.
+//    init(
+//        initialState: GameState,
+//        parser: Parser,
+//        ioHandler: IOHandler,
+//        registry: GameDefinitionRegistry = GameDefinitionRegistry(),
+//        onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)? = nil,
+//        beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)? = nil
+//    ) {
+//        self.gameState = initialState
+//        self.parser = parser
+//        self.ioHandler = ioHandler
+//        self.registry = registry
+//        self.actionHandlers = registry.customActionHandlers
+//            .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
+//        self.onEnterRoom = onEnterRoom
+//        self.beforeTurn = beforeTurn
+//        self.activeFuses = initializeFuses(from: initialState, registry: registry)
+//    }
 
-            // Meta
-            "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
-            "help": PlaceholderActionHandler(verb: "help"), // Placeholder
-            "inventory": InventoryActionHandler(), // Need to create this
-            "quit": QuitActionHandler(),
-            "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
-            "save": PlaceholderActionHandler(verb: "save"), // Placeholder
-            "score": ScoreActionHandler(),
-            "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
-        ]
-
-        // Merge defaults, keeping custom handlers provided during init if they exist
-        self.actionHandlers.merge(defaultHandlers) { (custom, _) in custom }
+    private func initializeFuses(from state: GameState, registry: GameDefinitionRegistry) -> [Fuse.ID: Fuse] {
+        var fuses: [Fuse.ID: Fuse] = [:]
+        for (fuseID, turnsRemaining) in state.activeFuses {
+            guard let definition = registry.fuseDefinition(for: fuseID) else {
+                print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
+                continue
+            }
+            let runtimeFuse = Fuse(id: fuseID, turns: turnsRemaining, action: definition.action)
+            fuses[fuseID] = runtimeFuse
+        }
+        return fuses
     }
 
     // Add Placeholder Handler Struct (Temporary)
@@ -149,24 +125,6 @@ public class GameEngine {
             await engine.output("Sorry, the default handler for '\(verb)' is not implemented yet.")
         }
     }
-
-    // Need InventoryActionHandler
-//    fileprivate struct InventoryActionHandler: ActionHandler {
-//        func perform(
-//            command: Command,
-//            engine: GameEngine
-//        ) async throws {
-//             let heldItems = await engine.itemSnapshots(withParent: .player)
-//             if heldItems.isEmpty {
-//                 await engine.output("You aren't carrying anything.")
-//             } else {
-//                 await engine.output("You are carrying:")
-//                 for item in heldItems {
-//                     await engine.output("  A \(item.name)") // TODO: Proper article/listing
-//                 }
-//             }
-//         }
-//     }
 
     // MARK: - Fuse & Daemon Management
 
@@ -240,7 +198,7 @@ public class GameEngine {
     /// Starts and runs the main game loop.
     public func run() async {
         // Register handlers *after* actor initialization
-        registerDefaultHandlers()
+        actionHandlers.merge(Self.actionHandlerDefaults) { (custom, _) in custom }
 
         await ioHandler.setup()
         await describeCurrentLocation() // Initial look
@@ -881,35 +839,6 @@ public class GameEngine {
         gameState.player.score += delta
     }
 
-    // MARK: - Debug/Testing Helpers
-
-    /// Adds an item directly to the game state's item dictionary using its constituent data.
-    ///
-    /// Creates the item within the actor's context.
-    ///
-    /// - Warning: Use with caution! This function is only intended to be used when setting up
-    ///            test scenarios.
-    func debugAddItem(
-        id: ItemID,
-        name: String,
-        description: String? = nil,
-        properties: Set<ItemProperty> = [],
-        size: Int = 5,
-        parent: ParentEntity = .nowhere,
-        readableText: String? = nil
-    ) {
-        let newItem = Item.init(
-            id: id,
-            name: name,
-            description: description,
-            properties: properties,
-            size: size,
-            parent: parent,
-            readableText: readableText
-        )
-        gameState.items[newItem.id] = newItem
-    }
-
     // MARK: - Public Accessors & Mutators (Thread-Safe)
 
     /// Updates the player's current location and triggers the onEnterRoom hook.
@@ -972,4 +901,44 @@ public class GameEngine {
         // Alternative, if itemsInInventory is efficient:
         // return gameState.itemsInInventory().contains(itemID)
     }
+}
+
+extension GameEngine {
+    private static let actionHandlerDefaults: [VerbID: ActionHandler] = [
+        "blow out": TurnOffActionHandler(),
+        "close": CloseActionHandler(),
+        "drop": DropActionHandler(),
+        "examine": LookActionHandler(),
+        "extinguish": TurnOffActionHandler(),
+        "go": GoActionHandler(),
+        "hang": PutActionHandler(),
+        "light": TurnOnActionHandler(),
+        "listen": ListenActionHandler(),
+        "lock": LockActionHandler(),
+        "look": LookActionHandler(),
+        "open": OpenActionHandler(),
+        "put": PutActionHandler(),
+        "read": ReadActionHandler(),
+        "remove": RemoveActionHandler(),
+        "smell": SmellActionHandler(),
+        "take": TakeActionHandler(),
+        "taste": TasteActionHandler(),
+        "think-about": ThinkAboutActionHandler(),
+        "touch": PlaceholderActionHandler(verb: "touch"),
+        "turn_off": TurnOffActionHandler(),
+        "turn_on": TurnOnActionHandler(),
+        "unlock": UnlockActionHandler(),
+        "wait": WaitActionHandler(),
+        "wear": WearActionHandler(),
+
+        // Meta
+        "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
+        "help": PlaceholderActionHandler(verb: "help"), // Placeholder
+        "inventory": InventoryActionHandler(), // Need to create this
+        "quit": QuitActionHandler(),
+        "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
+        "save": PlaceholderActionHandler(verb: "save"), // Placeholder
+        "score": ScoreActionHandler(),
+        "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
+    ]
 }

@@ -6,61 +6,35 @@ import Testing
 @MainActor
 @Suite("GoActionHandler Tests")
 struct GoActionHandlerTests {
-    // Helper (adapted from previous tests)
-    static func createTestData(
-        itemsToAdd: [Item] = [],
-        locations: [Location] = [],
-        initialPlayerLocationID: LocationID? = nil
-    ) async -> (items: [Item], locations: [Location], player: Player, vocab: Vocabulary) {
-        var locations = locations
-        if locations.isEmpty {
-            locations.append(Location(id: "room1", name: "Room 1", description: "First room."))
-        }
-        let playerLocation = initialPlayerLocationID ?? locations[0].id
-        let player = Player(in: playerLocation)
-
-        // Add movement verbs to vocab
-        let verbs = [
-            Verb(id: "go"), // Assuming "go" itself is a verb
-            Verb(id: "north", synonyms: "n"),
-            Verb(id: "south", synonyms: "s"),
-            Verb(id: "east", synonyms: "e"),
-            Verb(id: "west", synonyms: "w")
-            // Add other directions/verbs as needed
-        ]
-        let vocabulary = Vocabulary.build(items: itemsToAdd, verbs: verbs)
-        return (items: itemsToAdd, locations: locations, player: player, vocab: vocabulary)
-    }
-
     @Test("Go successfully changes location")
     func testGoSuccessfullyChangesLocation() async throws {
-        // Arrange: Create two locations with an exit connecting them
         let loc1 = Location(
-            id: "start",
+            id: "startRoom",
             name: "Start Room",
             description: "You are here.",
             properties: .inherentlyLit
         )
         let loc2 = Location(
-            id: "end",
+            id: "endRoom",
             name: "End Room",
             description: "You went there.",
             properties: .inherentlyLit
         )
-        loc1.exits[.north] = Exit(destination: "end")
+        loc1.exits[.north] = Exit(destination: "endRoom")
 
-        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
+        #expect(loc1.exits[.north] == Exit(destination: "endRoom"))
+        #expect(loc1.exits[.north] == nil)
 
-        // Arrange: Engine and mocks
+        let game = MinimalGame(
+            locations: [loc1, loc2]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState(
-            locations: testData.locations,
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
 
         let handler = GoActionHandler()
         // Command representing "go north" or just "north"
@@ -86,21 +60,24 @@ struct GoActionHandlerTests {
     @Test("Go fails for invalid direction")
     func testGoFailsInvalidDirection() async throws {
         // Arrange: Location with no exit to the south
-        let loc1 = Location(id: "start", name: "Start Room", description: "You are here.")
-        #expect(loc1.exits[.south] == nil) // Verify no south exit
+        let loc1 = Location(
+            id: "start",
+            name: "Start Room",
+            description: "You are here."
+        )
 
-        let testData = await Self.createTestData(locations: [loc1], initialPlayerLocationID: "start")
-
-        // Arrange: Engine and mocks
+        let game = MinimalGame(
+            locations: [loc1]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState(
-            locations: testData.locations,
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
+
+        #expect(loc1.exits[.south] == nil) // Verify no south exit
 
         let handler = GoActionHandler()
         let command = Command(verbID: "south", direction: .south, rawInput: "south")
@@ -122,18 +99,16 @@ struct GoActionHandlerTests {
         let loc2 = Location(id: "end", name: "End Room", description: "You went there.")
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: false) // Door, explicitly closed
 
-        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
-
-        // Arrange: Engine and mocks
+        let game = MinimalGame(
+            locations: [loc1, loc2]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState(
-            locations: testData.locations,
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
 
         let handler = GoActionHandler()
         let command = Command(verbID: "north", direction: .north, rawInput: "north")
@@ -157,18 +132,16 @@ struct GoActionHandlerTests {
         // Note: A door can be locked but technically open (e.g., gate)
         loc1.exits[.north] = Exit(destination: "end", isDoor: true, isOpen: true, isLocked: true)
 
-        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
-
-        // Arrange: Engine and mocks
+        let game = MinimalGame(
+            locations: [loc1, loc2]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState(
-            locations: testData.locations,
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
 
         let handler = GoActionHandler()
         let command = Command(verbID: "north", direction: .north, rawInput: "north")
@@ -191,18 +164,16 @@ struct GoActionHandlerTests {
         let blockMsg = "A chasm blocks your path."
         loc1.exits[.north] = Exit(destination: "end", blockedMessage: blockMsg)
 
-        let testData = await Self.createTestData(locations: [loc1, loc2], initialPlayerLocationID: "start")
-
-        // Arrange: Engine and mocks
+        let game = MinimalGame(
+            locations: [loc1, loc2]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let initialState = GameState(
-            locations: testData.locations,
-            items: [],
-            player: testData.player,
-            vocabulary: testData.vocab
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
         )
-        let engine = GameEngine(initialState: initialState, parser: mockParser, ioHandler: mockIO)
 
         let handler = GoActionHandler()
         let command = Command(verbID: "north", direction: .north, rawInput: "north")

@@ -9,7 +9,7 @@ extension ItemDefinitions {
     ///
     /// - Returns: Array of all defined Items
     /// - Throws: Fatal error if duplicate item IDs are found
-    public static func all() -> [Item] {
+    public static var items: [Item] {
         let items = Self()
         var seenIds = Set<ItemID>()
 
