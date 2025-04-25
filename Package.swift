@@ -13,10 +13,6 @@ let package = Package(
             name: "GnustoEngine",
             targets: ["GnustoEngine"]
         ),
-        .library(
-            name: "CloakOfDarknessGame",
-            targets: ["CloakOfDarknessGame"]
-        ),
         .executable(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
@@ -32,17 +28,9 @@ let package = Package(
     targets: [
         .target(
             name: "GnustoEngine"),
-        .target(
-            name: "CloakOfDarknessGame",
-            dependencies: ["GnustoEngine"],
-            path: "Sources/CloakOfDarknessGame"
-        ),
         .executableTarget(
             name: "CloakOfDarkness",
-            dependencies: [
-                "GnustoEngine",
-                "CloakOfDarknessGame"
-            ],
+            dependencies: ["GnustoEngine"],
             path: "Executables/CloakOfDarkness"
         ),
 //        .executableTarget(
@@ -54,7 +42,7 @@ let package = Package(
             name: "GnustoEngineTests",
             dependencies: [
                 "GnustoEngine",
-                "CloakOfDarknessGame",
+                "CloakOfDarkness",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),

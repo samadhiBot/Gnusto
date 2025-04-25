@@ -1,8 +1,7 @@
+import CloakOfDarkness
 import CustomDump
+import GnustoEngine
 import Testing
-import CloakOfDarknessGame
-
-@testable import GnustoEngine
 
 // Define custom tags in an extension
 extension Tag {
@@ -32,7 +31,7 @@ struct CloakOfDarknessWalkthroughTests {
             nil // Signal end of input
         )
         let engine = GameEngine(
-            game: CloakOfDarknessGame(),
+            game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -93,7 +92,7 @@ struct CloakOfDarknessWalkthroughTests {
             nil
         )
         let engine = GameEngine(
-            game: CloakOfDarknessGame(),
+            game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -133,7 +132,7 @@ struct CloakOfDarknessWalkthroughTests {
             nil
         )
         let engine = GameEngine(
-            game: CloakOfDarknessGame(),
+            game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -176,7 +175,7 @@ struct CloakOfDarknessWalkthroughTests {
             nil
         )
         let engine = GameEngine(
-            game: CloakOfDarknessGame(),
+            game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -215,7 +214,7 @@ struct CloakOfDarknessWalkthroughTests {
             nil
         )
         let engine = GameEngine(
-            game: CloakOfDarknessGame(),
+            game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )

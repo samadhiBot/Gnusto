@@ -1,7 +1,7 @@
 import GnustoEngine
 
 /// Provides the setup components for the Cloak of Darkness game.
-public struct CloakOfDarknessGame: GameBlueprint {
+public struct CloakOfDarkness: GameBlueprint {
     public var state: GameState
 
     public let registry: DefinitionRegistry
