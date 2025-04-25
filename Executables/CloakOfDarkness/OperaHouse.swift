@@ -27,8 +27,8 @@ struct OperaHouse: AreaContents {
         id: "cloakroom",
         name: "Cloakroom",
         description: """
-                The walls of this small room were clearly once lined with hooks, though now only \
-                one remains. The exit is a door to the east.
+                The walls of this small room were clearly once lined with hooks,
+                though now only one remains. The exit is a door to the east.
                 """,
         exits: [
             .east: Exit(destination: "foyer"),
@@ -38,8 +38,8 @@ struct OperaHouse: AreaContents {
 
     let hook = Item(
         id: "hook",
-        name: "hook",
-        adjectives: "brass",
+        name: "small brass hook",
+        adjectives: "small", "brass",
         synonyms: "peg",
         properties: .surface,
         parent: .location("cloakroom")
@@ -51,14 +51,20 @@ struct OperaHouse: AreaContents {
         id: "foyer",
         name: "Foyer of the Opera House",
         description: """
-                You are standing in a spacious hall, splendidly decorated in red and gold, which \
-                serves as the lobby of the opera house. The walls are adorned with portraits of \
-                famous singers, and the floor is covered with a thick crimson carpet. A grand \
-                staircase leads upwards, and there are doorways to the south and west.
+                You are standing in a spacious hall, splendidly decorated in red
+                and gold, with glittering chandeliers overhead. The entrance from
+                the street is to the north, and there are doorways south and west.
                 """,
         exits: [
             .south: Exit(destination: "bar"),
             .west: Exit(destination: "cloakroom"),
+            .north: Exit(
+                destination: "street",
+                blockedMessage: """
+                    You've only just arrived, and besides, the weather outside
+                    seems to be getting worse.
+                    """
+            )
         ],
         properties: .inherentlyLit
     )

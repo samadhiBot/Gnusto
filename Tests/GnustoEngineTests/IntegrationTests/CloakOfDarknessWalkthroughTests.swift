@@ -4,7 +4,6 @@ import Testing
 
 @testable import CloakOfDarkness
 
-// Define custom tags in an extension
 extension Tag {
     @Tag static var integration: Tag
     @Tag static var walkthrough: Tag
@@ -12,9 +11,6 @@ extension Tag {
 
 @MainActor
 struct CloakOfDarknessWalkthroughTests {
-    // Use StandardParser for tests
-    // let parser = StandardParser() // Removed shared instance
-
     /// Performs a basic walkthrough: look, go west, take cloak, wear cloak, go east, look.
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))
     func testBasicCloakWalkthrough() async throws {
