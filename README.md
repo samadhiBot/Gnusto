@@ -71,6 +71,25 @@ Refer to the [ROADMAP.md](Docs/ROADMAP.md) for detailed information on the next 
 2. Open the project in Xcode.
 3. Build and run the example games in the `Executables` directory.
 
+### Reference Materials
+
+The project includes a script to fetch reference materials from historical Infocom source code repositories. These materials are used for research and development purposes, helping to understand the design patterns and implementation details of classic interactive fiction games.
+
+To fetch the reference materials:
+
+```bash
+./Scripts/fetch_infocom_sources.sh
+```
+
+This script will:
+
+- Clone the source repositories for "A Mind Forever Voyaging", "Hitchhikers Guide to the Galaxy", and "Zork 1"
+- Extract only the relevant source files (`.zil`, `.md`, and `.txt`)
+- Place them in the `Docs/References/` directory
+- Clean up temporary files
+
+Note: The reference materials are not tracked in git (except for "Cloak of Darkness"). Run this script whenever you need to update or access the reference materials.
+
 ## Contributing
 
 Contributions are welcome! Please ensure your code adheres to the project's conventions and includes appropriate tests and documentation.
