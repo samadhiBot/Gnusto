@@ -152,14 +152,14 @@ struct StandardParserTests {
         ]
 
         // 2. Define Game-Specific Verbs (if any) - Most verbs are now defaults
-        let gameSpecificVerbs: [Verb] = [
-            // Example: Add back a verb if its specific syntax/conditions ARE needed for a test
-            // and differ from the default (unlikely for most basic tests now).
-            // Verb(id: "eat", syntax: [ SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: []) ])
-            // NOTE: The test setup previously defined verbs like 'take', 'look', 'go', 'put', 'drop', 'eat'.
-            // These are now provided by Vocabulary.defaultVerbs and should NOT be redefined here
-            // unless a specific test requires overriding a default rule.
-        ]
+        // let gameSpecificVerbs: [Verb] = [
+        //     // Example: Add back a verb if its specific syntax/conditions ARE needed for a test
+        //     // and differ from the default (unlikely for most basic tests now).
+        //     // Verb(id: "eat", syntax: [ SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: []) ])
+        //     // NOTE: The test setup previously defined verbs like 'take', 'look', 'go', 'put', 'drop', 'eat'.
+        //     // These are now provided by Vocabulary.defaultVerbs and should NOT be redefined here
+        //     // unless a specific test requires overriding a default rule.
+        // ]
 
         // 3. Define all Locations
         let locations = [
@@ -167,8 +167,7 @@ struct StandardParserTests {
                 id: roomID,
                 name: "Room",
                 description: "A room.",
-                // items: // Removed
-                globals: ["rug"] // Globals remain associated with location
+                globals: "rug" // Globals remain associated with location
             )
             // Add more locations later if needed
         ]
