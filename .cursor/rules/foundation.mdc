@@ -37,3 +37,4 @@ alwaysApply: true
 ## Current Sprint
 
 - The current development sprint is based on `Docs/ROADMAP.md`. All design decisions must take the Gnusto Engine Roadmap document into account and serve to further the goals specified within.
+  - The current epic is detailed in `Docs/ENHANCED_ACTION_HANDLING.md`. See `Implementation Phases` for next steps.
