@@ -1,143 +1,76 @@
-# Gnusto
+# Gnusto Engine
 
-A modern Swift interactive fiction game engine.
+A modern Swift implementation of an Interactive Fiction (IF) engine, designed to be powerful, flexible, and maintainable. The engine is built with a focus on clean, efficient, and well-structured code, adhering to SOLID principles and modern Swift practices.
 
-The Gnusto game engine aims to:
+## Project Structure
 
-1. Facilitate creation of faithful translations of the original ZIL-based classics, accurately replicating the original gameplay mechanics and stories.
-2. Provide the best possible foundation and ergonomics for creating new works of interactive fiction
-3. Allow games to easily customize and extend the built-in functionality
-4. Utilize modern Swift features and optimizations under the hood.
-5. Adhere to the highest standards of software craftsmanship, with clean, SOLID, maintainable, and well-tested code (80-90% coverage).
+The project is organized into two main directories:
 
-### Proposed Project Structure
+- **Sources/GnustoEngine:** Contains the core engine code.
+- **Executables:** Contains example games and demos built using the engine.
 
-We need a structure that supports the Gnusto-based implementation of one or more ZIL-based games, alongside the Gnusto engine itself.
+## Core Engine Features
 
-```
-Gnusto/
-├── Documentation/          # Project documentation, design docs, etc.
-├── Package.swift           # Xcode project file
-├── Sources/
-│   ├── GnustoEngine/         # The reusable text adventure engine
-│   │   ├── Core/           # Fundamental types (GameState, Action, etc.)
-│   │   ├── IO/             # Input/Output handling
-│   │   ├── Parsing/        # Command parsing logic
-│   │   └── /* Other Engine Modules */
-│   ├── ZILGame/            # Gnusto-specific implementation
-│   │   ├── Actors/         # Player, NPCs (like the Troll)
-│   │   ├── Data/           # Game data (Rooms, Items, Verbs specific to ZILGame)
-│   │   ├── Handlers/       # Logic for specific ZILGame actions/events
-│   │   └── Main.swift      # Application entry point
-│   └── /* Potentially shared utility modules */
-└── Tests/
-    ├── GnustoEngineTests/    # Tests for the reusable engine
-    └── ZILGameTests/      # Tests for the Gnusto-specific logic
-```
+### Item System
 
-### Core Domain Models (Initial Thoughts)
+The `Item` class represents interactable objects within the game world. Key features include:
 
-Now, let's brainstorm some fundamental types. We'll start simple and refine as we go. These would likely reside initially within `GnustoEngine/Core` or `ZILGame/Data`, depending on their generality.
+- **Properties:** Items can have a set of `ItemProperty` values defining their characteristics.
+- **Descriptions:** Items have `description`, `firstDescription`, and `subsequentDescription` for static text.
+- **Synonyms and Adjectives:** Items can have synonyms and adjectives for flexible command parsing.
+- **Size and Capacity:** Items have a `size` and `capacity` for inventory management.
 
-1.  **`Location` (or `Room`)**: Represents a distinct place in the game world.
+### Action Handling
 
-    - `id`: A unique identifier (e.g., `"westOfHouse"`).
-    - `name`: The display name (e.g., "West of House").
-    - `description`: Text shown when the player enters or looks around.
-    - `exits`: A way to map directions (e.g., `Direction.north`) to other `Location` IDs.
-    - `items`: A collection of `Item`s currently in the location.
-    - `properties`: Flags or attributes (e.g., `isLit`, `isOutside`).
+- **Current State:** Basic action handling is in place, with plans to enhance it for more dynamic behavior.
+- **Future Goals:** Implement `before` and `after` routines for action validation and side effects, as outlined in the ROADMAP.
 
-2.  **`Item` (or `GameObject`)**: Represents objects the player can interact with.
+### Dynamic Content
 
-    - `id`: Unique identifier (e.g., `"brassLantern"`).
-    - `name`: Primary noun used to refer to the item (e.g., "lantern").
-    - `description`: Text shown when the item is examined.
-    - `synonyms`: Other words used to refer to the item (e.g., ["lamp", "light"]).
-    - `properties`: Attributes (e.g., `isTakable`, `isContainer`, `isLightSource`, `isOpenable`).
-    - `contents`: If it's a container, the `Item`s inside.
+- **Current State:** Descriptions are static strings.
+- **Future Goals:** Implement dynamic descriptions based on game state, using either closure-based or handler-based approaches.
 
-3.  **`Player`**: Represents the user's state.
+### Custom State Management
 
-    - `currentLocationID`: The ID of the `Location` the player is in.
-    - `inventory`: A collection of `Item`s the player is carrying.
-    - `score`: The player's current score.
-    - `moves`: The number of turns taken.
+- **Current State:** Limited to boolean properties via `Item.properties`.
+- **Future Goals:** Extend support for custom, mutable state on items and locations.
 
-4.  **`Verb`**: Represents the action the player wants to perform.
+### Parser
 
-    - `id`: Unique identifier (e.g., `"take"`).
-    - `synonyms`: Different ways to invoke the verb (e.g., ["get", "pick up"]).
+- **Current State:** Basic command parsing with synonyms and adjectives.
+- **Future Goals:** Enhance parser to handle custom grammar and advanced noun phrase parsing.
 
-5.  **`Command`**: Represents the parsed player input.
+## Development Conventions
 
-    - `verb`: The identified `Verb`.
-    - `directObject`: The primary `Item` or target of the action (optional).
-    - `indirectObject`: The secondary `Item` or target (optional, e.g., "put _lantern_ in _case_").
+- **Code Style:** Alphabetize properties, functions, enum cases, etc., unless another ordering is more logical.
+- **Testing:** Use `Swift Testing` over `XCTest` unless working on a legacy project.
+- **Documentation:** Include clear inline documentation for all types, functions, properties, and enumeration cases.
+- **Project Organization:** Organize projects in a logical hierarchy of folders and files, with a dedicated file for each type of any complexity or importance.
 
-6.  **`GameState`**: An aggregate representing the entire state of the game world at a point in time. This is crucial for saving/loading and potentially for concurrency management.
+## Example Games
 
-    - `locations`: A dictionary mapping `Location.ID` to `Location` instances.
-    - `items`: A dictionary mapping `Item.ID` to `Item` instances (potentially including their current location or container).
-    - `player`: The `Player` state.
-    - `flags`: Game-wide flags or variables (e.g., `trollDefeated`).
+### Cloak of Darkness
 
-7.  **`Engine`**: The central orchestrator.
+A simple demonstration of Interactive Fiction, showcasing the engine's capabilities. The game features:
 
-    - Responsible for the main game loop: Read input -> Parse -> Execute -> Update State -> Print Output.
-    - Holds or manages access to the `GameState`.
+- Three rooms: Foyer, Bar, and Cloakroom.
+- Three objects: Hook, Cloak, and Message.
+- Dynamic descriptions and action handling based on game state.
 
-8.  **`Parser`**: Responsible for taking raw string input and attempting to turn it into a `Command`. This involves:
-    - Tokenization.
-    - Verb identification.
-    - Noun identification (mapping words to `Item`s or `Location` features).
-    - Handling ambiguity and unknown words.
+### Frobozz Magic Demo Kit
 
-### Reference Materials
+A demo kit showcasing the engine's features and providing a template for new games.
 
-```
-Docs
-└── References
-    ├── A Mind Forever Voyaging
-    ├── Cloak of Darkness
-    ├── Hitchhikers Guide to the Galaxy
-    └── Zork 1
-```
+## Next Steps
 
-Having original Infocom source files from [Historical Source](https://github.com/historicalsource/) as references is invaluable. They provide concrete examples of how Infocom structured their data and logic, which significantly informs the Swift implementation. The progression from Cloak of Darkness to Zork, Hitchhiker's, and AMFV provides a clear path for evolving the engine's complexity.
+Refer to the [ROADMAP.md](Docs/ROADMAP.md) for detailed information on the next major phase of development, focusing on dynamic content and action handling.
 
-Cloak of Darkness, in particular, with its explicit ZIL definitions for objects, properties, flags, and routines, provides immediate insights.
+## Getting Started
 
-### Roadmap
+1. Clone the repository.
+2. Open the project in Xcode.
+3. Build and run the example games in the `Executables` directory.
 
-Looking at the structure of classic ZIL games like Cloak of Darkness and Zork 1, and comparing that to what we've built so far, here are some other foundational elements or systems besides the Parser Implementation that are currently missing or very rudimentary in GnustoEngine:
+## Contributing
 
-1. Game Data Definition & Loading:
-
-   - ZIL: Had its own definition language within .zil files to declare objects (items), rooms (locations), routines, globals, syntax, etc.
-   - Gnusto: Currently, we define objects, locations, and vocabulary mostly within Swift code, either directly in tests or via initializers (GameState.initial). A robust engine needs a way to load game data from external files (e.g., JSON, YAML, or a custom format) separate from the engine code itself. This allows different games to run on the same engine.
-
-2. Event/Time System (Daemons, Fuses, Clocks):
-
-   - ZIL: Relied heavily on timed events (CLOCKER daemon, FUSE system in Zork) to manage things like lamp timers, character actions occurring over time, or periodic world events (events.zil, gclock.zil).
-   - Gnusto: Our GameEngine has a simple turn-based loop but no concept of timed events, daemons running in the background each turn, or actions that take multiple turns.
-
-3. Advanced Scope Resolution / Reachability:
-
-   - ZIL: Had sophisticated routines (scope.zil) to determine what the player could "see" or interact with, considering light levels (darkness/light sources), open/closed/transparent containers, player location, and potentially other factors.
-   - Gnusto: Our current handlers implement very basic scope checks (e.g., Take checks if the item is in the current location or an accessible open container). We lack a centralized scope resolution system, especially regarding light.
-
-4. NPC / Actor System:
-
-   - ZIL: Supported non-player characters (often called actors or routines associated with PERSONBIT objects) that could have their own behaviors, potentially move between rooms, or react to player actions (orphan.zil hints at this).
-   - Gnusto: We have ItemProperty.person, but no system for managing NPC state, behavior routines, or interactions beyond basic object properties.
-
-5. Pronoun Resolution Logic:
-
-   - ZIL: Had dedicated logic (pronouns.zil) to handle resolving pronouns like "it" and "them" based on recent actions and context.
-   - Gnusto: GameState has a pronouns dictionary placeholder, but no Parser or ActionHandler logic currently updates or uses it.
-
-6. Save/Restore System:
-
-   - ZIL: Supported saving and restoring game state.
-   - Gnusto: We have Codable conformance on core types, laying some groundwork, but no actual save/restore mechanism implemented in the GameEngine.
+Contributions are welcome! Please ensure your code adheres to the project's conventions and includes appropriate tests and documentation.

@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Gnusto Interactive Fiction Engine
@@ -33,3 +33,7 @@ alwaysApply: true
   - Use `Docs/References/A Mind Forever Voyaging` to study the later state of the art in the classical era of ZIL programming
 - ALWAYS provide comprehensive tests when adding or modifying functionality
 - NEVER move on to the next task without providing comprehensive tests
+
+## Current Sprint
+
+- The current development sprint is based on `Docs/ROADMAP.md`. All design decisions must take the Gnusto Engine Roadmap document into account and serve to further the goals specified within.
