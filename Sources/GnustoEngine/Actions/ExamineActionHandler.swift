@@ -38,14 +38,29 @@ public struct ExamineActionHandler: ActionHandler {
             return
         }
 
-        // 6. Default: Print generic message (Zork default)
-        await engine.output("There's nothing special about the \(targetItem.name).")
+        // 6. Get the item's description using the description handler
+        if let descriptionHandler = targetItem.description {
+            let description = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+            await engine.output(description)
+        } else {
+            // Default message if no description handler
+            await engine.output("There's nothing special about the \(targetItem.name).")
+        }
     }
 
     /// Helper function to handle examining containers or doors.
     private func examineContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async {
         // Print the item's main description first, if available
-        if let description = targetItem.description, !description.isEmpty {
+        if let descriptionHandler = targetItem.description {
+            let description = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
             await engine.output(description)
         } else {
             // Fallback if no specific description

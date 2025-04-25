@@ -15,10 +15,10 @@ public final class Item: Codable, Identifiable {
     // var actionHandlerID: String?
 
     /// The description shown when the item is examined (`EXAMINE`).
-    public var description: String?
+    public var description: DescriptionHandler?
 
     /// The description shown when the item is first seen in a room (`FDESC`).
-    public var firstDescription: String?
+    public var firstDescription: DescriptionHandler?
 
     /// Text displayed only when the item is held and read (`READ`, requires `ItemProperty.read`).
     public var heldText: String?
@@ -39,7 +39,7 @@ public final class Item: Codable, Identifiable {
     public var size: Int
 
     /// The description shown when the item is present in a room after the first time (`LDESC`).
-    public var subsequentDescription: String?
+    public var subsequentDescription: DescriptionHandler?
 
     /// Synonyms for the item's name (e.g., ["lamp", "light"]).
     public var synonyms: Set<String>
@@ -77,9 +77,9 @@ public final class Item: Codable, Identifiable {
         self.name = name
         self.adjectives = Set(adjectives)
         self.synonyms = Set(synonyms)
-        self.description = description
-        self.firstDescription = firstDescription
-        self.subsequentDescription = subsequentDescription
+        self.description = description.map { DescriptionHandler(staticDescription: $0) }
+        self.firstDescription = firstDescription.map { DescriptionHandler(staticDescription: $0) }
+        self.subsequentDescription = subsequentDescription.map { DescriptionHandler(staticDescription: $0) }
         self.text = text
         self.heldText = heldText
         self.properties = Set(properties)
@@ -96,9 +96,9 @@ public final class Item: Codable, Identifiable {
         name: String,
         adjectives: Set<String> = [],
         synonyms: Set<String> = [],
-        description: String? = nil,
-        firstDescription: String? = nil,
-        subsequentDescription: String? = nil,
+        description: DescriptionHandler? = nil,
+        firstDescription: DescriptionHandler? = nil,
+        subsequentDescription: DescriptionHandler? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: Set<ItemProperty> = [],
@@ -152,15 +152,15 @@ public final class Item: Codable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adjectives = try container.decode(Set<String>.self, forKey: .adjectives)
         capacity = try container.decode(Int.self, forKey: .capacity)
-        description = try container.decodeIfPresent(String.self, forKey: .description)
-        firstDescription = try container.decodeIfPresent(String.self, forKey: .firstDescription)
+        description = try container.decodeIfPresent(DescriptionHandler.self, forKey: .description)
+        firstDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .firstDescription)
         heldText = try container.decodeIfPresent(String.self, forKey: .heldText)
         id = try container.decode(ItemID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         parent = try container.decode(ParentEntity.self, forKey: .parent)
         properties = try container.decode(Set<ItemProperty>.self, forKey: .properties)
         size = try container.decode(Int.self, forKey: .size)
-        subsequentDescription = try container.decodeIfPresent(String.self, forKey: .subsequentDescription)
+        subsequentDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .subsequentDescription)
         synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
         text = try container.decodeIfPresent(String.self, forKey: .text)
         readableText = try container.decodeIfPresent(String.self, forKey: .readableText)

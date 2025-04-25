@@ -24,6 +24,9 @@ public class GameEngine {
     /// The registry holding static game definitions (fuses, daemons, etc.).
     public let registry: DefinitionRegistry
 
+    /// The registry for dynamic description handlers.
+    public let descriptionHandlerRegistry: DescriptionHandlerRegistry
+
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: ActionHandler]()
 
@@ -66,6 +69,7 @@ public class GameEngine {
         self.parser = parser
         self.ioHandler = ioHandler
         self.registry = game.registry
+        self.descriptionHandlerRegistry = DescriptionHandlerRegistry()
         self.actionHandlers = game.registry.customActionHandlers
             .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom

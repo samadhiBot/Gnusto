@@ -24,31 +24,37 @@ public struct LookActionHandler: ActionHandler {
             throw ActionError.internalEngineError("Resolved item ID \(targetItemID) not found in game state.")
         }
 
-        // Print the item's description, or a default message
-        let description = targetItemSnapshot.description ?? "You see nothing special about the \(targetItemSnapshot.name)."
-        await engine.ioHandler.print(description)
+        // Get the item's description using the description handler
+        if let descriptionHandler = targetItemSnapshot.description {
+            let description = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItemSnapshot,
+                using: descriptionHandler,
+                engine: engine
+            )
+            await engine.ioHandler.print(description)
+        } else {
+            // Default message if no description handler
+            await engine.ioHandler.print("You see nothing special about the \(targetItemSnapshot.name).")
+        }
 
         // If the item is a container, list its *visible* contents
         if targetItemSnapshot.hasProperty(.container) {
-            // Check if contents are visible (open or transparent)
             let isOpen = targetItemSnapshot.hasProperty(.open)
-            let isTransparent = targetItemSnapshot.hasProperty(.transparent) // Assumes .transparent property exists
+            let isTransparent = targetItemSnapshot.hasProperty(.transparent)
 
             if isOpen || isTransparent {
-                // Use safe snapshot accessor
-                let contentsSnapshots = await engine.itemSnapshots(withParent: .item(targetItemID))
-
-                if contentsSnapshots.isEmpty {
+                let contents = await engine.itemSnapshots(withParent: .item(targetItemSnapshot.id))
+                if contents.isEmpty {
                     await engine.ioHandler.print("The \(targetItemSnapshot.name) is empty.")
                 } else {
                     await engine.ioHandler.print("The \(targetItemSnapshot.name) contains:")
-                    for itemSnapshot in contentsSnapshots {
-                        // TODO: Improve formatting (e.g., proper sentence, articles)
-                        await engine.ioHandler.print("  A \(itemSnapshot.name)")
+                    for item in contents {
+                        // TODO: Proper sentence construction with articles
+                        await engine.ioHandler.print("  A \(item.name)")
                     }
                 }
             } else {
-                // Container is closed and not transparent
+                // Closed and not transparent
                 await engine.ioHandler.print("The \(targetItemSnapshot.name) is closed.")
             }
         }

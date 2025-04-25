@@ -8,9 +8,9 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public let name: String
     public let adjectives: Set<String>
     public let synonyms: Set<String>
-    public let description: String?
-    public let firstDescription: String?
-    public let subsequentDescription: String?
+    public let description: DescriptionHandler?
+    public let firstDescription: DescriptionHandler?
+    public let subsequentDescription: DescriptionHandler?
     public let text: String?
     public let heldText: String?
     public let properties: Set<ItemProperty>
@@ -47,7 +47,7 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
     }
-    
+
     /// Returns `the {name}` for the item.
     public var theName: String {
         "the \(name)"
