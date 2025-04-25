@@ -1,7 +1,8 @@
-import CloakOfDarkness
 import CustomDump
 import GnustoEngine
 import Testing
+
+@testable import CloakOfDarkness
 
 // Define custom tags in an extension
 extension Tag {
