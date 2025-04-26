@@ -24,7 +24,7 @@ public struct DynamicDescriptionExample {
 
         // Example 3: A container that describes its contents
         await engine.descriptionHandlerRegistry.registerItemHandler(id: "container_description") { item, engine in
-            let contents = await engine.itemSnapshots(withParent: .item(item.id))
+            let contents = engine.itemSnapshots(withParent: .item(item.id))
             if contents.isEmpty {
                 return "The \(item.name) is empty."
             } else {

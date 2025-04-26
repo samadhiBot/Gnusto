@@ -14,10 +14,10 @@ public typealias DynamicLocationDescriptionHandler = @MainActor (LocationSnapsho
 @MainActor // Make registry MainActor to simplify handler registration/calling
 public class DescriptionHandlerRegistry { // Changed from actor to class
     /// Dictionary mapping item handler IDs to their dynamic logic.
-    private var dynamicItemHandlers: [String: DynamicDescriptionHandler]
+    private var dynamicItemHandlers: [DescriptionHandlerID: DynamicDescriptionHandler]
 
     /// Dictionary mapping location handler IDs to their dynamic logic.
-    private var dynamicLocationHandlers: [String: DynamicLocationDescriptionHandler]
+    private var dynamicLocationHandlers: [DescriptionHandlerID: DynamicLocationDescriptionHandler]
 
     /// Creates a new empty registry.
     public init() {
@@ -32,7 +32,10 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
     /// - Parameters:
     ///   - id: The ID of the handler to register.
     ///   - handler: The closure that generates the dynamic description.
-    public func registerItemHandler(id: String, handler: @escaping DynamicDescriptionHandler) {
+    public func registerItemHandler(
+        id: DescriptionHandlerID,
+        handler: @escaping DynamicDescriptionHandler
+    ) {
         // No need for await as we are @MainActor
         dynamicItemHandlers[id] = handler
     }
@@ -68,7 +71,10 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
     /// - Parameters:
     ///   - id: The ID of the handler to register.
     ///   - handler: The closure that generates the dynamic description.
-    public func registerLocationHandler(id: String, handler: @escaping DynamicLocationDescriptionHandler) {
+    public func registerLocationHandler(
+        id: DescriptionHandlerID,
+        handler: @escaping DynamicLocationDescriptionHandler
+    ) {
         // No need for await
         dynamicLocationHandlers[id] = handler
     }

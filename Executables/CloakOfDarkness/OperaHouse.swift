@@ -27,9 +27,9 @@ struct OperaHouse: AreaContents {
         id: "cloakroom",
         name: "Cloakroom",
         longDescription: """
-                The walls of this small room were clearly once lined with hooks,
-                though now only one remains. The exit is a door to the east.
-                """,
+            The walls of this small room were clearly once lined with hooks,
+            though now only one remains. The exit is a door to the east.
+            """,
         exits: [
             .east: Exit(destination: "foyer"),
         ],

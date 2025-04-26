@@ -36,7 +36,7 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
-        expectNoDifference(output, "It's just a rock.")
+        expectNoDifference(output, "It’s just a rock.")
     }
 
     @Test("Examine simple object (held)")

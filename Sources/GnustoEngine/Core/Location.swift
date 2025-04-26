@@ -63,32 +63,28 @@ public final class Location: Codable, Identifiable {
         case id
         case name
         case properties
-        case shortDescription // Added
+        case shortDescription
     }
 
     public required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        // Decode as DescriptionHandler?
         longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
         exits = try container.decode([Direction: Exit].self, forKey: .exits)
         globals = try container.decode([ItemID].self, forKey: .globals)
         id = try container.decode(LocationID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         properties = try container.decode(Set<LocationProperty>.self, forKey: .properties)
-        // Decode as DescriptionHandler?
         shortDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .shortDescription)
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        // Encode as DescriptionHandler?
         try container.encodeIfPresent(longDescription, forKey: .longDescription)
         try container.encode(exits, forKey: .exits)
         try container.encode(globals, forKey: .globals)
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(properties, forKey: .properties)
-        // Encode as DescriptionHandler?
         try container.encodeIfPresent(shortDescription, forKey: .shortDescription)
     }
 
