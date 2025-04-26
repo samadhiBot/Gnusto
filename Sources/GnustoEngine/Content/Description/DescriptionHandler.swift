@@ -1,7 +1,7 @@
 import Foundation
 
 /// A handler that can generate dynamic descriptions for items based on game state.
-public struct DescriptionHandler: Codable, Sendable, Equatable {
+public struct DescriptionHandler: Codable, Sendable, Equatable, ExpressibleByStringLiteral {
     /// The unique identifier for this description handler.
     public let id: DescriptionHandlerID
 
@@ -13,10 +13,14 @@ public struct DescriptionHandler: Codable, Sendable, Equatable {
     public let dynamicHandlerID: String?
 
     /// Creates a new description handler with a static description.
-    /// - Parameter staticDescription: The static text to use for the description.
-    public init(staticDescription: String?) {
+    ///
+    /// - Tip: `DescriptionHandler` is `ExpressibleByStringLiteral`, so just use
+    ///         a string literal when you want to create a static description.
+    ///
+    /// - Parameter value: The static text to use for the description.
+    public init(stringLiteral value: String) {
         self.id = DescriptionHandlerID(UUID().uuidString)
-        self.staticDescription = staticDescription
+        self.staticDescription = value
         self.dynamicHandlerID = nil
     }
 
@@ -24,7 +28,7 @@ public struct DescriptionHandler: Codable, Sendable, Equatable {
     /// - Parameters:
     ///   - handlerID: The ID of the dynamic handler to use.
     ///   - staticDescription: Optional fallback static description.
-    public init(handlerID: String, staticDescription: String? = nil) {
+    public init(_ handlerID: String, staticDescription: String? = nil) {
         self.id = DescriptionHandlerID(UUID().uuidString)
         self.staticDescription = staticDescription
         self.dynamicHandlerID = handlerID

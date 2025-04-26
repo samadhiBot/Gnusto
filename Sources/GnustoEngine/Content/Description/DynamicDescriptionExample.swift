@@ -40,26 +40,26 @@ public struct DynamicDescriptionExample {
             Item(
                 id: "lamp",
                 name: "brass lantern",
-                adjectives: ["brass"],
-                synonyms: ["lamp", "light"],
-                longDescription: DescriptionHandler(handlerID: "lamp_description"),
-                properties: [.lightSource, .on]
+                adjectives: "brass",
+                synonyms: "lamp", "light",
+                longDescription: DescriptionHandler("lamp_description"),
+                properties: .lightSource, .on
             ),
             Item(
                 id: "book",
                 name: "ancient tome",
-                adjectives: ["ancient"],
-                synonyms: ["volume", "tome"],
-                longDescription: DescriptionHandler(handlerID: "book_description"),
-                properties: [.readable]
+                adjectives: "ancient",
+                synonyms: "volume", "tome",
+                longDescription: DescriptionHandler("book_description"),
+                properties: .readable
             ),
             Item(
                 id: "chest",
                 name: "wooden chest",
-                adjectives: ["wooden"],
-                synonyms: ["box", "container"],
-                longDescription: DescriptionHandler(handlerID: "container_description"),
-                properties: [.container, .open]
+                adjectives: "wooden",
+                synonyms: "box", "container",
+                longDescription: DescriptionHandler("container_description"),
+                properties: .container, .open
             )
         ]
     }

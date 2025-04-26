@@ -53,22 +53,20 @@ public final class Item: Codable, Identifiable {
     /// The key needed to lock/unlock this item (if `.lockable`).
     public var lockKey: ItemID? = nil
 
-    // --- Initialization ---
-
     public init(
         id: ItemID,
         name: String,
         adjectives: String...,
         synonyms: String...,
-        shortDescription: String? = nil,
-        firstDescription: String? = nil,
-        longDescription: String? = nil,
+        shortDescription: DescriptionHandler? = nil,
+        firstDescription: DescriptionHandler? = nil,
+        longDescription: DescriptionHandler? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: ItemProperty...,
         size: Int = 5,
         capacity: Int = -1,
-        parent: ParentEntity = .nowhere, // Default parent to .nowhere
+        parent: ParentEntity = .nowhere,
         readableText: String? = nil,
         lockKey: ItemID? = nil
         // actionHandlerID: String? = nil
@@ -77,9 +75,9 @@ public final class Item: Codable, Identifiable {
         self.name = name
         self.adjectives = Set(adjectives)
         self.synonyms = Set(synonyms)
-        self.shortDescription = shortDescription.map { DescriptionHandler(staticDescription: $0) }
-        self.firstDescription = firstDescription.map { DescriptionHandler(staticDescription: $0) }
-        self.longDescription = longDescription.map { DescriptionHandler(staticDescription: $0) }
+        self.shortDescription = shortDescription
+        self.firstDescription = firstDescription
+        self.longDescription = longDescription
         self.text = text
         self.heldText = heldText
         self.properties = Set(properties)
@@ -91,44 +89,7 @@ public final class Item: Codable, Identifiable {
         // self.actionHandlerID = actionHandlerID
     }
 
-    init(
-        id: ItemID,
-        name: String,
-        adjectives: Set<String> = [],
-        synonyms: Set<String> = [],
-        shortDescription: DescriptionHandler? = nil,
-        firstDescription: DescriptionHandler? = nil,
-        longDescription: DescriptionHandler? = nil,
-        text: String? = nil,
-        heldText: String? = nil,
-        properties: Set<ItemProperty> = [],
-        size: Int = 5,
-        capacity: Int = -1,
-        parent: ParentEntity = .nowhere, // Default parent to .nowhere
-        readableText: String? = nil,
-        lockKey: ItemID? = nil
-        // actionHandlerID: String? = nil
-    ) {
-        self.id = id
-        self.name = name
-        self.adjectives = adjectives
-        self.synonyms = synonyms
-        self.shortDescription = shortDescription
-        self.firstDescription = firstDescription
-        self.longDescription = longDescription
-        self.text = text
-        self.heldText = heldText
-        self.properties = properties
-        self.size = size
-        self.capacity = capacity
-        self.parent = parent
-        self.readableText = readableText
-        self.lockKey = lockKey
-        // self.actionHandlerID = actionHandlerID
-    }
-
-    // --- Codable Conformance ---
-    // Classes require explicit implementation for Codable
+    // MARK: - Codable Conformance
 
     enum CodingKeys: String, CodingKey {
         case adjectives
@@ -185,8 +146,11 @@ public final class Item: Codable, Identifiable {
         try container.encodeIfPresent(readableText, forKey: .readableText)
         try container.encodeIfPresent(lockKey, forKey: .lockKey)
     }
+}
 
-    // --- Convenience Accessors ---
+// MARK: - Convenience Accessors
+
+extension Item {
 
     /// Checks if the item has a specific property.
     /// - Parameter property: The `ItemProperty` to check for.

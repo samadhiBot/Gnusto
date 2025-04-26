@@ -38,7 +38,13 @@ public struct ExamineActionHandler: ActionHandler {
             return
         }
 
-        // 6. Get the item's description using the description handler
+        // 6. Check if item is a surface and list contents
+        if targetItem.hasProperty(.surface) {
+            await examineSurface(targetItem: targetItem, engine: engine)
+            return
+        }
+
+        // 7. Get the item's description using the description handler (fallback)
         if let descriptionHandler = targetItem.longDescription {
             let description = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
@@ -85,5 +91,32 @@ public struct ExamineActionHandler: ActionHandler {
             // Closed and not transparent
             await engine.output("The \(targetItem.name) is closed.")
         }
+    }
+
+    /// Helper function to handle examining surfaces.
+    private func examineSurface(targetItem: ItemSnapshot, engine: GameEngine) async {
+        // Print the item's main description first, if available
+        if let descriptionHandler = targetItem.longDescription {
+            let description = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+            await engine.output(description)
+        } else {
+            // Fallback if no specific description
+            await engine.output("You examine the \(targetItem.name).")
+        }
+
+        // List items on the surface
+        let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
+        if !contents.isEmpty {
+            // TODO: Use proper sentence construction like Zork: "On the table is a book and a key."
+            await engine.output("On the \(targetItem.name) is:")
+            for item in contents {
+                await engine.output("  A \(item.name)")
+            }
+        }
+        // If empty, we just print the description above, no extra message needed unlike containers.
     }
 }

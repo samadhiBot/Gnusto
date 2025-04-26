@@ -737,7 +737,11 @@ struct GameEngineTests {
         var game = MinimalGame()
 
         // Arrange: Closed container in room, item inside
-        let container = Item(id: "box", name: "box", properties: [.container]) // Closed by default
+        let container = Item(
+            id: "box",
+            name: "box",
+            properties: .container
+        ) // Closed by default
         let itemIn = Item(id: "gem", name: "gem", parent: .item("box"))
         game.state.items[container.id] = container
         game.state.items[itemIn.id] = itemIn
@@ -792,7 +796,12 @@ struct GameEngineTests {
         var game = MinimalGame()
 
         // Arrange: Item that is takable but not wearable, held by player
-        let item = Item(id: "rock", name: "rock", properties: [.takable], parent: .player)
+        let item = Item(
+            id: "rock",
+            name: "rock",
+            properties: .takable,
+            parent: .player
+        )
         game.state.items[item.id] = item
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
@@ -813,8 +822,20 @@ struct GameEngineTests {
         var game = MinimalGame()
 
         // Arrange: Player holds item, capacity is low, try to take another
-        let itemHeld = Item(id: "sword", name: "sword", properties: [.takable], size: 8, parent: .player)
-        let itemToTake = Item(id: "shield", name: "shield", properties: [.takable], size: 7, parent: .location("startRoom"))
+        let itemHeld = Item(
+            id: "sword",
+            name: "sword",
+            properties: .takable,
+            size: 8,
+            parent: .player
+        )
+        let itemToTake = Item(
+            id: "shield",
+            name: "shield",
+            properties: .takable,
+            size: 7,
+            parent: .location("startRoom")
+        )
         game.state.player.carryingCapacity = 10 // Low capacity
         game.state.items[itemHeld.id] = itemHeld
         game.state.items[itemToTake.id] = itemToTake
@@ -917,7 +938,12 @@ struct GameEngineTests {
 
         // Arrange: Try closing an already closed item
         // Correct: Ensure it's a container AND .openable, lacks .open
-        let container = Item(id: "box", name: "box", properties: [.container, .openable], parent: .location("startRoom")) // Starts closed
+        let container = Item(
+            id: "box",
+            name: "box",
+            properties: .container, .openable,
+            parent: .location("startRoom")
+        ) // Starts closed
         game.state.items[container.id] = container
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
@@ -938,7 +964,12 @@ struct GameEngineTests {
 
         // Arrange: Try unlocking an already unlocked item
         // Correct: Remove `key:` parameter. Unlock handler needs key logic.
-        let container = Item(id: "chest", name: "chest", properties: [.container, .openable, .lockable], parent: .location("startRoom")) // Unlocked
+        let container = Item(
+            id: "chest",
+            name: "chest",
+            properties: .container, .openable, .lockable,
+            parent: .location("startRoom")
+        ) // Unlocked
         let key = Item(id: "key1", name: "key", parent: .player) // Assume key ID "key1" matches chest internally
         game.state.items[container.id] = container
         game.state.items[key.id] = key
@@ -991,7 +1022,12 @@ struct GameEngineTests {
 
         // Arrange: Player holding an item assumed fixed by handler logic
         // Correct: Add `.fixed` property to trigger the check
-        let item = Item(id: "statue", name: "statue", properties: [.fixed], parent: .player)
+        let item = Item(
+            id: "statue",
+            name: "statue",
+            properties: .fixed,
+            parent: .player
+        )
         game.state.items[item.id] = item
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
@@ -1012,7 +1048,12 @@ struct GameEngineTests {
 
         // Arrange: Player wearing an item assumed fixed/irremovable by handler logic
         // Correct: Add `.fixed` property to trigger the check
-        let item = Item(id: "amulet", name: "cursed amulet", properties: [.wearable, .worn, .fixed], parent: .player)
+        let item = Item(
+            id: "amulet",
+            name: "cursed amulet",
+            properties: .wearable, .worn, .fixed,
+            parent: .player
+        )
         game.state.items[item.id] = item
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
 
@@ -1075,7 +1116,12 @@ struct GameEngineTests {
 
         // Arrange: Locked item, player tries unlocking with wrong key
         // Correct: Remove `key:` parameter. Unlock handler needs key logic.
-        let container = Item(id: "chest", name: "chest", properties: [.container, .lockable, .locked], parent: .location("startRoom")) // Assumes internally requires "key1"
+        let container = Item(
+            id: "chest",
+            name: "chest",
+            properties: .container, .lockable, .locked,
+            parent: .location("startRoom")
+        ) // Assumes internally requires "key1"
         let wrongKey = Item(id: "key2", name: "wrong key", parent: .player)
         game.state.items[container.id] = container
         game.state.items[wrongKey.id] = wrongKey

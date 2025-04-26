@@ -36,8 +36,8 @@ public final class Location: Codable, Identifiable {
     public init(
         id: LocationID,
         name: String,
-        longDescription: String? = nil, // Changed to optional String
-        shortDescription: String? = nil, // Added optional String
+        longDescription: DescriptionHandler? = nil,
+        shortDescription: DescriptionHandler? = nil,
         exits: [Direction : Exit] = [:],
         properties: LocationProperty...,
         globals: ItemID...
@@ -45,31 +45,10 @@ public final class Location: Codable, Identifiable {
     ) {
         self.id = id
         self.name = name
-        // Convert String? to DescriptionHandler?
-        self.longDescription = longDescription.map { DescriptionHandler(staticDescription: $0) }
-        self.shortDescription = shortDescription.map { DescriptionHandler(staticDescription: $0) }
-        self.exits = exits
-        self.properties = Set(properties)
-        self.globals = globals
-        // self.actionHandlerID = actionHandlerID
-    }
-
-    init(
-        id: LocationID,
-        name: String,
-        longDescription: DescriptionHandler? = nil, // Changed to DescriptionHandler?
-        shortDescription: DescriptionHandler? = nil, // Added DescriptionHandler?
-        exits: [Direction : Exit] = [:],
-        properties: Set<LocationProperty> = [],
-        globals: [ItemID] = []
-        // actionHandlerID: String? = nil // Placeholder
-    ) {
-        self.id = id
-        self.name = name
         self.longDescription = longDescription
         self.shortDescription = shortDescription
         self.exits = exits
-        self.properties = properties
+        self.properties = Set(properties)
         self.globals = globals
         // self.actionHandlerID = actionHandlerID
     }

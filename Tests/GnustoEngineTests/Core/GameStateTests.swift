@@ -134,7 +134,7 @@ struct GameStateTests {
         state.pronouns["it"] = [Self.itemLantern]
 
         // Modify Location/Item (reference types held by struct)
-        state.locations[Self.locWOH]?.longDescription = DescriptionHandler(staticDescription: "A new description.")
+        state.locations[Self.locWOH]?.longDescription = "A new description."
         state.items[Self.itemLantern]?.name = "Magic Lantern"
         // Simulate taking the lantern
         state.items[Self.itemLantern]?.parent = .player

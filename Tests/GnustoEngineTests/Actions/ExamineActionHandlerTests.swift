@@ -4,7 +4,6 @@ import Testing
 @testable import GnustoEngine
 
 @MainActor
-@Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
     let handler = ExamineActionHandler()
 
@@ -339,8 +338,8 @@ struct ExamineActionHandlerTests {
         )
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
 
-        // Act & Assert
-        await #expect(throws: ActionError.roomIsDark) {
+        // Act & Assert: When calling handler directly, expect itemNotAccessible due to darkness
+        await #expect(throws: ActionError.itemNotAccessible("rock")) {
             try await handler.perform(command: command, engine: engine)
         }
     }
@@ -350,7 +349,8 @@ struct ExamineActionHandlerTests {
         // Arrange
         let pebble = Item(
             id: "pebble",
-            name: "small pebble"
+            name: "small pebble",
+            parent: .location("startRoom")
             // No description provided
         )
         let game = MinimalGame(items: [pebble])
@@ -372,14 +372,14 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "There's nothing special about the small pebble.")
     }
 
-    @Test("Examine simple object with dynamic description")
-    func testExamineSimpleObjectDynamicDescription() async throws {
+    @Test("Examine simple object with dynamic description (realistic state)")
+    func testExamineSimpleObjectDynamicDescriptionRealistic() async throws {
         // Arrange
         let moodStone = Item(
             id: "stone",
             name: "mood stone",
-            // Set longDescription to a handler ID
-            longDescription: DescriptionHandler(handlerID: "mood_stone_desc"),
+            longDescription: DescriptionHandler("mood_stone_desc"),
+            properties: .device,
             parent: .location("startRoom")
         )
 
@@ -392,21 +392,27 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        // Register the dynamic handler
-        var stoneColor = "blue"
-        await engine.descriptionHandlerRegistry.registerItemHandler(id: "mood_stone_desc") { item, _ in
-            "The mood stone glows a soft \(stoneColor)."
+        // Register the dynamic handler - reads item's state
+        engine.descriptionHandlerRegistry.registerItemHandler(id: "mood_stone_desc") { item, _ in
+            // Use hasProperty on the snapshot
+            let color = item.hasProperty(ItemProperty.on) ? "red" : "blue"
+            return "The mood stone glows a soft \(color)."
         }
 
         let command = Command(verbID: "examine", directObject: "stone", rawInput: "examine stone")
 
-        // Act 1: Examine when blue
+        // Act 1: Examine when blue (isOn: false)
         try await handler.perform(command: command, engine: engine)
         let output1 = await mockIO.flush()
         expectNoDifference(output1, "The mood stone glows a soft blue.")
 
-        // Change state and Act 2: Examine when red
-        stoneColor = "red"
+        // Change the item's state directly via the engine by adding the .on property
+        engine.updateItemProperties(itemID: "stone", adding: ItemProperty.on) // Use full ItemProperty.on
+
+        // Assert intermediate state change
+        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(ItemProperty.on) == true) // Use full ItemProperty.on
+
+        // Act 2: Examine when red (isOn: true)
         try await handler.perform(command: command, engine: engine)
         let output2 = await mockIO.flush()
         expectNoDifference(output2, "The mood stone glows a soft red.")

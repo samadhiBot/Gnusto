@@ -12,7 +12,7 @@ struct ReadActionHandlerTests {
         let book = Item(
             id: "book",
             name: "dusty book",
-            properties: [.takable, .readable],
+            properties: .takable, .readable,
             parent: .player,
             readableText: "It reads: \"Beware the Grue!\""
         )
@@ -45,7 +45,7 @@ struct ReadActionHandlerTests {
         let sign = Item(
             id: "sign",
             name: "warning sign",
-            properties: [.readable],
+            properties: .readable,
             parent: .location("litRoom"),
             readableText: "DANGER AHEAD"
         )
@@ -111,7 +111,7 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            properties: [.readable],
+            properties: .readable,
             parent: .nowhere,
             readableText: "Secrets within"
         )
@@ -167,7 +167,7 @@ struct ReadActionHandlerTests {
         let map = Item(
             id: "map",
             name: "folded map",
-            properties: [.takable, .readable],
+            properties: .takable, .readable,
             parent: .location("darkRoom"),
             readableText: "X marks the spot"
         )
@@ -205,7 +205,7 @@ struct ReadActionHandlerTests {
         let blankPaper = Item(
             id: "paper",
             name: "blank paper",
-            properties: [.takable, .readable],
+            properties: .takable, .readable,
             parent: .player,
             readableText: ""
         )
@@ -238,7 +238,7 @@ struct ReadActionHandlerTests {
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",
-            properties: [.lightSource, .on, .readable],
+            properties: .lightSource, .on, .readable,
             parent: .location("darkRoom"),
             readableText: "Ancient Runes"
         )

@@ -8,14 +8,12 @@ struct LocationTests {
     // --- Test Setup ---
     let defaultLocationID: LocationID = "defaultLoc"
     let defaultLocationName = "Room"
-    let defaultLocationLongDesc = "A non-descript room."
-    let customLocationLongDesc = "A comfortably furnished living room. There are exits west and east."
 
     func createDefaultLocation() -> Location {
         Location(
             id: defaultLocationID,
             name: defaultLocationName,
-            longDescription: defaultLocationLongDesc // Use longDescription parameter
+            longDescription: "A nondescript room."
         )
     }
 
@@ -25,7 +23,7 @@ struct LocationTests {
         return Location(
             id: "livingRoom",
             name: "Living Room",
-            longDescription: customLocationLongDesc, // Use longDescription parameter
+            longDescription: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
             properties: .inherentlyLit, .sacred,
             globals: "rug", "fireplace"
@@ -41,7 +39,7 @@ struct LocationTests {
         #expect(location.id == defaultLocationID)
         #expect(location.name == defaultLocationName)
         // Check the static description within the DescriptionHandler
-        #expect(location.longDescription?.staticDescription == defaultLocationLongDesc)
+        #expect(location.longDescription?.staticDescription == "A nondescript room.")
         #expect(location.longDescription?.dynamicHandlerID == nil)
         #expect(location.shortDescription == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
@@ -56,7 +54,7 @@ struct LocationTests {
 
         #expect(location.id == "livingRoom")
         #expect(location.name == "Living Room")
-        #expect(location.longDescription?.staticDescription == customLocationLongDesc)
+        #expect(location.longDescription?.staticDescription == "A comfortably furnished living room. There are exits west and east.")
         #expect(location.longDescription?.dynamicHandlerID == nil)
         #expect(location.shortDescription == nil)
         #expect(location.exits.count == 2)
@@ -101,7 +99,7 @@ struct LocationTests {
     func testLocationCodable() throws {
         let originalLocation = createCustomLocation()
         // Add a short description for thorough testing
-        originalLocation.shortDescription = DescriptionHandler(staticDescription: "A comfy room.")
+        originalLocation.shortDescription = "A comfy room."
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -131,7 +129,7 @@ struct LocationTests {
         location2.name = "Renamed Room"
         location2.addProperty(.visited)
         // Modify the description handler indirectly (if it were mutable, or reassign)
-        location2.longDescription = DescriptionHandler(staticDescription: "An updated room.")
+        location2.longDescription = "An updated room."
 
         #expect(location1.name == "Renamed Room") // Change in location2 reflects in location1
         #expect(location1.hasProperty(.visited))

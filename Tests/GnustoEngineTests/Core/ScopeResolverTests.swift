@@ -69,7 +69,7 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: [.lightSource, .takable],
+            properties: .lightSource, .takable,
             parent: .player
         )
         let game = MinimalGame(
@@ -120,7 +120,7 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: [.lightSource],
+            properties: .lightSource,
             parent: .location(darkRoom.id)
         )
         let game = MinimalGame(
@@ -268,7 +268,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: [.lightSource, .on],
+            properties: .lightSource, .on,
             parent: .location("startRoom")
         )
         let visibleItem = Item(
@@ -279,7 +279,7 @@ struct ScopeResolverTests {
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            properties: [.invisible],
+            properties: .invisible,
             parent: .location("startRoom")
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
@@ -629,7 +629,7 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: [.lightSource],
+            properties: .lightSource,
             parent: .location(darkRoom.id)
         )
         let item = Item(
