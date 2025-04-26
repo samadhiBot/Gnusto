@@ -1,4 +1,5 @@
 import Foundation
+import Markdown
 
 /// A type that can generate a dynamic description for an item based on game state.
 public typealias DynamicDescriptionHandler = @MainActor (ItemSnapshot, GameEngine) async -> String
@@ -7,24 +8,28 @@ public typealias DynamicDescriptionHandler = @MainActor (ItemSnapshot, GameEngin
 public typealias DynamicLocationDescriptionHandler = @MainActor (LocationSnapshot, GameEngine) async -> String
 
 /// A registry that manages description handlers and their dynamic logic.
-@MainActor // Make registry MainActor to simplify handler registration/calling
-public class DescriptionHandlerRegistry { // Changed from actor to class
+@MainActor
+public class DescriptionHandlerRegistry {
     /// Dictionary mapping item handler IDs to their dynamic logic.
     private var dynamicItemHandlers: [DescriptionHandlerID: DynamicDescriptionHandler]
 
     /// Dictionary mapping location handler IDs to their dynamic logic.
     private var dynamicLocationHandlers: [DescriptionHandlerID: DynamicLocationDescriptionHandler]
+    
+    /// The maximum line length before soft-wrapping a description.
+    private let maximumDescriptionLength: Int
 
     /// Creates a new empty registry.
-    public init() {
+    public init(maximumDescriptionLength: Int = .max) {
         self.dynamicItemHandlers = [:]
         self.dynamicLocationHandlers = [:]
+        self.maximumDescriptionLength = maximumDescriptionLength
     }
 
     // --- Item Handlers ---
 
     /// Registers a new dynamic description handler for an item.
-    /// 
+    ///
     /// - Parameters:
     ///   - id: The ID of the handler to register.
     ///   - handler: The closure that generates the dynamic description.
@@ -48,16 +53,17 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
-        // No need for await as we are @MainActor
-        // If there's a dynamic handler, use it
-        if let handlerID = handler.id,
-           let dynamicHandler = dynamicItemHandlers[handlerID] {
-            // Handler itself is @MainActor, await is fine
-            return await dynamicHandler(item, engine)
+        let raw = if let handlerID = handler.id,
+                     let dynamicHandler = dynamicItemHandlers[handlerID] {
+            await dynamicHandler(item, engine)
+        } else if let rawStatic = handler.rawStaticDescription {
+            rawStatic
+        } else {
+            "You see nothing special about the \(item.name)."
         }
-
-        // Otherwise, use the static description or a default message
-        return handler.staticDescription ?? "You see nothing special about the \(item.name)."
+        let document = Document(parsing: raw)
+        return document.format(options: markupOptions)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     // --- Location Handlers ---
@@ -88,14 +94,31 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
-        // If there's a dynamic handler, use it
-        if let handlerID = handler.id,
-           let dynamicHandler = dynamicLocationHandlers[handlerID] {
-            return await dynamicHandler(location, engine)
+        let raw = if let handlerID = handler.id,
+                     let dynamicHandler = dynamicLocationHandlers[handlerID] {
+            await dynamicHandler(location, engine)
+        } else if let rawStatic = handler.rawStaticDescription {
+            rawStatic
+        } else {
+            "You are in the \(location.name)."
         }
+        let document = Document(parsing: raw)
+        return document.format(
+            options: .init(
+                preferredLineLimit: .init(maxLength: .max, breakWith: .hardBreak),
+            )
+        )
+        .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
 
-        // Otherwise, use the static description or a default message
-        // Consider a more appropriate default message for locations.
-        return handler.staticDescription ?? "You are in the \(location.name)."
+extension DescriptionHandlerRegistry {
+    private var markupOptions: MarkupFormatter.Options {
+        MarkupFormatter.Options(
+            preferredLineLimit: MarkupFormatter.Options.PreferredLineLimit(
+                maxLength: maximumDescriptionLength,
+                breakWith: .hardBreak
+            )
+        )
     }
 }

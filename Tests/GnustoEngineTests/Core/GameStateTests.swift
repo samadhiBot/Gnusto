@@ -151,7 +151,10 @@ struct GameStateTests {
         #expect(state.pronouns["it"] == [Self.itemLantern])
 
         // Check new description
-        #expect(state.locations[Self.locWOH]?.longDescription?.staticDescription == "A new description.")
+        #expect(
+            state.locations[Self.locWOH]?.longDescription?
+                .rawStaticDescription == "A new description."
+        )
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
         // Check sword is now in the location

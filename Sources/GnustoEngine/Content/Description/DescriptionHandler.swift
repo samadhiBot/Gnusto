@@ -1,5 +1,4 @@
 import Foundation
-import Markdown
 
 /// A handler that can generate dynamic descriptions for items based on game state.
 /// Static descriptions can be provided as Markdown strings.
@@ -35,13 +34,6 @@ extension DescriptionHandler: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self.id = nil
         self.rawStaticDescription = value
-    }
-
-    /// The processed static Markdown description, if one exists.
-    public var staticDescription: String? {
-        guard let raw = rawStaticDescription else { return nil }
-        let document = Document(parsing: raw)
-        return document.format().trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
 

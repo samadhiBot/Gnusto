@@ -39,7 +39,7 @@ struct LocationTests {
         #expect(location.id == defaultLocationID)
         #expect(location.name == defaultLocationName)
         // Check the static description within the DescriptionHandler
-        #expect(location.longDescription?.staticDescription == "A nondescript room.")
+        #expect(location.longDescription?.rawStaticDescription == "A nondescript room.")
         #expect(location.longDescription?.id == nil)
         #expect(location.shortDescription == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
@@ -54,7 +54,7 @@ struct LocationTests {
 
         #expect(location.id == "livingRoom")
         #expect(location.name == "Living Room")
-        #expect(location.longDescription?.staticDescription == "A comfortably furnished living room. There are exits west and east.")
+        #expect(location.longDescription?.rawStaticDescription == "A comfortably furnished living room. There are exits west and east.")
         #expect(location.longDescription?.id == nil)
         #expect(location.shortDescription == nil)
         #expect(location.exits.count == 2)
@@ -133,7 +133,7 @@ struct LocationTests {
 
         #expect(location1.name == "Renamed Room") // Change in location2 reflects in location1
         #expect(location1.hasProperty(.visited))
-        #expect(location1.longDescription?.staticDescription == "An updated room.")
+        #expect(location1.longDescription?.rawStaticDescription == "An updated room.")
         #expect(location1 === location2) // Verify they point to the same instance
     }
 
