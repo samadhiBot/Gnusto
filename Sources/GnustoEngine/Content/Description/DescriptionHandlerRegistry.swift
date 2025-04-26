@@ -1,16 +1,12 @@
 import Foundation
 
 /// A type that can generate a dynamic description for an item based on game state.
-/// Runs on the MainActor.
 public typealias DynamicDescriptionHandler = @MainActor (ItemSnapshot, GameEngine) async -> String
 
 /// A type that can generate a dynamic description for a location based on game state.
-/// Runs on the MainActor.
-/// Note: Assumes `LocationSnapshot` exists or will be created.
 public typealias DynamicLocationDescriptionHandler = @MainActor (LocationSnapshot, GameEngine) async -> String
 
 /// A registry that manages description handlers and their dynamic logic.
-/// The registry itself is an actor, but the handlers it calls run on the MainActor.
 @MainActor // Make registry MainActor to simplify handler registration/calling
 public class DescriptionHandlerRegistry { // Changed from actor to class
     /// Dictionary mapping item handler IDs to their dynamic logic.
@@ -28,7 +24,7 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
     // --- Item Handlers ---
 
     /// Registers a new dynamic description handler for an item.
-    /// Must be called from the MainActor.
+    /// 
     /// - Parameters:
     ///   - id: The ID of the handler to register.
     ///   - handler: The closure that generates the dynamic description.
@@ -54,7 +50,7 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
     ) async -> String {
         // No need for await as we are @MainActor
         // If there's a dynamic handler, use it
-        if let handlerID = handler.dynamicHandlerID,
+        if let handlerID = handler.id,
            let dynamicHandler = dynamicItemHandlers[handlerID] {
             // Handler itself is @MainActor, await is fine
             return await dynamicHandler(item, engine)
@@ -92,11 +88,9 @@ public class DescriptionHandlerRegistry { // Changed from actor to class
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
-        // No need for await
         // If there's a dynamic handler, use it
-        if let handlerID = handler.dynamicHandlerID,
+        if let handlerID = handler.id,
            let dynamicHandler = dynamicLocationHandlers[handlerID] {
-            // Handler itself is @MainActor, await is fine
             return await dynamicHandler(location, engine)
         }
 

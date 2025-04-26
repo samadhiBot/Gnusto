@@ -378,7 +378,7 @@ struct ExamineActionHandlerTests {
         let moodStone = Item(
             id: "stone",
             name: "mood stone",
-            longDescription: DescriptionHandler(id: "mood_stone_desc"),
+            longDescription: .id("mood_stone_desc"),
             properties: .device,
             parent: .location("startRoom")
         )

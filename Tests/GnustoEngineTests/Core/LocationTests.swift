@@ -40,7 +40,7 @@ struct LocationTests {
         #expect(location.name == defaultLocationName)
         // Check the static description within the DescriptionHandler
         #expect(location.longDescription?.staticDescription == "A nondescript room.")
-        #expect(location.longDescription?.dynamicHandlerID == nil)
+        #expect(location.longDescription?.id == nil)
         #expect(location.shortDescription == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
         #expect(location.properties.isEmpty)
@@ -55,7 +55,7 @@ struct LocationTests {
         #expect(location.id == "livingRoom")
         #expect(location.name == "Living Room")
         #expect(location.longDescription?.staticDescription == "A comfortably furnished living room. There are exits west and east.")
-        #expect(location.longDescription?.dynamicHandlerID == nil)
+        #expect(location.longDescription?.id == nil)
         #expect(location.shortDescription == nil)
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
