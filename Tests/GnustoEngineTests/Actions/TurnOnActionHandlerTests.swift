@@ -115,10 +115,12 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
 
-        // Act & Assert: Expect specific error
-        await #expect(throws: ActionError.prerequisiteNotMet("It's already on.")) {
-            try await handler.perform(command: command, engine: engine)
-        }
+        // Act: Call the handler directly
+        try await handler.perform(command: command, engine: engine)
+
+        // Assert: Check for the specific output message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "It's already on.")
 
         // Verify item state didn't change unexpectedly
         let finalItemState = engine.itemSnapshot(with: "lamp")

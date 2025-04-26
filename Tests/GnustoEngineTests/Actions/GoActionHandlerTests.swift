@@ -14,16 +14,17 @@ struct GoActionHandlerTests {
             id: "startRoom",
             name: "Start Room",
             longDescription: "You are here.",
-            exits: [.north: Exit(destination: "end")]
+            exits: [.north: Exit(destination: "end")],
+            properties: .inherentlyLit
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
-            longDescription: "You went there."
+            longDescription: "You went there.",
+            properties: .inherentlyLit
         )
 
         let game = MinimalGame(
-            player: Player(in: "startRoom"),
             locations: [startRoom, endRoom]
         )
         let mockIO = await MockIOHandler()

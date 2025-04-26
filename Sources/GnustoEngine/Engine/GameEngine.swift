@@ -675,8 +675,6 @@ public class GameEngine {
         }
         location.properties.formUnion(adding)
         location.properties.subtract(removing)
-        // Reassign the modified location object back to the dictionary
-        gameState.locations[id] = location
     }
 
     /// Updates the parent entity of a specific item.
@@ -740,7 +738,6 @@ public class GameEngine {
         for direction in removing {
             location.exits.removeValue(forKey: direction)
         }
-        gameState.locations[id] = location
     }
 
     /// Updates the referent for a specific pronoun (e.g., "it").
