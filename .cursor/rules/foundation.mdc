@@ -25,6 +25,7 @@ alwaysApply: true
 
 ## Foundational Rules
 
+- ALWAYS refer to `Sources/GnustoEngine` and `Tests/GnustoEngineTests` before making changes, to ensure you follow existing conventions and APIs.
 - When adding, modifying or reviewing functionality, ALWAYS refer to the original ZIL source code in `Docs/References`
   - Use `Docs/References/Cloak of Darkness` to quickly learn the fundamentals of how some functionality was handled in ZIL
   - Use `Docs/References/Zork 1` for the canonical mechanics and phrases, e.g. "It is pitch black. You are likely to be eaten by a grue."
