@@ -612,14 +612,14 @@ public class GameEngine {
     /// - Parameter parent: The `ParentEntity` to filter by.
     /// - Returns: An array of `ItemSnapshot`s for items with the specified parent.
     public func itemSnapshots(withParent parent: ParentEntity) -> [ItemSnapshot] {
-        return gameState.items.values
+        gameState.items.values
             .filter { $0.parent == parent }
             .map { ItemSnapshot(item: $0) }
     }
 
     /// Safely retrieves the player's current location ID.
     public func playerLocationID() -> LocationID {
-        return gameState.player.currentLocationID
+        gameState.player.currentLocationID
     }
 
     /// Safely retrieves a snapshot of the player's current location.
@@ -629,12 +629,12 @@ public class GameEngine {
 
     /// Safely retrieves the player's score.
     public func playerScore() -> Int {
-        return gameState.player.score
+        gameState.player.score
     }
 
     /// Safely retrieves the player's move count.
     public func playerMoves() -> Int {
-        return gameState.player.moves
+        gameState.player.moves
     }
 
     /// Checks if the player can carry an item of the given size based on current inventory weight and capacity.
@@ -691,9 +691,11 @@ public class GameEngine {
             print("Warning: Attempted to update parent for non-existent item '\(itemID)'.")
             return
         }
-        // TODO: Add checks? (e.g., prevent moving item inside itself?)
+        guard item.parent != newParent else {
+            print("Warning: Attempted to update item '\(itemID)' parent to itself.")
+            return
+        }
         item.parent = newParent
-        gameState.items[itemID] = item
     }
 
     /// Updates the properties of a specific item.
@@ -716,7 +718,6 @@ public class GameEngine {
         if !removing.isEmpty {
             item.properties.subtract(removing)
         }
-        gameState.items[itemID] = item
     }
 
     /// Updates the exits of a specific location.
@@ -786,7 +787,7 @@ public class GameEngine {
     /// - Parameter key: The key for the state value.
     /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
     public func getGameSpecificStateValue(key: String) -> AnyCodable? {
-        return gameState.gameSpecificState[key]
+        gameState.gameSpecificState[key]
     }
 
     /// Safely retrieves a String value from the game-specific state dictionary.
@@ -794,14 +795,14 @@ public class GameEngine {
     /// - Parameter key: The key for the state value.
     /// - Returns: The `String` value if found and castable, otherwise `nil`.
     public func getGameSpecificStateString(key: String) -> String? {
-        return gameState.gameSpecificState[key]?.value as? String
+        gameState.gameSpecificState[key]?.value as? String
     }
 
     /// Safely retrieves the value of a boolean flag from the game state.
     /// - Parameter key: The key for the flag.
     /// - Returns: The `Bool` value if the flag exists, otherwise `nil`.
     public func getFlagValue(key: String) -> Bool? {
-        return gameState.flags[key]
+        gameState.flags[key]
     }
 
     /// Safely sets the value of a boolean flag in the game state.

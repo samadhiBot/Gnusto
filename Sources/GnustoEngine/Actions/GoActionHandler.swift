@@ -20,14 +20,17 @@ public struct GoActionHandler: ActionHandler {
 
         // 3. Find Exit
         guard let exit = currentLoc.exits[direction] else {
-            throw ActionError.invalidDirection // Standard message: "You can't go that way."
+            // Standard message: "You can't go that way."
+            await engine.output("You can't go that way.")
+            return // Stop processing
         }
 
         // 4. Check Exit Conditions
 
         // Check for static blocked message first (highest priority override)
         if let staticBlockedMessage = exit.blockedMessage {
-            throw ActionError.directionIsBlocked(staticBlockedMessage)
+            await engine.output(staticBlockedMessage)
+            return // Stop processing
         }
 
         // Check required key
