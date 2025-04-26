@@ -378,7 +378,7 @@ struct ExamineActionHandlerTests {
         let moodStone = Item(
             id: "stone",
             name: "mood stone",
-            longDescription: DescriptionHandler("mood_stone_desc"),
+            longDescription: DescriptionHandler(id: "mood_stone_desc"),
             properties: .device,
             parent: .location("startRoom")
         )
@@ -395,7 +395,7 @@ struct ExamineActionHandlerTests {
         // Register the dynamic handler - reads item's state
         engine.descriptionHandlerRegistry.registerItemHandler(id: "mood_stone_desc") { item, _ in
             // Use hasProperty on the snapshot
-            let color = item.hasProperty(ItemProperty.on) ? "red" : "blue"
+            let color = item.hasProperty(.on) ? "red" : "blue"
             return "The mood stone glows a soft \(color)."
         }
 
@@ -407,10 +407,10 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output1, "The mood stone glows a soft blue.")
 
         // Change the item's state directly via the engine by adding the .on property
-        engine.updateItemProperties(itemID: "stone", adding: ItemProperty.on) // Use full ItemProperty.on
+        engine.updateItemProperties(itemID: "stone", adding: .on) // Use full ItemProperty.on
 
         // Assert intermediate state change
-        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(ItemProperty.on) == true) // Use full ItemProperty.on
+        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(.on) == true) // Use full ItemProperty.on
 
         // Act 2: Examine when red (isOn: true)
         try await handler.perform(command: command, engine: engine)

@@ -123,6 +123,7 @@ final class MockIOHandler: IOHandler {
             }
         }
 
+        recordedOutput.removeAll()
         return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

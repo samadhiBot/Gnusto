@@ -12,6 +12,16 @@ public struct DescriptionHandler: Codable, Sendable, Equatable, ExpressibleByStr
     /// This is not directly Codable, so we'll use a handler ID pattern.
     public let dynamicHandlerID: String?
 
+    /// Creates a new description handler with a dynamic handler.
+    /// - Parameters:
+    ///   - handlerID: The ID of the dynamic handler to use.
+    ///   - staticDescription: Optional fallback static description.
+    public init(id: String, staticDescription: String? = nil) {
+        self.id = DescriptionHandlerID(id)
+        self.staticDescription = staticDescription
+        self.dynamicHandlerID = id
+    }
+
     /// Creates a new description handler with a static description.
     ///
     /// - Tip: `DescriptionHandler` is `ExpressibleByStringLiteral`, so just use
@@ -22,16 +32,6 @@ public struct DescriptionHandler: Codable, Sendable, Equatable, ExpressibleByStr
         self.id = DescriptionHandlerID(UUID().uuidString)
         self.staticDescription = value
         self.dynamicHandlerID = nil
-    }
-
-    /// Creates a new description handler with a dynamic handler.
-    /// - Parameters:
-    ///   - handlerID: The ID of the dynamic handler to use.
-    ///   - staticDescription: Optional fallback static description.
-    public init(_ handlerID: String, staticDescription: String? = nil) {
-        self.id = DescriptionHandlerID(UUID().uuidString)
-        self.staticDescription = staticDescription
-        self.dynamicHandlerID = handlerID
     }
 
     public static func == (lhs: DescriptionHandler, rhs: DescriptionHandler) -> Bool {

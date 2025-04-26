@@ -42,7 +42,7 @@ public struct DynamicDescriptionExample {
                 name: "brass lantern",
                 adjectives: "brass",
                 synonyms: "lamp", "light",
-                longDescription: DescriptionHandler("lamp_description"),
+                longDescription: DescriptionHandler(id: "lamp_description"),
                 properties: .lightSource, .on
             ),
             Item(
@@ -50,7 +50,7 @@ public struct DynamicDescriptionExample {
                 name: "ancient tome",
                 adjectives: "ancient",
                 synonyms: "volume", "tome",
-                longDescription: DescriptionHandler("book_description"),
+                longDescription: DescriptionHandler(id: "book_description"),
                 properties: .readable
             ),
             Item(
@@ -58,7 +58,7 @@ public struct DynamicDescriptionExample {
                 name: "wooden chest",
                 adjectives: "wooden",
                 synonyms: "box", "container",
-                longDescription: DescriptionHandler("container_description"),
+                longDescription: DescriptionHandler(id: "container_description"),
                 properties: .container, .open
             )
         ]
