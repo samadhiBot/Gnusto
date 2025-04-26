@@ -13,7 +13,7 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Test Room",
-            description: "A basic room.",
+            longDescription: "A basic room.",
             properties: .inherentlyLit
         )
         let item1 = Item(
@@ -60,7 +60,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            description: "A basic room."
+            longDescription: "A basic room."
         )
         let item1 = Item(
             id: "widget",
@@ -94,7 +94,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            description: "A basic room."
+            longDescription: "A basic room."
         )
         let activeLamp = Item(
             id: "lamp",
@@ -139,7 +139,11 @@ struct LookActionHandlerTests {
 
     @Test("LOOK AT item shows description")
     func testLookAtItem() async throws {
-        let item = Item(id: "rock", name: "plain rock", description: "It looks like a rock.")
+        let item = Item(
+            id: "rock",
+            name: "plain rock",
+            longDescription: "It looks like a rock."
+        )
 
         let game = MinimalGame(
             items: [item]

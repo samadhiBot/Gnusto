@@ -166,7 +166,7 @@ struct StandardParserTests {
             Location(
                 id: roomID,
                 name: "Room",
-                description: "A room.",
+                longDescription: "A room.",
                 globals: "rug" // Globals remain associated with location
             )
             // Add more locations later if needed

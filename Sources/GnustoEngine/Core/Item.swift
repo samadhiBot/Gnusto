@@ -14,16 +14,16 @@ public final class Item: Codable, Identifiable {
     // Action handler - Placeholder.
     // var actionHandlerID: String?
 
-    /// The description shown when the item is examined (`EXAMINE`).
-    public var description: DescriptionHandler?
+    /// The short description shown in room listings and when the item is mentioned (ZIL DESC).
+    public var shortDescription: DescriptionHandler?
 
-    /// The description shown when the item is first seen in a room (`FDESC`).
+    /// The description shown when the item is first seen in a room (ZIL FDESC).
     public var firstDescription: DescriptionHandler?
 
     /// Text displayed only when the item is held and read (`READ`, requires `ItemProperty.read`).
     public var heldText: String?
 
-    /// The unique identifier for this item. `let` because identity doesn't change.
+    /// The unique identifier for this item (ZIL NAME). `let` because identity doesn't change.
     public let id: ItemID
 
     /// The primary noun used to refer to the item (e.g., "lantern").
@@ -38,8 +38,8 @@ public final class Item: Codable, Identifiable {
     /// The item's size, influencing carrying capacity and container limits. Defaults to 5 per ZILF docs.
     public var size: Int
 
-    /// The description shown when the item is present in a room after the first time (`LDESC`).
-    public var subsequentDescription: DescriptionHandler?
+    /// The detailed description shown when examining the item (ZIL LDESC).
+    public var longDescription: DescriptionHandler?
 
     /// Synonyms for the item's name (e.g., ["lamp", "light"]).
     public var synonyms: Set<String>
@@ -60,9 +60,9 @@ public final class Item: Codable, Identifiable {
         name: String,
         adjectives: String...,
         synonyms: String...,
-        description: String? = nil,
+        shortDescription: String? = nil,
         firstDescription: String? = nil,
-        subsequentDescription: String? = nil,
+        longDescription: String? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: ItemProperty...,
@@ -77,9 +77,9 @@ public final class Item: Codable, Identifiable {
         self.name = name
         self.adjectives = Set(adjectives)
         self.synonyms = Set(synonyms)
-        self.description = description.map { DescriptionHandler(staticDescription: $0) }
+        self.shortDescription = shortDescription.map { DescriptionHandler(staticDescription: $0) }
         self.firstDescription = firstDescription.map { DescriptionHandler(staticDescription: $0) }
-        self.subsequentDescription = subsequentDescription.map { DescriptionHandler(staticDescription: $0) }
+        self.longDescription = longDescription.map { DescriptionHandler(staticDescription: $0) }
         self.text = text
         self.heldText = heldText
         self.properties = Set(properties)
@@ -96,9 +96,9 @@ public final class Item: Codable, Identifiable {
         name: String,
         adjectives: Set<String> = [],
         synonyms: Set<String> = [],
-        description: DescriptionHandler? = nil,
+        shortDescription: DescriptionHandler? = nil,
         firstDescription: DescriptionHandler? = nil,
-        subsequentDescription: DescriptionHandler? = nil,
+        longDescription: DescriptionHandler? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: Set<ItemProperty> = [],
@@ -113,9 +113,9 @@ public final class Item: Codable, Identifiable {
         self.name = name
         self.adjectives = adjectives
         self.synonyms = synonyms
-        self.description = description
+        self.shortDescription = shortDescription
         self.firstDescription = firstDescription
-        self.subsequentDescription = subsequentDescription
+        self.longDescription = longDescription
         self.text = text
         self.heldText = heldText
         self.properties = properties
@@ -133,7 +133,7 @@ public final class Item: Codable, Identifiable {
     enum CodingKeys: String, CodingKey {
         case adjectives
         case capacity
-        case description
+        case shortDescription
         case firstDescription
         case heldText
         case id
@@ -141,7 +141,7 @@ public final class Item: Codable, Identifiable {
         case parent
         case properties
         case size
-        case subsequentDescription
+        case longDescription
         case synonyms
         case text
         case readableText
@@ -152,7 +152,7 @@ public final class Item: Codable, Identifiable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adjectives = try container.decode(Set<String>.self, forKey: .adjectives)
         capacity = try container.decode(Int.self, forKey: .capacity)
-        description = try container.decodeIfPresent(DescriptionHandler.self, forKey: .description)
+        shortDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .shortDescription)
         firstDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .firstDescription)
         heldText = try container.decodeIfPresent(String.self, forKey: .heldText)
         id = try container.decode(ItemID.self, forKey: .id)
@@ -160,7 +160,7 @@ public final class Item: Codable, Identifiable {
         parent = try container.decode(ParentEntity.self, forKey: .parent)
         properties = try container.decode(Set<ItemProperty>.self, forKey: .properties)
         size = try container.decode(Int.self, forKey: .size)
-        subsequentDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .subsequentDescription)
+        longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
         synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
         text = try container.decodeIfPresent(String.self, forKey: .text)
         readableText = try container.decodeIfPresent(String.self, forKey: .readableText)
@@ -171,7 +171,7 @@ public final class Item: Codable, Identifiable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(adjectives, forKey: .adjectives)
         try container.encode(capacity, forKey: .capacity)
-        try container.encodeIfPresent(description, forKey: .description)
+        try container.encodeIfPresent(shortDescription, forKey: .shortDescription)
         try container.encodeIfPresent(firstDescription, forKey: .firstDescription)
         try container.encodeIfPresent(heldText, forKey: .heldText)
         try container.encode(id, forKey: .id)
@@ -179,7 +179,7 @@ public final class Item: Codable, Identifiable {
         try container.encode(parent, forKey: .parent)
         try container.encode(properties, forKey: .properties)
         try container.encode(size, forKey: .size)
-        try container.encodeIfPresent(subsequentDescription, forKey: .subsequentDescription)
+        try container.encodeIfPresent(longDescription, forKey: .longDescription)
         try container.encode(synonyms, forKey: .synonyms)
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(readableText, forKey: .readableText)

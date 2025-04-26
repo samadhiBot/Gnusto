@@ -16,7 +16,7 @@ struct MinimalGame: GameBlueprint {
                 Location(
                     id: "startRoom",
                     name: "Void",
-                    description: "An empty void.",
+                    longDescription: "An empty void.",
                     properties: .inherentlyLit
                 )
             ],

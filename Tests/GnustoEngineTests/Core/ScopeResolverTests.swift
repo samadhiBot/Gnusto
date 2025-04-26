@@ -64,7 +64,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
         let inactiveLamp = Item(
             id: "lamp",
@@ -86,7 +86,7 @@ struct ScopeResolverTests {
         )
         let resolver = engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == false)
+        #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
 
     @Test("Location is lit if active light source is in room")
@@ -115,12 +115,12 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource,
+            properties: [.lightSource],
             parent: .location(darkRoom.id)
         )
         let game = MinimalGame(
@@ -137,7 +137,7 @@ struct ScopeResolverTests {
         )
         let resolver = engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == false)
+        #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
 
     @Test("Location is lit if inherentlyLit and player holds active light (inherentlyLit takes precedence)")
@@ -313,6 +313,37 @@ struct ScopeResolverTests {
         #expect(visibleIDs.isEmpty)
     }
 
+    // MARK: - Reachable Tests
+
+    let baseBox = Item(
+        id: "box",
+        name: "box",
+        properties: .container,
+        parent: .player
+    )
+    let baseOpenBox = Item(
+        id: "openBox",
+        name: "open box",
+        properties: .container, .open,
+        parent: .player
+    )
+    let baseClosedBox = Item(
+        id: "closedBox",
+        name: "closed box",
+        properties: .container,
+        parent: .player
+    )
+    let baseTransparentBox = Item(
+        id: "transBox",
+        name: "transparent box",
+        properties: .container, .transparent,
+        parent: .player
+    )
+    let baseItemInBox = Item(
+        id: "itemInBox",
+        name: "item in box"
+    )
+
     @Test("Reachable includes inventory")
     func testReachableInventory() async throws {
         let inventoryItem = Item(
@@ -361,7 +392,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
         let locationItem = Item(
             id: "locItem",
@@ -385,37 +416,6 @@ struct ScopeResolverTests {
         let reachable = resolver.itemsReachableByPlayer()
         #expect(!reachable.contains(locationItem.id))
     }
-
-    // MARK: - Reachable Tests
-
-    let baseBox = Item(
-        id: "box",
-        name: "box",
-        properties: .container,
-        parent: .player
-    )
-    let baseOpenBox = Item(
-        id: "openBox",
-        name: "open box",
-        properties: .container, .open,
-        parent: .player
-    )
-    let baseClosedBox = Item(
-        id: "closedBox",
-        name: "closed box",
-        properties: .container,
-        parent: .player
-    )
-    let baseTransparentBox = Item(
-        id: "transBox",
-        name: "transparent box",
-        properties: .container, .transparent,
-        parent: .player
-    )
-    let baseItemInBox = Item(
-        id: "itemInBox",
-        name: "item in box"
-    )
 
     @Test("Reachable includes item in open container (inventory)")
     func testReachableOpenContainerInventory() async throws {
@@ -588,7 +588,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
         let openBox = Item(
             id: "openBox",
@@ -619,5 +619,39 @@ struct ScopeResolverTests {
         #expect(reachable.isEmpty) // Neither box nor item inside should be reachable in dark
     }
 
-    // Add tests for nested containers, transparent closed containers, etc.
+    @Test("No items visible in room lit by inactive light")
+    func testVisibleItemsRoomInactiveLight() async throws {
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            longDescription: "It's dark."
+        )
+        let inactiveLamp = Item(
+            id: "lamp",
+            name: "lamp",
+            properties: [.lightSource],
+            parent: .location(darkRoom.id)
+        )
+        let item = Item(
+            id: "key",
+            name: "key",
+            parent: .location(darkRoom.id)
+        )
+        let game = MinimalGame(
+            player: Player(in: darkRoom.id),
+            locations: [darkRoom],
+            items: [inactiveLamp, item]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let resolver = engine.scopeResolver
+
+        let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
+        #expect(visibleIDs.isEmpty)
+    }
 }

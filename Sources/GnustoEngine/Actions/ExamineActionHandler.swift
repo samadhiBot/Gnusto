@@ -39,7 +39,7 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // 6. Get the item's description using the description handler
-        if let descriptionHandler = targetItem.description {
+        if let descriptionHandler = targetItem.longDescription {
             let description = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
@@ -55,7 +55,7 @@ public struct ExamineActionHandler: ActionHandler {
     /// Helper function to handle examining containers or doors.
     private func examineContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async {
         // Print the item's main description first, if available
-        if let descriptionHandler = targetItem.description {
+        if let descriptionHandler = targetItem.longDescription {
             let description = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,

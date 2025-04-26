@@ -50,14 +50,14 @@ struct GameStateTests {
             Location(
                 id: Self.locWOH,
                 name: "West of House",
-                description: "You are standing west of a white house.",
+                longDescription: "You are standing west of a white house.",
                 exits: [.north: Exit(destination: Self.locNorth)]
                 // items: // Removed
             ),
             Location(
                 id: Self.locNorth,
                 name: "North of House",
-                description: "You are north of the house.",
+                longDescription: "You are north of the house.",
                 exits: [.south: Exit(destination: Self.locWOH)]
             )
         ]
@@ -134,7 +134,7 @@ struct GameStateTests {
         state.pronouns["it"] = [Self.itemLantern]
 
         // Modify Location/Item (reference types held by struct)
-        state.locations[Self.locWOH]?.description = "A new description."
+        state.locations[Self.locWOH]?.longDescription = DescriptionHandler(staticDescription: "A new description.")
         state.items[Self.itemLantern]?.name = "Magic Lantern"
         // Simulate taking the lantern
         state.items[Self.itemLantern]?.parent = .player
@@ -150,7 +150,8 @@ struct GameStateTests {
         #expect(state.flags["lightSeen"] == true)
         #expect(state.pronouns["it"] == [Self.itemLantern])
 
-        #expect(state.locations[Self.locWOH]?.description == "A new description.")
+        // Check new description
+        #expect(state.locations[Self.locWOH]?.longDescription?.staticDescription == "A new description.")
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
         // Check sword is now in the location
@@ -184,7 +185,7 @@ struct GameStateTests {
         // Check content of locations (comparing key properties)
         #expect(decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
         // #expect(decodedState.locations[locWOH]?.items == originalState.locations[locWOH]?.items) // Removed
-        #expect(decodedState.locations[Self.locNorth]?.description == originalState.locations[Self.locNorth]?.description)
+        #expect(decodedState.locations[Self.locNorth]?.longDescription == originalState.locations[Self.locNorth]?.longDescription)
 
         // Check content of items (comparing key properties, including parent)
         #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)

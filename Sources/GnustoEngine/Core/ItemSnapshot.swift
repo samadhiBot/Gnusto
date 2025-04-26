@@ -8,9 +8,9 @@ public struct ItemSnapshot: Identifiable, Sendable {
     public let name: String
     public let adjectives: Set<String>
     public let synonyms: Set<String>
-    public let description: DescriptionHandler?
+    public let shortDescription: DescriptionHandler?
     public let firstDescription: DescriptionHandler?
-    public let subsequentDescription: DescriptionHandler?
+    public let longDescription: DescriptionHandler?
     public let text: String?
     public let heldText: String?
     public let properties: Set<ItemProperty>
@@ -28,9 +28,9 @@ public struct ItemSnapshot: Identifiable, Sendable {
         self.name = item.name
         self.adjectives = item.adjectives
         self.synonyms = item.synonyms
-        self.description = item.description
+        self.shortDescription = item.shortDescription
         self.firstDescription = item.firstDescription
-        self.subsequentDescription = item.subsequentDescription
+        self.longDescription = item.longDescription
         self.text = item.text
         self.heldText = item.heldText
         self.properties = item.properties // Set is a value type

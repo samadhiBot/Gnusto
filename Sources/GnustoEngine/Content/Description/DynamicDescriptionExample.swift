@@ -5,7 +5,7 @@ public struct DynamicDescriptionExample {
     /// Example of a dynamic description handler that changes based on item state.
     public static func registerExampleHandlers(engine: GameEngine) async {
         // Example 1: A lamp that changes description based on whether it's on
-        await engine.descriptionHandlerRegistry.registerHandler(id: "lamp_description") { item, engine in
+        await engine.descriptionHandlerRegistry.registerItemHandler(id: "lamp_description") { item, engine in
             if item.hasProperty(.on) {
                 return "The \(item.name) is glowing brightly, casting light all around."
             } else {
@@ -14,7 +14,7 @@ public struct DynamicDescriptionExample {
         }
 
         // Example 2: A book that shows different text based on whether it's been read
-        await engine.descriptionHandlerRegistry.registerHandler(id: "book_description") { item, engine in
+        await engine.descriptionHandlerRegistry.registerItemHandler(id: "book_description") { item, engine in
             if item.hasProperty(.touched) {
                 return "The \(item.name) appears to be a well-read volume."
             } else {
@@ -23,7 +23,7 @@ public struct DynamicDescriptionExample {
         }
 
         // Example 3: A container that describes its contents
-        await engine.descriptionHandlerRegistry.registerHandler(id: "container_description") { item, engine in
+        await engine.descriptionHandlerRegistry.registerItemHandler(id: "container_description") { item, engine in
             let contents = await engine.itemSnapshots(withParent: .item(item.id))
             if contents.isEmpty {
                 return "The \(item.name) is empty."
@@ -42,7 +42,7 @@ public struct DynamicDescriptionExample {
                 name: "brass lantern",
                 adjectives: ["brass"],
                 synonyms: ["lamp", "light"],
-                description: DescriptionHandler(handlerID: "lamp_description"),
+                longDescription: DescriptionHandler(handlerID: "lamp_description"),
                 properties: [.lightSource, .on]
             ),
             Item(
@@ -50,7 +50,7 @@ public struct DynamicDescriptionExample {
                 name: "ancient tome",
                 adjectives: ["ancient"],
                 synonyms: ["volume", "tome"],
-                description: DescriptionHandler(handlerID: "book_description"),
+                longDescription: DescriptionHandler(handlerID: "book_description"),
                 properties: [.readable]
             ),
             Item(
@@ -58,7 +58,7 @@ public struct DynamicDescriptionExample {
                 name: "wooden chest",
                 adjectives: ["wooden"],
                 synonyms: ["box", "container"],
-                description: DescriptionHandler(handlerID: "container_description"),
+                longDescription: DescriptionHandler(handlerID: "container_description"),
                 properties: [.container, .open]
             )
         ]

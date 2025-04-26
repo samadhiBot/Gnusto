@@ -427,15 +427,27 @@ public class GameEngine {
             return
         }
 
-        // 2. If lit, proceed with description
-        guard let currentLocation = gameState.locations[locationID] else {
-            await ioHandler.print("Error: Current location not found!", style: .debug)
+        // 2. If lit, get snapshot and print name
+        guard let locationSnapshot = locationSnapshot(with: locationID) else {
+            await ioHandler.print("Error: Current location snapshot not found!", style: .debug)
             return
         }
-        await ioHandler.print("--- \(currentLocation.name) ---", style: .strong)
-        await ioHandler.print(currentLocation.description)
+        await ioHandler.print("--- \(locationSnapshot.name) ---", style: .strong)
 
-        // 3. List visible items
+        // 3. Generate and print the description using the handler
+        if let descriptionHandler = locationSnapshot.longDescription {
+            let description = await descriptionHandlerRegistry.generateDescription(
+                for: locationSnapshot,
+                using: descriptionHandler,
+                engine: self // Pass self as the engine
+            )
+            await ioHandler.print(description)
+        } else {
+            // Fallback if no description handler is set
+            await ioHandler.print("You are in \(locationSnapshot.name).") // Default message
+        }
+
+        // 4. List visible items
         await listItemsInLocation(locationID: locationID)
     }
 

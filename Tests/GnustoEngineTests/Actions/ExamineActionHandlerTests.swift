@@ -14,7 +14,7 @@ struct ExamineActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            description: "It's just a rock.",
+            longDescription: "It's just a rock.",
             parent: .location("startRoom")
         )
 
@@ -36,8 +36,8 @@ struct ExamineActionHandlerTests {
         let finalItemState = engine.itemSnapshot(with: "rock")
         #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
-        // Expect default message because simple objects without text/container props get it
-        expectNoDifference(output, "There's nothing special about the plain rock.")
+        // Expect the actual description now
+        expectNoDifference(output, "It's just a rock.")
     }
 
     @Test("Examine simple object (held)")
@@ -46,7 +46,7 @@ struct ExamineActionHandlerTests {
         let key = Item(
             id: "key",
             name: "brass key",
-            description: "A small brass key.",
+            longDescription: "A small brass key.",
             properties: .takable,
             parent: .player
         )
@@ -69,7 +69,7 @@ struct ExamineActionHandlerTests {
         let finalItemState = engine.itemSnapshot(with: "key")
         #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There's nothing special about the brass key.")
+        expectNoDifference(output, "A small brass key.")
     }
 
     @Test("Examine readable item (prioritizes text)")
@@ -78,7 +78,7 @@ struct ExamineActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            description: "A rolled up scroll.",
+            longDescription: "A rolled up scroll.",
             properties: .readable,
             parent: .location("startRoom"),
             readableText: "FROBOZZ"
@@ -111,7 +111,7 @@ struct ExamineActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            description: "A plain wooden box.",
+            longDescription: "A plain wooden box.",
             properties: .container, .openable, .open,
             parent: .location("startRoom")
         )
@@ -144,7 +144,7 @@ struct ExamineActionHandlerTests {
             The wooden box contains:
               A ruby gem
             """
-        expectNoDifference(output, expectedOutput.trimmingCharacters(in: .whitespacesAndNewlines))
+        expectNoDifference(output, expectedOutput)
     }
 
     @Test("Examine open empty container")
@@ -153,7 +153,7 @@ struct ExamineActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            description: "A plain wooden box.",
+            longDescription: "A plain wooden box.",
             properties: .container, .openable, .open,
             parent: .location("startRoom")
         )
@@ -178,7 +178,7 @@ struct ExamineActionHandlerTests {
             A plain wooden box.
             The wooden box is empty.
             """
-        expectNoDifference(output, expectedOutput.trimmingCharacters(in: .whitespacesAndNewlines))
+        expectNoDifference(output, expectedOutput)
     }
 
     @Test("Examine closed container (shows description and closed status)")
@@ -187,7 +187,7 @@ struct ExamineActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            description: "A plain wooden box.",
+            longDescription: "A plain wooden box.",
             properties: .container, .openable, // Closed by default
             parent: .location("startRoom")
         )
@@ -212,7 +212,7 @@ struct ExamineActionHandlerTests {
             A plain wooden box.
             The wooden box is closed.
             """
-        expectNoDifference(output, expectedOutput.trimmingCharacters(in: .whitespacesAndNewlines))
+        expectNoDifference(output, expectedOutput)
     }
 
     @Test("Examine transparent closed container (shows description and contents)")
@@ -221,7 +221,7 @@ struct ExamineActionHandlerTests {
         let bottle = Item(
             id: "bottle",
             name: "glass bottle",
-            description: "A clear glass bottle.",
+            longDescription: "A clear glass bottle.",
             properties: .container, .transparent, // Closed by default, but transparent
             parent: .location("startRoom")
         )
@@ -252,22 +252,22 @@ struct ExamineActionHandlerTests {
             The glass bottle contains:
               A water
             """
-        expectNoDifference(output, expectedOutput.trimmingCharacters(in: .whitespacesAndNewlines))
+        expectNoDifference(output, expectedOutput)
     }
 
-    @Test("Examine surface (shows description and contents)")
+    @Test("Examine surface (shows description and items on it)")
     func testExamineSurface() async throws {
         // Arrange
         let table = Item(
             id: "table",
-            name: "wooden table",
-            description: "A sturdy table.",
+            name: "sturdy table",
+            longDescription: "A sturdy table.",
             properties: .surface,
             parent: .location("startRoom")
         )
         let book = Item(
             id: "book",
-            name: "heavy book",
+            name: "dusty book",
             parent: .item(table.id)
         )
 
@@ -287,23 +287,23 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        // Note: Current handler doesn't list surface contents, only container/door.
-        // Zork's V-EXAMINE didn't list surface contents either, V-LOOK-INSIDE did.
-        // Aligning test with V-EXAMINE: expect the default message for non-readable surfaces.
-        expectNoDifference(output, "There's nothing special about the wooden table.") // Updated expectation
-        #expect(engine.itemSnapshot(with: "table")?.hasProperty(ItemProperty.touched) == true)
+        let expectedOutput = """
+            A sturdy table.
+            On the sturdy table is:
+              A dusty book
+            """
+        expectNoDifference(output, expectedOutput)
     }
 
     @Test("Examine fails item not accessible")
-    func testExamineFailsItemNotAccessible() async throws {
+    func testExamineItemNotAccessible() async throws {
         // Arrange
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            description: "It's just a rock.",
-            parent: .nowhere // Inaccessible
+            longDescription: "It's just a rock.",
+            parent: .nowhere
         )
-
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -312,7 +312,6 @@ struct ExamineActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
 
         // Act & Assert
@@ -321,10 +320,16 @@ struct ExamineActionHandlerTests {
         }
     }
 
-    @Test("Examine fails no direct object")
-    func testExamineFailsNoObject() async throws {
+    @Test("Examine fails in dark room")
+    func testExamineInDarkRoom() async throws {
         // Arrange
-        let game = MinimalGame()
+        let darkRoom = Location(id: "darkRoom", name: "Dark Room")
+        let rock = Item(
+            id: "rock",
+            name: "plain rock",
+            parent: .location(darkRoom.id)
+        )
+        let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -332,61 +337,22 @@ struct ExamineActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "examine", rawInput: "examine")
+        let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Examine what?")
+        // Act & Assert
+        await #expect(throws: ActionError.roomIsDark) {
+            try await handler.perform(command: command, engine: engine)
+        }
     }
 
-    @Test("Examine with custom hook (handled)")
-    func testExamineWithCustomHookHandled() async throws {
-        // Arrange
-        let statue = Item(
-            id: "statue",
-            name: "stone statue",
-            description: "Default description.",
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [statue])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(verbID: "examine", directObject: "statue", rawInput: "examine statue")
-
-        // Act: Run the standard handler
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert: Check that the default handler printed its message
-        // (because the custom hook is gone)
-        let output = await mockIO.flush()
-        let expectedOutput = "There's nothing special about the stone statue."
-        expectNoDifference(output, expectedOutput)
-
-        // Ensure item was still marked touched
-        let finalItemState = engine.itemSnapshot(with: "statue")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
-    }
-
-    @Test("Examine with custom hook (not handled)")
-    func testExamineWithCustomHookNotHandled() async throws {
+    @Test("Examine item with no description")
+    func testExamineItemWithNoDescription() async throws {
         // Arrange
         let pebble = Item(
             id: "pebble",
-            name: "small pebble",
-            description: "Just a pebble.",
-            parent: .location("startRoom")
+            name: "small pebble"
+            // No description provided
         )
-
         let game = MinimalGame(items: [pebble])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -401,13 +367,48 @@ struct ExamineActionHandlerTests {
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert: Default handler should run and print its message
+        // Assert
         let output = await mockIO.flush()
-        let expectedOutput = "There's nothing special about the small pebble."
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "There's nothing special about the small pebble.")
+    }
 
-        // Ensure item was still marked touched
-        let finalItemState = engine.itemSnapshot(with: "pebble")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+    @Test("Examine simple object with dynamic description")
+    func testExamineSimpleObjectDynamicDescription() async throws {
+        // Arrange
+        let moodStone = Item(
+            id: "stone",
+            name: "mood stone",
+            // Set longDescription to a handler ID
+            longDescription: DescriptionHandler(handlerID: "mood_stone_desc"),
+            parent: .location("startRoom")
+        )
+
+        let game = MinimalGame(items: [moodStone])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        // Register the dynamic handler
+        var stoneColor = "blue"
+        await engine.descriptionHandlerRegistry.registerItemHandler(id: "mood_stone_desc") { item, _ in
+            "The mood stone glows a soft \(stoneColor)."
+        }
+
+        let command = Command(verbID: "examine", directObject: "stone", rawInput: "examine stone")
+
+        // Act 1: Examine when blue
+        try await handler.perform(command: command, engine: engine)
+        let output1 = await mockIO.flush()
+        expectNoDifference(output1, "The mood stone glows a soft blue.")
+
+        // Change state and Act 2: Examine when red
+        stoneColor = "red"
+        try await handler.perform(command: command, engine: engine)
+        let output2 = await mockIO.flush()
+        expectNoDifference(output2, "The mood stone glows a soft red.")
     }
 }

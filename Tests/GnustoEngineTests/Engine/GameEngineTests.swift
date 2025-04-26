@@ -17,7 +17,7 @@ struct GameEngineTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -390,7 +390,7 @@ struct GameEngineTests {
             You can see:
               A pebble
             >
-            
+
             Goodbye!
             """)
 

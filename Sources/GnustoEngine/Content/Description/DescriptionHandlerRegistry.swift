@@ -1,27 +1,44 @@
 import Foundation
 
 /// A type that can generate a dynamic description for an item based on game state.
-public typealias DynamicDescriptionHandler = (ItemSnapshot, GameEngine) async -> String
+/// Runs on the MainActor.
+public typealias DynamicDescriptionHandler = @MainActor (ItemSnapshot, GameEngine) async -> String
+
+/// A type that can generate a dynamic description for a location based on game state.
+/// Runs on the MainActor.
+/// Note: Assumes `LocationSnapshot` exists or will be created.
+public typealias DynamicLocationDescriptionHandler = @MainActor (LocationSnapshot, GameEngine) async -> String
 
 /// A registry that manages description handlers and their dynamic logic.
-public actor DescriptionHandlerRegistry {
-    /// Dictionary mapping handler IDs to their dynamic logic.
-    private var dynamicHandlers: [String: DynamicDescriptionHandler]
+/// The registry itself is an actor, but the handlers it calls run on the MainActor.
+@MainActor // Make registry MainActor to simplify handler registration/calling
+public class DescriptionHandlerRegistry { // Changed from actor to class
+    /// Dictionary mapping item handler IDs to their dynamic logic.
+    private var dynamicItemHandlers: [String: DynamicDescriptionHandler]
+
+    /// Dictionary mapping location handler IDs to their dynamic logic.
+    private var dynamicLocationHandlers: [String: DynamicLocationDescriptionHandler]
 
     /// Creates a new empty registry.
     public init() {
-        self.dynamicHandlers = [:]
+        self.dynamicItemHandlers = [:]
+        self.dynamicLocationHandlers = [:]
     }
 
-    /// Registers a new dynamic description handler.
+    // --- Item Handlers ---
+
+    /// Registers a new dynamic description handler for an item.
+    /// Must be called from the MainActor.
     /// - Parameters:
     ///   - id: The ID of the handler to register.
     ///   - handler: The closure that generates the dynamic description.
-    public func registerHandler(id: String, handler: @escaping DynamicDescriptionHandler) {
-        dynamicHandlers[id] = handler
+    public func registerItemHandler(id: String, handler: @escaping DynamicDescriptionHandler) {
+        // No need for await as we are @MainActor
+        dynamicItemHandlers[id] = handler
     }
 
     /// Generates a description for an item using its description handler.
+    /// Must be called from the MainActor.
     /// - Parameters:
     ///   - item: The item snapshot to generate a description for.
     ///   - handler: The description handler to use.
@@ -32,13 +49,53 @@ public actor DescriptionHandlerRegistry {
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
+        // No need for await as we are @MainActor
         // If there's a dynamic handler, use it
         if let handlerID = handler.dynamicHandlerID,
-           let dynamicHandler = dynamicHandlers[handlerID] {
+           let dynamicHandler = dynamicItemHandlers[handlerID] {
+            // Handler itself is @MainActor, await is fine
             return await dynamicHandler(item, engine)
         }
 
         // Otherwise, use the static description or a default message
         return handler.staticDescription ?? "You see nothing special about the \(item.name)."
+    }
+
+    // --- Location Handlers ---
+
+    /// Registers a new dynamic description handler for a location.
+    /// Must be called from the MainActor.
+    /// - Parameters:
+    ///   - id: The ID of the handler to register.
+    ///   - handler: The closure that generates the dynamic description.
+    public func registerLocationHandler(id: String, handler: @escaping DynamicLocationDescriptionHandler) {
+        // No need for await
+        dynamicLocationHandlers[id] = handler
+    }
+
+    /// Generates a description for a location using its description handler.
+    /// Must be called from the MainActor.
+    /// Note: Assumes `LocationSnapshot` exists or will be created.
+    /// - Parameters:
+    ///   - location: The location snapshot to generate a description for.
+    ///   - handler: The description handler to use.
+    ///   - engine: The game engine providing context.
+    /// - Returns: The generated description string.
+    public func generateDescription(
+        for location: LocationSnapshot,
+        using handler: DescriptionHandler,
+        engine: GameEngine
+    ) async -> String {
+        // No need for await
+        // If there's a dynamic handler, use it
+        if let handlerID = handler.dynamicHandlerID,
+           let dynamicHandler = dynamicLocationHandlers[handlerID] {
+            // Handler itself is @MainActor, await is fine
+            return await dynamicHandler(location, engine)
+        }
+
+        // Otherwise, use the static description or a default message
+        // Consider a more appropriate default message for locations.
+        return handler.staticDescription ?? "You are in the \(location.name)."
     }
 }

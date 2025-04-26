@@ -12,8 +12,7 @@ struct ReadActionHandlerTests {
         let book = Item(
             id: "book",
             name: "dusty book",
-            properties: .takable,
-            .readable,
+            properties: [.takable, .readable],
             parent: .player,
             readableText: "It reads: \"Beware the Grue!\""
         )
@@ -35,7 +34,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "book")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "It reads: \"Beware the Grue!\"")
     }
@@ -46,14 +45,14 @@ struct ReadActionHandlerTests {
         let sign = Item(
             id: "sign",
             name: "warning sign",
-            properties: .readable,
+            properties: [.readable],
             parent: .location("litRoom"),
             readableText: "DANGER AHEAD"
         )
         let litRoom = Location(
             id: "litRoom",
             name: "Bright Room",
-            description: "It's bright here.",
+            longDescription: "It's bright here.",
             properties: .inherentlyLit
         )
 
@@ -78,7 +77,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "sign")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "DANGER AHEAD")
     }
@@ -112,7 +111,7 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            properties: .readable,
+            properties: [.readable],
             parent: .nowhere,
             readableText: "Secrets within"
         )
@@ -142,7 +141,7 @@ struct ReadActionHandlerTests {
             id: "rock",
             name: "plain rock",
             parent: .location("startRoom")
-        ) // No .readable
+        )
 
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
@@ -168,15 +167,15 @@ struct ReadActionHandlerTests {
         let map = Item(
             id: "map",
             name: "folded map",
-            properties: .takable, .readable,
+            properties: [.takable, .readable],
             parent: .location("darkRoom"),
             readableText: "X marks the spot"
         )
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
-        ) // No .inherentlyLit
+            longDescription: "It's dark."
+        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -206,9 +205,9 @@ struct ReadActionHandlerTests {
         let blankPaper = Item(
             id: "paper",
             name: "blank paper",
-            properties: .takable, .readable,
+            properties: [.takable, .readable],
             parent: .player,
-            readableText: "" // Readable but empty string
+            readableText: ""
         )
 
         let game = MinimalGame(items: [blankPaper])
@@ -228,7 +227,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "paper")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "There's nothing written on the blank paper.")
     }
@@ -239,14 +238,14 @@ struct ReadActionHandlerTests {
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",
-            properties: .lightSource, .on, .readable,
+            properties: [.lightSource, .on, .readable],
             parent: .location("darkRoom"),
             readableText: "Ancient Runes"
         )
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            longDescription: "It's dark."
         )
 
         let game = MinimalGame(
@@ -270,7 +269,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "tablet")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "Ancient Runes")
     }

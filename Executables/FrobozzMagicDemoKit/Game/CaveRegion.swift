@@ -35,7 +35,7 @@ extension CaveRegion {
     static let startRoom = Location(
         id: "startRoom",
         name: "Cave Entrance",
-        description: """
+        longDescription: """
                 You stand at the entrance to a dark cave. Sunlight streams in from the
                 opening to the south behind you, but the passage ahead to the north quickly
                 disappears into darkness. A narrow passage leads east.
@@ -52,7 +52,7 @@ extension CaveRegion {
     static let darkChamber = Location(
         id: "darkChamber",
         name: "Dark Chamber",
-        description: """
+        longDescription: """
                 This is a large cavern with walls that disappear into darkness overhead.
                 Strange echoes bounce around as you move. The cave continues to the north,
                 and the entrance is back to the south. Another passage leads west.
@@ -67,7 +67,7 @@ extension CaveRegion {
     static let treasureRoom = Location(
         id: "treasureRoom",
         name: "Treasure Room",
-        description: """
+        longDescription: """
                 This small chamber sparkles with reflections from numerous precious gems
                 embedded in the walls. A stone pedestal in the center of the room holds
                 what appears to be a golden crown. The only obvious exit is south.
@@ -81,7 +81,7 @@ extension CaveRegion {
     static let narrowPassage = Location(
         id: "narrowPassage",
         name: "Narrow Passage",
-        description: """
+        longDescription: """
                 The walls close in here, forming a tight corridor that slopes downward.
                 You have to duck to avoid hitting your head on the low ceiling. The passage
                 continues east, and the cave entrance is to the west.
@@ -95,7 +95,7 @@ extension CaveRegion {
     static let ironDoorRoom = Location(
         id: "ironDoorRoom",
         name: "Iron Door Chamber",
-        description: """
+        longDescription: """
                 This small chamber appears to be a dead end. The narrow passage leads back
                 to the west. The eastern wall is dominated by a massive iron door.
                 """,
@@ -108,7 +108,7 @@ extension CaveRegion {
     static let hiddenVault = Location(
         id: "hiddenVault",
         name: "Hidden Vault",
-        description: """
+        longDescription: """
                 Beyond the iron door lies a secret vault. The walls are lined with carvings
                 of ancient runes that seem to glow with a faint, otherworldly light. A small
                 altar stands in the center of the room. The only way out is back through
@@ -122,7 +122,7 @@ extension CaveRegion {
     static let crystalGrotto = Location(
         id: "crystalGrotto",
         name: "Crystal Grotto",
-        description: """
+        longDescription: """
                 This spectacular cavern is filled with towering crystal formations that
                 catch and reflect any light in dazzling patterns. The floor is studded with
                 smaller crystals in various hues. The dark chamber lies to the east, and a hole
@@ -137,7 +137,7 @@ extension CaveRegion {
     static let undergroundPool = Location(
         id: "undergroundPool",
         name: "Underground Pool",
-        description: """
+        longDescription: """
                 A still, dark pool of water occupies most of this chamber. The water is so
                 clear and still that it mirrors the ceiling perfectly. Faint phosphorescent
                 fungi on the walls cast everything in a ghostly blue glow. A passage leads back up.
@@ -158,7 +158,7 @@ extension CaveRegion {
         name: "lantern",
         adjectives: "brass",
         synonyms: "lamp", "light",
-        description: "A sturdy brass lantern, useful for exploring dark places.",
+        longDescription: "A sturdy brass lantern, useful for exploring dark places.",
         properties: .takable, .lightSource, .device,
         parent: .location("startRoom")
     )
@@ -168,7 +168,7 @@ extension CaveRegion {
         id: "goldCrown",
         name: "crown",
         adjectives: "gold", "golden",
-        description: "A magnificent golden crown, adorned with precious jewels.",
+        longDescription: "A magnificent golden crown, adorned with precious jewels.",
         properties: .takable, .wearable,
         parent: .item("stonePedestal") // Placed on the pedestal
     )
@@ -177,7 +177,7 @@ extension CaveRegion {
         id: "stonePedestal",
         name: "pedestal",
         adjectives: "stone",
-        description: "A weathered stone pedestal in the center of the room.",
+        longDescription: "A weathered stone pedestal in the center of the room.",
         properties: .surface, .ndesc, // Use .ndesc instead of .scenery, imply !takable
         parent: .location("treasureRoom")
     )
@@ -187,7 +187,7 @@ extension CaveRegion {
         id: "ironDoor",
         name: "door",
         adjectives: "iron", "massive",
-        description: """
+        longDescription: """
                 A massive door made of solid iron. Ancient runes are inscribed around its
                 frame. There's a keyhole below the handle.
                 """,
@@ -201,7 +201,7 @@ extension CaveRegion {
         id: "woodenChest",
         name: "chest",
         adjectives: "wooden", "old",
-        description: "An old wooden chest with brass fittings. The lid is currently closed.",
+        longDescription: "An old wooden chest with brass fittings. The lid is currently closed.",
         properties: .container, .openable, // Starts closed (no .open property)
         parent: .location("crystalGrotto")
     )
@@ -210,7 +210,7 @@ extension CaveRegion {
         id: "silverCoin",
         name: "coin",
         adjectives: "silver", "ancient",
-        description: "An ancient silver coin with unfamiliar markings.",
+        longDescription: "An ancient silver coin with unfamiliar markings.",
         properties: .takable,
         parent: .item("woodenChest") // Inside the chest
     )
@@ -220,7 +220,7 @@ extension CaveRegion {
         id: "mysteriousAltar",
         name: "altar",
         adjectives: "mysterious", "stone",
-        description: """
+        longDescription: """
                 A stone altar with intricate carvings. A shallow basin on top contains an \
                 iridescent liquid that seems to shift colors as you watch.
                 """,
@@ -233,7 +233,7 @@ extension CaveRegion {
         name: "gem",
         adjectives: "large", "glowing",
         synonyms: "crystal", "stone",
-        description: """
+        longDescription: """
                 A large gem that seems to pulse with an inner light. As you examine it, \
                 the color shifts between deep blue and violet.
                 """,
@@ -247,7 +247,7 @@ extension CaveRegion {
         name: "pool",
         adjectives: "dark", "still",
         synonyms: "water",
-        description: """
+        longDescription: """
                 The water is perfectly still and incredibly clear. Looking down, you can see \
                 small, strange artifacts scattered on the bottom, just out of reach.
                 """,

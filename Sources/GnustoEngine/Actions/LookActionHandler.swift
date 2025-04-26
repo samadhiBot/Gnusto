@@ -25,7 +25,7 @@ public struct LookActionHandler: ActionHandler {
         }
 
         // Get the item's description using the description handler
-        if let descriptionHandler = targetItemSnapshot.description {
+        if let descriptionHandler = targetItemSnapshot.longDescription {
             let description = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItemSnapshot,
                 using: descriptionHandler,
