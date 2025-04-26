@@ -15,7 +15,10 @@ struct TurnOffActionHandler: ActionHandler {
 
         // 2. Fetch the item snapshot.
         guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            throw ActionError
+                .internalEngineError(
+                    "Parser resolved non-existent item ID '\(targetItemID.rawValue)'."
+                )
         }
 
         // 3. Verify the item is reachable.

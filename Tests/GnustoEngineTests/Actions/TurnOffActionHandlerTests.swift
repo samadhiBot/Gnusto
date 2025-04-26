@@ -7,7 +7,7 @@ import CustomDump
 struct TurnOffActionHandlerTests {
     let handler = TurnOffActionHandler()
 
-    @Test("TURN OFF turns off a light source")
+    @Test("TURN OFF turns off a light source in a dark room makes everything dark")
     func testTurnOffLightSource() async throws {
         let room = Location(
             id: "room",
@@ -19,7 +19,8 @@ struct TurnOffActionHandlerTests {
             name: "lamp",
             shortDescription: "A brass lamp",
             longDescription: "A brass lamp is here.",
-            properties: .lightSource, .device, .on
+            properties: .lightSource, .device, .on,
+            parent: .player
         )
 
         let game = MinimalGame(
@@ -40,7 +41,10 @@ struct TurnOffActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The lamp is now off.")
+        expectNoDifference(output, """
+            The lamp is now off.
+            It is now pitch black. You are likely to be eaten by a grue.
+            """)
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
         #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
@@ -51,13 +55,15 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here."
+            longDescription: "You are here.",
+            properties: .inherentlyLit
         )
         let book = Item(
             id: "book",
             name: "book",
             shortDescription: "A dusty book",
-            longDescription: "A dusty book lies here."
+            longDescription: "A dusty book lies here.",
+            parent: .location(room.id)
         )
 
         let game = MinimalGame(
@@ -102,7 +108,8 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        await #expect(throws: ActionError.itemNotAccessible("lamp")) {
+        // Expect internalEngineError when item ID doesn't exist in gameState
+        await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
             try await handler.perform(command: command, engine: engine)
         }
     }
@@ -208,9 +215,14 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        await #expect(throws: ActionError.prerequisiteNotMet("It's already off.")) {
-             try await handler.perform(command: command, engine: engine)
-        }
+        // Act: Call the handler directly
+        try await handler.perform(command: command, engine: engine)
+
+        // Assert: Check for the specific output message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "It's already off.")
+
+        // Check state remains unchanged
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
         #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
