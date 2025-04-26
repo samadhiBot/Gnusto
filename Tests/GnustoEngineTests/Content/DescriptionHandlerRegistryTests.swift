@@ -108,7 +108,7 @@ struct DescriptionHandlerRegistryTests {
             using: bookItem.longDescription!,
             engine: engine
         )
-        #expect(description == "The ancient tome looks like it hasn't been opened in a while.")
+        #expect(description == "The ancient tome looks like it hasn’t been opened in a while.")
 
         // Removed book touched test - requires action simulation
 
