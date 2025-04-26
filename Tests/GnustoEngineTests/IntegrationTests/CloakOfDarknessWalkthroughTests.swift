@@ -16,16 +16,16 @@ struct CloakOfDarknessWalkthroughTests {
     func testBasicCloakWalkthrough() async throws {
         let mockIO = await MockIOHandler(
             "look",
-            "w",         // Go to Cloakroom
+            "w",            // Go to Cloakroom
             "remove cloak", // Need to remove before taking/dropping
-            "drop cloak",  // Drop it to test taking later (optional step, could just go east)
-            "e",         // Go back to Foyer
-            "w",         // Back to Cloakroom
-            "take cloak", // Now take the cloak
-            "wear cloak", // And wear it
-            "e",         // Back to Foyer
+            "drop cloak",   // Drop it to test taking later (optional step, could just go east)
+            "e",            // Go back to Foyer
+            "w",            // Back to Cloakroom
+            "take cloak",   // Now take the cloak
+            "wear cloak",   // And wear it
+            "e",            // Back to Foyer
             "look",
-            nil // Signal end of input
+            nil             // Signal end of input
         )
         let engine = GameEngine(
             game: CloakOfDarkness(),
@@ -38,40 +38,52 @@ struct CloakOfDarknessWalkthroughTests {
 
         expectNoDifference(actualTranscript, """
             --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            You are standing in a spacious hall, splendidly decorated in red \
+            and gold, with glittering chandeliers overhead. The entrance from \
+            the street is to the north, and there are doorways south and west.
             > look
             --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            You are standing in a spacious hall, splendidly decorated in red \
+            and gold, with glittering chandeliers overhead. The entrance from \
+            the street is to the north, and there are doorways south and west.
             > w
             --- Cloakroom ---
-            The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
+            The walls of this small room were clearly once lined with hooks, \
+            though now only one remains. The exit is a door to the east.
             You can see:
-              A hook
+              A small brass hook
             > remove cloak
             You take off the cloak.
             > drop cloak
             Dropped.
             > e
             --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            You are standing in a spacious hall, splendidly decorated in red \
+            and gold, with glittering chandeliers overhead. The entrance from \
+            the street is to the north, and there are doorways south and west.
             > w
             --- Cloakroom ---
-            The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
+            The walls of this small room were clearly once lined with hooks, \
+            though now only one remains. The exit is a door to the east.
             You can see:
               A cloak
-              A hook
+              A small brass hook
             > take cloak
             Taken.
             > wear cloak
             You put on the cloak.
             > e
             --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            You are standing in a spacious hall, splendidly decorated in red \
+            and gold, with glittering chandeliers overhead. The entrance from \
+            the street is to the north, and there are doorways south and west.
             > look
             --- Foyer of the Opera House ---
-            You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
+            You are standing in a spacious hall, splendidly decorated in red \
+            and gold, with glittering chandeliers overhead. The entrance from \
+            the street is to the north, and there are doorways south and west.
             >
-
+            
             Goodbye!
             """
         )
