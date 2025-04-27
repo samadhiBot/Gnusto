@@ -11,14 +11,14 @@ struct ActionResultTests {
     func testActionResultInitialization() {
         let change = StateChange(
             objectId: "lamp",
-            property: "isOn",
-            oldValue: AnyCodable(false),
-            newValue: AnyCodable(true)
+            propertyKey: "isOn",
+            oldValue: .bool(false),
+            newValue: .bool(true)
         )
         let effect = SideEffect(
             type: .startFuse,
             targetId: "bomb",
-            parameters: ["duration": AnyCodable(10)]
+            parameters: ["duration": .int(10)]
         )
 
         let result = ActionResult(
@@ -32,8 +32,8 @@ struct ActionResultTests {
         #expect(result.message == "The lamp is now on.")
         #expect(result.stateChanges.count == 1)
         #expect(result.sideEffects.count == 1)
-        #expect(result.stateChanges.first?.objectId == "lamp")
-        #expect(result.sideEffects.first?.type == .startFuse)
+        #expect(result.stateChanges.first == change)
+        #expect(result.sideEffects.first == effect)
     }
 
     @Test("ActionResult Default Initializer Values")
@@ -53,29 +53,29 @@ struct ActionResultTests {
     func testStateChangeInitialization() {
         let change = StateChange(
             objectId: "door",
-            property: "isOpen",
-            oldValue: AnyCodable(false),
-            newValue: AnyCodable(true)
+            propertyKey: "isOpen",
+            oldValue: .bool(false),
+            newValue: .bool(true)
         )
 
         #expect(change.objectId == "door")
-        #expect(change.property == "isOpen")
-        #expect(change.oldValue?.value as? Bool == false)
-        #expect(change.newValue.value as? Bool == true)
+        #expect(change.propertyKey == "isOpen")
+        #expect(change.oldValue == .bool(false))
+        #expect(change.newValue == .bool(true))
     }
 
     @Test("StateChange Initialization without Old Value")
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
             objectId: "player",
-            property: "score",
-            newValue: AnyCodable(10)
+            propertyKey: "score",
+            newValue: .int(10)
         )
 
         #expect(change.objectId == "player")
-        #expect(change.property == "score")
+        #expect(change.propertyKey == "score")
         #expect(change.oldValue == nil)
-        #expect(change.newValue.value as? Int == 10)
+        #expect(change.newValue == .int(10))
     }
 
     @Test("SideEffect Initialization")
@@ -84,16 +84,16 @@ struct ActionResultTests {
             type: .runDaemon,
             targetId: "clock",
             parameters: [
-                "interval": AnyCodable(60),
-                "message": AnyCodable("Tick tock")
+                "interval": .int(60),
+                "message": .string("Tick tock")
             ]
         )
 
         #expect(effect.type == .runDaemon)
         #expect(effect.targetId == "clock")
         #expect(effect.parameters.count == 2)
-        #expect(effect.parameters["interval"]?.value as? Int == 60)
-        #expect(effect.parameters["message"]?.value as? String == "Tick tock")
+        #expect(effect.parameters["interval"] == .int(60))
+        #expect(effect.parameters["message"] == .string("Tick tock"))
     }
 
     @Test("SideEffect Initialization with Default Parameters")
@@ -108,21 +108,25 @@ struct ActionResultTests {
         #expect(effect.parameters.isEmpty == true)
     }
 
-    @Test("SideEffectType Codable Conformance")
-    func testSideEffectTypeCodable() throws {
+    @Test("StateValue Codable Conformance")
+    func testStateValueCodable() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let types: [SideEffectType] = [.startFuse, .stopFuse, .runDaemon, .stopDaemon, .scheduleEvent]
+        let values: [StateValue] = [
+            .bool(true),
+            .int(123),
+            .string("hello"),
+            .itemID("key"),
+            .itemProperties([.takable, .lightSource]),
+            .locationProperties([.inherentlyLit]),
+            .parentEntity(.player)
+        ]
 
-        for type in types {
-            let encodedData = try encoder.encode(type)
-            let decodedType = try decoder.decode(SideEffectType.self, from: encodedData)
-            #expect(decodedType == type)
-
-            // Verify string representation
-            let stringValue = String(data: encodedData, encoding: .utf8)
-            #expect(stringValue == "\"\(type.rawValue)\"")
+        for value in values {
+            let encodedData = try encoder.encode(value)
+            let decodedValue = try decoder.decode(StateValue.self, from: encodedData)
+            #expect(decodedValue == value)
         }
     }
 

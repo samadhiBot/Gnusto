@@ -1,7 +1,33 @@
 import Foundation
 
+/// Represents the possible types of values that can be tracked in state changes.
+/// Ensures values are both Codable and Sendable.
+public enum StateValue: Codable, Sendable, Equatable {
+    case bool(Bool)
+    case int(Int)
+    case string(String)
+    case itemID(ItemID)
+    case itemProperties(Set<ItemProperty>)
+    case locationProperties(Set<LocationProperty>)
+    case parentEntity(ParentEntity)
+    // Add other common Sendable & Codable types as needed (e.g., Double, Array<String>)
+
+    // Helper to get underlying value if needed, though direct switching is often better.
+    var underlyingValue: Any {
+        switch self {
+        case .bool(let v): return v
+        case .int(let v): return v
+        case .string(let v): return v
+        case .itemID(let v): return v
+        case .itemProperties(let v): return v
+        case .locationProperties(let v): return v
+        case .parentEntity(let v): return v
+        }
+    }
+}
+
 /// Result of an action execution with enhanced information.
-public struct ActionResult {
+public struct ActionResult: Sendable {
     /// Whether the action was successful.
     public let success: Bool
 
@@ -34,41 +60,41 @@ public struct ActionResult {
 }
 
 /// Represents a change in game state.
-public struct StateChange: Codable {
-    /// The object being changed (can be Item, Location, Player, etc. - needs clarification).
-    /// Using ItemID for now as per the doc, but this might need to be more generic.
+public struct StateChange: Codable, Sendable, Equatable {
+    /// The object being changed (can be Item, Location, Player, etc.).
+    /// Using ItemID for now, consider a more generic EntityID enum later.
     public let objectId: ItemID
 
-    /// The property being modified.
-    public let property: String
+    /// The property being modified (e.g., "parent", "score", "flags.isOpen").
+    public let propertyKey: String // Renamed from 'property' for clarity
 
-    /// The old value (optional, for tracking/undo).
-    public let oldValue: AnyCodable?
+    /// The value of the property before the change (optional).
+    public let oldValue: StateValue?
 
-    /// The new value.
-    public let newValue: AnyCodable
+    /// The value of the property after the change.
+    public let newValue: StateValue
 
     /// Creates a new state change record.
     /// - Parameters:
     ///   - objectId: The ID of the object being changed.
-    ///   - property: The name of the property being modified.
+    ///   - propertyKey: The name of the property being modified.
     ///   - oldValue: The value of the property before the change (optional).
     ///   - newValue: The value of the property after the change.
     public init(
         objectId: ItemID,
-        property: String,
-        oldValue: AnyCodable? = nil, // Default to nil if not provided
-        newValue: AnyCodable
+        propertyKey: String,
+        oldValue: StateValue? = nil,
+        newValue: StateValue
     ) {
         self.objectId = objectId
-        self.property = property
+        self.propertyKey = propertyKey
         self.oldValue = oldValue
         self.newValue = newValue
     }
 }
 
 /// Represents a side effect of an action (e.g., starting a fuse, running a daemon).
-public struct SideEffect {
+public struct SideEffect: Sendable, Equatable {
     /// The type of side effect.
     public let type: SideEffectType
 
@@ -77,7 +103,7 @@ public struct SideEffect {
     public let targetId: ItemID
 
     /// Any additional parameters specific to the side effect type.
-    public let parameters: [String: AnyCodable]
+    public let parameters: [String: StateValue]
 
     /// Creates a new side effect record.
     /// - Parameters:
@@ -87,7 +113,7 @@ public struct SideEffect {
     public init(
         type: SideEffectType,
         targetId: ItemID,
-        parameters: [String: AnyCodable] = [:] // Default to empty dictionary
+        parameters: [String: StateValue] = [:]
     ) {
         self.type = type
         self.targetId = targetId
@@ -96,7 +122,7 @@ public struct SideEffect {
 }
 
 /// Enumerates the types of possible side effects.
-public enum SideEffectType: String, Codable, Sendable {
+public enum SideEffectType: String, Codable, Sendable, Equatable {
     case startFuse
     case stopFuse
     case runDaemon

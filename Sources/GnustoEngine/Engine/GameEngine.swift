@@ -385,17 +385,42 @@ public class GameEngine {
                     return
                 }
 
-                // Execute the default handler
+                // --- Execute Handler (New Logic) ---
                 do {
-                    try await verbHandler.perform(command: command, engine: self)
+                    if let enhancedHandler = verbHandler as? EnhancedActionHandler {
+                        // Use the new pipeline
+                        try await enhancedHandler.validate(command: command, engine: self)
+                        let result = try await enhancedHandler.process(command: command, engine: self)
+
+                        // Apply state changes BEFORE postProcess, record AFTER successful application.
+                        for change in result.stateChanges {
+                            try await applyStateChange(change) // Apply the change first
+                            gameState.recordStateChange(change) // Record if application succeeded
+                        }
+
+                        // Process side effects BEFORE postProcess
+                        for effect in result.sideEffects {
+                            await processSideEffect(effect)
+                            // TODO: Should side effect processing throw?
+                        }
+
+                        // Call postProcess AFTER state changes and side effects are applied/triggered.
+                        // The default postProcess will print the message.
+                        try await enhancedHandler.postProcess(command: command, engine: self, result: result)
+
+                    } else {
+                        // Use the original perform method for standard handlers
+                        try await verbHandler.perform(command: command, engine: self)
+                    }
                 } catch let actionError as ActionError {
-                    // Handle specific action failures
+                    // Handle specific action failures from either pipeline
                     await report(actionError: actionError)
                 } catch {
-                    // Handle unexpected errors during action execution
+                    // Handle unexpected errors during action execution from either pipeline
                     await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
                     await ioHandler.print("Sorry, something went wrong.")
                 }
+                // --- End Execute Handler ---
             }
         }
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
@@ -410,6 +435,122 @@ public class GameEngine {
             }
             // Check if handler quit the game
             if shouldQuit { return }
+        }
+    }
+
+    // MARK: - State Change & Side Effect Application
+
+    /// Applies a single state change to the game state.
+    /// - Parameter change: The `StateChange` to apply.
+    /// - Throws: An error if the change cannot be applied (e.g., invalid property, wrong type).
+    private func applyStateChange(_ change: StateChange) async throws {
+        // Switch on the property key to determine how to apply the change.
+        switch change.propertyKey {
+        case "parent":
+            // Expect ItemID for objectId, ParentEntity for newValue
+            guard case .parentEntity(let newParent) = change.newValue else {
+                throw ActionError.internalEngineError("Invalid StateValue type for 'parent' change: \(change.newValue)")
+            }
+            updateItemParent(itemID: change.objectId, newParent: newParent)
+
+        case "properties":
+            // Determine the type of properties being set based on newValue
+            switch change.newValue {
+            case .itemProperties(let newProps):
+                // Expect ItemID for objectId
+                guard let item = gameState.items[change.objectId] else {
+                    throw ActionError.internalEngineError("Cannot apply item properties change to unknown ItemID: \(change.objectId)")
+                }
+                // TODO: How to represent add/remove vs. set? For now, assume set.
+                item.properties = newProps
+
+            case .locationProperties(let newProps):
+                // Expect LocationID for objectId. Need to ensure ItemID can represent/be cast to LocationID if needed.
+                // This requires understanding how ItemID and LocationID relate. If LocationID(rawValue:) exists:
+                let locID = LocationID(change.objectId.rawValue)
+                guard let location = gameState.locations[locID] else {
+                    throw ActionError.internalEngineError("Cannot apply location properties change to unknown LocationID: \(change.objectId.rawValue)")
+                }
+                // TODO: How to represent add/remove vs. set? For now, assume set.
+                location.properties = newProps
+
+            default:
+                throw ActionError.internalEngineError("Invalid StateValue type for 'properties' change: \(change.newValue)")
+            }
+
+        case "score":
+             // Expect Int for newValue
+             guard case .int(let newScore) = change.newValue else {
+                 throw ActionError.internalEngineError("Invalid StateValue type for 'score' change: \(change.newValue)")
+             }
+             // Assume score changes always apply to the player
+             gameState.player.score = newScore
+
+        // Add cases for other state elements like flags, etc.
+        // Example: Handling a boolean flag associated with an item
+        case let flagKey where flagKey.starts(with: "flags."): // e.g., "flags.isOpen"
+            let actualFlagKey = String(flagKey.dropFirst("flags.".count))
+            guard case .bool(let flagValue) = change.newValue else {
+                 throw ActionError.internalEngineError("Invalid StateValue type for flag '\(actualFlagKey)' change: \(change.newValue)")
+            }
+            // Need a way to set flags on different entity types (Item, Location, Player?, Global?)
+            // This needs refinement. For now, assume Item flag.
+            if let item = gameState.items[change.objectId] {
+                // Assuming Item has a method/property for flags, e.g., item.flags[actualFlagKey] = flagValue
+                 print("Warning: Applying flag '\(actualFlagKey)'=\(flagValue) to item \(change.objectId) not fully implemented.")
+            } else {
+                 throw ActionError.internalEngineError("Cannot apply flag change to non-item object ID: \(change.objectId)")
+            }
+
+        default:
+            // Try applying to gameSpecificState if propertyKey matches a key there.
+            // This allows handlers to modify arbitrary game state if needed.
+            if gameState.gameSpecificState.keys.contains(change.propertyKey) {
+                 // We need to convert StateValue back to AnyCodable for gameSpecificState
+                 // This requires a helper or direct conversion logic.
+                 let anyCodableValue: AnyCodable
+                 switch change.newValue {
+                 case .bool(let v): anyCodableValue = AnyCodable(v)
+                 case .int(let v): anyCodableValue = AnyCodable(v)
+                 case .string(let v): anyCodableValue = AnyCodable(v)
+                 // Add other StateValue cases as needed
+                 default:
+                      throw ActionError.internalEngineError("Cannot convert StateValue '\(change.newValue)' to AnyCodable for gameSpecificState.")
+                 }
+                 updateGameSpecificState(key: change.propertyKey, value: anyCodableValue)
+            } else {
+                throw ActionError.internalEngineError("Unsupported propertyKey in state change: \(change.propertyKey)")
+            }
+        }
+        // Note: Consider validating oldValue matches current state before applying newValue.
+    }
+
+    /// Processes a single side effect.
+    /// - Parameter effect: The `SideEffect` to process.
+    private func processSideEffect(_ effect: SideEffect) async {
+        let targetStringID = effect.targetId.rawValue
+
+        switch effect.type {
+        case .startFuse:
+            // Expect parameters["turns"] to be .int(Int)?
+            let turns: Int?
+            if case .int(let t) = effect.parameters["turns"] {
+                turns = t
+            } else {
+                turns = nil // Use default from definition
+            }
+            addFuse(id: targetStringID, overrideTurns: turns)
+        case .stopFuse:
+            removeFuse(id: targetStringID)
+        case .runDaemon:
+            if !gameState.activeDaemons.contains(targetStringID) {
+                 registerDaemon(id: targetStringID)
+            }
+        case .stopDaemon:
+            unregisterDaemon(id: targetStringID)
+        case .scheduleEvent:
+            print("Warning: SideEffectType.scheduleEvent not yet implemented.")
+            // Parameters would be StateValue here, need conversion if scheduler expects AnyCodable.
         }
     }
 
