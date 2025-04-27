@@ -1,47 +1,30 @@
 import Foundation
 
 /// Handles the "OPEN" command.
-public struct OpenActionHandler: ActionHandler {
+public struct OpenActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Open what?") // Zork-like prompt
-            return
+            throw ActionError.prerequisiteNotMet("Open what?")
         }
 
-        // 2. Check if item exists and is accessible
+        // 2. Check if item exists and is accessible using ScopeResolver
         guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            // If snapshot is nil, it implies item doesn't exist in current state.
+            // ScopeResolver checks typically operate on existing items.
+            // Let's use the standard not accessible error.
+            throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // Inline reachability check (adapted from TouchActionHandler)
-        let currentLocationID = await engine.playerLocationID()
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .item(let parentItemID):
-            guard let parentItem = await engine.itemSnapshot(with: parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
-            }
-            let parentParent = parentItem.parent
-            let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
-            if isParentItemInReach {
-                if parentItem.hasProperty(.surface) || (parentItem.hasProperty(.container) && parentItem.hasProperty(.open)) {
-                    isReachable = true // Can reach things on surfaces or in open containers
-                }
-            }
-        case .player:
-            isReachable = true
-        case .nowhere:
-            isReachable = false
-        }
-
-        guard isReachable else {
+        // Use ScopeResolver to determine reachability
+        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
@@ -52,30 +35,52 @@ public struct OpenActionHandler: ActionHandler {
 
         // 4. Check if already open
         guard !targetItem.hasProperty(.open) else {
-            // Zork used dummy messages; let's be specific.
             throw ActionError.itemAlreadyOpen(targetItemID)
         }
 
         // 5. Check if locked
-        // If it has .locked, it implies it is lockable for now.
         if targetItem.hasProperty(.locked) {
-            // Default message, as Zork's was specific (e.g., "locked from above")
             throw ActionError.itemIsLocked(targetItemID)
         }
+    }
 
-        // 6. Perform Open Action
-        await engine.updateItemProperties(
-            itemID: targetItemID,
-            adding: .open,
-            .touched
+    public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            // Should be caught by validate, but defensive check.
+            throw ActionError.internalEngineError("Open command reached process without direct object.")
+        }
+        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+            // Should be caught by validate.
+            throw ActionError.internalEngineError("Open command target item disappeared between validate and process.")
+        }
+
+        // Calculate the new properties
+        var newProperties = targetItem.properties
+        newProperties.insert(.open)
+        newProperties.insert(.touched)
+
+        // Create the state change
+        let stateChange = StateChange(
+            objectId: targetItemID,
+            propertyKey: .itemProperties,
+            oldValue: .itemProperties(targetItem.properties), // Record old state
+            newValue: .itemProperties(newProperties)
         )
 
-        // 7. Output Message
-        // ObjectActionHandlers now control if default message is suppressed
-        // If an object handler handled the action (returned true), execute won't call this.
-        // If it returned false, we *always* print the default message.
-        await engine.output("You open the \(targetItem.name).")
+        // Prepare the result
+        return ActionResult(
+            success: true,
+            message: "You open the \(targetItem.theName).", // Use theName helper
+            stateChanges: [stateChange],
+            sideEffects: []
+        )
     }
+
+    // Rely on default postProcess to print the message.
+    // Engine's execute method handles applying the stateChanges.
 }
 
 // TODO: Add/verify ActionError cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked

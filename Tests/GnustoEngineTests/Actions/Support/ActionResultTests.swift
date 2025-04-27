@@ -11,9 +11,9 @@ struct ActionResultTests {
     func testActionResultInitialization() {
         let change = StateChange(
             objectId: "lamp",
-            propertyKey: "isOn",
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            propertyKey: .itemProperties,
+            oldValue: .itemProperties([.lightSource]),
+            newValue: .itemProperties([.lightSource, .on])
         )
         let effect = SideEffect(
             type: .startFuse,
@@ -53,29 +53,55 @@ struct ActionResultTests {
     func testStateChangeInitialization() {
         let change = StateChange(
             objectId: "door",
-            propertyKey: "isOpen",
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            propertyKey: .itemProperties,
+            oldValue: .itemProperties([.openable]),
+            newValue: .itemProperties([.openable, .open])
         )
 
         #expect(change.objectId == "door")
-        #expect(change.propertyKey == "isOpen")
-        #expect(change.oldValue == .bool(false))
-        #expect(change.newValue == .bool(true))
+        #expect(change.propertyKey == .itemProperties)
+        #expect(change.oldValue == .itemProperties([.openable]))
+        #expect(change.newValue == .itemProperties([.openable, .open]))
     }
 
     @Test("StateChange Initialization without Old Value")
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
             objectId: "player",
-            propertyKey: "score",
+            propertyKey: .playerScore,
             newValue: .int(10)
         )
 
         #expect(change.objectId == "player")
-        #expect(change.propertyKey == "score")
+        #expect(change.propertyKey == .playerScore)
         #expect(change.oldValue == nil)
         #expect(change.newValue == .int(10))
+    }
+
+    @Test("StateChange Initialization for Global Flag")
+    func testStateChangeInitializationGlobalFlag() {
+        let change = StateChange(
+            objectId: "unused",
+            propertyKey: .globalFlag(key: "lightsOut"),
+            oldValue: .bool(false),
+            newValue: .bool(true)
+        )
+
+        #expect(change.propertyKey == .globalFlag(key: "lightsOut"))
+        #expect(change.newValue == .bool(true))
+    }
+
+    @Test("StateChange Initialization for Game Specific State")
+    func testStateChangeInitializationGameSpecific() {
+        let change = StateChange(
+            objectId: "unused",
+            propertyKey: .gameSpecificState(key: "puzzleCounter"),
+            oldValue: .int(5),
+            newValue: .int(6)
+        )
+
+        #expect(change.propertyKey == .gameSpecificState(key: "puzzleCounter"))
+        #expect(change.newValue == .int(6))
     }
 
     @Test("SideEffect Initialization")
@@ -127,6 +153,27 @@ struct ActionResultTests {
             let encodedData = try encoder.encode(value)
             let decodedValue = try decoder.decode(StateValue.self, from: encodedData)
             #expect(decodedValue == value)
+        }
+    }
+
+    @Test("StatePropertyKey Codable Conformance")
+    func testStatePropertyKeyCodable() throws {
+        let encoder = JSONEncoder()
+        let decoder = JSONDecoder()
+
+        let keys: [StatePropertyKey] = [
+            .itemParent,
+            .itemProperties,
+            .locationProperties,
+            .playerScore,
+            .globalFlag(key: "testFlag"),
+            .gameSpecificState(key: "testCounter")
+        ]
+
+        for key in keys {
+            let encodedData = try encoder.encode(key)
+            let decodedKey = try decoder.decode(StatePropertyKey.self, from: encodedData)
+            #expect(decodedKey == key)
         }
     }
 

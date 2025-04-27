@@ -1,11 +1,24 @@
 import Foundation
 
 /// Action handler for the SCORE verb.
-struct ScoreActionHandler: ActionHandler {
-    func perform(command: Command, engine: GameEngine) async throws {
-        // Use the safe accessor on the engine
+struct ScoreActionHandler: EnhancedActionHandler {
+
+    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Fetch current score and turn count
         let currentScore = await engine.playerScore()
         let turnCount = await engine.playerMoves()
-        await engine.output("Your score is \(currentScore) in \(turnCount) turns.")
+
+        // The SCORE command only reports information, it doesn't change state.
+        let message = "Your score is \(currentScore) in \(turnCount) moves."
+
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: [], // No state changes
+            sideEffects: []  // No side effects
+        )
     }
+
+    // Relies on default validate() and postProcess().
+    // Default postProcess will print the message from ActionResult.
 }

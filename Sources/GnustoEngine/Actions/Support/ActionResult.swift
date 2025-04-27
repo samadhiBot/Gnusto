@@ -6,11 +6,14 @@ public enum StateValue: Codable, Sendable, Equatable {
     case bool(Bool)
     case int(Int)
     case string(String)
-    case itemID(ItemID)
+    case itemID(ItemID)             // Represents an ItemID value itself
     case itemProperties(Set<ItemProperty>)
+    case itemAdjectives(Set<String>)
+    case itemSynonyms(Set<String>)
     case locationProperties(Set<LocationProperty>)
     case parentEntity(ParentEntity)
-    // Add other common Sendable & Codable types as needed (e.g., Double, Array<String>)
+    // case double(Double) // Add if needed
+    // case stringArray([String]) // Add if needed
 
     // Helper to get underlying value if needed, though direct switching is often better.
     var underlyingValue: Any {
@@ -20,10 +23,42 @@ public enum StateValue: Codable, Sendable, Equatable {
         case .string(let v): return v
         case .itemID(let v): return v
         case .itemProperties(let v): return v
+        case .itemAdjectives(let v): return v
+        case .itemSynonyms(let v): return v
         case .locationProperties(let v): return v
         case .parentEntity(let v): return v
         }
     }
+}
+
+/// Defines the specific state property being modified.
+public enum StatePropertyKey: Codable, Sendable, Hashable {
+    // Item Properties
+    case itemParent
+    case itemProperties     // The entire Set<ItemProperty>
+    case itemSize           // Int
+    case itemCapacity       // Int
+    case itemName           // String
+    case itemAdjectives     // Set<String>
+    case itemSynonyms       // Set<String>
+    // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
+
+    // Location Properties
+    case locationProperties // The entire Set<LocationProperty>
+    case locationName       // String
+    // TODO: Add locationExits, locationDesc etc. if needed
+
+    // Player Properties
+    case playerScore        // Int
+    case playerMoves        // Int
+    case playerCapacity     // Int
+    // TODO: Add playerLocation if changing location needs to be a StateChange
+
+    // Global State
+    case globalFlag(key: String) // Bool
+
+    // Game Specific State
+    case gameSpecificState(key: String) // AnyCodable (converted internally)
 }
 
 /// Result of an action execution with enhanced information.
@@ -63,10 +98,10 @@ public struct ActionResult: Sendable {
 public struct StateChange: Codable, Sendable, Equatable {
     /// The object being changed (can be Item, Location, Player, etc.).
     /// Using ItemID for now, consider a more generic EntityID enum later.
-    public let objectId: ItemID
+    public let objectId: ItemID // May need generalization later (e.g., PlayerID, GlobalContextID)
 
-    /// The property being modified (e.g., "parent", "score", "flags.isOpen").
-    public let propertyKey: String // Renamed from 'property' for clarity
+    /// The specific property being modified.
+    public let propertyKey: StatePropertyKey // Changed from String
 
     /// The value of the property before the change (optional).
     public let oldValue: StateValue?
@@ -81,8 +116,8 @@ public struct StateChange: Codable, Sendable, Equatable {
     ///   - oldValue: The value of the property before the change (optional).
     ///   - newValue: The value of the property after the change.
     public init(
-        objectId: ItemID,
-        propertyKey: String,
+        objectId: ItemID, // Keep ItemID for now, refine if needed for Player/Global changes
+        propertyKey: StatePropertyKey, // Changed from String
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) {
