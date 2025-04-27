@@ -58,6 +58,58 @@ struct OpenActionHandlerTests {
         expectNoDifference(recordedChange, expectedChange)
     }
 
+    @Test("Open item that is already touched")
+    func testOpenItemAlreadyTouched() async throws {
+        // Arrange: Item is openable, closed, and already touched
+        let initialProperties: Set<ItemProperty> = [.container, .openable, .touched]
+        let closedBox = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .location("startRoom")
+        )
+        closedBox.properties = initialProperties
+
+        let game = MinimalGame(items: [closedBox])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        // Initial state check
+        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == false)
+        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.touched) == true)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
+
+        // Act: Call the engine's execute method
+        await engine.execute(command: command)
+
+        // Assert State Change
+        let finalItemState = engine.itemSnapshot(with: "box")
+        let expectedProperties: Set<ItemProperty> = [.container, .openable, .open, .touched]
+        #expect(finalItemState?.properties == expectedProperties, "Item should gain .open property and retain .touched")
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You open the wooden box.")
+
+        // Assert Change History
+        #expect(engine.gameState.changeHistory.count == 1)
+        let recordedChange = engine.gameState.changeHistory.first
+        let expectedChange = StateChange(
+            objectId: "box",
+            propertyKey: .itemProperties,
+            oldValue: .itemProperties(initialProperties),
+            newValue: .itemProperties(expectedProperties)
+        )
+        // Change should still happen because .open is added
+        expectNoDifference(recordedChange, expectedChange)
+    }
+
     @Test("Open fails with no direct object")
     func testOpenFailsWithNoObject() async throws {
         // Arrange
