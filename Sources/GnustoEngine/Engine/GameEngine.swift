@@ -107,17 +107,14 @@ public class GameEngine {
     ///   - id: The `FuseID` of the fuse to add or update.
     ///   - overrideTurns: Optional number of turns to set for the fuse. If `nil`, the default turns from the `FuseDefinition` are used.
     /// - Returns: `true` if the fuse was successfully added or updated, `false` if no definition was found for the ID.
-    @discardableResult
     public func addFuse(
         id: FuseID,
         overrideTurns: Int? = nil
-    ) -> Bool {
+    ) throws {
         // 1. Find the definition in the registry.
         guard let definition = registry.fuseDefinition(for: id) else {
-            // Log warning or error: Attempting to add an undefined fuse.
-            print("Warning: No FuseDefinition found for fuse ID '\(id)'. Cannot add fuse.")
-            // Consider throwing an error or returning a more specific result.
-            return false
+            // Throw an error instead of printing/returning false.
+            throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(id)'. Cannot add fuse.")
         }
 
         // 2. Determine the number of turns.
@@ -131,8 +128,6 @@ public class GameEngine {
 
         // 5. Update persistent state in GameState.
         gameState.activeFuses[id] = turns
-
-        return true
     }
 
     /// Removes a fuse by its ID (runtime and persistent state).
@@ -147,16 +142,13 @@ public class GameEngine {
     /// The daemon must be defined in the registry.
     /// - Parameter id: The `DaemonID` of the daemon to register.
     /// - Returns: `true` if the daemon was successfully registered, `false` if no definition was found for the ID.
-    @discardableResult
-    public func registerDaemon(id: DaemonID) -> Bool {
+    public func registerDaemon(id: DaemonID) throws {
         // 1. Verify the definition exists in the registry.
         guard registry.daemonDefinition(for: id) != nil else {
-            print("Warning: No DaemonDefinition found for daemon ID '\(id)'. Cannot register daemon.")
-            return false
+            throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(id)'. Cannot register daemon.")
         }
         // 2. Add the ID to the active set in GameState.
         gameState.activeDaemons.insert(id)
-        return true
     }
 
     /// Unregisters a daemon by removing its ID from the active set in GameState.
@@ -400,7 +392,7 @@ public class GameEngine {
 
                         // Process side effects BEFORE postProcess
                         for effect in result.sideEffects {
-                            await processSideEffect(effect)
+                            try await processSideEffect(effect)
                             // TODO: Should side effect processing throw?
                         }
 
@@ -440,96 +432,132 @@ public class GameEngine {
 
     // MARK: - State Change & Side Effect Application
 
+    /// Validates the old value specified in a StateChange against the actual current value.
+    /// - Parameters:
+    ///   - change: The StateChange being applied.
+    ///   - actualOldValue: The actual value currently in the game state, or nil if not applicable/found.
+    /// - Throws: `ActionError.internalEngineError` if `change.oldValue` is non-nil and doesn't match `actualOldValue`.
+    private func validateOldValue(
+        _ change: StateChange,
+        actualOldValue: StateValue?
+    ) throws {
+        guard let expectedOldValue = change.oldValue else {
+            return // No validation needed if oldValue wasn't provided in the change record
+        }
+
+        // If expectedOldValue was provided, the actual value must match.
+        // Treats nil actual value as a mismatch if an old value was expected.
+        guard actualOldValue == expectedOldValue else {
+            let actualDesc = actualOldValue != nil ? "\(actualOldValue!)" : "nil"
+            throw ActionError.internalEngineError(
+                "StateChange oldValue mismatch for \(change.propertyKey) on \(change.objectId). " +
+                "Expected: \(expectedOldValue), Actual: \(actualDesc)"
+            )
+        }
+    }
+
     /// Applies a single state change to the game state.
     /// - Parameter change: The `StateChange` to apply.
-    /// - Throws: An error if the change cannot be applied (e.g., invalid property, wrong type).
+    /// - Throws: An error if the change cannot be applied (e.g., invalid property, wrong type, oldValue mismatch).
     private func applyStateChange(_ change: StateChange) async throws {
-        // TODO: Implement optional oldValue validation logic for all cases.
-
+        // Remove the general TODO, specific validation is added case-by-case
         // Switch on the property key enum to determine how to apply the change.
         switch change.propertyKey {
 
         // MARK: Item Changes
         case .itemParent:
+            guard let item = gameState.items[change.objectId] else {
+                throw ActionError.internalEngineError("Cannot apply .itemParent change to unknown object ID: \(change.objectId)")
+            }
+            try validateOldValue(change, actualOldValue: .parentEntity(item.parent))
             guard case .parentEntity(let newParent) = change.newValue else {
                 throw ActionError.internalEngineError("Invalid StateValue type for .itemParent: \(change.newValue)")
             }
             updateItemParent(itemID: change.objectId, newParent: newParent)
 
         case .itemProperties:
-            guard case .itemProperties(let newProps) = change.newValue else {
-                // Throw error if the value type is wrong
-                throw ActionError.internalEngineError("Invalid StateValue type for .itemProperties: \(change.newValue)")
-            }
             guard let item = gameState.items[change.objectId] else {
-                // Throw error if the item ID is somehow invalid
                 throw ActionError.internalEngineError("Cannot apply .itemProperties change to unknown object ID: \(change.objectId)")
+            }
+            try validateOldValue(change, actualOldValue: .itemProperties(item.properties))
+            guard case .itemProperties(let newProps) = change.newValue else {
+                throw ActionError.internalEngineError("Invalid StateValue type for .itemProperties: \(change.newValue)")
             }
             // WARNING: This sets the entire property set. Requires handler to calculate final set.
             // TODO: Consider a more granular StateChange/StatePropertyKey for add/remove.
             item.properties = newProps
 
         case .itemSize:
-            guard case .int(let newSize) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
+            guard let item = gameState.items[change.objectId] else { throw ActionError.internalEngineError("Cannot apply .itemSize change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .int(item.size))
+            guard case .int(let newSize) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSize: \(change.newValue)") }
             item.size = newSize
 
         case .itemCapacity:
-            guard case .int(let newCapacity) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
+            guard let item = gameState.items[change.objectId] else { throw ActionError.internalEngineError("Cannot apply .itemCapacity change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .int(item.capacity))
+            guard case .int(let newCapacity) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemCapacity: \(change.newValue)") }
             item.capacity = newCapacity
 
         case .itemName:
-            guard case .string(let newName) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
-            // Note: Item names are often considered immutable after creation.
+            guard let item = gameState.items[change.objectId] else { throw ActionError.internalEngineError("Cannot apply .itemName change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .string(item.name))
+            guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemName: \(change.newValue)") }
             item.name = newName
 
         case .itemAdjectives:
-            guard case .itemAdjectives(let newAdjectives) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
-            item.adjectives = newAdjectives // Sets the entire Set
+            guard let item = gameState.items[change.objectId] else { throw ActionError.internalEngineError("Cannot apply .itemAdjectives change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .itemAdjectives(item.adjectives))
+            guard case .itemAdjectives(let newAdjectives) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemAdjectives: \(change.newValue)") }
+            item.adjectives = newAdjectives
 
         case .itemSynonyms:
-            guard case .itemSynonyms(let newSynonyms) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
-            item.synonyms = newSynonyms // Sets the entire Set
+            guard let item = gameState.items[change.objectId] else { throw ActionError.internalEngineError("Cannot apply .itemSynonyms change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .itemSynonyms(item.synonyms))
+            guard case .itemSynonyms(let newSynonyms) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSynonyms: \(change.newValue)") }
+            item.synonyms = newSynonyms
 
         // MARK: Location Changes
         case .locationProperties:
-            guard case .locationProperties(let newProps) = change.newValue else { /* Error handling */ return }
-            let locID = LocationID(change.objectId.rawValue) // Assumes ItemID rawValue is compatible
-            guard let location = gameState.locations[locID] else { /* Error handling */ return }
-            // WARNING: This sets the entire property set. Requires handler to calculate final set.
-            // TODO: Consider a more granular StateChange/StatePropertyKey for add/remove.
+            let locID = LocationID(change.objectId.rawValue)
+            guard let location = gameState.locations[locID] else { throw ActionError.internalEngineError("Cannot apply .locationProperties change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .locationProperties(location.properties))
+            guard case .locationProperties(let newProps) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationProperties: \(change.newValue)") }
             location.properties = newProps
 
         case .locationName:
-            guard case .string(let newName) = change.newValue else { /* Error handling */ return }
             let locID = LocationID(change.objectId.rawValue)
-            guard let location = gameState.locations[locID] else { /* Error handling */ return }
+            guard let location = gameState.locations[locID] else { throw ActionError.internalEngineError("Cannot apply .locationName change to unknown object ID: \(change.objectId)") }
+            try validateOldValue(change, actualOldValue: .string(location.name))
+            guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationName: \(change.newValue)") }
             location.name = newName
 
         // MARK: Player Changes
         case .playerScore:
-             guard case .int(let newScore) = change.newValue else { /* Error handling */ return }
-             // objectId might be ignored here or used for validation (e.g., ensure it's PlayerID placeholder)
+             try validateOldValue(change, actualOldValue: .int(gameState.player.score))
+             guard case .int(let newScore) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerScore: \(change.newValue)") }
              gameState.player.score = newScore
 
         case .playerMoves:
-             guard case .int(let newMoves) = change.newValue else { /* Error handling */ return }
+             try validateOldValue(change, actualOldValue: .int(gameState.player.moves))
+             guard case .int(let newMoves) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerMoves: \(change.newValue)") }
              gameState.player.moves = newMoves
 
         case .playerCapacity:
-             guard case .int(let newCapacity) = change.newValue else { /* Error handling */ return }
+             try validateOldValue(change, actualOldValue: .int(gameState.player.carryingCapacity))
+             guard case .int(let newCapacity) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerCapacity: \(change.newValue)") }
              gameState.player.carryingCapacity = newCapacity
 
         // MARK: Global Changes
         case .globalFlag(let actualFlagKey):
-            guard case .bool(let flagValue) = change.newValue else { /* Error handling */ return }
+            let actualValue = gameState.flags[actualFlagKey]
+            try validateOldValue(change, actualOldValue: actualValue != nil ? .bool(actualValue!) : nil)
+            guard case .bool(let flagValue) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .globalFlag(\(actualFlagKey)): \(change.newValue)") }
             gameState.flags[actualFlagKey] = flagValue
 
         case .pronounReference(let pronoun):
+            let actualValue = gameState.pronouns[pronoun]
+            try validateOldValue(change, actualOldValue: actualValue != nil ? .itemIDSet(actualValue!) : nil)
             guard case .itemIDSet(let itemIDSet) = change.newValue else {
                 throw ActionError.internalEngineError("Invalid StateValue type for .pronounReference(\(pronoun)): \(change.newValue)")
             }
@@ -538,7 +566,7 @@ public class GameEngine {
 
         // MARK: Game Specific State Changes
         case .gameSpecificState(let key):
-            // Convert StateValue back to AnyCodable for gameSpecificState
+            // Skipping oldValue validation for AnyCodable gameSpecificState for now.
              let anyCodableValue: AnyCodable
              switch change.newValue {
              case .bool(let v): anyCodableValue = AnyCodable(v)
@@ -552,51 +580,31 @@ public class GameEngine {
         }
     }
 
-    // --- Helper for error handling in applyStateChange ---
-    // (Example - needs integration into guards above)
-    private func handleApplyStateChangeError(
-        _ change: StateChange,
-        expectedType: String? = nil,
-        unknownID: Bool = false
-    ) throws -> Never {
-        if unknownID {
-            throw ActionError.internalEngineError("Cannot apply state change for key '\(change.propertyKey)' to unknown object ID: \(change.objectId)")
-        } else if let expectedType {
-             throw ActionError.internalEngineError("Invalid StateValue type for key '\(change.propertyKey)'. Expected \(expectedType), got \(change.newValue).")
-        } else {
-             throw ActionError.internalEngineError("Failed to apply state change for key '\(change.propertyKey)' with value \(change.newValue).")
-        }
-    }
-
     /// Processes a single side effect.
     /// - Parameter effect: The `SideEffect` to process.
-    private func processSideEffect(_ effect: SideEffect) async {
-        // Current implementation seems okay, keep warning for .scheduleEvent
-        // No changes needed here for now.
-        // ... existing implementation ...
+    /// - Throws: An error if processing the side effect fails (e.g., undefined fuse/daemon).
+    private func processSideEffect(_ effect: SideEffect) async throws {
         let targetStringID = effect.targetId.rawValue
 
         switch effect.type {
         case .startFuse:
-            // Expect parameters["turns"] to be .int(Int)?
             let turns: Int?
             if case .int(let t) = effect.parameters["turns"] {
                 turns = t
             } else {
-                turns = nil // Use default from definition
+                turns = nil
             }
-            addFuse(id: targetStringID, overrideTurns: turns)
+            try addFuse(id: targetStringID, overrideTurns: turns)
         case .stopFuse:
             removeFuse(id: targetStringID)
         case .runDaemon:
             if !gameState.activeDaemons.contains(targetStringID) {
-                 registerDaemon(id: targetStringID)
+                 try registerDaemon(id: targetStringID)
             }
         case .stopDaemon:
             unregisterDaemon(id: targetStringID)
         case .scheduleEvent:
             print("Warning: SideEffectType.scheduleEvent not yet implemented.")
-            // Parameters would be StateValue here, need conversion if scheduler expects AnyCodable.
         }
     }
 

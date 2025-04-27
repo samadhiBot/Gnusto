@@ -557,8 +557,8 @@ struct GameEngineTests {
         )
 
         // Register the daemon dynamically AFTER engine init
-        let registerSuccess = engine.registerDaemon(id: "testDaemon")
-        #expect(registerSuccess == true, "Daemon registration should succeed")
+        // Should succeed without throwing
+        try engine.registerDaemon(id: "testDaemon")
 
         // Act: Run engine for 7 turns (look x 7, quit)
         let commands = Array(repeating: "look", count: 7) + ["quit"]
@@ -625,8 +625,8 @@ struct GameEngineTests {
         )
 
         // Register the daemon after engine creation
-        let registerSuccess = engine.registerDaemon(id: testDaemon.id)
-        #expect(registerSuccess == true, "Daemon registration should succeed")
+        // Should succeed without throwing
+        try engine.registerDaemon(id: testDaemon.id)
 
         // Act: Run for 6 turns with "look" commands
         let commands = Array(repeating: "look", count: 6) + ["quit"]

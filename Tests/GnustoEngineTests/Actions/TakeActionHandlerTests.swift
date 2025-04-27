@@ -68,7 +68,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
         game.state.player.carryingCapacity = 10
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it") // Capture initial state
+        let initialPronounIt = engine.getPronounReference(pronoun: "it") // Capture initial state
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -217,7 +217,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -257,7 +257,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
 
@@ -433,7 +433,7 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         game.state.player.carryingCapacity = 10
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
 
@@ -472,7 +472,7 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         game.state.player.carryingCapacity = 10
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
 
