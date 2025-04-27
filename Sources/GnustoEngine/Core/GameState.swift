@@ -8,6 +8,10 @@ public struct GameState: Codable {
     /// Set tracking the IDs of currently active daemons.
     public var activeDaemons: Set<DaemonID>
 
+    /// A log of state changes that have occurred, potentially turn-by-turn or action-by-action.
+    /// This could be used for debugging, undo functionality, or complex event triggers.
+    public var changeHistory: [StateChange]
+
     /// Current value of global variables or flags (e.g., [FlagID: FlagValue]).
     /// Using String for key flexibility, might refine later (e.g., `FlagID` type).
     public var flags: [String: Bool]
@@ -45,10 +49,12 @@ extension GameState {
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [String: AnyCodable] = [:]
+        gameSpecificState: [String: AnyCodable] = [:],
+        changeHistory: [StateChange] = []
     ) {
         self.activeDaemons = activeDaemons
         self.activeFuses = activeFuses
+        self.changeHistory = changeHistory
         self.flags = flags
         self.gameSpecificState = gameSpecificState
         self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
@@ -67,7 +73,8 @@ extension GameState {
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [String: AnyCodable] = [:]
+        gameSpecificState: [String: AnyCodable] = [:],
+        changeHistory: [StateChange] = []
     ) {
         var allItems: [Item] = []
         var allLocations: [Location] = []
@@ -102,6 +109,7 @@ extension GameState {
         // Initialize GameState properties using collected data
         self.activeDaemons = activeDaemons
         self.activeFuses = activeFuses
+        self.changeHistory = changeHistory
         self.flags = flags
         self.gameSpecificState = gameSpecificState
         // Create dictionaries from the validated, unique items and locations
@@ -153,6 +161,12 @@ extension GameState {
         return true
     }
 
+    /// Records a state change in the history.
+    /// Typically called by the engine after applying a change derived from an `ActionResult`.
+    public mutating func recordStateChange(_ change: StateChange) {
+        changeHistory.append(change)
+    }
+
     // TODO: Add other state mutation helpers (e.g., setFlag, addProperty).
 
     // MARK: - State Mutation Helpers
@@ -191,6 +205,7 @@ extension GameState {
     enum CodingKeys: String, CodingKey {
         case activeFuses
         case activeDaemons
+        case changeHistory
         case flags
         case items // Store items as an array for simpler encoding/decoding
         case locations // Store locations as an array
@@ -206,6 +221,7 @@ extension GameState {
 
         activeFuses = try container.decodeIfPresent([Fuse.ID: Int].self, forKey: .activeFuses) ?? [:]
         activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []
+        changeHistory = try container.decode([StateChange].self, forKey: .changeHistory)
         flags = try container.decode([String: Bool].self, forKey: .flags)
         player = try container.decode(Player.self, forKey: .player)
         pronouns = try container.decode([String: Set<ItemID>].self, forKey: .pronouns)
@@ -229,6 +245,7 @@ extension GameState {
 
         try container.encode(activeFuses, forKey: .activeFuses)
         try container.encode(activeDaemons, forKey: .activeDaemons)
+        try container.encode(changeHistory, forKey: .changeHistory)
         try container.encode(flags, forKey: .flags)
         try container.encode(player, forKey: .player)
         try container.encode(pronouns, forKey: .pronouns)

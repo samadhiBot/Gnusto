@@ -24,7 +24,6 @@ struct DescriptionHandlerTests {
         let handler: DescriptionHandler = "This is a static description."
         #expect(handler.id == nil)
         #expect(handler.rawStaticDescription == "This is a static description.")
-//        #expect(handler.rawStaticDescription == "This is a static description.")
     }
 
     @Test("DescriptionHandler Dynamic Initialization (.id)")
@@ -32,7 +31,6 @@ struct DescriptionHandlerTests {
         let handler = DescriptionHandler.id("dynamic_handler")
         #expect(handler.id == "dynamic_handler")
         #expect(handler.rawStaticDescription == nil)
-//        #expect(handler.rawStaticDescription == nil)
     }
 
     @Test("DescriptionHandler Dynamic Initialization with Fallback")
@@ -40,12 +38,5 @@ struct DescriptionHandlerTests {
         let handler = DescriptionHandler.id("dynamic_handler", fallback: "Static fallback.")
         #expect(handler.id == "dynamic_handler")
         #expect(handler.rawStaticDescription == "Static fallback.")
-//        #expect(handler.rawStaticDescription == "Static fallback.")
-    }
-
-    @Test("DescriptionHandler Static Description Processing (Markdown)")
-    func testStaticDescriptionProcessing() {
-        let handler: DescriptionHandler = "  *Emphasis* and **strong** text.  \n  "
-//        #expect(handler.rawStaticDescription == "*Emphasis* and **strong** text.") // Check trimming and Markdown passthrough
     }
 }
