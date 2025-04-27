@@ -362,5 +362,85 @@ struct InsertActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
+    @Test("Insert fails when container is full")
+    func testInsertFailsContainerFull() async throws {
+        // Arrange: Player holds coin (size 5), box has capacity 10 but already contains item size 6
+        let coin = Item(id: "coin", name: "gold coin", size: 5, parent: .player)
+        let existingItem = Item(id: "rock", name: "rock", size: 6, parent: .item("fullBox"))
+        let box = Item(
+            id: "fullBox",
+            name: "nearly full box",
+            properties: .container, .openable, .open, // Open
+            capacity: 10,
+            parent: .location("startRoom")
+        )
+        let game = MinimalGame(items: [coin, box, existingItem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+
+        // Initial state check
+        #expect(engine.calculateCurrentLoad(of: "fullBox") == 6)
+
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "fullBox", preposition: "in", rawInput: "put coin in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The nearly full box is full.") // ActionError.containerIsFull
+
+        // Assert No State Change
+        #expect(await engine.itemSnapshot(with: "coin")?.parent == .player) // Coin still held
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert succeeds when container has exact space")
+    func testInsertSucceedsContainerExactSpace() async throws {
+        // Arrange: Player holds coin (size 5), box has capacity 10 and contains item size 5
+        let initialCoin = Item(id: "coin", name: "gold coin", size: 5, parent: .player)
+        let existingItem = Item(id: "rock", name: "rock", size: 5, parent: .item("exactBox"))
+        let initialBox = Item(
+            id: "exactBox",
+            name: "half-full box",
+            properties: .container, .openable, .open, // Open
+            capacity: 10,
+            parent: .location("startRoom")
+        )
+        let initialCoinProps = initialCoin.properties
+        let initialBoxProps = initialBox.properties
+
+        let game = MinimalGame(items: [initialCoin, initialBox, existingItem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+
+        // Initial state check
+        #expect(engine.calculateCurrentLoad(of: "exactBox") == 5)
+
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "exactBox", preposition: "in", rawInput: "put coin in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You put the gold coin in the half-full box.") // Success message
+
+        // Assert Final State
+        #expect(await engine.itemSnapshot(with: "coin")?.parent == .item("exactBox")) // Coin is in box
+        #expect(engine.calculateCurrentLoad(of: "exactBox") == 10) // Box is now full
+
+        // Assert Change History (should include parent change, touched flags, pronoun)
+        let expectedChanges = expectedInsertChanges(
+            itemToInsertID: "coin",
+            containerID: "exactBox",
+            oldItemProps: initialCoinProps,
+            oldContainerProps: initialBoxProps
+        )
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
     // TODO: Add capacity check test when implemented
 }

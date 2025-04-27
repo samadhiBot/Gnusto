@@ -703,7 +703,7 @@ public class GameEngine {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
         case .containerIsFull(let item):
-            "The \(theThat(item)) is full."
+            "\(theThat(item).capitalizedFirst) is full."
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
         case .directionIsBlocked(let reason):
@@ -1078,6 +1078,19 @@ public class GameEngine {
     public func getPronounReference(pronoun: String) -> Set<ItemID>? {
         return gameState.pronouns[pronoun.lowercased()]
     }
+
+    /// Calculates the total size of all items directly contained within the specified item.
+    /// Only considers direct children.
+    /// - Parameter containerID: The ID of the potential container item.
+    /// - Returns: The sum of the `size` properties of all direct children, or 0 if the item
+    ///            is not found or has no children.
+    internal func calculateCurrentLoad(of containerID: ItemID) -> Int {
+        let children = gameState.items.values.filter { $0.parent == .item(containerID) }
+        return children.reduce(0) { $0 + $1.size }
+    }
+
+    /// Retrieves snapshots of all items directly contained within a specific parent entity.
+    /// This is useful for inventory listings or describing container contents.
 }
 
 extension GameEngine {

@@ -1,10 +1,8 @@
 import Foundation
 
 /// Handles the "INSERT [item] INTO/IN [container]" action.
-/// Renamed from PutActionHandler.
 @MainActor
 struct InsertActionHandler: EnhancedActionHandler {
-
     func validate(
         command: Command,
         engine: GameEngine
@@ -57,7 +55,16 @@ struct InsertActionHandler: EnhancedActionHandler {
         guard containerItem.hasProperty(.open) else {
             throw ActionError.containerIsClosed(containerID)
         }
-        // TODO: Add capacity checks
+
+        // Capacity Check (New)
+        // Check if container has limited capacity (capacity >= 0)
+        if containerItem.capacity >= 0 {
+            let currentLoad = engine.calculateCurrentLoad(of: containerID)
+            let itemSize = itemToInsert.size
+            if currentLoad + itemSize > containerItem.capacity {
+                throw ActionError.containerIsFull(containerID)
+            }
+        }
     }
 
     func process(
