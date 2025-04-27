@@ -1,96 +1,133 @@
 import Foundation
 
-/// Handles the "PUT [item] ON/IN [target]" action.
+/// Handles the "INSERT [item] INTO/IN [container]" action.
+/// Renamed from PutActionHandler.
 @MainActor
-struct PutActionHandler: ActionHandler {
-    func perform(
+struct InsertActionHandler: EnhancedActionHandler {
+
+    func validate(
         command: Command,
         engine: GameEngine
     ) async throws {
         // 1. Validate Direct and Indirect Objects
-        guard let itemToPutID = command.directObject else {
-            await engine.output("What do you want to put?")
-            return // Or throw ActionError.missingDirectObject
+        guard let itemToInsertID = command.directObject else {
+            throw ActionError.prerequisiteNotMet("Insert what?")
         }
-        // Fetch direct object name *only* for the potential error message below
-        let directObjectName = engine.itemSnapshot(with: itemToPutID)?.name ?? "item"
-        guard let targetID = command.indirectObject else {
-            await engine.output("Where do you want to put the \(directObjectName)?")
-            return // Or throw ActionError.missingIndirectObject
+        guard let containerID = command.indirectObject else {
+            // Fetch name for better error message if possible
+            let itemName = engine.itemSnapshot(with: itemToInsertID)?.name ?? "item"
+            throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item Snapshots
-        guard let itemToPut = engine.itemSnapshot(with: itemToPutID) else {
-            // Should ideally be caught by parser scope check, but double-check
-            throw ActionError.itemNotAccessible(itemToPutID)
+        guard let itemToInsert = engine.itemSnapshot(with: itemToInsertID) else {
+            throw ActionError.itemNotAccessible(itemToInsertID)
         }
-        guard let targetItem = engine.itemSnapshot(with: targetID) else {
-            throw ActionError.itemNotAccessible(targetID)
+        guard let containerItem = engine.itemSnapshot(with: containerID) else {
+            throw ActionError.itemNotAccessible(containerID)
         }
 
         // 3. Perform Basic Checks
-        // Check if player holds the item to put
-        guard itemToPut.parent == .player else {
-            throw ActionError.itemNotHeld(itemToPutID)
+        guard itemToInsert.parent == .player else {
+            throw ActionError.itemNotHeld(itemToInsertID)
         }
-
-        // Check if target is accessible (basic reachability)
-        // Note: Parser usually handles scope, but good to double check reachability
         let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetID) else {
-             throw ActionError.itemNotAccessible(targetID) // Or more specific error if needed
+        guard reachableItems.contains(containerID) else {
+             throw ActionError.itemNotAccessible(containerID)
         }
 
-        // Prevent putting item inside/onto itself or its container
-        if itemToPutID == targetID {
-             throw ActionError.prerequisiteNotMet("You can't put something on or in itself.")
+        // Prevent putting item inside/onto itself
+        if itemToInsertID == containerID {
+             throw ActionError.prerequisiteNotMet("You can't put something in itself.")
         }
-        // Recursive check: is the target inside the item we are putting?
-        var currentParent = targetItem.parent
+        // Recursive check: is the target container inside the item we are inserting?
+        var currentParent = containerItem.parent
         while case .item(let parentItemID) = currentParent {
-            if parentItemID == itemToPutID {
-                throw ActionError.prerequisiteNotMet("You can't put the \(targetItem.name) inside the \(itemToPut.name) like that.")
+            if parentItemID == itemToInsertID {
+                throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
             }
-            guard let parentItem = engine.itemSnapshot(with: parentItemID) else { break } // Stop if parent chain breaks
+            guard let parentItem = engine.itemSnapshot(with: parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
-
-        // 4. Determine action based on preposition ("on" vs "in")
-        let preposition = command.preposition?.lowercased() ?? "" // Default to "" if nil
-
-        if preposition == "in" || preposition == "into" {
-            // --- Handle PUT IN ---
-            guard targetItem.hasProperty(.container) else {
-                throw ActionError.targetIsNotAContainer(targetID)
-            }
-            guard targetItem.hasProperty(.open) else {
-                throw ActionError.containerIsClosed(targetID)
-            }
-            // TODO: Add capacity checks if necessary
-
-            // Perform the move
-            engine.updateItemParent(itemID: itemToPutID, newParent: .item(targetID))
-            engine.updatePronounReference(pronoun: "it", itemID: itemToPutID) // Update "it"
-            await engine.output("You put the \(itemToPut.name) in the \(targetItem.name).")
-
-        } else if preposition == "on" || preposition == "onto" {
-            // --- Handle PUT ON ---
-            guard targetItem.hasProperty(.surface) else {
-                throw ActionError.targetIsNotASurface(targetID)
-            }
-             // TODO: Add capacity checks if necessary
-
-            // Perform the move
-            engine.updateItemParent(itemID: itemToPutID, newParent: .item(targetID))
-            engine.updatePronounReference(pronoun: "it", itemID: itemToPutID) // Update "it"
-            await engine.output("You put the \(itemToPut.name) on the \(targetItem.name).")
-
-        } else {
-            // Invalid or missing preposition
-            // TODO: Improve error message? ZIL might infer based on target type.
-            await engine.output("Do you want to put it 'in' or 'on' the \(targetItem.name)?")
-            // Or throw ActionError.badGrammar("Specify 'in' or 'on'.")
+        // 4. Target Checks (Specific to INSERT)
+        guard containerItem.hasProperty(.container) else {
+            throw ActionError.targetIsNotAContainer(containerID)
         }
+        guard containerItem.hasProperty(.open) else {
+            throw ActionError.containerIsClosed(containerID)
+        }
+        // TODO: Add capacity checks
+    }
+
+    func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        // IDs guaranteed non-nil by validate
+        let itemToInsertID = command.directObject!
+        let containerID = command.indirectObject!
+
+        // Get snapshots (existence guaranteed by validate)
+        guard let itemToInsertSnapshot = engine.itemSnapshot(with: itemToInsertID),
+              let containerSnapshot = engine.itemSnapshot(with: containerID) else
+        {
+            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for INSERT.")
+        }
+
+        // --- Insert Successful: Calculate State Changes ---
+        var stateChanges: [StateChange] = []
+
+        // Change 1: Update item parent
+        let oldParent = itemToInsertSnapshot.parent // Should be .player
+        let newParent: ParentEntity = .item(containerID)
+        stateChanges.append(StateChange(
+            objectId: itemToInsertID,
+            propertyKey: .itemParent,
+            oldValue: .parentEntity(oldParent),
+            newValue: .parentEntity(newParent)
+        ))
+
+        // Change 2: Mark item touched
+        let oldItemProps = itemToInsertSnapshot.properties
+        if !oldItemProps.contains(.touched) {
+            var newItemProps = oldItemProps
+            newItemProps.insert(.touched)
+            stateChanges.append(StateChange(
+                objectId: itemToInsertID,
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(oldItemProps),
+                newValue: .itemProperties(newItemProps)
+            ))
+        }
+
+        // Change 3: Mark container touched
+        let oldContainerProps = containerSnapshot.properties
+        if !oldContainerProps.contains(.touched) {
+            var newContainerProps = oldContainerProps
+            newContainerProps.insert(.touched)
+            stateChanges.append(StateChange(
+                objectId: containerID,
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(oldContainerProps),
+                newValue: .itemProperties(newContainerProps)
+            ))
+        }
+
+        // Change 4: Update pronoun "it"
+        stateChanges.append(StateChange(
+            objectId: itemToInsertID, // Ignored for pronouns, but required
+            propertyKey: .pronounReference(pronoun: "it"),
+            oldValue: nil, // Old value often unknown/irrelevant for pronoun updates
+            newValue: .itemIDSet([itemToInsertID])
+        ))
+
+        // --- Prepare Result ---
+        let message = "You put the \(itemToInsertSnapshot.name) in the \(containerSnapshot.name)."
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
     }
 }

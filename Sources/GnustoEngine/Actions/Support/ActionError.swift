@@ -1,35 +1,105 @@
 /// Enumerates errors that can occur during the execution phase of a command.
 public enum ActionError: Error, Equatable, Sendable {
+    /// Action failed because the target container is closed.
     case containerIsClosed(ItemID)
-    case containerIsFull(ItemID)
-    case containerIsOpen(ItemID)     // e.g., trying to close an already open non-openable item?
-    case directionIsBlocked(String?) // Optional message from Exit
-    case internalEngineError(String) // Unexpected issue within the engine/handler
-    case invalidDirection
-    case itemAlreadyClosed(ItemID)
-    case itemAlreadyOpen(ItemID)
-    case itemIsLocked(ItemID)
-    case itemIsUnlocked(ItemID)
-    case itemNotAccessible(ItemID) // Item exists but is not in reach
-    case itemNotCloseable(ItemID)
-    case itemNotDroppable(ItemID)  // e.g., fixed objects
-    case itemNotEdible(ItemID)
-    case itemNotHeld(ItemID)       // Player isn't holding an item (e.g., for drop, wear)
-    case itemNotInContainer(item: ItemID, container: ItemID)
-    case itemNotLockable(ItemID)
-    case itemNotOnSurface(item: ItemID, surface: ItemID)
-    case itemNotOpenable(ItemID)
-    case itemNotReadable(ItemID)
-    case itemNotRemovable(ItemID)  // For worn items
-    case itemNotTakable(ItemID)
-    case itemNotUnlockable(ItemID)
-    case itemNotWearable(ItemID)
-    case playerCannotCarryMore
-    case prerequisiteNotMet(String) // Generic message for when a condition isn't met
-    case roomIsDark                 // Action requires light, but the room is dark
-    case targetIsNotAContainer(ItemID)
-    case targetIsNotASurface(ItemID)
-    case wrongKey(keyID: ItemID, lockID: ItemID)
 
-    // Add more specific errors as needed...
+    /// Action failed because the target container cannot hold any more items.
+    case containerIsFull(ItemID)
+
+    /// Action failed because the target container is already open (e.g., trying to close
+    /// non-closeable open item).
+    case containerIsOpen(ItemID)
+
+    /// Movement failed because the exit in the specified direction is blocked.
+    ///
+    /// Includes an optional message from the Exit definition.
+    case directionIsBlocked(String?)
+
+    /// An unexpected internal error occurred within the engine or an action handler.
+    case internalEngineError(String)
+
+    /// The direction specified in a movement command was invalid or not recognized.
+    case invalidDirection
+
+    /// Action failed because the target item is already closed.
+    case itemAlreadyClosed(ItemID)
+
+    /// Action failed because the target item is already open.
+    case itemAlreadyOpen(ItemID)
+
+    /// Action failed because the player attempted to wear an item they are already wearing.
+    case itemIsAlreadyWorn(ItemID)
+
+    /// Action failed because the target item is locked.
+    case itemIsLocked(ItemID)
+
+    /// Action failed because the player attempted to remove an item they are not wearing.
+    case itemIsNotWorn(ItemID)
+
+    /// Action failed because the target item is already unlocked.
+    case itemIsUnlocked(ItemID)
+
+    /// Action failed because the target item exists but is not reachable by the player.
+    case itemNotAccessible(ItemID)
+
+    /// Action failed because the target item cannot be closed (lacks `.closeable` property,
+    /// or equivalent logic).
+    case itemNotCloseable(ItemID)
+
+    /// Action failed because the target item cannot be dropped (e.g., has `.fixed` property).
+    case itemNotDroppable(ItemID)
+
+    /// Action failed because the target item cannot be eaten (lacks `.edible` property).
+    case itemNotEdible(ItemID)
+
+    /// Action failed because the player is not holding the required item.
+    case itemNotHeld(ItemID)
+
+    /// Action failed because the specified item is not inside the specified container.
+    case itemNotInContainer(item: ItemID, container: ItemID)
+
+    /// Action failed because the target item cannot be locked (lacks `.lockable` property).
+    case itemNotLockable(ItemID)
+
+    /// Action failed because the specified item is not on the specified surface.
+    case itemNotOnSurface(item: ItemID, surface: ItemID)
+
+    /// Action failed because the target item cannot be opened (lacks `.openable` property).
+    case itemNotOpenable(ItemID)
+
+    /// Action failed because the target item cannot be read (lacks `.readable` property, or text).
+    case itemNotReadable(ItemID)
+
+    /// Action failed because the target item cannot be removed (e.g., a worn, cursed item).
+    case itemNotRemovable(ItemID)
+
+    /// Action failed because the target item cannot be taken (lacks `.takable` property).
+    case itemNotTakable(ItemID)
+
+    /// Action failed because the target item cannot be unlocked (lacks `.lockable` property
+    /// or key mechanism).
+    case itemNotUnlockable(ItemID)
+
+    /// Action failed because the item cannot be worn (lacks `.wearable` property).
+    case itemNotWearable(ItemID)
+
+    /// Action failed because the player cannot carry any more items (inventory capacity reached).
+    case playerCannotCarryMore
+
+    /// A generic failure because some prerequisite for the action was not met.
+    ///
+    /// Includes a descriptive message provided by the handler.
+    case prerequisiteNotMet(String)
+
+    /// Action failed because the current location is dark and the action requires light.
+    case roomIsDark
+
+    /// Action failed because the target item is not a container (lacks `.container` property).
+    case targetIsNotAContainer(ItemID)
+
+    /// Action failed because the target item is not a surface (lacks `.surface` property).
+    case targetIsNotASurface(ItemID)
+
+    /// Action failed because the key used does not match the lock mechanism of the target item.
+    case wrongKey(keyID: ItemID, lockID: ItemID)
 }

@@ -152,41 +152,38 @@ public struct Vocabulary: Codable, Sendable {
             syntax: [SyntaxRule(.verb, .directObject)]
         ),
         Verb(
-            id: "put",
-            synonyms: ["place", "hang"],
-            // Corrected: Only place is a reasonable synonym
+            id: "insert",
+            synonyms: ["put"],
             syntax: [
-                // Define rules for PUT/PLACE: V+DO+PREP+IO
-                // put <DO> in <IO> - DO must be reachable, IO must be a container
-                // put <DO> into <IO> - Same as 'in'
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
-                    // Must be reachable (default), .takable checked by action
-                    indirectObjectConditions: [.container],
-                    // IO must be a container
                     requiredPreposition: "in"
                 ),
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
-                    // Must be reachable (default), .takable checked by action
-                    indirectObjectConditions: [.container],
-                    // IO must be a container
                     requiredPreposition: "into"
                 ),
-                // put <DO> on <IO> - DO must be reachable, IO must be a surface (checked by action)
-                // put <DO> into <IO> - Same as 'in'
+            ],
+            requiresLight: true
+        ),
+        Verb(
+            id: "puton",
+            synonyms: ["put", "place", "set"],
+            syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
-                    // IO must be reachable surface (action checks property)
                     requiredPreposition: "on"
                 ),
-            ]
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "onto"
+                ),
+            ],
+            requiresLight: true
         ),
-        // put <DO> into <IO> - Same as 'in'
         Verb(
             id: "drop",
             synonyms: ["discard"],
-            // Corrected: Removed put, place
             syntax: [SyntaxRule(.verb, .directObject)]
         ), // Simple drop syntax
         Verb(

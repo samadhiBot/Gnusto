@@ -5,9 +5,6 @@ import Foundation
 /// and IO handler, and executes player commands using registered ActionHandlers.
 @MainActor
 public class GameEngine {
-
-    // MARK: - Properties
-
     /// The current state of the game world.
     public private(set) var gameState: GameState
 
@@ -1089,41 +1086,41 @@ public class GameEngine {
 }
 
 extension GameEngine {
+    /// Default action handlers provided by the engine.
     private static let actionHandlerDefaults: [VerbID: ActionHandler] = [
-        "blow out": TurnOffActionHandler(),
+        // Alphabetical Order
+        "blow": PlaceholderActionHandler(verb: "blow"), // Assumes particle handled by parser/verb syntax
+        "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
         "close": CloseActionHandler(),
         "drop": DropActionHandler(),
-        "examine": LookActionHandler(),
-        "extinguish": TurnOffActionHandler(),
+        "examine": LookActionHandler(), // Examine maps to Look
+        "extinguish": PlaceholderActionHandler(verb: "extinguish"), // Maps to turn_off?
         "go": GoActionHandler(),
-        "hang": PutActionHandler(),
-        "light": TurnOnActionHandler(),
-        "listen": ListenActionHandler(),
+        "help": PlaceholderActionHandler(verb: "help"), // Placeholder
+        "insert": InsertActionHandler(), // Handles "put in"
+        "inventory": InventoryActionHandler(), // Placeholder? No, created.
+        "light": PlaceholderActionHandler(verb: "light"), // Maps to turn_on?
+        "listen": PlaceholderActionHandler(verb: "listen"), // Placeholder
         "lock": LockActionHandler(),
         "look": LookActionHandler(),
         "open": OpenActionHandler(),
-        "put": PutActionHandler(),
-        "read": ReadActionHandler(),
-        "remove": RemoveActionHandler(),
-        "smell": SmellActionHandler(),
-        "take": TakeActionHandler(),
-        "taste": TasteActionHandler(),
-        "think-about": ThinkAboutActionHandler(),
-        "touch": PlaceholderActionHandler(verb: "touch"),
-        "turn_off": TurnOffActionHandler(),
-        "turn_on": TurnOnActionHandler(),
-        "unlock": UnlockActionHandler(),
-        "wait": WaitActionHandler(),
-        "wear": WearActionHandler(),
-
-        // Meta
-        "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
-        "help": PlaceholderActionHandler(verb: "help"), // Placeholder
-        "inventory": InventoryActionHandler(), // Need to create this
+        "puton": PutOnActionHandler(), // Handles "put on"
         "quit": QuitActionHandler(),
+        "read": PlaceholderActionHandler(verb: "read"), // Placeholder
+        "remove": PlaceholderActionHandler(verb: "remove"), // Placeholder
         "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
         "save": PlaceholderActionHandler(verb: "save"), // Placeholder
-        "score": ScoreActionHandler(),
+        "score": PlaceholderActionHandler(verb: "score"), // Placeholder
+        "smell": PlaceholderActionHandler(verb: "smell"), // Placeholder
+        "switch": PlaceholderActionHandler(verb: "switch"), // Assumes particle handled by parser/verb syntax
+        "take": TakeActionHandler(),
+        "taste": PlaceholderActionHandler(verb: "taste"), // Placeholder
+        "think-about": PlaceholderActionHandler(verb: "think-about"), // Placeholder
+        "touch": PlaceholderActionHandler(verb: "touch"), // Placeholder
+        "turn": PlaceholderActionHandler(verb: "turn"), // Assumes particle handled by parser/verb syntax
+        "unlock": UnlockActionHandler(),
         "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
+        "wait": PlaceholderActionHandler(verb: "wait"), // Placeholder
+        "wear": PlaceholderActionHandler(verb: "wear") // Placeholder
     ]
 }
