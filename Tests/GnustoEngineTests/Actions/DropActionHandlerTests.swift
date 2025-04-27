@@ -49,7 +49,6 @@ struct DropActionHandlerTests {
             parent: .player
         )
         let initialProperties = testItem.properties
-        let initialParent: ParentEntity = .player
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -59,7 +58,7 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = await engine.playerLocationID()
+        let finalLocation = engine.playerLocationID()
 
         #expect(engine.itemSnapshot(with: "key")?.parent == .player) // Verify setup
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -153,7 +152,6 @@ struct DropActionHandlerTests {
             parent: .player
         )
         let initialProperties = testItem.properties
-        let initialParent: ParentEntity = .player
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -163,7 +161,7 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = await engine.playerLocationID()
+        let finalLocation = engine.playerLocationID()
 
         #expect(engine.itemSnapshot(with: "cloak")?.parent == .player)
         #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == true)
