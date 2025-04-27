@@ -108,18 +108,16 @@ public struct ScopeResolver: Sendable {
         let visibleLocationItems = self.visibleItemsIn(locationID: gameState.player.currentLocationID)
         reachableItems.formUnion(visibleLocationItems)
 
-        // Now, process containers among the currently reachable items
+        // Now, process containers and surfaces among the currently reachable items
         var itemsToCheck = reachableItems // Copy the set to iterate while potentially modifying reachableItems
 
         while !itemsToCheck.isEmpty {
             let currentItemID = itemsToCheck.removeFirst()
             guard let currentItem = gameState.items[currentItemID] else { continue }
 
-            // Check if it's a container and hasn't been processed yet
+            // A) Check if it's an accessible container
             if currentItem.hasProperty(.container) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
-
-                // Check if container is accessible (open or transparent)
                 if currentItem.hasProperty(.open) || currentItem.hasProperty(.transparent) {
                     // Find items directly inside this container
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
@@ -129,9 +127,23 @@ public struct ScopeResolver: Sendable {
                     let newlyReachable = Set(insideIDs).subtracting(reachableItems)
                     reachableItems.formUnion(newlyReachable)
 
-                    // Add newly found containers to the queue to check their contents
+                    // Add newly found items (potential containers/surfaces) to the queue
                     itemsToCheck.formUnion(newlyReachable)
                 }
+            }
+
+            // B) Check if it's a surface
+            if currentItem.hasProperty(.surface) {
+                // Find items directly on this surface
+                let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
+                let onSurfaceIDs = itemsOnSurface.map { $0.id }
+
+                // Add newly found items to reachable set
+                let newlyReachable = Set(onSurfaceIDs).subtracting(reachableItems)
+                reachableItems.formUnion(newlyReachable)
+
+                // Add newly found items (potential containers/surfaces) to the queue
+                itemsToCheck.formUnion(newlyReachable)
             }
         }
 

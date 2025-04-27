@@ -15,7 +15,7 @@ A registry holding definitions for potentially game-specific elements like timed
 
 ## DescriptionHandlerRegistry / DescriptionHandler
 
-Responsible for generating dynamic descriptions for items and locations, potentially based on game state. (We haven't interacted with this much yet, but it's likely a key component). [DescriptionHandlerRegistry.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandlerRegistry.swift) [DescriptionHandler.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandler.swift)
+Responsible for generating dynamic descriptions for items and locations, potentially based on game state. [DescriptionHandlerRegistry.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandlerRegistry.swift) [DescriptionHandler.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandler.swift)
 
 ## GameEngine
 
@@ -31,7 +31,7 @@ Defines the interface for all input/output operations: reading player commands, 
 
 ## Item / Location
 
-The core model classes representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like properties, parent). @Item.swift [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
+The core model classes representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like properties, parent). [Item.swift](mdc:Sources/GnustoEngine/Core/Item.swift) [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
 
 ## Parser
 

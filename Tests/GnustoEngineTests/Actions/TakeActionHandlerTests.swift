@@ -10,28 +10,28 @@ struct TakeActionHandlerTests {
 
     // Helper to create the expected StateChange array for successful take
     private func expectedTakeChanges(
-        item: Item,
+        itemID: ItemID,
         oldParent: ParentEntity,
+        oldProperties: Set<ItemProperty>,
         oldPronounIt: Set<ItemID>?
     ) -> [StateChange] {
-        let initialProperties = item.properties
-        var finalProperties = initialProperties
+        var finalProperties = oldProperties
         finalProperties.insert(.touched)
 
         var changes: [StateChange] = [
             StateChange(
-                objectId: item.id,
+                objectId: itemID,
                 propertyKey: .itemParent,
                 oldValue: .parentEntity(oldParent),
                 newValue: .parentEntity(.player)
             )
         ]
 
-        if initialProperties != finalProperties {
+        if oldProperties != finalProperties {
             changes.append(StateChange(
-                objectId: item.id,
+                objectId: itemID,
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(initialProperties),
+                oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(finalProperties)
             ))
         }
@@ -40,7 +40,7 @@ struct TakeActionHandlerTests {
             objectId: "unused",
             propertyKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounIt != nil ? .itemIDSet(oldPronounIt!) : nil,
-            newValue: .itemIDSet([item.id])
+            newValue: .itemIDSet([itemID])
         ))
 
         return changes
@@ -75,8 +75,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "key")
@@ -89,7 +89,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(item: testItem, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(itemID: "key", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -106,8 +106,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act: Perform should not throw, process returns ActionResult(success: false)
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
         let finalItemState = engine.itemSnapshot(with: "key")
@@ -211,6 +211,7 @@ struct TakeActionHandlerTests {
         let container = Item(id: "box", name: "wooden box", properties: .container, .open, parent: .location("startRoom"))
         let itemInContainer = Item(id: "gem", name: "ruby gem", properties: .takable, parent: .item("box"))
         let initialParent = itemInContainer.parent
+        let initialProperties = itemInContainer.properties
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
@@ -223,8 +224,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "gem")
@@ -240,7 +241,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(item: itemInContainer, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(itemID: "gem", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -250,6 +251,7 @@ struct TakeActionHandlerTests {
         let container = Item(id: "pouch", name: "leather pouch", properties: .container, .open, .takable, parent: .player)
         let itemInContainer = Item(id: "coin", name: "gold coin", properties: .takable, parent: .item("pouch"))
         let initialParent = itemInContainer.parent
+        let initialProperties = itemInContainer.properties
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
@@ -262,8 +264,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "coin")
@@ -279,7 +281,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(item: itemInContainer, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(itemID: "coin", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -424,6 +426,7 @@ struct TakeActionHandlerTests {
         // Arrange
         let testItem = Item(id: "cloak", name: "dark cloak", properties: .takable, .wearable, size: 2, parent: .location("startRoom"))
         let initialParent = testItem.parent
+        let initialProperties = testItem.properties
 
         var game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -437,8 +440,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "cloak")
@@ -452,7 +455,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(item: testItem, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(itemID: "cloak", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -462,6 +465,7 @@ struct TakeActionHandlerTests {
         let surfaceItem = Item(id: "table", name: "wooden table", properties: .surface, parent: .location("startRoom"))
         let itemOnSurface = Item(id: "book", name: "old book", properties: .takable, .read, parent: .item(surfaceItem.id))
         let initialParent = itemOnSurface.parent
+        let initialProperties = itemOnSurface.properties
 
         var game = MinimalGame(items: [surfaceItem, itemOnSurface])
         let mockIO = await MockIOHandler()
@@ -475,8 +479,8 @@ struct TakeActionHandlerTests {
         // Initial state check
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
         // Assert Final State
         let finalItemState = engine.itemSnapshot(with: itemOnSurface.id)
@@ -491,7 +495,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(item: itemOnSurface, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(itemID: itemOnSurface.id, oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 }

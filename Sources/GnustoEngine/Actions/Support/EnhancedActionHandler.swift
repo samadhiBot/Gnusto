@@ -77,14 +77,12 @@ extension EnhancedActionHandler {
         engine: GameEngine,
         result: ActionResult
     ) async throws {
-        // Default: If the action succeeded, print the message from the result.
+        // Default: Print the message from the result, regardless of success.
+        // The message often indicates *why* an action failed (e.g., "You already have that.").
         // State changes and side effects are assumed to be handled elsewhere or by the engine.
-        if result.success {
+        if !result.message.isEmpty {
             await engine.output(result.message)
-            // TODO: Implement actual state change application and side effect handling here or in the engine.
         }
-        // If !result.success, the error likely occurred in `process`, which would have thrown,
-        // or the result indicates failure, which might need specific error reporting.
-        // This default assumes errors are thrown rather than returned via `success = false`.
+        // TODO: Revisit if explicit error throwing is preferred over success=false + message.
     }
 }

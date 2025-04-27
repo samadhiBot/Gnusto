@@ -28,25 +28,40 @@ public struct TakeActionHandler: EnhancedActionHandler {
              return
         }
 
-        // 4. Check reachability using ScopeResolver
+        // 4. Check if item is inside something invalid (non-container/non-surface)
+        if case .item(let parentID) = targetItem.parent,
+           let parentItem = await engine.itemSnapshot(with: parentID) {
+            // Fail only if the parent is NOT a container and NOT a surface.
+            // We allow taking from *closed* containers here; reachability handles closed state later.
+            let isContainer = parentItem.hasProperty(.container)
+            let isSurface = parentItem.hasProperty(.surface)
+            if !isContainer && !isSurface {
+                // Custom message similar to Zork's, using the plain name.
+                throw ActionError.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
+            }
+        }
+
+        // 5. Check reachability using ScopeResolver (general check)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
              // Handle specific container closed errors before general unreachability
+             // This case might now be redundant due to check #4, but keep for safety/edge cases
              if case .item(let parentID) = targetItem.parent,
                 let container = await engine.itemSnapshot(with: parentID),
                 container.hasProperty(.container),
                 !container.hasProperty(.open) {
                  throw ActionError.containerIsClosed(parentID)
              }
+            // If not reachable for other reasons (e.g., too far, darkness affecting scope)
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // 5. Check if the item is takable
+        // 6. Check if the item is takable
         guard targetItem.hasProperty(.takable) else {
             throw ActionError.itemNotTakable(targetItemID)
         }
 
-        // 6. Check capacity
+        // 7. Check capacity
         guard await engine.canPlayerCarry(itemSize: targetItem.size) else {
             throw ActionError.playerCannotCarryMore
         }

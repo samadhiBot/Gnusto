@@ -34,8 +34,8 @@ struct OpenActionHandlerTests {
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
 
-        // Act: Call perform, which triggers validate/process/postProcess
-        try await handler.perform(command: command, engine: engine)
+        // Act: Call the engine's execute method to use the full enhanced pipeline
+        await engine.execute(command: command)
 
         // Assert State Change
         let finalItemState = engine.itemSnapshot(with: "box")

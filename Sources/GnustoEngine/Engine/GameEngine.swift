@@ -298,7 +298,7 @@ public class GameEngine {
 
     /// Looks up and executes the appropriate ActionHandler for the given command.
     /// - Parameter command: The command to execute.
-    private func execute(command: Command) async {
+    func execute(command: Command) async {
         var actionHandled = false
         var actionError: Error? = nil // To store error from object handlers
 
@@ -395,7 +395,7 @@ public class GameEngine {
                         // Apply state changes BEFORE postProcess, record AFTER successful application.
                         for change in result.stateChanges {
                             try await applyStateChange(change) // Apply the change first
-                            gameState.recordStateChange(change) // Record if application succeeded
+                            self.gameState.changeHistory.append(change)
                         }
 
                         // Process side effects BEFORE postProcess
@@ -457,8 +457,14 @@ public class GameEngine {
             updateItemParent(itemID: change.objectId, newParent: newParent)
 
         case .itemProperties:
-            guard case .itemProperties(let newProps) = change.newValue,
-                  let item = gameState.items[change.objectId] else { /* Error handling */ return }
+            guard case .itemProperties(let newProps) = change.newValue else {
+                // Throw error if the value type is wrong
+                throw ActionError.internalEngineError("Invalid StateValue type for .itemProperties: \(change.newValue)")
+            }
+            guard let item = gameState.items[change.objectId] else {
+                // Throw error if the item ID is somehow invalid
+                throw ActionError.internalEngineError("Cannot apply .itemProperties change to unknown object ID: \(change.objectId)")
+            }
             // WARNING: This sets the entire property set. Requires handler to calculate final set.
             // TODO: Consider a more granular StateChange/StatePropertyKey for add/remove.
             item.properties = newProps
