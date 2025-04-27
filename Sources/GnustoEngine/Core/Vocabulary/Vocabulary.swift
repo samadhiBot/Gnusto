@@ -28,14 +28,18 @@ public struct Vocabulary: Codable, Sendable {
     public var directions: [String: Direction]
 
     /// Computed property to get the verb synonym mapping needed by the parser.
-    public var verbSynonyms: [String: VerbID] {
-        var mapping: [String: VerbID] = [:]
+    /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
+    public var verbSynonyms: [String: Set<VerbID>] {
+        var mapping: [String: Set<VerbID>] = [:]
         for verb in verbDefinitions.values {
+            let verbID = verb.id
+            let primaryKey = verbID.rawValue.lowercased()
             // Map the primary ID
-            mapping[verb.id.rawValue.lowercased()] = verb.id
+            mapping[primaryKey, default: Set()].insert(verbID)
             // Map all synonyms
             for synonym in verb.synonyms {
-                mapping[synonym.lowercased()] = verb.id
+                let synonymKey = synonym.lowercased()
+                mapping[synonymKey, default: Set()].insert(verbID) // Insert instead of overwrite
             }
         }
         return mapping
@@ -153,7 +157,7 @@ public struct Vocabulary: Codable, Sendable {
         ),
         Verb(
             id: "insert",
-            synonyms: ["put"],
+            synonyms: ["put", "place"],
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],

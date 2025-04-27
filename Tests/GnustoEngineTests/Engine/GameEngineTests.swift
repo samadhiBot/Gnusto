@@ -735,27 +735,16 @@ struct GameEngineTests {
     @Test("ReportActionError: .containerIsClosed")
     func testReportErrorContainerIsClosed() async throws {
         var game = MinimalGame()
-
-        // Arrange: Closed container in room, item inside
-        let container = Item(
-            id: "box",
-            name: "box",
-            properties: .container
-        ) // Closed by default
-        let itemIn = Item(id: "gem", name: "gem", parent: .item("box"))
-        game.state.items[container.id] = container
-        game.state.items[itemIn.id] = itemIn
-        game.state.player.currentLocationID = "startRoom" // Ensure player is where box is
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit) // Ensure room is lit
-        game.state.items[container.id]?.parent = .location("startRoom") // Box in room
-
-        // Command: Try to take item from closed container (will fail in Take handler)
-        // OR simpler: Try to put something IN the closed container
+        // Arrange: Try putting item IN a closed container
         let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "box", name: "box", properties: .container, .openable, parent: .location("startRoom")) // Closed
         game.state.items[itemToPut.id] = itemToPut
+        game.state.items[target.id] = target
+        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
+        // Use "insert" verb for putting IN
         let command = Command(
-            verbID: "put",
+            verbID: "insert",
             directObject: "key",
             indirectObject: "box",
             preposition: "in",
@@ -863,8 +852,9 @@ struct GameEngineTests {
         game.state.items[target.id] = target
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
+        // Use "insert" verb for putting IN
         let command = Command(
-            verbID: "put",
+            verbID: "insert",
             directObject: "key",
             indirectObject: "rock",
             preposition: "in",
@@ -890,8 +880,9 @@ struct GameEngineTests {
         game.state.items[target.id] = target
         game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
+        // Use "puton" verb for putting ON
         let command = Command(
-            verbID: "put",
+            verbID: "puton",
             directObject: "key",
             indirectObject: "rock",
             preposition: "on",

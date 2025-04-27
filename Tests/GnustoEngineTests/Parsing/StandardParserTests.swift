@@ -292,7 +292,7 @@ struct StandardParserTests {
         let result = parser.parse(input: "put key in box", vocabulary: vocabulary, gameState: gameState)
         // Should now SUCCEED because "box" is in scope (in the room)
         let command = try result.get()
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "insert")
         #expect(command.directObject == "key")
         #expect(command.indirectObject == "box")
         #expect(command.preposition == "in")
@@ -304,7 +304,7 @@ struct StandardParserTests {
         let result = parser.parse(input: "place the small key into the wooden box", vocabulary: vocabulary, gameState: gameState)
         // Should now SUCCEED because "box" is in scope (in the room)
         let command = try result.get()
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "insert")
         #expect(command.directObject == "key")
         #expect(Set(command.directObjectModifiers) == Set(["small"]))
         #expect(command.indirectObject == "box")
@@ -330,7 +330,7 @@ struct StandardParserTests {
         let result = parser.parse(input: "put leaflet in box", vocabulary: vocabulary, gameState: gameState)
         // Should SUCCEED now.
         let command = try result.get()
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "insert")
         #expect(command.directObject == "leaflet")
         #expect(command.indirectObject == "box")
         #expect(command.preposition == "in")
@@ -338,12 +338,10 @@ struct StandardParserTests {
 
     @Test("Parse Ambiguous Indirect Object in Location", .tags(.parser, .resolution, .ambiguity, .errorHandling))
     func testAmbiguousIndirectObjectInLocation() throws {
-        // Direct object 'leaflet' is in inventory, indirect object 'lantern' is ambiguous BUT
-        // the rule `put ... in ...` requires IO condition [.container].
-        // Neither lantern has .container property.
-        // Therefore, gatherCandidates for IO finds no matching items, resulting in itemNotInScope.
+        // Direct object 'leaflet' is in inventory, indirect object 'lantern' is ambiguous.
+        // Parser identifies ambiguity before checking if candidates meet the .container property.
         let result = parser.parse(input: "put leaflet in lantern", vocabulary: vocabulary, gameState: gameState)
-        #expect(result.isFailure(matching: .itemNotInScope(noun: "lantern")))
+        #expect(result.isFailure(matching: .ambiguity("Which lantern do you mean?")))
     }
 
     @Test("Parse Direct from Inventory, Indirect from Location", .tags(.parser, .resolution, .scope))
@@ -351,7 +349,7 @@ struct StandardParserTests {
         // 'leaflet' (DO) is in inventory, 'sword' (IO) is in the room
         let result = parser.parse(input: "put leaflet on sword", vocabulary: vocabulary, gameState: gameState)
         let command = try result.get()
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "puton")
         #expect(command.directObject == "leaflet")
         #expect(command.directObjectModifiers.isEmpty)
         #expect(command.preposition == "on")
@@ -508,7 +506,7 @@ struct StandardParserTests {
         tempGameState.pronouns["it"] = ["sword"] // Set refers to sword in location
         let result = parser.parse(input: "put leaflet on it", vocabulary: vocabulary, gameState: tempGameState)
         let command = try result.get()
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "puton")
         #expect(command.directObject == "leaflet")
         #expect(command.preposition == "on")
         #expect(command.indirectObject == "sword")
@@ -744,7 +742,7 @@ struct StandardParserTests {
         let result = parser.parse(input: "put the small box key in lamp", vocabulary: vocabulary, gameState: modifiedState)
         let command = try result.get()
 
-        #expect(command.verbID == "put")
+        #expect(command.verbID == "insert")
         // DO: noun = key (last known noun), mods = [small] ("box" is noun, not modifier)
         #expect(command.directObject == "key")
         #expect(command.directObjectModifiers == ["small"])

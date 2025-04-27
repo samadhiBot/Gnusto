@@ -112,21 +112,21 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the open box.")
 
         // Assert Final State
-        guard let finalCoinState = await engine.itemSnapshot(with: "coin") else {
+        guard let finalCoinState = engine.itemSnapshot(with: "coin") else {
             Issue.record("Final coin snapshot was nil")
             return
         }
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
         #expect(finalCoinState.hasProperty(.touched) == true, "Coin should be touched")
 
-        guard let finalBoxState = await engine.itemSnapshot(with: "openBox") else {
+        guard let finalBoxState = engine.itemSnapshot(with: "openBox") else {
             Issue.record("Final box snapshot was nil")
             return
         }
         #expect(finalBoxState.hasProperty(.touched) == true, "Box should be touched")
 
         // Assert Pronoun
-        #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
+        #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Change History
         let expectedChanges = expectedInsertChanges(

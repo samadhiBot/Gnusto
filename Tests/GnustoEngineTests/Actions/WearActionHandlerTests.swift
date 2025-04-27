@@ -17,7 +17,7 @@ struct WearActionHandlerTests {
             properties: .takable, .wearable, // Held, wearable
             parent: .player
         )
-        var game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let engine = GameEngine(
@@ -29,8 +29,8 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialProperties = await engine.itemSnapshot(with: "cloak")?.properties ?? []
-        let initialHistory = await engine.gameState.changeHistory // Capture initial state
+        let initialProperties = engine.itemSnapshot(with: "cloak")?.properties ?? []
+        let initialHistory = engine.gameState.changeHistory // Capture initial state
         #expect(initialProperties.contains(.worn) == false)
         #expect(initialHistory.isEmpty)
 
@@ -38,7 +38,7 @@ struct WearActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = await engine.itemSnapshot(with: "cloak")
+        let finalCloakState = engine.itemSnapshot(with: "cloak")
         #expect(finalCloakState?.hasProperty(.worn) == true, "Cloak should have .worn property")
         #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property")
 
@@ -61,13 +61,13 @@ struct WearActionHandlerTests {
                 newValue: .itemIDSet(["cloak"])
             )
         ]
-        let finalHistory = await engine.gameState.changeHistory
+        let finalHistory = engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
     }
 
     @Test("Wear fails if item not held")
     func testWearItemNotHeld() async throws {
-        var game = MinimalGame() // Cloak doesn't exist here
+        let game = MinimalGame() // Cloak doesn't exist here
         let engine = GameEngine(
             game: game,
             parser: MockParser(), // Parser needed for engine init
@@ -80,7 +80,7 @@ struct WearActionHandlerTests {
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
             try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails if item not wearable")
@@ -91,7 +91,7 @@ struct WearActionHandlerTests {
             properties: .takable, // Held, but not wearable
             parent: .player
         )
-        var game = MinimalGame(items: [rock])
+        let game = MinimalGame(items: [rock])
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -104,7 +104,7 @@ struct WearActionHandlerTests {
         await #expect(throws: ActionError.itemNotWearable("rock")) {
             try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails if item already worn")
@@ -115,7 +115,7 @@ struct WearActionHandlerTests {
             properties: .takable, .wearable, .worn, // Held, wearable, already worn
             parent: .player
         )
-        var game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: [cloak])
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -129,12 +129,12 @@ struct WearActionHandlerTests {
         await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
              try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails with no direct object")
     func testWearNoObject() async throws {
-        var game = MinimalGame()
+        let game = MinimalGame()
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -148,6 +148,6 @@ struct WearActionHandlerTests {
         await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
              try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 }

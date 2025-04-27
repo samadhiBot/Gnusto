@@ -16,7 +16,7 @@ struct RemoveActionHandlerTests {
             properties: .takable, .wearable, .worn, // Held, wearable, worn
             parent: .player
         )
-        var game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let engine = GameEngine(
@@ -29,16 +29,16 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        let initialProperties = await engine.itemSnapshot(with: "cloak")?.properties ?? []
+        let initialProperties = engine.itemSnapshot(with: "cloak")?.properties ?? []
         #expect(initialProperties.contains(.worn) == true)
-        let initialHistory = await engine.gameState.changeHistory
+        let initialHistory = engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 
         // Act
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = await engine.itemSnapshot(with: "cloak")
+        let finalCloakState = engine.itemSnapshot(with: "cloak")
         #expect(finalCloakState?.hasProperty(.worn) == false, "Cloak should NOT have .worn property")
         #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property") // Ensure touched is added
 
@@ -61,7 +61,7 @@ struct RemoveActionHandlerTests {
                 newValue: .itemIDSet(["cloak"])
             )
         ]
-        let finalHistory = await engine.gameState.changeHistory
+        let finalHistory = engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
     }
 
@@ -73,7 +73,7 @@ struct RemoveActionHandlerTests {
             properties: .takable, .wearable, // Held, wearable, NOT worn
             parent: .player
         )
-        var game = MinimalGame(items: [cloak])
+        let game = MinimalGame(items: [cloak])
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -86,12 +86,12 @@ struct RemoveActionHandlerTests {
         await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
             try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        var game = MinimalGame() // Cloak doesn't exist here
+        let game = MinimalGame() // Cloak doesn't exist here
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -104,12 +104,12 @@ struct RemoveActionHandlerTests {
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
              try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
-        var game = MinimalGame()
+        let game = MinimalGame()
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -123,7 +123,7 @@ struct RemoveActionHandlerTests {
         await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
              try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item is fixed (cursed)")
@@ -134,7 +134,7 @@ struct RemoveActionHandlerTests {
             properties: .wearable, .worn, .fixed, // Worn and fixed
             parent: .player
         )
-        var game = MinimalGame(items: [amulet])
+        let game = MinimalGame(items: [amulet])
         let engine = GameEngine(
             game: game,
             parser: MockParser(),
@@ -147,6 +147,6 @@ struct RemoveActionHandlerTests {
         await #expect(throws: ActionError.itemNotRemovable("amulet")) {
             try await handler.validate(command: command, engine: engine)
         }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 }
