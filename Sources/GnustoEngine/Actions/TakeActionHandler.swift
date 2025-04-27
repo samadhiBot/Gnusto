@@ -1,67 +1,43 @@
 import Foundation
 
 /// Handles the "TAKE" command and its synonyms (e.g., "GET").
-public struct TakeActionHandler: ActionHandler {
+public struct TakeActionHandler: EnhancedActionHandler {
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Take what?")
-            // Consider throwing ActionError.prerequisiteNotMet("Direct object required.")
-            return
+            throw ActionError.prerequisiteNotMet("Take what?")
         }
 
-        // 2. Get target item state and current location
+        // 2. Check if item exists
         guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
+            // Use standard not accessible error for non-existent items
+            throw ActionError.itemNotAccessible(targetItemID)
         }
-        let currentLocationID = await engine.playerLocationID()
 
         // 3. Check if player already has the item
         if targetItem.parent == .player {
-            await engine.output("You already have that.")
-            return
+            // Can't throw error here, need to report specific message.
+            // Let process handle returning a specific ActionResult for this.
+            // Or add a specific ActionError? For now, let process handle it.
+            // This validation passes if already held, process generates the message.
+             return
         }
 
-        // 4. Check reachability (item must be in the current location OR an accessible open container/surface)
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .item(let parentItemID):
-            guard let parentItem = await engine.itemSnapshot(with: parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
-            }
-            let parentParent = parentItem.parent
-            let isParentItemAccessible = (parentParent == .location(currentLocationID) || parentParent == .player)
-
-            if isParentItemAccessible {
-                if parentItem.hasProperty(.surface) {
-                    isReachable = true
-                } else if parentItem.hasProperty(.container) {
-                    guard parentItem.hasProperty(.open) else {
-                        throw ActionError.containerIsClosed(parentItemID)
-                    }
-                    isReachable = true
-                } else {
-                    // Trying to take from something not open/surface
-                    // Use a generic error? Or specific? Let's refine.
-                    throw ActionError.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
-                    // Old code: await engine.ioHandler.print("..."); return
-                }
-            }
-        case .player:
-            // Should have been caught by the "already have" check
-            throw ActionError.internalEngineError("Item parent is player but wasn't caught earlier.")
-            // Old code: await engine.ioHandler.print("...", style: .debug); return
-        case .nowhere:
-            isReachable = false
-        }
-
-        guard isReachable else {
-            // Throw the correct error for existing but unreachable items
+        // 4. Check reachability using ScopeResolver
+        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        guard reachableItems.contains(targetItemID) else {
+             // Handle specific container closed errors before general unreachability
+             if case .item(let parentID) = targetItem.parent,
+                let container = await engine.itemSnapshot(with: parentID),
+                container.hasProperty(.container),
+                !container.hasProperty(.open) {
+                 throw ActionError.containerIsClosed(parentID)
+             }
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
@@ -74,15 +50,72 @@ public struct TakeActionHandler: ActionHandler {
         guard await engine.canPlayerCarry(itemSize: targetItem.size) else {
             throw ActionError.playerCannotCarryMore
         }
-
-        // 7. Update State
-        await engine.updateItemParent(itemID: targetItemID, newParent: .player)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
-
-        // Add pronoun update
-        await engine.updatePronounReference(pronoun: "it", itemID: targetItemID)
-
-        // 8. Output Message
-        await engine.output("Taken.")
     }
+
+    public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            throw ActionError.internalEngineError("Take command reached process without direct object.")
+        }
+        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+            // Should be caught by validate.
+            throw ActionError.internalEngineError("Take command target item disappeared between validate and process.")
+        }
+
+        // Handle "already have" case detected (but not thrown) in validate
+        if targetItem.parent == .player {
+            return ActionResult(success: false, message: "You already have that.")
+        }
+
+        // --- Calculate State Changes ---
+        var stateChanges: [StateChange] = []
+
+        // Change 1: Parent
+        let parentChange = StateChange(
+            objectId: targetItemID,
+            propertyKey: .itemParent,
+            oldValue: .parentEntity(targetItem.parent),
+            newValue: .parentEntity(.player)
+        )
+        stateChanges.append(parentChange)
+
+        // Change 2: Properties (add .touched)
+        let oldProperties = targetItem.properties
+        var newProperties = oldProperties
+        newProperties.insert(.touched)
+
+        if oldProperties != newProperties {
+            let propertiesChange = StateChange(
+                objectId: targetItemID,
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(oldProperties),
+                newValue: .itemProperties(newProperties)
+            )
+            stateChanges.append(propertiesChange)
+        }
+
+        // Change 3: Pronoun ("it")
+        // TODO: Handle "them" for plural/multiple items? Requires parser changes.
+        // Get current pronoun state using the engine helper
+        let oldPronounValue = await engine.getPronounReference(pronoun: "it")
+        let pronounChange = StateChange(
+            objectId: "unused", // ObjectId is ignored for pronoun changes
+            propertyKey: .pronounReference(pronoun: "it"),
+            oldValue: oldPronounValue != nil ? .itemIDSet(oldPronounValue!) : nil,
+            newValue: .itemIDSet([targetItemID])
+        )
+        stateChanges.append(pronounChange)
+
+        // --- Prepare Result ---
+        return ActionResult(
+            success: true,
+            message: "Taken.",
+            stateChanges: stateChanges,
+            sideEffects: []
+        )
+    }
+
+    // Rely on default postProcess.
 }

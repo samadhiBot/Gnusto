@@ -12,6 +12,7 @@ public enum StateValue: Codable, Sendable, Equatable {
     case itemSynonyms(Set<String>)
     case locationProperties(Set<LocationProperty>)
     case parentEntity(ParentEntity)
+    case itemIDSet(Set<ItemID>)     // For pronoun references
     // case double(Double) // Add if needed
     // case stringArray([String]) // Add if needed
 
@@ -27,6 +28,7 @@ public enum StateValue: Codable, Sendable, Equatable {
         case .itemSynonyms(let v): return v
         case .locationProperties(let v): return v
         case .parentEntity(let v): return v
+        case .itemIDSet(let v): return v
         }
     }
 }
@@ -56,6 +58,7 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
 
     // Global State
     case globalFlag(key: String) // Bool
+    case pronounReference(pronoun: String) // Represents gameState.pronouns[pronoun]
 
     // Game Specific State
     case gameSpecificState(key: String) // AnyCodable (converted internally)

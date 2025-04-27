@@ -8,16 +8,56 @@ import Testing
 struct TakeActionHandlerTests {
     let handler = TakeActionHandler()
 
+    // Helper to create the expected StateChange array for successful take
+    private func expectedTakeChanges(
+        item: Item,
+        oldParent: ParentEntity,
+        oldPronounIt: Set<ItemID>?
+    ) -> [StateChange] {
+        let initialProperties = item.properties
+        var finalProperties = initialProperties
+        finalProperties.insert(.touched)
+
+        var changes: [StateChange] = [
+            StateChange(
+                objectId: item.id,
+                propertyKey: .itemParent,
+                oldValue: .parentEntity(oldParent),
+                newValue: .parentEntity(.player)
+            )
+        ]
+
+        if initialProperties != finalProperties {
+            changes.append(StateChange(
+                objectId: item.id,
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(initialProperties),
+                newValue: .itemProperties(finalProperties)
+            ))
+        }
+
+        changes.append(StateChange(
+            objectId: "unused",
+            propertyKey: .pronounReference(pronoun: "it"),
+            oldValue: oldPronounIt != nil ? .itemIDSet(oldPronounIt!) : nil,
+            newValue: .itemIDSet([item.id])
+        ))
+
+        return changes
+    }
+
     @Test("Take item successfully")
     func testTakeItemSuccessfully() async throws {
-        // Arrange: Create data
+        // Arrange
         let testItem = Item(
             id: "key",
             name: "brass key",
             properties: .takable,
-            size: 3, // Give size
+            size: 3,
             parent: .location("startRoom")
         )
+        let initialParent = testItem.parent
+        let initialProperties = testItem.properties
 
         var game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -27,59 +67,58 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        game.state.player.carryingCapacity = 10 // Set capacity
+        game.state.player.carryingCapacity = 10
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it") // Capture initial state
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        // Check item parent changed
+        // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "key")
-        #expect(finalItemState?.parent == .player, "Item should be held by player")
+        #expect(finalItemState?.parent == .player)
+        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
-        // Check item has .touched property
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.", "Expected 'Taken.' message")
+        expectNoDifference(output, "Taken.")
+
+        // Assert Change History
+        let expectedChanges = expectedTakeChanges(item: testItem, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Take item fails when already held")
     func testTakeItemFailsWhenAlreadyHeld() async throws {
-        // Arrange: Create data
-        let testItem = Item(
-            id: "key",
-            name: "brass key",
-            properties: .takable,
-            parent: .player
-        )
-
+        // Arrange
+        let testItem = Item(id: "key", name: "brass key", properties: .takable, parent: .player)
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
-        // Act
-        // Perform the action directly; expect it not to throw.
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        // Act: Perform should not throw, process returns ActionResult(success: false)
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        // Check item parent DID NOT change
+        // Assert Final State (Unchanged)
         let finalItemState = engine.itemSnapshot(with: "key")
-        #expect(finalItemState?.parent == .player, "Item should still be held by player")
+        #expect(finalItemState?.parent == .player)
 
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You already have that.")
+
+        // Assert Change History (Should be empty)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Take item fails when not present in location")
@@ -152,124 +191,96 @@ struct TakeActionHandlerTests {
 
     @Test("Take fails with no direct object")
     func testTakeFailsWithNoObject() async throws {
-        // Arrange: Minimal setup, no specific items needed
+        // Arrange
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        // Command with nil directObject
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "take", rawInput: "take")
-        #expect(command.directObject == nil) // Verify command setup
 
-        // Act
-        // Expect no throw, just a message
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert
-        // Check output message
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Take what?")
+        // Act & Assert: Expect error from validate()
+        await #expect(throws: ActionError.prerequisiteNotMet("Take what?")) {
+             try await handler.perform(command: command, engine: engine)
+        }
+        #expect(await mockIO.recordedOutput.isEmpty == true)
     }
 
     @Test("Take item successfully from open container in room")
     func testTakeItemSuccessfullyFromOpenContainerInRoom() async throws {
-        // Arrange: Create container and item inside it
-        let container = Item(
-            id: "box",
-            name: "wooden box",
-            properties: .container, .open, // Open container
-            parent: .location("startRoom")
-        )
-        let itemInContainer = Item(
-            id: "gem",
-            name: "ruby gem",
-            properties: .takable,
-            parent: .item("box")
-        )
+        // Arrange
+        let container = Item(id: "box", name: "wooden box", properties: .container, .open, parent: .location("startRoom"))
+        let itemInContainer = Item(id: "gem", name: "ruby gem", properties: .takable, parent: .item("box"))
+        let initialParent = itemInContainer.parent
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
-        let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem") // Target the item inside
+        let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
+
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        // Check item parent changed to player
+        // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "gem")
-        #expect(finalItemState?.parent == .player, "Item should be held by player")
-
-        // Check item has .touched property
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-
-        // Check container state didn't change (still open, in room)
+        #expect(finalItemState?.parent == .player)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.itemSnapshot(with: "box")
         #expect(finalContainerState?.parent == .location("startRoom"))
         #expect(finalContainerState?.hasProperty(.open) == true)
+        #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
 
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Taken.")
+
+        // Assert Change History
+        let expectedChanges = expectedTakeChanges(item: itemInContainer, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Take item successfully from open container held by player")
     func testTakeItemSuccessfullyFromOpenContainerHeld() async throws {
-        // Arrange: Create container and item inside it
-        let container = Item(
-            id: "pouch",
-            name: "leather pouch",
-            properties: .container, .open, .takable,
-            parent: .player
-        ) // Open & Takable
-        let itemInContainer = Item(
-            id: "coin",
-            name: "gold coin",
-            properties: .takable,
-            parent: .item("pouch")
-        )
+        // Arrange
+        let container = Item(id: "pouch", name: "leather pouch", properties: .container, .open, .takable, parent: .player)
+        let itemInContainer = Item(id: "coin", name: "gold coin", properties: .takable, parent: .item("pouch"))
+        let initialParent = itemInContainer.parent
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
-        let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin") // Target the item inside
+        let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
+
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        // Check item parent changed to player
+        // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "coin")
-        #expect(finalItemState?.parent == .player, "Item should be held by player")
-
-        // Check item has .touched property
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-
-        // Check container state didn't change (still open, held by player)
+        #expect(finalItemState?.parent == .player)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.itemSnapshot(with: "pouch")
         #expect(finalContainerState?.parent == .player)
         #expect(finalContainerState?.hasProperty(.open) == true)
+        #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
 
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Taken.")
+
+        // Assert Change History
+        let expectedChanges = expectedTakeChanges(item: itemInContainer, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Take item fails from closed container")
@@ -410,117 +421,77 @@ struct TakeActionHandlerTests {
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
     @Test("Take wearable item successfully (not worn)")
     func testTakeWearableItemSuccessfully() async throws {
-        // Arrange: Create a wearable item
-        let testItem = Item(
-            id: "cloak",
-            name: "dark cloak",
-            properties: .takable,
-            .wearable,
-            size: 2,
-            parent: .location("startRoom")
-        )
+        // Arrange
+        let testItem = Item(id: "cloak", name: "dark cloak", properties: .takable, .wearable, size: 2, parent: .location("startRoom"))
+        let initialParent = testItem.parent
 
         var game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         game.state.player.carryingCapacity = 10
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
 
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
-        // Check item parent changed
+        // Assert Final State
         let finalItemState = engine.itemSnapshot(with: "cloak")
-        #expect(finalItemState?.parent == .player, "Item should be held by player")
+        #expect(finalItemState?.parent == .player)
+        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(.worn) == false)
+        #expect(engine.getPronounReference(pronoun: "it") == ["cloak"])
 
-        // Check item has .touched property but NOT .worn
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-        #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property after just taking")
-
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Taken.")
-    }
 
-    @Test("Take updates 'it' pronoun")
-    func testTakeUpdatesPronoun() async throws {
-        // Arrange
-        let testItem = Item(
-            id: "widget",
-            name: "shiny widget",
-            properties: .takable,
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [testItem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(verbID: "take", directObject: testItem.id, rawInput: "take widget")
-
-        // Act
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert
-        let finalPronounIt = engine.gameState.pronouns["it"]
-        #expect(finalPronounIt == [testItem.id], "'it' pronoun should refer to the taken item")
-        let output = await mockIO.flush()
-        #expect(output == "Taken.")
+        // Assert Change History
+        let expectedChanges = expectedTakeChanges(item: testItem, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Take item successfully from surface in room")
     func testTakeItemSuccessfullyFromSurface() async throws {
-        // Arrange: Create surface and item on it
-        let surfaceItem = Item(
-            id: "table",
-            name: "wooden table",
-            properties: .surface,
-            parent: .location("startRoom")
-        )
-        let itemOnSurface = Item(
-            id: "book",
-            name: "old book",
-            properties: .takable, .read,
-            parent: .item(surfaceItem.id)
-        )
+        // Arrange
+        let surfaceItem = Item(id: "table", name: "wooden table", properties: .surface, parent: .location("startRoom"))
+        let itemOnSurface = Item(id: "book", name: "old book", properties: .takable, .read, parent: .item(surfaceItem.id))
+        let initialParent = itemOnSurface.parent
 
         var game = MinimalGame(items: [surfaceItem, itemOnSurface])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         game.state.player.carryingCapacity = 10
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
+
+        // Initial state check
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         try await handler.perform(command: command, engine: engine)
 
-        // Assert
+        // Assert Final State
         let finalItemState = engine.itemSnapshot(with: itemOnSurface.id)
-        #expect(finalItemState?.parent == .player, "Item should be held by player")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
-
+        #expect(finalItemState?.parent == .player)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let finalSurfaceState = engine.itemSnapshot(with: surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
+        #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
 
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Taken.")
+
+        // Assert Change History
+        let expectedChanges = expectedTakeChanges(item: itemOnSurface, oldParent: initialParent, oldPronounIt: initialPronounIt)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 }

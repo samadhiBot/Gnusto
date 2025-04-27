@@ -5,22 +5,6 @@ alwaysApply: true
 ---
 # Engine Architecture Overview
 
-## GameState
-
-The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via GameEngine helpers). [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
-
-## GameEngine
-
-The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers, processes timed events (tickClock), and provides helper methods for common state access and mutation. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
-
-## Parser
-
-Defines the interface for turning raw player input strings into structured Command objects. Concrete implementations handle grammar, vocabulary lookup, and disambiguation. [Parser.swift](mdc:Sources/GnustoEngine/Parsing/Parser.swift)
-
-## IOHandler
-
-Defines the interface for all input/output operations: reading player commands, printing game responses, displaying the status line, etc. This abstraction allows different frontends (console, GUI). [IOHandler.swift](mdc:Sources/GnustoEngine/IO/IOHandler.swift)
-
 ## ActionHandler / EnhancedActionHandler
 
 Protocols defining how specific game verbs (like "take", "open", "go") are implemented. They encapsulate the logic for performing an action, including validation and state changes (via ActionResult for enhanced handlers). [ActionHandler.swift](mdc:Sources/GnustoEngine/Actions/Support/ActionHandler.swift) [EnhancedActionHandler.swift](mdc:Sources/GnustoEngine/Actions/Support/EnhancedActionHandler.swift)
@@ -29,17 +13,34 @@ Protocols defining how specific game verbs (like "take", "open", "go") are imple
 
 A registry holding definitions for potentially game-specific elements like timed events (FuseDefinition, DaemonDefinition) and custom action overrides (ObjectActionHandler, RoomActionHandler). Allows decoupling of game-specific logic from the core engine handlers. [DefinitionRegistry.swift](mdc:Sources/GnustoEngine/Definitions/DefinitionRegistry.swift)
 
-## Vocabulary
-
-Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. [Vocabulary.swift](mdc:Sources/GnustoEngine/Core/Vocabulary/Vocabulary.swift)
-
 ## DescriptionHandlerRegistry / DescriptionHandler
 
 Responsible for generating dynamic descriptions for items and locations, potentially based on game state. (We haven't interacted with this much yet, but it's likely a key component). [DescriptionHandlerRegistry.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandlerRegistry.swift) [DescriptionHandler.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandler.swift)
 
+## GameEngine
+
+The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers, processes timed events (tickClock), and provides helper methods for common state access and mutation. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
+
+## GameState
+
+The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via GameEngine helpers). [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
+
+## IOHandler
+
+Defines the interface for all input/output operations: reading player commands, printing game responses, displaying the status line, etc. This abstraction allows different frontends (console, GUI). [IOHandler.swift](mdc:Sources/GnustoEngine/IO/IOHandler.swift)
+
 ## Item / Location
- (Core/): The core model classes representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like properties, parent). [Item.swift](mdc:Sources/GnustoEngine/Core/Item.swift) [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
+
+The core model classes representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like properties, parent). @Item.swift [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
+
+## Parser
+
+Defines the interface for turning raw player input strings into structured Command objects. Concrete implementations handle grammar, vocabulary lookup, and disambiguation. [Parser.swift](mdc:Sources/GnustoEngine/Parsing/Parser.swift)
 
 ## ScopeResolver
 
 Centralizes logic for determining what the player can see and interact with based on location, light, container state, etc. [ScopeResolver.swift](mdc:Sources/GnustoEngine/Core/ScopeResolver.swift)
+
+## Vocabulary
+
+Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. [Vocabulary.swift](mdc:Sources/GnustoEngine/Core/Vocabulary/Vocabulary.swift)

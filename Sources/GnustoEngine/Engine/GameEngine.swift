@@ -521,8 +521,14 @@ public class GameEngine {
         // MARK: Global Changes
         case .globalFlag(let actualFlagKey):
             guard case .bool(let flagValue) = change.newValue else { /* Error handling */ return }
-            // objectId is ignored for global flags
             gameState.flags[actualFlagKey] = flagValue
+
+        case .pronounReference(let pronoun):
+            guard case .itemIDSet(let itemIDSet) = change.newValue else {
+                throw ActionError.internalEngineError("Invalid StateValue type for .pronounReference(\(pronoun)): \(change.newValue)")
+            }
+            // objectId is ignored for pronoun references
+            gameState.updatePronoun(pronoun, referringTo: itemIDSet)
 
         // MARK: Game Specific State Changes
         case .gameSpecificState(let key):
@@ -1058,6 +1064,13 @@ public class GameEngine {
         return gameState.items[itemID]?.parent == .player
         // Alternative, if itemsInInventory is efficient:
         // return gameState.itemsInInventory().contains(itemID)
+    }
+
+    /// Safely retrieves the set of item IDs a pronoun currently refers to.
+    /// - Parameter pronoun: The pronoun string (e.g., "it", "them").
+    /// - Returns: The set of `ItemID`s if the pronoun is set, otherwise `nil`.
+    public func getPronounReference(pronoun: String) -> Set<ItemID>? {
+        return gameState.pronouns[pronoun.lowercased()]
     }
 }
 
