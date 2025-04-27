@@ -451,6 +451,7 @@ public class GameEngine {
             guard case .parentEntity(let newParent) = change.newValue else {
                 throw ActionError.internalEngineError("Invalid StateValue type for 'parent' change: \(change.newValue)")
             }
+            // TODO: Validate oldValue if provided
             updateItemParent(itemID: change.objectId, newParent: newParent)
 
         case "properties":
@@ -461,17 +462,19 @@ public class GameEngine {
                 guard let item = gameState.items[change.objectId] else {
                     throw ActionError.internalEngineError("Cannot apply item properties change to unknown ItemID: \(change.objectId)")
                 }
-                // TODO: How to represent add/remove vs. set? For now, assume set.
+                // TODO: Validate oldValue if provided (oldValue should be .itemProperties)
+                // This approach requires the handler to calculate the *final* set.
+                // It does NOT handle adding/removing individual properties directly.
                 item.properties = newProps
 
             case .locationProperties(let newProps):
-                // Expect LocationID for objectId. Need to ensure ItemID can represent/be cast to LocationID if needed.
-                // This requires understanding how ItemID and LocationID relate. If LocationID(rawValue:) exists:
+                // Expect LocationID for objectId.
+                // Reconstruct LocationID from ItemID's rawValue.
                 let locID = LocationID(change.objectId.rawValue)
                 guard let location = gameState.locations[locID] else {
-                    throw ActionError.internalEngineError("Cannot apply location properties change to unknown LocationID: \(change.objectId.rawValue)")
+                    throw ActionError.internalEngineError("Cannot apply location properties change to unknown LocationID: \(locID.rawValue)")
                 }
-                // TODO: How to represent add/remove vs. set? For now, assume set.
+                // TODO: Validate oldValue if provided (oldValue should be .locationProperties)
                 location.properties = newProps
 
             default:
@@ -484,45 +487,44 @@ public class GameEngine {
                  throw ActionError.internalEngineError("Invalid StateValue type for 'score' change: \(change.newValue)")
              }
              // Assume score changes always apply to the player
+             // TODO: Validate oldValue if provided (oldValue should be .int)
              gameState.player.score = newScore
 
-        // Add cases for other state elements like flags, etc.
-        // Example: Handling a boolean flag associated with an item
-        case let flagKey where flagKey.starts(with: "flags."): // e.g., "flags.isOpen"
-            let actualFlagKey = String(flagKey.dropFirst("flags.".count))
+        // Handle global flags (in gameState.flags)
+        case let flagKey where flagKey.starts(with: "globalFlags."):
+            let actualFlagKey = String(flagKey.dropFirst("globalFlags.".count))
             guard case .bool(let flagValue) = change.newValue else {
-                 throw ActionError.internalEngineError("Invalid StateValue type for flag '\(actualFlagKey)' change: \(change.newValue)")
+                 throw ActionError.internalEngineError("Invalid StateValue type for global flag '\(actualFlagKey)' change: \(change.newValue)")
             }
-            // Need a way to set flags on different entity types (Item, Location, Player?, Global?)
-            // This needs refinement. For now, assume Item flag.
-            if let item = gameState.items[change.objectId] {
-                // Assuming Item has a method/property for flags, e.g., item.flags[actualFlagKey] = flagValue
-                 print("Warning: Applying flag '\(actualFlagKey)'=\(flagValue) to item \(change.objectId) not fully implemented.")
-            } else {
-                 throw ActionError.internalEngineError("Cannot apply flag change to non-item object ID: \(change.objectId)")
-            }
+            // TODO: Validate oldValue if provided (oldValue should be .bool)
+            // objectId is ignored for global flags
+            gameState.flags[actualFlagKey] = flagValue
+
+        // Note: Item/Location flags are handled via the "properties" case above.
 
         default:
             // Try applying to gameSpecificState if propertyKey matches a key there.
-            // This allows handlers to modify arbitrary game state if needed.
             if gameState.gameSpecificState.keys.contains(change.propertyKey) {
-                 // We need to convert StateValue back to AnyCodable for gameSpecificState
-                 // This requires a helper or direct conversion logic.
+                 // Convert StateValue back to AnyCodable for gameSpecificState
                  let anyCodableValue: AnyCodable
                  switch change.newValue {
                  case .bool(let v): anyCodableValue = AnyCodable(v)
                  case .int(let v): anyCodableValue = AnyCodable(v)
                  case .string(let v): anyCodableValue = AnyCodable(v)
-                 // Add other StateValue cases as needed
+                 // We probably don't want complex types like ItemID/Properties/ParentEntity
+                 // directly in gameSpecificState via this mechanism. Handlers should use
+                 // specific StateValue cases or dedicated engine methods for those.
+                 // case .itemID(let v): anyCodableValue = AnyCodable(v.rawValue) // Example if needed
                  default:
-                      throw ActionError.internalEngineError("Cannot convert StateValue '\(change.newValue)' to AnyCodable for gameSpecificState.")
+                      throw ActionError.internalEngineError("Cannot convert StateValue type '\(change.newValue.self)' to AnyCodable for gameSpecificState.")
                  }
+                 // TODO: Validate oldValue if provided (would need AnyCodable comparison)
                  updateGameSpecificState(key: change.propertyKey, value: anyCodableValue)
             } else {
                 throw ActionError.internalEngineError("Unsupported propertyKey in state change: \(change.propertyKey)")
             }
         }
-        // Note: Consider validating oldValue matches current state before applying newValue.
+        // TODO: Add oldValue validation logic where appropriate.
     }
 
     /// Processes a single side effect.
