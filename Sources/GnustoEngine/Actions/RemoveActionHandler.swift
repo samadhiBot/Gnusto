@@ -1,49 +1,88 @@
 import Foundation
 
 /// Handles the "REMOVE" command and its synonyms (e.g., "DOFF", "TAKE OFF").
-public struct RemoveActionHandler: ActionHandler {
+public struct RemoveActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler
+
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.ioHandler.print("Remove what?")
-            return
+            throw ActionError.prerequisiteNotMet("Remove what?")
         }
 
-        // 2. Check if the item is held by the player
-        guard
-            let targetItem = await engine.itemSnapshot(with: targetItemID),
-            targetItem.parent == .player
-        else {
-            // If item doesn't exist OR isn't held, throw itemNotHeld
+        // 2. Check if the item exists and is held by the player
+        guard let targetItem = await engine.itemSnapshot(with: targetItemID),
+              targetItem.parent == .player else
+        {
             throw ActionError.itemNotHeld(targetItemID)
         }
 
         // 3. Check if the (held) item is currently worn
         guard targetItem.hasProperty(.worn) else {
-            // Zork: "You are not wearing the <noun>!"
-            // Use the correct wording from test failure
-            await engine.ioHandler.print("You are not wearing the \(targetItem.name).")
-            return
+            throw ActionError.itemIsNotWorn(targetItemID)
         }
 
-        // Check if the item is fixed (e.g., cursed amulet)
-        if targetItem.hasProperty(.fixed) {
+        // 4. Check if the item is fixed (e.g., cursed amulet)
+        guard !targetItem.hasProperty(.fixed) else {
             throw ActionError.itemNotRemovable(targetItemID)
         }
-
-        // 4. Update State - Remove .worn property (parent remains .player)
-        // Mark as touched (implicitly happens when taken, should happen here too)
-        await engine.updateItemProperties(
-            itemID: targetItemID,
-            adding: .touched,
-            removing: .worn
-        )
-
-        // 5. Output Message
-        // Zork: "You remove the <noun>."
-        await engine.ioHandler.print("You take off the \(targetItem.name).")
     }
+
+    public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        // IDs and validation guaranteed by validate()
+        let targetItemID = command.directObject!
+        guard let itemSnapshot = await engine.itemSnapshot(with: targetItemID) else {
+            // Should not happen if validate passed
+            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for REMOVE.")
+        }
+
+        var stateChanges: [StateChange] = []
+
+        // Calculate property changes: Remove .worn, add .touched
+        let oldProps = itemSnapshot.properties
+        var newProps = oldProps
+        newProps.remove(.worn)
+        newProps.insert(.touched) // Taking off implies touching
+
+        if oldProps != newProps {
+            stateChanges.append(StateChange(
+                objectId: targetItemID,
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(oldProps),
+                newValue: .itemProperties(newProps)
+            ))
+        }
+
+        // Update pronoun "it"
+        stateChanges.append(StateChange(
+            objectId: targetItemID,
+            propertyKey: .pronounReference(pronoun: "it"),
+            oldValue: nil,
+            newValue: .itemIDSet([targetItemID])
+        ))
+
+        // --- Prepare Result ---
+        let message = "You take off the \(itemSnapshot.name)."
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
+    }
+
+    // Remove the old perform method
+    /*
+    public func perform(command: Command, engine: GameEngine) async throws {
+        // ... old implementation ...
+    }
+    */
 }

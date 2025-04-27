@@ -712,7 +712,6 @@ public class GameEngine {
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
         case .internalEngineError(let msg):
-            // User-facing generic message; more details could be logged.
             "A strange buzzing sound indicates something is wrong.\n  • \(msg)"
         case .invalidDirection:
             "You can't go that way."
@@ -720,12 +719,15 @@ public class GameEngine {
             "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
+        case .itemIsAlreadyWorn(let item):
+            "You are already wearing \(theThat(item))."
         case .itemIsLocked(let item):
             "\(theThat(item).capitalizedFirst) is locked."
+        case .itemIsNotWorn(let item):
+            "You are not wearing \(theThat(item))."
         case .itemIsUnlocked(let item):
             "\(theThat(item).capitalizedFirst) is already unlocked."
         case .itemNotAccessible(let item):
-            // This often implies visibility/reachability issues.
             "You don't see \(theThat(item, alternate: "any")) here."
         case .itemNotCloseable(let item):
             "You can't close \(theThat(item))."
@@ -756,20 +758,16 @@ public class GameEngine {
         case .playerCannotCarryMore:
             "Your hands are full."
         case .prerequisiteNotMet(let customMessage):
-            // Use the custom message if provided, otherwise a generic one.
             customMessage.isEmpty ? "You can't do that." : customMessage
         case .roomIsDark:
-            // Usually handled by describeCurrentLocation, but a fallback action error.
             "It's too dark to do that."
         case .targetIsNotAContainer(let item):
             "You can't put things in \(theThat(item))."
         case .targetIsNotASurface(let item):
             "You can't put things on \(theThat(item))."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            // Correct: Calculate keyDesc inline to fix switch expression structure
             "The \(itemSnapshot(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
         }
-        // Only print if the message isn't empty (some errors might be handled silently)
         if !message.isEmpty {
             await ioHandler.print(message)
         }
@@ -1107,7 +1105,7 @@ extension GameEngine {
         "puton": PutOnActionHandler(), // Handles "put on"
         "quit": QuitActionHandler(),
         "read": PlaceholderActionHandler(verb: "read"), // Placeholder
-        "remove": PlaceholderActionHandler(verb: "remove"), // Placeholder
+        "remove": RemoveActionHandler(),
         "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
         "save": PlaceholderActionHandler(verb: "save"), // Placeholder
         "score": PlaceholderActionHandler(verb: "score"), // Placeholder
@@ -1121,6 +1119,6 @@ extension GameEngine {
         "unlock": UnlockActionHandler(),
         "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
         "wait": PlaceholderActionHandler(verb: "wait"), // Placeholder
-        "wear": PlaceholderActionHandler(verb: "wear") // Placeholder
+        "wear": WearActionHandler()
     ]
 }
