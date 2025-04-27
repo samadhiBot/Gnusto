@@ -159,9 +159,6 @@ public class GameEngine {
 
     /// Starts and runs the main game loop.
     public func run() async {
-        // Register handlers *after* actor initialization
-        actionHandlers.merge(Self.actionHandlerDefaults) { (custom, _) in custom }
-
         await ioHandler.setup()
         await describeCurrentLocation() // Initial look
 
