@@ -93,11 +93,11 @@ struct CloakOfDarknessWalkthroughTests {
     @Test("Bar Win Condition (Removing Cloak in Bar)", .tags(.integration, .walkthrough))
     func testBarWinConditionCloakRemovedInBar() async throws {
         let mockIO = await MockIOHandler(
-            "s",           // Enter the Bar (dark)
+            "s",            // Enter the Bar (dark)
             "remove cloak", // Remove cloak (room becomes lit before next command)
-            "drop cloak",  // Drop the cloak (now in light)
-            "look",        // Look around (should see lit room)
-            "x message",   // Examine message (should trigger win)
+            "drop cloak",   // Drop the cloak (now in light)
+            "look",         // Look around (should see lit room)
+            "x message",    // Examine message (should trigger win)
             nil
         )
         let engine = GameEngine(

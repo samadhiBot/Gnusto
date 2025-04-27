@@ -3,9 +3,25 @@ import GnustoEngine
 @MainActor
 struct Handlers {
     func cloakHandler(_ engine: GameEngine, _ command: Command) async -> Bool {
-        guard command.verbID == "examine" else { return false }
-        await engine.output("The cloak is unnaturally dark.")
-        return true
+        switch command.verbID {
+        case "examine":
+            await engine.output("The cloak is unnaturally dark.")
+            return true // Handled
+
+        case "drop":
+            // Original Inform logic: Prevent dropping outside cloakroom.
+            if engine.playerLocationID() != "cloakroom" {
+                await engine.output("This isn't the best place to leave a smart cloak lying around.")
+                return true // Handled (action prevented)
+            } else {
+                // Allow the default drop action if in the cloakroom
+                return false // Not handled (let default drop proceed)
+            }
+
+        default:
+            // Any other verb targeting the cloak is not handled by this custom handler.
+            return false
+        }
     }
 
     func messageHandler(_ engine: GameEngine, _ command: Command) async -> Bool {
