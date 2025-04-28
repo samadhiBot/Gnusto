@@ -8,16 +8,16 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
 
 **Steps:**
 
-- [ ] **Generalize `StateChange` Identifier:**
-    - [ ] Define `EntityID` enum (`.item(ItemID)`, `.location(LocationID)`, `.player`, `.global`) in `ActionResult.swift`.
-    - [ ] Update `StateChange` struct to use `entityId: EntityID` instead of `objectId: ItemID`.
-    - [ ] Review and update `StatePropertyKey` enum cases to align with `EntityID` (e.g., ensure keys clearly map to item, location, player, or global state). Add missing keys like `.locationExits` if needed, along with corresponding `StateValue` cases.
-- [ ] **Implement `GameState.apply(_:)`:**
-    - [ ] Add `public private(set)` access control to core state properties in `GameState` (`items`, `locations`, `flags`, `player`, `activeFuses`, `activeDaemons`, `pronouns`, `gameSpecificState`, `changeHistory`).
-    - [ ] Create a `public mutating func apply(_ change: StateChange) throws` method within `GameState`.
-    - [ ] Move the `switch change.propertyKey` logic from `GameEngine.applyStateChange` into `GameState.apply`.
-    - [ ] Ensure `GameState.apply` validates `change.oldValue` against the current state before applying the mutation.
-    - [ ] Ensure `GameState.apply` appends the `change` to `changeHistory` *after* a successful mutation.
+- [x] **Generalize `StateChange` Identifier:**
+    - [x] Define `EntityID` enum (`.item(ItemID)`, `.location(LocationID)`, `.player`, `.global`) in `ActionResult.swift`.
+    - [x] Update `StateChange` struct to use `entityId: EntityID` instead of `objectId: ItemID`.
+    - [x] Review and update `StatePropertyKey` enum cases to align with `EntityID` (e.g., ensure keys clearly map to item, location, player, or global state). Add missing keys like `.locationExits` if needed, along with corresponding `StateValue` cases.
+- [x] **Implement `GameState.apply(_:)`:**
+    - [x] Add `public private(set)` access control to core state properties in `GameState` (`items`, `locations`, `flags`, `player`, `activeFuses`, `activeDaemons`, `pronouns`, `gameSpecificState`, `changeHistory`).
+    - [x] Create a `public mutating func apply(_ change: StateChange) throws` method within `GameState`.
+    - [x] Move the `switch change.propertyKey` logic from `GameEngine.applyStateChange` into `GameState.apply`.
+    - [x] Ensure `GameState.apply` validates `change.oldValue` against the current state before applying the mutation.
+    - [x] Ensure `GameState.apply` appends the `change` to `changeHistory` *after* a successful mutation.
 - [ ] **Refactor `GameEngine`:**
     - [ ] Modify `GameEngine.applyStateChange` to be a simple forwarding call: `try gameState.apply(change)`.
     - [ ] Identify all methods/code locations within `GameEngine` that directly modify `gameState` or its contained objects (e.g., `updateItemParent`, `setFlagValue`, player move increments, fuse/daemon updates in `tickClock`, etc.).

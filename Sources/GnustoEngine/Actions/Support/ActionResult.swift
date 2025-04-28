@@ -7,14 +7,18 @@ public enum StateValue: Codable, Sendable, Equatable {
     case int(Int)
     case string(String)
     case itemID(ItemID)             // Represents an ItemID value itself
+    case locationID(LocationID)      // Added
     case itemProperties(Set<ItemProperty>)
     case itemAdjectives(Set<String>)
     case itemSynonyms(Set<String>)
     case locationProperties(Set<LocationProperty>)
+    case locationExits([Direction: Exit]) // Added
     case parentEntity(ParentEntity)
     case itemIDSet(Set<ItemID>)     // For pronoun references
     // case double(Double) // Add if needed
     // case stringArray([String]) // Add if needed
+    case itemDescription(String)      // Added
+    // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
 
     // Helper to get underlying value if needed, though direct switching is often better.
     var underlyingValue: Any {
@@ -23,12 +27,15 @@ public enum StateValue: Codable, Sendable, Equatable {
         case .int(let v): return v
         case .string(let v): return v
         case .itemID(let v): return v
+        case .locationID(let v): return v
         case .itemProperties(let v): return v
         case .itemAdjectives(let v): return v
         case .itemSynonyms(let v): return v
         case .locationProperties(let v): return v
+        case .locationExits(let v): return v
         case .parentEntity(let v): return v
         case .itemIDSet(let v): return v
+        case .itemDescription(let v): return v
         }
     }
 }
@@ -43,25 +50,50 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case itemName           // String
     case itemAdjectives     // Set<String>
     case itemSynonyms       // Set<String>
+    case itemDescription    // Added
     // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
 
     // Location Properties
     case locationProperties // The entire Set<LocationProperty>
     case locationName       // String
+    case locationExits      // Added
+    case locationDescription // Added
     // TODO: Add locationExits, locationDesc etc. if needed
 
     // Player Properties
     case playerScore        // Int
     case playerMoves        // Int
     case playerCapacity     // Int
+    case playerLocation     // Added
     // TODO: Add playerLocation if changing location needs to be a StateChange
 
     // Global State
-    case globalFlag(key: String) // Bool
-    case pronounReference(pronoun: String) // Represents gameState.pronouns[pronoun]
+    case globalFlag(key: String)
+    case pronounReference(pronoun: String)
+    // Fuse & Daemon State (Applies to EntityID.global)
+    case addActiveFuse(fuseId: FuseID, initialTurns: Int)
+    case removeActiveFuse(fuseId: FuseID)
+    case updateFuseTurns(fuseId: FuseID) // newValue is Int
+    case addActiveDaemon(daemonId: DaemonID)
+    case removeActiveDaemon(daemonId: DaemonID)
 
     // Game Specific State
-    case gameSpecificState(key: String) // AnyCodable (converted internally)
+    case gameSpecificState(key: String) // Uses .bool/int/string
+}
+
+/// Identifies the specific entity whose state is being changed.
+public enum EntityID: Codable, Sendable, Hashable {
+    /// Refers to an item via its unique ID.
+    case item(ItemID)
+
+    /// Refers to a location via its unique ID.
+    case location(LocationID)
+
+    /// Refers to the player entity.
+    case player
+
+    /// Refers to global state not tied to a specific item or location (e.g., flags, pronouns).
+    case global
 }
 
 /// Result of an action execution with enhanced information.
@@ -99,9 +131,8 @@ public struct ActionResult: Sendable {
 
 /// Represents a change in game state.
 public struct StateChange: Codable, Sendable, Equatable {
-    /// The object being changed (can be Item, Location, Player, etc.).
-    /// Using ItemID for now, consider a more generic EntityID enum later.
-    public let objectId: ItemID // May need generalization later (e.g., PlayerID, GlobalContextID)
+    /// The entity being changed (can be Item, Location, Player, or Global context).
+    public let entityId: EntityID
 
     /// The specific property being modified.
     public let propertyKey: StatePropertyKey // Changed from String
@@ -114,17 +145,17 @@ public struct StateChange: Codable, Sendable, Equatable {
 
     /// Creates a new state change record.
     /// - Parameters:
-    ///   - objectId: The ID of the object being changed.
+    ///   - entityId: The ID of the entity being changed.
     ///   - propertyKey: The name of the property being modified.
     ///   - oldValue: The value of the property before the change (optional).
     ///   - newValue: The value of the property after the change.
     public init(
-        objectId: ItemID, // Keep ItemID for now, refine if needed for Player/Global changes
-        propertyKey: StatePropertyKey, // Changed from String
+        entityId: EntityID,
+        propertyKey: StatePropertyKey,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) {
-        self.objectId = objectId
+        self.entityId = entityId
         self.propertyKey = propertyKey
         self.oldValue = oldValue
         self.newValue = newValue

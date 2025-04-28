@@ -3,39 +3,39 @@ import Foundation
 /// Represents the complete state of the game world at a given point in time.
 public struct GameState: Codable {
     /// Active fuses and their remaining turns.
-    public var activeFuses: [Fuse.ID: Int]
+    public private(set) var activeFuses: [Fuse.ID: Int]
 
     /// Set tracking the IDs of currently active daemons.
-    public var activeDaemons: Set<DaemonID>
+    public private(set) var activeDaemons: Set<DaemonID>
 
     /// A log of state changes that have occurred, potentially turn-by-turn or action-by-action.
     /// This could be used for debugging, undo functionality, or complex event triggers.
-    public var changeHistory: [StateChange]
+    public private(set) var changeHistory: [StateChange]
 
     /// Current value of global variables or flags (e.g., [FlagID: FlagValue]).
     /// Using String for key flexibility, might refine later (e.g., `FlagID` type).
-    public var flags: [String: Bool]
+    public private(set) var flags: [String: Bool]
 
     /// A dictionary mapping item IDs to their current state (references to Item instances).
     /// This is the single source of truth for all item data, including their parentage.
-    public var items: [ItemID: Item]
+    public private(set) var items: [ItemID: Item]
 
     /// A dictionary mapping location IDs to their current state (references to Location instances).
-    public var locations: [LocationID: Location]
+    public private(set) var locations: [LocationID: Location]
 
     /// The current state of the player.
-    public var player: Player
+    public private(set) var player: Player
 
     /// Pronoun resolution state (e.g., what does "it" or "them" currently refer to?).
     /// Maps pronoun string (lowercase) to the set of ItemIDs it represents.
-    public var pronouns: [String: Set<ItemID>]
+    public private(set) var pronouns: [String: Set<ItemID>]
 
     /// The game's vocabulary.
     public let vocabulary: Vocabulary
 
     /// Optional dictionary for storing arbitrary game-specific state (counters, quest flags, etc.).
     /// Use keys prefixed with game ID (e.g., "cod_counter") to avoid collisions if engine supports multiple games.
-    public var gameSpecificState: [String: AnyCodable]
+    public private(set) var gameSpecificState: [String: AnyCodable]
 }
 
 extension GameState {
@@ -142,7 +142,277 @@ extension GameState {
 
     // TODO: Add helpers for items in container, etc. as needed.
 
-    // MARK: - State Mutation
+    // MARK: - Centralized State Mutation
+
+    /// Validates the old value specified in a StateChange against the actual current value.
+    /// - Parameters:
+    ///   - change: The StateChange being applied.
+    ///   - actualOldValue: The actual value currently in the game state, or nil if not applicable/found.
+    /// - Throws: `ActionError.internalEngineError` if `change.oldValue` is non-nil and doesn't match `actualOldValue`.
+    private func validateOldValue(
+        _ change: StateChange,
+        actualOldValue: StateValue?
+    ) throws {
+        guard let expectedOldValue = change.oldValue else {
+            return // No validation needed if oldValue wasn't provided in the change record
+        }
+        // If expectedOldValue was provided, the actual value must match.
+        // Treats nil actual value as a mismatch if an old value was expected.
+        guard actualOldValue == expectedOldValue else {
+            let actualDesc = actualOldValue != nil ? "\(actualOldValue!)" : "nil"
+            // Use entityId in the error message
+            throw ActionError.internalEngineError(
+                "StateChange oldValue mismatch for \(change.propertyKey) on \(change.entityId). " +
+                "Expected: \(expectedOldValue), Actual: \(actualDesc)"
+            )
+        }
+    }
+
+    /// Applies a validated state change to the game state and records it.
+    /// This is the single point of truth for modifying the game state after initialization.
+    /// Ensures that the provided `oldValue` matches the current state before applying the change.
+    ///
+    /// - Parameter change: The `StateChange` to apply.
+    /// - Throws: `ActionError.internalEngineError` if the `oldValue` in the change
+    ///           does not match the current state, or if the change is invalid (e.g., wrong entity type,
+    ///           invalid value type).
+    public mutating func apply(_ change: StateChange) throws {
+        // Switch on the property key enum to determine how to apply the change.
+        switch change.propertyKey {
+
+        // MARK: Item Changes
+        case .itemParent, .itemProperties, .itemSize, .itemCapacity, .itemName, .itemAdjectives, .itemSynonyms, .itemDescription:
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for item property key \(change.propertyKey): \(change.entityId)")
+            }
+            guard let item = self.items[itemID] else {
+                throw ActionError.internalEngineError("Cannot apply change to unknown item ID: \(itemID)")
+            }
+
+            switch change.propertyKey {
+            case .itemParent:
+                try validateOldValue(change, actualOldValue: .parentEntity(item.parent))
+                guard case .parentEntity(let newParent) = change.newValue else {
+                    throw ActionError.internalEngineError("Invalid StateValue type for .itemParent: \(change.newValue)")
+                }
+                item.parent = newParent // Direct mutation of class instance
+
+            case .itemProperties:
+                try validateOldValue(change, actualOldValue: .itemProperties(item.properties))
+                guard case .itemProperties(let newProps) = change.newValue else {
+                    throw ActionError.internalEngineError("Invalid StateValue type for .itemProperties: \(change.newValue)")
+                }
+                item.properties = newProps // Direct mutation of class instance
+
+            case .itemSize:
+                try validateOldValue(change, actualOldValue: .int(item.size))
+                guard case .int(let newSize) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSize: \(change.newValue)") }
+                item.size = newSize // Direct mutation of class instance
+
+            case .itemCapacity:
+                try validateOldValue(change, actualOldValue: .int(item.capacity))
+                guard case .int(let newCapacity) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemCapacity: \(change.newValue)") }
+                item.capacity = newCapacity // Direct mutation of class instance
+
+            case .itemName:
+                try validateOldValue(change, actualOldValue: .string(item.name))
+                guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemName: \(change.newValue)") }
+                item.name = newName // Direct mutation of class instance
+
+            case .itemAdjectives:
+                try validateOldValue(change, actualOldValue: .itemAdjectives(item.adjectives))
+                guard case .itemAdjectives(let newAdjectives) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemAdjectives: \(change.newValue)") }
+                item.adjectives = newAdjectives // Direct mutation of class instance
+
+            case .itemSynonyms:
+                try validateOldValue(change, actualOldValue: .itemSynonyms(item.synonyms))
+                guard case .itemSynonyms(let newSynonyms) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSynonyms: \(change.newValue)") }
+                item.synonyms = newSynonyms // Direct mutation of class instance
+
+            case .itemDescription:
+                try validateOldValue(change, actualOldValue: .itemDescription(item.description ?? "")) // Use itemDescription StateValue
+                guard case .itemDescription(let newDesc) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemDescription: \(change.newValue)") }
+                item.description = newDesc // Direct mutation of class instance
+
+            default: // Should not happen due to outer switch grouping
+                throw ActionError.internalEngineError("Mismatched item property key processing: \(change.propertyKey)")
+            }
+
+        // MARK: Location Changes
+        case .locationProperties, .locationName, .locationExits, .locationDescription:
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for location property key \(change.propertyKey): \(change.entityId)")
+            }
+            guard let location = self.locations[locationID] else {
+                throw ActionError.internalEngineError("Cannot apply change to unknown location ID: \(locationID)")
+            }
+
+            switch change.propertyKey {
+            case .locationProperties:
+                try validateOldValue(change, actualOldValue: .locationProperties(location.properties))
+                guard case .locationProperties(let newProps) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationProperties: \(change.newValue)") }
+                location.properties = newProps // Direct mutation of class instance
+
+            case .locationName:
+                try validateOldValue(change, actualOldValue: .string(location.name))
+                guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationName: \(change.newValue)") }
+                location.name = newName // Direct mutation of class instance
+
+            case .locationExits:
+                try validateOldValue(change, actualOldValue: .locationExits(location.exits))
+                guard case .locationExits(let newExits) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationExits: \(change.newValue)") }
+                location.exits = newExits // Direct mutation of class instance
+
+            case .locationDescription:
+                 // Assuming Location has a description property similar to Item
+                 try validateOldValue(change, actualOldValue: .locationDescription(location.description ?? "")) // Use locationDescription StateValue
+                 guard case .locationDescription(let newDesc) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationDescription: \(change.newValue)") }
+                 location.description = newDesc // Direct mutation of class instance
+
+            default: // Should not happen
+                throw ActionError.internalEngineError("Mismatched location property key processing: \(change.propertyKey)")
+            }
+
+        // MARK: Player Changes
+        case .playerScore, .playerMoves, .playerCapacity, .playerLocation:
+            guard case .player = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for player property key \(change.propertyKey): \(change.entityId)")
+            }
+
+            switch change.propertyKey {
+            case .playerScore:
+                try validateOldValue(change, actualOldValue: .int(self.player.score))
+                guard case .int(let newScore) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerScore: \(change.newValue)") }
+                self.player.score = newScore
+
+            case .playerMoves:
+                try validateOldValue(change, actualOldValue: .int(self.player.moves))
+                guard case .int(let newMoves) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerMoves: \(change.newValue)") }
+                self.player.moves = newMoves
+
+            case .playerCapacity:
+                try validateOldValue(change, actualOldValue: .int(self.player.carryingCapacity))
+                guard case .int(let newCapacity) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerCapacity: \(change.newValue)") }
+                self.player.carryingCapacity = newCapacity
+
+            case .playerLocation:
+                try validateOldValue(change, actualOldValue: .locationID(self.player.currentLocationID))
+                guard case .locationID(let newLocationID) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .playerLocation: \(change.newValue)") }
+                // Ensure the destination location actually exists before setting
+                guard self.locations[newLocationID] != nil else {
+                    throw ActionError.internalEngineError("Attempted to move player to invalid location ID: \(newLocationID)")
+                }
+                self.player.currentLocationID = newLocationID
+
+            default: // Should not happen
+                throw ActionError.internalEngineError("Mismatched player property key processing: \(change.propertyKey)")
+            }
+
+        // MARK: Global Changes
+        case .globalFlag(let actualFlagKey):
+            guard case .global = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for global property key \(change.propertyKey): \(change.entityId)")
+            }
+            let actualValue = self.flags[actualFlagKey]
+            try validateOldValue(change, actualOldValue: actualValue != nil ? .bool(actualValue!) : nil)
+            guard case .bool(let flagValue) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .globalFlag(\(actualFlagKey)): \(change.newValue)") }
+            self.flags[actualFlagKey] = flagValue
+
+        case .pronounReference(let pronoun):
+            guard case .global = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for global property key \(change.propertyKey): \(change.entityId)")
+            }
+            let actualValue = self.pronouns[pronoun]
+            try validateOldValue(change, actualOldValue: actualValue != nil ? .itemIDSet(actualValue!) : nil)
+            guard case .itemIDSet(let itemIDSet) = change.newValue else {
+                throw ActionError.internalEngineError("Invalid StateValue type for .pronounReference(\(pronoun)): \(change.newValue)")
+            }
+            self.pronouns[pronoun] = itemIDSet
+
+        case .gameSpecificState(let key):
+            guard case .global = change.entityId else {
+                throw ActionError.internalEngineError("Invalid entity type for global property key \(change.propertyKey): \(change.entityId)")
+            }
+            // Skipping oldValue validation for gameSpecificState due to AnyCodable complexity/uncertainty.
+            let anyCodableValue: AnyCodable
+            switch change.newValue {
+            case .bool(let v): anyCodableValue = AnyCodable(v)
+            case .int(let v): anyCodableValue = AnyCodable(v)
+            case .string(let v): anyCodableValue = AnyCodable(v)
+            default:
+                 throw ActionError.internalEngineError("Cannot convert complex StateValue type '\(change.newValue.self)' for gameSpecificState key '\(key)'. Only Bool, Int, String supported.")
+            }
+            self.gameSpecificState[key] = anyCodableValue
+
+        // MARK: Fuse & Daemon Changes
+        case .addActiveFuse(let fuseId, let initialTurns):
+            guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .addActiveFuse: \(change.entityId)") }
+            // oldValue validation doesn't make sense for add
+            // Ensure newValue matches the expected type (implicitly Int from initialTurns)
+            guard case .int(let turnsValue) = change.newValue, turnsValue == initialTurns else {
+                throw ActionError.internalEngineError("Invalid StateValue type or value mismatch for .addActiveFuse: \(change.newValue) vs initialTurns \(initialTurns)")
+            }
+            // Check if already active? Overwrite or throw? Let's overwrite for simplicity.
+            self.activeFuses[fuseId] = initialTurns
+
+        case .removeActiveFuse(let fuseId):
+            guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .removeActiveFuse: \(change.entityId)") }
+            let actualOldValue = self.activeFuses[fuseId]
+            // Validate oldValue if provided (expected Int turns remaining)
+            try validateOldValue(change, actualOldValue: actualOldValue != nil ? .int(actualOldValue!) : nil)
+            // newValue validation doesn't make sense for remove
+            // Ensure fuse was actually present if oldValue validation passed or wasn't needed
+            guard self.activeFuses.removeValue(forKey: fuseId) != nil else {
+                 // Only throw if oldValue wasn't provided to validate existence
+                 if change.oldValue == nil {
+                      throw ActionError.internalEngineError("Attempted to remove non-existent active fuse: \(fuseId)")
+                 }
+                 // If oldValue was provided and matched nil, removal is technically successful (idempotent)
+                 break
+            }
+
+        case .updateFuseTurns(let fuseId):
+            guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .updateFuseTurns: \(change.entityId)") }
+            let actualOldValue = self.activeFuses[fuseId]
+            // Validate oldValue if provided (expected Int turns remaining)
+            try validateOldValue(change, actualOldValue: actualOldValue != nil ? .int(actualOldValue!) : nil)
+            // Ensure newValue is Int
+            guard case .int(let newTurns) = change.newValue else {
+                 throw ActionError.internalEngineError("Invalid StateValue type for .updateFuseTurns: \(change.newValue)")
+            }
+            // Ensure fuse exists before updating
+            guard self.activeFuses[fuseId] != nil else {
+                throw ActionError.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseId)")
+            }
+            self.activeFuses[fuseId] = newTurns
+
+        case .addActiveDaemon(let daemonId):
+            guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .addActiveDaemon: \(change.entityId)") }
+            // oldValue/newValue validation doesn't make sense for adding to a Set
+            self.activeDaemons.insert(daemonId)
+
+        case .removeActiveDaemon(let daemonId):
+            guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .removeActiveDaemon: \(change.entityId)") }
+            let wasPresent = self.activeDaemons.contains(daemonId)
+            // Validate oldValue if provided (expecting .bool(true) if present, .bool(false) if not)
+            try validateOldValue(change, actualOldValue: .bool(wasPresent))
+            // newValue validation doesn't make sense for remove
+            guard self.activeDaemons.remove(daemonId) != nil else {
+                 // Only throw if oldValue wasn't provided to validate existence
+                 if change.oldValue == nil {
+                     throw ActionError.internalEngineError("Attempted to remove non-existent active daemon: \(daemonId)")
+                 }
+                 // If oldValue was provided and matched .bool(false), removal is technically successful (idempotent)
+                 break
+            }
+        }
+
+        // If we reached here without throwing, the change was applied successfully.
+        // Record the change in the history.
+        self.changeHistory.append(change)
+    }
+
+    // MARK: - State Mutation (Legacy/Internal - To Be Removed/Refactored)
 
     /// Changes the parent of a specified item.
     /// Ensures the item exists before attempting mutation.
