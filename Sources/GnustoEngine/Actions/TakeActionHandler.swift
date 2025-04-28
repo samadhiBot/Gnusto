@@ -89,7 +89,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // Change 1: Parent
         let parentChange = StateChange(
-            objectId: targetItemID,
+            entityId: .item(targetItemID),
             propertyKey: .itemParent,
             oldValue: .parentEntity(targetItem.parent),
             newValue: .parentEntity(.player)
@@ -103,7 +103,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         if oldProperties != newProperties {
             let propertiesChange = StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(newProperties)
@@ -113,10 +113,10 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // Change 3: Pronoun ("it")
         // TODO: Handle "them" for plural/multiple items? Requires parser changes.
-        // Get current pronoun state using the engine helper
+        // Fix: Use engine.getPronounReference (not async)
         let oldPronounValue = await engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
-            objectId: "unused", // ObjectId is ignored for pronoun changes
+            entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounValue != nil ? .itemIDSet(oldPronounValue!) : nil,
             newValue: .itemIDSet([targetItemID])

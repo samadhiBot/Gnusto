@@ -77,7 +77,7 @@ public struct LookActionHandler: EnhancedActionHandler {
             var newProperties = oldProperties
             newProperties.insert(.touched)
             let propertiesChange = StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(newProperties)

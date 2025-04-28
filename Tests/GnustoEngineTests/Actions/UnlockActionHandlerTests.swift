@@ -36,7 +36,7 @@ struct UnlockActionHandlerTests {
         newTargetProps.insert(.touched)
         if oldTargetProps != newTargetProps {
             changes.append(StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldTargetProps),
                 newValue: .itemProperties(newTargetProps)
@@ -48,7 +48,7 @@ struct UnlockActionHandlerTests {
             var newKeyProps = oldKeyProps
             newKeyProps.insert(.touched)
             changes.append(StateChange(
-                objectId: keyItemID,
+                entityId: .item(keyItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldKeyProps),
                 newValue: .itemProperties(newKeyProps)

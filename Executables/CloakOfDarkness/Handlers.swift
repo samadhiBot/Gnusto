@@ -2,17 +2,16 @@ import GnustoEngine
 
 @MainActor
 struct Handlers {
-    func cloakHandler(_ engine: GameEngine, _ command: Command) async -> Bool {
+    func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
         switch command.verbID {
         case "examine":
-            await engine.output("The cloak is unnaturally dark.")
-            return true // Handled
+            throw ActionError.customResponse("The cloak is unnaturally dark.")
+            // Error thrown implicitly returns
 
         case "drop":
             // Original Inform logic: Prevent dropping outside cloakroom.
             if engine.playerLocationID() != "cloakroom" {
-                await engine.output("This isn't the best place to leave a smart cloak lying around.")
-                return true // Handled (action prevented)
+                throw ActionError.prerequisiteNotMet("This isn't the best place to leave a smart cloak lying around.")
             } else {
                 // Allow the default drop action if in the cloakroom
                 return false // Not handled (let default drop proceed)
@@ -24,21 +23,27 @@ struct Handlers {
         }
     }
 
-    func messageHandler(_ engine: GameEngine, _ command: Command) async -> Bool {
+    func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
         guard command.verbID == "examine", engine.playerLocationID() == "bar" else { return false }
-        guard engine.locationSnapshot(with: "bar")?.properties.contains(.isLit) ?? false else {
-            await engine.output("It's too dark to do that.")
-            return true
+        // Fix: Check location exists before accessing properties
+        guard let bar = engine.locationSnapshot(with: "bar") else {
+            // Should not happen if game setup is correct
+            throw ActionError.internalEngineError("Location 'bar' not found.")
         }
-        let disturbedCount = engine.getGameSpecificStateValue(key: "disturbedCounter")?.value as? Int ?? 0
-        await engine.output("The message simply reads: \"You ", newline: false)
+        guard bar.properties.contains(.isLit) else {
+            throw ActionError.prerequisiteNotMet("It's too dark to do that.")
+        }
+
+        let disturbedCount = engine.getGameSpecificStateValue(forKey: "disturbedCounter")?.value as? Int ?? 0
+        let finalMessage: String
         if disturbedCount > 1 {
-            await engine.output("lose.\"", style: .normal, newline: false)
-            engine.quitGame()
+            finalMessage = "The message simply reads: \"You lose.\""
+            engine.requestQuit()
         } else {
-            await engine.output("win.\"", style: .normal, newline: false)
-            engine.quitGame()
+            finalMessage = "The message simply reads: \"You win.\""
+            engine.requestQuit()
         }
-        return true
+        // Throw error to display the message via engine reporting
+        throw ActionError.customResponse(finalMessage)
     }
 }

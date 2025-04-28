@@ -10,10 +10,10 @@ struct ActionResultTests {
     @Test("ActionResult Initialization")
     func testActionResultInitialization() {
         let change = StateChange(
-            objectId: "lamp",
+            entityId: .item("lamp"),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties([.lightSource]),
-            newValue: .itemProperties([.lightSource, .on])
+            oldValue: StateValue.itemProperties([.lightSource]),
+            newValue: StateValue.itemProperties([ItemProperty.lightSource, ItemProperty.on])
         )
         let effect = SideEffect(
             type: .startFuse,
@@ -52,56 +52,56 @@ struct ActionResultTests {
     @Test("StateChange Initialization")
     func testStateChangeInitialization() {
         let change = StateChange(
-            objectId: "door",
+            entityId: .item("door"),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties([.openable]),
-            newValue: .itemProperties([.openable, .open])
+            oldValue: StateValue.itemProperties([ItemProperty.openable]),
+            newValue: StateValue.itemProperties([ItemProperty.openable, ItemProperty.open])
         )
 
-        #expect(change.objectId == "door")
+        #expect(change.entityId == .item("door"))
         #expect(change.propertyKey == .itemProperties)
-        #expect(change.oldValue == .itemProperties([.openable]))
-        #expect(change.newValue == .itemProperties([.openable, .open]))
+        #expect(change.oldValue == StateValue.itemProperties([ItemProperty.openable]))
+        #expect(change.newValue == StateValue.itemProperties([ItemProperty.openable, ItemProperty.open]))
     }
 
     @Test("StateChange Initialization without Old Value")
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
-            objectId: "player",
+            entityId: .player,
             propertyKey: .playerScore,
-            newValue: .int(10)
+            newValue: StateValue.int(10)
         )
 
-        #expect(change.objectId == "player")
+        #expect(change.entityId == .player)
         #expect(change.propertyKey == .playerScore)
         #expect(change.oldValue == nil)
-        #expect(change.newValue == .int(10))
+        #expect(change.newValue == StateValue.int(10))
     }
 
     @Test("StateChange Initialization for Global Flag")
     func testStateChangeInitializationGlobalFlag() {
         let change = StateChange(
-            objectId: "unused",
+            entityId: .global,
             propertyKey: .globalFlag(key: "lightsOut"),
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            oldValue: StateValue.bool(false),
+            newValue: StateValue.bool(true)
         )
 
-        #expect(change.propertyKey == .globalFlag(key: "lightsOut"))
-        #expect(change.newValue == .bool(true))
+        #expect(change.propertyKey == StatePropertyKey.globalFlag(key: "lightsOut"))
+        #expect(change.newValue == StateValue.bool(true))
     }
 
     @Test("StateChange Initialization for Game Specific State")
     func testStateChangeInitializationGameSpecific() {
         let change = StateChange(
-            objectId: "unused",
+            entityId: .global,
             propertyKey: .gameSpecificState(key: "puzzleCounter"),
-            oldValue: .int(5),
-            newValue: .int(6)
+            oldValue: StateValue.int(5),
+            newValue: StateValue.int(6)
         )
 
-        #expect(change.propertyKey == .gameSpecificState(key: "puzzleCounter"))
-        #expect(change.newValue == .int(6))
+        #expect(change.propertyKey == StatePropertyKey.gameSpecificState(key: "puzzleCounter"))
+        #expect(change.newValue == StateValue.int(6))
     }
 
     @Test("SideEffect Initialization")

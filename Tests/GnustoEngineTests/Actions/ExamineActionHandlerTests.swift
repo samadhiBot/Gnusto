@@ -407,10 +407,10 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output1, "The mood stone glows a soft blue.")
 
         // Change the item's state directly via the engine by adding the .on property
-        engine.updateItemProperties(itemID: "stone", adding: .on) // Use full ItemProperty.on
+        await engine.applyItemPropertyChange(itemID: "stone", adding: [ItemProperty.on])
 
         // Assert intermediate state change
-        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(.on) == true) // Use full ItemProperty.on
+        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(ItemProperty.on) == true)
 
         // Act 2: Examine when red (isOn: true)
         try await handler.perform(command: command, engine: engine)

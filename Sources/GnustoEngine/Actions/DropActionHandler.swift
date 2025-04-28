@@ -58,7 +58,7 @@ public struct DropActionHandler: EnhancedActionHandler {
 
         // Change 1: Parent
         let parentChange = StateChange(
-            objectId: targetItemID,
+            entityId: .item(targetItemID),
             propertyKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.location(currentLocationID))
@@ -73,7 +73,7 @@ public struct DropActionHandler: EnhancedActionHandler {
 
         if oldProperties != newProperties {
             let propertiesChange = StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(newProperties)

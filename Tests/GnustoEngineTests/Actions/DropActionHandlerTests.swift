@@ -20,7 +20,7 @@ struct DropActionHandlerTests {
 
         var changes: [StateChange] = [
             StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemParent,
                 oldValue: .parentEntity(.player),
                 newValue: .parentEntity(.location(newLocation))
@@ -29,7 +29,7 @@ struct DropActionHandlerTests {
 
         if oldProperties != finalProperties {
             changes.append(StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(finalProperties)

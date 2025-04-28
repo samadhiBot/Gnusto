@@ -20,7 +20,7 @@ struct TakeActionHandlerTests {
 
         var changes: [StateChange] = [
             StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemParent,
                 oldValue: .parentEntity(oldParent),
                 newValue: .parentEntity(.player)
@@ -29,7 +29,7 @@ struct TakeActionHandlerTests {
 
         if oldProperties != finalProperties {
             changes.append(StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(finalProperties)
@@ -37,7 +37,7 @@ struct TakeActionHandlerTests {
         }
 
         changes.append(StateChange(
-            objectId: "unused",
+            entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounIt != nil ? .itemIDSet(oldPronounIt!) : nil,
             newValue: .itemIDSet([itemID])
@@ -58,8 +58,10 @@ struct TakeActionHandlerTests {
         )
         let initialParent = testItem.parent
         let initialProperties = testItem.properties
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [testItem])
+        let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -67,7 +69,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        game.state.player.carryingCapacity = 10
         let initialPronounIt = engine.getPronounReference(pronoun: "it") // Capture initial state
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
@@ -389,8 +390,9 @@ struct TakeActionHandlerTests {
             parent: .location("startRoom")
         )
 
-        var game = MinimalGame(items: [itemHeld, itemToTake])
-        game.state.player.carryingCapacity = 10 // Capacity lower than combined size
+        let game = MinimalGame(items: [itemHeld, itemToTake])
+        // Define player with low capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -427,12 +429,13 @@ struct TakeActionHandlerTests {
         let testItem = Item(id: "cloak", name: "dark cloak", properties: .takable, .wearable, size: 2, parent: .location("startRoom"))
         let initialParent = testItem.parent
         let initialProperties = testItem.properties
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [testItem])
+        let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        game.state.player.carryingCapacity = 10
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
@@ -466,12 +469,13 @@ struct TakeActionHandlerTests {
         let itemOnSurface = Item(id: "book", name: "old book", properties: .takable, .read, parent: .item(surfaceItem.id))
         let initialParent = itemOnSurface.parent
         let initialProperties = itemOnSurface.properties
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [surfaceItem, itemOnSurface])
+        let game = MinimalGame(player: player, items: [surfaceItem, itemOnSurface])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        game.state.player.carryingCapacity = 10
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
@@ -511,8 +515,10 @@ struct TakeActionHandlerTests {
         )
         let initialParent = testItem.parent
         let initialProperties = testItem.properties // Includes .touched
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [testItem])
+        let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -520,7 +526,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        game.state.player.carryingCapacity = 10
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
@@ -561,9 +566,10 @@ struct TakeActionHandlerTests {
         )
         let initialParent = itemToTake.parent
         let initialProperties = itemToTake.properties
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [heldItem, itemToTake])
-        game.state.player.carryingCapacity = 10 // Exact capacity
+        let game = MinimalGame(player: player, items: [heldItem, itemToTake])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -612,9 +618,10 @@ struct TakeActionHandlerTests {
         )
         let initialParent = itemInContainer.parent
         let initialProperties = itemInContainer.properties
+        // Define player with capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
 
-        var game = MinimalGame(items: [container, itemInContainer])
-        game.state.player.carryingCapacity = 10
+        let game = MinimalGame(player: player, items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -644,5 +651,46 @@ struct TakeActionHandlerTests {
         // Assert Change History
         let expectedChanges = expectedTakeChanges(itemID: "fly", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Take item fails due to player capacity")
+    func testTakeItemFailsDueToCapacity() async throws {
+        // Arrange: Player holds item, capacity is low, try to take another
+        let itemHeld = Item(
+            id: "sword",
+            name: "sword",
+            properties: .takable,
+            size: 8,
+            parent: .player
+        )
+        let itemToTake = Item(
+            id: "shield",
+            name: "shield",
+            properties: .takable,
+            size: 7,
+            parent: .location("startRoom")
+        )
+        // Define player with low capacity
+        let player = Player(in: "startRoom", carryingCapacity: 10)
+
+        let game = MinimalGame(player: player, items: [itemHeld, itemToTake])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+
+        let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
+
+        // Act & Assert: Expect specific ActionError
+        await #expect(throws: ActionError.playerCannotCarryMore) {
+            try await handler.perform(command: command, engine: engine)
+        }
+
+        // Assert: Check item parent DID NOT change
+        let finalItemState = engine.itemSnapshot(with: "shield")
+        #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
+
+        // Assert: Check NO message was printed by the handler
+        let output = await mockIO.flush()
+        #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 }

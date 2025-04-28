@@ -64,7 +64,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
 
         // Create the state change
         let stateChange = StateChange(
-            objectId: targetItemID,
+            entityId: .item(targetItemID),
             propertyKey: .itemProperties,
             oldValue: .itemProperties(targetItem.properties), // Record old state
             newValue: .itemProperties(newProperties)

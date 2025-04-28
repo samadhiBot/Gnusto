@@ -89,7 +89,7 @@ public struct LockActionHandler: EnhancedActionHandler {
 
         if oldTargetProps != newTargetProps {
             let targetPropsChange = StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldTargetProps),
                 newValue: .itemProperties(newTargetProps)
@@ -103,7 +103,7 @@ public struct LockActionHandler: EnhancedActionHandler {
             var newKeyProps = oldKeyProps
             newKeyProps.insert(.touched)
             let keyPropsChange = StateChange(
-                objectId: keyItemID,
+                entityId: .item(keyItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldKeyProps),
                 newValue: .itemProperties(newKeyProps)

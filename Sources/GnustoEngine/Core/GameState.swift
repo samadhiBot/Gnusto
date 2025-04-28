@@ -189,6 +189,7 @@ extension GameState {
                 throw ActionError.internalEngineError("Cannot apply change to unknown item ID: \(itemID)")
             }
 
+            // Remove inner switch, handle directly based on propertyKey
             switch change.propertyKey {
             case .itemParent:
                 try validateOldValue(change, actualOldValue: .parentEntity(item.parent))
@@ -230,12 +231,12 @@ extension GameState {
                 item.synonyms = newSynonyms // Direct mutation of class instance
 
             case .itemDescription:
-                try validateOldValue(change, actualOldValue: .itemDescription(item.description ?? "")) // Use itemDescription StateValue
-                guard case .itemDescription(let newDesc) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemDescription: \(change.newValue)") }
-                item.description = newDesc // Direct mutation of class instance
+                 // Descriptions are closures (DescriptionHandler?) and cannot be set via StateChange.
+                 // This case should ideally not be reached if StateChanges are created correctly.
+                 throw ActionError.internalEngineError("Attempted to apply StateChange to immutable item description for \(itemID). Use DescriptionHandlerRegistry for dynamic descriptions.")
 
-            default: // Should not happen due to outer switch grouping
-                throw ActionError.internalEngineError("Mismatched item property key processing: \(change.propertyKey)")
+            // Default case for any other keys that might fall into this outer group (shouldn't happen)
+            default: fatalError("Mismatched item property key processing: \(change.propertyKey)")
             }
 
         // MARK: Location Changes
@@ -247,6 +248,7 @@ extension GameState {
                 throw ActionError.internalEngineError("Cannot apply change to unknown location ID: \(locationID)")
             }
 
+            // Remove inner switch, handle directly based on propertyKey
             switch change.propertyKey {
             case .locationProperties:
                 try validateOldValue(change, actualOldValue: .locationProperties(location.properties))
@@ -264,13 +266,11 @@ extension GameState {
                 location.exits = newExits // Direct mutation of class instance
 
             case .locationDescription:
-                 // Assuming Location has a description property similar to Item
-                 try validateOldValue(change, actualOldValue: .locationDescription(location.description ?? "")) // Use locationDescription StateValue
-                 guard case .locationDescription(let newDesc) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationDescription: \(change.newValue)") }
-                 location.description = newDesc // Direct mutation of class instance
+                // Descriptions are closures (DescriptionHandler?) and cannot be set via StateChange.
+                throw ActionError.internalEngineError("Attempted to apply StateChange to immutable location description for \(locationID). Use DescriptionHandlerRegistry for dynamic descriptions.")
 
-            default: // Should not happen
-                throw ActionError.internalEngineError("Mismatched location property key processing: \(change.propertyKey)")
+            // Default case for any other keys that might fall into this outer group (shouldn't happen)
+            default: fatalError("Mismatched location property key processing: \(change.propertyKey)")
             }
 
         // MARK: Player Changes
@@ -279,6 +279,7 @@ extension GameState {
                 throw ActionError.internalEngineError("Invalid entity type for player property key \(change.propertyKey): \(change.entityId)")
             }
 
+            // Remove inner switch, handle directly based on propertyKey
             switch change.propertyKey {
             case .playerScore:
                 try validateOldValue(change, actualOldValue: .int(self.player.score))
@@ -304,8 +305,8 @@ extension GameState {
                 }
                 self.player.currentLocationID = newLocationID
 
-            default: // Should not happen
-                throw ActionError.internalEngineError("Mismatched player property key processing: \(change.propertyKey)")
+            // Default case for any other keys that might fall into this outer group (shouldn't happen)
+            default: fatalError("Mismatched player property key processing: \(change.propertyKey)")
             }
 
         // MARK: Global Changes

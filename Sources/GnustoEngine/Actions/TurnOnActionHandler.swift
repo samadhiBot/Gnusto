@@ -10,7 +10,7 @@ struct TurnOnActionHandler: ActionHandler {
         // 1. Get direct object ID from command.
         guard let targetItemID = command.directObject else {
             // Zork: "Turn on what?"
-            await engine.output("Turn on what?")
+            await engine.ioHandler.print("Turn on what?")
             return // Not an error, just needs clarification
         }
 
@@ -46,7 +46,7 @@ struct TurnOnActionHandler: ActionHandler {
         }
 
         // Mark as touched regardless of outcome (standard Zork behavior)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.touched])
 
         // 4. Check if the item has the `.device` property.
         // Zork V-LAMP-ON checks LIGHTBIT first, but let's check device for broader applicability.
@@ -60,7 +60,7 @@ struct TurnOnActionHandler: ActionHandler {
         // 5. Check if the item already has the `.on` property.
         if targetItem.hasProperty(.on) {
             // Zork V-LAMP-ON: "It is already on."
-            await engine.output("It's already on.")
+            await engine.ioHandler.print("It's already on.")
             return
         }
 
@@ -71,11 +71,11 @@ struct TurnOnActionHandler: ActionHandler {
         let wasLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
 
         // 7. Add the `.on` property to the item.
-        await engine.updateItemProperties(itemID: targetItemID, adding: .on)
+        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.on])
 
         // 8. Print "You turn the [item name] on."
         // Zork V-LAMP-ON: "The brass lantern is now on."
-        await engine.output("The \(targetItem.name) is now on.")
+        await engine.ioHandler.print("The \(targetItem.name) is now on.")
 
         // 9. Check if the location was previously dark and is now lit.
         // Only describe the location if it was dark AND the item turned on is a light source.

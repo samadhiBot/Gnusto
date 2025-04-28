@@ -8,7 +8,7 @@ public struct ReadActionHandler: ActionHandler {
     public func perform(command: Command, engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Read what?") // Invented prompt
+            await engine.ioHandler.print("Read what?") // Invented prompt
             return
         }
 
@@ -59,15 +59,15 @@ public struct ReadActionHandler: ActionHandler {
         }
 
         // 5. Perform Read Action
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.touched])
 
         // 6. Check if item has text
         guard let textToRead = targetItem.readableText, !textToRead.isEmpty else {
-            await engine.output("There's nothing written on the \(targetItem.name).")
+            await engine.ioHandler.print("There's nothing written on the \(targetItem.name).")
             return
         }
 
         // 7. Output Message (the actual text)
-        await engine.output(textToRead) // Print the text directly
+        await engine.ioHandler.print(textToRead) // Print the text directly
     }
 }

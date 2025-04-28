@@ -37,7 +37,7 @@ struct InsertActionHandlerTests {
 
         // Change 1: Item parent
         changes.append(StateChange(
-            objectId: itemToInsertID,
+            entityId: .item(itemToInsertID),
             propertyKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.item(containerID))
@@ -48,7 +48,7 @@ struct InsertActionHandlerTests {
             var newItemProps = oldItemProps
             newItemProps.insert(.touched)
             changes.append(StateChange(
-                objectId: itemToInsertID,
+                entityId: .item(itemToInsertID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldItemProps),
                 newValue: .itemProperties(newItemProps)
@@ -60,7 +60,7 @@ struct InsertActionHandlerTests {
             var newContainerProps = oldContainerProps
             newContainerProps.insert(.touched)
             changes.append(StateChange(
-                objectId: containerID,
+                entityId: .item(containerID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldContainerProps),
                 newValue: .itemProperties(newContainerProps)
@@ -69,7 +69,7 @@ struct InsertActionHandlerTests {
 
         // Change 4: Pronoun "it"
         changes.append(StateChange(
-            objectId: itemToInsertID,
+            entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
@@ -379,8 +379,10 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        // Initial state check
-        #expect(engine.calculateCurrentLoad(of: "fullBox") == 6)
+        // Initial state check - Calculate manually
+        let itemsInside = await engine.itemSnapshots(withParent: .item("fullBox"))
+        let initialLoad = itemsInside.reduce(0) { $0 + $1.size }
+        #expect(initialLoad == 6)
 
         let command = Command(verbID: "insert", directObject: "coin", indirectObject: "fullBox", preposition: "in", rawInput: "put coin in box")
 
@@ -416,8 +418,10 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        // Initial state check
-        #expect(engine.calculateCurrentLoad(of: "exactBox") == 5)
+        // Initial state check - Calculate manually
+        let itemsInsideInitial = await engine.itemSnapshots(withParent: .item("exactBox"))
+        let initialLoad = itemsInsideInitial.reduce(0) { $0 + $1.size }
+        #expect(initialLoad == 5)
 
         let command = Command(verbID: "insert", directObject: "coin", indirectObject: "exactBox", preposition: "in", rawInput: "put coin in box")
 
@@ -430,7 +434,10 @@ struct InsertActionHandlerTests {
 
         // Assert Final State
         #expect(engine.itemSnapshot(with: "coin")?.parent == .item("exactBox")) // Coin is in box
-        #expect(engine.calculateCurrentLoad(of: "exactBox") == 10) // Box is now full
+        // Final state check - Calculate manually
+        let itemsInsideFinal = await engine.itemSnapshots(withParent: .item("exactBox"))
+        let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
+        #expect(finalLoad == 10) // Box is now full
 
         // Assert Change History (should include parent change, touched flags, pronoun)
         let expectedChanges = expectedInsertChanges(

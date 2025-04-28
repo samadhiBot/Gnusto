@@ -21,7 +21,7 @@ struct CloseActionHandlerTests {
 
         if oldProperties != finalProperties {
             changes.append(StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(finalProperties)

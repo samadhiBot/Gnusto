@@ -49,13 +49,13 @@ struct RemoveActionHandlerTests {
         // Assert Change History
         let expectedChanges = [
             StateChange(
-                objectId: "cloak",
+                entityId: .item("cloak"),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(initialProperties),
                 newValue: .itemProperties([.takable, .wearable, .touched]) // .worn removed, .touched added
             ),
             StateChange(
-                objectId: "cloak",
+                entityId: .global,
                 propertyKey: .pronounReference(pronoun: "it"),
                 oldValue: nil,
                 newValue: .itemIDSet(["cloak"])

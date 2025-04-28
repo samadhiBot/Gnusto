@@ -50,7 +50,7 @@ struct OpenActionHandlerTests {
         #expect(engine.gameState.changeHistory.count == 1)
         let recordedChange = engine.gameState.changeHistory.first
         let expectedChange = StateChange(
-            objectId: "box",
+            entityId: .item("box"),
             propertyKey: .itemProperties,
             oldValue: .itemProperties(initialProperties),
             newValue: .itemProperties(expectedProperties)
@@ -101,7 +101,7 @@ struct OpenActionHandlerTests {
         #expect(engine.gameState.changeHistory.count == 1)
         let recordedChange = engine.gameState.changeHistory.first
         let expectedChange = StateChange(
-            objectId: "box",
+            entityId: .item("box"),
             propertyKey: .itemProperties,
             oldValue: .itemProperties(initialProperties),
             newValue: .itemProperties(expectedProperties)

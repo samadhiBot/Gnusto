@@ -4,9 +4,9 @@ import Foundation
 /// This actor manages the game state, handles the game loop, interacts with the parser
 /// and IO handler, and executes player commands using registered ActionHandlers.
 @MainActor
-public class GameEngine {
+public class GameEngine: Sendable {
     /// The current state of the game world.
-    public private(set) var gameState: GameState
+    public internal(set) var gameState: GameState
 
     /// The parser responsible for understanding player input.
     private let parser: Parser
@@ -49,6 +49,40 @@ public class GameEngine {
     /// and no further action is required.
     public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
+    // MARK: - Default Handlers
+
+    /// Default action handlers provided by the engine.
+    /// Games can override these via the `DefinitionRegistry`.
+    private static let defaultActionHandlers: [VerbID: ActionHandler] = [
+        // Movement & World Interaction
+        "go": GoActionHandler(),
+        "look": LookActionHandler(),
+        "examine": ExamineActionHandler(),
+        "open": OpenActionHandler(),
+        "close": CloseActionHandler(),
+        "lock": LockActionHandler(),
+        "unlock": UnlockActionHandler(),
+        // "put": PutActionHandler(), // TODO: Implement PutActionHandler
+
+        // Inventory Management
+        "take": TakeActionHandler(),
+        "drop": DropActionHandler(),
+        "inventory": InventoryActionHandler(),
+        "wear": WearActionHandler(),
+        "remove": RemoveActionHandler(),
+
+        // Other Actions
+        "wait": WaitActionHandler(),
+        "score": ScoreActionHandler(),
+        "quit": QuitActionHandler(), // Basic quit functionality
+        "listen": ListenActionHandler(),
+        "smell": SmellActionHandler(),
+        "taste": TasteActionHandler(),
+        "think": ThinkAboutActionHandler(), // Alias 'think about' if needed via vocab
+
+        // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
+    ]
+
     // MARK: - Initialization
 
     /// Creates a new `GameEngine` instance from a game definition.
@@ -68,7 +102,7 @@ public class GameEngine {
         self.registry = game.registry
         self.descriptionHandlerRegistry = DescriptionHandlerRegistry()
         self.actionHandlers = game.registry.customActionHandlers
-            .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
+            .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
 
@@ -92,7 +126,7 @@ public class GameEngine {
             command: Command,
             engine: GameEngine
         ) async throws {
-            await engine.output("Sorry, the default handler for '\(verb)' is not implemented yet.")
+            await engine.ioHandler.print("Sorry, the default handler for '\\(verb)' is not implemented yet.")
         }
     }
 
@@ -249,8 +283,8 @@ public class GameEngine {
                 let removeChange = StateChange(
                     entityId: .global,
                     propertyKey: .removeActiveFuse(fuseId: id),
-                    oldValue: .int(oldTurns) // Or perhaps validate against the *just applied* newTurns (0)? Let's use oldTurns for simplicity.
-                    // No newValue needed for remove
+                    oldValue: .int(oldTurns),
+                    newValue: .int(0)
                 )
                 do {
                     try gameState.apply(removeChange)
@@ -394,7 +428,6 @@ public class GameEngine {
                         // Apply state changes BEFORE postProcess, record AFTER successful application.
                         for change in result.stateChanges {
                             try await applyStateChange(change) // Apply the change first
-                            self.gameState.changeHistory.append(change)
                         }
 
                         // Process side effects BEFORE postProcess
@@ -443,6 +476,7 @@ public class GameEngine {
     /// - Parameter change: The `StateChange` to apply.
     /// - Throws: An error if the change cannot be applied (forwarded from `GameState.apply`).
     private func applyStateChange(_ change: StateChange) throws {
+        // Forward directly to GameState's apply method.
         try gameState.apply(change)
     }
 
@@ -485,8 +519,8 @@ public class GameEngine {
             let removeChange = StateChange(
                 entityId: .global,
                 propertyKey: .removeActiveFuse(fuseId: fuseId),
-                oldValue: oldTurns != nil ? .int(oldTurns!) : nil
-                // No newValue for remove
+                oldValue: oldTurns != nil ? .int(oldTurns!) : nil,
+                newValue: .int(0)
             )
             // 3. Apply the StateChange
             try gameState.apply(removeChange)
@@ -558,7 +592,7 @@ public class GameEngine {
             let description = await descriptionHandlerRegistry.generateDescription(
                 for: locationSnapshot,
                 using: descriptionHandler,
-                engine: self // Pass self as the engine
+                engine: self
             )
             await ioHandler.print(description)
         } else {
@@ -636,12 +670,18 @@ public class GameEngine {
             "\(theThat(item).capitalizedFirst) is full."
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
+        case .customResponse(let message):
+            message // Use the custom message directly
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
+        case .general(let message):
+            message // Use the general message directly
         case .internalEngineError(let msg):
             "A strange buzzing sound indicates something is wrong.\n  • \(msg)"
         case .invalidDirection:
             "You can't go that way."
+        case .invalidIndirectObject(let object):
+            "You can't use \(object ?? "that") for that."
         case .itemAlreadyClosed(let item):
             "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
@@ -692,8 +732,13 @@ public class GameEngine {
             "You can't put things in \(theThat(item))."
         case .targetIsNotASurface(let item):
             "You can't put things on \(theThat(item))."
+        case .toolMissing(let tool):
+            "You need \(tool) for that."
+        case .unknownVerb(let verb):
+            "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
             "The \(itemSnapshot(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
+        // All ActionError cases are now explicitly handled.
         }
         if !message.isEmpty {
             await ioHandler.print(message)
@@ -768,4 +813,266 @@ public class GameEngine {
     /// This method runs on the GameEngine's actor context.
     /// - Parameter id: The `LocationID` of the location to retrieve.
     /// - Returns: A `LocationSnapshot`
+    ///   if the location is found, otherwise `nil`.
+    public func locationSnapshot(with id: LocationID) -> LocationSnapshot? {
+        guard let location = gameState.locations[id] else { return nil }
+        return LocationSnapshot(location: location)
+    }
+
+    // MARK: - State Mutation Helpers (Public API for Handlers/Hooks)
+
+    /// Applies a change to a specific item's properties.
+    /// This creates and applies the necessary `StateChange`.
+    /// It logs an error and returns if the item doesn't exist or the change fails.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item to modify.
+    ///   - adding: A set of properties to add (optional).
+    ///   - removing: A set of properties to remove (optional).
+    public func applyItemPropertyChange(
+        itemID: ItemID,
+        adding: Set<ItemProperty> = [],
+        removing: Set<ItemProperty> = []
+    ) async {
+        guard let item = itemSnapshot(with: itemID) else {
+            await ioHandler.print("Debug: Cannot apply property change to non-existent item '\(itemID)'.", style: .debug)
+            return
+        }
+        let oldProps = item.properties
+        var newProps = oldProps
+        newProps.formUnion(adding)
+        newProps.subtract(removing)
+
+        // Only apply if there's an actual change
+        if oldProps != newProps {
+            let change = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(oldProps),
+                newValue: .itemProperties(newProps)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply item property change for '\(itemID)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Applies a change to a global flag.
+    ///
+    /// - Parameters:
+    ///   - flag: The key of the flag to set.
+    ///   - value: The new boolean value for the flag.
+    public func applyFlagChange(flag: String, value: Bool) async {
+        let oldValue = gameState.flags[flag]
+        // Only apply if value is actually changing
+        if oldValue != value {
+            let change = StateChange(
+                entityId: .global,
+                propertyKey: .globalFlag(key: flag),
+                oldValue: oldValue != nil ? .bool(oldValue!) : nil,
+                newValue: .bool(value)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply flag change for '\(flag)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Updates the pronoun reference (e.g., "it") to point to a specific item.
+    ///
+    /// - Parameters:
+    ///   - pronoun: The pronoun (e.g., "it").
+    ///   - itemID: The ItemID the pronoun should refer to.
+    public func applyPronounChange(pronoun: String, itemID: ItemID) async {
+        let newSet: Set<ItemID> = [itemID]
+        let oldSet = gameState.pronouns[pronoun]
+
+        if oldSet != newSet {
+            let change = StateChange(
+                entityId: .global,
+                propertyKey: .pronounReference(pronoun: pronoun),
+                oldValue: oldSet != nil ? .itemIDSet(oldSet!) : nil,
+                newValue: .itemIDSet(newSet)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply pronoun change for '\(pronoun)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Moves an item to a new parent entity.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item to move.
+    ///   - newParent: The target parent entity.
+    public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
+        guard let item = itemSnapshot(with: itemID) else {
+            await ioHandler.print("Debug: Cannot move non-existent item '\(itemID)'.", style: .debug)
+            return
+        }
+        let oldParent = item.parent
+
+        // Check if destination is valid (e.g., Location exists)
+        if case .location(let locID) = newParent {
+            guard locationSnapshot(with: locID) != nil else {
+                await ioHandler.print("Debug: Cannot move item '\(itemID)' to non-existent location '\(locID)'.", style: .debug)
+                return
+            }
+        } else if case .item(let containerID) = newParent {
+             guard itemSnapshot(with: containerID) != nil else {
+                await ioHandler.print("Debug: Cannot move item '\(itemID)' into non-existent container '\(containerID)'.", style: .debug)
+                return
+            }
+            // TODO: Add container capacity check?
+        }
+
+        if oldParent != newParent {
+            let change = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemParent,
+                oldValue: .parentEntity(oldParent),
+                newValue: .parentEntity(newParent)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply item move for '\(itemID)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Moves the player to a new location.
+    ///
+    /// - Parameter newLocationID: The ID of the destination location.
+    public func applyPlayerMove(to newLocationID: LocationID) async {
+        let oldLocationID = gameState.player.currentLocationID
+
+        // Check if destination is valid
+        guard locationSnapshot(with: newLocationID) != nil else {
+            await ioHandler.print("Debug: Cannot move player to non-existent location '\(newLocationID)'.", style: .debug)
+            return
+        }
+
+        if oldLocationID != newLocationID {
+            let change = StateChange(
+                entityId: .player,
+                propertyKey: .playerLocation,
+                oldValue: .locationID(oldLocationID),
+                newValue: .locationID(newLocationID)
+            )
+            do {
+                try gameState.apply(change)
+
+                // --- Trigger onEnterRoom Hook --- (Moved from changePlayerLocation)
+                if let hook = onEnterRoom {
+                    if await hook(self, newLocationID) {
+                        // Hook handled everything, potentially quit game.
+                        return
+                    }
+                }
+
+            } catch {
+                await ioHandler.print("Debug: Failed to apply player move to '\(newLocationID)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Signals the engine to stop the main game loop after the current turn.
+    public func requestQuit() {
+        self.shouldQuit = true
+    }
+
+    /// Retrieves the current set of item IDs referenced by a pronoun.
+    ///
+    /// - Parameter pronoun: The pronoun string (e.g., "it").
+    /// - Returns: The set of `ItemID`s the pronoun refers to, or `nil` if not set.
+    public func getPronounReference(pronoun: String) -> Set<ItemID>? {
+        gameState.pronouns[pronoun.lowercased()]
+    }
+
+    /// Retrieves the value of a game-specific state variable.
+    ///
+    /// - Parameter key: The key for the game-specific state variable.
+    /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
+    public func getGameSpecificStateValue(forKey key: String) -> AnyCodable? {
+        gameState.gameSpecificState[key]
+    }
+
+    /// Applies a change to a specific location's properties.
+    ///
+    /// - Parameters:
+    ///   - locationID: The ID of the location to modify.
+    ///   - adding: A set of properties to add (optional).
+    ///   - removing: A set of properties to remove (optional).
+    public func applyLocationPropertyChange(
+        locationID: LocationID,
+        adding: Set<LocationProperty> = [],
+        removing: Set<LocationProperty> = []
+    ) async {
+        guard let location = locationSnapshot(with: locationID) else {
+            await ioHandler.print("Debug: Cannot apply property change to non-existent location '\(locationID)'.", style: .debug)
+            return
+        }
+        let oldProps = location.properties
+        var newProps = oldProps
+        newProps.formUnion(adding)
+        newProps.subtract(removing)
+
+        if oldProps != newProps {
+            let change = StateChange(
+                entityId: .location(locationID),
+                propertyKey: .locationProperties,
+                oldValue: .locationProperties(oldProps),
+                newValue: .locationProperties(newProps)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply location property change for '\(locationID)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    /// Applies a change to a game-specific state variable.
+    /// Only supports simple types (Bool, Int, String) via AnyCodable.
+    ///
+    /// - Parameters:
+    ///   - key: The key for the game-specific state.
+    ///   - value: The new value (Bool, Int, or String).
+    public func applyGameSpecificStateChange(key: String, value: StateValue) async {
+        // Note: StateValue should be .bool, .int, or .string for this
+        let oldValue = gameState.gameSpecificState[key]
+        let actualOldValue: StateValue? // Convert AnyCodable back for comparison if possible
+        if let oldAny = oldValue {
+            if let v = oldAny.value as? Bool { actualOldValue = .bool(v) }
+            else if let v = oldAny.value as? Int { actualOldValue = .int(v) }
+            else if let v = oldAny.value as? String { actualOldValue = .string(v) }
+            else { actualOldValue = nil } // Cannot represent complex type
+        } else {
+            actualOldValue = nil
+        }
+
+        // Only apply if the value is changing (and types are compatible)
+        if value != actualOldValue {
+            let change = StateChange(
+                entityId: .global,
+                propertyKey: .gameSpecificState(key: key),
+                oldValue: actualOldValue, // Pass converted old value for validation
+                newValue: value
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                await ioHandler.print("Debug: Failed to apply game specific state change for '\(key)': \(error)", style: .debug)
+            }
+        }
+    }
+
+    // TODO: Add helpers for score/move updates if needed by standard ActionHandlers?
 }

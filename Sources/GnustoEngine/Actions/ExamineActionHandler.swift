@@ -8,7 +8,7 @@ public struct ExamineActionHandler: ActionHandler {
     public func perform(command: Command, engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Examine what?") // TODO: Zork message?
+            await engine.ioHandler.print("Examine what?")
             return
         }
 
@@ -24,11 +24,11 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // Mark as touched regardless of what happens next (standard Zork behavior)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.touched])
 
         // 4. Check if item is readable (Zork V-EXAMINE prioritizes P?TEXT)
         if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
-            await engine.output(text) // Print the readable text
+            await engine.ioHandler.print(text) // Print the readable text
             return
         }
 
@@ -51,10 +51,10 @@ public struct ExamineActionHandler: ActionHandler {
                 using: descriptionHandler,
                 engine: engine
             )
-            await engine.output(description)
+            await engine.ioHandler.print(description)
         } else {
             // Default message if no description handler
-            await engine.output("There's nothing special about the \(targetItem.name).")
+            await engine.ioHandler.print("There's nothing special about the \(targetItem.name).")
         }
     }
 
@@ -67,10 +67,10 @@ public struct ExamineActionHandler: ActionHandler {
                 using: descriptionHandler,
                 engine: engine
             )
-            await engine.output(description)
+            await engine.ioHandler.print(description)
         } else {
             // Fallback if no specific description
-            await engine.output("You examine the \(targetItem.name).")
+            await engine.ioHandler.print("You examine the \(targetItem.name).")
         }
 
         let isOpen = targetItem.hasProperty(.open)
@@ -79,17 +79,17 @@ public struct ExamineActionHandler: ActionHandler {
         if isOpen || isTransparent {
             let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
             if contents.isEmpty {
-                await engine.output("The \(targetItem.name) is empty.")
+                await engine.ioHandler.print("The \(targetItem.name) is empty.")
             } else {
-                await engine.output("The \(targetItem.name) contains:")
+                await engine.ioHandler.print("The \(targetItem.name) contains:")
                 for item in contents {
                     // TODO: Proper sentence construction with articles
-                    await engine.output("  A \(item.name)")
+                    await engine.ioHandler.print("  A \(item.name)")
                 }
             }
         } else {
             // Closed and not transparent
-            await engine.output("The \(targetItem.name) is closed.")
+            await engine.ioHandler.print("The \(targetItem.name) is closed.")
         }
     }
 
@@ -102,19 +102,19 @@ public struct ExamineActionHandler: ActionHandler {
                 using: descriptionHandler,
                 engine: engine
             )
-            await engine.output(description)
+            await engine.ioHandler.print(description)
         } else {
             // Fallback if no specific description
-            await engine.output("You examine the \(targetItem.name).")
+            await engine.ioHandler.print("You examine the \(targetItem.name).")
         }
 
         // List items on the surface
         let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
         if !contents.isEmpty {
             // TODO: Use proper sentence construction like Zork: "On the table is a book and a key."
-            await engine.output("On the \(targetItem.name) is:")
+            await engine.ioHandler.print("On the \(targetItem.name) is:")
             for item in contents {
-                await engine.output("  A \(item.name)")
+                await engine.ioHandler.print("  A \(item.name)")
             }
         }
         // If empty, we just print the description above, no extra message needed unlike containers.

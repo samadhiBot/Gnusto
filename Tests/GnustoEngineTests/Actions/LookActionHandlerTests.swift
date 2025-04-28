@@ -18,7 +18,7 @@ struct LookActionHandlerTests {
 
         return [
             StateChange(
-                objectId: itemID,
+                entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(finalProperties)

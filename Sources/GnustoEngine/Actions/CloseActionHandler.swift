@@ -71,7 +71,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
 
         if oldProperties != newProperties {
             let propertiesChange = StateChange(
-                objectId: targetItemID,
+                entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldProperties),
                 newValue: .itemProperties(newProperties)

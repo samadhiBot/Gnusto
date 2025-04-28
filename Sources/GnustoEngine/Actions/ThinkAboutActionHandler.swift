@@ -9,7 +9,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
             // No specific prompt in CoD ZIL, invent one.
-            await engine.output("Think about what?")
+            await engine.ioHandler.print("Think about what?")
             return
         }
 
@@ -17,7 +17,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         // Use the conventional ItemID "player"
         if targetItemID.rawValue == "player" { // Check rawValue against string
             // CoD message: "Yes, yes, you're very important."
-            await engine.output("Yes, yes, you're very important.")
+            await engine.ioHandler.print("Yes, yes, you're very important.")
             return
         }
 
@@ -35,10 +35,10 @@ public struct ThinkAboutActionHandler: ActionHandler {
 
         // Item is accessible, mark as touched?
         // CoD ZIL doesn't explicitly set TOUCHBIT here, but it's harmless.
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.touched])
 
         // 4. Output default message
         // CoD message: "You contemplate the {object} for a bit, but nothing fruitful comes to mind."
-        await engine.output("You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind.")
+        await engine.ioHandler.print("You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind.")
     }
 }

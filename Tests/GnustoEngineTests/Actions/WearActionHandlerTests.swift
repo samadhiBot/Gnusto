@@ -49,13 +49,13 @@ struct WearActionHandlerTests {
         // Assert Change History
         let expectedChanges = [
             StateChange(
-                objectId: "cloak",
+                entityId: .item("cloak"),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(initialProperties),
                 newValue: .itemProperties([.takable, .wearable, .worn, .touched])
             ),
             StateChange(
-                objectId: "cloak",
+                entityId: .global,
                 propertyKey: .pronounReference(pronoun: "it"),
                 oldValue: nil,
                 newValue: .itemIDSet(["cloak"])

@@ -21,7 +21,7 @@ public struct GoActionHandler: ActionHandler {
         // 3. Find Exit
         guard let exit = currentLoc.exits[direction] else {
             // Standard message: "You can't go that way."
-            await engine.output("You can't go that way.")
+            await engine.ioHandler.print("You can't go that way.")
             return // Stop processing
         }
 
@@ -29,14 +29,14 @@ public struct GoActionHandler: ActionHandler {
 
         // Check for static blocked message first (highest priority override)
         if let staticBlockedMessage = exit.blockedMessage {
-            await engine.output(staticBlockedMessage)
+            await engine.ioHandler.print(staticBlockedMessage)
             return // Stop processing
         }
 
         // Check required key
         if let keyID = exit.requiredKey {
-            // Correct: Use an engine method to check inventory for concurrency safety
-            let playerHasKey = await engine.playerHasItem(itemID: keyID)
+            let inventory = await engine.itemSnapshots(withParent: .player)
+            let playerHasKey = inventory.contains { $0.id == keyID }
             if !playerHasKey {
                 // TODO: Check Zork message for lacking a key for a passage
                 throw ActionError.directionIsBlocked("You lack the key required to pass.")
@@ -58,7 +58,7 @@ public struct GoActionHandler: ActionHandler {
         // --- Movement Successful ---
 
         // 5. Update Player Location using the engine method that triggers hooks
-        await engine.changePlayerLocation(to: exit.destination)
+        await engine.applyPlayerMove(to: exit.destination)
 
         // 6. Describe New Location
         // The GameEngine loop usually handles describing the location after a successful turn.

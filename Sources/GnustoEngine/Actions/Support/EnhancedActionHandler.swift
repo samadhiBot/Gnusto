@@ -81,7 +81,7 @@ extension EnhancedActionHandler {
         // The message often indicates *why* an action failed (e.g., "You already have that.").
         // State changes and side effects are assumed to be handled elsewhere or by the engine.
         if !result.message.isEmpty {
-            await engine.output(result.message)
+            await engine.ioHandler.print(result.message)
         }
         // TODO: Revisit if explicit error throwing is preferred over success=false + message.
     }

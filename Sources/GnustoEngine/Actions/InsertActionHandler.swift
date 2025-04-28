@@ -59,7 +59,9 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Capacity Check (New)
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
-            let currentLoad = engine.calculateCurrentLoad(of: containerID)
+            // Fix: Calculate load manually
+            let itemsInside = await engine.itemSnapshots(withParent: .item(containerID))
+            let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
                 throw ActionError.containerIsFull(containerID)
@@ -89,7 +91,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         let oldParent = itemToInsertSnapshot.parent // Should be .player
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
-            objectId: itemToInsertID,
+            entityId: .item(itemToInsertID),
             propertyKey: .itemParent,
             oldValue: .parentEntity(oldParent),
             newValue: .parentEntity(newParent)
@@ -101,7 +103,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             var newItemProps = oldItemProps
             newItemProps.insert(.touched)
             stateChanges.append(StateChange(
-                objectId: itemToInsertID,
+                entityId: .item(itemToInsertID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldItemProps),
                 newValue: .itemProperties(newItemProps)
@@ -114,7 +116,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             var newContainerProps = oldContainerProps
             newContainerProps.insert(.touched)
             stateChanges.append(StateChange(
-                objectId: containerID,
+                entityId: .item(containerID),
                 propertyKey: .itemProperties,
                 oldValue: .itemProperties(oldContainerProps),
                 newValue: .itemProperties(newContainerProps)
@@ -123,9 +125,9 @@ struct InsertActionHandler: EnhancedActionHandler {
 
         // Change 4: Update pronoun "it"
         stateChanges.append(StateChange(
-            objectId: itemToInsertID, // Ignored for pronouns, but required
+            entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),
-            oldValue: nil, // Old value often unknown/irrelevant for pronoun updates
+            oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))
 
