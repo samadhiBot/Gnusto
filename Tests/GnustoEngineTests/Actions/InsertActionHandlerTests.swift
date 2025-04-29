@@ -380,7 +380,7 @@ struct InsertActionHandlerTests {
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInside = await engine.itemSnapshots(withParent: .item("fullBox"))
+        let itemsInside = engine.itemSnapshots(withParent: .item("fullBox"))
         let initialLoad = itemsInside.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 6)
 
@@ -419,7 +419,7 @@ struct InsertActionHandlerTests {
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInsideInitial = await engine.itemSnapshots(withParent: .item("exactBox"))
+        let itemsInsideInitial = engine.itemSnapshots(withParent: .item("exactBox"))
         let initialLoad = itemsInsideInitial.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 5)
 
@@ -435,7 +435,7 @@ struct InsertActionHandlerTests {
         // Assert Final State
         #expect(engine.itemSnapshot(with: "coin")?.parent == .item("exactBox")) // Coin is in box
         // Final state check - Calculate manually
-        let itemsInsideFinal = await engine.itemSnapshots(withParent: .item("exactBox"))
+        let itemsInsideFinal = engine.itemSnapshots(withParent: .item("exactBox"))
         let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
         #expect(finalLoad == 10) // Box is now full
 

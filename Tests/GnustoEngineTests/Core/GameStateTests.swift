@@ -196,7 +196,7 @@ struct GameStateTests {
     @Test("GameState Value Semantics (Mixed with Reference)")
     func testGameStateValueSemantics() async throws {
         let state1 = await createSampleGameState()
-        var state2 = state1 // Creates a copy of the struct
+        let state2 = state1 // Creates a copy of the struct
 
         // Check initial equality of value types
         #expect(state1.player == state2.player)

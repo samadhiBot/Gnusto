@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
@@ -29,6 +30,9 @@ public class GameEngine: Sendable {
 
     /// Active timed events (Fuses) - Runtime storage with closures.
     private var activeFuses = [FuseID: Fuse]()
+
+    /// A logger used for unhandled error warnings.
+    private let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
 
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
@@ -349,7 +353,7 @@ public class GameEngine: Sendable {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                await ioHandler.print("Error in room beforeTurn handler: \(error)", style: .debug)
+                logger.warning("💥 Error in room beforeTurn handler: \(error, privacy: .public)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -389,7 +393,7 @@ public class GameEngine: Sendable {
             if let specificError = error as? ActionError {
                 await report(actionError: specificError)
             } else {
-                await ioHandler.print("An unexpected error occurred in an object handler: \(error)", style: .debug)
+                logger.warning("💥 An unexpected error occurred in an object handler: \(error, privacy: .public)")
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {
@@ -402,7 +406,10 @@ public class GameEngine: Sendable {
             // Correct: Look up the Verb definition directly
             guard let verb = gameState.vocabulary.verbDefinitions[command.verbID] else {
                 // This case should ideally not be reached if parser validates verbs
-                await ioHandler.print("Internal Error: Unknown verb ID '\(command.verbID)' reached execution.", style: .debug)
+                logger.warning("""
+                    💥 Internal Error: Unknown verb ID \
+                    '\(command.verbID.rawValue, privacy: .public)' reached execution.
+                    """)
                 await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                 return
             }
@@ -415,7 +422,10 @@ public class GameEngine: Sendable {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verbID] else {
                     // No handler registered for this verb (should match vocabulary definition)
-                    await ioHandler.print("Internal Error: No ActionHandler registered for verb ID '\(command.verbID)'.", style: .debug)
+                    logger.warning("""
+                        💥 Internal Error: No ActionHandler registered for verb ID  \
+                        '\(command.verbID.rawValue, privacy: .public)'.
+                        """)
                     await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                     return
                 }
@@ -451,7 +461,7 @@ public class GameEngine: Sendable {
                     await report(actionError: actionError)
                 } catch {
                     // Handle unexpected errors during action execution from either pipeline
-                    await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
+                    logger.warning("💥 An unexpected error occurred while performing the action: \(error, privacy: .public)")
                     await ioHandler.print("Sorry, something went wrong.")
                 }
                 // --- End Execute Handler ---
@@ -465,7 +475,7 @@ public class GameEngine: Sendable {
                 // Call handler, ignore return value, use correct enum case syntax
                 _ = try await roomHandler(self, RoomActionMessage.afterTurn(command))
             } catch {
-                await ioHandler.print("Error in room afterTurn handler: \(error)", style: .debug)
+                logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }
             // Check if handler quit the game
             if shouldQuit { return }
@@ -585,7 +595,7 @@ public class GameEngine: Sendable {
 
         // 2. If lit, get snapshot and print name
         guard let locationSnapshot = locationSnapshot(with: locationID) else {
-            await ioHandler.print("Error: Current location snapshot not found!", style: .debug)
+            logger.warning("💥 Error: Current location snapshot not found!")
             return
         }
         await ioHandler.print("--- \(locationSnapshot.name) ---", style: .strong)
@@ -637,31 +647,32 @@ public class GameEngine: Sendable {
 
     /// Reports a parsing error to the player.
     private func report(parseError: ParseError) async {
-        // Provide more user-friendly messages
-        let message: String
-        switch parseError {
+        let message = switch parseError {
         case .emptyInput:
-            message = "I beg your pardon?" // More classic response
+            "I beg your pardon?"
         case .unknownVerb(let verb):
-            message = "I don't know the verb '\(verb)'."
+            "I don't know the verb '\(verb)'."
         case .unknownNoun(let noun):
-            message = "I don't see any '\(noun)' here."
+            "I don't see any '\(noun)' here."
         case .itemNotInScope(let noun):
-            message = "You can't see any '\(noun)' here."
+            "You can't see any '\(noun)' here."
         case .modifierMismatch(let noun, let modifiers):
-            message = "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
+            "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
         case .ambiguity(let text), .ambiguousPronounReference(let text):
-            message = text // Use the message generated by the parser
+            text
         case .badGrammar(let text):
-            message = text
+            text
         case .pronounNotSet(let pronoun):
-            message = "I don't know what '\(pronoun)' refers to."
+            "I don't know what '\(pronoun)' refers to."
         case .pronounRefersToOutOfScopeItem(let pronoun):
-            message = "You can't see what '\(pronoun)' refers to right now."
-        case .internalError(let details):
-            message = "A weird parsing error occurred: \(details)" // Should be rare
+            "You can't see what '\(pronoun)' refers to right now."
+        case .internalError:
+            "A strange buzzing sound indicates something is wrong."
         }
         await ioHandler.print(message)
+        if case .internalError(let details) = parseError {
+            logger.error("💥 ParseError: \(details, privacy: .public)")
+        }
     }
 
     /// Reports user-friendly messages for action failures to the player.
@@ -674,17 +685,17 @@ public class GameEngine: Sendable {
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
         case .customResponse(let message):
-            message // Use the custom message directly
+            message
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
         case .general(let message):
-            message // Use the general message directly
-        case .internalEngineError(let msg):
-            "A strange buzzing sound indicates something is wrong.\n  • \(msg)"
+            message
+        case .internalEngineError:
+            "A strange buzzing sound indicates something is wrong."
         case .invalidDirection:
             "You can't go that way."
-        case .invalidIndirectObject(let object):
-            "You can't use \(object ?? "that") for that."
+        case .invalidIndirectObject(let objectName):
+            "You can't use \(theThat(objectName)) for that."
         case .itemAlreadyClosed(let item):
             "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
@@ -741,10 +752,11 @@ public class GameEngine: Sendable {
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
             "The \(itemSnapshot(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
-        // All ActionError cases are now explicitly handled.
         }
-        if !message.isEmpty {
-            await ioHandler.print(message)
+        await ioHandler.print(message)
+
+        if case .internalEngineError(let msg) = actionError {
+            logger.error("💥 ActionError: \(msg, privacy: .public)")
         }
     }
 
@@ -760,6 +772,23 @@ public class GameEngine: Sendable {
     ) -> String {
         if let item = itemSnapshot(with: itemID) {
             "the \(item.name)"
+        } else {
+            alternate
+        }
+    }
+
+    /// Returns `the {name}` of an item, or an alternate reference if the name is unknown.
+    ///
+    /// - Parameters:
+    ///   - itemName: The item name.
+    ///   - alternate: An alternate reference to the item.
+    /// - Returns: `the {name}` of an item, or `that` if name is unknown.
+    private func theThat(
+        _ itemName: String?,
+        alternate: String = "that"
+    ) -> String {
+        if let itemName {
+            "the \(itemName)"
         } else {
             alternate
         }
@@ -842,7 +871,11 @@ public class GameEngine: Sendable {
         removing: Set<ItemProperty> = []
     ) async {
         guard let item = itemSnapshot(with: itemID) else {
-            await ioHandler.print("Debug: Cannot apply property change to non-existent item '\(itemID)'.", style: .debug)
+            logger
+                .warning("""
+                    💥 Cannot apply property change to non-existent item \
+                    '\(itemID.rawValue, privacy: .public)'.
+                    """)
             return
         }
         let oldProps = item.properties
@@ -861,7 +894,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply item property change for '\(itemID)': \(error)", style: .debug)
+                logger.warning("""
+                    💥 Failed to apply item property change for \
+                    '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -884,7 +920,11 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply flag change for '\(flag)': \(error)", style: .debug)
+                logger
+                    .warning("""
+                        💥 Failed to apply flag change for '\(flag, privacy: .public)': \
+                        \(error, privacy: .public)
+                        """)
             }
         }
     }
@@ -908,7 +948,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply pronoun change for '\(pronoun)': \(error)", style: .debug)
+                logger.warning("""
+                    💥 Failed to apply pronoun change for '\(pronoun, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -920,7 +963,8 @@ public class GameEngine: Sendable {
     ///   - newParent: The target parent entity.
     public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
         guard let item = itemSnapshot(with: itemID) else {
-            await ioHandler.print("Debug: Cannot move non-existent item '\(itemID)'.", style: .debug)
+            logger
+                .warning("💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'.")
             return
         }
         let oldParent = item.parent
@@ -928,12 +972,21 @@ public class GameEngine: Sendable {
         // Check if destination is valid (e.g., Location exists)
         if case .location(let locID) = newParent {
             guard locationSnapshot(with: locID) != nil else {
-                await ioHandler.print("Debug: Cannot move item '\(itemID)' to non-existent location '\(locID)'.", style: .debug)
+                logger
+                    .warning("""
+                        💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
+                        non-existent location '\(locID.rawValue, privacy: .public)'.
+                        """
+                    )
                 return
             }
         } else if case .item(let containerID) = newParent {
              guard itemSnapshot(with: containerID) != nil else {
-                await ioHandler.print("Debug: Cannot move item '\(itemID)' into non-existent container '\(containerID)'.", style: .debug)
+                 logger
+                     .warning("""
+                        💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \
+                        non-existent container '\(containerID.rawValue, privacy: .public)'.
+                        """)
                 return
             }
             // TODO: Add container capacity check?
@@ -949,7 +1002,7 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply item move for '\(itemID)': \(error)", style: .debug)
+                logger.warning("💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)")
             }
         }
     }
@@ -962,7 +1015,10 @@ public class GameEngine: Sendable {
 
         // Check if destination is valid
         guard locationSnapshot(with: newLocationID) != nil else {
-            await ioHandler.print("Debug: Cannot move player to non-existent location '\(newLocationID)'.", style: .debug)
+            logger
+                .warning(
+                    "💥 Cannot move player to non-existent location '\(newLocationID.rawValue, privacy: .public)'."
+                )
             return
         }
 
@@ -985,7 +1041,10 @@ public class GameEngine: Sendable {
                 }
 
             } catch {
-                await ioHandler.print("Debug: Failed to apply player move to '\(newLocationID)': \(error)", style: .debug)
+                logger
+                    .warning(
+                        "💥 Failed to apply player move to '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)"
+                    )
             }
         }
     }
@@ -1023,7 +1082,11 @@ public class GameEngine: Sendable {
         removing: Set<LocationProperty> = []
     ) async {
         guard let location = locationSnapshot(with: locationID) else {
-            await ioHandler.print("Debug: Cannot apply property change to non-existent location '\(locationID)'.", style: .debug)
+            logger
+                .warning("""
+                    💥 Cannot apply property change to non-existent location \
+                    '\(locationID.rawValue, privacy: .public)'.
+                    """)
             return
         }
         let oldProps = location.properties
@@ -1041,7 +1104,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply location property change for '\(locationID)': \(error)", style: .debug)
+                logger.warning("""
+                    💥 Failed to apply location property change for \
+                    '\(locationID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -1076,7 +1142,7 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                await ioHandler.print("Debug: Failed to apply game specific state change for '\(key)': \(error)", style: .debug)
+                logger.warning("💥 Failed to apply game specific state change for '\(key, privacy: .public)': \(error, privacy: .public)")
             }
         }
     }

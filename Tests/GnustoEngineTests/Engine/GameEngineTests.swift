@@ -434,7 +434,7 @@ struct GameEngineTests {
         )
 
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
 
         // Ensure pebble is initially takable and in the room (check initial game state)
         #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
@@ -493,7 +493,7 @@ struct GameEngineTests {
     @Test("Fuse executes after correct number of turns")
     func testFuseExecution() async throws {
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let stateHolder = TestStateHolder()
         let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { _ in
             await mockIO.print("Fuse triggered!")
@@ -523,7 +523,7 @@ struct GameEngineTests {
     @Test("Daemon executes at correct frequency")
     func testDaemonExecutionFrequency() async throws {
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
         let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in
@@ -552,7 +552,7 @@ struct GameEngineTests {
     @Test("Fuse and Daemon Interaction")
     func testFuseAndDaemonInteraction() async throws {
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
+        let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
         let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in /* ... */ }
@@ -603,10 +603,7 @@ struct GameEngineTests {
             commandInput: "go xyzzy",
             commandToParse: command
         )
-        expectNoDifference(output, """
-            A strange buzzing sound indicates something is wrong.
-              • Go command processed without a direction.
-            """)
+        expectNoDifference(output, "A strange buzzing sound indicates something is wrong.")
     }
 
     @Test("ReportActionError: .itemNotTakable")

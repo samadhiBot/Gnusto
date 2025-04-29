@@ -60,7 +60,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = await engine.itemSnapshots(withParent: .item(containerID))
+            let itemsInside = engine.itemSnapshots(withParent: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
