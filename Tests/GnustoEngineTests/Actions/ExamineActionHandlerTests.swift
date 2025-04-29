@@ -33,7 +33,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "rock")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
         expectNoDifference(output, "It’s just a rock.")
@@ -66,7 +66,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "key")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "A small brass key.")
     }
@@ -99,7 +99,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "scroll")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "FROBOZZ") // Should print the readableText
     }
@@ -136,7 +136,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "box")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         let expectedOutput = """
             A plain wooden box.
@@ -410,7 +410,7 @@ struct ExamineActionHandlerTests {
         await engine.applyItemPropertyChange(itemID: "stone", adding: [ItemProperty.on])
 
         // Assert intermediate state change
-        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(ItemProperty.on) == true)
+        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(.on) == true)
 
         // Act 2: Examine when red (isOn: true)
         try await handler.perform(command: command, engine: engine)

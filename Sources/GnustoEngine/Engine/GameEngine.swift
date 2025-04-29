@@ -62,6 +62,8 @@ public class GameEngine: Sendable {
         "close": CloseActionHandler(),
         "lock": LockActionHandler(),
         "unlock": UnlockActionHandler(),
+        "insert": InsertActionHandler(),
+        "puton": PutOnActionHandler(),
         // "put": PutActionHandler(), // TODO: Implement PutActionHandler
 
         // Inventory Management
@@ -425,19 +427,19 @@ public class GameEngine: Sendable {
                         try await enhancedHandler.validate(command: command, engine: self)
                         let result = try await enhancedHandler.process(command: command, engine: self)
 
-                        // Apply state changes BEFORE postProcess, record AFTER successful application.
+                        // Apply state changes BEFORE postProcess
                         for change in result.stateChanges {
-                            try await applyStateChange(change) // Apply the change first
+                            // Call apply directly on self.gameState (struct is mutable here)
+                            try self.gameState.apply(change)
                         }
 
                         // Process side effects BEFORE postProcess
                         for effect in result.sideEffects {
-                            try await processSideEffect(effect)
-                            // TODO: Should side effect processing throw?
+                            // Pass self.gameState as inout to processSideEffect
+                            try processSideEffect(effect, gameState: &self.gameState)
                         }
 
                         // Call postProcess AFTER state changes and side effects are applied/triggered.
-                        // The default postProcess will print the message.
                         try await enhancedHandler.postProcess(command: command, engine: self, result: result)
 
                     } else {
@@ -474,16 +476,17 @@ public class GameEngine: Sendable {
 
     /// Applies a single state change to the game state by forwarding to the central `GameState.apply` method.
     /// - Parameter change: The `StateChange` to apply.
+    /// - Parameter gameState: The GameState instance to modify (passed as inout).
     /// - Throws: An error if the change cannot be applied (forwarded from `GameState.apply`).
-    private func applyStateChange(_ change: StateChange) throws {
-        // Forward directly to GameState's apply method.
+    private func applyStateChange(_ change: StateChange, gameState: inout GameState) throws {
+        // Forward directly to GameState's apply method, modifying the inout parameter.
         try gameState.apply(change)
     }
 
     /// Processes a single side effect, potentially triggering StateChanges.
     /// - Parameter effect: The `SideEffect` to process.
     /// - Throws: An error if processing the side effect fails (e.g., definition not found, apply fails).
-    private func processSideEffect(_ effect: SideEffect) throws {
+    private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
         let fuseId = effect.targetId.rawValue // Assuming targetId is FuseID for fuse effects
         let daemonId = effect.targetId.rawValue // Assuming targetId is DaemonID for daemon effects
 
@@ -755,7 +758,11 @@ public class GameEngine: Sendable {
         _ itemID: ItemID,
         alternate: String = "that"
     ) -> String {
-        itemSnapshot(with: itemID)?.theName ?? alternate
+        if let item = itemSnapshot(with: itemID) {
+            "the \(item.name)"
+        } else {
+            alternate
+        }
     }
 
     // MARK: - State Access Helpers (Public but @MainActor isolated)

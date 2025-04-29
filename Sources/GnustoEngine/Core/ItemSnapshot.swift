@@ -48,11 +48,6 @@ public struct ItemSnapshot: Identifiable, Sendable {
         properties.contains(property)
     }
 
-    /// Returns `the {name}` for the item.
-    public var theName: String {
-        "the \(name)"
-    }
-
     // --- Matching Logic ---
 
     /// Checks if the provided noun matches the item's name or synonyms.

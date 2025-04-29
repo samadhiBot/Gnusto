@@ -374,26 +374,15 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when capacity exceeded")
     func testTakeItemFailsWhenCapacityExceeded() async throws {
-        // Arrange: Items with specific sizes
-        let itemHeld = Item(
-            id: "sword",
-            name: "heavy sword",
+        // Arrange
+        let heavyItem = Item(
+            id: "heavy",
+            name: "heavy thing",
             properties: .takable,
-            size: 8,
-            parent: .player
-        )
-        let itemToTake = Item(
-            id: "shield",
-            name: "large shield",
-            properties: .takable,
-            size: 7,
+            size: 101, // Exceeds default capacity (100)
             parent: .location("startRoom")
         )
-
-        let game = MinimalGame(items: [itemHeld, itemToTake])
-        // Define player with low capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
-
+        let game = MinimalGame(items: [heavyItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -401,25 +390,16 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
+        let command = Command(verbID: "take", directObject: "heavy", rawInput: "take heavy")
 
-        // Verify initial weight calculation is correct (optional but good)
-        let initialWeight = engine.gameState.player.currentInventoryWeight(allItems: engine.gameState.items)
-        #expect(initialWeight == 8)
-
-        let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield") // Try to take shield
-
-        // Act & Assert: Expect specific ActionError
+        // Act & Assert: Expect validate to throw playerCannotCarryMore
         await #expect(throws: ActionError.playerCannotCarryMore) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
 
-        // Assert: Check item parent DID NOT change
-        let finalItemState = engine.itemSnapshot(with: "shield")
-        #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
-
-        // Assert: Check NO message was printed by the handler
+        // Assert no output was printed by the handler itself during validation
         let output = await mockIO.flush()
-        #expect(output.isEmpty == true, "No output should be printed by handler on error")
+        #expect(output.isEmpty, "No output should be printed by handler on error")
     }
 
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.

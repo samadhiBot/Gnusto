@@ -73,7 +73,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
         // Prepare the result
         return ActionResult(
             success: true,
-            message: "You open the \(targetItem.name).", // Use theName helper
+            message: "You open the \(targetItem.name).",
             stateChanges: [stateChange],
             sideEffects: []
         )

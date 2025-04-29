@@ -462,7 +462,7 @@ struct StandardParserTests {
         )
 
         // Ensure lamp IS IN SCOPE (room) for setup, the test checks parser result
-        #expect(initState.items[lampID]?.parent == ParentEntity.location(roomID))
+        #expect(initState.items[lampID]?.parent == .location(roomID))
 
         let result = parser.parse(input: "examine it", vocabulary: vocabulary, gameState: initState)
         // This test should actually *pass* now, as the lantern is in scope.
@@ -481,7 +481,7 @@ struct StandardParserTests {
             vocabulary: self.vocabulary,
             pronouns: ["it": ["orb"]] // Start with 'it' = orb
         )
-        #expect(initState.items["orb"]?.parent == ParentEntity.nowhere)
+        #expect(initState.items["orb"]?.parent == .nowhere)
 
         let result = parser.parse(input: "take it", vocabulary: vocabulary, gameState: initState)
         #expect(result == .failure(ParseError.pronounRefersToOutOfScopeItem(pronoun: "it")))
@@ -583,7 +583,7 @@ struct StandardParserTests {
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["note"]?.parent == .item("chest"))
-        #expect(initState.items["chest"]?.hasProperty(ItemProperty.open) == false)
+        #expect(initState.items["chest"]?.hasProperty(.open) == false)
 
         // Only the key should be resolved from "them" because the note is out of scope
         let result = parser.parse(input: "drop them", vocabulary: vocabulary, gameState: initState)
@@ -739,7 +739,7 @@ struct StandardParserTests {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict[lampID]?.parent = ParentEntity.nowhere // Move lamp out of scope
+        itemsDict[lampID]?.parent = .nowhere // Move lamp out of scope
         let customState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -747,7 +747,7 @@ struct StandardParserTests {
             vocabulary: self.vocabulary,
             pronouns: self.gameState.pronouns // Use base pronouns
         )
-        #expect(customState.items[lampID]?.parent == ParentEntity.nowhere) // Verify setup
+        #expect(customState.items[lampID]?.parent == .nowhere) // Verify setup
 
         // Run parser with the custom state
         let result = parser.parse(input: "take lamp", vocabulary: vocabulary, gameState: customState)
@@ -821,7 +821,7 @@ struct StandardParserTests {
     func testExtractNounModsPronoun() throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"]?.parent = ParentEntity.player // Put key in inventory
+        itemsDict["key"]?.parent = .player // Put key in inventory
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -841,7 +841,7 @@ struct StandardParserTests {
     func testExtractNounModsPronounNoise() throws {
         // "drop the it"
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"]?.parent = ParentEntity.player
+        itemsDict["key"]?.parent = .player
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),

@@ -46,8 +46,8 @@ struct TurnOffActionHandlerTests {
             It is now pitch black. You are likely to be eaten by a grue.
             """)
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("TURN OFF fails for non-light source")
@@ -137,8 +137,8 @@ struct TurnOffActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now off.")
@@ -180,8 +180,8 @@ struct TurnOffActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -224,8 +224,8 @@ struct TurnOffActionHandlerTests {
 
         // Check state remains unchanged
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Try to turn off non-device item")
@@ -252,8 +252,8 @@ struct TurnOffActionHandlerTests {
             try await handler.perform(command: command, engine: engine)
         }
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == true)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Try to turn off item not accessible")
@@ -314,8 +314,8 @@ struct TurnOffActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -358,8 +358,8 @@ struct TurnOffActionHandlerTests {
         try await handler.perform(command: command, engine: engine)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
-        #expect(finalItemState?.hasProperty(ItemProperty.on) == false)
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.on) == false)
+        #expect(finalItemState?.hasProperty(.touched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """

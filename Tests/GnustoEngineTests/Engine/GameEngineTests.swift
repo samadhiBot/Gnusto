@@ -413,8 +413,8 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             name: "pebble",
-            properties: ItemProperty.takable,
-            parent: ParentEntity.location("startRoom")
+            properties: .takable,
+            parent: .location("startRoom")
         )
         let startRoom = Location(
             id: "startRoom",
@@ -437,15 +437,15 @@ struct GameEngineTests {
         var mockParser = MockParser()
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.hasProperty(ItemProperty.takable) == true)
-        #expect(game.state.items["startItem"]?.parent == ParentEntity.location("startRoom"))
+        #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
+        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
         let engine = GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.itemSnapshots(withParent: ParentEntity.player).isEmpty == true)
+        #expect(engine.itemSnapshots(withParent: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -461,12 +461,12 @@ struct GameEngineTests {
 
         // Verify the final state using safe engine accessors
         let finalPebbleSnapshot = engine.itemSnapshot(with: "startItem")
-        #expect(finalPebbleSnapshot?.parent == ParentEntity.player, "Pebble snapshot should show parent as player")
+        #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.itemSnapshots(withParent: ParentEntity.player)
+        let finalInventorySnapshots = engine.itemSnapshots(withParent: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.itemSnapshots(withParent: ParentEntity.location("startRoom"))
+        let finalRoomSnapshots = engine.itemSnapshots(withParent: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
@@ -612,11 +612,11 @@ struct GameEngineTests {
     @Test("ReportActionError: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
-        let pebble = Item(id: "startItem", name: "pebble", parent: ParentEntity.location("startRoom"))
+        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.hasProperty(ItemProperty.takable) == false)
+        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
 
         let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
         let output = await runCommandAndCaptureOutput(
@@ -630,11 +630,11 @@ struct GameEngineTests {
     @Test("ReportActionError: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
-        let pebble = Item(id: "startItem", name: "pebble", parent: ParentEntity.location("startRoom"))
+        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.parent == ParentEntity.location("startRoom"))
+        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
         let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
         let output = await runCommandAndCaptureOutput(
@@ -648,12 +648,12 @@ struct GameEngineTests {
     @Test("ReportActionError: .containerIsClosed")
     func testReportErrorContainerIsClosed() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: ParentEntity.player)
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(
             id: "box",
             name: "box",
             properties: .container, .openable,
-            parent: ParentEntity.location("startRoom")
+            parent: .location("startRoom")
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
@@ -676,7 +676,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .itemNotOpenable")
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
-        let item = Item(id: "rock", name: "rock", parent: ParentEntity.location("startRoom"))
+        let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
@@ -695,8 +695,8 @@ struct GameEngineTests {
         let item = Item(
             id: "rock",
             name: "rock",
-            properties: ItemProperty.takable,
-            parent: ParentEntity.player
+            properties: .takable,
+            parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [item])
@@ -716,16 +716,16 @@ struct GameEngineTests {
         let itemHeld = Item(
             id: "sword",
             name: "sword",
-            properties: ItemProperty.takable,
+            properties: .takable,
             size: 8,
-            parent: ParentEntity.player
+            parent: .player
         )
         let itemToTake = Item(
             id: "shield",
             name: "shield",
-            properties: ItemProperty.takable,
+            properties: .takable,
             size: 7,
-            parent: ParentEntity.location("startRoom")
+            parent: .location("startRoom")
         )
         let player = Player(
             in: "startRoom",
@@ -746,8 +746,8 @@ struct GameEngineTests {
     @Test("ReportActionError: .targetIsNotAContainer")
     func testReportErrorTargetIsNotContainer() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: ParentEntity.player)
-        let target = Item(id: "rock", name: "rock", parent: ParentEntity.location("startRoom"))
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
@@ -769,8 +769,8 @@ struct GameEngineTests {
     @Test("ReportActionError: .targetIsNotASurface")
     func testReportErrorTargetIsNotSurface() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: ParentEntity.player)
-        let target = Item(id: "rock", name: "rock", parent: ParentEntity.location("startRoom"))
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
@@ -820,7 +820,7 @@ struct GameEngineTests {
             id: "box",
             name: "box",
             properties: .container, .openable,
-            parent: ParentEntity.location("startRoom")
+            parent: .location("startRoom")
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [container])
@@ -841,10 +841,10 @@ struct GameEngineTests {
             id: "chest",
             name: "chest",
             properties: .container, .openable, .lockable,
-            parent: ParentEntity.location("startRoom"),
+            parent: .location("startRoom"),
             lockKey: "key1"
         )
-        let key = Item(id: "key1", name: "key", properties: ItemProperty.takable, parent: ParentEntity.player)
+        let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
@@ -867,7 +867,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .itemNotCloseable")
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
-        let item = Item(id: "book", name: "book", parent: ParentEntity.location("startRoom"))
+        let item = Item(id: "book", name: "book", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
@@ -886,8 +886,8 @@ struct GameEngineTests {
         let item = Item(
             id: "statue",
             name: "statue",
-            properties: ItemProperty.fixed,
-            parent: ParentEntity.player
+            properties: .fixed,
+            parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [item])
@@ -908,7 +908,7 @@ struct GameEngineTests {
             id: "amulet",
             name: "cursed amulet",
             properties: .wearable, .worn, .fixed,
-            parent: ParentEntity.player
+            parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let game = MinimalGame(locations: [startRoom], items: [item])
@@ -949,7 +949,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
         // Initialize dark room with an item
-        let item = Item(id: "shadow", name: "shadow", parent: ParentEntity.location("startRoom"))
+        let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Dark Room")
         let game = MinimalGame(locations: [startRoom], items: [item])
 
@@ -971,10 +971,10 @@ struct GameEngineTests {
             id: "chest",
             name: "chest",
             properties: .container, .lockable, .locked,
-            parent: ParentEntity.location("startRoom"),
+            parent: .location("startRoom"),
             lockKey: "key1"
         )
-        let wrongKey = Item(id: "key2", name: "wrong key", properties: ItemProperty.takable, parent: ParentEntity.player)
+        let wrongKey = Item(id: "key2", name: "wrong key", properties: .takable, parent: .player)
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])

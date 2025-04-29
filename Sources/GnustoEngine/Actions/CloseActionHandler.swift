@@ -57,7 +57,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
 
         // Handle "already closed" case detected (but not thrown) in validate
         if !targetItem.hasProperty(.open) {
-            return ActionResult(success: false, message: "\(targetItem.theName.capitalizedFirst) is already closed.")
+            return ActionResult(success: false, message: "The \(targetItem.name) is already closed.")
         }
 
         // --- Calculate State Changes ---

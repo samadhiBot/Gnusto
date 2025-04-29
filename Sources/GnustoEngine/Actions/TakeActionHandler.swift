@@ -23,9 +23,8 @@ public struct TakeActionHandler: EnhancedActionHandler {
         if targetItem.parent == .player {
             // Can't throw error here, need to report specific message.
             // Let process handle returning a specific ActionResult for this.
-            // Or add a specific ActionError? For now, let process handle it.
             // This validation passes if already held, process generates the message.
-             return
+            return
         }
 
         // 4. Check if item is inside something invalid (non-container/non-surface)
@@ -44,14 +43,13 @@ public struct TakeActionHandler: EnhancedActionHandler {
         // 5. Check reachability using ScopeResolver (general check)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-             // Handle specific container closed errors before general unreachability
-             // This case might now be redundant due to check #4, but keep for safety/edge cases
-             if case .item(let parentID) = targetItem.parent,
-                let container = await engine.itemSnapshot(with: parentID),
-                container.hasProperty(.container),
-                !container.hasProperty(.open) {
-                 throw ActionError.containerIsClosed(parentID)
-             }
+            // Handle specific container closed errors before general unreachability
+            if case .item(let parentID) = targetItem.parent,
+               let container = await engine.itemSnapshot(with: parentID),
+               container.hasProperty(.container),
+               !container.hasProperty(.open) {
+                throw ActionError.containerIsClosed(parentID)
+            }
             // If not reachable for other reasons (e.g., too far, darkness affecting scope)
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -61,7 +59,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
             throw ActionError.itemNotTakable(targetItemID)
         }
 
-        // 7. Check capacity
+        // 7. Check capacity <-- Check added here
         guard await engine.canPlayerCarry(itemSize: targetItem.size) else {
             throw ActionError.playerCannotCarryMore
         }
@@ -112,8 +110,6 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // Change 3: Pronoun ("it")
-        // TODO: Handle "them" for plural/multiple items? Requires parser changes.
-        // Fix: Use engine.getPronounReference (not async)
         let oldPronounValue = await engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
             entityId: .global,
