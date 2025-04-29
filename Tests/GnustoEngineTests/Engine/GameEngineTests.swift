@@ -434,7 +434,19 @@ struct GameEngineTests {
         )
 
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        var mockParser = MockParser()
+
+        // Configure the MockParser
+        let takeCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
+        let inventoryCommand = Command(verbID: "inventory", rawInput: "inventory")
+        mockParser.parseHandler = { input, _, _ in
+            switch input {
+            case "take pebble": return .success(takeCommand)
+            case "inventory": return .success(inventoryCommand)
+            // Handle quit implicitly via engine.run loop
+            default: return .failure(.unknownVerb(input))
+            }
+        }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
         #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
