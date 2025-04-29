@@ -113,8 +113,8 @@ public struct ExamineActionHandler: ActionHandler {
         if !contents.isEmpty {
             // TODO: Use proper sentence construction like Zork: "On the table is a book and a key."
             await engine.ioHandler.print("On the \(targetItem.name) is:")
-            for item in contents {
-                await engine.ioHandler.print("  A \(item.name)")
+            for item in contents.map(\.name).sorted() {
+                await engine.ioHandler.print("  A \(item)")
             }
         }
         // If empty, we just print the description above, no extra message needed unlike containers.
