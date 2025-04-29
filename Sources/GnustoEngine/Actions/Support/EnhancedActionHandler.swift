@@ -47,24 +47,6 @@ public protocol EnhancedActionHandler: Sendable {
 // MARK: - Default Implementation
 
 extension EnhancedActionHandler {
-    /// Default implementation of the original `ActionHandler.perform` method.
-    /// This bridges the old `perform` requirement to the new pipeline (`validate`, `process`, `postProcess`).
-    /// Simple action handlers can continue using the old `perform` method if they don't need the enhanced pipeline.
-    public func perform(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        try await validate(command: command, engine: engine)
-        let result = try await process(command: command, engine: engine)
-        // TODO: Consider if the engine should apply state changes/side effects centrally
-        // based on ActionResult, or if the handler's postProcess is always responsible.
-        // For now, assume postProcess handles applying the result.
-        try await postProcess(command: command, engine: engine, result: result)
-    }
-
-    // Provide default empty implementations for validate and postProcess
-    // to make adoption easier for handlers that only need custom process logic.
-
     public func validate(
         command: Command,
         engine: GameEngine
@@ -72,18 +54,39 @@ extension EnhancedActionHandler {
         // Default: No specific validation required.
     }
 
+    /// A convenience method that runs the validation and processing steps.
+    ///
+    /// Primarily intended as a convenience for testing handlers directly.
+    ///
+    /// Note: This default implementation does *not* apply the state changes from the returned
+    ///       `ActionResult`, as that is the responsibility of the `GameEngine`.
+    ///
+    /// - Parameters:
+    ///   - command: The command to perform.
+    ///   - engine: The game engine instance.
+    /// - Returns: The `ActionResult` produced by the `process` method.
+    @discardableResult
+    public func perform(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        try await validate(command: command, engine: engine)
+        let result = try await process(command: command, engine: engine)
+        // The GameEngine is responsible for applying state changes from the result.
+        // The `postProcess` hook is available for handlers needing custom logic *after* processing.
+        return result
+    }
+
+    /// Optional step for handlers needing custom logic after `process` returns, but before
+    /// the engine applies state changes or prints the message.
+    ///
+    /// The default implementation does nothing.
     public func postProcess(
         command: Command,
         engine: GameEngine,
         result: ActionResult
     ) async throws {
-        // Default: Print the message from the result, regardless of success.
-        // The message often indicates *why* an action failed (e.g., "You already have that.").
-        // State changes and side effects are assumed to be handled elsewhere or by the engine.
-        if !result.message.isEmpty {
-            await engine.ioHandler.print(result.message)
-        }
-        // TODO: Revisit if explicit error throwing is preferred over success=false + message.
+        // Default: Do nothing
     }
 }
 
