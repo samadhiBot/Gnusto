@@ -1,76 +1,102 @@
 import Foundation
 
 /// Handles the "EXAMINE" command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
-public struct ExamineActionHandler: ActionHandler {
+public struct ExamineActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.ioHandler.print("Examine what?")
-            return
+            throw ActionError.customResponse("Examine what?")
         }
 
-        // 2. Check if item exists and is accessible
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        // 2. Check if item exists
+        guard await engine.itemSnapshot(with: targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
+        // 3. Check reachability
         let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
         guard isReachable else {
-            // Error message like "You can't see any... here" is handled by engine's report(actionError:)
             throw ActionError.itemNotAccessible(targetItemID)
-        }
-
-        // Mark as touched regardless of what happens next (standard Zork behavior)
-        await engine.applyItemPropertyChange(itemID: targetItemID, adding: [.touched])
-
-        // 4. Check if item is readable (Zork V-EXAMINE prioritizes P?TEXT)
-        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
-            await engine.ioHandler.print(text) // Print the readable text
-            return
-        }
-
-        // 5. Check if item is a container or door (Zork V-EXAMINE calls V-LOOK-INSIDE)
-        if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
-            await examineContainerOrDoor(targetItem: targetItem, engine: engine)
-            return
-        }
-
-        // 6. Check if item is a surface and list contents
-        if targetItem.hasProperty(.surface) {
-            await examineSurface(targetItem: targetItem, engine: engine)
-            return
-        }
-
-        // 7. Get the item's description using the description handler (fallback)
-        if let descriptionHandler = targetItem.longDescription {
-            let description = await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: engine
-            )
-            await engine.ioHandler.print(description)
-        } else {
-            // Default message if no description handler
-            await engine.ioHandler.print("There's nothing special about the \(targetItem.name).")
         }
     }
 
-    /// Helper function to handle examining containers or doors.
-    private func examineContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async {
-        // Print the item's main description first, if available
-        if let descriptionHandler = targetItem.longDescription {
-            let description = await engine.descriptionHandlerRegistry.generateDescription(
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            throw ActionError.internalEngineError("Examine command reached process without direct object.")
+        }
+        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+        }
+
+        // --- State Change: Mark as Touched ---
+        var stateChanges: [StateChange] = []
+        if !targetItem.hasProperty(.touched) {
+            let change = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemProperties(targetItem.properties),
+                newValue: .itemProperties(targetItem.properties.union([.touched]))
+            )
+            stateChanges.append(change)
+        }
+
+        // --- Determine Message ---
+        let message: String
+
+        // Priority 1: Readable Text
+        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
+            message = text
+        }
+        // Priority 2: Container/Door Description
+        else if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
+            message = await describeContainerOrDoor(targetItem: targetItem, engine: engine)
+        }
+        // Priority 3: Surface Description
+        else if targetItem.hasProperty(.surface) {
+            message = await describeSurface(targetItem: targetItem, engine: engine)
+        }
+        // Priority 4: Dynamic Long Description
+        else if let descriptionHandler = targetItem.longDescription {
+            message = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
                 engine: engine
             )
-            await engine.ioHandler.print(description)
+        }
+        // Fallback: Default Message
+        else {
+            message = "There's nothing special about the \(targetItem.name)."
+        }
+
+        // --- Create Result ---
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
+    }
+
+    // MARK: - Private Helpers (Adapted to return String)
+
+    /// Helper function to generate description for containers or doors.
+    private func describeContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async -> String {
+        var descriptionParts: [String] = []
+
+        // Start with the item's main description, if available
+        if let descriptionHandler = targetItem.longDescription {
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+            descriptionParts.append(baseDescription)
         } else {
-            // Fallback if no specific description
-            await engine.ioHandler.print("You examine the \(targetItem.name).")
+            descriptionParts.append("You examine the \(targetItem.name).")
         }
 
         let isOpen = targetItem.hasProperty(.open)
@@ -79,44 +105,42 @@ public struct ExamineActionHandler: ActionHandler {
         if isOpen || isTransparent {
             let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
             if contents.isEmpty {
-                await engine.ioHandler.print("The \(targetItem.name) is empty.")
+                descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
-                await engine.ioHandler.print("The \(targetItem.name) contains:")
+                descriptionParts.append("The \(targetItem.name) contains:")
                 for item in contents {
-                    // TODO: Proper sentence construction with articles
-                    await engine.ioHandler.print("  A \(item.name)")
+                    descriptionParts.append("  A \(item.name)")
                 }
             }
         } else {
-            // Closed and not transparent
-            await engine.ioHandler.print("The \(targetItem.name) is closed.")
+            descriptionParts.append("The \(targetItem.name) is closed.")
         }
+        return descriptionParts.joined(separator: "\n")
     }
 
-    /// Helper function to handle examining surfaces.
-    private func examineSurface(targetItem: ItemSnapshot, engine: GameEngine) async {
-        // Print the item's main description first, if available
+    /// Helper function to generate description for surfaces.
+    private func describeSurface(targetItem: ItemSnapshot, engine: GameEngine) async -> String {
+        var descriptionParts: [String] = []
+
+        // Start with the item's main description, if available
         if let descriptionHandler = targetItem.longDescription {
-            let description = await engine.descriptionHandlerRegistry.generateDescription(
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
                 engine: engine
             )
-            await engine.ioHandler.print(description)
+            descriptionParts.append(baseDescription)
         } else {
-            // Fallback if no specific description
-            await engine.ioHandler.print("You examine the \(targetItem.name).")
+            descriptionParts.append("You examine the \(targetItem.name).")
         }
 
         // List items on the surface
         let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
         if !contents.isEmpty {
-            // TODO: Use proper sentence construction like Zork: "On the table is a book and a key."
-            await engine.ioHandler.print("On the \(targetItem.name) is:")
-            for item in contents.map(\.name).sorted() {
-                await engine.ioHandler.print("  A \(item)")
-            }
+            let itemNames = contents.map { "a \($0.name)" }
+            descriptionParts.append("On the \(targetItem.name) is \(itemNames.formatted()).")
         }
-        // If empty, we just print the description above, no extra message needed unlike containers.
+
+        return descriptionParts.joined(separator: "\n")
     }
 }

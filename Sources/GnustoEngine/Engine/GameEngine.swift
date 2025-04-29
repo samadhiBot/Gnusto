@@ -26,7 +26,7 @@ public class GameEngine: Sendable {
     public let descriptionHandlerRegistry: DescriptionHandlerRegistry
 
     /// Registered handlers for specific verb commands.
-    private var actionHandlers = [VerbID: ActionHandler]()
+    private var actionHandlers = [VerbID: EnhancedActionHandler]()
 
     /// Active timed events (Fuses) - Runtime storage with closures.
     private var activeFuses = [FuseID: Fuse]()
@@ -57,7 +57,7 @@ public class GameEngine: Sendable {
 
     /// Default action handlers provided by the engine.
     /// Games can override these via the `DefinitionRegistry`.
-    private static let defaultActionHandlers: [VerbID: ActionHandler] = [
+    private static let defaultActionHandlers: [VerbID: EnhancedActionHandler] = [
         // Movement & World Interaction
         "go": GoActionHandler(),
         "look": LookActionHandler(),
@@ -432,23 +432,18 @@ public class GameEngine: Sendable {
 
                 // --- Execute Handler (New Logic) ---
                 do {
-                    if let enhancedHandler = verbHandler as? EnhancedActionHandler {
-                        // Use the new pipeline
-                        try await enhancedHandler.validate(command: command, engine: self)
-                        let result = try await enhancedHandler.process(command: command, engine: self)
+                    // Directly use the enhanced handler pipeline
+                    try await verbHandler.validate(command: command, engine: self)
+                    let result = try await verbHandler.process(command: command, engine: self)
 
-                        // Apply state changes
-                        for change in result.stateChanges {
-                            try self.gameState.apply(change)
-                        }
-
-                        // Print the result message (always present)
-                        await ioHandler.print(result.message)
-
-                    } else {
-                        // Use the old pipeline for standard ActionHandlers
-                        try await verbHandler.perform(command: command, engine: self)
+                    // Apply state changes
+                    for change in result.stateChanges {
+                        try self.gameState.apply(change)
                     }
+
+                    // Print the result message (always present)
+                    await ioHandler.print(result.message)
+
                 } catch let actionErr as ActionError {
                     // Catch ActionError specifically for reporting
                     await report(actionError: actionErr)

@@ -545,20 +545,6 @@ struct GameEngineTests {
             }
         }
 
-        // Bridge the EnhancedActionHandler to ActionHandler for registry
-        struct EnhancedHandlerBridge: ActionHandler {
-            let enhancedHandler: EnhancedActionHandler
-
-            func perform(command: Command, engine: GameEngine) async throws {
-                // This implementation assumes the engine's execute method
-                // correctly handles calling enhanced handlers.
-                // We just need this bridge for registration.
-                // The actual execution path will go through the enhanced pipeline.
-                // If execute wasn't handling it, we'd call validate/process/apply here.
-                print("Warning: EnhancedHandlerBridge.perform called directly - should be handled by engine execute pipeline.")
-            }
-        }
-
         let testItemID: ItemID = "testLamp"
         let testFlagKey = "lampLit"
         let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
@@ -566,13 +552,13 @@ struct GameEngineTests {
         let game = MinimalGame(
             items: [lamp],
             registry: DefinitionRegistry(
-                // Use customActionHandlers and the bridge
+                // Use customActionHandlers directly with the EnhancedActionHandler
                 customActionHandlers: [
-                    VerbID("activate"): EnhancedHandlerBridge(enhancedHandler: mockEnhancedHandler)
+                    VerbID("activate"): mockEnhancedHandler // No bridge needed
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit) // Qualified
+        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()

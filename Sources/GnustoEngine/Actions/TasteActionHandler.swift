@@ -1,13 +1,20 @@
 import Foundation
 
 /// Action handler for the TASTE verb (default behavior).
-struct TasteActionHandler: ActionHandler {
-    func perform(command: Command, engine: GameEngine) async throws {
+struct TasteActionHandler: EnhancedActionHandler {
+
+    func validate(command: Command, engine: GameEngine) async throws {
         guard command.directObject != nil else {
-            await engine.ioHandler.print("Taste what?")
-            return
+            throw ActionError.customResponse("Taste what?")
         }
+        // Basic TASTE doesn't need reachability check by default.
+    }
+
+    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Generic response. Tasting specific items (like food) would need custom logic.
-        await engine.ioHandler.print("That tastes about average.")
+        return ActionResult(
+            success: true,
+            message: "That tastes about average."
+        )
     }
 }

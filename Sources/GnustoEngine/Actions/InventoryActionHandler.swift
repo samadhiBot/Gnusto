@@ -1,28 +1,41 @@
 import Foundation
 
 /// Handles the "INVENTORY" command and its synonyms (e.g., "I").
-public struct InventoryActionHandler: ActionHandler {
+public struct InventoryActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
+        // No specific validation needed for basic inventory command.
+    }
+
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // 1. Get inventory item snapshots
         let inventoryItems = await engine.itemSnapshots(withParent: .player)
 
-        // 2. Check if empty
+        // 2. Construct the message
+        let message: String
         if inventoryItems.isEmpty {
             // TODO: Check Zork/classic message
-            await engine.ioHandler.print("You are empty-handed.")
+            message = "You are empty-handed."
         } else {
             // 3. List Items
             // TODO: Check Zork/classic message format
-            await engine.ioHandler.print("You are carrying:")
+            var messageParts = ["You are carrying:"]
             for item in inventoryItems.sorted() {
-                // Basic listing, could be enhanced with articles, descriptions etc.
-                await engine.ioHandler.print("  A \(item.name)")
+                messageParts.append("  A \(item.name)") // TODO: Improve listing format
             }
+            message = messageParts.joined(separator: "\n")
         }
-        // Inventory command typically takes no game time / turn count doesn't increment
-        // This should be handled by the GameEngine loop logic if desired.
+
+        // Inventory command typically takes no game time.
+        // No state changes occur.
+        return ActionResult(
+            success: true,
+            message: message
+            // stateChanges and sideEffects default to empty
+        )
     }
 }

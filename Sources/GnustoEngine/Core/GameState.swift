@@ -362,15 +362,15 @@ extension GameState {
             // Validate oldValue if provided (expected Int turns remaining)
             try validateOldValue(change, actualOldValue: actualOldValue != nil ? .int(actualOldValue!) : nil)
             // newValue validation doesn't make sense for remove
-            // Ensure fuse was actually present if oldValue validation passed or wasn't needed
-            guard self.activeFuses.removeValue(forKey: fuseId) != nil else {
-                 // Only throw if oldValue wasn't provided to validate existence
-                 if change.oldValue == nil {
-                      throw ActionError.internalEngineError("Attempted to remove non-existent active fuse: \(fuseId)")
-                 }
-                 // If oldValue was provided and matched nil, removal is technically successful (idempotent)
-                 break
+
+            // Attempt to remove the value
+            let didRemove = self.activeFuses.removeValue(forKey: fuseId) != nil
+
+            // If it wasn't present, only throw an error if oldValue *wasn't* provided to confirm expectation
+            if !didRemove, change.oldValue == nil {
+                throw ActionError.internalEngineError("Attempted to remove non-existent active fuse: \(fuseId)")
             }
+            // If oldValue was provided and matched nil (validation passed), or if remove succeeded, we are good.
 
         case .updateFuseTurns(let fuseId):
             guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .updateFuseTurns: \(change.entityId)") }

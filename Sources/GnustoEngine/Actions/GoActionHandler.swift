@@ -1,14 +1,15 @@
 import Foundation
 
 /// Handles movement commands (e.g., "GO NORTH", "NORTH", "N").
-public struct GoActionHandler: ActionHandler {
+public struct GoActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
-        // 1. Identify Direction (Assume parser sets command.direction)
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
+        // 1. Identify Direction
         guard let direction = command.direction else {
-            // This should be caught by parser ensuring direction commands are valid
             throw ActionError.internalEngineError("Go command processed without a direction.")
         }
 
@@ -20,17 +21,14 @@ public struct GoActionHandler: ActionHandler {
 
         // 3. Find Exit
         guard let exit = currentLoc.exits[direction] else {
-            // Standard message: "You can't go that way."
-            await engine.ioHandler.print("You can't go that way.")
-            return // Stop processing
+            throw ActionError.invalidDirection // Standard message: "You can't go that way."
         }
 
         // 4. Check Exit Conditions
 
-        // Check for static blocked message first (highest priority override)
+        // Check for static blocked message first
         if let staticBlockedMessage = exit.blockedMessage {
-            await engine.ioHandler.print(staticBlockedMessage)
-            return // Stop processing
+            throw ActionError.directionIsBlocked(staticBlockedMessage)
         }
 
         // Check required key
@@ -46,27 +44,41 @@ public struct GoActionHandler: ActionHandler {
         // Check door status if applicable
         if exit.isDoor {
             if !exit.isOpen {
-                // Standard message for closed door
                 throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
             }
-            if exit.isLocked {
-                // Standard message for locked door
-                throw ActionError.directionIsBlocked("The \(direction.rawValue) door seems to be locked.")
-            }
+            // Note: Lock check removed - UnlockAction should handle setting isLocked = false when isOpen is set true.
+            // If a door can be open *and* locked, this needs reconsideration. Zork doors usually auto-unlock when opened.
+        }
+    }
+
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Validation passed, find exit again (state might have changed, though unlikely for exits)
+        guard let direction = command.direction,
+              let currentLoc = await engine.locationSnapshot(with: await engine.playerLocationID()),
+              let exit = currentLoc.exits[direction]
+        else {
+            // Should not happen if validate passed, but defensive check
+            throw ActionError.internalEngineError("Exit disappeared between validate and process for GO command.")
         }
 
-        // --- Movement Successful ---
+        // --- Create State Change ---
+        let oldLocationID = await engine.playerLocationID()
+        let newLocationID = exit.destination
 
-        // 5. Update Player Location using the engine method that triggers hooks
-        await engine.applyPlayerMove(to: exit.destination)
+        let change = StateChange(
+            entityId: .player,
+            propertyKey: .playerLocation,
+            oldValue: .locationID(oldLocationID),
+            newValue: .locationID(newLocationID)
+        )
 
-        // 6. Describe New Location
-        // The GameEngine loop usually handles describing the location after a successful turn.
-        // However, explicitly calling it here ensures it happens immediately after movement.
-        await engine.describeCurrentLocation()
-
-        // 7. Output Message (Optional)
-        // Often, just the new location description is sufficient output for movement.
-        // await engine.ioHandler.print("You go \(direction.rawValue).")
+        // --- Create Result ---
+        // Movement itself doesn't usually print a message; the new location description suffices.
+        // The engine's run loop will trigger describeCurrentLocation after state changes.
+        return ActionResult(
+            success: true,
+            message: "", // No specific message for GO action itself
+            stateChanges: [change]
+        )
     }
 }
