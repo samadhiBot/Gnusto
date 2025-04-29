@@ -62,3 +62,29 @@ func testExamineSimpleObjectHeld() async throws {
     expectNoDifference(output, "A small brass key.")
 }
 ```
+
+## Reporting Errors:
+
+- Use `Issue.record` instead of `#expect(Bool(false), ...)`
+
+```swift
+// Wrong:
+do {
+    try gameState.apply(change)
+    #expect(Bool(false), "Expected apply to throw an error, but it succeeded.")
+} catch { ... }
+
+if errorWasActionError { ... } else {
+    #expect(Bool(false), "Thrown error was not an ActionError: \(thrownError)")
+}
+
+// Right:
+do {
+    try gameState.apply(change)
+    Issue.record("Expected apply to throw an error, but it succeeded.")
+} catch { ... }
+
+if errorWasActionError { ... } else {
+    Issue.record("Thrown error was not an ActionError: \(thrownError)")
+}
+```

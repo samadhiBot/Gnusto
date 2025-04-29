@@ -1049,6 +1049,13 @@ public class GameEngine: Sendable {
         }
     }
 
+    /// Retrieves the full change history.
+    ///
+    /// - Returns: An array of `StateChange` objects.
+    public func getChangeHistory() -> [StateChange] {
+        gameState.changeHistory
+    }
+
     /// Signals the engine to stop the main game loop after the current turn.
     public func requestQuit() {
         self.shouldQuit = true
@@ -1145,6 +1152,14 @@ public class GameEngine: Sendable {
                 logger.warning("💥 Failed to apply game specific state change for '\(key, privacy: .public)': \(error, privacy: .public)")
             }
         }
+    }
+
+    /// Retrieves the value of a global flag.
+    ///
+    /// - Parameter key: The key of the flag to retrieve.
+    /// - Returns: The boolean value of the flag, or `false` if not set.
+    public func getFlagValue(key: String) -> Bool {
+        gameState.flags[key] ?? false
     }
 
     // TODO: Add helpers for score/move updates if needed by standard ActionHandlers?

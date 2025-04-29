@@ -106,6 +106,12 @@ struct GameEngineTests {
         // Check turn counter was incremented despite error
         let finalMoves = engine.playerMoves()
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
+
+        // Check change history only contains the move increment
+        let history = engine.getChangeHistory()
+        #expect(history.count == 1, "Only move increment should be in history on parse error")
+        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.newValue == .int(1))
     }
 
     @Test("Engine Handles Action Error")
@@ -172,6 +178,12 @@ struct GameEngineTests {
         // Check turn counter incremented
         let finalMoves = engine.playerMoves()
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
+
+        // Check change history only contains the move increment
+        let history = engine.getChangeHistory()
+        #expect(history.count == 1, "Only move increment should be in history on action error")
+        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.newValue == .int(1))
     }
 
     @Test("Engine Processes Successful Command")
@@ -495,6 +507,145 @@ struct GameEngineTests {
          // Verify output included "Taken."
         let output = await mockIO.recordedOutput
         #expect(output.contains { $0.text == "Taken." })
+    }
+
+    @Test("Engine Records State Changes from Enhanced Handler")
+    func testEngineRecordsStateChangesFromEnhancedHandler() async throws {
+        // Given: An enhanced handler that changes multiple things
+        struct MockMultiChangeHandler: EnhancedActionHandler {
+            let itemIDToModify: ItemID
+            let flagToSet: String
+
+            func validate(command: Command, engine: GameEngine) async throws { }
+
+            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+                guard let item = await engine.itemSnapshot(with: itemIDToModify) else {
+                    throw ActionError.internalEngineError("Test item missing")
+                }
+
+                // Define multiple changes
+                let change1 = StateChange(
+                    entityId: .item(itemIDToModify),
+                    propertyKey: .itemProperties,
+                    oldValue: .itemProperties(item.properties),
+                    newValue: .itemProperties(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
+                )
+                let change2 = StateChange(
+                    entityId: .global,
+                    propertyKey: .globalFlag(key: flagToSet),
+                    oldValue: .bool(await engine.getFlagValue(key: flagToSet)),
+                    newValue: .bool(true)
+                )
+
+                return ActionResult(
+                    success: true,
+                    message: "Multiple changes applied.",
+                    stateChanges: [change1, change2]
+                )
+            }
+        }
+
+        // Bridge the EnhancedActionHandler to ActionHandler for registry
+        struct EnhancedHandlerBridge: ActionHandler {
+            let enhancedHandler: EnhancedActionHandler
+
+            func perform(command: Command, engine: GameEngine) async throws {
+                // This implementation assumes the engine's execute method
+                // correctly handles calling enhanced handlers.
+                // We just need this bridge for registration.
+                // The actual execution path will go through the enhanced pipeline.
+                // If execute wasn't handling it, we'd call validate/process/apply here.
+                print("Warning: EnhancedHandlerBridge.perform called directly - should be handled by engine execute pipeline.")
+            }
+        }
+
+        let testItemID: ItemID = "testLamp"
+        let testFlagKey = "lampLit"
+        let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
+        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey)
+        let game = MinimalGame(
+            items: [lamp],
+            registry: DefinitionRegistry(
+                // Use customActionHandlers and the bridge
+                customActionHandlers: [
+                    VerbID("activate"): EnhancedHandlerBridge(enhancedHandler: mockEnhancedHandler)
+                ]
+            )
+        )
+        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit) // Qualified
+
+        let mockIO = await MockIOHandler()
+        var mockParser = MockParser()
+        let activateCommand = Command(verbID: "activate", directObject: testItemID, rawInput: "activate lamp")
+
+        mockParser.parseHandler = { input, _, _ in
+            if input == "activate lamp" { return .success(activateCommand) }
+            if input == "quit" { return .failure(.emptyInput) }
+            return .failure(.unknownVerb(input))
+        }
+
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        // Ensure initial state
+        #expect(await engine.gameState.flags[testFlagKey] == nil)
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.on) == false) // Qualified
+        #expect(engine.getChangeHistory().isEmpty) // Use helper
+
+        // Act
+        await mockIO.enqueueInput("activate lamp", "quit")
+        await engine.run()
+
+        // Then
+        // Check final state
+        #expect(await engine.gameState.flags[testFlagKey] == true, "Flag should be set")
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.on) == true, "Item .on property should be set") // Qualified
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.touched) == true, "Item .touched property should be set") // Qualified
+
+        // Check history recorded correctly
+        let history = engine.getChangeHistory() // Use helper
+        #expect(!history.isEmpty, "Change history should not be empty")
+
+        // Check for Player moves increment change
+        #expect(
+            history.contains { change in
+                change.propertyKey == StatePropertyKey.playerMoves && change.newValue == StateValue.int(1)
+            },
+            "History should contain playerMoves increment to 1"
+        )
+
+        // Check for Item property change (touched + on)
+        #expect(
+            history.contains { change in
+                guard change.entityId == .item(testItemID), change.propertyKey == StatePropertyKey.itemProperties else { return false }
+                if case .itemProperties(let props) = change.newValue {
+                    return props.contains(ItemProperty.on) && props.contains(ItemProperty.touched)
+                } else {
+                    return false
+                }
+            },
+            "History should contain item property change adding .on and .touched"
+        )
+
+        // Check for Flag change
+        #expect(
+            history.contains { change in
+                change.entityId == .global &&
+                change.propertyKey == StatePropertyKey.globalFlag(key: testFlagKey) &&
+                change.newValue == StateValue.bool(true)
+            },
+            "History should contain flag change to true for \(testFlagKey)"
+        )
+
+        // Optionally, still check count if exact number is important
+        #expect(history.count == 3, "Expected exactly 3 changes: moves + item props + flag")
+
+        // Check output message
+        let output = await mockIO.recordedOutput
+        #expect(output.contains { $0.text == "Multiple changes applied." })
     }
 
     // MARK: - Fuse & Daemon Tests
