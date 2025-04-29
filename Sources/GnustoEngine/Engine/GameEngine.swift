@@ -437,32 +437,25 @@ public class GameEngine: Sendable {
                         try await enhancedHandler.validate(command: command, engine: self)
                         let result = try await enhancedHandler.process(command: command, engine: self)
 
-                        // Apply state changes BEFORE postProcess
+                        // Apply state changes
                         for change in result.stateChanges {
-                            // Call apply directly on self.gameState (struct is mutable here)
                             try self.gameState.apply(change)
                         }
 
-                        // Process side effects BEFORE postProcess
-                        for effect in result.sideEffects {
-                            // Pass self.gameState as inout to processSideEffect
-                            try processSideEffect(effect, gameState: &self.gameState)
-                        }
-
-                        // Call postProcess AFTER state changes and side effects are applied/triggered.
-                        try await enhancedHandler.postProcess(command: command, engine: self, result: result)
+                        // Print the result message (always present)
+                        await ioHandler.print(result.message)
 
                     } else {
-                        // Use the original perform method for standard handlers
+                        // Use the old pipeline for standard ActionHandlers
                         try await verbHandler.perform(command: command, engine: self)
                     }
-                } catch let actionError as ActionError {
-                    // Handle specific action failures from either pipeline
-                    await report(actionError: actionError)
+                } catch let actionErr as ActionError {
+                    // Catch ActionError specifically for reporting
+                    await report(actionError: actionErr)
                 } catch {
-                    // Handle unexpected errors during action execution from either pipeline
-                    logger.warning("💥 An unexpected error occurred while performing the action: \(error, privacy: .public)")
-                    await ioHandler.print("Sorry, something went wrong.")
+                    // Catch any other unexpected errors from handlers
+                    logger.error("💥 Unexpected error during handler execution: \(error)")
+                    await ioHandler.print("An unexpected problem occurred.")
                 }
                 // --- End Execute Handler ---
             }

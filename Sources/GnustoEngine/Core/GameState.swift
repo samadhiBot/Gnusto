@@ -389,7 +389,13 @@ extension GameState {
 
         case .addActiveDaemon(let daemonId):
             guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .addActiveDaemon: \(change.entityId)") }
-            // oldValue/newValue validation doesn't make sense for adding to a Set
+            // Validate oldValue if provided (expecting .bool(true) if present, .bool(false) if not)
+            let wasPresent = self.activeDaemons.contains(daemonId)
+            try validateOldValue(change, actualOldValue: .bool(wasPresent))
+            // newValue should be .bool(true) representing the desired active state
+            guard change.newValue == .bool(true) else {
+                throw ActionError.internalEngineError("Invalid StateValue newValue for .addActiveDaemon: \(change.newValue), expected .bool(true)")
+            }
             self.activeDaemons.insert(daemonId)
 
         case .removeActiveDaemon(let daemonId):
