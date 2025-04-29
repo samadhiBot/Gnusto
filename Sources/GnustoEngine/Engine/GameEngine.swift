@@ -226,6 +226,19 @@ public class GameEngine: Sendable {
                 return // Hook might quit
             }
             await execute(command: command)
+
+            // Describe location AFTER executing command if no error occurred during execution
+            // (Errors are handled within execute/report)
+            // Only describe if the command wasn't a quit command (already handled)
+            // Also check if shouldQuit was set during execute
+            if command.verbID != "quit" && !shouldQuit {
+                // TODO: Only describe if the action *might* have changed the view
+                // (e.g., movement, light change, taking/dropping items). LOOK already handles it.
+                if command.verbID != "look" { // Avoid double-description for LOOK
+                    await describeCurrentLocation()
+                }
+            }
+
         case .failure(let error):
             await report(parseError: error)
         }

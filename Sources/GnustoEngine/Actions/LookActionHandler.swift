@@ -129,9 +129,9 @@ public struct LookActionHandler: EnhancedActionHandler {
             // Get snapshots of items *on* the surface
             let itemsOnSurface = await engine.itemSnapshots(withParent: .item(item.id))
             if !itemsOnSurface.isEmpty {
-                lines.append("On the \(item.name) is:")
-                // TODO: Proper sentence construction with articles/grouping
-                lines.append(contentsOf: itemsOnSurface.map { "  A \($0.name)" }.sorted())
+                let itemNames = itemsOnSurface.map { "a \($0.name)" } // Get "a {name}" for each
+                let itemsString = itemNames.joined(separator: " and ") // Join with " and "
+                lines.append("On the \(item.name) is \(itemsString).")
             }
             // No message needed if surface is empty
         }

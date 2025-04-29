@@ -80,12 +80,12 @@ struct TouchActionHandlerTests {
 
         let command = Command(verbID: "touch", rawInput: "touch")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert
+        // Act & Assert
+        await #expect(throws: ActionError.customResponse("Touch what?")) {
+            try await handler.validate(command: command, engine: engine)
+        }
         let output = await mockIO.flush()
-        expectNoDifference(output, "Touch what?")
+        #expect(output.isEmpty)
     }
 
     @Test("Touch fails item not accessible")
@@ -108,7 +108,7 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("ghost")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
     }
 
@@ -211,7 +211,7 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("The locked chest is closed.")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
     }
 }

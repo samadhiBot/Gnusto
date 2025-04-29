@@ -61,14 +61,14 @@ public struct TouchActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
         if let targetItem = await engine.itemSnapshot(with: targetItemID) {
-            if !targetItem.hasProperty(.touched) {
-                let change = StateChange(
+            let initialProperties = targetItem.properties // Use initial state
+            if !initialProperties.contains(.touched) {
+                stateChanges.append(StateChange(
                     entityId: .item(targetItemID),
                     propertyKey: .itemProperties,
-                    oldValue: .itemProperties(targetItem.properties),
-                    newValue: .itemProperties(targetItem.properties.union([.touched]))
-                )
-                stateChanges.append(change)
+                    oldValue: .itemProperties(initialProperties),
+                    newValue: .itemProperties(initialProperties.union([.touched]))
+                ))
             }
         } else {
             // Should not happen if validate passed

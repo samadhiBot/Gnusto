@@ -60,24 +60,31 @@ struct TurnOnActionHandler: EnhancedActionHandler {
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
+        let initialProperties = targetItem.properties // Use initial state
 
-        // Add touched property if not present
-        if !targetItem.hasProperty(.touched) {
+        // Add touched property change if needed
+        if !initialProperties.contains(.touched) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(targetItem.properties),
-                newValue: .itemProperties(targetItem.properties.union([.touched]))
+                oldValue: .itemProperties(initialProperties),
+                newValue: .itemProperties(initialProperties.union([.touched]))
             ))
         }
 
-        // Add .on property
-        stateChanges.append(StateChange(
-            entityId: .item(targetItemID),
-            propertyKey: .itemProperties,
-            oldValue: .itemProperties(targetItem.properties.union(stateChanges.isEmpty ? [] : [.touched])), // Old value includes touched if added
-            newValue: .itemProperties(targetItem.properties.union(stateChanges.isEmpty ? [] : [.touched]).union([.on]))
-        ))
+        // Add .on property change (based on initial state + touched)
+        let propertiesAfterTouch = initialProperties.union(stateChanges.isEmpty ? [] : [.touched])
+        let propertiesAfterOn = propertiesAfterTouch.union([.on])
+        // Only add the change if .on was not already present initially
+        if !initialProperties.contains(.on) { // Ensure we only add if it was off
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                // Old value depends on whether touched was added *before* this change conceptually
+                oldValue: .itemProperties(propertiesAfterTouch),
+                newValue: .itemProperties(propertiesAfterOn)
+            ))
+        }
 
         // --- Determine Message ---
         let message = "The \(targetItem.name) is now on."

@@ -115,17 +115,15 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
 
-        // Act: Call the handler directly
-        try await handler.perform(command: command, engine: engine)
+        // Act & Assert: Expect error during validation
+        await #expect(throws: ActionError.customResponse("It's already on.")) {
+            try await handler.validate(command: command, engine: engine)
+        }
 
-        // Assert: Check for the specific output message
-        let output = await mockIO.flush()
-        expectNoDifference(output, "It's already on.")
-
-        // Verify item state didn't change unexpectedly
+        // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true) // Should still be on
-        #expect(finalItemState?.hasProperty(.touched) == true) // Should still be touched
+        #expect(finalItemState?.hasProperty(.touched) == false) // Should NOT be touched
     }
 
     @Test("Try to turn on non-device item")
@@ -151,12 +149,12 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine) // Changed to validate
         }
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false) // Should not gain .on
-        #expect(finalItemState?.hasProperty(.touched) == true) // Should be touched
+        #expect(finalItemState?.hasProperty(.touched) == false) // Should NOT be touched
     }
 
     @Test("Try to turn on item not accessible")
@@ -182,7 +180,7 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("lamp")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine) // Changed to validate
         }
     }
 

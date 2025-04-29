@@ -44,24 +44,31 @@ struct TurnOffActionHandler: EnhancedActionHandler {
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
+        let initialProperties = targetItem.properties // Use initial state
 
-        // Add touched property if not present
-        if !targetItem.hasProperty(.touched) {
+        // Add touched property change if needed
+        if !initialProperties.contains(.touched) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(targetItem.properties),
-                newValue: .itemProperties(targetItem.properties.union([.touched]))
+                oldValue: .itemProperties(initialProperties),
+                newValue: .itemProperties(initialProperties.union([.touched]))
             ))
         }
 
-        // Remove .on property
-        stateChanges.append(StateChange(
-            entityId: .item(targetItemID),
-            propertyKey: .itemProperties,
-            oldValue: .itemProperties(targetItem.properties.union(stateChanges.isEmpty ? [] : [.touched])), // Old value includes touched if added
-            newValue: .itemProperties(targetItem.properties.union(stateChanges.isEmpty ? [] : [.touched]).subtracting([.on]))
-        ))
+        // Remove .on property change (always based on initial state + touched)
+        let propertiesAfterTouch = initialProperties.union(stateChanges.isEmpty ? [] : [.touched]) // Account for potential touch
+        let propertiesAfterOff = propertiesAfterTouch.subtracting([.on])
+        // Only add the change if .on was actually present initially
+        if initialProperties.contains(.on) { // Ensure we only remove if it was on
+             stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                 // Old value depends on whether touched was added *before* this change conceptually
+                oldValue: .itemProperties(propertiesAfterTouch),
+                newValue: .itemProperties(propertiesAfterOff)
+            ))
+        }
 
         // --- Determine Message ---
         var messageParts: [String] = []

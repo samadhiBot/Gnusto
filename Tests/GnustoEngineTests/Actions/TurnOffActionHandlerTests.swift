@@ -82,7 +82,7 @@ struct TurnOffActionHandlerTests {
         let command = Command(verbID: "turn off", directObject: "book", rawInput: "turn off book")
 
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
     }
 
@@ -110,7 +110,7 @@ struct TurnOffActionHandlerTests {
 
         // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
     }
 
@@ -215,17 +215,15 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        // Act: Call the handler directly
-        try await handler.perform(command: command, engine: engine)
+        // Act & Assert: Expect error during validation
+        await #expect(throws: ActionError.customResponse("It's already off.")) {
+             try await handler.validate(command: command, engine: engine)
+        }
 
-        // Assert: Check for the specific output message
-        let output = await mockIO.flush()
-        expectNoDifference(output, "It's already off.")
-
-        // Check state remains unchanged
+        // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == false)
     }
 
     @Test("Try to turn off non-device item")
@@ -248,12 +246,14 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
+        // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.perform(command: command, engine: engine)
+             try await handler.validate(command: command, engine: engine)
         }
+        // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == false)
     }
 
     @Test("Try to turn off item not accessible")

@@ -35,14 +35,14 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if !targetItem.hasProperty(.touched) {
-            let change = StateChange(
+        let initialProperties = targetItem.properties // Use initial state
+        if !initialProperties.contains(.touched) {
+            stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(targetItem.properties),
-                newValue: .itemProperties(targetItem.properties.union([.touched]))
-            )
-            stateChanges.append(change)
+                oldValue: .itemProperties(initialProperties),
+                newValue: .itemProperties(initialProperties.union([.touched]))
+            ))
         }
 
         // --- Determine Message ---
@@ -138,7 +138,8 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
         if !contents.isEmpty {
             let itemNames = contents.map { "a \($0.name)" }
-            descriptionParts.append("On the \(targetItem.name) is \(itemNames.formatted()).")
+            let itemsString = itemNames.joined(separator: " and ")
+            descriptionParts.append("On the \(targetItem.name) is \(itemsString).")
         }
 
         return descriptionParts.joined(separator: "\n")

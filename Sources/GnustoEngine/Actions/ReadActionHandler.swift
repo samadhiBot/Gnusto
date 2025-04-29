@@ -70,14 +70,14 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if !targetItem.hasProperty(.touched) {
-            let change = StateChange(
+        let initialProperties = targetItem.properties // Use initial state
+        if !initialProperties.contains(.touched) {
+            stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(targetItem.properties),
-                newValue: .itemProperties(targetItem.properties.union([.touched]))
-            )
-            stateChanges.append(change)
+                oldValue: .itemProperties(initialProperties),
+                newValue: .itemProperties(initialProperties.union([.touched]))
+            ))
         }
 
         // --- Determine Message ---
