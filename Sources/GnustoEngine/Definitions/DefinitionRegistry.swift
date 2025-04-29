@@ -71,12 +71,4 @@ public struct DefinitionRegistry {
     internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? {
         roomActionHandlers[id]
     }
-
-    /// Fetches an `ActionHandler` by its associated `VerbID`.
-    ///
-    /// - Parameter id: The `VerbID` to look up.
-    /// - Returns: The `ActionHandler` if found, otherwise `nil`.
-    internal func verbActionHandler(for id: VerbID) -> ActionHandler? {
-        customActionHandlers[id]
-    }
 }

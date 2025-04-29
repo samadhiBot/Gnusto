@@ -117,7 +117,8 @@ struct GameEngineTests {
     @Test("Engine Handles Action Error")
     func testEngineHandlesActionError() async throws {
         let mockTakeHandler = MockActionHandler(
-            errorToThrow: .itemNotTakable("startItem")
+            errorToThrow: .itemNotTakable("startItem"),
+            throwFrom: .process
         )
         let game = MinimalGame(
             registry: DefinitionRegistry(
@@ -169,8 +170,8 @@ struct GameEngineTests {
         )
 
         // Verify the handler was called (optional but good practice)
-        let handlerCalled = await mockTakeHandler.getPerformCalled()
-        #expect(handlerCalled == true, "MockActionHandler.perform should have been called")
+        let processCalled = await mockTakeHandler.getProcessCalled()
+        #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(commandReceived?.verbID == "take")
         #expect(commandReceived?.directObject == "startItem")
@@ -228,8 +229,8 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the handler was called with the correct command
-        let handlerCalled = await mockLookHandler.getPerformCalled()
-        #expect(handlerCalled == true, "MockActionHandler.perform should have been called for LOOK")
+        let processCalled = await mockLookHandler.getProcessCalled()
+        #expect(processCalled == true, "MockActionHandler.process should have been called for LOOK")
         let commandReceived = await mockLookHandler.getLastCommandReceived()
         #expect(commandReceived?.verbID == "look", "Handler received incorrect verb")
 
@@ -287,10 +288,10 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify handlers were called
-        let lookHandlerCalled = await mockLookHandler.getPerformCalled()
-        #expect(lookHandlerCalled == true, "Look handler should be called")
-        let takeHandlerCalled = await mockTakeHandler.getPerformCalled()
-        #expect(takeHandlerCalled == true, "Take handler should be called")
+        let lookProcessCalled = await mockLookHandler.getProcessCalled()
+        #expect(lookProcessCalled == true, "Look handler should be called")
+        let takeProcessCalled = await mockTakeHandler.getProcessCalled()
+        #expect(takeProcessCalled == true, "Take handler should be called")
 
         // Verify commands received by handlers
         let lookCommandReceived = await mockLookHandler.getLastCommandReceived()

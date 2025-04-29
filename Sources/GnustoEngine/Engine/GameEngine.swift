@@ -124,18 +124,6 @@ public class GameEngine: Sendable {
         self.activeFuses = fuses
     }
 
-    // Add Placeholder Handler Struct (Temporary)
-    fileprivate struct PlaceholderActionHandler: ActionHandler {
-        let verb: String
-
-        func perform(
-            command: Command,
-            engine: GameEngine
-        ) async throws {
-            await engine.ioHandler.print("Sorry, the default handler for '\\(verb)' is not implemented yet.")
-        }
-    }
-
     // MARK: - Fuse & Daemon Management (Runtime Only)
 
     /// Adds or updates a fuse in the ENGINE'S RUNTIME state based on its definition.

@@ -5,7 +5,7 @@ import Foundation
 /// This protocol provides a more structured way to handle complex actions that involve
 /// multiple stages or potential side effects.
 /// Note: This protocol is Sendable as its methods now use Sendable types.
-public protocol EnhancedActionHandler: ActionHandler, Sendable {
+public protocol EnhancedActionHandler: Sendable {
     /// Validates if the action can be performed given the current game state.
     /// This step should check prerequisites but not modify the game state.
     /// - Parameters:
@@ -86,3 +86,9 @@ extension EnhancedActionHandler {
         // TODO: Revisit if explicit error throwing is preferred over success=false + message.
     }
 }
+
+// MARK: - Associated Types & Aliases
+
+/// A closure that handles a specific action potentially targeting a specific item.
+/// Return `true` if the action was fully handled (preventing default verb handler), `false` otherwise.
+public typealias ObjectActionHandler = @MainActor @Sendable (GameEngine, Command) async throws -> Bool
