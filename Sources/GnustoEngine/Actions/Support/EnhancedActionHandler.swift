@@ -47,13 +47,6 @@ public protocol EnhancedActionHandler: Sendable {
 // MARK: - Default Implementation
 
 extension EnhancedActionHandler {
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // Default: No specific validation required.
-    }
-
     /// A convenience method that runs the validation and processing steps.
     ///
     /// Primarily intended as a convenience for testing handlers directly.
@@ -75,6 +68,13 @@ extension EnhancedActionHandler {
         // The GameEngine is responsible for applying state changes from the result.
         // The `postProcess` hook is available for handlers needing custom logic *after* processing.
         return result
+    }
+
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
+        // Default: No specific validation required.
     }
 
     /// Optional step for handlers needing custom logic after `process` returns, but before

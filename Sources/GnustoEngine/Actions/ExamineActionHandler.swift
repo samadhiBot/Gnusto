@@ -137,9 +137,9 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // List items on the surface
         let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
         if !contents.isEmpty {
-            let itemNames = contents.map { "a \($0.name)" }
-            let itemsString = itemNames.joined(separator: " and ")
-            descriptionParts.append("On the \(targetItem.name) is \(itemsString).")
+            let itemNames = contents.map(\.name).listWithIndefiniteArticles
+            descriptionParts
+                .append("On the \(targetItem.name) is \(itemNames).")
         }
 
         return descriptionParts.joined(separator: "\n")

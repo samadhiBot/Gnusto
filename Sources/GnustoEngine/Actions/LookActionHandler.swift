@@ -129,9 +129,8 @@ public struct LookActionHandler: EnhancedActionHandler {
             // Get snapshots of items *on* the surface
             let itemsOnSurface = await engine.itemSnapshots(withParent: .item(item.id))
             if !itemsOnSurface.isEmpty {
-                let itemNames = itemsOnSurface.map { "a \($0.name)" } // Get "a {name}" for each
-                let itemsString = itemNames.joined(separator: " and ") // Join with " and "
-                lines.append("On the \(item.name) is \(itemsString).")
+                let itemNames = itemsOnSurface.map(\.name).listWithIndefiniteArticles
+                lines.append("On the \(item.name) is \(itemNames).")
             }
             // No message needed if surface is empty
         }

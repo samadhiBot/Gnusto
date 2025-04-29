@@ -8,4 +8,22 @@ extension String {
         }
         return String(firstCharacter).uppercased() + dropFirst()
     }
+
+    /// The string prepended with the appropriate indefinite article ("a" or "an").
+    ///
+    /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
+    /// and "a" otherwise. Handles empty strings gracefully.
+    var withIndefiniteArticle: String {
+        guard let firstChar = self.lowercased().first else {
+            return self // Return original string if empty
+        }
+
+        let vowels: Set<Character> = ["a", "e", "i", "o", "u"]
+
+        if vowels.contains(firstChar) {
+            return "an \(self)"
+        } else {
+            return "a \(self)"
+        }
+    }
 }
