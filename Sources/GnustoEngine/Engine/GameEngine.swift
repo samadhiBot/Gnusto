@@ -481,15 +481,15 @@ public class GameEngine: Sendable {
     private func processActionResult(_ result: ActionResult) async throws {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
-        print("%%% ENGINE DEBUG: Processing ActionResult with \(result.stateChanges.count) changes.")
         for change in result.stateChanges {
-            print("%%% ENGINE DEBUG: Attempting to apply change: \(change)")
             do {
                 try gameState.apply(change)
-                print("%%% ENGINE DEBUG: Successfully applied change: \(change.propertyKey)")
             } catch {
-                print("%%% ENGINE DEBUG: ERROR applying change: \(error)")
-                logger.error("💥 Failed to apply state change during processActionResult: \(error, privacy: .public) - Change: \(String(describing: change), privacy: .public)")
+                logger.error("""
+                    💥 Failed to apply state change during processActionResult:
+                       - \(error, privacy: .public) 
+                       - Change: \(String(describing: change), privacy: .public)
+                    """)
                 throw error // Re-throw the error to be caught by execute()
             }
         }
@@ -603,7 +603,6 @@ public class GameEngine: Sendable {
 
         // 1. Check for light
         let isLitResult = scopeResolver.isLocationLit(locationID: locationID)
-        print("%%% ENGINE DEBUG: describeCurrentLocation called for \(locationID). isLocationLitResult: \(isLitResult)")
         guard isLitResult else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")

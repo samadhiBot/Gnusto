@@ -86,7 +86,6 @@ public struct StandardParser: Parser {
             }
         }
 
-        print("%%% PARSER DEBUG: Matched Verb IDs: \(matchedVerbIDs), Verb Tokens: \(significantTokens[verbStartIndex..<(verbStartIndex + verbTokenCount)])")
 
         // Ensure at least one verb was matched
         guard !matchedVerbIDs.isEmpty else {
@@ -121,16 +120,13 @@ public struct StandardParser: Parser {
 
         // Pre-calculate input preposition once, as it's the same for all rules
         let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
-        print("%%% PARSER DEBUG: Input preposition: \(inputPreposition ?? "nil")")
 
         for (verbID, rule) in allPotentialRules { // Iterate through all potential rules
-            print("%%% PARSER DEBUG: Trying rule for verb '\(verbID)': \(rule)")
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
                 verbID: verbID, // <<< Pass the specific verbID for this rule
-                _debugHook: { print("%%% PARSER DEBUG: Calling matchRule with verbID: \(verbID)") }, // Add debug print
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
@@ -138,21 +134,17 @@ public struct StandardParser: Parser {
 
             switch matchResult {
             case .success(let command): // Command already contains the correct verbID from matchRule
-                print("%%% PARSER DEBUG: Rule matched structurally for verb '\(verbID)'.")
                 // Rule matched structurally. Now check prepositions.
                 if let requiredPrep = rule.requiredPreposition {
-                    print("%%% PARSER DEBUG: Rule requires preposition '\(requiredPrep)'.")
                     // Rule requires a specific preposition
                     if let inputPrep = inputPreposition {
                         // Input also has a preposition
                         if requiredPrep == inputPrep {
-                            print("%%% PARSER DEBUG: PREPOSITIONS MATCH - DEFINITIVE SUCCESS for verb '\(verbID)'.")
                             // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
                             successfulParse = command // Command has the correct verbID
                             bestError = nil // Clear any previous error
                             break // Found the best possible match for this input
                         } else {
-                            print("%%% PARSER DEBUG: PREPOSITIONS MISMATCH for verb '\(verbID)'.")
                             // PREPOSITIONS MISMATCH - Record error, continue
                             // Use the specific verbID associated with this rule
                             let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(verbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
@@ -162,7 +154,6 @@ public struct StandardParser: Parser {
                             continue // Try next rule, this one is invalid for this input
                         }
                     } else {
-                        print("%%% PARSER DEBUG: RULE REQUIRES PREP, INPUT HAS NONE for verb '\(verbID)'.")
                         // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
                         // Use the specific verbID associated with this rule
                         let missingPrepError = ParseError.badGrammar("Verb '\(verbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
@@ -172,7 +163,6 @@ public struct StandardParser: Parser {
                         continue // Try next rule, this one is invalid for this input
                     }
                 } else {
-                    print("%%% PARSER DEBUG: Rule requires no specific preposition. Input has '\(inputPreposition ?? "none")'.")
                     // RULE REQUIRES NO SPECIFIC PREPOSITION
                     // If the input *also* has no preposition, this is a strong match.
                     // If the input *does* have a preposition, this is still a structural match,
@@ -181,7 +171,6 @@ public struct StandardParser: Parser {
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
                     if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
-                        print("%%% PARSER DEBUG: Tentative SUCCESS (no required prep) for verb '\(verbID)'.")
                         successfulParse = command // Command has the correct verbID
                         // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
                     }
@@ -189,7 +178,6 @@ public struct StandardParser: Parser {
                     continue
                 }
             case .failure(let currentError):
-                print("%%% PARSER DEBUG: Rule failed structurally for verb '\(verbID)' with error: \(currentError)")
                 // Structural failure reported by matchRule
                 if bestError == nil || shouldReplaceError(existing: bestError!, new: currentError) {
                      bestError = currentError
@@ -201,10 +189,8 @@ public struct StandardParser: Parser {
 
         // 7. Return Result
         if let command = successfulParse {
-            print("%%% PARSER DEBUG: Final SUCCESS: \(command)")
             return .success(command)
         } else if let error = bestError { // Otherwise return best error found
-             print("%%% PARSER DEBUG: Final FAILURE (best error): \(error)")
              return .failure(error)
         } else {
             // Handle simple verb-only commands or internal error
@@ -212,7 +198,6 @@ public struct StandardParser: Parser {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
                  // Pick the first matched verb ID as the canonical one (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
-                 print("%%% PARSER DEBUG: Final SUCCESS (verb-only command): \(firstMatchedID)")
                  let command = Command(verbID: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
@@ -221,7 +206,6 @@ public struct StandardParser: Parser {
                  // or no structural matches occurred at all. bestError should ideally have been set.
                  // Provide a generic grammar error based on the *first* matched verb ID (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
-                 print("%%% PARSER DEBUG: Final FAILURE (generic grammar): \(firstMatchedID)")
                  return .failure(.badGrammar("I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."))
              }
         }
@@ -473,10 +457,8 @@ public struct StandardParser: Parser {
             )
             return .success(command)
         case (.failure(let error), _):
-            print("%%% PARSER DEBUG: matchRule failed resolving DO: \(error)")
             return .failure(error)
         case (_, .failure(let error)):
-            print("%%% PARSER DEBUG: matchRule failed resolving IO: \(error)")
             return .failure(error)
         }
     }
