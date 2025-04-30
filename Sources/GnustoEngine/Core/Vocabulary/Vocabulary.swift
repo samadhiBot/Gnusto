@@ -171,7 +171,7 @@ public struct Vocabulary: Codable, Sendable {
             requiresLight: true
         ),
         Verb(
-            id: "puton",
+            id: "put-on",
             synonyms: ["put", "place", "set"],
             syntax: [
                 SyntaxRule(

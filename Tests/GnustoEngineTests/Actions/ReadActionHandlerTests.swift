@@ -26,7 +26,6 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-//        let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
 
         // Act
@@ -69,7 +68,6 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "sign", rawInput: "read sign")
 
         // Act
@@ -199,7 +197,7 @@ struct ReadActionHandlerTests {
         }
     }
 
-     @Test("Read readable item with no text")
+    @Test("Read readable item with no text")
     func testReadReadableItemWithNoText() async throws {
         // Arrange
         let blankPaper = Item(
@@ -219,7 +217,6 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "paper", rawInput: "read paper")
 
         // Act
@@ -261,7 +258,6 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
         // Act

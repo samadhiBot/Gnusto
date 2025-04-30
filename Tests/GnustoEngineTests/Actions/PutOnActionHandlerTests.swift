@@ -92,7 +92,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
+        let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
         // Act
         await engine.execute(command: command)
@@ -142,7 +142,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", indirectObject: "table", preposition: "on", rawInput: "put on table") // No DO
+        let command = Command(verbID: "put-on", indirectObject: "table", preposition: "on", rawInput: "put on table") // No DO
 
         // Act
         await engine.execute(command: command)
@@ -169,7 +169,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "book", preposition: "on", rawInput: "put book on") // No IO
+        let command = Command(verbID: "put-on", directObject: "book", preposition: "on", rawInput: "put book on") // No IO
 
         // Act
         await engine.execute(command: command)
@@ -197,7 +197,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
+        let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
         // Act
         await engine.execute(command: command)
@@ -227,7 +227,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
+        let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
         // Act
         await engine.execute(command: command)
@@ -255,7 +255,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "book", indirectObject: "box", preposition: "on", rawInput: "put book on box")
+        let command = Command(verbID: "put-on", directObject: "book", indirectObject: "box", preposition: "on", rawInput: "put book on box")
 
         // Act
         await engine.execute(command: command)
@@ -282,7 +282,7 @@ struct PutOnActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "puton", directObject: "table", indirectObject: "table", preposition: "on", rawInput: "put table on table")
+        let command = Command(verbID: "put-on", directObject: "table", indirectObject: "table", preposition: "on", rawInput: "put table on table")
 
         // Act
         await engine.execute(command: command)
@@ -311,7 +311,7 @@ struct PutOnActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Try to put the tray onto the table (which is on the tray)
-        let command = Command(verbID: "puton", directObject: "tray", indirectObject: "table", preposition: "on", rawInput: "put tray on table")
+        let command = Command(verbID: "put-on", directObject: "tray", indirectObject: "table", preposition: "on", rawInput: "put tray on table")
 
         // Act
         await engine.execute(command: command)

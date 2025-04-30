@@ -579,7 +579,7 @@ struct GameEngineTests {
 
         // Ensure initial state
         #expect(await engine.gameState.flags[testFlagKey] == nil)
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.on) == false) // Qualified
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == false) // Qualified
         #expect(engine.getChangeHistory().isEmpty) // Use helper
 
         // Act
@@ -589,8 +589,8 @@ struct GameEngineTests {
         // Then
         // Check final state
         #expect(await engine.gameState.flags[testFlagKey] == true, "Flag should be set")
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.on) == true, "Item .on property should be set") // Qualified
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(ItemProperty.touched) == true, "Item .touched property should be set") // Qualified
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set") // Qualified
+        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set") // Qualified
 
         // Check history recorded correctly
         let history = engine.getChangeHistory() // Use helper
@@ -922,7 +922,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: "puton",
+            verbID: "put-on",
             directObject: "key",
             indirectObject: "rock",
             preposition: "on",

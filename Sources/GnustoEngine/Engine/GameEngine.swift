@@ -59,32 +59,32 @@ public class GameEngine: Sendable {
     /// Games can override these via the `DefinitionRegistry`.
     private static let defaultActionHandlers: [VerbID: EnhancedActionHandler] = [
         // Movement & World Interaction
-        "go": GoActionHandler(),
-        "look": LookActionHandler(),
-        "examine": ExamineActionHandler(),
-        "open": OpenActionHandler(),
         "close": CloseActionHandler(),
-        "lock": LockActionHandler(),
-        "unlock": UnlockActionHandler(),
+        "examine": ExamineActionHandler(),
+        "go": GoActionHandler(),
         "insert": InsertActionHandler(),
-        "puton": PutOnActionHandler(),
-        // "put": PutActionHandler(), // TODO: Implement PutActionHandler
+        "lock": LockActionHandler(),
+        "look": LookActionHandler(),
+        "open": OpenActionHandler(),
+        "put-on": PutOnActionHandler(),
+        "unlock": UnlockActionHandler(),
 
         // Inventory Management
-        "take": TakeActionHandler(),
         "drop": DropActionHandler(),
         "inventory": InventoryActionHandler(),
-        "wear": WearActionHandler(),
         "remove": RemoveActionHandler(),
+        "take": TakeActionHandler(),
+        "wear": WearActionHandler(),
 
         // Other Actions
-        "wait": WaitActionHandler(),
-        "score": ScoreActionHandler(),
-        "quit": QuitActionHandler(), // Basic quit functionality
         "listen": ListenActionHandler(),
+        "quit": QuitActionHandler(), // Basic quit functionality
+        "read": ReadActionHandler(),
+        "score": ScoreActionHandler(),
         "smell": SmellActionHandler(),
         "taste": TasteActionHandler(),
         "think": ThinkAboutActionHandler(), // Alias 'think about' if needed via vocab
+        "wait": WaitActionHandler(),
 
         // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
     ]
