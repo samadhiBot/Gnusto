@@ -126,8 +126,8 @@ struct TakeActionHandlerTests {
     func testTakeItemFailsWhenNotPresent() async throws {
         // Arrange: Create item that *won't* be added to location
         let nonexistentItem = Item(
-            id: "ghost",
-            name: "ghostly apparition",
+            id: "figurine",
+            name: "jade figurine",
             properties: .takable,
             parent: .nowhere
         )
@@ -141,19 +141,20 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "ghost", rawInput: "take ghost")
+        let command = Command(verbID: "take", directObject: "figurine", rawInput: "take figurine")
 
-        // Act & Assert: Expect ActionError.itemNotAccessible
-        await #expect(throws: ActionError.itemNotAccessible("ghost")) {
-            await engine.execute(command: command)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check that the player is still holding nothing
         #expect(engine.itemSnapshots(withParent: .player).isEmpty == true)
-
-        // Assert: Check NO message was printed by the handler
-        let output = await mockIO.flush()
-        #expect(output.isEmpty == true)
     }
 
     @Test("Take item fails when not takable")
@@ -176,18 +177,19 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "rock", rawInput: "take rock")
 
-        // Act & Assert: Expect specific ActionError
-        await #expect(throws: ActionError.itemNotTakable("rock")) {
-            await engine.execute(command: command)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't take the heavy rock.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.itemSnapshot(with: "rock")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
-
-        // Assert: Check NO message was printed by the handler (error is caught by engine)
-        let output = await mockIO.flush()
-        #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
     @Test("Take fails with no direct object")
@@ -199,11 +201,15 @@ struct TakeActionHandlerTests {
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "take", rawInput: "take")
 
-        // Act & Assert: Expect error from validate()
-        await #expect(throws: ActionError.prerequisiteNotMet("Take what?")) {
-             await engine.execute(command: command)
-        }
-        #expect(await mockIO.recordedOutput.isEmpty == true)
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Take what?")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Take item successfully from open container in room")
@@ -315,18 +321,19 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
-        // Act & Assert: Expect specific ActionError
-        await #expect(throws: ActionError.containerIsClosed("box")) {
-            await engine.execute(command: command)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The wooden box is closed.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.itemSnapshot(with: "gem")
         #expect(finalItemState?.parent == .item("box"), "Item should still be in the box")
-
-        // Assert: Check NO message was printed by the handler
-        let output = await mockIO.flush()
-        #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 
     @Test("Take item fails from non-container item")
@@ -358,18 +365,19 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "chip", rawInput: "take chip from statue") // Target the chip
 
-        // Act & Assert: Expect ActionError.prerequisiteNotMet
-        await #expect(throws: ActionError.prerequisiteNotMet("You can't take things out of the stone statue.")) {
-             await engine.execute(command: command)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't take things out of the stone statue.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.itemSnapshot(with: "chip")
         #expect(finalItemState?.parent == .item("statue"), "Chip should still be parented to statue")
-
-        // Assert: Check NO message was printed by the handler
-        let output = await mockIO.flush()
-        #expect(output.isEmpty == true)
     }
 
     @Test("Take item fails when capacity exceeded")
@@ -660,17 +668,18 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
 
-        // Act & Assert: Expect specific ActionError
-        await #expect(throws: ActionError.playerCannotCarryMore) {
-            await engine.execute(command: command)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Your hands are full.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.itemSnapshot(with: "shield")
         #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
-
-        // Assert: Check NO message was printed by the handler
-        let output = await mockIO.flush()
-        #expect(output.isEmpty == true, "No output should be printed by handler on error")
     }
 }

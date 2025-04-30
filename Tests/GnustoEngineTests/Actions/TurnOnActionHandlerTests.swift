@@ -26,7 +26,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
+        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act
         await engine.execute(command: command)
@@ -72,7 +72,7 @@ struct TurnOnActionHandlerTests {
         let initiallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(initiallyLit == false)
 
-        let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
+        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act
         await engine.execute(command: command)
@@ -113,7 +113,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
+        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already on.")) {
@@ -145,7 +145,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
+        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
@@ -176,7 +176,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
+        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("lamp")) {
@@ -212,7 +212,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn on", directObject: "radio", rawInput: "turn on radio")
+        let command = Command(verbID: "turn-on", directObject: "radio", rawInput: "turn on radio")
 
         // Act
         await engine.execute(command: command)

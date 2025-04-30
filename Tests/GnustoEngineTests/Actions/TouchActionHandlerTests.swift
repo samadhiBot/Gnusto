@@ -90,12 +90,12 @@ struct TouchActionHandlerTests {
 
     @Test("Touch fails item not accessible")
     func testTouchFailsItemNotAccessible() async throws {
-        let ghost = Item(
-            id: "ghost",
-            name: "ghostly form",
+        let figurine = Item(
+            id: "figurine",
+            name: "jade figurine",
             parent: .nowhere
         )
-        let game = MinimalGame(items: [ghost])
+        let game = MinimalGame(items: [figurine])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -104,10 +104,10 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "ghost", rawInput: "touch ghost")
+        let command = Command(verbID: "touch", directObject: "figurine", rawInput: "touch figurine")
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("ghost")) {
+        await #expect(throws: ActionError.itemNotAccessible("figurine")) {
             try await handler.validate(command: command, engine: engine)
         }
     }

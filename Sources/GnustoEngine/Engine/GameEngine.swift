@@ -78,13 +78,18 @@ public class GameEngine: Sendable {
 
         // Other Actions
         "listen": ListenActionHandler(),
-        "quit": QuitActionHandler(), // Basic quit functionality
         "read": ReadActionHandler(),
-        "score": ScoreActionHandler(),
         "smell": SmellActionHandler(),
         "taste": TasteActionHandler(),
-        "think": ThinkAboutActionHandler(), // Alias 'think about' if needed via vocab
+        "think": ThinkAboutActionHandler(),
+        "touch": TouchActionHandler(),
+        "turn-off": TurnOffActionHandler(),
+        "turn-on": TurnOnActionHandler(),
         "wait": WaitActionHandler(),
+
+        // Meta Actions
+        "quit": QuitActionHandler(),
+        "score": ScoreActionHandler(),
 
         // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
     ]
