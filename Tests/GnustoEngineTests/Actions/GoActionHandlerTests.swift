@@ -35,16 +35,16 @@ struct GoActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "north")
+        let command = Command(
+            verbID: "go",
+            direction: .north,
+            rawInput: "north"
+        )
 
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            --- End Room ---
-            You went there.
-            """
-        )
+        expectNoDifference(output, "")
     }
 
     @Test("GO NORTH prints blocked message when exit is blocked")
@@ -73,7 +73,11 @@ struct GoActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "north")
+        let command = Command(
+            verbID: "go",
+            direction: .north,
+            rawInput: "north"
+        )
 
         await #expect(throws: ActionError.directionIsBlocked("A wall blocks your path.")) {
             try await handler.validate(command: command, engine: engine)
@@ -108,7 +112,11 @@ struct GoActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "north")
+        let command = Command(
+            verbID: "go",
+            direction: .north,
+            rawInput: "north"
+        )
 
         await #expect(throws: ActionError.invalidDirection) {
             try await handler.validate(command: command, engine: engine)

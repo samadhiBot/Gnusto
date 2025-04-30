@@ -242,7 +242,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You don't see the box here.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)

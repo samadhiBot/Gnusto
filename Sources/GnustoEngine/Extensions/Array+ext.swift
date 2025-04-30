@@ -1,25 +1,22 @@
 import Foundation
 
-extension Array where Element == String {
+extension Array where Element == ItemSnapshot {
     /// Returns a grammatically correct string listing the elements,
     /// sorted alphabetically, with appropriate indefinite articles prepended.
     ///
     /// Example: `["pear", "apple", "banana"]` becomes `"an apple, a banana and a pear"`.
     /// Returns "nothing" for an empty array.
     var listWithIndefiniteArticles: String {
-        guard !self.isEmpty else {
+        switch count {
+        case 0:
             return "nothing"
+        case 1:
+            return self[0].withIndefiniteArticle
+        default:
+            var sortedItemsWithArticles = sorted()
+                .map(\.withIndefiniteArticle)
+            let lastItem = sortedItemsWithArticles.removeLast()
+            return "\(sortedItemsWithArticles.joined(separator: ", ")) and \(lastItem)"
         }
-
-        let sortedItemsWithArticles = self.sorted().map { $0.withIndefiniteArticle }
-
-        guard sortedItemsWithArticles.count > 1 else {
-            return sortedItemsWithArticles.first ?? "" // Should always have one if count is 1
-        }
-
-        let allButLast = sortedItemsWithArticles.dropLast()
-        let lastItem = sortedItemsWithArticles.last! // Safe due to guard above
-
-        return "\(allButLast.joined(separator: ", ")) and \(lastItem)"
     }
 } 

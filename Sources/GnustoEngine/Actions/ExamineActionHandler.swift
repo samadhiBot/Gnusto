@@ -107,15 +107,13 @@ public struct ExamineActionHandler: EnhancedActionHandler {
             if contents.isEmpty {
                 descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
-                descriptionParts.append("The \(targetItem.name) contains:")
-                for item in contents {
-                    descriptionParts.append("  A \(item.name)")
-                }
+                let itemNames = contents.listWithIndefiniteArticles
+                descriptionParts.append("The \(targetItem.name) contains \(itemNames).")
             }
         } else {
             descriptionParts.append("The \(targetItem.name) is closed.")
         }
-        return descriptionParts.joined(separator: "\n")
+        return descriptionParts.joined(separator: " ")
     }
 
     /// Helper function to generate description for surfaces.
@@ -137,11 +135,12 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // List items on the surface
         let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
         if !contents.isEmpty {
-            let itemNames = contents.map(\.name).listWithIndefiniteArticles
-            descriptionParts
-                .append("On the \(targetItem.name) is \(itemNames).")
+            let itemNames = contents.listWithIndefiniteArticles
+            descriptionParts.append(
+                "On the \(targetItem.name) is \(itemNames)."
+            )
         }
 
-        return descriptionParts.joined(separator: "\n")
+        return descriptionParts.joined(separator: " ")
     }
 }

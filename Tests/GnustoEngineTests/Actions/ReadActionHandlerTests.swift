@@ -26,7 +26,7 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = ReadActionHandler()
+//        let handler = ReadActionHandler()
         let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
 
         // Act

@@ -697,8 +697,8 @@ public class GameEngine: Sendable {
             "You are not wearing \(theThat(item))."
         case .itemIsUnlocked(let item):
             "\(theThat(item).capitalizedFirst) is already unlocked."
-        case .itemNotAccessible:
-            "You can't see any such thing."
+        case .itemNotAccessible(let item):
+            "You can't see \(anySuch(item))."
         case .itemNotCloseable(let item):
             "\(theThat(item).capitalizedFirst) is not something you can close."
         case .itemNotDroppable(let item):
@@ -746,6 +746,14 @@ public class GameEngine: Sendable {
 
         if case .internalEngineError(let msg) = actionError {
             logger.error("💥 ActionError: \(msg, privacy: .public)")
+        }
+    }
+
+    private func anySuch(_ itemID: ItemID) -> String {
+        if let item = itemSnapshot(with: itemID), item.hasProperty(.touched) {
+            "the \(item.name)"
+        } else {
+            "any such thing"
         }
     }
 

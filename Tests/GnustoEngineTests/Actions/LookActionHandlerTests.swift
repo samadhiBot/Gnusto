@@ -333,12 +333,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A sturdy wooden box.
-            The wooden box contains:
-              A gold coin
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A sturdy wooden box. The wooden box contains a gold coin.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.itemSnapshot(with: "box")
@@ -385,11 +380,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A sturdy wooden box.
-            The wooden box is closed.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A sturdy wooden box. The wooden box is closed.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.itemSnapshot(with: "box")
@@ -437,12 +428,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A clear glass jar.
-            The glass jar contains:
-              A dead fly
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A clear glass jar. The glass jar contains a dead fly.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.itemSnapshot(with: "jar")
@@ -493,15 +479,9 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
-        // Note: Order depends on internal dictionary iteration, map { $0.name } and sort?
-        // Let's assume alphabetical for now.
-        let expectedOutput = """
-            A simple wooden table.
-            On the wooden table is:
-              A red book
-              A white candle
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, """
+            A simple wooden table. On the wooden table is a red book and a white candle.
+            """)
 
         // Assert Final State (Surface marked touched)
         let finalItemState = engine.itemSnapshot(with: "table")
@@ -546,7 +526,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Error message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You don't see the glowing artifact here.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
         let finalItemState = engine.itemSnapshot(with: "artifact")

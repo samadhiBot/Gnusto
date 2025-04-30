@@ -14,16 +14,10 @@ extension String {
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
     /// and "a" otherwise. Handles empty strings gracefully.
     var withIndefiniteArticle: String {
-        guard let firstChar = self.lowercased().first else {
-            return self // Return original string if empty
+        guard let firstChar = first?.lowercased() else {
+            return self
         }
-
         let vowels: Set<Character> = ["a", "e", "i", "o", "u"]
-
-        if vowels.contains(firstChar) {
-            return "an \(self)"
-        } else {
-            return "a \(self)"
-        }
+        return vowels.contains(firstChar) ? "an \(self)" : "a \(self)"
     }
 }

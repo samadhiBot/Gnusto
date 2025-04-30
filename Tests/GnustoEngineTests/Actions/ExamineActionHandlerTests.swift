@@ -154,12 +154,7 @@ struct ExamineActionHandlerTests {
         let finalItemState = engine.itemSnapshot(with: "box")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A plain wooden box.
-            The wooden box contains:
-              A ruby gem
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A plain wooden box. The wooden box contains a ruby gem.")
     }
 
     @Test("Examine open empty container")
@@ -193,11 +188,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A plain wooden box.
-            The wooden box is empty.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A plain wooden box. The wooden box is empty.")
     }
 
     @Test("Examine closed container (shows description and closed status)")
@@ -231,11 +222,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A plain wooden box.
-            The wooden box is closed.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A plain wooden box. The wooden box is closed.")
     }
 
     @Test("Examine transparent closed container (shows description and contents)")
@@ -251,6 +238,7 @@ struct ExamineActionHandlerTests {
         let water = Item(
             id: "water",
             name: "water",
+            properties: .narticle,
             parent: .item(bottle.id)
         )
 
@@ -274,12 +262,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A clear glass bottle.
-            The glass bottle contains:
-              A water
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "A clear glass bottle. The glass bottle contains water.")
     }
 
     @Test("Examine surface (shows description and items on it)")
@@ -318,7 +301,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "On the sturdy table is a dusty book.")
+        expectNoDifference(output, "A sturdy table. On the sturdy table is a dusty book.")
     }
 
     @Test("Examine fails item not accessible")
@@ -344,11 +327,12 @@ struct ExamineActionHandlerTests {
             rawInput: "examine rock"
         )
 
-        // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("rock")) {
-            await engine.execute(command: command)
+        // Act
+        await engine.execute(command: command)
 
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
     }
 
     @Test("Examine fails in dark room")
@@ -374,11 +358,12 @@ struct ExamineActionHandlerTests {
             rawInput: "examine rock"
         )
 
-        // Act & Assert: When calling handler directly, expect itemNotAccessible due to darkness
-        await #expect(throws: ActionError.itemNotAccessible("rock")) {
-            await engine.execute(command: command)
+        // Act
+        await engine.execute(command: command)
 
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "It's too dark to do that.")
     }
 
     @Test("Examine item with no description")
