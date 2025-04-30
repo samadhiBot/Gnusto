@@ -26,7 +26,7 @@ struct InventoryActionHandlerTests {
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -58,7 +58,7 @@ struct InventoryActionHandlerTests {
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()

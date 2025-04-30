@@ -38,7 +38,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
@@ -134,7 +134,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
@@ -177,7 +177,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
@@ -277,7 +277,7 @@ struct TurnOffActionHandlerTests {
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         await #expect(throws: ActionError.itemNotAccessible("lamp")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
         }
     }
 
@@ -311,7 +311,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "extinguish", directObject: "lamp", rawInput: "extinguish lamp")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
@@ -355,7 +355,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(verbID: "blow out", directObject: "lamp", rawInput: "blow out lamp")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)

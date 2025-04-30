@@ -25,7 +25,7 @@ struct WaitActionHandlerTests {
         // Act
         // We call perform(), which uses the default implementation
         // calling validate(), process(), and postProcess().
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         // The default postProcess should print the message from the ActionResult.

@@ -697,10 +697,10 @@ public class GameEngine: Sendable {
             "You are not wearing \(theThat(item))."
         case .itemIsUnlocked(let item):
             "\(theThat(item).capitalizedFirst) is already unlocked."
-        case .itemNotAccessible(let item):
-            "You don't see \(theThat(item, alternate: "any")) here."
+        case .itemNotAccessible:
+            "You can't see any such thing."
         case .itemNotCloseable(let item):
-            "You can't close \(theThat(item))."
+            "\(theThat(item).capitalizedFirst) is not something you can close."
         case .itemNotDroppable(let item):
             "You can't drop \(theThat(item))."
         case .itemNotEdible(let item):

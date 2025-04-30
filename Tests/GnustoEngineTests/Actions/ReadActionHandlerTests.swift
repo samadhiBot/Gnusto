@@ -30,7 +30,7 @@ struct ReadActionHandlerTests {
         let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "book")
@@ -73,7 +73,7 @@ struct ReadActionHandlerTests {
         let command = Command(verbID: "read", directObject: "sign", rawInput: "read sign")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "sign")
@@ -223,7 +223,7 @@ struct ReadActionHandlerTests {
         let command = Command(verbID: "read", directObject: "paper", rawInput: "read paper")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "paper")
@@ -265,7 +265,7 @@ struct ReadActionHandlerTests {
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "tablet")

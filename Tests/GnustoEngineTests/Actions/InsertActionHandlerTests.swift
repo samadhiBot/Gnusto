@@ -83,7 +83,12 @@ struct InsertActionHandlerTests {
     @Test("Insert item successfully")
     func testInsertItemSuccessfully() async throws {
         // Arrange: Player holds coin, open box is reachable
-        let initialCoin = Item(id: "coin", name: "gold coin", properties: .takable, parent: .player)
+        let initialCoin = Item(
+            id: "coin",
+            name: "gold coin",
+            properties: .takable,
+            parent: .player
+        )
         let initialBox = Item(
             id: "openBox", name: "open box",
             properties: .container, .openable, .open, // Start open
@@ -141,7 +146,12 @@ struct InsertActionHandlerTests {
     @Test("Insert fails with no direct object")
     func testInsertFailsNoDirectObject() async throws {
         // Arrange: Open box is reachable
-        let box = Item(id: "openBox", name: "open box", properties: .container, .open, parent: .location("startRoom"))
+        let box = Item(
+            id: "openBox",
+            name: "open box",
+            properties: .container, .open,
+            parent: .location("startRoom")
+        )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -168,7 +178,11 @@ struct InsertActionHandlerTests {
     @Test("Insert fails with no indirect object")
     func testInsertFailsNoIndirectObject() async throws {
         // Arrange: Player holds coin
-        let coin = Item(id: "coin", name: "gold coin", parent: .player)
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            parent: .player
+        )
         let game = MinimalGame(items: [coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -195,8 +209,17 @@ struct InsertActionHandlerTests {
     @Test("Insert fails when item not held")
     func testInsertFailsItemNotHeld() async throws {
         // Arrange: Coin is in the room, not held; box is open
-        let coin = Item(id: "coin", name: "gold coin", parent: .location("startRoom"))
-        let box = Item(id: "openBox", name: "open box", properties: .container, .open, parent: .location("startRoom"))
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            parent: .location("startRoom")
+        )
+        let box = Item(
+            id: "openBox",
+            name: "open box",
+            properties: .container, .open,
+            parent: .location("startRoom")
+        )
         let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -223,11 +246,31 @@ struct InsertActionHandlerTests {
     @Test("Insert fails when target not reachable")
     func testInsertFailsTargetNotReachable() async throws {
         // Arrange: Box is in another room, player holds coin
-        let coin = Item(id: "coin", name: "gold coin", parent: .player)
-        let box = Item(id: "openBox", name: "open box", properties: .container, .open, parent: .location("otherRoom"))
-        let room1 = Location(id: "startRoom", name: "Start", properties: .inherentlyLit)
-        let room2 = Location(id: "otherRoom", name: "Other", properties: .inherentlyLit)
-        let game = MinimalGame(locations: [room1, room2], items: [coin, box])
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            parent: .player
+        )
+        let box = Item(
+            id: "openBox",
+            name: "open box",
+            properties: .container, .open,
+            parent: .location("otherRoom")
+        )
+        let room1 = Location(
+            id: "startRoom",
+            name: "Start",
+            properties: .inherentlyLit
+        )
+        let room2 = Location(
+            id: "otherRoom",
+            name: "Other",
+            properties: .inherentlyLit
+        )
+        let game = MinimalGame(
+            locations: [room1, room2],
+            items: [coin, box]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -237,7 +280,13 @@ struct InsertActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "openBox", preposition: "in", rawInput: "put coin in box")
+        let command = Command(
+            verbID: "insert",
+            directObject: "coin",
+            indirectObject: "openBox",
+            preposition: "in",
+            rawInput: "put coin in box"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -253,8 +302,16 @@ struct InsertActionHandlerTests {
     @Test("Insert fails when target not a container")
     func testInsertFailsTargetNotContainer() async throws {
         // Arrange: Target is a rock (not container), player holds coin
-        let coin = Item(id: "coin", name: "gold coin", parent: .player)
-        let rock = Item(id: "rock", name: "rock", parent: .location("startRoom")) // Not a container
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            parent: .player
+        )
+        let rock = Item(
+            id: "rock",
+            name: "rock",
+            parent: .location("startRoom")
+        ) // Not a container
         let game = MinimalGame(items: [coin, rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -281,8 +338,17 @@ struct InsertActionHandlerTests {
     @Test("Insert fails when container closed")
     func testInsertFailsContainerClosed() async throws {
         // Arrange: Box is closed, player holds coin
-        let coin = Item(id: "coin", name: "gold coin", parent: .player)
-        let box = Item(id: "box", name: "wooden box", properties: .container, .openable, parent: .location("startRoom")) // Closed
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            parent: .player
+        )
+        let box = Item(
+            id: "box",
+            name: "wooden box",
+            properties: .container, .openable,
+            parent: .location("startRoom")
+        ) // Closed
         let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -309,7 +375,12 @@ struct InsertActionHandlerTests {
     @Test("Insert fails self-insertion")
     func testInsertFailsSelfInsertion() async throws {
         // Arrange: Player holds box
-        let box = Item(id: "box", name: "box", properties: .container, .open, parent: .player)
+        let box = Item(
+            id: "box",
+            name: "box",
+            properties: .container, .open,
+            parent: .player
+        )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -336,8 +407,18 @@ struct InsertActionHandlerTests {
     @Test("Insert fails recursive insertion")
     func testInsertFailsRecursiveInsertion() async throws {
         // Arrange: Player holds bag, bag contains box
-        let bag = Item(id: "bag", name: "bag", properties: .container, .open, parent: .player)
-        let box = Item(id: "box", name: "box", properties: .container, .open, parent: .item("bag"))
+        let bag = Item(
+            id: "bag",
+            name: "bag",
+            properties: .container, .open,
+            parent: .player
+        )
+        let box = Item(
+            id: "box",
+            name: "box",
+            properties: .container, .open,
+            parent: .item("bag")
+        )
         let game = MinimalGame(items: [bag, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -365,8 +446,18 @@ struct InsertActionHandlerTests {
     @Test("Insert fails when container is full")
     func testInsertFailsContainerFull() async throws {
         // Arrange: Player holds coin (size 5), box has capacity 10 but already contains item size 6
-        let coin = Item(id: "coin", name: "gold coin", size: 5, parent: .player)
-        let existingItem = Item(id: "rock", name: "rock", size: 6, parent: .item("fullBox"))
+        let coin = Item(
+            id: "coin",
+            name: "gold coin",
+            size: 5,
+            parent: .player
+        )
+        let existingItem = Item(
+            id: "rock",
+            name: "rock",
+            size: 6,
+            parent: .item("fullBox")
+        )
         let box = Item(
             id: "fullBox",
             name: "nearly full box",
@@ -401,8 +492,18 @@ struct InsertActionHandlerTests {
     @Test("Insert succeeds when container has exact space")
     func testInsertSucceedsContainerExactSpace() async throws {
         // Arrange: Player holds coin (size 5), box has capacity 10 and contains item size 5
-        let initialCoin = Item(id: "coin", name: "gold coin", size: 5, parent: .player)
-        let existingItem = Item(id: "rock", name: "rock", size: 5, parent: .item("exactBox"))
+        let initialCoin = Item(
+            id: "coin",
+            name: "gold coin",
+            size: 5,
+            parent: .player
+        )
+        let existingItem = Item(
+            id: "rock",
+            name: "rock",
+            size: 5,
+            parent: .item("exactBox")
+        )
         let initialBox = Item(
             id: "exactBox",
             name: "half-full box",

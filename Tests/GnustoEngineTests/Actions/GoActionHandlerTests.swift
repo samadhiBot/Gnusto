@@ -37,7 +37,7 @@ struct GoActionHandlerTests {
 
         let command = Command(verbID: "go", direction: .north, rawInput: "north")
 
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         let output = await mockIO.flush()
         expectNoDifference(output, """

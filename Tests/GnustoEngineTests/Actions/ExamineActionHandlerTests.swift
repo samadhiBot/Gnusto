@@ -26,10 +26,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
+        let command = Command(
+            verbID: "examine",
+            directObject: "rock",
+            rawInput: "examine rock"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "rock")
@@ -59,10 +63,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "key", rawInput: "examine key")
+        let command = Command(
+            verbID: "examine",
+            directObject: "key",
+            rawInput: "examine key"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "key")
@@ -92,10 +100,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "scroll", rawInput: "examine scroll")
+        let command = Command(
+            verbID: "examine",
+            directObject: "scroll",
+            rawInput: "examine scroll"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "scroll")
@@ -129,10 +141,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
+        let command = Command(
+            verbID: "examine",
+            directObject: "box",
+            rawInput: "examine box"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "box")
@@ -166,10 +182,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
+        let command = Command(
+            verbID: "examine",
+            directObject: "box",
+            rawInput: "examine box"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -200,10 +220,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "box", rawInput: "examine box")
+        let command = Command(
+            verbID: "examine",
+            directObject: "box",
+            rawInput: "examine box"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -239,10 +263,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "bottle", rawInput: "examine bottle")
+        let command = Command(
+            verbID: "examine",
+            directObject: "bottle",
+            rawInput: "examine bottle"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -279,19 +307,18 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "table", rawInput: "examine table")
+        let command = Command(
+            verbID: "examine",
+            directObject: "table",
+            rawInput: "examine table"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
-        let expectedOutput = """
-            A sturdy table.
-            On the sturdy table is:
-              A dusty book
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, "On the sturdy table is a dusty book.")
     }
 
     @Test("Examine fails item not accessible")
@@ -311,11 +338,16 @@ struct ExamineActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
+        let command = Command(
+            verbID: "examine",
+            directObject: "rock",
+            rawInput: "examine rock"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("rock")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
+
         }
     }
 
@@ -336,11 +368,16 @@ struct ExamineActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "examine", directObject: "rock", rawInput: "examine rock")
+        let command = Command(
+            verbID: "examine",
+            directObject: "rock",
+            rawInput: "examine rock"
+        )
 
         // Act & Assert: When calling handler directly, expect itemNotAccessible due to darkness
         await #expect(throws: ActionError.itemNotAccessible("rock")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
+
         }
     }
 
@@ -362,10 +399,14 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "examine", directObject: "pebble", rawInput: "examine pebble")
+        let command = Command(
+            verbID: "examine",
+            directObject: "pebble",
+            rawInput: "examine pebble"
+        )
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -399,10 +440,15 @@ struct ExamineActionHandlerTests {
             return "The mood stone glows a soft \(color)."
         }
 
-        let command = Command(verbID: "examine", directObject: "stone", rawInput: "examine stone")
+        let command = Command(
+            verbID: "examine",
+            directObject: "stone",
+            rawInput: "examine stone"
+        )
 
         // Act 1: Examine when blue (isOn: false)
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
+
         let output1 = await mockIO.flush()
         expectNoDifference(output1, "The mood stone glows a soft blue.")
 
@@ -413,7 +459,8 @@ struct ExamineActionHandlerTests {
         #expect(engine.itemSnapshot(with: "stone")?.hasProperty(.on) == true)
 
         // Act 2: Examine when red (isOn: true)
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
+
         let output2 = await mockIO.flush()
         expectNoDifference(output2, "The mood stone glows a soft red.")
     }

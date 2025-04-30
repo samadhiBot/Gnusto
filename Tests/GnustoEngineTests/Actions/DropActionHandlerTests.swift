@@ -96,11 +96,12 @@ struct DropActionHandlerTests {
 
         let command = Command(verbID: "drop", rawInput: "drop") // No direct object
 
-        // Act & Assert: Expect error from validate()
-        await #expect(throws: ActionError.prerequisiteNotMet("Drop what?")) {
-            try await handler.perform(command: command, engine: engine)
-        }
-        #expect(await mockIO.recordedOutput.isEmpty == true)
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Expect error from validate()
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Drop what?")
     }
 
     @Test("Drop fails when item not held")
@@ -207,10 +208,11 @@ struct DropActionHandlerTests {
 
         let command = Command(verbID: "drop", directObject: "sword-in-stone", rawInput: "drop sword")
 
-        // Act & Assert: Expect error from validate()
-        await #expect(throws: ActionError.itemNotDroppable("sword-in-stone")) {
-            try await handler.perform(command: command, engine: engine)
-        }
-        #expect(await mockIO.recordedOutput.isEmpty == true)
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Expect error from validate()
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't drop the sword in stone.")
     }
 }

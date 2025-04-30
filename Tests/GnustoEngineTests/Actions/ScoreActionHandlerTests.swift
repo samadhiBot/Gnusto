@@ -27,7 +27,7 @@ struct ScoreActionHandlerTests {
         // Act
         // Call perform(), which uses the default implementation
         // calling validate(), process(), and postProcess().
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         // Check the output message printed by the default postProcess

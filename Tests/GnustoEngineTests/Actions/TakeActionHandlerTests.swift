@@ -145,7 +145,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect ActionError.itemNotAccessible
         await #expect(throws: ActionError.itemNotAccessible("ghost")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
         }
 
         // Assert: Check that the player is still holding nothing
@@ -178,7 +178,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect specific ActionError
         await #expect(throws: ActionError.itemNotTakable("rock")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
         }
 
         // Assert: Check item parent DID NOT change
@@ -201,7 +201,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect error from validate()
         await #expect(throws: ActionError.prerequisiteNotMet("Take what?")) {
-             try await handler.perform(command: command, engine: engine)
+             await engine.execute(command: command)
         }
         #expect(await mockIO.recordedOutput.isEmpty == true)
     }
@@ -317,7 +317,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect specific ActionError
         await #expect(throws: ActionError.containerIsClosed("box")) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
         }
 
         // Assert: Check item parent DID NOT change
@@ -360,7 +360,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect ActionError.prerequisiteNotMet
         await #expect(throws: ActionError.prerequisiteNotMet("You can't take things out of the stone statue.")) {
-             try await handler.perform(command: command, engine: engine)
+             await engine.execute(command: command)
         }
 
         // Assert: Check item parent DID NOT change
@@ -662,7 +662,7 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect specific ActionError
         await #expect(throws: ActionError.playerCannotCarryMore) {
-            try await handler.perform(command: command, engine: engine)
+            await engine.execute(command: command)
         }
 
         // Assert: Check item parent DID NOT change

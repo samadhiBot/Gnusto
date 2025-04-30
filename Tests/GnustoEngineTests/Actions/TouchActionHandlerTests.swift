@@ -28,7 +28,7 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "rock", rawInput: "touch rock")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "rock")
@@ -58,7 +58,7 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "key", rawInput: "touch key")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "key")
@@ -138,7 +138,7 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "gem", rawInput: "touch gem")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "gem")
@@ -173,7 +173,7 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "book", rawInput: "touch book")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "book")

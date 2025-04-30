@@ -29,7 +29,7 @@ struct TurnOnActionHandlerTests {
         let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "lamp")
@@ -75,7 +75,7 @@ struct TurnOnActionHandlerTests {
         let command = Command(verbID: "turn on", directObject: "lamp", rawInput: "turn on lamp")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "lamp")
@@ -215,7 +215,7 @@ struct TurnOnActionHandlerTests {
         let command = Command(verbID: "turn on", directObject: "radio", rawInput: "turn on radio")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let finalItemState = engine.itemSnapshot(with: "radio")
@@ -254,7 +254,7 @@ struct TurnOnActionHandlerTests {
         let command = Command(verbID: "light", directObject: "lamp", rawInput: "light lamp")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert: Same expectations
         let finalItemState = engine.itemSnapshot(with: "lamp")
