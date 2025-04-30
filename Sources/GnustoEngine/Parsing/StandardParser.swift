@@ -94,84 +94,102 @@ public struct StandardParser: Parser {
             return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
         }
 
-        // ***** NEW: Determine the single canonical VerbID to use *****
-        // If multiple IDs matched (ambiguous synonym?), we might need error handling.
-        // For now, assume the first one is the intended canonical ID.
-        guard let canonicalVerbID = matchedVerbIDs.first else {
-            // This should be impossible if matchedVerbIDs is not empty
-            return .failure(.internalError("Verb matched, but no canonical ID found."))
-        }
-        print("%%% PARSER DEBUG: Determined canonicalVerbID: \(canonicalVerbID)")
-        // TODO: Add check here if matchedVerbIDs.count > 1 and handle ambiguity?
-
-        // 5b. Get Syntax Rules using the *canonical* ID
-        var rulesForCanonicalVerb: [SyntaxRule] = []
-        if let verbDef = vocabulary.verbDefinitions[canonicalVerbID] { // Use canonical ID
-             rulesForCanonicalVerb = verbDef.syntax
-        } else {
-            // If canonical ID has no definition (shouldn't happen if vocab is consistent)
-            // Handle simple verb-only case later if rules list ends up empty
+        // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
+        var allPotentialRules: [(verbID: VerbID, rule: SyntaxRule)] = []
+        var verbIDsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
+        for verbID in matchedVerbIDs {
+            if let verbDef = vocabulary.verbDefinitions[verbID] {
+                if !verbDef.syntax.isEmpty {
+                    verbIDsWithRules.insert(verbID)
+                    for rule in verbDef.syntax {
+                        allPotentialRules.append((verbID: verbID, rule: rule))
+                    }
+                }
+            }
         }
 
-        // Handle cases where canonical verb exists but has NO rules...
-        if rulesForCanonicalVerb.isEmpty && significantTokens.count > verbTokenCount {
-            // Provide a generic error based on the canonical verb ID.
-            return .failure(.badGrammar("I understand the verb '\(canonicalVerbID.rawValue)', but not the rest of that sentence."))
+        // Handle cases where verb(s) were matched but NONE have rules, and there are extra tokens
+        if allPotentialRules.isEmpty && significantTokens.count > verbTokenCount {
+            // Provide a generic error based on the *first* matched verb ID (arbitrary choice in ambiguity)
+            let firstMatchedID = matchedVerbIDs.first!
+            return .failure(.badGrammar("I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."))
         }
 
-        // 6. Match Tokens Against Syntax Rules
+        // 6. Match Tokens Against All Potential Syntax Rules
         var successfulParse: Command? = nil
         var bestError: ParseError? = nil
 
-        for rule in rulesForCanonicalVerb { // Iterate rules for the canonical verb
+        // Pre-calculate input preposition once, as it's the same for all rules
+        let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
+        print("%%% PARSER DEBUG: Input preposition: \(inputPreposition ?? "nil")")
+
+        for (verbID, rule) in allPotentialRules { // Iterate through all potential rules
+            print("%%% PARSER DEBUG: Trying rule for verb '\(verbID)': \(rule)")
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
-                verbID: canonicalVerbID, // <<< Pass the canonical ID
-                _debugHook: { print("%%% PARSER DEBUG: Calling matchRule with verbID: \(canonicalVerbID)") }, // Add debug print
+                verbID: verbID, // <<< Pass the specific verbID for this rule
+                _debugHook: { print("%%% PARSER DEBUG: Calling matchRule with verbID: \(verbID)") }, // Add debug print
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
             )
 
-            if case .success(let command) = matchResult {
+            switch matchResult {
+            case .success(let command): // Command already contains the correct verbID from matchRule
+                print("%%% PARSER DEBUG: Rule matched structurally for verb '\(verbID)'.")
                 // Rule matched structurally. Now check prepositions.
-                let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
-
                 if let requiredPrep = rule.requiredPreposition {
+                    print("%%% PARSER DEBUG: Rule requires preposition '\(requiredPrep)'.")
                     // Rule requires a specific preposition
                     if let inputPrep = inputPreposition {
                         // Input also has a preposition
                         if requiredPrep == inputPrep {
+                            print("%%% PARSER DEBUG: PREPOSITIONS MATCH - DEFINITIVE SUCCESS for verb '\(verbID)'.")
                             // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
-                            successfulParse = command
+                            successfulParse = command // Command has the correct verbID
                             bestError = nil // Clear any previous error
                             break // Found the best possible match for this input
                         } else {
+                            print("%%% PARSER DEBUG: PREPOSITIONS MISMATCH for verb '\(verbID)'.")
                             // PREPOSITIONS MISMATCH - Record error, continue
-                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(canonicalVerbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').") // Use canonicalVerbID
+                            // Use the specific verbID associated with this rule
+                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(verbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
                             if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
                                 bestError = mismatchError
                             }
                             continue // Try next rule, this one is invalid for this input
                         }
                     } else {
+                        print("%%% PARSER DEBUG: RULE REQUIRES PREP, INPUT HAS NONE for verb '\(verbID)'.")
                         // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
-                        let missingPrepError = ParseError.badGrammar("Verb '\(canonicalVerbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.") // Use canonicalVerbID
+                        // Use the specific verbID associated with this rule
+                        let missingPrepError = ParseError.badGrammar("Verb '\(verbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
                         if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
                             bestError = missingPrepError
                         }
                         continue // Try next rule, this one is invalid for this input
                     }
                 } else {
-                    // RULE REQUIRES NO SPECIFIC PREPOSITION - DEFINITIVE SUCCESS (structurally)
-                    // This rule is a valid interpretation of the input structure.
-                    successfulParse = command
-                    bestError = nil // Clear any previous error
-                    break // Found a valid match
+                    print("%%% PARSER DEBUG: Rule requires no specific preposition. Input has '\(inputPreposition ?? "none")'.")
+                    // RULE REQUIRES NO SPECIFIC PREPOSITION
+                    // If the input *also* has no preposition, this is a strong match.
+                    // If the input *does* have a preposition, this is still a structural match,
+                    // but potentially weaker than one where prepositions align. ZIL often ignores extra preps.
+                    // Let's treat this as a potential success but keep looking for a better (preposition-matching) rule.
+                    // However, for simplicity now, let's consider it a success unless we find a better one later.
+                    // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
+                    if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
+                        print("%%% PARSER DEBUG: Tentative SUCCESS (no required prep) for verb '\(verbID)'.")
+                        successfulParse = command // Command has the correct verbID
+                        // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
+                    }
+                    // Continue searching for a potentially better match (e.g., one that uses the input preposition)
+                    continue
                 }
-            } else if case .failure(let currentError) = matchResult {
+            case .failure(let currentError):
+                print("%%% PARSER DEBUG: Rule failed structurally for verb '\(verbID)' with error: \(currentError)")
                 // Structural failure reported by matchRule
                 if bestError == nil || shouldReplaceError(existing: bestError!, new: currentError) {
                      bestError = currentError
@@ -179,22 +197,32 @@ public struct StandardParser: Parser {
                 // Continue to the next rule (implicit in loop structure)
             }
         } // End rule loop
+        endRuleLoop: // Label for goto
 
         // 7. Return Result
         if let command = successfulParse {
+            print("%%% PARSER DEBUG: Final SUCCESS: \(command)")
             return .success(command)
         } else if let error = bestError { // Otherwise return best error found
+             print("%%% PARSER DEBUG: Final FAILURE (best error): \(error)")
              return .failure(error)
         } else {
             // Handle simple verb-only commands or internal error
-             if rulesForCanonicalVerb.isEmpty && significantTokens.count == verbTokenCount { // Use rulesForCanonicalVerb
-                 // Input was just a verb phrase matching a verb with no rules
-                 let command = Command(verbID: canonicalVerbID, rawInput: input) // <<< Use canonical ID
+             if allPotentialRules.isEmpty && significantTokens.count == verbTokenCount {
+                 // Input was just a verb phrase matching one or more verbs, none of which had rules.
+                 // Pick the first matched verb ID as the canonical one (arbitrary choice).
+                 let firstMatchedID = matchedVerbIDs.first!
+                 print("%%% PARSER DEBUG: Final SUCCESS (verb-only command): \(firstMatchedID)")
+                 let command = Command(verbID: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
                  // If we get here, rules existed, but none resulted in success or a recorded error.
-                 // ... Provide a generic grammar error based on the canonical verb matched.
-                 return .failure(.badGrammar("I understood '\(canonicalVerbID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules.")) // Use canonicalVerbID
+                 // This likely means structural matches occurred, but preposition checks failed,
+                 // or no structural matches occurred at all. bestError should ideally have been set.
+                 // Provide a generic grammar error based on the *first* matched verb ID (arbitrary choice).
+                 let firstMatchedID = matchedVerbIDs.first!
+                 print("%%% PARSER DEBUG: Final FAILURE (generic grammar): \(firstMatchedID)")
+                 return .failure(.badGrammar("I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."))
              }
         }
     }

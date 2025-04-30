@@ -443,13 +443,8 @@ public class GameEngine: Sendable {
                     try await verbHandler.validate(command: command, engine: self)
                     let result = try await verbHandler.process(command: command, engine: self)
 
-                    // Apply state changes
-                    for change in result.stateChanges {
-                        try self.gameState.apply(change)
-                    }
-
-                    // Print the result message (always present)
-                    await ioHandler.print(result.message)
+                    // Process the result (apply changes, print message)
+                    try await processActionResult(result)
 
                 } catch let actionErr as ActionError {
                     // Catch ActionError specifically for reporting
@@ -478,6 +473,32 @@ public class GameEngine: Sendable {
     }
 
     // MARK: - State Change & Side Effect Application
+
+    /// Processes the result of an action, applying state changes and printing the message.
+    ///
+    /// - Parameter result: The `ActionResult` returned by an `EnhancedActionHandler`.
+    /// - Throws: Re-throws errors encountered during state application.
+    private func processActionResult(_ result: ActionResult) async throws {
+        // 1. Apply State Changes
+        // Errors during apply will propagate up.
+        print("%%% ENGINE DEBUG: Processing ActionResult with \(result.stateChanges.count) changes.")
+        for change in result.stateChanges {
+            print("%%% ENGINE DEBUG: Attempting to apply change: \(change)")
+            do {
+                try gameState.apply(change)
+                print("%%% ENGINE DEBUG: Successfully applied change: \(change.propertyKey)")
+            } catch {
+                print("%%% ENGINE DEBUG: ERROR applying change: \(error)")
+                logger.error("💥 Failed to apply state change during processActionResult: \(error, privacy: .public) - Change: \(String(describing: change), privacy: .public)")
+                throw error // Re-throw the error to be caught by execute()
+            }
+        }
+
+        // 2. Print Result Message
+        await ioHandler.print(result.message)
+
+        // TODO: Handle SideEffects if they are added to ActionResult?
+    }
 
     /// Applies a single state change to the game state by forwarding to the central `GameState.apply` method.
     /// - Parameter change: The `StateChange` to apply.
@@ -1165,6 +1186,14 @@ public class GameEngine: Sendable {
     /// - Returns: The boolean value of the flag, or `false` if not set.
     public func getFlagValue(key: String) -> Bool {
         gameState.flags[key] ?? false
+    }
+
+    /// Retrieves the optional value of a global flag.
+    ///
+    /// - Parameter key: The key of the flag to retrieve.
+    /// - Returns: The boolean value of the flag if set, otherwise `nil`.
+    public func getOptionalFlagValue(key: String) -> Bool? {
+        gameState.flags[key]
     }
 
     // TODO: Add helpers for score/move updates if needed by standard ActionHandlers?

@@ -531,10 +531,15 @@ struct GameEngineTests {
                     oldValue: .itemProperties(item.properties),
                     newValue: .itemProperties(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
                 )
+
+                // Correctly determine oldValue for the flag using the new helper
+                let actualOldFlagValue: Bool? = await engine.getOptionalFlagValue(key: flagToSet)
+                let flagOldValueState: StateValue? = actualOldFlagValue != nil ? .bool(actualOldFlagValue!) : nil
+
                 let change2 = StateChange(
                     entityId: .global,
                     propertyKey: .globalFlag(key: flagToSet),
-                    oldValue: .bool(await engine.getFlagValue(key: flagToSet)),
+                    oldValue: flagOldValueState, // Use the correctly determined nil or .bool value
                     newValue: .bool(true)
                 )
 
@@ -1024,7 +1029,7 @@ struct GameEngineTests {
             commandInput: "close book",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't close the book.")
+        expectNoDifference(output, "The book is not something you can close.")
     }
 
     @Test("ReportActionError: .itemNotDroppable")

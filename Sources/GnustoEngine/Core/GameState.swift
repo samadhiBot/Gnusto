@@ -363,20 +363,20 @@ extension GameState {
             try validateOldValue(change, actualOldValue: actualOldValue != nil ? .int(actualOldValue!) : nil)
             // newValue validation doesn't make sense for remove
 
-            // Attempt to remove the value
-            let didRemove = self.activeFuses.removeValue(forKey: fuseId) != nil
+            // If fuse exists, remove it.
+            let removedValue = self.activeFuses.removeValue(forKey: fuseId)
 
-            // If removal failed (fuse wasn't present), only throw an error if
-            // the caller *didn't* explicitly expect it to be nil via change.oldValue.
-            if !didRemove, change.oldValue == nil {
-                // If oldValue is nil, it means the caller expected the fuse to be absent.
-                // In this case, the "removal" is successful idempotently. Do nothing.
-            } else if !didRemove {
-                // If removal failed and oldValue was *not* nil (either it was provided with a value,
-                // or it wasn't provided at all), then it's an error.
-                throw ActionError.internalEngineError("Attempted to remove non-existent active fuse: \(fuseId), or unexpected oldValue.")
+            // If the fuse didn't exist (removedValue is nil), it's only an error
+            // if the caller *expected* it to exist (i.e., provided an oldValue).
+            // If oldValue was nil, non-existence is okay (idempotent removal).
+            if removedValue == nil && change.oldValue != nil {
+                // Error: oldValue was provided, implying existence, but fuse wasn't found.
+                // The validateOldValue check should have already caught the mismatch,
+                // but this provides an extra layer of safety/clarity.
+                throw ActionError.internalEngineError("State inconsistency: removeActiveFuse failed, fuse \(fuseId) not found despite non-nil oldValue expectation.")
             }
-            // If fuse was present (didRemove=true), it was removed successfully.
+            // If removedValue was non-nil, the fuse was successfully removed.
+            // If removedValue was nil AND oldValue was nil, the operation is idempotent, proceed without error.
 
         case .updateFuseTurns(let fuseId):
             guard case .global = change.entityId else { throw ActionError.internalEngineError("Invalid entity type for .updateFuseTurns: \(change.entityId)") }
