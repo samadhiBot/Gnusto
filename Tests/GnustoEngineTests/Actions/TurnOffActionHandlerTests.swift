@@ -36,7 +36,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         await engine.execute(command: command)
 
@@ -79,7 +79,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-off", directObject: "book", rawInput: "turn off book")
+        let command = Command(verbID: "turn off", directObject: "book", rawInput: "turn off book")
 
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
             try await handler.validate(command: command, engine: engine)
@@ -106,7 +106,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
@@ -132,7 +132,7 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         await engine.execute(command: command)
 
@@ -175,7 +175,7 @@ struct TurnOffActionHandlerTests {
         let initiallyLit = engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(initiallyLit == true)
 
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         await engine.execute(command: command)
 
@@ -213,7 +213,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already off.")) {
@@ -244,7 +244,7 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
@@ -274,27 +274,30 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn-off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
-        await #expect(throws: ActionError.itemNotAccessible("lamp")) {
-            await engine.execute(command: command)
-        }
+        // Act: Execute the command
+        await engine.execute(command: command)
+
+        // Assert: Check IOHandler output for the expected error message
+        let output = await mockIO.flush()
+        // The specific error message comes from GameEngine.report(actionError:)
+        expectNoDifference(output, "You can't see any such thing.")
     }
 
     @Test("Extinguish alias works correctly")
     func testExtinguishAlias() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            name: "Dark Room",
-            longDescription: "This room will become dark."
-        )
+        // Arrange
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .location(darkRoom.id)
+            parent: .location("darkRoom")
+        )
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            longDescription: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -302,17 +305,23 @@ struct TurnOffActionHandlerTests {
             items: [lamp]
         )
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        // Use the real parser to test alias resolution
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser, // Use StandardParser
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "extinguish", directObject: "lamp", rawInput: "extinguish lamp")
+        // Act
+        // Parse the raw input first
+        let parseResult = parser.parse(input: "extinguish lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get() // Get the parsed command
 
+        // Execute the parsed command
         await engine.execute(command: command)
 
+        // Assert
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
         #expect(finalItemState?.hasProperty(.touched) == true)
@@ -327,18 +336,17 @@ struct TurnOffActionHandlerTests {
 
     @Test("Blow Out alias works correctly")
     func testBlowOutAlias() async throws {
-        let darkRoom = Location(
-            id: "darkRoom",
-            name: "Dark Room",
-            longDescription: "This room will become dark."
-        )
+        // Arrange
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .location(darkRoom.id)
+            parent: .location("darkRoom")
+        )
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            longDescription: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -346,17 +354,23 @@ struct TurnOffActionHandlerTests {
             items: [lamp]
         )
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        // Use the real parser to test alias resolution
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser, // Use StandardParser
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "blow out", directObject: "lamp", rawInput: "blow out lamp")
+        // Act
+        // Parse the raw input first
+        let parseResult = parser.parse(input: "blow out lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get() // Get the parsed command
 
+        // Execute the parsed command
         await engine.execute(command: command)
 
+        // Assert
         let finalItemState = engine.itemSnapshot(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false)
         #expect(finalItemState?.hasProperty(.touched) == true)

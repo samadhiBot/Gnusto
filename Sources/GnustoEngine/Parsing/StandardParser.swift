@@ -86,55 +86,50 @@ public struct StandardParser: Parser {
             }
         }
 
+        print("%%% PARSER DEBUG: Matched Verb IDs: \(matchedVerbIDs), Verb Tokens: \(significantTokens[verbStartIndex..<(verbStartIndex + verbTokenCount)])")
+
         // Ensure at least one verb was matched
         guard !matchedVerbIDs.isEmpty else {
-             // No known single or multi-word verb/synonym found
-             return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
+            // No known single or multi-word verb/synonym found
+            return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
         }
 
-        // 5b. Get *all* Syntax Rules for *all* matched VerbIDs
-        var rulesWithVerbID: [(rule: SyntaxRule, verbID: VerbID)] = []
-        for verbID in matchedVerbIDs {
-            if let verbDef = vocabulary.verbDefinitions[verbID] {
-                for rule in verbDef.syntax {
-                    rulesWithVerbID.append((rule: rule, verbID: verbID))
-                }
-            } else if significantTokens.count == verbTokenCount {
-                // If a matched verb has NO rules BUT the input was *only* the verb, it's a valid simple command.
-                // We need to handle this possibility if *any* of the matched verbs fit this criteria.
-                // Let the loop below handle rule matching; if it fails, we check this condition.
-                // Add a placeholder or handle after the loop? Add rule-less verb ID to check later?
-                // For now, let's rely on the loop potentially finding a rule from another verbID.
-                // If loop finishes with no match, we might need to reconsider simple commands here.
-            }
+        // ***** NEW: Determine the single canonical VerbID to use *****
+        // If multiple IDs matched (ambiguous synonym?), we might need error handling.
+        // For now, assume the first one is the intended canonical ID.
+        guard let canonicalVerbID = matchedVerbIDs.first else {
+            // This should be impossible if matchedVerbIDs is not empty
+            return .failure(.internalError("Verb matched, but no canonical ID found."))
+        }
+        print("%%% PARSER DEBUG: Determined canonicalVerbID: \(canonicalVerbID)")
+        // TODO: Add check here if matchedVerbIDs.count > 1 and handle ambiguity?
+
+        // 5b. Get Syntax Rules using the *canonical* ID
+        var rulesForCanonicalVerb: [SyntaxRule] = []
+        if let verbDef = vocabulary.verbDefinitions[canonicalVerbID] { // Use canonical ID
+             rulesForCanonicalVerb = verbDef.syntax
+        } else {
+            // If canonical ID has no definition (shouldn't happen if vocab is consistent)
+            // Handle simple verb-only case later if rules list ends up empty
         }
 
-        // Handle cases where a verb was matched, but NO rules were found across ALL matched VerbIDs
-        // (e.g., "xyzzy" is a verb synonym but has no rules)
-        // AND the input was longer than just the verb phrase.
-        if rulesWithVerbID.isEmpty && significantTokens.count > verbTokenCount {
-             // This case should be rare if verbs usually have rules or are single-word commands.
-             // Provide a generic error based on the first matched verb ID.
-             let firstVerbID = matchedVerbIDs.first! // We know it's not empty
-             return .failure(.badGrammar("I understand the verb '\(firstVerbID.rawValue)', but not the rest of that sentence."))
+        // Handle cases where canonical verb exists but has NO rules...
+        if rulesForCanonicalVerb.isEmpty && significantTokens.count > verbTokenCount {
+            // Provide a generic error based on the canonical verb ID.
+            return .failure(.badGrammar("I understand the verb '\(canonicalVerbID.rawValue)', but not the rest of that sentence."))
         }
-        // Handle the case where the input was *just* the verb phrase and *at least one* matched verb has no rules?
-        // This is complex. Let's assume rule matching below will handle valid parses.
 
-
-        // 6. Match Tokens Against Syntax Rules (using the combined `rulesWithVerbID` list)
+        // 6. Match Tokens Against Syntax Rules
         var successfulParse: Command? = nil
         var bestError: ParseError? = nil
 
-        // Sort rules? Maybe prioritize rules with required prepositions if input has one?
-        // For now, process in the order gathered.
-
-        for (rule, ruleVerbID) in rulesWithVerbID { // Iterate through combined list
+        for rule in rulesForCanonicalVerb { // Iterate rules for the canonical verb
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
-                verbID: ruleVerbID, // Pass the specific VerbID for this rule
+                verbID: canonicalVerbID, // <<< Pass the canonical ID
+                _debugHook: { print("%%% PARSER DEBUG: Calling matchRule with verbID: \(canonicalVerbID)") }, // Add debug print
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
@@ -155,7 +150,7 @@ public struct StandardParser: Parser {
                             break // Found the best possible match for this input
                         } else {
                             // PREPOSITIONS MISMATCH - Record error, continue
-                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(ruleVerbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
+                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(canonicalVerbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').") // Use canonicalVerbID
                             if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
                                 bestError = mismatchError
                             }
@@ -163,10 +158,10 @@ public struct StandardParser: Parser {
                         }
                     } else {
                         // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
-                        let missingPrepError = ParseError.badGrammar("Verb '\(ruleVerbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
+                        let missingPrepError = ParseError.badGrammar("Verb '\(canonicalVerbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.") // Use canonicalVerbID
                         if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
-                             bestError = missingPrepError
-                         }
+                            bestError = missingPrepError
+                        }
                         continue // Try next rule, this one is invalid for this input
                     }
                 } else {
@@ -192,16 +187,14 @@ public struct StandardParser: Parser {
              return .failure(error)
         } else {
             // Handle simple verb-only commands or internal error
-             if rulesWithVerbID.isEmpty && significantTokens.count == verbTokenCount {
+             if rulesForCanonicalVerb.isEmpty && significantTokens.count == verbTokenCount { // Use rulesForCanonicalVerb
                  // Input was just a verb phrase matching a verb with no rules
-                 let command = Command(verbID: matchedVerbIDs.first!, rawInput: input)
+                 let command = Command(verbID: canonicalVerbID, rawInput: input) // <<< Use canonical ID
                  return .success(command)
              } else {
                  // If we get here, rules existed, but none resulted in success or a recorded error.
-                 // This implies all rules failed structurally or had preposition issues that didn't record high-priority errors.
-                 // Provide a generic grammar error based on the first verb matched.
-                 let firstVerb = matchedVerbIDs.first!.rawValue
-                 return .failure(.badGrammar("I understood '\(firstVerb)' but couldn't parse the rest of the sentence with its known grammar rules."))
+                 // ... Provide a generic grammar error based on the canonical verb matched.
+                 return .failure(.badGrammar("I understood '\(canonicalVerbID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules.")) // Use canonicalVerbID
              }
         }
     }
@@ -293,10 +286,12 @@ public struct StandardParser: Parser {
         tokens: [String],
         verbStartIndex: Int,
         verbID: VerbID,
+        _debugHook: (() -> Void)? = nil, // Add parameter for debug hook
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
+        _debugHook?() // Call the hook
         var tokenCursor = verbStartIndex + 1
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
@@ -438,60 +433,25 @@ public struct StandardParser: Parser {
             resolvedIndirectObjectResult = .success(nil)
         }
 
-        var finalVerbID = verbID
-
-        switch verbID.rawValue {
-        case "turn", "switch":
-            guard let particle = matchedParticle else {
-                return .failure(.internalError("Verb '\(verbID.rawValue)' matched rule but particle missing."))
-            }
-            guard particle == "on" || particle == "off" else {
-                return .failure(.badGrammar("Expected 'on' or 'off' after '\(verbID.rawValue)', not '\(particle)'."))
-            }
-            finalVerbID = (particle == "on") ? VerbID("turn_on") : VerbID("turn_off")
-
-        case "blow":
-            guard let particle = matchedParticle else {
-                return .failure(.internalError("Verb 'blow' matched rule but particle missing."))
-            }
-            guard particle == "out" else {
-                return .failure(.badGrammar("Expected 'out' after 'blow', not '\(particle)'."))
-            }
-            finalVerbID = VerbID("turn_off")
-
-        case "light":
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb 'light' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-            finalVerbID = VerbID("turn_on")
-
-        case "extinguish":
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb 'extinguish' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-            finalVerbID = VerbID("turn_off")
-
-        default:
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb '\(verbID.rawValue)' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-        }
-
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
         case (.success(let doID), .success(let ioID)):
             let command = Command(
-                verbID: finalVerbID,
+                verbID: verbID,
                 directObject: doID,
-                directObjectModifiers: doModsExtracted,
+                directObjectModifiers: modsToUseDO,
                 indirectObject: ioID,
-                indirectObjectModifiers: ioModsExtracted,
+                indirectObjectModifiers: modsToUseIO,
                 preposition: matchedPreposition,
                 direction: matchedDirection,
                 rawInput: originalInput
             )
             return .success(command)
-        case (.failure(let error), _): return .failure(error)
-        case (_, .failure(let error)): return .failure(error)
+        case (.failure(let error), _):
+            print("%%% PARSER DEBUG: matchRule failed resolving DO: \(error)")
+            return .failure(error)
+        case (_, .failure(let error)):
+            print("%%% PARSER DEBUG: matchRule failed resolving IO: \(error)")
+            return .failure(error)
         }
     }
 

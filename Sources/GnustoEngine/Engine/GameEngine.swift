@@ -83,8 +83,8 @@ public class GameEngine: Sendable {
         "taste": TasteActionHandler(),
         "think": ThinkAboutActionHandler(),
         "touch": TouchActionHandler(),
-        "turn-off": TurnOffActionHandler(),
-        "turn-on": TurnOnActionHandler(),
+        "turn off": TurnOffActionHandler(),
+        "turn on": TurnOnActionHandler(),
         "wait": WaitActionHandler(),
 
         // Meta Actions
@@ -420,8 +420,9 @@ public class GameEngine: Sendable {
                 return
             }
 
-            // If the room is dark and the verb requires light, report the error and stop.
-            if !isLit && verb.requiresLight {
+            // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
+            let isTurnOn = command.verbID == VerbID("turn on") // Special case for turning on lights
+            if !isLit && verb.requiresLight && !isTurnOn {
                 await report(actionError: .roomIsDark)
                 // Do not proceed to execute the handler
             } else {
@@ -580,7 +581,9 @@ public class GameEngine: Sendable {
         let locationID = gameState.player.currentLocationID
 
         // 1. Check for light
-        guard scopeResolver.isLocationLit(locationID: locationID) else {
+        let isLitResult = scopeResolver.isLocationLit(locationID: locationID)
+        print("%%% ENGINE DEBUG: describeCurrentLocation called for \(locationID). isLocationLitResult: \(isLitResult)")
+        guard isLitResult else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
             // Do not describe the room or list items.

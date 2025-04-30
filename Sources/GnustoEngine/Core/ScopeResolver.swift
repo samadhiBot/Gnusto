@@ -61,6 +61,61 @@ public struct ScopeResolver: Sendable {
         return false
     }
 
+    /// Checks if the specified location would be lit given a hypothetical change
+    /// to a single item's properties.
+    /// Used by handlers to predict darkness after an action.
+    ///
+    /// - Parameters:
+    ///   - locationID: The ID of the location to check.
+    ///   - changedItemID: The ID of the item whose properties are hypothetically changed.
+    ///   - newItemProperties: The hypothetical set of properties for the changed item.
+    /// - Returns: `true` if the location would be lit, `false` otherwise.
+    public func isLocationLitAfterSimulatedChange(
+        locationID: LocationID,
+        changedItemID: ItemID,
+        newItemProperties: Set<ItemProperty>
+    ) -> Bool {
+        // Access current game state
+        let gameState = engine.gameState
+        guard let location = gameState.locations[locationID] else {
+            return false // Location not found
+        }
+
+        // 1. Check inherent lit property.
+        if location.hasProperty(.inherentlyLit) { return true }
+        // 2. Check dynamic .isLit flag.
+        if location.hasProperty(.isLit) { return true }
+
+        // 3. Check player inventory
+        let playerInventory = gameState.items.values.filter { $0.parent == .player }
+        for item in playerInventory {
+            let isLightSource = item.hasProperty(.lightSource)
+            let isOn: Bool
+            if item.id == changedItemID {
+                isOn = newItemProperties.contains(.on) // Use hypothetical state
+            } else {
+                isOn = item.hasProperty(.on) // Use actual state
+            }
+            if isLightSource && isOn { return true }
+        }
+
+        // 4. Check items in location
+        let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
+        for item in itemsInLocation {
+            let isLightSource = item.hasProperty(.lightSource)
+            let isOn: Bool
+            if item.id == changedItemID {
+                isOn = newItemProperties.contains(.on) // Use hypothetical state
+            } else {
+                isOn = item.hasProperty(.on) // Use actual state
+            }
+            if isLightSource && isOn { return true }
+        }
+
+        // 5. Otherwise, the location would be dark.
+        return false
+    }
+
     /// Determines which items are directly visible within a given location.
     /// Considers light conditions and item properties (e.g., `.invisible`).
     /// Does not include contents of containers unless they are transparent.

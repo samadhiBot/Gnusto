@@ -78,12 +78,24 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         let isLightSource = targetItem.hasProperty(.lightSource)
         if isLightSource {
             let currentLocationID = await engine.playerLocationID()
-            // Check lit status *after* applying potential state changes (hypothetically)
-            // This requires simulating the state change effect on the light source.
-            // A simpler approach is to check the *current* lit status and assume the handler
-            // turning off the light *might* make it dark, then let the engine's main loop
-            // re-describe the location which will handle the darkness message if needed.
-            // For now, just return the primary message.
+
+            // Determine the hypothetical state of the target item *after* changes
+            var propsAfterOff = targetItem.properties // Start with current props
+            propsAfterOff.remove(.on)
+            if !targetItem.hasProperty(.touched) {
+                propsAfterOff.insert(.touched)
+            }
+
+            // Check lit status using the hypothetical state of the single changed item
+            let locationIsNowLit = await engine.scopeResolver.isLocationLitAfterSimulatedChange(
+                locationID: currentLocationID,
+                changedItemID: targetItemID,
+                newItemProperties: propsAfterOff // Pass the hypothetical properties
+            )
+
+            if !locationIsNowLit {
+                messageParts.append("It is now pitch black. You are likely to be eaten by a grue.")
+            }
         }
 
         // --- Create Result ---

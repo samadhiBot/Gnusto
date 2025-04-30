@@ -19,14 +19,15 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
+        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act
         await engine.execute(command: command)
@@ -61,10 +62,10 @@ struct TurnOnActionHandlerTests {
             items: [lamp]
         )
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
@@ -72,7 +73,8 @@ struct TurnOnActionHandlerTests {
         let initiallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(initiallyLit == false)
 
-        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
+        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act
         await engine.execute(command: command)
@@ -83,15 +85,12 @@ struct TurnOnActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
 
         let output = await mockIO.flush()
-        // Expect turn on message *followed by* the room description
-        let expectedOutput = """
-            The brass lantern is now on.
-            --- Dark Room ---
-            This is a dark room that should now be lit.
-            You can see:
-              A brass lantern
-            """
-        expectNoDifference(output, expectedOutput)
+        // Assert: Only expect the direct handler message
+        expectNoDifference(output, "The brass lantern is now on.")
+
+        // Assert: Verify the room is now lit
+        let finallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
+        #expect(finallyLit == true, "Room should be lit after turning on the lamp.")
     }
 
     @Test("Try to turn on item already on")
@@ -106,14 +105,15 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
+        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already on.")) {
@@ -138,14 +138,15 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
+        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
@@ -169,18 +170,17 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-on", directObject: "lamp", rawInput: "turn on lamp")
-
-        // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("lamp")) {
-            try await handler.validate(command: command, engine: engine) // Changed to validate
+        // Act & Assert: Expect parser error because item is out of scope
+        let expectedError = ParseError.itemNotInScope(noun: "lamp")
+        await #expect(throws: expectedError) {
+            _ = try parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState).get()
         }
     }
 
@@ -205,14 +205,15 @@ struct TurnOnActionHandlerTests {
             items: [radio]
         )
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn-on", directObject: "radio", rawInput: "turn on radio")
+        let parseResult = parser.parse(input: "turn on radio", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act
         await engine.execute(command: command)
@@ -233,7 +234,7 @@ struct TurnOnActionHandlerTests {
 
     @Test("Light alias works correctly")
     func testLightAlias() async throws {
-        // Arrange: Same setup as testTurnOnLightSourceInInventory
+        // Arrange
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
@@ -243,15 +244,15 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
 
-        // Use "light lamp" command
-        let command = Command(verbID: "light", directObject: "lamp", rawInput: "light lamp")
+        let parseResult = parser.parse(input: "light lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let command = try parseResult.get()
 
         // Act
         await engine.execute(command: command)

@@ -216,47 +216,24 @@ public struct Vocabulary: Codable, Sendable {
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: false // ADDED: Removing items works in the dark
         ), // For worn items
-        // Light/Device Verbs (Note: Synonyms handle mapping multiple words to the same VerbID)
+
+        // --- Restore Combined Turn On/Off Verbs ---
         Verb(
-            id: "light",
-            synonyms: ["illuminate"],
-            // Direct mapping to turn_on
-            syntax: [SyntaxRule(.verb, .directObject)]
+            id: "turn on",
+            synonyms: ["light", "switch on"],
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
         ),
         Verb(
-            id: "extinguish",
-            synonyms: ["douse"],
-            // Direct mapping to turn_off
-            syntax: [SyntaxRule(.verb, .directObject)]
+            id: "turn off",
+            synonyms: ["extinguish", "douse", "switch off", "blow out"],
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
         ),
-        Verb(
-            id: "blow",
-            // Requires "out" particle
-            syntax: [
-                SyntaxRule(.verb, .particle("out"), .directObject),
-                SyntaxRule(.verb, .directObject, .particle("out"))
-            ]
-        ),
-        Verb(
-            id: "turn",
-            // Requires "on"/"off" particle
-            syntax: [
-                SyntaxRule(.verb, .particle("on"), .directObject),
-                SyntaxRule(.verb, .directObject, .particle("on")),
-                SyntaxRule(.verb, .particle("off"), .directObject),
-                SyntaxRule(.verb, .directObject, .particle("off"))
-            ]
-        ),
-        Verb(
-            id: "switch",
-            // Requires "on"/"off" particle
-            syntax: [
-                SyntaxRule(.verb, .particle("on"), .directObject),
-                SyntaxRule(.verb, .directObject, .particle("on")),
-                SyntaxRule(.verb, .particle("off"), .directObject),
-                SyntaxRule(.verb, .directObject, .particle("off"))
-            ]
-        ),
+        // --- REMOVED Separate Verbs for Testing ---
+        // Verb(id: "extinguish", ...)
+        // Verb(id: "blow out", ...)
+        // Verb(id: "switch off", ...)
 
         // Sensory / Non-committal
         Verb(
@@ -359,7 +336,11 @@ public struct Vocabulary: Codable, Sendable {
     public mutating func add(item: Item) {
         let itemID = item.id
         let lowercasedName = item.name.lowercased()
+        let lowercasedID = itemID.rawValue.lowercased()
+
+        // Add name, ID, and synonyms as potential nouns
         self.items[lowercasedName, default: []].insert(itemID)
+        self.items[lowercasedID, default: []].insert(itemID) // Add item ID
         for synonym in item.synonyms {
             self.items[synonym.lowercased(), default: []].insert(itemID)
         }
