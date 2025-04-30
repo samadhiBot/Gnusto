@@ -257,9 +257,7 @@ struct GameStateTests {
         )
 
         // Then: Apply should succeed without throwing
-        try #require(throws: Never.self) { // Expect NO error
-            try gameState.apply(change)
-        }
+        try gameState.apply(change)
 
         // Assert final state: Fuse should still be absent
         #expect(gameState.activeFuses[fuseId] == nil)
@@ -284,7 +282,7 @@ struct GameStateTests {
 
         // Expect an error because the oldValue is wrong
         let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseId: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
-        await #expect(throws: expectedError) {
+        #expect(throws: expectedError) {
             try gameState.apply(change)
         }
 

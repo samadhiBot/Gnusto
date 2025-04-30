@@ -22,7 +22,6 @@ struct InventoryActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = InventoryActionHandler()
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act
@@ -54,7 +53,6 @@ struct InventoryActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = InventoryActionHandler()
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act

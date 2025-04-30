@@ -325,7 +325,6 @@ public struct StandardParser: Parser {
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
         var matchedDirection: Direction? = nil
-        var matchedParticle: String? = nil
 
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
@@ -407,7 +406,6 @@ public struct StandardParser: Parser {
                 guard currentToken == expectedParticle else {
                     return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(tokens[verbStartIndex])' but found '\(currentToken)'."))
                 }
-                matchedParticle = currentToken
                 tokenCursor += 1
             }
         }

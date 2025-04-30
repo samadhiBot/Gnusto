@@ -179,7 +179,7 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert: Expect parser error because item is out of scope
         let expectedError = ParseError.itemNotInScope(noun: "lamp")
-        await #expect(throws: expectedError) {
+        #expect(throws: expectedError) {
             _ = try parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState).get()
         }
     }

@@ -583,9 +583,9 @@ struct GameEngineTests {
         )
 
         // Ensure initial state
-        #expect(await engine.gameState.flags[testFlagKey] == nil)
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == false) // Qualified
-        #expect(engine.getChangeHistory().isEmpty) // Use helper
+        #expect(engine.gameState.flags[testFlagKey] == nil)
+        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == false)
+        #expect(engine.getChangeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
@@ -593,12 +593,12 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(await engine.gameState.flags[testFlagKey] == true, "Flag should be set")
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set") // Qualified
-        #expect(await engine.itemSnapshot(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set") // Qualified
+        #expect(engine.gameState.flags[testFlagKey] == true, "Flag should be set")
+        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
+        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
 
         // Check history recorded correctly
-        let history = engine.getChangeHistory() // Use helper
+        let history = engine.getChangeHistory()
         #expect(!history.isEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
@@ -626,8 +626,8 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityId == .global &&
-                change.propertyKey == StatePropertyKey.globalFlag(key: testFlagKey) &&
-                change.newValue == StateValue.bool(true)
+                    change.propertyKey == StatePropertyKey.globalFlag(key: testFlagKey) &&
+                    change.newValue == StateValue.bool(true)
             },
             "History should contain flag change to true for \(testFlagKey)"
         )
@@ -661,7 +661,7 @@ struct GameEngineTests {
             // TODO: Need initial state setup for activeFuses
         )
 
-        let engine = GameEngine(
+        let _ = GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -690,7 +690,7 @@ struct GameEngineTests {
             registry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
-        let engine = GameEngine(
+        let _ = GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -708,7 +708,7 @@ struct GameEngineTests {
     func testFuseAndDaemonInteraction() async throws {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let stateHolder = TestStateHolder()
+        let _ = TestStateHolder() // Use _ for unused stateHolder
 
         let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in /* ... */ }
         let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in /* ... */ }
@@ -722,7 +722,7 @@ struct GameEngineTests {
             // TODO: Need initial state setup for active timers
         )
 
-        let engine = GameEngine(
+        let _ = GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
