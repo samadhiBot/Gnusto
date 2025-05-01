@@ -647,10 +647,22 @@ public class GameEngine: Sendable {
             for itemID in visibleItemIDs {
                 // TODO: Fetch actual item state for description if needed
                 if let item = item(with: itemID) {
-                    if let fdesc = item.firstDescription { // Placeholder for FDESC logic
-                        ioHandler.print(await fdesc.generate(item, self), style: .itemDescription)
-                    } else if let sdesc = item.shortDescription { // Default to short description
-                        ioHandler.print(await sdesc.generate(item, self), style: .itemDescription)
+                    if let firstDescription = item.firstDescription {
+                        let description = await descriptionHandlerRegistry
+                            .generateDescription(
+                                for: item,
+                                using: firstDescription,
+                                engine: self
+                            )
+                        await ioHandler.print(description)
+                    } else if let shortDescription = item.shortDescription {
+                        let description = await descriptionHandlerRegistry
+                            .generateDescription(
+                                for: item,
+                                using: shortDescription,
+                                engine: self
+                            )
+                        await ioHandler.print(description)
                     }
                 }
             }
@@ -913,11 +925,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                logger
-                    .warning("""
-                        💥 Failed to apply flag change for '\(flag, privacy: .public)': \
-                        \(error, privacy: .public)
-                        """)
+                logger.warning("""
+                    💥 Failed to apply flag change for '\(flag, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -955,22 +966,21 @@ public class GameEngine: Sendable {
     ///   - itemID: The ID of the item to move.
     ///   - newParent: The target parent entity.
     public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
-        guard let item = item(with: itemID) else {
-            logger
-                .warning("💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'.")
+        guard let moveItem = item(with: itemID) else {
+            logger.warning(
+                "💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'."
+            )
             return
         }
-        let oldParent = item.parent
+        let oldParent = moveItem.parent
 
         // Check if destination is valid (e.g., Location exists)
         if case .location(let locID) = newParent {
             guard location(with: locID) != nil else {
-                logger
-                    .warning("""
-                        💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
-                        non-existent location '\(locID.rawValue, privacy: .public)'.
-                        """
-                    )
+                logger.warning("""
+                    💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
+                    non-existent location '\(locID.rawValue, privacy: .public)'.
+                    """)
                 return
             }
         } else if case .item(let containerID) = newParent {
@@ -1034,10 +1044,9 @@ public class GameEngine: Sendable {
                 }
 
             } catch {
-                logger
-                    .warning(
-                        "💥 Failed to apply player move to '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)"
-                    )
+                logger.warning(
+                    "💥 Failed to apply player move to '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)"
+                )
             }
         }
     }
@@ -1165,202 +1174,202 @@ public class GameEngine: Sendable {
 
     // TODO: Add helpers for score/move updates if needed by standard ActionHandlers?
 
-    // MARK: - Scope Resolution Delegation
-
-    /// Finds items directly visible to the player in their current location.
-    public func itemsVisibleInCurrentLocation(excludeScenery: Bool = false) async -> [ItemID] {
-        await scopeResolver.itemsVisibleInLocation(
-            locationID: gameState.player.currentLocationID, // Use gameState.player.currentLocationID
-            engine: self,
-            excludeScenery: excludeScenery
-        )
-    }
-
-    /// Finds items potentially reachable by the player (inventory, visible location items).
-    public func itemsReachableByPlayer() async -> [ItemID] {
-        await scopeResolver.itemsReachableByPlayer(engine: self)
-    }
-
-    /// Checks if the player can currently see a specific item.
-    public func canPlayerSeeItem(itemID: ItemID) async -> Bool {
-        guard let item = await item(with: itemID) else { return false } // Use item(with:)
-        return await scopeResolver.canPlayerSeeItem(item: item, engine: self)
-    }
-
-    /// Checks if an item is directly or indirectly inside a container.
-    public func isItem(_ itemID: ItemID, inside containerID: ItemID) async -> Bool {
-        guard await item(with: itemID) != nil else { return false } // Use item(with:)
-        var currentParent = await self.itemParent(itemID)
-        while case .item(let parentID) = currentParent {
-            if parentID == containerID { return true }
-            // Check if the container we found actually exists before continuing up the chain
-            guard await item(with: parentID) != nil else { return false } // Use item(with:)
-            currentParent = await self.itemParent(parentID)
-        }
-        return false
-    }
-
-    /// Finds the outermost container of an item, or the location ID if it's not in a container.
-    public func ultimateParent(of itemID: ItemID) async -> ParentEntity {
-        guard let initialParent = await itemParent(itemID) else { return .nowhere } // Should exist if item exists
-        var currentParent = initialParent
-        while case .item(let parentID) = currentParent {
-            // Check if the container we found actually exists before continuing up the chain
-            guard let nextParent = await itemParent(parentID) else {
-                // If parent doesn't exist, treat the last valid container as ultimate parent
-                // Or if the initial item wasn't in a container, return its parent.
-                return currentParent
-            }
-            // Stop if we hit .nowhere or a .location
-            guard case .item = nextParent else { return nextParent }
-            currentParent = nextParent
-        }
-        return currentParent // Will be .location(id), .player, or .nowhere
-    }
-
-    /// Checks if the player's current location is lit.
-    public func isCurrentLocationLit() async -> Bool {
-        guard let location = await location(with: gameState.player.currentLocationID) else { return false } // Use location(with:) and gameState.player.currentLocationID
-        return await scopeResolver.isLocationLit(location: location, engine: self)
-    }
-
-    /// Checks if a specific location is lit.
-    public func isLocationLit(locationID: LocationID) async -> Bool {
-        guard let location = await location(with: locationID) else { return false } // Use location(with:)
-        return await scopeResolver.isLocationLit(location: location, engine: self)
-    }
-
-    /// Checks if an item is considered scenery (usually fixed, non-interactive elements).
-    public func isScenery(itemID: ItemID) async -> Bool {
-        guard let item = await item(with: itemID) else { return false } // Use item(with:)
-        return item.hasProperty(.scenery)
-    }
-
-    /// Checks if an item is currently worn by the player.
-    public func isWorn(itemID: ItemID) async -> Bool {
-        guard let item = await item(with: itemID) else { return false } // Use item(with:)
-        return item.parent == .player && item.hasProperty(.worn)
-    }
-
-    /// Checks if a container is open.
-    public func isOpen(containerID: ItemID) async -> Bool {
-        guard let item = await item(with: containerID) else { return false } // Use item(with:)
-        // Ensure it's actually a container before checking open status
-        return item.hasProperty(.container) && item.hasProperty(.open)
-    }
-
-    /// Gets the total size/weight of items currently held by the player.
-    public func currentInventoryWeight() async -> Int {
-        gameState.player.currentInventoryWeight(allItems: gameState.items)
-    }
-
-    /// Checks if the player can carry an item of the given size.
-    public func canPlayerCarry(itemSize: Int) async -> Bool {
-        let currentWeight = await currentInventoryWeight()
-        let playerCapacity = gameState.player.carryingCapacity
-        return (currentWeight + itemSize) <= playerCapacity
-    }
-
-    /// Checks if an item ID refers to an existing item.
-    public func itemExists(itemID: ItemID) async -> Bool {
-        await item(with: itemID) != nil // Use item(with:)
-    }
-
-    /// Checks if a location ID refers to an existing location.
-    public func locationExists(locationID: LocationID) async -> Bool {
-        await location(with: locationID) != nil // Use location(with:)
-    }
-
-    private func lookInLocation(_ location: Location) async {
-        let description = await description(for: location)
-        ioHandler.print(description, style: .locationDescription)
-
-        // Describe visible items (not scenery/globals)
-        let visibleItems = await scopeResolver.itemsVisibleInLocation(
-            locationID: location.id,
-            engine: self,
-            excludeScenery: true
-        )
-
-        if !visibleItems.isEmpty {
-            // TODO: Add Zork-style grouping ("There is a KEY and a LAMP here.")
-            // TODO: Handle FDESC (first description)
-            for itemID in visibleItems {
-                // TODO: Fetch actual item state for description if needed
-                if let item = await item(with: itemID) {
-                    if let fdesc = item.firstDescription { // Placeholder for FDESC logic
-                        ioHandler.print(await fdesc.generate(item, self), style: .itemDescription)
-                    } else if let sdesc = item.shortDescription { // Default to short description
-                        ioHandler.print(await sdesc.generate(item, self), style: .itemDescription)
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Actor Method Implementation
-
-    public nonisolated func run() async throws {
-        // Initial setup - show starting location description
-        // Use gameState.player.currentLocationID and location(with:)
-        if let startLocation = await location(with: gameState.player.currentLocationID) {
-            await showLocationDescription(location: startLocation)
-        } else {
-            throw ActionError.internalEngineError("Initial player location ID '\\(gameState.player.currentLocationID)' is invalid.")
-        }
-
-        // ... existing code ...
-
-        // 1. Check if the location exists
-        // Use location(with:) instead of location(with:)
-        guard let currentLoc = await location(with: player.currentLocationID) else {
-            throw ActionError.internalEngineError("Player is in an invalid location: \\(player.currentLocationID)")
-        }
-
-        // ... existing code ...
-        // Use item(with:) instead of item(with:)
-        if let keyItem = await item(with: keyID), keyItem.parent == .player {
-            // Proceed with unlock logic
-        } else {
-            let keyName = await item(with: keyID)?.name ?? keyID.rawValue
-            // Use item(with:) instead of item(with:)
-            return ActionResult(
-                success: false,
-                message: "The \\(await item(with: keyID)?.name ?? keyID.rawValue) doesn't fit \\(theThat(lockID))." // Example update
-            )
-        }
-
-        // If we reach here, item is unlocked.
-        return ActionResult(
-            success: true,
-            message: "You unlock the \\(theThat(lockID))."
-        )
-    }
-
-    /// Helper to check if an item has been touched (handled by the engine).
-    public func hasBeenTouched(itemID: ItemID) async -> Bool {
-        // Use item(with:) instead of item(with:)
-        if let item = await item(with: itemID), item.hasProperty(.touched) {
-            return true
-        }
-        return false
-    }
-
-    /// Sets the touched flag on an item if it exists.
-    public func setTouchedFlag(itemID: ItemID) async throws {
-        // Use item(with:) instead of item(with:)
-        if let item = await item(with: itemID) {
-            if !item.hasProperty(.touched) {
-                let change = StateChange(
-                    entityId: .item(itemID),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemProperties(item.properties),
-                    newValue: .itemProperties(item.properties.union([.touched]))
-                )
-                try applyStateChange(change)
-            }
-        } else {
-            throw ActionError.internalEngineError("Attempted to set touched flag on non-existent item: \\(itemID)")
-        }
-    }
+//    // MARK: - Scope Resolution Delegation
+//
+//    /// Finds items directly visible to the player in their current location.
+//    public func itemsVisibleInCurrentLocation(excludeScenery: Bool = false) async -> [ItemID] {
+//        await scopeResolver.itemsVisibleInLocation(
+//            locationID: gameState.player.currentLocationID, // Use gameState.player.currentLocationID
+//            engine: self,
+//            excludeScenery: excludeScenery
+//        )
+//    }
+//
+//    /// Finds items potentially reachable by the player (inventory, visible location items).
+//    public func itemsReachableByPlayer() async -> [ItemID] {
+//        await scopeResolver.itemsReachableByPlayer(engine: self)
+//    }
+//
+//    /// Checks if the player can currently see a specific item.
+//    public func canPlayerSeeItem(itemID: ItemID) async -> Bool {
+//        guard let item = await item(with: itemID) else { return false } // Use item(with:)
+//        return await scopeResolver.canPlayerSeeItem(item: item, engine: self)
+//    }
+//
+//    /// Checks if an item is directly or indirectly inside a container.
+//    public func isItem(_ itemID: ItemID, inside containerID: ItemID) async -> Bool {
+//        guard await item(with: itemID) != nil else { return false } // Use item(with:)
+//        var currentParent = await self.itemParent(itemID)
+//        while case .item(let parentID) = currentParent {
+//            if parentID == containerID { return true }
+//            // Check if the container we found actually exists before continuing up the chain
+//            guard await item(with: parentID) != nil else { return false } // Use item(with:)
+//            currentParent = await self.itemParent(parentID)
+//        }
+//        return false
+//    }
+//
+//    /// Finds the outermost container of an item, or the location ID if it's not in a container.
+//    public func ultimateParent(of itemID: ItemID) async -> ParentEntity {
+//        guard let initialParent = await itemParent(itemID) else { return .nowhere } // Should exist if item exists
+//        var currentParent = initialParent
+//        while case .item(let parentID) = currentParent {
+//            // Check if the container we found actually exists before continuing up the chain
+//            guard let nextParent = await itemParent(parentID) else {
+//                // If parent doesn't exist, treat the last valid container as ultimate parent
+//                // Or if the initial item wasn't in a container, return its parent.
+//                return currentParent
+//            }
+//            // Stop if we hit .nowhere or a .location
+//            guard case .item = nextParent else { return nextParent }
+//            currentParent = nextParent
+//        }
+//        return currentParent // Will be .location(id), .player, or .nowhere
+//    }
+//
+//    /// Checks if the player's current location is lit.
+//    public func isCurrentLocationLit() async -> Bool {
+//        guard let location = await location(with: gameState.player.currentLocationID) else { return false } // Use location(with:) and gameState.player.currentLocationID
+//        return await scopeResolver.isLocationLit(location: location, engine: self)
+//    }
+//
+//    /// Checks if a specific location is lit.
+//    public func isLocationLit(locationID: LocationID) async -> Bool {
+//        guard let location = await location(with: locationID) else { return false } // Use location(with:)
+//        return await scopeResolver.isLocationLit(location: location, engine: self)
+//    }
+//
+//    /// Checks if an item is considered scenery (usually fixed, non-interactive elements).
+//    public func isScenery(itemID: ItemID) async -> Bool {
+//        guard let item = await item(with: itemID) else { return false } // Use item(with:)
+//        return item.hasProperty(.scenery)
+//    }
+//
+//    /// Checks if an item is currently worn by the player.
+//    public func isWorn(itemID: ItemID) async -> Bool {
+//        guard let item = await item(with: itemID) else { return false } // Use item(with:)
+//        return item.parent == .player && item.hasProperty(.worn)
+//    }
+//
+//    /// Checks if a container is open.
+//    public func isOpen(containerID: ItemID) async -> Bool {
+//        guard let item = await item(with: containerID) else { return false } // Use item(with:)
+//        // Ensure it's actually a container before checking open status
+//        return item.hasProperty(.container) && item.hasProperty(.open)
+//    }
+//
+//    /// Gets the total size/weight of items currently held by the player.
+//    public func currentInventoryWeight() async -> Int {
+//        gameState.player.currentInventoryWeight(allItems: gameState.items)
+//    }
+//
+//    /// Checks if the player can carry an item of the given size.
+//    public func canPlayerCarry(itemSize: Int) async -> Bool {
+//        let currentWeight = await currentInventoryWeight()
+//        let playerCapacity = gameState.player.carryingCapacity
+//        return (currentWeight + itemSize) <= playerCapacity
+//    }
+//
+//    /// Checks if an item ID refers to an existing item.
+//    public func itemExists(itemID: ItemID) async -> Bool {
+//        await item(with: itemID) != nil // Use item(with:)
+//    }
+//
+//    /// Checks if a location ID refers to an existing location.
+//    public func locationExists(locationID: LocationID) async -> Bool {
+//        await location(with: locationID) != nil // Use location(with:)
+//    }
+//
+//    private func lookInLocation(_ location: Location) async {
+//        let description = await description(for: location)
+//        ioHandler.print(description, style: .locationDescription)
+//
+//        // Describe visible items (not scenery/globals)
+//        let visibleItems = await scopeResolver.itemsVisibleInLocation(
+//            locationID: location.id,
+//            engine: self,
+//            excludeScenery: true
+//        )
+//
+//        if !visibleItems.isEmpty {
+//            // TODO: Add Zork-style grouping ("There is a KEY and a LAMP here.")
+//            // TODO: Handle FDESC (first description)
+//            for itemID in visibleItems {
+//                // TODO: Fetch actual item state for description if needed
+//                if let item = await item(with: itemID) {
+//                    if let fdesc = item.firstDescription { // Placeholder for FDESC logic
+//                        ioHandler.print(await fdesc.generate(item, self))
+//                    } else if let sdesc = item.shortDescription { // Default to short description
+//                        ioHandler.print(await sdesc.generate(item, self))
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    // MARK: - Actor Method Implementation
+//
+//    public nonisolated func run() async throws {
+//        // Initial setup - show starting location description
+//        // Use gameState.player.currentLocationID and location(with:)
+//        if let startLocation = await location(with: gameState.player.currentLocationID) {
+//            await showLocationDescription(location: startLocation)
+//        } else {
+//            throw ActionError.internalEngineError("Initial player location ID '\\(gameState.player.currentLocationID)' is invalid.")
+//        }
+//
+//        // ... existing code ...
+//
+//        // 1. Check if the location exists
+//        // Use location(with:) instead of location(with:)
+//        guard let currentLoc = await location(with: player.currentLocationID) else {
+//            throw ActionError.internalEngineError("Player is in an invalid location: \\(player.currentLocationID)")
+//        }
+//
+//        // ... existing code ...
+//        // Use item(with:) instead of item(with:)
+//        if let keyItem = await item(with: keyID), keyItem.parent == .player {
+//            // Proceed with unlock logic
+//        } else {
+//            let keyName = await item(with: keyID)?.name ?? keyID.rawValue
+//            // Use item(with:) instead of item(with:)
+//            return ActionResult(
+//                success: false,
+//                message: "The \\(await item(with: keyID)?.name ?? keyID.rawValue) doesn't fit \\(theThat(lockID))." // Example update
+//            )
+//        }
+//
+//        // If we reach here, item is unlocked.
+//        return ActionResult(
+//            success: true,
+//            message: "You unlock the \\(theThat(lockID))."
+//        )
+//    }
+//
+//    /// Helper to check if an item has been touched (handled by the engine).
+//    public func hasBeenTouched(itemID: ItemID) async -> Bool {
+//        // Use item(with:) instead of item(with:)
+//        if let item = await item(with: itemID), item.hasProperty(.touched) {
+//            return true
+//        }
+//        return false
+//    }
+//
+//    /// Sets the touched flag on an item if it exists.
+//    public func setTouchedFlag(itemID: ItemID) async throws {
+//        // Use item(with:) instead of item(with:)
+//        if let item = await item(with: itemID) {
+//            if !item.hasProperty(.touched) {
+//                let change = StateChange(
+//                    entityId: .item(itemID),
+//                    propertyKey: .itemProperties,
+//                    oldValue: .itemProperties(item.properties),
+//                    newValue: .itemProperties(item.properties.union([.touched]))
+//                )
+//                try applyStateChange(change)
+//            }
+//        } else {
+//            throw ActionError.internalEngineError("Attempted to set touched flag on non-existent item: \\(itemID)")
+//        }
+//    }
 }
