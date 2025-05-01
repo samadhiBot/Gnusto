@@ -17,7 +17,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         }
 
         // EXAMINE [Object] - Ensure item exists and is reachable
-        guard let _ = await engine.itemSnapshot(with: targetItemID) else {
+        guard let _ = await engine.item(with: targetItemID) else {
             // Should not happen if parser resolved correctly, but safety first.
             // Or perhaps the item *just* disappeared.
             throw ActionError.itemNotAccessible(targetItemID)
@@ -48,7 +48,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // EXAMINE [Object]
         // Validation ensures item exists and is reachable
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // This should not happen due to validation, but guard defensively.
             throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
         }
@@ -110,7 +110,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
             if isOpen || isTransparent {
                 // Get snapshots of items *inside* the container
-                let contents = await engine.itemSnapshots(withParent: .item(item.id))
+                let contents = await engine.items(withParent: .item(item.id))
                 if contents.isEmpty {
                     lines.append("The \(item.name) is empty.")
                 } else {
@@ -127,7 +127,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Surface contents
         if item.hasProperty(.surface) {
             // Get snapshots of items *on* the surface
-            let itemsOnSurface = await engine.itemSnapshots(withParent: .item(item.id))
+            let itemsOnSurface = await engine.items(withParent: .item(item.id))
             if !itemsOnSurface.isEmpty {
                 let itemNames = itemsOnSurface.listWithIndefiniteArticles
                 lines.append("On the \(item.name) is \(itemNames).")

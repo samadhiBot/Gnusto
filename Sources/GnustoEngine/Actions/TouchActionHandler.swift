@@ -14,20 +14,20 @@ public struct TouchActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
         }
 
         // 3. Check reachability
         // Inline check as ScopeResolver doesn't have this specific logic yet.
-        let currentLocationID = await engine.playerLocationID()
+        let currentLocationID = await engine.gameState.player.currentLocationID
         let itemParent = targetItem.parent
         var isReachable = false
         switch itemParent {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await engine.itemSnapshot(with: parentItemID) else {
+            guard let parentItem = await engine.item(with: parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
@@ -60,7 +60,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
-        if let targetItem = await engine.itemSnapshot(with: targetItemID) {
+        if let targetItem = await engine.item(with: targetItemID) {
             let initialProperties = targetItem.properties // Use initial state
             if !initialProperties.contains(.touched) {
                 stateChanges.append(StateChange(

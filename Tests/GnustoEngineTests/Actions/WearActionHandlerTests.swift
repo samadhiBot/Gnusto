@@ -29,7 +29,7 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialProperties = engine.itemSnapshot(with: "cloak")?.properties ?? []
+        let initialProperties = engine.item(with: "cloak")?.properties ?? []
         let initialHistory = engine.gameState.changeHistory // Capture initial state
         #expect(initialProperties.contains(.worn) == false)
         #expect(initialHistory.isEmpty)
@@ -38,7 +38,7 @@ struct WearActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = engine.itemSnapshot(with: "cloak")
+        let finalCloakState = engine.item(with: "cloak")
         #expect(finalCloakState?.hasProperty(.worn) == true, "Cloak should have .worn property")
         #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property")
 

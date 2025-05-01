@@ -17,7 +17,7 @@ public struct WearActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID),
+        guard let targetItem = await engine.item(with: targetItemID),
               targetItem.parent == .player else
         {
             throw ActionError.itemNotHeld(targetItemID)
@@ -40,7 +40,7 @@ public struct WearActionHandler: EnhancedActionHandler {
     ) async throws -> ActionResult {
         // IDs and validation guaranteed by validate()
         let targetItemID = command.directObject!
-        guard let itemSnapshot = await engine.itemSnapshot(with: targetItemID) else {
+        guard let itemSnapshot = await engine.item(with: targetItemID) else {
             // Should not happen if validate passed
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
         }

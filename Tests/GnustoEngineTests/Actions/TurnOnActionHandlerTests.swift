@@ -33,7 +33,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "lamp")
+        let finalItemState = engine.item(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true)
         #expect(finalItemState?.hasProperty(.touched) == true)
 
@@ -80,7 +80,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "lamp")
+        let finalItemState = engine.item(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true)
         #expect(finalItemState?.hasProperty(.touched) == true)
 
@@ -121,7 +121,7 @@ struct TurnOnActionHandlerTests {
         }
 
         // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
-        let finalItemState = engine.itemSnapshot(with: "lamp")
+        let finalItemState = engine.item(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true) // Should still be on
         #expect(finalItemState?.hasProperty(.touched) == false) // Should NOT be touched
     }
@@ -153,7 +153,7 @@ struct TurnOnActionHandlerTests {
             try await handler.validate(command: command, engine: engine) // Changed to validate
         }
 
-        let finalItemState = engine.itemSnapshot(with: "lamp")
+        let finalItemState = engine.item(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == false) // Should not gain .on
         #expect(finalItemState?.hasProperty(.touched) == false) // Should NOT be touched
     }
@@ -219,7 +219,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "radio")
+        let finalItemState = engine.item(with: "radio")
         #expect(finalItemState?.hasProperty(.on) == true)
         #expect(finalItemState?.hasProperty(.touched) == true)
 
@@ -258,7 +258,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert: Same expectations
-        let finalItemState = engine.itemSnapshot(with: "lamp")
+        let finalItemState = engine.item(with: "lamp")
         #expect(finalItemState?.hasProperty(.on) == true)
         #expect(finalItemState?.hasProperty(.touched) == true)
 

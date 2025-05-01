@@ -14,7 +14,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard await engine.itemSnapshot(with: targetItemID) != nil else {
+        guard await engine.item(with: targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
@@ -29,7 +29,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         guard let targetItemID = command.directObject else {
             throw ActionError.internalEngineError("Examine command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
         }
 
@@ -103,7 +103,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         let isTransparent = targetItem.hasProperty(.transparent)
 
         if isOpen || isTransparent {
-            let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
+            let contents = await engine.items(withParent: .item(targetItem.id))
             if contents.isEmpty {
                 descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
@@ -133,7 +133,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
 
         // List items on the surface
-        let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
+        let contents = await engine.items(withParent: .item(targetItem.id))
         if !contents.isEmpty {
             let itemNames = contents.listWithIndefiniteArticles
             descriptionParts.append(

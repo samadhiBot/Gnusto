@@ -12,12 +12,12 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
         // 3. Verify the item is reachable (with light source exception in dark).
-        let currentLocationID = await engine.playerLocationID()
+        let currentLocationID = await engine.gameState.player.currentLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLight = targetItem.hasProperty(.lightSource)
@@ -53,7 +53,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         guard let targetItemID = command.directObject else {
             throw ActionError.internalEngineError("TURN ON command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
         }

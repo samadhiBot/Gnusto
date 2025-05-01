@@ -80,7 +80,7 @@ struct DescriptionHandlerRegistryTests {
 
         // Example 3: A container that describes its contents
         engine.descriptionHandlerRegistry.registerItemHandler(id: "container_description") { item, engine in
-            let contents = engine.itemSnapshots(withParent: .item(item.id))
+            let contents = engine.items(withParent: .item(item.id))
             if contents.isEmpty {
                 return "The \(item.name) is empty."
             } else {
@@ -89,8 +89,8 @@ struct DescriptionHandlerRegistryTests {
             }
         }
 
-        let lampItem = engine.itemSnapshot(with: "lamp")!
-        let bookItem = engine.itemSnapshot(with: "book")!
+        let lampItem = engine.item(with: "lamp")!
+        let bookItem = engine.item(with: "book")!
 
         // When & Then: Lamp (On - initial state)
         var description = await registry.generateDescription(
@@ -113,7 +113,7 @@ struct DescriptionHandlerRegistryTests {
         // Removed book touched test - requires action simulation
 
         // When & Then: Chest (With Key)
-        let updatedChestItem = engine.itemSnapshot(with: "chest")! // Re-fetch after item setup
+        let updatedChestItem = engine.item(with: "chest")! // Re-fetch after item setup
         description = await registry.generateDescription(
             for: updatedChestItem,
             using: updatedChestItem.longDescription!,
@@ -128,7 +128,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler.id("missing_handler", fallback: "This is the fallback.")
         let testItem = Item(id: "test", name: "test item", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
-        let itemSnapshot = engine.itemSnapshot(with: "test")! // No await needed
+        let itemSnapshot = engine.item(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -147,7 +147,7 @@ struct DescriptionHandlerRegistryTests {
         let handler: DescriptionHandler = "This is purely static."
         let testItem = Item(id: "test", name: "test item", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
-        let itemSnapshot = engine.itemSnapshot(with: "test")! // No await needed
+        let itemSnapshot = engine.item(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -166,7 +166,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler.id("nonexistent_handler") // No fallback
         let testItem = Item(id: "test", name: "test item", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
-        let itemSnapshot = engine.itemSnapshot(with: "test")! // No await needed
+        let itemSnapshot = engine.item(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -185,7 +185,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler(id: nil, rawStaticDescription: nil) // Edge case
         let testItem = Item(id: "test", name: "test item", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
-        let itemSnapshot = engine.itemSnapshot(with: "test")! // No await needed
+        let itemSnapshot = engine.item(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -217,7 +217,7 @@ struct DescriptionHandlerRegistryTests {
             return "You have entered the \(location.name) \(visitCount) time(s)."
         }
 
-        let locSnapshot = engine.locationSnapshot(with: "dynamic")! // No await needed
+        let locSnapshot = engine.location(with: "dynamic")! // No await needed
 
         // When & Then (First Visit)
         var description = await registry.generateDescription(
@@ -242,7 +242,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler.id("missing_loc_handler", fallback: "Static location fallback.")
         let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
-        let locSnapshot = engine.locationSnapshot(with: "test")! // No await needed
+        let locSnapshot = engine.location(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -261,7 +261,7 @@ struct DescriptionHandlerRegistryTests {
         let handler: DescriptionHandler = "Purely static room."
         let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
-        let locSnapshot = engine.locationSnapshot(with: "test")! // No await needed
+        let locSnapshot = engine.location(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -280,7 +280,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler.id("nonexistent_loc_handler") // No fallback
         let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
-        let locSnapshot = engine.locationSnapshot(with: "test")! // No await needed
+        let locSnapshot = engine.location(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(
@@ -299,7 +299,7 @@ struct DescriptionHandlerRegistryTests {
         let handler = DescriptionHandler(id: nil, rawStaticDescription: nil) // Edge case
         let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
-        let locSnapshot = engine.locationSnapshot(with: "test")! // No await needed
+        let locSnapshot = engine.location(with: "test")! // No await needed
 
         // When
         let description = await registry.generateDescription(

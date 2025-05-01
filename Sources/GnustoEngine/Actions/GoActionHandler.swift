@@ -14,8 +14,8 @@ public struct GoActionHandler: EnhancedActionHandler {
         }
 
         // 2. Get Current Location data
-        let currentLocationID = await engine.playerLocationID()
-        guard let currentLoc = await engine.locationSnapshot(with: currentLocationID) else {
+        let currentLocationID = await engine.gameState.player.currentLocationID
+        guard let currentLoc = await engine.location(with: currentLocationID) else {
             throw ActionError.internalEngineError("Player's current location ID '\(currentLocationID)' is invalid.")
         }
 
@@ -33,7 +33,7 @@ public struct GoActionHandler: EnhancedActionHandler {
 
         // Check required key
         if let keyID = exit.requiredKey {
-            let inventory = await engine.itemSnapshots(withParent: .player)
+            let inventory = await engine.items(withParent: .player)
             let playerHasKey = inventory.contains { $0.id == keyID }
             if !playerHasKey {
                 // TODO: Check Zork message for lacking a key for a passage
@@ -54,7 +54,7 @@ public struct GoActionHandler: EnhancedActionHandler {
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
         guard let direction = command.direction,
-              let currentLoc = await engine.locationSnapshot(with: await engine.playerLocationID()),
+              let currentLoc = await engine.location(with: await engine.gameState.player.currentLocationID),
               let exit = currentLoc.exits[direction]
         else {
             // Should not happen if validate passed, but defensive check
@@ -62,7 +62,7 @@ public struct GoActionHandler: EnhancedActionHandler {
         }
 
         // --- Create State Change ---
-        let oldLocationID = await engine.playerLocationID()
+        let oldLocationID = await engine.gameState.player.currentLocationID
         let newLocationID = exit.destination
 
         let change = StateChange(

@@ -36,7 +36,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "rock")
+        let finalItemState = engine.item(with: "rock")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
@@ -73,7 +73,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "key")
+        let finalItemState = engine.item(with: "key")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "A small brass key.")
@@ -110,7 +110,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "scroll")
+        let finalItemState = engine.item(with: "scroll")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "FROBOZZ") // Should print the readableText
@@ -151,7 +151,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "box")
+        let finalItemState = engine.item(with: "box")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "A plain wooden box. The wooden box contains a ruby gem.")
@@ -441,7 +441,7 @@ struct ExamineActionHandlerTests {
         await engine.applyItemPropertyChange(itemID: "stone", adding: [ItemProperty.on])
 
         // Assert intermediate state change
-        #expect(engine.itemSnapshot(with: "stone")?.hasProperty(.on) == true)
+        #expect(engine.item(with: "stone")?.hasProperty(.on) == true)
 
         // Act 2: Examine when red (isOn: true)
         await engine.execute(command: command)

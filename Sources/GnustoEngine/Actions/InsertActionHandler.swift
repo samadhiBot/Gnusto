@@ -13,15 +13,15 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
         guard let containerID = command.indirectObject else {
             // Fetch name for better error message if possible
-            let itemName = engine.itemSnapshot(with: itemToInsertID)?.name ?? "item"
+            let itemName = engine.item(with: itemToInsertID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item Snapshots
-        guard let itemToInsert = engine.itemSnapshot(with: itemToInsertID) else {
+        guard let itemToInsert = engine.item(with: itemToInsertID) else {
             throw ActionError.itemNotAccessible(itemToInsertID)
         }
-        guard let containerItem = engine.itemSnapshot(with: containerID) else {
+        guard let containerItem = engine.item(with: containerID) else {
             throw ActionError.itemNotAccessible(containerID)
         }
 
@@ -44,7 +44,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             if parentItemID == itemToInsertID {
                 throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
             }
-            guard let parentItem = engine.itemSnapshot(with: parentItemID) else { break }
+            guard let parentItem = engine.item(with: parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
@@ -60,7 +60,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = engine.itemSnapshots(withParent: .item(containerID))
+            let itemsInside = engine.items(withParent: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
@@ -78,8 +78,8 @@ struct InsertActionHandler: EnhancedActionHandler {
         let containerID = command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToInsertSnapshot = engine.itemSnapshot(with: itemToInsertID),
-              let containerSnapshot = engine.itemSnapshot(with: containerID) else
+        guard let itemToInsertSnapshot = engine.item(with: itemToInsertID),
+              let containerSnapshot = engine.item(with: containerID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for INSERT.")
         }

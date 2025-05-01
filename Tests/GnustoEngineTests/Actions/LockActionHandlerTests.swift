@@ -89,13 +89,13 @@ struct LockActionHandlerTests {
         )
 
         // Check initial state
-        guard let initialBoxSnapshot = engine.itemSnapshot(with: "box") else {
+        guard let initialBoxSnapshot = engine.item(with: "box") else {
             Issue.record("Initial box snapshot was nil")
             return // Exit test if setup failed
         }
         #expect(initialBoxSnapshot.hasProperty(.locked) == false)
 
-        guard let initialKeySnapshot = engine.itemSnapshot(with: "key") else {
+        guard let initialKeySnapshot = engine.item(with: "key") else {
             Issue.record("Initial key snapshot was nil")
             return // Exit test if setup failed
         }
@@ -113,14 +113,14 @@ struct LockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now locked.")
 
         // Assert Final State
-        guard let finalBoxState = engine.itemSnapshot(with: "box") else {
+        guard let finalBoxState = engine.item(with: "box") else {
             Issue.record("Final box snapshot was nil")
             return // Exit test if check failed
         }
         #expect(finalBoxState.hasProperty(.locked) == true, "Box should be locked")
         #expect(finalBoxState.hasProperty(.touched) == true, "Box should be touched")
 
-        guard let finalKeyState = engine.itemSnapshot(with: "key") else {
+        guard let finalKeyState = engine.item(with: "key") else {
             Issue.record("Final key snapshot was nil")
             return // Exit test if check failed
         }
@@ -334,7 +334,7 @@ struct LockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        guard let initialBoxSnapshot = engine.itemSnapshot(with: "box") else {
+        guard let initialBoxSnapshot = engine.item(with: "box") else {
             Issue.record("Initial box snapshot was nil")
             return
         }

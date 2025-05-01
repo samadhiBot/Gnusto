@@ -14,7 +14,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Use standard not accessible error for non-existent items
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -29,7 +29,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // 4. Check if item is inside something invalid (non-container/non-surface)
         if case .item(let parentID) = targetItem.parent,
-           let parentItem = await engine.itemSnapshot(with: parentID) {
+           let parentItem = await engine.item(with: parentID) {
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
             let isContainer = parentItem.hasProperty(.container)
@@ -45,7 +45,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         guard reachableItems.contains(targetItemID) else {
             // Handle specific container closed errors before general unreachability
             if case .item(let parentID) = targetItem.parent,
-               let container = await engine.itemSnapshot(with: parentID),
+               let container = await engine.item(with: parentID),
                container.hasProperty(.container),
                !container.hasProperty(.open) {
                 throw ActionError.containerIsClosed(parentID)
@@ -72,7 +72,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         guard let targetItemID = command.directObject else {
             throw ActionError.internalEngineError("Take command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Should be caught by validate.
             throw ActionError.internalEngineError("Take command target item disappeared between validate and process.")
         }

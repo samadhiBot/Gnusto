@@ -470,7 +470,7 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.itemSnapshots(withParent: .player).isEmpty == true)
+        #expect(engine.items(withParent: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -485,13 +485,13 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = engine.itemSnapshot(with: "startItem")
+        let finalPebbleSnapshot = engine.item(with: "startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.itemSnapshots(withParent: .player)
+        let finalInventorySnapshots = engine.items(withParent: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.itemSnapshots(withParent: .location("startRoom"))
+        let finalRoomSnapshots = engine.items(withParent: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
@@ -520,7 +520,7 @@ struct GameEngineTests {
             func validate(command: Command, engine: GameEngine) async throws { }
 
             func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-                guard let item = await engine.itemSnapshot(with: itemIDToModify) else {
+                guard let item = await engine.item(with: itemIDToModify) else {
                     throw ActionError.internalEngineError("Test item missing")
                 }
 
@@ -584,7 +584,7 @@ struct GameEngineTests {
 
         // Ensure initial state
         #expect(engine.gameState.flags[testFlagKey] == nil)
-        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == false)
+        #expect(engine.item(with: testItemID)?.hasProperty(.on) == false)
         #expect(engine.getChangeHistory().isEmpty)
 
         // Act
@@ -594,8 +594,8 @@ struct GameEngineTests {
         // Then
         // Check final state
         #expect(engine.gameState.flags[testFlagKey] == true, "Flag should be set")
-        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
-        #expect(engine.itemSnapshot(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
+        #expect(engine.item(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
+        #expect(engine.item(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = engine.getChangeHistory()

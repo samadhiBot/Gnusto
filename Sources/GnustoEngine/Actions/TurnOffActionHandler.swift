@@ -12,7 +12,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID.rawValue)'.")
         }
 
@@ -37,7 +37,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         guard let targetItemID = command.directObject else {
             throw ActionError.internalEngineError("TURN OFF command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
              // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN OFF.")
         }
@@ -77,7 +77,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         // Check if location became dark
         let isLightSource = targetItem.hasProperty(.lightSource)
         if isLightSource {
-            let currentLocationID = await engine.playerLocationID()
+            let currentLocationID = await engine.gameState.player.currentLocationID
 
             // Determine the hypothetical state of the target item *after* changes
             var propsAfterOff = targetItem.properties // Start with current props

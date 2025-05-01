@@ -15,7 +15,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists and is accessible using ScopeResolver
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // If snapshot is nil, it implies item doesn't exist in current state.
             // ScopeResolver checks typically operate on existing items.
             // Let's use the standard not accessible error.
@@ -52,7 +52,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
             // Should be caught by validate, but defensive check.
             throw ActionError.internalEngineError("Open command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Should be caught by validate.
             throw ActionError.internalEngineError("Open command target item disappeared between validate and process.")
         }

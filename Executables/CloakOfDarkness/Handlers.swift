@@ -10,7 +10,7 @@ struct Handlers {
 
         case "drop":
             // Original Inform logic: Prevent dropping outside cloakroom.
-            if engine.playerLocationID() != "cloakroom" {
+            if engine.gameState.player.currentLocationID != "cloakroom" {
                 throw ActionError.prerequisiteNotMet("This isn't the best place to leave a smart cloak lying around.")
             } else {
                 // Allow the default drop action if in the cloakroom
@@ -24,9 +24,9 @@ struct Handlers {
     }
 
     func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
-        guard command.verbID == "examine", engine.playerLocationID() == "bar" else { return false }
+        guard command.verbID == "examine", engine.gameState.player.currentLocationID == "bar" else { return false }
         // Fix: Check location exists before accessing properties
-        guard let bar = engine.locationSnapshot(with: "bar") else {
+        guard let bar = engine.location(with: "bar") else {
             // Should not happen if game setup is correct
             throw ActionError.internalEngineError("Location 'bar' not found.")
         }

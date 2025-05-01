@@ -58,9 +58,9 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = engine.playerLocationID()
+        let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.itemSnapshot(with: "key")?.parent == .player) // Verify setup
+        #expect(engine.item(with: "key")?.parent == .player) // Verify setup
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -69,7 +69,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.itemSnapshot(with: "key")
+        let finalItemState = engine.item(with: "key")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
@@ -123,7 +123,7 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.itemSnapshot(with: "key")?.parent == .location("startRoom"))
+        #expect(engine.item(with: "key")?.parent == .location("startRoom"))
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -132,7 +132,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = engine.itemSnapshot(with: "key")
+        let finalItemState = engine.item(with: "key")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
 
         // Assert Output
@@ -162,10 +162,10 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = engine.playerLocationID()
+        let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.itemSnapshot(with: "cloak")?.parent == .player)
-        #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == true)
+        #expect(engine.item(with: "cloak")?.parent == .player)
+        #expect(engine.item(with: "cloak")?.hasProperty(.worn) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "cloak", rawInput: "drop cloak")
@@ -174,7 +174,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.itemSnapshot(with: "cloak")
+        let finalItemState = engine.item(with: "cloak")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")

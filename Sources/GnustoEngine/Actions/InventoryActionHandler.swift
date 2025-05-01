@@ -13,7 +13,7 @@ public struct InventoryActionHandler: EnhancedActionHandler {
 
     public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // 1. Get inventory item snapshots
-        let inventoryItems = await engine.itemSnapshots(withParent: .player)
+        let inventoryItems = await engine.items(withParent: .player)
 
         // 2. Construct the message
         let message: String

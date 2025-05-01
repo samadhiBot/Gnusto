@@ -51,7 +51,7 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == true)
+        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -64,7 +64,7 @@ struct CloseActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.itemSnapshot(with: "box")
+        let finalItemState = engine.item(with: "box")
         #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should gain .touched property")
 
@@ -97,8 +97,8 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == true)
-        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.touched) == true)
+        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
+        #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -111,7 +111,7 @@ struct CloseActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.itemSnapshot(with: "box")
+        let finalItemState = engine.item(with: "box")
         #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should still have .touched property")
 
@@ -234,7 +234,7 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.itemSnapshot(with: "box")?.hasProperty(.open) == false)
+        #expect(engine.item(with: "box")?.hasProperty(.open) == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -247,7 +247,7 @@ struct CloseActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = engine.itemSnapshot(with: "box")
+        let finalItemState = engine.item(with: "box")
         #expect(finalItemState?.hasProperty(.open) == false)
 
         // Assert Output

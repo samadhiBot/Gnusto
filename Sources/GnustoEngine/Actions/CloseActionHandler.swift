@@ -17,7 +17,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -50,7 +50,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
             // Should be caught by validate, but defensive check.
             throw ActionError.internalEngineError("Close command reached process without direct object.")
         }
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // Should be caught by validate.
             throw ActionError.internalEngineError("Close command target item disappeared between validate and process.")
         }
