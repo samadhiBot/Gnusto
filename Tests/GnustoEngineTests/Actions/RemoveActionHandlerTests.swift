@@ -51,8 +51,8 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(initialProperties),
-                newValue: .itemProperties([.takable, .wearable, .touched]) // .worn removed, .touched added
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet([.takable, .wearable, .touched]) // .worn removed, .touched added
             ),
             StateChange(
                 entityId: .global,

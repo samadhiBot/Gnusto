@@ -73,8 +73,8 @@ public struct CloseActionHandler: EnhancedActionHandler {
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldProperties),
-                newValue: .itemProperties(newProperties)
+                oldValue: .itemPropertySet(oldProperties),
+                newValue: .itemPropertySet(newProperties)
             )
             stateChanges.append(propertiesChange)
         }

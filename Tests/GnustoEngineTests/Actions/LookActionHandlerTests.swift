@@ -20,8 +20,8 @@ struct LookActionHandlerTests {
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldProperties),
-                newValue: .itemProperties(finalProperties)
+                oldValue: .itemPropertySet(oldProperties),
+                newValue: .itemPropertySet(finalProperties)
             )
         ]
         // No pronoun changes expected for look/examine

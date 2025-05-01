@@ -67,8 +67,8 @@ struct TurnOnActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(initialProperties),
-                newValue: .itemProperties(initialProperties.union([.touched]))
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet(initialProperties.union([.touched]))
             ))
         }
 
@@ -81,8 +81,8 @@ struct TurnOnActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 // Old value depends on whether touched was added *before* this change conceptually
-                oldValue: .itemProperties(propertiesAfterTouch),
-                newValue: .itemProperties(propertiesAfterOn)
+                oldValue: .itemPropertySet(propertiesAfterTouch),
+                newValue: .itemPropertySet(propertiesAfterOn)
             ))
         }
 

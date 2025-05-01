@@ -51,8 +51,8 @@ struct WearActionHandlerTests {
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(initialProperties),
-                newValue: .itemProperties([.takable, .wearable, .worn, .touched])
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet([.takable, .wearable, .worn, .touched])
             ),
             StateChange(
                 entityId: .global,

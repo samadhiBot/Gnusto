@@ -44,8 +44,8 @@ struct PutOnActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(itemToPutID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldItemProps),
-                newValue: .itemProperties(newItemProps)
+                oldValue: .itemPropertySet(oldItemProps),
+                newValue: .itemPropertySet(newItemProps)
             ))
         }
 
@@ -56,8 +56,8 @@ struct PutOnActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(surfaceID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldSurfaceProps),
-                newValue: .itemProperties(newSurfaceProps)
+                oldValue: .itemPropertySet(oldSurfaceProps),
+                newValue: .itemPropertySet(newSurfaceProps)
             ))
         }
 

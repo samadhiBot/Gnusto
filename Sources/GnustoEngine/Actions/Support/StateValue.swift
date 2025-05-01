@@ -3,21 +3,15 @@
 public enum StateValue: Codable, Sendable, Equatable {
     case bool(Bool)
     case int(Int)
-    case itemAdjectives(Set<String>)
-    case itemDescription(String)
     case itemID(ItemID)
     case itemIDSet(Set<ItemID>)
-    case itemProperties(Set<ItemProperty>)
-    case itemSynonyms(Set<String>)
+    case itemPropertySet(Set<ItemProperty>)
     case locationExits([Direction: Exit])
     case locationID(LocationID)
-    case locationProperties(Set<LocationProperty>)
+    case locationPropertySet(Set<LocationProperty>)
     case parentEntity(ParentEntity)
     case string(String)
-
-    // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
-    // case double(Double) // Add if needed
-    // case stringArray([String]) // Add if needed
+    case stringSet(Set<String>)
 }
 
 // MARK: - Public casting helpers
@@ -108,17 +102,15 @@ extension StateValue {
         switch self {
         case .bool(let value): value
         case .int(let value): value
-        case .itemAdjectives(let value): value
-        case .itemDescription(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .itemProperties(let value): value
-        case .itemSynonyms(let value): value
+        case .itemPropertySet(let value): value
         case .locationExits(let value): value
         case .locationID(let value): value
-        case .locationProperties(let value): value
+        case .locationPropertySet(let value): value
         case .parentEntity(let value): value
         case .string(let value): value
+        case .stringSet(let value): value
         }
     }
 }

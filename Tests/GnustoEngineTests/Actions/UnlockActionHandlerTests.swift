@@ -38,8 +38,8 @@ struct UnlockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldTargetProps),
-                newValue: .itemProperties(newTargetProps)
+                oldValue: .itemPropertySet(oldTargetProps),
+                newValue: .itemPropertySet(newTargetProps)
             ))
         }
 
@@ -50,8 +50,8 @@ struct UnlockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldKeyProps),
-                newValue: .itemProperties(newKeyProps)
+                oldValue: .itemPropertySet(oldKeyProps),
+                newValue: .itemPropertySet(newKeyProps)
             ))
         }
 

@@ -528,8 +528,8 @@ struct GameEngineTests {
                 let change1 = StateChange(
                     entityId: .item(itemIDToModify),
                     propertyKey: .itemProperties,
-                    oldValue: .itemProperties(item.properties),
-                    newValue: .itemProperties(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
+                    oldValue: .itemPropertySet(item.properties),
+                    newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
                 )
 
                 // Correctly determine oldValue for the flag using the new helper
@@ -613,7 +613,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityId == .item(testItemID), change.propertyKey == StatePropertyKey.itemProperties else { return false }
-                if case .itemProperties(let props) = change.newValue {
+                if case .itemPropertySet(let props) = change.newValue {
                     return props.contains(ItemProperty.on) && props.contains(ItemProperty.touched)
                 } else {
                     return false

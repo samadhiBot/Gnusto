@@ -57,8 +57,8 @@ public struct RemoveActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldProps),
-                newValue: .itemProperties(newProps)
+                oldValue: .itemPropertySet(oldProps),
+                newValue: .itemPropertySet(newProps)
             ))
         }
 

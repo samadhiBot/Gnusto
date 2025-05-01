@@ -75,8 +75,8 @@ public struct ReadActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(initialProperties),
-                newValue: .itemProperties(initialProperties.union([.touched]))
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet(initialProperties.union([.touched]))
             ))
         }
 

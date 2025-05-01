@@ -52,8 +52,8 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
                 let change = StateChange(
                     entityId: .item(targetItemID),
                     propertyKey: .itemProperties,
-                    oldValue: .itemProperties(targetItem.properties),
-                    newValue: .itemProperties(targetItem.properties.union([.touched]))
+                    oldValue: .itemPropertySet(targetItem.properties),
+                    newValue: .itemPropertySet(targetItem.properties.union([.touched]))
                 )
                 stateChanges.append(change)
             }

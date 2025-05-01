@@ -105,8 +105,8 @@ struct InsertActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(itemToInsertID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldItemProps),
-                newValue: .itemProperties(newItemProps)
+                oldValue: .itemPropertySet(oldItemProps),
+                newValue: .itemPropertySet(newItemProps)
             ))
         }
 
@@ -118,8 +118,8 @@ struct InsertActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(containerID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldContainerProps),
-                newValue: .itemProperties(newContainerProps)
+                oldValue: .itemPropertySet(oldContainerProps),
+                newValue: .itemPropertySet(newContainerProps)
             ))
         }
 

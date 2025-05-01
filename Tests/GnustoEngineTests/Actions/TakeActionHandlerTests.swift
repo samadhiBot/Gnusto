@@ -31,8 +31,8 @@ struct TakeActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldProperties),
-                newValue: .itemProperties(finalProperties)
+                oldValue: .itemPropertySet(oldProperties),
+                newValue: .itemPropertySet(finalProperties)
             ))
         }
 

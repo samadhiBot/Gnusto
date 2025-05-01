@@ -24,8 +24,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(GameStateTests.itemLantern),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties(oldProperties),
-            newValue: .itemProperties(newProperties)
+            oldValue: .itemPropertySet(oldProperties),
+            newValue: .itemPropertySet(newProperties)
         )
 
         // When
@@ -54,8 +54,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(GameStateTests.itemLantern),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties(incorrectOldProperties), // Use incorrect old value
-            newValue: .itemProperties(newProperties)
+            oldValue: .itemPropertySet(incorrectOldProperties), // Use incorrect old value
+            newValue: .itemPropertySet(newProperties)
         )
 
         // When & Then
@@ -412,8 +412,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(itemID),
             propertyKey: .itemAdjectives,
-            oldValue: .itemAdjectives(initialAdjectives),
-            newValue: .itemAdjectives(newAdjectives)
+            oldValue: .stringSet(initialAdjectives),
+            newValue: .stringSet(newAdjectives)
         )
 
         // When
@@ -436,8 +436,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(itemID),
             propertyKey: .itemAdjectives,
-            oldValue: .itemAdjectives(incorrectOldAdjectives),
-            newValue: .itemAdjectives(newAdjectives)
+            oldValue: .stringSet(incorrectOldAdjectives),
+            newValue: .stringSet(newAdjectives)
         )
 
         // When & Then
@@ -476,8 +476,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(itemID),
             propertyKey: .itemSynonyms,
-            oldValue: .itemSynonyms(initialSynonyms),
-            newValue: .itemSynonyms(newSynonyms)
+            oldValue: .stringSet(initialSynonyms),
+            newValue: .stringSet(newSynonyms)
         )
 
         // When
@@ -500,8 +500,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .item(itemID),
             propertyKey: .itemSynonyms,
-            oldValue: .itemSynonyms(incorrectOldSynonyms),
-            newValue: .itemSynonyms(newSynonyms)
+            oldValue: .stringSet(incorrectOldSynonyms),
+            newValue: .stringSet(newSynonyms)
         )
 
         // When & Then
@@ -540,8 +540,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .location(locationID),
             propertyKey: .locationProperties,
-            oldValue: .locationProperties(initialProperties),
-            newValue: .locationProperties(newProperties)
+            oldValue: .locationPropertySet(initialProperties),
+            newValue: .locationPropertySet(newProperties)
         )
 
         // When
@@ -564,8 +564,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .location(locationID),
             propertyKey: .locationProperties,
-            oldValue: .locationProperties(incorrectOldProperties),
-            newValue: .locationProperties(newProperties)
+            oldValue: .locationPropertySet(incorrectOldProperties),
+            newValue: .locationPropertySet(newProperties)
         )
 
         // When & Then

@@ -12,8 +12,8 @@ struct ActionResultTests {
         let change = StateChange(
             entityId: .item("lamp"),
             propertyKey: .itemProperties,
-            oldValue: StateValue.itemProperties([.lightSource]),
-            newValue: StateValue.itemProperties([ItemProperty.lightSource, ItemProperty.on])
+            oldValue: StateValue.itemPropertySet([.lightSource]),
+            newValue: StateValue.itemPropertySet([ItemProperty.lightSource, ItemProperty.on])
         )
         let effect = SideEffect(
             type: .startFuse,
@@ -54,14 +54,14 @@ struct ActionResultTests {
         let change = StateChange(
             entityId: .item("door"),
             propertyKey: .itemProperties,
-            oldValue: StateValue.itemProperties([ItemProperty.openable]),
-            newValue: StateValue.itemProperties([ItemProperty.openable, ItemProperty.open])
+            oldValue: StateValue.itemPropertySet([ItemProperty.openable]),
+            newValue: StateValue.itemPropertySet([ItemProperty.openable, ItemProperty.open])
         )
 
         #expect(change.entityId == .item("door"))
         #expect(change.propertyKey == .itemProperties)
-        #expect(change.oldValue == StateValue.itemProperties([ItemProperty.openable]))
-        #expect(change.newValue == StateValue.itemProperties([ItemProperty.openable, ItemProperty.open]))
+        #expect(change.oldValue == StateValue.itemPropertySet([ItemProperty.openable]))
+        #expect(change.newValue == StateValue.itemPropertySet([ItemProperty.openable, ItemProperty.open]))
     }
 
     @Test("StateChange Initialization without Old Value")
@@ -144,8 +144,8 @@ struct ActionResultTests {
             .int(123),
             .string("hello"),
             .itemID("key"),
-            .itemProperties([.takable, .lightSource]),
-            .locationProperties([.inherentlyLit]),
+            .itemPropertySet([.takable, .lightSource]),
+            .locationPropertySet([.inherentlyLit]),
             .parentEntity(.player)
         ]
 

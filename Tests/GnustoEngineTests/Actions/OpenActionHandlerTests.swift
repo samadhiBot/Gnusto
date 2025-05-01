@@ -52,8 +52,8 @@ struct OpenActionHandlerTests {
         let expectedChange = StateChange(
             entityId: .item("box"),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties(initialProperties),
-            newValue: .itemProperties(expectedProperties)
+            oldValue: .itemPropertySet(initialProperties),
+            newValue: .itemPropertySet(expectedProperties)
         )
         expectNoDifference(recordedChange, expectedChange)
     }
@@ -103,8 +103,8 @@ struct OpenActionHandlerTests {
         let expectedChange = StateChange(
             entityId: .item("box"),
             propertyKey: .itemProperties,
-            oldValue: .itemProperties(initialProperties),
-            newValue: .itemProperties(expectedProperties)
+            oldValue: .itemPropertySet(initialProperties),
+            newValue: .itemPropertySet(expectedProperties)
         )
         // Change should still happen because .open is added
         expectNoDifference(recordedChange, expectedChange)

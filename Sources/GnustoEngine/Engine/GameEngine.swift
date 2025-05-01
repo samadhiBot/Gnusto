@@ -909,8 +909,8 @@ public class GameEngine: Sendable {
             let change = StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemProperties,
-                oldValue: .itemProperties(oldProps),
-                newValue: .itemProperties(newProps)
+                oldValue: .itemPropertySet(oldProps),
+                newValue: .itemPropertySet(newProps)
             )
             do {
                 try gameState.apply(change)
@@ -1147,8 +1147,8 @@ public class GameEngine: Sendable {
             let change = StateChange(
                 entityId: .location(locationID),
                 propertyKey: .locationProperties,
-                oldValue: .locationProperties(oldProps),
-                newValue: .locationProperties(newProps)
+                oldValue: .locationPropertySet(oldProps),
+                newValue: .locationPropertySet(newProps)
             )
             do {
                 try gameState.apply(change)
