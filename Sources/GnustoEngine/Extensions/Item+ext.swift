@@ -1,6 +1,6 @@
 import Foundation
 
-extension ItemSnapshot {
+extension Item {
     /// The item's name prepended with the appropriate indefinite article ("a" or "an").
     ///
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,

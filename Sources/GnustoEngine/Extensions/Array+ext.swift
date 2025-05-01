@@ -1,6 +1,6 @@
 import Foundation
 
-extension Array where Element == ItemSnapshot {
+extension Array where Element == Item {
     /// Returns a grammatically correct string listing the elements,
     /// sorted alphabetically, with appropriate indefinite articles prepended.
     ///
@@ -19,4 +19,4 @@ extension Array where Element == ItemSnapshot {
             return "\(sortedItemsWithArticles.joined(separator: ", ")) and \(lastItem)"
         }
     }
-} 
+}

@@ -1,7 +1,7 @@
 import Foundation // Needed for Codable conformance for classes
 
 /// Represents an interactable object within the game world.
-public struct Item: Codable, Identifiable {
+public struct Item: Codable, Identifiable, Sendable {
 
     // --- Stored Properties (Alphabetical) ---
 
@@ -169,5 +169,13 @@ extension Item {
     /// - Returns: `true` if the item has the property, `false` otherwise.
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
+    }
+}
+
+// MARK: - Comparable conformance
+
+extension Item: Comparable {
+    public static func < (lhs: Item, rhs: Item) -> Bool {
+        lhs.id < rhs.id
     }
 }

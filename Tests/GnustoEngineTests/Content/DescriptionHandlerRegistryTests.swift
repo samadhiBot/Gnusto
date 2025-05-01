@@ -108,7 +108,7 @@ struct DescriptionHandlerRegistryTests {
             using: bookItem.longDescription!,
             engine: engine
         )
-        #expect(description == "The ancient tome looks like it hasn’t been opened in a while.")
+        #expect(description == "The ancient tome looks like it hasn't been opened in a while.")
 
         // Removed book touched test - requires action simulation
 
@@ -311,4 +311,122 @@ struct DescriptionHandlerRegistryTests {
         // Then
         #expect(description == "You are in the Test Room.")
     }
+
+    @Test("Generate Description with Dynamic Handler")
+    func testGenerateDescription_dynamicItemHandler() async throws {
+        let registry = DescriptionHandlerRegistry()
+        let testItem = Item(id: "test", name: "widget")
+        let engine = createMockEngine(items: [testItem])
+
+        // Register a dynamic handler
+        registry.register(id: "dynamicTest") { (item: Item, _) in // Update type to Item
+            "Dynamic description for \(item.name)"
+        }
+
+        // Get item struct (no longer snapshot)
+        let item = engine.item(with: "test")! // Rename itemSnapshot to item
+
+        // Generate description using registry ID
+        let desc = await registry.generateDescription(
+            for: item, // Use item variable
+            using: .id("dynamicTest"),
+            engine: engine
+        )
+
+        #expect(desc == "Dynamic description for widget")
+    }
+
+    @Test("Generate Description with Dynamic Location Handler")
+    func testGenerateDescription_dynamicLocationHandler() async throws {
+        let registry = DescriptionHandlerRegistry()
+        let testLoc = Location(id: "testLoc", name: "Test Location")
+        let engine = createMockEngine(locations: [testLoc])
+
+        // Register a dynamic handler
+        registry.register(id: "dynamicLocTest") { (loc: Location, _) in // Update type to Location
+            "Dynamic description for \(loc.name)"
+        }
+
+        // Get location struct
+        let location = engine.location(with: "testLoc")! // Rename locationSnapshot to location
+
+        // Generate description using registry ID
+        let desc = await registry.generateDescription(
+            for: location, // Use location variable
+            using: .id("dynamicLocTest"),
+            engine: engine
+        )
+
+        #expect(desc == "Dynamic description for Test Location")
+    }
+
+    @Test("Generate Description with Dynamic Handler and Fallback")
+    func testGenerateDescription_dynamicWithFallback() async throws {
+        let registry = DescriptionHandlerRegistry()
+        let testItem = Item(id: "test", name: "widget")
+        let engine = createMockEngine(items: [testItem])
+
+        // Register a dynamic handler (which will be used)
+        registry.register(id: "dynamicTest") { (item: Item, _) in // Update type to Item
+            "Dynamic description for \(item.name)"
+        }
+
+        // Get item struct
+        let item = engine.item(with: "test")! // Rename itemSnapshot to item
+
+        // Generate description using registry ID with a fallback
+        let desc = await registry.generateDescription(
+            for: item, // Use item variable
+            using: .id("dynamicTest", fallback: "Fallback static"),
+            engine: engine
+        )
+
+        #expect(desc == "Dynamic description for widget")
+    }
+
+    @Test("Generate Description with Fallback Used When Dynamic Missing")
+    func testGenerateDescription_fallbackUsedWhenDynamicMissing() async throws {
+        let registry = DescriptionHandlerRegistry()
+        let testItem = Item(id: "test", name: "widget")
+        let engine = createMockEngine(items: [testItem])
+
+        // DO NOT register "dynamicTest"
+
+        // Get item struct
+        let item = engine.item(with: "test")! // Rename itemSnapshot to item
+
+        // Generate description using registry ID with a fallback
+        let desc = await registry.generateDescription(
+            for: item, // Use item variable
+            using: .id("dynamicTest", fallback: "Fallback static"),
+            engine: engine
+        )
+
+        #expect(desc == "Fallback static")
+    }
+
+    @Test("Generate Description with Registry Error Logged")
+    func testGenerateDescription_registryErrorLogged() async throws {
+        let registry = DescriptionHandlerRegistry()
+        let testItem = Item(id: "test", name: "widget")
+        let engine = createMockEngine(items: [testItem])
+        let mockIO = engine.ioHandler as! MockIOHandler
+
+        // DO NOT register "dynamicTest"
+
+        // Get item struct
+        let item = engine.item(with: "test")! // Rename itemSnapshot to item
+
+        // Generate description using registry ID with NO fallback
+        let desc = await registry.generateDescription(
+            for: item, // Use item variable
+            using: .id("dynamicTest"),
+            engine: engine
+        )
+
+        #expect(desc == "") // Expect empty string on error
+        #expect(mockIO.printedStrings.contains { $0.contains("Error generating dynamic description") })
+    }
+
+    // TODO: Add tests for location description generation
 }

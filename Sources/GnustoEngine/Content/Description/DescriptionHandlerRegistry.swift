@@ -2,10 +2,10 @@ import Foundation
 import Markdown
 
 /// A type that can generate a dynamic description for an item based on game state.
-public typealias DynamicDescriptionHandler = @MainActor (ItemSnapshot, GameEngine) async -> String
+public typealias DynamicDescriptionHandler = @MainActor (Item, GameEngine) async -> String
 
 /// A type that can generate a dynamic description for a location based on game state.
-public typealias DynamicLocationDescriptionHandler = @MainActor (LocationSnapshot, GameEngine) async -> String
+public typealias DynamicLocationDescriptionHandler = @MainActor (Location, GameEngine) async -> String
 
 /// A registry that manages description handlers and their dynamic logic.
 @MainActor
@@ -15,7 +15,7 @@ public class DescriptionHandlerRegistry {
 
     /// Dictionary mapping location handler IDs to their dynamic logic.
     private var dynamicLocationHandlers: [DescriptionHandlerID: DynamicLocationDescriptionHandler]
-    
+
     /// The maximum line length before soft-wrapping a description.
     private let maximumDescriptionLength: Int
 
@@ -44,12 +44,12 @@ public class DescriptionHandlerRegistry {
     /// Generates a description for an item using its description handler.
     /// Must be called from the MainActor.
     /// - Parameters:
-    ///   - item: The item snapshot to generate a description for.
+    ///   - item: The item to generate a description for.
     ///   - handler: The description handler to use.
     ///   - engine: The game engine providing context.
     /// - Returns: The generated description string.
     public func generateDescription(
-        for item: ItemSnapshot,
+        for item: Item,
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
@@ -83,14 +83,14 @@ public class DescriptionHandlerRegistry {
 
     /// Generates a description for a location using its description handler.
     /// Must be called from the MainActor.
-    /// Note: Assumes `LocationSnapshot` exists or will be created.
+    /// Note: Assumes `Location` exists or will be created.
     /// - Parameters:
-    ///   - location: The location snapshot to generate a description for.
+    ///   - location: The location to generate a description for.
     ///   - handler: The description handler to use.
     ///   - engine: The game engine providing context.
     /// - Returns: The generated description string.
     public func generateDescription(
-        for location: LocationSnapshot,
+        for location: Location,
         using handler: DescriptionHandler,
         engine: GameEngine
     ) async -> String {
