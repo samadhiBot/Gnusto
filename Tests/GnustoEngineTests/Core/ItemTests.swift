@@ -137,18 +137,27 @@ struct ItemTests {
         #expect(decodedItem.lockKey == originalItem.lockKey)
     }
 
-    @Test("Item Reference Semantics")
-    func testItemReferenceSemantics() throws {
+    @Test("Item Value Semantics")
+    func testItemValueSemantics() throws {
         let item1 = createDefaultItem()
-        var item2 = item1 // Assign reference, not a copy
+        var item2 = item1 // Assign creates a copy for structs
 
+        // Modify the copy (item2)
         item2.name = "modified thing"
         item2.addProperty(.invisible)
-        item2.parent = .location("limbo") // Modify parent
+        item2.parent = .location("limbo")
 
-        #expect(item1.name == "modified thing") // Change in item2 reflects in item1
-        #expect(item1.hasProperty(.invisible))
-        #expect(item1.parent == .location("limbo")) // Parent change reflects
-        #expect(item1 == item2) // Verify they point to the same instance
+        // Assert that the original (item1) is unchanged
+        #expect(item1.name == "thing")
+        #expect(!item1.hasProperty(.invisible))
+        #expect(item1.parent == .nowhere)
+
+        // Assert that item2 has the changes
+        #expect(item2.name == "modified thing")
+        #expect(item2.hasProperty(.invisible))
+        #expect(item2.parent == .location("limbo"))
+
+        // Assert that item1 and item2 are now different
+        #expect(item1 != item2)
     }
 }

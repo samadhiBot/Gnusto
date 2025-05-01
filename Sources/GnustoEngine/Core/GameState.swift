@@ -221,7 +221,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .itemValue:
             // Expecting an .int for itemValue
-            guard case .int(let newValue) = change.newValue else {
+            guard case .int = change.newValue else { // Ignore newValue for now
                 throw ActionError.internalEngineError("Type mismatch for itemValue: expected .int, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityId else {
@@ -458,7 +458,7 @@ public struct GameState: Codable, Equatable, Sendable {
             // Map item's size Int to .int
             actualCurrentValue = items[id].map { .int($0.size) }
         case .itemValue:
-            guard case .item(_) = change.entityId else {
+            guard case .item = change.entityId else {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for itemValue")
             }
             print("WARN: Old value validation skipped for itemValue (property not implemented).")

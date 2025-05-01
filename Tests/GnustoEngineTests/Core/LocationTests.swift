@@ -118,23 +118,34 @@ struct LocationTests {
         #expect(decodedLocation.exits[.west]?.destination == originalLocation.exits[.west]?.destination)
         #expect(decodedLocation.exits[.east]?.blockedMessage == originalLocation.exits[.east]?.blockedMessage)
         #expect(decodedLocation.properties == originalLocation.properties)
-        #expect(Set(decodedLocation.globals) == Set(originalLocation.globals))
+        #expect(decodedLocation.globals == originalLocation.globals)
     }
 
-    @Test("Location Reference Semantics")
-    func testLocationReferenceSemantics() throws {
+    @Test("Location Value Semantics")
+    func testLocationValueSemantics() throws {
         let location1 = createDefaultLocation()
-        var location2 = location1 // Assign reference, not a copy
+        var location2 = location1 // Assign creates a copy for structs
 
+        let originalName = location1.name // Capture original values
+        let originalDesc = location1.longDescription
+
+        // Modify the copy (location2)
         location2.name = "Renamed Room"
         location2.addProperty(.visited)
-        // Modify the description handler indirectly (if it were mutable, or reassign)
         location2.longDescription = "An updated room."
 
-        #expect(location1.name == "Renamed Room") // Change in location2 reflects in location1
-        #expect(location1.hasProperty(.visited))
-        #expect(location1.longDescription?.rawStaticDescription == "An updated room.")
-        #expect(location1 == location2) // Verify they point to the same instance
+        // Assert that the original (location1) is unchanged
+        #expect(location1.name == originalName) // Check against captured default
+        #expect(!location1.hasProperty(.visited))
+        #expect(location1.longDescription?.rawStaticDescription == originalDesc?.rawStaticDescription)
+
+        // Assert that location2 has the changes
+        #expect(location2.name == "Renamed Room")
+        #expect(location2.hasProperty(.visited))
+        #expect(location2.longDescription?.rawStaticDescription == "An updated room.")
+
+        // Assert that location1 and location2 are now different
+        #expect(location1 != location2)
     }
 
     // TODO: Add tests for dynamic description handler registration and generation
