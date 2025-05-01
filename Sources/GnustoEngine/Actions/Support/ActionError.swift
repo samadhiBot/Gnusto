@@ -1,7 +1,5 @@
 /// Enumerates errors that can occur during the execution phase of a command.
 public enum ActionError: Error, Equatable, Sendable {
-    // MARK: - Cases
-
     /// Action failed because the target container is closed.
     case containerIsClosed(ItemID)
 
@@ -119,4 +117,7 @@ public enum ActionError: Error, Equatable, Sendable {
 
     /// Action failed because the key used does not match the lock mechanism of the target item.
     case wrongKey(keyID: ItemID, lockID: ItemID)
+
+    /// Action failed during GameState.apply because a provided `oldValue` did not match the actual current state.
+    case stateValidationFailed(change: StateChange, actualOldValue: StateValue?)
 }

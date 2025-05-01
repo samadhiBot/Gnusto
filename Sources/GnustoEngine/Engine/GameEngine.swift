@@ -209,9 +209,9 @@ public class GameEngine: Sendable {
             let oldMoves = gameState.player.moves
             let change = StateChange(
                 entityId: .player,
-                propertyKey: .playerMoves,
-                oldValue: .int(oldMoves),
-                newValue: .int(oldMoves + 1)
+                propertyKey: StatePropertyKey.playerMoves,
+                oldValue: StateValue.int(oldMoves),
+                newValue: StateValue.int(oldMoves + 1)
             )
             try gameState.apply(change)
         } catch {
@@ -276,9 +276,9 @@ public class GameEngine: Sendable {
             // Create StateChange to update persistent state
             let updateChange = StateChange(
                 entityId: .global,
-                propertyKey: .updateFuseTurns(fuseId: id),
-                oldValue: .int(oldTurns),
-                newValue: .int(newTurns)
+                propertyKey: StatePropertyKey.updateFuseTurns(fuseId: id),
+                oldValue: StateValue.int(oldTurns),
+                newValue: StateValue.int(newTurns)
             )
             do {
                 try gameState.apply(updateChange)
@@ -294,9 +294,9 @@ public class GameEngine: Sendable {
                 // Create StateChange to remove from persistent state
                 let removeChange = StateChange(
                     entityId: .global,
-                    propertyKey: .removeActiveFuse(fuseId: id),
-                    oldValue: .int(oldTurns),
-                    newValue: .int(0)
+                    propertyKey: StatePropertyKey.removeActiveFuse(fuseId: id),
+                    oldValue: StateValue.int(oldTurns),
+                    newValue: StateValue.int(0)
                 )
                 do {
                     try gameState.apply(removeChange)
@@ -532,9 +532,9 @@ public class GameEngine: Sendable {
             // 3. Create StateChange to add to persistent state
             let addChange = StateChange(
                 entityId: .global,
-                propertyKey: .addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
+                propertyKey: StatePropertyKey.addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
                 // No oldValue for add
-                newValue: .int(initialTurns) // The value being set
+                newValue: StateValue.int(initialTurns)
             )
             // 4. Apply the StateChange
             try gameState.apply(addChange)
@@ -547,9 +547,9 @@ public class GameEngine: Sendable {
             // 2. Create StateChange to remove from persistent state
             let removeChange = StateChange(
                 entityId: .global,
-                propertyKey: .removeActiveFuse(fuseId: fuseId),
-                oldValue: oldTurns != nil ? .int(oldTurns!) : nil,
-                newValue: .int(0)
+                propertyKey: StatePropertyKey.removeActiveFuse(fuseId: fuseId),
+                oldValue: oldTurns != nil ? StateValue.int(oldTurns!) : nil,
+                newValue: StateValue.int(0)
             )
             // 3. Apply the StateChange
             try gameState.apply(removeChange)
@@ -567,9 +567,9 @@ public class GameEngine: Sendable {
             if !isAlreadyActive {
                 let addDaemonChange = StateChange(
                     entityId: .global,
-                    propertyKey: .addActiveDaemon(daemonId: daemonId),
-                    oldValue: .bool(false), // Explicitly stating it wasn't present
-                    newValue: .bool(true) // Representing the state of being active
+                    propertyKey: StatePropertyKey.addActiveDaemon(daemonId: daemonId),
+                    oldValue: StateValue.bool(false),
+                    newValue: StateValue.bool(true)
                 )
                 // 4. Apply the StateChange
                 try gameState.apply(addDaemonChange)
@@ -582,9 +582,9 @@ public class GameEngine: Sendable {
             if wasActive {
                 let removeDaemonChange = StateChange(
                     entityId: .global,
-                    propertyKey: .removeActiveDaemon(daemonId: daemonId),
-                    oldValue: .bool(true), // Explicitly stating it was present
-                    newValue: .bool(false) // Representing the state of being inactive
+                    propertyKey: StatePropertyKey.removeActiveDaemon(daemonId: daemonId),
+                    oldValue: StateValue.bool(true),
+                    newValue: StateValue.bool(false)
                 )
                 // 3. Apply the StateChange
                 try gameState.apply(removeDaemonChange)
@@ -711,6 +711,7 @@ public class GameEngine: Sendable {
 
     /// Reports user-friendly messages for action failures to the player.
     private func report(actionError: ActionError) async {
+        // Determine the user-facing message
         let message = switch actionError {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
@@ -785,12 +786,27 @@ public class GameEngine: Sendable {
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            "The \(item(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
+            "The \(item(with: keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
+        case .stateValidationFailed: // Provide a user-facing message
+            "A strange buzzing sound indicates something is wrong with the state validation."
         }
         await ioHandler.print(message)
 
-        if case .internalEngineError(let msg) = actionError {
-            logger.error("💥 ActionError: \(msg, privacy: .public)")
+        // Log detailed errors separately
+        switch actionError {
+        case .internalEngineError(let msg):
+            logger.error("💥 ActionError: Internal Engine Error: \(msg, privacy: .public)")
+        case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
+            // Construct the log string first
+            let logDetail = """
+            State Validation Failed!
+                - Change: \(String(describing: change))
+                - Expected Old Value: \(String(describing: change.oldValue))
+                - Actual Old Value: \(String(describing: actualOldValue))
+            """
+            logger.error("💥 ActionError: \(logDetail, privacy: .public)")
+        default:
+            break // No detailed logging needed for other handled errors
         }
     }
 
@@ -917,10 +933,10 @@ public class GameEngine: Sendable {
         // Only apply if value is actually changing
         if oldValue != value {
             let change = StateChange(
-                entityId: .global,
-                propertyKey: .globalFlag(key: flag),
-                oldValue: oldValue != nil ? .bool(oldValue!) : nil,
-                newValue: .bool(value)
+                entityId: EntityID.global,
+                propertyKey: StatePropertyKey.flag(key: flag),
+                oldValue: oldValue != nil ? StateValue.bool(oldValue!) : nil,
+                newValue: StateValue.bool(value)
             )
             do {
                 try gameState.apply(change)
@@ -1073,10 +1089,34 @@ public class GameEngine: Sendable {
 
     /// Retrieves the value of a game-specific state variable.
     ///
-    /// - Parameter key: The key for the game-specific state variable.
-    /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
-    public func getGameSpecificStateValue(forKey key: GameStateKey) -> StateValue? {
+    /// - Parameter key: The key (`GameStateKey`) for the game-specific state variable.
+    /// - Returns: The `StateValue` if found, otherwise `nil`.
+    public func getStateValue(key: GameStateKey) -> StateValue? {
         gameState.gameSpecificState[key]
+    }
+
+    /// Applies a change to a game-specific state variable.
+    ///
+    /// - Parameters:
+    ///   - key: The key (`GameStateKey`) for the game-specific state.
+    ///   - value: The new `StateValue`.
+    public func applyGameSpecificStateChange(key: GameStateKey, value: StateValue) async {
+        let oldValue = gameState.gameSpecificState[key] // Read using GameStateKey
+
+        // Only apply if the value is changing
+        if value != oldValue {
+            let change = StateChange( // Add explicit type
+                entityId: .global,
+                propertyKey: StatePropertyKey.gameSpecificState(key: key), // Use GameStateKey
+                oldValue: oldValue, // Pass the existing StateValue? as oldValue
+                newValue: value
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("💥 Failed to apply game specific state change for key '\(key.rawValue, privacy: .public)': \(error, privacy: .public)")
+            }
+        }
     }
 
     /// Applies a change to a specific location's properties.
@@ -1117,41 +1157,6 @@ public class GameEngine: Sendable {
                     💥 Failed to apply location property change for \
                     '\(locationID.rawValue, privacy: .public)': \(error, privacy: .public)
                     """)
-            }
-        }
-    }
-
-    /// Applies a change to a game-specific state variable.
-    /// Only supports simple types (Bool, Int, String) via AnyCodable.
-    ///
-    /// - Parameters:
-    ///   - key: The key for the game-specific state.
-    ///   - value: The new value (Bool, Int, or String).
-    public func applyGameSpecificStateChange(key: String, value: StateValue) async {
-        // Note: StateValue should be .bool, .int, or .string for this
-        let oldValue = gameState.gameSpecificState[key]
-        let actualOldValue: StateValue? // Convert AnyCodable back for comparison if possible
-        if let oldAny = oldValue {
-            if let v = oldAny.value as? Bool { actualOldValue = .bool(v) }
-            else if let v = oldAny.value as? Int { actualOldValue = .int(v) }
-            else if let v = oldAny.value as? String { actualOldValue = .string(v) }
-            else { actualOldValue = nil } // Cannot represent complex type
-        } else {
-            actualOldValue = nil
-        }
-
-        // Only apply if the value is changing (and types are compatible)
-        if value != actualOldValue {
-            let change = StateChange(
-                entityId: .global,
-                propertyKey: .gameSpecificState(key: key),
-                oldValue: actualOldValue, // Pass converted old value for validation
-                newValue: value
-            )
-            do {
-                try gameState.apply(change)
-            } catch {
-                logger.warning("💥 Failed to apply game specific state change for '\(key, privacy: .public)': \(error, privacy: .public)")
             }
         }
     }

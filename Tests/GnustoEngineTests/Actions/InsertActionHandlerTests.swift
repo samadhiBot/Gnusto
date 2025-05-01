@@ -70,7 +70,7 @@ struct InsertActionHandlerTests {
         // Change 4: Pronoun "it"
         changes.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounIt,
+            propertyKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))

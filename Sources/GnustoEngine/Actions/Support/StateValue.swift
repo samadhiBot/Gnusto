@@ -2,42 +2,131 @@
 /// Ensures values are both Codable and Sendable.
 public enum StateValue: Codable, Sendable, Equatable {
     case bool(Bool)
+    case exitMap([Direction: Exit])
     case int(Int)
-    case string(String)
-    case itemID(ItemID)             // Represents an ItemID value itself
-    case locationID(LocationID)      // Added
-    case itemProperties(Set<ItemProperty>)
     case itemAdjectives(Set<String>)
+    case itemDescription(String)
+    case itemID(ItemID)
+    case itemIDSet(Set<ItemID>)
+    case itemProperties(Set<ItemProperty>)
     case itemSynonyms(Set<String>)
+    case locationExits([Direction: Exit])
+    case locationID(LocationID)
     case locationProperties(Set<LocationProperty>)
-    case locationExits([Direction: Exit]) // Added
+    case locationPropertySet(Set<LocationProperty>)
     case parentEntity(ParentEntity)
-    case itemIDSet(Set<ItemID>)     // For pronoun references
+    case string(String)
+
+    // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
     // case double(Double) // Add if needed
     // case stringArray([String]) // Add if needed
-    case itemDescription(String)      // Added
-    // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
-    case locationPropertySet(Set<LocationProperty>) // Added for GameState.apply
-    case exitMap([Direction: Exit])                // Added for GameState.apply
 
-    // Helper to get underlying value if needed, though direct switching is often better.
+    /// Helper to get underlying value if needed, though direct switching is often better.
     var underlyingValue: Any {
         switch self {
-        case .bool(let v): return v
-        case .int(let v): return v
-        case .string(let v): return v
-        case .itemID(let v): return v
-        case .locationID(let v): return v
-        case .itemProperties(let v): return v
-        case .itemAdjectives(let v): return v
-        case .itemSynonyms(let v): return v
-        case .locationProperties(let v): return v
-        case .locationExits(let v): return v
-        case .parentEntity(let v): return v
-        case .itemIDSet(let v): return v
-        case .itemDescription(let v): return v
-        case .locationPropertySet(let v): return v
-        case .exitMap(let v): return v
+        case .bool(let value): value
+        case .exitMap(let value): value
+        case .int(let value): value
+        case .itemAdjectives(let value): value
+        case .itemDescription(let value): value
+        case .itemID(let value): value
+        case .itemIDSet(let value): value
+        case .itemProperties(let value): value
+        case .itemSynonyms(let value): value
+        case .locationExits(let value): value
+        case .locationID(let value): value
+        case .locationProperties(let value): value
+        case .locationPropertySet(let value): value
+        case .parentEntity(let value): value
+        case .string(let value): value
         }
+    }
+
+    /// Returns the `StateValue` underlying value as a `Bool`, or `nil` if the type does not match.
+    public var toBool: Bool? {
+        underlyingValue as? Bool
+    }
+
+    /// Returns the `StateValue` underlying value as a `[Direction: Exit]`, or `nil` if the
+    /// type does not match.
+    public var toExitMap: [Direction: Exit]? {
+        underlyingValue as? [Direction: Exit]
+    }
+
+    /// Returns the `StateValue` underlying value as a `Int`, or `nil` if the type does not match.
+    public var toInt: Int? {
+        underlyingValue as? Int
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<String>`, or `nil` if the type
+    /// does not match.
+    public var toItemAdjectives: Set<String>? {
+        underlyingValue as? Set<String>
+    }
+
+    /// Returns the `StateValue` underlying value as a `String`, or `nil` if the type does
+    /// not match.
+    public var toItemDescription: String? {
+        underlyingValue as? String
+    }
+
+    /// Returns the `StateValue` underlying value as a `ItemID`, or `nil` if the type does
+    /// not match.
+    public var toItemID: ItemID? {
+        underlyingValue as? ItemID
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<ItemID>`, or `nil` if the type
+    /// does not match.
+    public var toItemIDSet: Set<ItemID>? {
+        underlyingValue as? Set<ItemID>
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<ItemProperty>`, or `nil` if the
+    /// type does not match.
+    public var toItemProperties: Set<ItemProperty>? {
+        underlyingValue as? Set<ItemProperty>
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<String>`, or `nil` if the type
+    /// does not match.
+    public var toItemSynonyms: Set<String>? {
+        underlyingValue as? Set<String>
+    }
+
+    /// Returns the `StateValue` underlying value as a `[Direction: Exit]`, or `nil` if the
+    /// type does not match.
+    public var toLocationExits: [Direction: Exit]? {
+        underlyingValue as? [Direction: Exit]
+    }
+
+    /// Returns the `StateValue` underlying value as a `LocationID`, or `nil` if the type does
+    /// not match.
+    public var toLocationID: LocationID? {
+        underlyingValue as? LocationID
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<LocationProperty>`, or `nil` if
+    /// the type does not match.
+    public var toLocationProperties: Set<LocationProperty>? {
+        underlyingValue as? Set<LocationProperty>
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<LocationProperty>`, or `nil` if
+    /// the type does not match.
+    public var toLocationPropertySet: Set<LocationProperty>? {
+        underlyingValue as? Set<LocationProperty>
+    }
+
+    /// Returns the `StateValue` underlying value as a `ParentEntity`, or `nil` if the type
+    /// does not match.
+    public var toParentEntity: ParentEntity? {
+        underlyingValue as? ParentEntity
+    }
+
+    /// Returns the `StateValue` underlying value as a `String`, or `nil` if the type does
+    /// not match.
+    public var toString: String? {
+        underlyingValue as? String
     }
 }

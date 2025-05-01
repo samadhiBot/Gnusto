@@ -971,7 +971,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .globalFlag(key: flagKey),
+            propertyKey: .flag(key: flagKey),
             oldValue: nil, // Expecting nil for a new flag
             newValue: .bool(true)
         )
@@ -994,7 +994,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .globalFlag(key: flagKey),
+            propertyKey: .flag(key: flagKey),
             oldValue: .bool(initialValue!), // Correct old value
             newValue: .bool(false)
         )
@@ -1018,7 +1018,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .globalFlag(key: flagKey),
+            propertyKey: .flag(key: flagKey),
             oldValue: .bool(incorrectOldValue),
             newValue: .bool(false)
         )
@@ -1056,7 +1056,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .globalFlag(key: flagKey),
+            propertyKey: .flag(key: flagKey),
             oldValue: .bool(incorrectOldValue),
             newValue: .bool(true)
         )

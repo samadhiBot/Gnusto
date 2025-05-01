@@ -34,7 +34,7 @@ struct Handlers {
             throw ActionError.prerequisiteNotMet("It's too dark to do that.")
         }
 
-        let disturbedCount = engine.getGameSpecificStateValue(forKey: "disturbedCounter")?.value as? Int ?? 0
+        let disturbedCount = engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
         let finalMessage: String
         if disturbedCount > 1 {
             finalMessage = "The message simply reads: \"You lose.\""

@@ -38,7 +38,7 @@ struct TakeActionHandlerTests {
 
         changes.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounIt,
+            propertyKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounIt != nil ? .itemIDSet(oldPronounIt!) : nil,
             newValue: .itemIDSet([itemID])
         ))

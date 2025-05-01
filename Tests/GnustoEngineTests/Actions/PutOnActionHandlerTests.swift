@@ -64,7 +64,7 @@ struct PutOnActionHandlerTests {
         // Change 4: Pronoun "it"
         changes.append(StateChange(
             entityId: .global, // Pronoun is global
-            propertyKey: .pronounIt,
+            propertyKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToPutID])
         ))

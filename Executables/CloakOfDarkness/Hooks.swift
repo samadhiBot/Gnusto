@@ -45,8 +45,11 @@ struct Hooks {
                 // If the action is NOT specifically allowed, THEN it's an unsafe disturbance.
                 if !isActionAllowedInDark {
                     // Increment counter
-                    let currentCount = engine.getGameSpecificStateValue(forKey: "disturbedCounter")?.value as? Int ?? 0
-                    await engine.applyGameSpecificStateChange(key: "disturbedCounter", value: .int(currentCount + 1))
+                    let currentCount = engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
+                    await engine.applyGameSpecificStateChange(
+                        key: "disturbedCounter",
+                        value: .int(currentCount + 1)
+                    )
 
                     // Throw error to display message and halt default action
                     throw ActionError.prerequisiteNotMet("You grope around clumsily in the dark. Better be careful.")

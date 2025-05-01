@@ -81,7 +81,7 @@ enum Components {
                 frequency: 1 // Run every turn
             ) { engine in
                 // Closure runs every turn to update lantern battery
-                let batteryLifeValue = engine.getGameSpecificStateValue(key: Constants.batteryLifeKey)?.value as? Int
+                let batteryLifeValue = engine.getStateValue(key: Constants.batteryLifeKey)?.value as? Int
                     ?? Constants.defaultBatteryLife
 
                 // Check lantern state directly via snapshot to avoid direct gameState access

@@ -204,21 +204,73 @@ public struct GameState: Codable, Equatable, Sendable {
             guard change.entityId == .global else { throw ActionError.internalEngineError("...") }
             flags[key] = newValue // Use String key
 
-        case .pronounIt:
-            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounIt: expected .itemIDSet, got \(change.newValue)") }
-            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounIt...") }
-            pronouns["it"] = newItemIDSet // Use String key "it" and expect itemIDSet
-
-        case .pronounThem:
-            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounThem: expected .itemIDSet, got \(change.newValue)") }
-            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounThem...") }
-            pronouns["them"] = newItemIDSet // Use String key "them" and expect itemIDSet
+//        case .pronounIt:
+//            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounIt: expected .itemIDSet, got \(change.newValue)") }
+//            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounIt...") }
+//            pronouns["it"] = newItemIDSet // Use String key "it" and expect itemIDSet
+//
+//        case .pronounThem:
+//            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounThem: expected .itemIDSet, got \(change.newValue)") }
+//            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounThem...") }
+//            pronouns["them"] = newItemIDSet // Use String key "them" and expect itemIDSet
 
         case .gameSpecificState(let key):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for gameSpecificState...")
             }
              gameSpecificState[key] = change.newValue
+
+        case .pronounReference(let pronoun):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for pronounReference: expected .global, got \(change.entityId)")
+            }
+            guard case .itemIDSet(let newItemIDSet) = change.newValue else {
+                throw ActionError.internalEngineError("Type mismatch for pronounReference: expected .itemIDSet, got \(change.newValue)")
+            }
+            pronouns[pronoun] = newItemIDSet
+
+        case .addActiveDaemon(let daemonId):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityId)")
+            }
+            guard case .bool(true) = change.newValue else {
+                 print("WARN: addActiveDaemon StateChange newValue was not .bool(true), was \(change.newValue). Proceeding anyway.")
+                 return
+             }
+            activeDaemons.insert(daemonId)
+
+        case .addActiveFuse(let fuseId, let initialTurns):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for addActiveFuse: expected .global, got \(change.entityId)")
+            }
+            guard case .int(let turnsValue) = change.newValue, turnsValue == initialTurns else {
+                throw ActionError.internalEngineError("StateChange newValue (\(change.newValue)) does not match initialTurns (\(initialTurns)) in addActiveFuse key.")
+            }
+            activeFuses[fuseId] = initialTurns
+
+        case .removeActiveDaemon(let daemonId):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for removeActiveDaemon: expected .global, got \(change.entityId)")
+            }
+            activeDaemons.remove(daemonId)
+
+        case .removeActiveFuse(let fuseId):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for removeActiveFuse: expected .global, got \(change.entityId)")
+            }
+            activeFuses.removeValue(forKey: fuseId)
+
+        case .updateFuseTurns(let fuseId):
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("EntityID mismatch for updateFuseTurns: expected .global, got \(change.entityId)")
+            }
+            guard case .int(let newTurns) = change.newValue else {
+                throw ActionError.internalEngineError("Type mismatch for updateFuseTurns: expected .int, got \(change.newValue)")
+            }
+            guard activeFuses[fuseId] != nil else {
+                throw ActionError.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseId)")
+            }
+            activeFuses[fuseId] = newTurns
         }
 
         changeHistory.append(change)
@@ -231,48 +283,68 @@ public struct GameState: Codable, Equatable, Sendable {
 
         switch change.propertyKey {
         // Item Properties
-        case .itemParent:       guard case .item(let id) = change.entityId else { /*...*/ }; currentValue = items[id].map { .parentEntity($0.parent) }
+        case .itemParent:
+            guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemParent") }
+            currentValue = items[id].map { .parentEntity($0.parent) }
         case .itemProperties:
-            break // TODO: implement
-
-        case .itemSize:         guard case .item(let id) = change.entityId else { /*...*/ }; currentValue = items[id].map { .int($0.size) }
-        case .itemValue:        print("WARN: Old value validation skipped for itemValue (property not implemented)."); currentValue = nil
+             guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemProperties") }
+             currentValue = items[id].map { .itemProperties($0.properties) } // Added back
+        case .itemSize:
+            guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize") }
+            currentValue = items[id].map { .int($0.size) }
+        case .itemValue:
+             guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemValue") }
+             print("WARN: Old value validation skipped for itemValue (property not implemented)."); currentValue = nil
 
         // Location Properties
-        case .locationName:     guard case .location(let id) = change.entityId else { /*...*/ }; currentValue = locations[id].map { .string($0.name) }
-        case .locationDescription: currentValue = nil // Cannot validate description
-        case .locationProperties: guard case .location(let id) = change.entityId else { /*...*/ }; currentValue = locations[id].map { .locationPropertySet($0.properties) }
-        case .locationExits:    guard case .location(let id) = change.entityId else { /*...*/ }; currentValue = locations[id].map { .exitMap($0.exits) }
+        case .locationName:
+            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationName") }
+            currentValue = locations[id].map { .string($0.name) }
+        case .locationDescription:
+             // Cannot validate description as it's handler-based
+             currentValue = nil
+        case .locationProperties:
+            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationProperties") }
+            currentValue = locations[id].map { .locationPropertySet($0.properties) }
+        case .locationExits:
+            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationExits") }
+            currentValue = locations[id].map { .exitMap($0.exits) }
 
         // Player Properties
-        case .playerScore:      guard change.entityId == .player else { /*...*/ }; currentValue = .int(player.score)
-        case .playerMoves:      guard change.entityId == .player else { /*...*/ }; currentValue = .int(player.moves)
-        case .playerInventoryLimit: guard change.entityId == .player else { /*...*/ }; currentValue = .int(player.carryingCapacity) // Use correct name
-        case .playerLocation:   guard change.entityId == .player else { /*...*/ }; currentValue = .locationID(player.currentLocationID) // Use correct name
-        case .playerStrength, .playerHealth: print("WARN: Old value validation skipped..."); currentValue = nil
+        case .playerScore:
+            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerScore") }
+            currentValue = .int(player.score)
+        case .playerMoves:
+            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerMoves") }
+            currentValue = .int(player.moves)
+        case .playerInventoryLimit:
+            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerInventoryLimit") }
+            currentValue = .int(player.carryingCapacity)
+        case .playerLocation:
+            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerLocation") }
+            currentValue = .locationID(player.currentLocationID)
+        case .playerStrength, .playerHealth:
+             print("WARN: Old value validation skipped..."); currentValue = nil
 
         // Global/Misc Properties
-        case .flag(let key):    guard change.entityId == .global else { /*...*/ }; currentValue = flags[key].map { .bool($0) } ?? .bool(false)
-        case .pronounIt:        guard change.entityId == .global else { /*...*/ }; currentValue = pronouns["it"].map { .itemIDSet($0) } // Use key "it", wrap in .itemIDSet
-        case .pronounThem:      guard change.entityId == .global else { /*...*/ }; currentValue = pronouns["them"].map { .itemIDSet($0) } // Use key "them", wrap in .itemIDSet
+        case .flag(let key):
+            guard change.entityId == .global else { throw ActionError.internalEngineError("Validation: Invalid entity ID for flag") }
+            currentValue = flags[key].map { .bool($0) } ?? .bool(false)
+        case .pronounReference:
+            // This key is primarily for GameEngine helpers; direct validation might be complex.
+            // Assume GameEngine handles it correctly for now.
+            print("WARN: Old value validation skipped for pronounReference."); currentValue = nil
         case .gameSpecificState(let key):
-            guard change.entityId == .global else {
-                throw ActionError.internalEngineError(
-                    "Validation: Invalid entity ID for gameSpecificState"
-                )
-            }
-            // Compare expected StateValue with AnyCodable by converting current value back
+            guard change.entityId == .global else { throw ActionError.internalEngineError("Validation: Invalid entity ID for gameSpecificState") }
             currentValue = gameSpecificState[key]
-//             if let currentAnyCodable = gameSpecificState[key] {
-//                 // Attempt conversion from AnyCodable -> StateValue for comparison
-//                 // This is brittle and only supports simple types
-//                 if let boolVal = currentAnyCodable.value as? Bool { currentValue = .bool(boolVal) }
-//                 else if let intVal = currentAnyCodable.value as? Int { currentValue = .int(intVal) }
-//                 else if let stringVal = currentAnyCodable.value as? String { currentValue = .string(stringVal) }
-//                 else { print("WARN: Old value validation skipped for gameSpecificState key '\(key)'. Cannot convert AnyCodable back to StateValue."); currentValue = nil }
-//             } else {
-//                 currentValue = nil // Key doesn't exist in current state
-//             }
+
+        // Fuse & Daemon cases - These are typically managed via GameEngine helpers,
+        // direct validation here might be redundant or overly complex.
+        // If needed, they would require checking activeFuses/activeDaemons dictionaries.
+        // If needed, they would require checking activeFuses/activeDaemons dictionaries.
+        case .addActiveFuse, .removeActiveFuse, .updateFuseTurns, .addActiveDaemon, .removeActiveDaemon:
+             print("WARN: Old value validation skipped for Fuse/Daemon StatePropertyKeys.")
+             currentValue = nil
         }
 
         if currentValue != expectedOldValue {

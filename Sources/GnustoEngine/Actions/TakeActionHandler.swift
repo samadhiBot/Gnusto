@@ -113,7 +113,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         let oldPronounValue = await engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
             entityId: .global,
-            propertyKey: .pronounIt,
+            propertyKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounValue != nil ? .itemIDSet(oldPronounValue!) : nil,
             newValue: .itemIDSet([targetItemID])
         )

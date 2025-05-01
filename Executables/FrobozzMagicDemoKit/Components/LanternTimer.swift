@@ -55,7 +55,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
         // Get current battery life from game state
         // Default to defaultBatteryLife if not set
-        let batteryLifeValue = engine.getGameSpecificStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
+        let batteryLifeValue = engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
             ?? LanternConstants.defaultBatteryLife
 
         // Decrement battery life by 1
@@ -135,7 +135,7 @@ public func setupLanternTimer(
 /// - Returns: The remaining battery life in turns, or nil if not set
 @MainActor
 public func getLanternBatteryLife(engine: GameEngine) -> Int? {
-    return engine.getGameSpecificStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
+    return engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
 }
 
 /// Recharges the lantern to the specified battery life.

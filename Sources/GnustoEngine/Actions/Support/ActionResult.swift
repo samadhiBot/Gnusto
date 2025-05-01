@@ -32,5 +32,3 @@ public struct ActionResult: Sendable {
         self.sideEffects = sideEffects
     }
 }
-
-

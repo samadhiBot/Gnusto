@@ -1,54 +1,66 @@
+import Foundation
+
 /// Defines the specific state property being modified.
 public enum StatePropertyKey: Codable, Sendable, Hashable {
     // Item Properties
-    case itemParent // Uses .parentEntity
+    case itemParent
     case itemProperties
-    case itemSize // Uses .int
-    case itemValue // Uses .int
+    case itemSize
+    case itemValue
 
     // Location Properties
-    case locationDescription // Uses .string
-    case locationExits // Uses .exitMap
-    case locationName // Uses .string
-    case locationProperties // Uses .locationPropertySet
+    case locationDescription
+    case locationExits
+    case locationName
+    case locationProperties
 
     // Player Properties
-    case playerHealth // Uses .int // Example for future expansion
-    case playerInventoryLimit // Uses .int
-    case playerLocation // Uses .locationID
-    case playerMoves // Uses .int
-    case playerScore // Uses .int
-    case playerStrength // Uses .int // Example for future expansion
+    case playerHealth
+    case playerInventoryLimit
+    case playerLocation
+    case playerMoves
+    case playerScore
+    case playerStrength
 
     // Global/Misc Properties
-    case flag(key: String) // Uses .bool - Reverted from FlagKey
-    case gameSpecificState(key: GameStateKey) // Uses .bool/int/string - Reverted from GameStateKey
-    case pronounIt // Uses .itemIDSet nullable - NOTE: Represents a Set<ItemID>
-    case pronounThem // Uses .itemIDSet nullable - NOTE: Represents a Set<ItemID>
+    case flag(key: String)
+    case gameSpecificState(key: GameStateKey)
+    case pronounReference(pronoun: String)
+
+    // Fuse & Daemon State (Managed via GameEngine helpers typically)
+    case addActiveDaemon(daemonId: DaemonID)
+    case addActiveFuse(fuseId: Fuse.ID, initialTurns: Int)
+    case removeActiveDaemon(daemonId: DaemonID)
+    case removeActiveFuse(fuseId: Fuse.ID)
+    case updateFuseTurns(fuseId: Fuse.ID)
 }
 
 // MARK: - CustomStringConvertible
 extension StatePropertyKey: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .flag(let key): "flag(\(key))"
-        case .gameSpecificState(let key): "gameSpecificState(\(key))"
-        case .itemParent: "itemParent"
-        case .itemProperties: "itemProperties"
-        case .itemSize: "itemSize"
-        case .itemValue: "itemValue"
-        case .locationDescription: "locationDescription"
-        case .locationExits: "locationExits"
-        case .locationName: "locationName"
-        case .locationProperties: "locationProperties"
-        case .playerHealth: "playerHealth"
-        case .playerInventoryLimit: "playerInventoryLimit"
-        case .playerLocation: "playerLocation"
-        case .playerMoves: "playerMoves"
-        case .playerScore: "playerScore"
-        case .playerStrength: "playerStrength"
-        case .pronounIt: "pronounIt"
-        case .pronounThem: "pronounThem"
+        case .addActiveDaemon(let id): return "addActiveDaemon(\(id))"
+        case .addActiveFuse(let id, _): return "addActiveFuse(\(id))"
+        case .flag(let key): return "flag(\(key))"
+        case .gameSpecificState(let key): return "gameSpecificState(\(key.rawValue))"
+        case .itemParent: return "itemParent"
+        case .itemProperties: return "itemProperties"
+        case .itemSize: return "itemSize"
+        case .itemValue: return "itemValue"
+        case .locationDescription: return "locationDescription"
+        case .locationExits: return "locationExits"
+        case .locationName: return "locationName"
+        case .locationProperties: return "locationProperties"
+        case .playerHealth: return "playerHealth"
+        case .playerInventoryLimit: return "playerInventoryLimit"
+        case .playerLocation: return "playerLocation"
+        case .playerMoves: return "playerMoves"
+        case .playerScore: return "playerScore"
+        case .playerStrength: return "playerStrength"
+        case .pronounReference(let p): return "pronounReference(\(p))"
+        case .removeActiveDaemon(let id): return "removeActiveDaemon(\(id))"
+        case .removeActiveFuse(let id): return "removeActiveFuse(\(id))"
+        case .updateFuseTurns(let id): return "updateFuseTurns(\(id))"
         }
     }
 }

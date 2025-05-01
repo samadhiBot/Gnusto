@@ -66,7 +66,7 @@ enum Hooks {
     /// - Parameter command: The command about to be executed.
     static func beforeEachTurn(engine: GameEngine, command: Command) async -> Bool {
         // Use safe accessors
-        let messageValue = engine.getGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
+        let messageValue = engine.getStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 
         // Check for pending messages from daemons or fuses
         if let pendingMessage = messageValue?.value as? String {
@@ -78,7 +78,7 @@ enum Hooks {
 
         // Add atmospheric messages based on location
         let locationID = engine.gameState.player.currentLocationID // Safe accessor
-        let turnCount = engine.playerMoves()      // Safe accessor
+        let turnCount = engine.playerMoves      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
         guard turnCount % 5 == 0 else { return false }

@@ -314,12 +314,11 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Dynamic Handler")
     func testGenerateDescription_dynamicItemHandler() async throws {
-        let registry = DescriptionHandlerRegistry()
         let testItem = Item(id: "test", name: "widget")
-        let engine = createMockEngine(items: [testItem])
+        let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Explicit args
 
         // Register a dynamic handler
-        registry.register(id: "dynamicTest") { (item: Item, _) in // Update type to Item
+        registry.registerItemHandler(id: "dynamicTest") { item, _ in
             "Dynamic description for \(item.name)"
         }
 

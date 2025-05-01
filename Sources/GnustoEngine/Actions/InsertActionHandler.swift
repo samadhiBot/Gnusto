@@ -126,7 +126,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Change 4: Update pronoun "it"
         stateChanges.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounIt,
+            propertyKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))

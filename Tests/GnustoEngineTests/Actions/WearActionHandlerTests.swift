@@ -56,7 +56,7 @@ struct WearActionHandlerTests {
             ),
             StateChange(
                 entityId: .global,
-                propertyKey: .pronounIt,
+                propertyKey: .pronounReference(pronoun: "it"),
                 oldValue: nil,
                 newValue: .itemIDSet(["cloak"])
             )

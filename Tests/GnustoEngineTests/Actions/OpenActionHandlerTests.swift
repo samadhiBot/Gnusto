@@ -12,7 +12,7 @@ struct OpenActionHandlerTests {
     func testOpenItemSuccessfully() async throws {
         // Arrange
         let initialProperties: Set<ItemProperty> = [.container, .openable]
-        let closedBox = Item(
+        var closedBox = Item(
             id: "box",
             name: "wooden box",
             parent: .location("startRoom")
@@ -62,7 +62,7 @@ struct OpenActionHandlerTests {
     func testOpenItemAlreadyTouched() async throws {
         // Arrange: Item is openable, closed, and already touched
         let initialProperties: Set<ItemProperty> = [.container, .openable, .touched]
-        let closedBox = Item(
+        var closedBox = Item(
             id: "box",
             name: "wooden box",
             parent: .location("startRoom")
