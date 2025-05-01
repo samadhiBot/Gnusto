@@ -27,18 +27,6 @@ extension StateValue {
         underlyingValue as? Int
     }
 
-    /// Returns the `StateValue` underlying value as a `Set<String>`, or `nil` if the type
-    /// does not match.
-    public var toItemAdjectives: Set<String>? {
-        underlyingValue as? Set<String>
-    }
-
-    /// Returns the `StateValue` underlying value as a `String`, or `nil` if the type does
-    /// not match.
-    public var toItemDescription: String? {
-        underlyingValue as? String
-    }
-
     /// Returns the `StateValue` underlying value as a `ItemID`, or `nil` if the type does
     /// not match.
     public var toItemID: ItemID? {
@@ -47,7 +35,7 @@ extension StateValue {
 
     /// Returns the `StateValue` underlying value as a `Set<ItemID>`, or `nil` if the type
     /// does not match.
-    public var toItemIDSet: Set<ItemID>? {
+    public var toItemIDs: Set<ItemID>? {
         underlyingValue as? Set<ItemID>
     }
 
@@ -55,12 +43,6 @@ extension StateValue {
     /// type does not match.
     public var toItemProperties: Set<ItemProperty>? {
         underlyingValue as? Set<ItemProperty>
-    }
-
-    /// Returns the `StateValue` underlying value as a `Set<String>`, or `nil` if the type
-    /// does not match.
-    public var toItemSynonyms: Set<String>? {
-        underlyingValue as? Set<String>
     }
 
     /// Returns the `StateValue` underlying value as a `[Direction: Exit]`, or `nil` if the
@@ -91,6 +73,12 @@ extension StateValue {
     /// not match.
     public var toString: String? {
         underlyingValue as? String
+    }
+
+    /// Returns the `StateValue` underlying value as a `Set<String>`, or `nil` if the type
+    /// does not match.
+    public var toStrings: Set<String>? {
+        underlyingValue as? Set<String>
     }
 }
 
