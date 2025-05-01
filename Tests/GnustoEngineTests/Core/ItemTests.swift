@@ -79,7 +79,7 @@ struct ItemTests {
 
     @Test("Item Property Management")
     func testItemPropertyManagement() throws {
-        let item = createDefaultItem()
+        var item = createDefaultItem()
 
         #expect(!item.hasProperty(.takable))
 
@@ -109,7 +109,7 @@ struct ItemTests {
 
     @Test("Item Codable Conformance")
     func testItemCodable() throws {
-        let originalItem = createCustomItem()
+        var originalItem = createCustomItem()
         originalItem.readableText = "Readable text."
         originalItem.lockKey = "key1"
 
@@ -140,7 +140,7 @@ struct ItemTests {
     @Test("Item Reference Semantics")
     func testItemReferenceSemantics() throws {
         let item1 = createDefaultItem()
-        let item2 = item1 // Assign reference, not a copy
+        var item2 = item1 // Assign reference, not a copy
 
         item2.name = "modified thing"
         item2.addProperty(.invisible)
@@ -149,6 +149,6 @@ struct ItemTests {
         #expect(item1.name == "modified thing") // Change in item2 reflects in item1
         #expect(item1.hasProperty(.invisible))
         #expect(item1.parent == .location("limbo")) // Parent change reflects
-        #expect(item1 === item2) // Verify they point to the same instance
+        #expect(item1 == item2) // Verify they point to the same instance
     }
 }

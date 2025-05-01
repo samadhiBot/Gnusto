@@ -213,7 +213,7 @@ struct ScopeResolverTests {
             name: "key",
             parent: .location("startRoom")
         )
-        let game = MinimalGame(items: [item])
+        var game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(

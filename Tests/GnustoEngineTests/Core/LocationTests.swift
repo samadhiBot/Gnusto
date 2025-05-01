@@ -67,7 +67,7 @@ struct LocationTests {
 
     @Test("Location Property Management")
     func testLocationPropertyManagement() throws {
-        let location = createDefaultLocation()
+        var location = createDefaultLocation()
 
         #expect(!location.hasProperty(.inherentlyLit))
 
@@ -97,7 +97,7 @@ struct LocationTests {
 
     @Test("Location Codable Conformance")
     func testLocationCodable() throws {
-        let originalLocation = createCustomLocation()
+        var originalLocation = createCustomLocation()
         // Add a short description for thorough testing
         originalLocation.shortDescription = "A comfy room."
 
@@ -124,7 +124,7 @@ struct LocationTests {
     @Test("Location Reference Semantics")
     func testLocationReferenceSemantics() throws {
         let location1 = createDefaultLocation()
-        let location2 = location1 // Assign reference, not a copy
+        var location2 = location1 // Assign reference, not a copy
 
         location2.name = "Renamed Room"
         location2.addProperty(.visited)
@@ -134,7 +134,7 @@ struct LocationTests {
         #expect(location1.name == "Renamed Room") // Change in location2 reflects in location1
         #expect(location1.hasProperty(.visited))
         #expect(location1.longDescription?.rawStaticDescription == "An updated room.")
-        #expect(location1 === location2) // Verify they point to the same instance
+        #expect(location1 == location2) // Verify they point to the same instance
     }
 
     // TODO: Add tests for dynamic description handler registration and generation

@@ -738,7 +738,7 @@ struct StandardParserTests {
     func testNounNotInScope() {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
-        let itemsDict = self.gameState.items // Base items copy
+        var itemsDict = self.gameState.items // Base items copy
         itemsDict[lampID]?.parent = .nowhere // Move lamp out of scope
         let customState = GameState(
             locations: Array(self.gameState.locations.values),
@@ -780,7 +780,7 @@ struct StandardParserTests {
     func testExtractNounModsMultipleNouns() throws {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
-        let itemsDict = self.gameState.items // Base items copy
+        var itemsDict = self.gameState.items // Base items copy
         itemsDict["lantern"]?.properties.insert(ItemProperty.container)
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
@@ -820,7 +820,7 @@ struct StandardParserTests {
     @Test("Extract Noun/Mods - Pronoun", .tags(.parser, .resolution, .pronouns))
     func testExtractNounModsPronoun() throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
-        let itemsDict = self.gameState.items // Base items copy
+        var itemsDict = self.gameState.items // Base items copy
         itemsDict["key"]?.parent = .player // Put key in inventory
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
@@ -840,7 +840,7 @@ struct StandardParserTests {
     @Test("Extract Noun/Mods - Pronoun With Noise", .tags(.parser, .resolution, .pronouns))
     func testExtractNounModsPronounNoise() throws {
         // "drop the it"
-        let itemsDict = self.gameState.items // Base items copy
+        var itemsDict = self.gameState.items // Base items copy
         itemsDict["key"]?.parent = .player
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
