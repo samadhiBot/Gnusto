@@ -283,7 +283,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .item(itemID),
-            propertyKey: .itemCapacity,
+            propertyKey: .playerInventoryLimit,
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -307,7 +307,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .item(itemID),
-            propertyKey: .itemCapacity,
+            propertyKey: .playerInventoryLimit,
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )

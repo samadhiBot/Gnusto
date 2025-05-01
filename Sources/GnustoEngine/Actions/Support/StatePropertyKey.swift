@@ -3,9 +3,13 @@ import Foundation
 /// Defines the specific state property being modified.
 public enum StatePropertyKey: Codable, Sendable, Hashable {
     // Item Properties
+    case itemAdjectives
+    case itemCapacity
+    case itemName
     case itemParent
     case itemProperties
     case itemSize
+    case itemSynonyms
     case itemValue
 
     // Location Properties
@@ -39,28 +43,32 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
 extension StatePropertyKey: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .addActiveDaemon(let id): return "addActiveDaemon(\(id))"
-        case .addActiveFuse(let id, _): return "addActiveFuse(\(id))"
-        case .flag(let key): return "flag(\(key))"
-        case .gameSpecificState(let key): return "gameSpecificState(\(key.rawValue))"
-        case .itemParent: return "itemParent"
-        case .itemProperties: return "itemProperties"
-        case .itemSize: return "itemSize"
-        case .itemValue: return "itemValue"
-        case .locationDescription: return "locationDescription"
-        case .locationExits: return "locationExits"
-        case .locationName: return "locationName"
-        case .locationProperties: return "locationProperties"
-        case .playerHealth: return "playerHealth"
-        case .playerInventoryLimit: return "playerInventoryLimit"
-        case .playerLocation: return "playerLocation"
-        case .playerMoves: return "playerMoves"
-        case .playerScore: return "playerScore"
-        case .playerStrength: return "playerStrength"
-        case .pronounReference(let p): return "pronounReference(\(p))"
-        case .removeActiveDaemon(let id): return "removeActiveDaemon(\(id))"
-        case .removeActiveFuse(let id): return "removeActiveFuse(\(id))"
-        case .updateFuseTurns(let id): return "updateFuseTurns(\(id))"
+        case .addActiveDaemon(let id): "addActiveDaemon(\(id))"
+        case .addActiveFuse(let id, _): "addActiveFuse(\(id))"
+        case .flag(let key): "flag(\(key))"
+        case .gameSpecificState(let key): "gameSpecificState(\(key.rawValue))"
+        case .itemAdjectives: "itemAdjectives"
+        case .itemCapacity: "itemCapacity"
+        case .itemName: "itemName"
+        case .itemParent: "itemParent"
+        case .itemProperties: "itemProperties"
+        case .itemSize: "itemSize"
+        case .itemSynonyms: "itemSynonyms"
+        case .itemValue: "itemValue"
+        case .locationDescription: "locationDescription"
+        case .locationExits: "locationExits"
+        case .locationName: "locationName"
+        case .locationProperties: "locationProperties"
+        case .playerHealth: "playerHealth"
+        case .playerInventoryLimit: "playerInventoryLimit"
+        case .playerLocation: "playerLocation"
+        case .playerMoves: "playerMoves"
+        case .playerScore: "playerScore"
+        case .playerStrength: "playerStrength"
+        case .pronounReference(let p): "pronounReference(\(p))"
+        case .removeActiveDaemon(let id): "removeActiveDaemon(\(id))"
+        case .removeActiveFuse(let id): "removeActiveFuse(\(id))"
+        case .updateFuseTurns(let id): "updateFuseTurns(\(id))"
         }
     }
 }

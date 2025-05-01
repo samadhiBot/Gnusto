@@ -126,68 +126,133 @@ public struct GameState: Codable, Equatable, Sendable {
         // --- Mutation Phase ---
         switch change.propertyKey {
         // MARK: Item Properties
+
+        case .itemAdjectives:
+            break // TODO: implement
+
+        case .itemCapacity:
+            break // TODO: implement
+
+        case .itemName:
+            break // TODO: implement
+
         case .itemParent:
-            guard case .parentEntity(let newParent) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .item(let itemID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard items[itemID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .parentEntity(let newParent) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard items[itemID] != nil else {
+                throw ActionError.internalEngineError("...")
+            }
             items[itemID]?.parent = newParent
 
         case .itemProperties:
             break // TODO: implement
 
         case .itemSize:
-            guard case .int(let newSize) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .item(let itemID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard items[itemID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .int(let newSize) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard items[itemID] != nil else {
+                throw ActionError.internalEngineError("...")
+            }
             items[itemID]?.size = newSize
 
+        case .itemSynonyms:
+            break // TODO: implement
+
         case .itemValue:
-            guard case .int(let newValue) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .item(let itemID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard items[itemID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .int(let newValue) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard items[itemID] != nil else {
+                throw ActionError.internalEngineError("...")
+            }
             print("WARN: Item value setting not yet implemented in Item struct.") // Placeholder
 
         // MARK: Location Properties
         case .locationName:
-            guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard locations[locationID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .string(let newName) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard locations[locationID] != nil else {
+                throw ActionError.internalEngineError("...")
+            }
             locations[locationID]?.name = newName
 
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
 
         case .locationProperties:
-            guard case .locationProperties(let newProperties) = change.newValue else { throw ActionError.internalEngineError("newValue type mismatch for locationProperties") }
-            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("entityId type mismatch for locationProperties") }
-            guard locations[locationID] != nil else { throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationProperties change") }
+            guard case .locationProperties(let newProperties) = change.newValue else {
+                throw ActionError.internalEngineError("newValue type mismatch for locationProperties")
+            }
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("entityId type mismatch for locationProperties")
+            }
+            guard locations[locationID] != nil else {
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationProperties change")
+            }
             locations[locationID]?.properties = newProperties
 
         case .locationExits:
-            guard case .locationExits(let newExits) = change.newValue else { throw ActionError.internalEngineError("newValue type mismatch for locationExits") }
-            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("entityId type mismatch for locationExits") }
-            guard locations[locationID] != nil else { throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change") }
+            guard case .locationExits(let newExits) = change.newValue else {
+                throw ActionError.internalEngineError("newValue type mismatch for locationExits")
+            }
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("entityId type mismatch for locationExits")
+            }
+            guard locations[locationID] != nil else {
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change")
+            }
             locations[locationID]?.exits = newExits
 
         // MARK: Player Properties
         case .playerScore:
-            guard case .int(let newScore) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard change.entityId == .player else { throw ActionError.internalEngineError("...") }
+            guard case .int(let newScore) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard change.entityId == .player else {
+                throw ActionError.internalEngineError("...")
+            }
             player.score = newScore
 
         case .playerMoves:
-            guard case .int(let newMoves) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard change.entityId == .player else { throw ActionError.internalEngineError("...") }
+            guard case .int(let newMoves) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard change.entityId == .player else {
+                throw ActionError.internalEngineError("...")
+            }
             player.moves = newMoves
 
         case .playerInventoryLimit:
-            guard case .int(let newLimit) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard change.entityId == .player else { throw ActionError.internalEngineError("...") }
+            guard case .int(let newLimit) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard change.entityId == .player else {
+                throw ActionError.internalEngineError("...")
+            }
             player.carryingCapacity = newLimit // Use correct property name
 
         case .playerLocation:
-            guard case .locationID(let newLocationID) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard change.entityId == .player else { throw ActionError.internalEngineError("...") }
+            guard case .locationID(let newLocationID) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard change.entityId == .player else {
+                throw ActionError.internalEngineError("...")
+            }
             // Ensure destination exists before moving player
             guard locations[newLocationID] != nil else {
                  throw ActionError.internalEngineError("Attempted to move player to non-existent location: \(newLocationID.rawValue)")
@@ -199,19 +264,13 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // MARK: Global/Misc Properties
         case .flag(let key):
-            guard case .bool(let newValue) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard change.entityId == .global else { throw ActionError.internalEngineError("...") }
+            guard case .bool(let newValue) = change.newValue else {
+                throw ActionError.internalEngineError("...")
+            }
+            guard change.entityId == .global else {
+                throw ActionError.internalEngineError("...")
+            }
             flags[key] = newValue // Use String key
-
-//        case .pronounIt:
-//            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounIt: expected .itemIDSet, got \(change.newValue)") }
-//            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounIt...") }
-//            pronouns["it"] = newItemIDSet // Use String key "it" and expect itemIDSet
-//
-//        case .pronounThem:
-//            guard case .itemIDSet(let newItemIDSet) = change.newValue else { throw ActionError.internalEngineError("Type mismatch for pronounThem: expected .itemIDSet, got \(change.newValue)") }
-//            guard change.entityId == .global else { throw ActionError.internalEngineError("EntityID mismatch for pronounThem...") }
-//            pronouns["them"] = newItemIDSet // Use String key "them" and expect itemIDSet
 
         case .gameSpecificState(let key):
             guard change.entityId == .global else {
@@ -277,77 +336,128 @@ public struct GameState: Codable, Equatable, Sendable {
 
     /// Validates that the `oldValue` in a `StateChange` matches the current state.
     private func validateOldValue(for change: StateChange) throws {
+        // Old value validation only occurs if an expectedOldValue is provided in the change.
         guard let expectedOldValue = change.oldValue else { return }
-        let currentValue: StateValue?
 
+        // Determine the actual current value based on the property key.
+        let actualCurrentValue: StateValue?
         switch change.propertyKey {
         // Item Properties
+        case .itemAdjectives:
+            // TODO: implement
+            actualCurrentValue = nil
+
+        case .itemCapacity:
+            // TODO: implement
+            actualCurrentValue = nil
+
+        case .itemName:
+            // TODO: implement
+            actualCurrentValue = nil
+
+        case .itemSynonyms:
+            // TODO: implement
+            actualCurrentValue = nil
+
         case .itemParent:
-            guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemParent") }
-            currentValue = items[id].map { .parentEntity($0.parent) }
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemParent")
+            }
+            actualCurrentValue = items[itemID].map { .parentEntity($0.parent) }
+
         case .itemProperties:
-             guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemProperties") }
-             currentValue = items[id].map { .itemProperties($0.properties) } // Added back
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemProperties")
+            }
+            actualCurrentValue = items[itemID].map { .itemProperties($0.properties) }
+
         case .itemSize:
-            guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize") }
-            currentValue = items[id].map { .int($0.size) }
+            guard case .item(let id) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize")
+            }
+            actualCurrentValue = items[id].map { .int($0.size) }
         case .itemValue:
-             guard case .item(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for itemValue") }
-             print("WARN: Old value validation skipped for itemValue (property not implemented)."); currentValue = nil
+            guard case .item(_) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemValue")
+            }
+            print("WARN: Old value validation skipped for itemValue (property not implemented).")
+            actualCurrentValue = nil // Skip validation for unimplemented property
 
         // Location Properties
         case .locationName:
-            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationName") }
-            currentValue = locations[id].map { .string($0.name) }
+            guard case .location(let id) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationName")
+            }
+            actualCurrentValue = locations[id].map { .string($0.name) }
+
         case .locationDescription:
-             // Cannot validate description as it's handler-based
-             currentValue = nil
+             throw ActionError.internalEngineError("Old value validation cannot be performed on locationDescription.")
+
         case .locationProperties:
-            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationProperties") }
-            currentValue = locations[id].map { .locationPropertySet($0.properties) }
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationProperties")
+            }
+            actualCurrentValue = if let properties = locations[locationID]?.properties {
+                .locationProperties(properties)
+            } else {
+                nil
+            }
+
         case .locationExits:
-            guard case .location(let id) = change.entityId else { throw ActionError.internalEngineError("Validation: Invalid entity ID for locationExits") }
-            currentValue = locations[id].map { .exitMap($0.exits) }
+            guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationExits")
+            }
+            actualCurrentValue = if let exits = locations[locationID]?.exits {
+                .locationExits(exits)
+            } else {
+                nil
+            }
 
         // Player Properties
         case .playerScore:
-            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerScore") }
-            currentValue = .int(player.score)
+            actualCurrentValue = .int(player.score)
         case .playerMoves:
-            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerMoves") }
-            currentValue = .int(player.moves)
+            actualCurrentValue = .int(player.moves)
         case .playerInventoryLimit:
-            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerInventoryLimit") }
-            currentValue = .int(player.carryingCapacity)
+            actualCurrentValue = .int(player.carryingCapacity)
         case .playerLocation:
-            guard change.entityId == .player else { throw ActionError.internalEngineError("Validation: Invalid entity ID for playerLocation") }
-            currentValue = .locationID(player.currentLocationID)
+            actualCurrentValue = .locationID(player.currentLocationID)
         case .playerStrength, .playerHealth:
-             print("WARN: Old value validation skipped..."); currentValue = nil
+            print("WARN: Old value validation skipped for player strength/health (properties not implemented).")
+            actualCurrentValue = nil // Skip validation
 
         // Global/Misc Properties
         case .flag(let key):
-            guard change.entityId == .global else { throw ActionError.internalEngineError("Validation: Invalid entity ID for flag") }
-            currentValue = flags[key].map { .bool($0) } ?? .bool(false)
-        case .pronounReference:
-            // This key is primarily for GameEngine helpers; direct validation might be complex.
-            // Assume GameEngine handles it correctly for now.
-            print("WARN: Old value validation skipped for pronounReference."); currentValue = nil
-        case .gameSpecificState(let key):
-            guard change.entityId == .global else { throw ActionError.internalEngineError("Validation: Invalid entity ID for gameSpecificState") }
-            currentValue = gameSpecificState[key]
+            actualCurrentValue = flags[key].map { .bool($0) }
 
-        // Fuse & Daemon cases - These are typically managed via GameEngine helpers,
-        // direct validation here might be redundant or overly complex.
-        // If needed, they would require checking activeFuses/activeDaemons dictionaries.
-        // If needed, they would require checking activeFuses/activeDaemons dictionaries.
-        case .addActiveFuse, .removeActiveFuse, .updateFuseTurns, .addActiveDaemon, .removeActiveDaemon:
-             print("WARN: Old value validation skipped for Fuse/Daemon StatePropertyKeys.")
-             currentValue = nil
+        case .gameSpecificState(let key):
+             actualCurrentValue = gameSpecificState[key]
+
+        case .pronounReference(let pronoun):
+            actualCurrentValue = pronouns[pronoun].map { StateValue.itemIDSet($0) }
+
+        // Fuses & Daemons
+        case .addActiveDaemon, .addActiveFuse:
+            // Add actions do not validate oldValue, so we skip the final check.
+            // This could be adjusted if strict validation on 'add' is desired (e.g., ensuring it *wasn't* present).
+            print("INFO: Old value validation skipped for addActiveDaemon/addActiveFuse.")
+            return // Skip the final comparison
+
+        case .removeActiveDaemon(let daemonId):
+            let currentlyActive = activeDaemons.contains(daemonId)
+            actualCurrentValue = StateValue.bool(currentlyActive)
+
+        case .removeActiveFuse(let fuseId):
+            actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
+
+        case .updateFuseTurns(let fuseId):
+            // If fuse doesn't exist, current value is nil
+            actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
         }
 
-        if currentValue != expectedOldValue {
-            throw ActionError.stateValidationFailed(change: change, actualOldValue: currentValue)
+        // Perform the comparison: expectedOldValue is guaranteed non-nil here.
+        if actualCurrentValue != expectedOldValue {
+            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
         }
     }
 
