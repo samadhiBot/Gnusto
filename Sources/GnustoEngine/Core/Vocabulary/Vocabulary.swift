@@ -1,5 +1,5 @@
 /// Holds the game's vocabulary, mapping words to game entities and concepts.
-public struct Vocabulary: Codable, Sendable {
+public struct Vocabulary: Codable, Equatable, Sendable {
     // MARK: - Properties
 
     /// Maps VerbIDs to their full definitions (including synonyms, syntax, requiresLight).

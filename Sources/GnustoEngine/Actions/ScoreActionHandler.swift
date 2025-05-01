@@ -5,8 +5,8 @@ struct ScoreActionHandler: EnhancedActionHandler {
 
     func process(command: Command, engine: GameEngine) async throws -> ActionResult {
         // Fetch current score and turn count
-        let currentScore = await engine.playerScore()
-        let turnCount = await engine.playerMoves()
+        let currentScore = await engine.playerScore
+        let turnCount = await engine.playerMoves
 
         // The SCORE command only reports information, it doesn't change state.
         let message = "Your score is \(currentScore) in \(turnCount) moves."

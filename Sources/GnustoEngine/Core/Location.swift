@@ -1,7 +1,7 @@
 import Foundation // Needed for Codable conformance for classes
 
 /// Represents a distinct location within the game world.
-public struct Location: Codable, Identifiable, Sendable {
+public struct Location: Codable, Equatable, Identifiable, Sendable {
 
     // --- Stored Properties (Alphabetical) ---
 

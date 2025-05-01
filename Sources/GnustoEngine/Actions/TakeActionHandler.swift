@@ -60,7 +60,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 7. Check capacity <-- Check added here
-        guard await engine.canPlayerCarry(itemSize: targetItem.size) else {
+        guard await engine.playerCanCarry(targetItem) else {
             throw ActionError.playerCannotCarryMore
         }
     }
@@ -113,7 +113,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         let oldPronounValue = await engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            propertyKey: .pronounIt,
             oldValue: oldPronounValue != nil ? .itemIDSet(oldPronounValue!) : nil,
             newValue: .itemIDSet([targetItemID])
         )

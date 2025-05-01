@@ -65,7 +65,7 @@ public struct WearActionHandler: EnhancedActionHandler {
         // Update pronoun "it"
         stateChanges.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            propertyKey: .pronounIt,
             oldValue: nil,
             newValue: .itemIDSet([targetItemID])
         ))
