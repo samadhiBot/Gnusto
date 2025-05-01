@@ -1,46 +1,42 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Gnusto Interactive Fiction Engine
 
-- The Gnusto Interactive Fiction Engine enables faithful translations of the original ZIL-based interactive fiction classics, accurately replicating the original gameplay mechanics and stories
-- It provides a clean, elegant and ergonomic foundation for creating new works of interactive fiction
-- It adheres to the highest standards of software craftsmanship, with clean, SOLID, modular, maintainable code
-- All of the Gnusto Interactive Fiction Engine's code is well-tested, with 80-90% coverage
-- It is easy customize and extend ANY and ALL of the built-in functionality
-- It utilizes modern Swift standards, features and optimizations under the hood
-- `Docs/References/Zork 1` is ALWAYS the definitive reference for ZIL behavior
+- The Gnusto Interactive Fiction Engine enables faithful **player-facing experiences** replicating the original ZIL-based interactive fiction classics, accurately recreating the original gameplay mechanics and stories.
+- It provides a clean, elegant and ergonomic foundation for creating new works of interactive fiction **built on modern Swift principles**.
+- It adheres to the highest standards of software craftsmanship, with clean, SOLID, modular, maintainable code.
+- All of the Gnusto Interactive Fiction Engine's code is well-tested, with 80-90% coverage **required for pull requests**.
+- It is easy customize and extend ANY and ALL of the built-in functionality.
+- It utilizes modern Swift standards, features and optimizations under the hood.
+- `Docs/References/Zork 1` is ALWAYS the definitive reference for ZIL **player-facing behavior, mechanics, and nostalgic phrases.**
 
 ## Design principles
 
-- Common operations should have simple, direct APIs.
-
-  Any need for workarounds in client game code shows that the current engine design isn't fully considering the client game developer's experience.
-
-- The cleanest code is no code.
-
-  Minimize boilerplate. The presence of the Gnusto Interactive Fiction Engine should be as unobtrusive as possible, so developers can focus on their game worlds. It should make game creation as easy, fun and intuitive as possible.
+- Common operations should have simple, direct APIs. Any need for workarounds in client game code shows that the current engine design isn't fully considering the client game developer's experience.
+- The cleanest code is no code. Minimize boilerplate. The presence of the Gnusto Interactive Fiction Engine should be as unobtrusive as possible, so developers can focus on their game worlds. It should make game creation as easy, fun and intuitive as possible.
 
 ## Foundational Rules
 
-- ALWAYS refer to `Sources/GnustoEngine` and `Tests/GnustoEngineTests` before making changes, to ensure you follow existing conventions and APIs
-- When adding, modifying or reviewing functionality, ALWAYS refer to the original ZIL source code in `Docs/References`
-  - Use `Docs/References/Cloak of Darkness` to quickly learn the fundamentals of how some functionality was handled in ZIL
+- ALWAYS refer to `Sources/GnustoEngine` and `Tests/GnustoEngineTests` before making changes, to ensure you follow existing conventions and APIs.
+- When adding, modifying or reviewing functionality, ALWAYS refer to the original ZIL source code in `Docs/References` **for inspiration and player-experience guidance**.
+  - Use `Docs/References/Cloak of Darkness` to quickly learn the fundamentals of how some functionality was handled in ZIL.
   - Use `Docs/References/Zork 1` for the canonical mechanics and phrases, e.g. "It is pitch black. You are likely to be eaten by a grue."
-  - Nostalgia is the heart of the Gnusto engine, so ALWAYS honor the past by using phrases and response from the classics
-  - Use `Docs/References/Hitchhikers Guide to the Galaxy` to study more advanced puzzles and techniques
-  - Use `Docs/References/A Mind Forever Voyaging` to study the later state of the art in the classical era of ZIL programming
-- ALWAYS provide comprehensive tests when adding or modifying functionality
-- NEVER move on to the next task without providing comprehensive tests
-- NEVER resort to `@unchecked Sendable`
+  - Nostalgia is the heart of the Gnusto engine, so ALWAYS honor the past by using phrases and response from the classics.
+  - Use `Docs/References/Hitchhikers Guide to the Galaxy` to study more advanced puzzles and techniques.
+  - Use `Docs/References/A Mind Forever Voyaging` to study the later state of the art in the classical era of ZIL programming.
+- **If ZIL implementation details seem overly complexn best practices, RAISE this for discussion.** Propose modern solutions that preserve the *spirit* and *player effect* of the original. **Prioritize modern, SOLID Swift code over exact ZIL implementation.**
+- ALWAYS provide comprehensive tests (`Swift Testing`, 80-90% coverage) **before a pull request is considered complete**. Iterative development allows flexibility at the commit level.
+- NEVER resort to `@unchecked Sendable`.
 
 ## Current Sprint
 
-- The current development sprint is detailed in [STATE_REFACTOR_PLAN.md](mdc:Docs/STATE_REFACTOR_PLAN.md). We will follow the two-phase refactor plan diligently and carefully.
+- The current development sprint is detailed in [STATE_REFACTOR_PLAN.md](mdc:Docs/STATE_REFACTOR_PLAN.md). We will follow the plan diligently, **using it as a guide but remaining open to purposeful deviation ("with gnusto") if deemed crucial after discussion.**
 
-## Next Sprint 
+## Next Sprint
 
-- The next development sprint is based on `Docs/ROADMAP.md`. 
+- The next development sprint is based on `Docs/ROADMAP.md`.
   - The first epic in the next sprint is detailed in `Docs/ENHANCED_ACTION_HANDLING.md`. See `Implementation Phases` for next steps.
+- **Roadmaps and plans are guides.** Both user and AI share the responsibility to question and refine them if they seem misguided or incomplete.
