@@ -138,14 +138,14 @@ struct GameStateTests {
 
     @Test("Initialization with Multiple Areas")
     func testInitWithAreas() {
-        // Define mock AreaContents
+        // Define mock AreaContents with *instance* properties
         struct Area1: AreaContents {
-            static let locations: [Location] = [Location(id: "loc1", name: "Area 1 Room")]
-            static let items: [Item] = [Item(id: "item1", name: "Area 1 Item", parent: .location("loc1"))]
+            let locations: [Location] = [Location(id: "loc1", name: "Area 1 Room")]
+            let items: [Item] = [Item(id: "item1", name: "Area 1 Item", parent: .location("loc1"))]
         }
         struct Area2: AreaContents {
-            static let locations: [Location] = [Location(id: "loc2", name: "Area 2 Room")]
-            static let items: [Item] = [Item(id: "item2", name: "Area 2 Item", parent: .location("loc2"))]
+            let locations: [Location] = [Location(id: "loc2", name: "Area 2 Room")]
+            let items: [Item] = [Item(id: "item2", name: "Area 2 Item", parent: .location("loc2"))]
         }
 
         let player = Player(in: "loc1")
@@ -210,8 +210,8 @@ struct GameStateTests {
 
     // MARK: - Codable Tests
 
-    @Test("GameState Codable Conformance")
-    func testGameStateCodable() throws {
+    @Test("GameState Basic Codable Conformance")
+    func testGameStateBasicCodable() throws {
         var originalState = createInitialState() // Make mutable for change history
         // Add some history for encoding
         let change1 = StateChange(entityId: .player, propertyKey: .playerScore, newValue: .int(10))
@@ -272,7 +272,7 @@ struct GameStateTests {
 
     @Test("GameState Initial Factory and Parent Setting")
     func testGameStateInitialFactory() async throws {
-        var state = await createSampleGameState()
+        let state = await createSampleGameState()
 
         // Check locations exist
         #expect(state.locations.count == 2)
@@ -361,7 +361,7 @@ struct GameStateTests {
         let decoder = JSONDecoder()
 
         let jsonData = try encoder.encode(originalState)
-        var decodedState = try decoder.decode(GameState.self, from: jsonData)
+        let decodedState = try decoder.decode(GameState.self, from: jsonData)
 
         // Basic properties
         #expect(decodedState.flags == originalState.flags)
@@ -390,7 +390,7 @@ struct GameStateTests {
 
     @Test("GameState Value Semantics (Struct Behavior)") // Updated name
     func testGameStateValueSemantics() async throws {
-        var state1 = await createSampleGameState()
+        let state1 = await createSampleGameState()
         var state2 = state1 // Creates a copy of the struct
 
         // Check initial equality of value types
@@ -483,9 +483,19 @@ struct GameStateTests {
         )
 
         // Expect an error because the oldValue is wrong
-        let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseId: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
-        #expect(throws: expectedError) {
+        // Expect stateValidationFailed because the validation should catch the mismatch
+        // let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseId: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
+        do {
             try gameState.apply(change)
+            Issue.record("Expected apply to throw ActionError.stateValidationFailed, but it did not throw.")
+        } catch let error as ActionError {
+            if case .stateValidationFailed = error {
+                // Correct error type thrown, continue verification
+            } else {
+                Issue.record("Expected ActionError.stateValidationFailed, but got \(error)")
+            }
+        } catch {
+            Issue.record("Expected ActionError, but got unexpected error type: \(error)")
         }
 
         // Verify state hasn't changed unexpectedly
