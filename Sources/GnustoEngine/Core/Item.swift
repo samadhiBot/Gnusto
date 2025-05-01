@@ -1,7 +1,7 @@
 import Foundation // Needed for Codable conformance for classes
 
-/// Represents an interactable object within the game world. Modeled as a class for reference semantics.
-public final class Item: Codable, Identifiable {
+/// Represents an interactable object within the game world.
+public struct Item: Codable, Identifiable {
 
     // --- Stored Properties (Alphabetical) ---
 
@@ -109,7 +109,7 @@ public final class Item: Codable, Identifiable {
         case lockKey
     }
 
-    public required init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adjectives = try container.decode(Set<String>.self, forKey: .adjectives)
         capacity = try container.decode(Int.self, forKey: .capacity)
@@ -146,6 +146,18 @@ public final class Item: Codable, Identifiable {
         try container.encodeIfPresent(readableText, forKey: .readableText)
         try container.encodeIfPresent(lockKey, forKey: .lockKey)
     }
+
+    /// Adds a property to the item.
+    /// - Parameter property: The `ItemProperty` to add.
+    public mutating func addProperty(_ property: ItemProperty) {
+        properties.insert(property)
+    }
+
+    /// Removes a property from the item.
+    /// - Parameter property: The `ItemProperty` to remove.
+    public mutating func removeProperty(_ property: ItemProperty) {
+        properties.remove(property)
+    }
 }
 
 // MARK: - Convenience Accessors
@@ -157,17 +169,5 @@ extension Item {
     /// - Returns: `true` if the item has the property, `false` otherwise.
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
-    }
-
-    /// Adds a property to the item.
-    /// - Parameter property: The `ItemProperty` to add.
-    public func addProperty(_ property: ItemProperty) {
-        properties.insert(property)
-    }
-
-    /// Removes a property from the item.
-    /// - Parameter property: The `ItemProperty` to remove.
-    public func removeProperty(_ property: ItemProperty) {
-        properties.remove(property)
     }
 }

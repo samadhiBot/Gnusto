@@ -1,7 +1,7 @@
 import Foundation // Needed for Codable conformance for classes
 
-/// Represents a distinct location within the game world. Modeled as a class for reference semantics.
-public final class Location: Codable, Identifiable {
+/// Represents a distinct location within the game world.
+public struct Location: Codable, Identifiable {
 
     // --- Stored Properties (Alphabetical) ---
 
@@ -66,7 +66,7 @@ public final class Location: Codable, Identifiable {
         case shortDescription
     }
 
-    public required init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
         exits = try container.decode([Direction: Exit].self, forKey: .exits)
@@ -99,13 +99,13 @@ public final class Location: Codable, Identifiable {
 
     /// Adds a property to the location.
     /// - Parameter property: The `LocationProperty` to add.
-    public func addProperty(_ property: LocationProperty) {
+    public mutating func addProperty(_ property: LocationProperty) {
         properties.insert(property)
     }
 
     /// Removes a property from the location.
     /// - Parameter property: The `LocationProperty` to remove.
-    public func removeProperty(_ property: LocationProperty) {
+    public mutating func removeProperty(_ property: LocationProperty) {
         properties.remove(property)
     }
 }

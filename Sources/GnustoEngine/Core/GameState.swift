@@ -185,85 +185,89 @@ extension GameState {
             guard case .item(let itemID) = change.entityId else {
                 throw ActionError.internalEngineError("Invalid entity type for item property key \(change.propertyKey): \(change.entityId)")
             }
-            guard let item = self.items[itemID] else {
+            // Ensure item exists before proceeding
+            guard var item = self.items[itemID] else { // Use 'var' to make it mutable
                 throw ActionError.internalEngineError("Cannot apply change to unknown item ID: \(itemID)")
             }
 
-            // Remove inner switch, handle directly based on propertyKey
+            // Validate and apply the change based on the specific property key
             switch change.propertyKey {
             case .itemParent:
                 try validateOldValue(change, actualOldValue: .parentEntity(item.parent))
                 guard case .parentEntity(let newParent) = change.newValue else {
                     throw ActionError.internalEngineError("Invalid StateValue type for .itemParent: \(change.newValue)")
                 }
-                item.parent = newParent // Direct mutation of class instance
+                item.parent = newParent // Mutate the copy
 
             case .itemProperties:
                 try validateOldValue(change, actualOldValue: .itemProperties(item.properties))
                 guard case .itemProperties(let newProps) = change.newValue else {
                     throw ActionError.internalEngineError("Invalid StateValue type for .itemProperties: \(change.newValue)")
                 }
-                item.properties = newProps // Direct mutation of class instance
+                item.properties = newProps // Mutate the copy
 
             case .itemSize:
                 try validateOldValue(change, actualOldValue: .int(item.size))
                 guard case .int(let newSize) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSize: \(change.newValue)") }
-                item.size = newSize // Direct mutation of class instance
+                item.size = newSize // Mutate the copy
 
             case .itemCapacity:
                 try validateOldValue(change, actualOldValue: .int(item.capacity))
                 guard case .int(let newCapacity) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemCapacity: \(change.newValue)") }
-                item.capacity = newCapacity // Direct mutation of class instance
+                item.capacity = newCapacity // Mutate the copy
 
             case .itemName:
                 try validateOldValue(change, actualOldValue: .string(item.name))
                 guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemName: \(change.newValue)") }
-                item.name = newName // Direct mutation of class instance
+                item.name = newName // Mutate the copy
 
             case .itemAdjectives:
                 try validateOldValue(change, actualOldValue: .itemAdjectives(item.adjectives))
                 guard case .itemAdjectives(let newAdjectives) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemAdjectives: \(change.newValue)") }
-                item.adjectives = newAdjectives // Direct mutation of class instance
+                item.adjectives = newAdjectives // Mutate the copy
 
             case .itemSynonyms:
                 try validateOldValue(change, actualOldValue: .itemSynonyms(item.synonyms))
                 guard case .itemSynonyms(let newSynonyms) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .itemSynonyms: \(change.newValue)") }
-                item.synonyms = newSynonyms // Direct mutation of class instance
+                item.synonyms = newSynonyms // Mutate the copy
 
             case .itemDescription:
                  // Descriptions are closures (DescriptionHandler?) and cannot be set via StateChange.
-                 // This case should ideally not be reached if StateChanges are created correctly.
                  throw ActionError.internalEngineError("Attempted to apply StateChange to immutable item description for \(itemID). Use DescriptionHandlerRegistry for dynamic descriptions.")
 
             // Default case for any other keys that might fall into this outer group (shouldn't happen)
             default: fatalError("Mismatched item property key processing: \(change.propertyKey)")
             }
 
+            // After successful validation and mutation of the copy, update the dictionary
+            self.items[itemID] = item
+
         // MARK: Location Changes
         case .locationProperties, .locationName, .locationExits, .locationDescription:
             guard case .location(let locationID) = change.entityId else {
                 throw ActionError.internalEngineError("Invalid entity type for location property key \(change.propertyKey): \(change.entityId)")
             }
-            guard let location = self.locations[locationID] else {
+            // Ensure location exists before proceeding
+            guard var location = self.locations[locationID] else { // Use 'var' to make it mutable
                 throw ActionError.internalEngineError("Cannot apply change to unknown location ID: \(locationID)")
             }
 
-            // Remove inner switch, handle directly based on propertyKey
+            // Validate and apply the change based on the specific property key
             switch change.propertyKey {
             case .locationProperties:
                 try validateOldValue(change, actualOldValue: .locationProperties(location.properties))
                 guard case .locationProperties(let newProps) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationProperties: \(change.newValue)") }
-                location.properties = newProps // Direct mutation of class instance
+                location.properties = newProps // Mutate the copy
 
             case .locationName:
                 try validateOldValue(change, actualOldValue: .string(location.name))
                 guard case .string(let newName) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationName: \(change.newValue)") }
-                location.name = newName // Direct mutation of class instance
+                location.name = newName // Mutate the copy
 
             case .locationExits:
                 try validateOldValue(change, actualOldValue: .locationExits(location.exits))
                 guard case .locationExits(let newExits) = change.newValue else { throw ActionError.internalEngineError("Invalid StateValue type for .locationExits: \(change.newValue)") }
-                location.exits = newExits // Direct mutation of class instance
+                location.exits = newExits // Mutate the copy
 
             case .locationDescription:
                 // Descriptions are closures (DescriptionHandler?) and cannot be set via StateChange.
@@ -272,6 +276,9 @@ extension GameState {
             // Default case for any other keys that might fall into this outer group (shouldn't happen)
             default: fatalError("Mismatched location property key processing: \(change.propertyKey)")
             }
+
+            // After successful validation and mutation of the copy, update the dictionary
+            self.locations[locationID] = location
 
         // MARK: Player Changes
         case .playerScore, .playerMoves, .playerCapacity, .playerLocation:
