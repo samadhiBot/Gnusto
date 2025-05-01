@@ -113,7 +113,8 @@ struct GameStateApplyTests {
         #expect(finalItem?.parent == newParent, "Item parent should be updated")
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
-        #expect(gameState.itemsInInventory().contains(itemToMove), "Item should now be in inventory")
+        let inventoryItemsAfterMove = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        #expect(inventoryItemsAfterMove.contains(itemToMove), "Item should now be in inventory")
     }
 
     @Test("Apply item parent change with invalid oldValue")
@@ -156,7 +157,54 @@ struct GameStateApplyTests {
         let finalItem = gameState.items[itemToMove]
         #expect(finalItem?.parent == actualOldParent, "Item parent should not be updated on error")
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
-        #expect(gameState.itemsInInventory().contains(itemToMove) == false, "Item should not be in inventory")
+        let inventoryItemsAfterError = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        #expect(inventoryItemsAfterError.contains(itemToMove) == false, "Item should not be in inventory")
+    }
+
+    @Test("Apply Item Parent Change - Move to Player")
+    func testApplyItemParentPlayer() throws {
+        var state = helper.createInitialState()
+        let itemID: ItemID = "testItem"
+        let change = StateChange(
+            entityId: .item(itemID),
+            propertyKey: .itemParent,
+            oldValue: .parentEntity(.location("startRoom")),
+            newValue: .parentEntity(.player)
+        )
+
+        try state.apply(change)
+
+        #expect(state.items[itemID]?.parent == .player)
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        #expect(inventoryItems.contains(itemID))
+        #expect(state.changeHistory.last == change)
+    }
+
+    @Test("Apply Item Parent Change - Move from Player")
+    func testApplyItemParentFromPlayer() throws {
+        var state = helper.createInitialState()
+        let itemID: ItemID = "testItem"
+        // Pre-move item to player
+        state.items[itemID]?.parent = .player
+        #expect(state.items[itemID]?.parent == .player)
+        state.changeHistory = [] // Clear history
+
+        let newLocationID: LocationID = "anotherRoom"
+        state.locations[newLocationID] = Location(id: newLocationID, name: "Another Room") // Ensure location exists
+
+        let change = StateChange(
+            entityId: .item(itemID),
+            propertyKey: .itemParent,
+            oldValue: .parentEntity(.player),
+            newValue: .parentEntity(.location(newLocationID))
+        )
+
+        try state.apply(change)
+
+        #expect(state.items[itemID]?.parent == .location(newLocationID))
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        #expect(!inventoryItems.contains(itemID))
+        #expect(state.changeHistory.last == change)
     }
 
     // MARK: - Item Size Tests
@@ -797,10 +845,10 @@ struct GameStateApplyTests {
         #expect(gameState.changeHistory.isEmpty)
     }
 
-    // MARK: - Player Capacity Tests
+    // MARK: - Player Inventory Limit Tests (Was Player Capacity)
 
-    @Test("Apply valid player capacity change")
-    func testApplyValidPlayerCapacityChange() async throws {
+    @Test("Apply valid player inventory limit change") // Corrected name and key
+    func testApplyValidPlayerInventoryLimitChange() async throws { // Corrected name
         // Given
         var gameState = await helper.createSampleGameState()
         let initialCapacity = gameState.player.carryingCapacity
@@ -808,7 +856,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .player,
-            propertyKey: .playerCapacity,
+            propertyKey: .playerInventoryLimit, // Corrected key
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -821,8 +869,8 @@ struct GameStateApplyTests {
         #expect(gameState.changeHistory.last == change)
     }
 
-    @Test("Apply player capacity change with invalid oldValue")
-    func testApplyInvalidPlayerCapacityChangeOldValue() async throws {
+    @Test("Apply player inventory limit change with invalid oldValue") // Corrected name and key
+    func testApplyInvalidPlayerInventoryLimitChangeOldValue() async throws { // Corrected name
         // Given
         var gameState = await helper.createSampleGameState()
         let actualOldCapacity = gameState.player.carryingCapacity
@@ -831,7 +879,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .player,
-            propertyKey: .playerCapacity,
+            propertyKey: .playerInventoryLimit, // Corrected key
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )
@@ -1325,5 +1373,51 @@ struct GameStateApplyTests {
         // Then
         #expect(gameState.activeFuses[fuseID] == nil, "Fuse should remain non-existent")
         #expect(gameState.changeHistory.last == change, "Change should still be recorded")
+    }
+
+    @Test("Apply Player Inventory Limit Change") // Already using correct key
+    func testApplyPlayerInventoryLimit() throws {
+        // Use helper.createInitialState()
+        var state = helper.createInitialState()
+        let originalLimit = state.player.carryingCapacity
+        let newLimit = originalLimit + 50
+        let change = StateChange(
+            entityId: .player,
+            propertyKey: .playerInventoryLimit, // Already correct
+            oldValue: .int(originalLimit),
+            newValue: .int(newLimit)
+        )
+
+        try state.apply(change)
+
+        #expect(state.player.carryingCapacity == newLimit)
+        #expect(state.changeHistory.last == change)
+    }
+
+    @Test("Apply Player Inventory Limit Change - Validation Failure") // Already using correct key
+    func testApplyPlayerInventoryLimitValidationFailure() throws {
+        // Use helper.createInitialState()
+        var state = helper.createInitialState()
+        let wrongOldLimit = state.player.carryingCapacity + 10
+        let newLimit = state.player.carryingCapacity + 50
+        let change = StateChange(
+            entityId: .player,
+            propertyKey: .playerInventoryLimit, // Already correct
+            oldValue: .int(wrongOldLimit), // Incorrect oldValue
+            newValue: .int(newLimit)
+        )
+
+        #expect(throws: ActionError.self) {
+            try state.apply(change)
+        }
+        do {
+            try state.apply(change)
+            Issue.record("Expected apply to throw an error, but it succeeded.")
+        } catch let error as ActionError {
+            #expect(error == ActionError.stateValidationFailed(change: change, actualOldValue: .int(state.player.carryingCapacity)))
+        } catch {
+            Issue.record("Thrown error was not an ActionError: \(error)")
+        }
+        #expect(state.changeHistory.isEmpty)
     }
 }

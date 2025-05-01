@@ -60,9 +60,8 @@ public struct GameState: Codable, Equatable, Sendable {
         self.activeFuses = activeFuses
         self.activeDaemons = activeDaemons
         self.pronouns = pronouns
-        self.gameSpecificState = gameSpecificState // Keep AnyCodable
+        self.gameSpecificState = gameSpecificState
         self.changeHistory = changeHistory
-        // Build vocabulary if not provided (ensures it's always populated)
         self.vocabulary = vocabulary ?? .build(items: items)
     }
 
@@ -107,12 +106,12 @@ public struct GameState: Codable, Equatable, Sendable {
             locations: allLocations,
             items: allItems,
             player: player,
-            vocabulary: vocabulary, // Pass along provided or let inner init build
+            vocabulary: vocabulary,
             flags: flags,
             pronouns: pronouns,
             activeFuses: activeFuses,
             activeDaemons: activeDaemons,
-            gameSpecificState: gameSpecificState, // Keep AnyCodable
+            gameSpecificState: gameSpecificState,
             changeHistory: changeHistory
         )
     }
@@ -159,15 +158,15 @@ public struct GameState: Codable, Equatable, Sendable {
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
 
         case .locationProperties:
-            guard case .locationPropertySet(let newProperties) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard locations[locationID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .locationProperties(let newProperties) = change.newValue else { throw ActionError.internalEngineError("newValue type mismatch for locationProperties") }
+            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("entityId type mismatch for locationProperties") }
+            guard locations[locationID] != nil else { throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationProperties change") }
             locations[locationID]?.properties = newProperties
 
         case .locationExits:
-            guard case .exitMap(let newExits) = change.newValue else { throw ActionError.internalEngineError("...") }
-            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("...") }
-            guard locations[locationID] != nil else { throw ActionError.internalEngineError("...") }
+            guard case .locationExits(let newExits) = change.newValue else { throw ActionError.internalEngineError("newValue type mismatch for locationExits") }
+            guard case .location(let locationID) = change.entityId else { throw ActionError.internalEngineError("entityId type mismatch for locationExits") }
+            guard locations[locationID] != nil else { throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change") }
             locations[locationID]?.exits = newExits
 
         // MARK: Player Properties

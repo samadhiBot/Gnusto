@@ -103,6 +103,9 @@ public enum ActionError: Error, Equatable, Sendable {
     /// Action failed because the current location is dark and the action requires light.
     case roomIsDark
 
+    /// Action failed during GameState.apply because a provided `oldValue` did not match the actual current state.
+    case stateValidationFailed(change: StateChange, actualOldValue: StateValue?)
+
     /// Action failed because the target item is not a container (lacks `.container` property).
     case targetIsNotAContainer(ItemID)
 
@@ -117,7 +120,4 @@ public enum ActionError: Error, Equatable, Sendable {
 
     /// Action failed because the key used does not match the lock mechanism of the target item.
     case wrongKey(keyID: ItemID, lockID: ItemID)
-
-    /// Action failed during GameState.apply because a provided `oldValue` did not match the actual current state.
-    case stateValidationFailed(change: StateChange, actualOldValue: StateValue?)
 }

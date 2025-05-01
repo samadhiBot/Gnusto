@@ -2,7 +2,6 @@
 /// Ensures values are both Codable and Sendable.
 public enum StateValue: Codable, Sendable, Equatable {
     case bool(Bool)
-    case exitMap([Direction: Exit])
     case int(Int)
     case itemAdjectives(Set<String>)
     case itemDescription(String)
@@ -13,44 +12,20 @@ public enum StateValue: Codable, Sendable, Equatable {
     case locationExits([Direction: Exit])
     case locationID(LocationID)
     case locationProperties(Set<LocationProperty>)
-    case locationPropertySet(Set<LocationProperty>)
     case parentEntity(ParentEntity)
     case string(String)
 
     // TODO: Add itemShortDesc, itemLongDesc, itemText etc. if mutable descriptions needed
     // case double(Double) // Add if needed
     // case stringArray([String]) // Add if needed
+}
 
-    /// Helper to get underlying value if needed, though direct switching is often better.
-    var underlyingValue: Any {
-        switch self {
-        case .bool(let value): value
-        case .exitMap(let value): value
-        case .int(let value): value
-        case .itemAdjectives(let value): value
-        case .itemDescription(let value): value
-        case .itemID(let value): value
-        case .itemIDSet(let value): value
-        case .itemProperties(let value): value
-        case .itemSynonyms(let value): value
-        case .locationExits(let value): value
-        case .locationID(let value): value
-        case .locationProperties(let value): value
-        case .locationPropertySet(let value): value
-        case .parentEntity(let value): value
-        case .string(let value): value
-        }
-    }
+// MARK: - Public casting helpers
 
+extension StateValue {
     /// Returns the `StateValue` underlying value as a `Bool`, or `nil` if the type does not match.
     public var toBool: Bool? {
         underlyingValue as? Bool
-    }
-
-    /// Returns the `StateValue` underlying value as a `[Direction: Exit]`, or `nil` if the
-    /// type does not match.
-    public var toExitMap: [Direction: Exit]? {
-        underlyingValue as? [Direction: Exit]
     }
 
     /// Returns the `StateValue` underlying value as a `Int`, or `nil` if the type does not match.
@@ -112,12 +87,6 @@ public enum StateValue: Codable, Sendable, Equatable {
         underlyingValue as? Set<LocationProperty>
     }
 
-    /// Returns the `StateValue` underlying value as a `Set<LocationProperty>`, or `nil` if
-    /// the type does not match.
-    public var toLocationPropertySet: Set<LocationProperty>? {
-        underlyingValue as? Set<LocationProperty>
-    }
-
     /// Returns the `StateValue` underlying value as a `ParentEntity`, or `nil` if the type
     /// does not match.
     public var toParentEntity: ParentEntity? {
@@ -128,5 +97,28 @@ public enum StateValue: Codable, Sendable, Equatable {
     /// not match.
     public var toString: String? {
         underlyingValue as? String
+    }
+}
+
+// MARK: - Private helpers
+
+extension StateValue {
+    /// Helper to get underlying value if needed, though direct switching is often better.
+    private var underlyingValue: Any {
+        switch self {
+        case .bool(let value): value
+        case .int(let value): value
+        case .itemAdjectives(let value): value
+        case .itemDescription(let value): value
+        case .itemID(let value): value
+        case .itemIDSet(let value): value
+        case .itemProperties(let value): value
+        case .itemSynonyms(let value): value
+        case .locationExits(let value): value
+        case .locationID(let value): value
+        case .locationProperties(let value): value
+        case .parentEntity(let value): value
+        case .string(let value): value
+        }
     }
 }

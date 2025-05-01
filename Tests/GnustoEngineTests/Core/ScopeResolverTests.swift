@@ -208,12 +208,26 @@ struct ScopeResolverTests {
 
     @Test("No items visible in dark room")
     func testVisibleItemsDarkRoom() async throws {
+        // Explicitly create a dark room
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Pitch Black Room",
+            longDescription: "It's dark."
+            // No .inherentlyLit property
+        )
         let item = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom")
+            parent: .location(darkRoom.id) // Place item in the dark room
         )
-        var game = MinimalGame(items: [item])
+        let player = Player(in: darkRoom.id)
+
+        // Initialize game with the dark room and item
+        let game = MinimalGame(
+            player: player,
+            locations: [darkRoom],
+            items: [item]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -223,9 +237,10 @@ struct ScopeResolverTests {
         )
         let resolver = engine.scopeResolver
 
-        game.state.locations["startRoom"]?.properties.remove(.inherentlyLit)
+        // No need to modify state after initialization
+        // game.state.locations["startRoom"]?.properties.remove(.inherentlyLit)
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
     }
 
