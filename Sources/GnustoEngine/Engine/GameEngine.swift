@@ -646,7 +646,7 @@ public class GameEngine: Sendable {
             await ioHandler.print("You can see:")
             for itemID in visibleItemIDs {
                 // TODO: Fetch actual item state for description if needed
-                if let item = await item(with: itemID) {
+                if let item = item(with: itemID) {
                     if let fdesc = item.firstDescription { // Placeholder for FDESC logic
                         ioHandler.print(await fdesc.generate(item, self), style: .itemDescription)
                     } else if let sdesc = item.shortDescription { // Default to short description

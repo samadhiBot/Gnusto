@@ -64,23 +64,23 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         let keyItemID = command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let targetItemSnapshot = await engine.item(with: targetItemID),
-              let keyItemSnapshot = await engine.item(with: keyItemID) else
+        guard let targetItem = await engine.item(with: targetItemID),
+              let keyItem = await engine.item(with: keyItemID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
         }
 
         // Handle case: Already unlocked (detected in validate)
-        if !targetItemSnapshot.hasProperty(.locked) {
+        if !targetItem.hasProperty(.locked) {
             // Manually construct definite article message
-            return ActionResult(success: false, message: "The \(targetItemSnapshot.name) is already unlocked.")
+            return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
         }
 
         // --- Unlock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Remove .locked from target
-        let oldTargetProps = targetItemSnapshot.properties
+        let oldTargetProps = targetItem.properties
         var newTargetProps = oldTargetProps
         newTargetProps.remove(.locked)
         newTargetProps.insert(.touched) // Also mark target touched
@@ -96,7 +96,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // Change 2: Add .touched to key (if needed)
-        let oldKeyProps = keyItemSnapshot.properties
+        let oldKeyProps = keyItem.properties
         if !oldKeyProps.contains(.touched) {
             var newKeyProps = oldKeyProps
             newKeyProps.insert(.touched)
@@ -111,7 +111,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
 
         // --- Prepare Result ---
         // Manually construct definite article message
-        let message = "The \(targetItemSnapshot.name) is now unlocked."
+        let message = "The \(targetItem.name) is now unlocked."
         return ActionResult(
             success: true,
             message: message,

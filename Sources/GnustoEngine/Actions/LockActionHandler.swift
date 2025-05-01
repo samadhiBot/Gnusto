@@ -66,23 +66,23 @@ public struct LockActionHandler: EnhancedActionHandler {
 
         // Get snapshots (needed for properties)
         // Existence guaranteed by validate
-        guard let targetItemSnapshot = await engine.item(with: targetItemID),
-              let keyItemSnapshot = await engine.item(with: keyItemID) else
+        guard let targetItem = await engine.item(with: targetItemID),
+              let keyItem = await engine.item(with: keyItemID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for LOCK.")
         }
 
         // Handle case: Already locked (detected in validate)
-        if targetItemSnapshot.hasProperty(.locked) {
+        if targetItem.hasProperty(.locked) {
             // Manually construct definite article message
-            return ActionResult(success: false, message: "The \(targetItemSnapshot.name) is already locked.")
+            return ActionResult(success: false, message: "The \(targetItem.name) is already locked.")
         }
 
         // --- Lock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .locked to target
-        let oldTargetProps = targetItemSnapshot.properties
+        let oldTargetProps = targetItem.properties
         var newTargetProps = oldTargetProps
         newTargetProps.insert(.locked)
         newTargetProps.insert(.touched) // Also mark target touched
@@ -98,7 +98,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         }
 
         // Change 2: Add .touched to key (if needed)
-        let oldKeyProps = keyItemSnapshot.properties
+        let oldKeyProps = keyItem.properties
         if !oldKeyProps.contains(.touched) {
             var newKeyProps = oldKeyProps
             newKeyProps.insert(.touched)
@@ -113,7 +113,7 @@ public struct LockActionHandler: EnhancedActionHandler {
 
         // --- Prepare Result ---
         // Manually construct definite article message
-        let message = "The \(targetItemSnapshot.name) is now locked."
+        let message = "The \(targetItem.name) is now locked."
         return ActionResult(
             success: true,
             message: message,

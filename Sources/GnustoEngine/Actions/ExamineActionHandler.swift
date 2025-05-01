@@ -84,7 +84,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     // MARK: - Private Helpers (Adapted to return String)
 
     /// Helper function to generate description for containers or doors.
-    private func describeContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async -> String {
+    private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, if available
@@ -117,7 +117,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     }
 
     /// Helper function to generate description for surfaces.
-    private func describeSurface(targetItem: ItemSnapshot, engine: GameEngine) async -> String {
+    private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, if available

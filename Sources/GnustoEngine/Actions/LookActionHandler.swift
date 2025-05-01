@@ -67,7 +67,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         }
 
         // 2. Add container/surface contents
-        // Pass the ItemSnapshot (ReadOnlyItem) to the helper
+        // Pass the Item (ReadOnlyItem) to the helper
         descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: engine))
 
         // 3. Prepare state change (mark as touched)
@@ -99,8 +99,8 @@ public struct LookActionHandler: EnhancedActionHandler {
     // MARK: - Helper Functions
 
     /// Generates description lines for the contents of a container or surface.
-    /// Accepts a ItemSnapshot (ReadOnlyItem).
-    private func describeContents(of item: ItemSnapshot, engine: GameEngine) async -> [String] {
+    /// Accepts a Item (ReadOnlyItem).
+    private func describeContents(of item: Item, engine: GameEngine) async -> [String] {
         var lines: [String] = []
 
         // Container contents

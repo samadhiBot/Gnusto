@@ -138,5 +138,5 @@ struct LocationTests {
     }
 
     // TODO: Add tests for dynamic description handler registration and generation
-    // using DescriptionHandlerRegistry and LocationSnapshot.
+    // using DescriptionHandlerRegistry and Location.
 }
