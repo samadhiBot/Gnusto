@@ -13,10 +13,10 @@ extension Array where Element == Item {
         case 1:
             return self[0].withIndefiniteArticle
         default:
-            var sortedItemsWithArticles = sorted()
-                .map(\.withIndefiniteArticle)
-            let lastItem = sortedItemsWithArticles.removeLast()
-            return "\(sortedItemsWithArticles.joined(separator: ", ")) and \(lastItem)"
+            var items = sorted().map(\.withIndefiniteArticle)
+            let lastItem = items.removeLast()
+            let oxfordComma = count == 2 ? "" : ","
+            return "\(items.joined(separator: ", "))\(oxfordComma) and \(lastItem)"
         }
     }
 }

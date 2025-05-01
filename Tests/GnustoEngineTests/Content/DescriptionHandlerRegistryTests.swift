@@ -27,8 +27,11 @@ struct DescriptionHandlerRegistryTests {
     @Test("Register and Generate Dynamic Item Description")
     func testRegisterAndGenerateDynamicItem() async throws {
         // Given
-        // Add key to initial items
-        let keyItem = Item(id: "key", name: "small key", parent: .item("chest"))
+        let keyItem = Item(
+            id: "key",
+            name: "small key",
+            parent: .item("chest")
+        )
         var initialItems = [
             Item(
                 id: "lamp",
@@ -100,17 +103,13 @@ struct DescriptionHandlerRegistryTests {
         )
         #expect(description == "The brass lantern is glowing brightly, casting light all around.")
 
-        // Removed lamp turn off test - requires action simulation
-
         // When & Then: Book (Untouched - initial state)
         description = await registry.generateDescription(
             for: bookItem,
             using: bookItem.longDescription!,
             engine: engine
         )
-        #expect(description == "The ancient tome looks like it hasn't been opened in a while.")
-
-        // Removed book touched test - requires action simulation
+        #expect(description == "The ancient tome looks like it hasn’t been opened in a while.")
 
         // When & Then: Chest (With Key)
         let updatedChestItem = engine.item(with: "chest")! // Re-fetch after item setup
@@ -126,7 +125,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateItemWithStaticFallback() async throws {
         // Given
         let handler = DescriptionHandler.id("missing_handler", fallback: "This is the fallback.")
-        let testItem = Item(id: "test", name: "test item", longDescription: handler)
+        let testItem = Item(
+            id: "test",
+            name: "test item",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
         let itemSnapshot = engine.item(with: "test")! // No await needed
 
@@ -145,7 +148,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateItemWithStaticHandler() async throws {
         // Given
         let handler: DescriptionHandler = "This is purely static."
-        let testItem = Item(id: "test", name: "test item", longDescription: handler)
+        let testItem = Item(
+            id: "test",
+            name: "test item",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
         let itemSnapshot = engine.item(with: "test")! // No await needed
 
@@ -164,7 +171,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateItemWithMissingHandler() async throws {
         // Given
         let handler = DescriptionHandler.id("nonexistent_handler") // No fallback
-        let testItem = Item(id: "test", name: "test item", longDescription: handler)
+        let testItem = Item(
+            id: "test",
+            name: "test item",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
         let itemSnapshot = engine.item(with: "test")! // No await needed
 
@@ -183,7 +194,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateItemWithNilStaticNoID() async throws {
         // Given
         let handler = DescriptionHandler(id: nil, rawStaticDescription: nil) // Edge case
-        let testItem = Item(id: "test", name: "test item", longDescription: handler)
+        let testItem = Item(
+            id: "test",
+            name: "test item",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [], items: [testItem]) // Explicit args
         let itemSnapshot = engine.item(with: "test")! // No await needed
 
@@ -240,7 +255,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateLocationWithStaticFallback() async throws {
         // Given
         let handler = DescriptionHandler.id("missing_loc_handler", fallback: "Static location fallback.")
-        let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
+        let testLoc = Location(
+            id: "test",
+            name: "Test Room",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
         let locSnapshot = engine.location(with: "test")! // No await needed
 
@@ -259,7 +278,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateLocationWithStaticHandler() async throws {
         // Given
         let handler: DescriptionHandler = "Purely static room."
-        let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
+        let testLoc = Location(
+            id: "test",
+            name: "Test Room",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
         let locSnapshot = engine.location(with: "test")! // No await needed
 
@@ -278,7 +301,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateLocationWithMissingHandler() async throws {
         // Given
         let handler = DescriptionHandler.id("nonexistent_loc_handler") // No fallback
-        let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
+        let testLoc = Location(
+            id: "test",
+            name: "Test Room",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
         let locSnapshot = engine.location(with: "test")! // No await needed
 
@@ -297,7 +324,11 @@ struct DescriptionHandlerRegistryTests {
     func testGenerateLocationWithNilStaticNoID() async throws {
         // Given
         let handler = DescriptionHandler(id: nil, rawStaticDescription: nil) // Edge case
-        let testLoc = Location(id: "test", name: "Test Room", longDescription: handler)
+        let testLoc = Location(
+            id: "test",
+            name: "Test Room",
+            longDescription: handler
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc], items: []) // Explicit args
         let locSnapshot = engine.location(with: "test")! // No await needed
 
@@ -314,7 +345,10 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Dynamic Handler")
     func testGenerateDescription_dynamicItemHandler() async throws {
-        let testItem = Item(id: "test", name: "widget")
+        let testItem = Item(
+            id: "test",
+            name: "widget"
+        )
         let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Use helper
 
         // Register a dynamic handler
@@ -337,7 +371,10 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Dynamic Location Handler")
     func testGenerateDescription_dynamicLocationHandler() async throws {
-        let testLoc = Location(id: "testLoc", name: "Test Location")
+        let testLoc = Location(
+            id: "testLoc",
+            name: "Test Location"
+        )
         let (engine, registry) = await setupTestEnvironment(locations: [testLoc]) // Use helper
 
         // Register a dynamic handler
@@ -360,7 +397,10 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Dynamic Handler and Fallback")
     func testGenerateDescription_dynamicWithFallback() async throws {
-        let testItem = Item(id: "test", name: "widget")
+        let testItem = Item(
+            id: "test",
+            name: "widget"
+        )
         let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Use helper
 
         // Register a dynamic handler (which will be used)
@@ -383,7 +423,10 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Fallback Used When Dynamic Missing")
     func testGenerateDescription_fallbackUsedWhenDynamicMissing() async throws {
-        let testItem = Item(id: "test", name: "widget")
+        let testItem = Item(
+            id: "test",
+            name: "widget"
+        )
         let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Use helper
 
         // DO NOT register "dynamicTest"
@@ -403,7 +446,10 @@ struct DescriptionHandlerRegistryTests {
 
     @Test("Generate Description with Registry Error Logged")
     func testGenerateDescription_registryErrorLogged() async throws {
-        let testItem = Item(id: "test", name: "widget")
+        let testItem = Item(
+            id: "test",
+            name: "widget"
+        )
         let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Use helper
         let mockIO = engine.ioHandler as! MockIOHandler
 

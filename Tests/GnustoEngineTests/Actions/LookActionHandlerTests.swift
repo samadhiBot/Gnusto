@@ -71,11 +71,72 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             --- Test Room ---
             A basic room.
-            You can see:
-              A blue gizmo
-              A shiny widget
+            You can see a blue gizmo and a shiny widget here.
             """
         )
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("LOOK in lit room with multiple items lists them correctly")
+    func testLookInLitRoomWithMultipleItems() async throws {
+        // Arrange
+        let litRoom = Location(
+            id: "litRoom",
+            name: "Test Room",
+            longDescription: "A basic room.",
+            properties: .inherentlyLit
+        )
+        let item1 = Item(
+            id: "apple",
+            name: "apple",
+            parent: .location("litRoom")
+        )
+        let item2 = Item(
+            id: "banana",
+            name: "banana",
+            parent: .location("litRoom")
+        )
+        let item3 = Item(
+            id: "pear",
+            name: "pear",
+            parent: .location("litRoom")
+        )
+        let item4 = Item(
+            id: "orange",
+            name: "orange",
+            properties: .vowel, // For testing "an orange"
+            parent: .location("litRoom")
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: [litRoom],
+            items: [item4, item3, item2, item1] // Include all 4 items, in reverse order
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "look", rawInput: "look")
+
+        // Act: Use engine.execute
+        await engine.execute(command: command)
+
+        // Assert Output (primary check for LOOK)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            --- Test Room ---
+            A basic room.
+            You can see an apple, a banana, an orange, and a pear here.
+            """
+        )
+
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
     }
@@ -165,8 +226,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             --- Test Room ---
             A basic room.
-            You can see:
-              A shiny widget
+            You can see a shiny widget here.
             """
         )
         // Assert No State Change
