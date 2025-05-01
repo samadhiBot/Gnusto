@@ -1,4 +1,4 @@
-# State Management Refactoring Plan
+# State Management Refactoring Plan [DONE]
 
 This document outlines the phased plan to refactor the Gnusto Engine's state management for increased robustness, testability, and clarity, while maintaining good developer ergonomics.
 
@@ -37,20 +37,20 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
 
 **Steps:**
 
-- [ ] **Convert `Item` to Struct:**
-  - [ ] Change `Item` declaration from `class` to `struct`.
-  - [ ] Update all code that interacts with `Item` instances to handle value semantics (mutations will require replacing the instance in `GameState.items`).
-  - [ ] Adjust `GameState.apply` logic for item-related keys to replace the item struct in the dictionary.
-- [ ] **Convert `Location` to Struct:**
-  - [ ] Change `Location` declaration from `class` to `struct`.
-  - [ ] Update all code that interacts with `Location` instances to handle value semantics.
-  - [ ] Adjust `GameState.apply` logic for location-related keys to replace the location struct in the dictionary.
-- [ ] **Remove Snapshot Types:**
-  - [ ] Delete `ItemSnapshot.swift`.
-  - [ ] Delete `LocationSnapshot.swift`.
-  - [ ] Update all code (primarily in `GameEngine`) that used snapshots to use the `Item` and `Location` structs directly.
-- [ ] **Review `Sendable` Conformance:**
-  - [ ] Verify `Item`, `Location`, and `GameState` conform to `Sendable` correctly.
-- [ ] **Testing:**
-  - [ ] Update existing tests to reflect the use of structs instead of classes/snapshots.
-  - [ ] Add tests specifically verifying value semantics (ensuring mutations don't have unintended side effects).
+- [x] **Convert `Item` to Struct:**
+  - [x] Change `Item` declaration from `class` to `struct`.
+  - [x] Update all code that interacts with `Item` instances to handle value semantics (mutations will require replacing the instance in `GameState.items`).
+  - [x] Adjust `GameState.apply` logic for item-related keys to replace the item struct in the dictionary.
+- [x] **Convert `Location` to Struct:**
+  - [x] Change `Location` declaration from `class` to `struct`.
+  - [x] Update all code that interacts with `Location` instances to handle value semantics.
+  - [x] Adjust `GameState.apply` logic for location-related keys to replace the location struct in the dictionary.
+- [x] **Remove Snapshot Types:**
+  - [x] Delete `ItemSnapshot.swift`.
+  - [x] Delete `LocationSnapshot.swift`.
+  - [x] Update all code (primarily in `GameEngine`) that used snapshots to use the `Item` and `Location` structs directly.
+- [x] **Review `Sendable` Conformance:**
+  - [x] Verify `Item`, `Location`, and `GameState` conform to `Sendable` correctly.
+- [x] **Testing:**
+  - [x] Update existing tests to reflect the use of structs instead of classes/snapshots.
+  - [x] Add tests specifically verifying value semantics (ensuring mutations don't have unintended side effects).
