@@ -639,34 +639,16 @@ public class GameEngine: Sendable {
         // 1. Get visible item IDs using ScopeResolver
         let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID)
 
-        // 2. Get the actual Item objects/snapshots for the visible IDs
-        let visibleItems = visibleItemIDs.compactMap { gameState.items[$0] } // Fetch full Item objects
+        // 2. Asynchronously fetch Item objects/snapshots for the visible IDs
+        let visibleItems = visibleItemIDs.compactMap(item(with:))
 
+        // 3. Format and print the list if not empty
         if !visibleItems.isEmpty {
-            await ioHandler.print("You can see:")
-            for itemID in visibleItemIDs {
-                // TODO: Fetch actual item state for description if needed
-                if let item = item(with: itemID) {
-                    if let firstDescription = item.firstDescription {
-                        let description = await descriptionHandlerRegistry
-                            .generateDescription(
-                                for: item,
-                                using: firstDescription,
-                                engine: self
-                            )
-                        await ioHandler.print(description)
-                    } else if let shortDescription = item.shortDescription {
-                        let description = await descriptionHandlerRegistry
-                            .generateDescription(
-                                for: item,
-                                using: shortDescription,
-                                engine: self
-                            )
-                        await ioHandler.print(description)
-                    }
-                }
-            }
+            // Use the helper to generate a sentence like "a foo, a bar, and a baz"
+            let itemListing = visibleItems.listWithIndefiniteArticles
+            await ioHandler.print("You can see \(itemListing) here.")
         }
+        // No output if no items are visible
     }
 
     /// Displays the status line.
@@ -674,7 +656,7 @@ public class GameEngine: Sendable {
         guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else { return }
         await ioHandler.showStatusLine(
             roomName: currentLocation.name,
-            score: gameState.player.score, // Use actual score/turns
+            score: gameState.player.score,
             turns: gameState.player.moves
         )
     }

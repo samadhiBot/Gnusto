@@ -19,7 +19,7 @@ struct GameEngineTests {
             name: "Pitch Black Room",
             longDescription: "It's dark."
         )
-        var game = MinimalGame(
+        let game = MinimalGame(
             player: Player(in: darkRoom.id),
             locations: [darkRoom]
         )
@@ -96,8 +96,7 @@ struct GameEngineTests {
         expectNoDifference(output, """
             --- Void ---
             An empty void.
-            You can see:
-              A pebble
+            You can see a pebble here.
             > xyzzy
             I don't know the verb 'xyzzy'.
             > quit
@@ -315,7 +314,7 @@ struct GameEngineTests {
     @Test("Engine Exits Gracefully on Quit Command")
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         let mockQuitHandler = MockActionHandler()
-        var game = MinimalGame(
+        let game = MinimalGame(
             registry: DefinitionRegistry(
                 customActionHandlers: [VerbID("quit"): mockQuitHandler]
             )
@@ -376,7 +375,7 @@ struct GameEngineTests {
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
     func testEngineHandlesNilInputGracefully() async throws {
-        var game = MinimalGame()
+        let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -400,8 +399,7 @@ struct GameEngineTests {
         expectNoDifference(output, """
             --- Void ---
             An empty void.
-            You can see:
-              A pebble
+            You can see a pebble here.
             >
 
             Goodbye!
@@ -435,7 +433,7 @@ struct GameEngineTests {
             properties: LocationProperty.inherentlyLit
         )
 
-        var game = MinimalGame(
+        let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
             registry: DefinitionRegistry(
@@ -656,7 +654,7 @@ struct GameEngineTests {
         }
 
         // Initialize game with fuse definition
-        var game = MinimalGame(
+        let game = MinimalGame(
             registry: DefinitionRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
@@ -686,7 +684,7 @@ struct GameEngineTests {
             stateHolder.count += 1
         }
         // Initialize game with daemon definition
-        var game = MinimalGame(
+        let game = MinimalGame(
             registry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
@@ -714,7 +712,7 @@ struct GameEngineTests {
         let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in /* ... */ }
 
         // Initialize game with definitions
-        var game = MinimalGame(
+        let game = MinimalGame(
             registry: DefinitionRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
@@ -746,7 +744,7 @@ struct GameEngineTests {
             name: "Start Room",
             properties: LocationProperty.inherentlyLit // Qualify LocationProperty
         )
-        var game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: [startRoom])
 
         let command = Command(
             verbID: "go",
@@ -766,7 +764,7 @@ struct GameEngineTests {
         // Initialize item without .takable
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [pebble])
+        let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
 
@@ -784,7 +782,7 @@ struct GameEngineTests {
         // Initialize item in room, not held
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [pebble])
+        let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
@@ -808,7 +806,7 @@ struct GameEngineTests {
             parent: .location("startRoom")
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
             verbID: "insert",
@@ -830,7 +828,7 @@ struct GameEngineTests {
         // Initialize item directly
         let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
         let output = await runCommandAndCaptureOutput(
@@ -851,7 +849,7 @@ struct GameEngineTests {
             parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
         let output = await runCommandAndCaptureOutput(
@@ -884,7 +882,7 @@ struct GameEngineTests {
             carryingCapacity: 10 // Set low capacity
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
+        let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
         let output = await runCommandAndCaptureOutput(
@@ -901,7 +899,7 @@ struct GameEngineTests {
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
             verbID: "insert",
@@ -924,7 +922,7 @@ struct GameEngineTests {
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
             verbID: "put-on",
@@ -954,7 +952,7 @@ struct GameEngineTests {
             exits: [.north: blockedExit],
             properties: LocationProperty.inherentlyLit
         )
-        var game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: [startRoom])
 
         let command = Command(verbID: "go", directObject: "north", direction: .north, rawInput: "go north")
         let output = await runCommandAndCaptureOutput(
@@ -975,7 +973,7 @@ struct GameEngineTests {
             parent: .location("startRoom")
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [container])
+        let game = MinimalGame(locations: [startRoom], items: [container])
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
         let output = await runCommandAndCaptureOutput(
@@ -999,7 +997,7 @@ struct GameEngineTests {
         let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let player = Player(in: "startRoom")
-        var game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
+        let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
         let command = Command(
             verbID: "unlock",
@@ -1021,7 +1019,7 @@ struct GameEngineTests {
         // Initialize non-closeable item
         let item = Item(id: "book", name: "book", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
         let output = await runCommandAndCaptureOutput(
@@ -1042,7 +1040,7 @@ struct GameEngineTests {
             parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
         let output = await runCommandAndCaptureOutput(
@@ -1063,7 +1061,7 @@ struct GameEngineTests {
             parent: .player
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
         let output = await runCommandAndCaptureOutput(
@@ -1087,7 +1085,7 @@ struct GameEngineTests {
             exits: [.up: conditionalExit],
             properties: LocationProperty.inherentlyLit
         )
-        var game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: [startRoom])
 
         let command = Command(verbID: "go", directObject: "up", direction: .up, rawInput: "go up")
         let output = await runCommandAndCaptureOutput(
@@ -1103,7 +1101,7 @@ struct GameEngineTests {
         // Initialize dark room with an item
         let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
         let startRoom = Location(id: "startRoom", name: "Dark Room")
-        var game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: [startRoom], items: [item])
 
         #expect(game.state.locations["startRoom"]?.hasProperty(LocationProperty.inherentlyLit) == false)
 
@@ -1129,7 +1127,7 @@ struct GameEngineTests {
         let wrongKey = Item(id: "key2", name: "wrong key", properties: .takable, parent: .player)
         let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
         let player = Player(in: "startRoom")
-        var game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
+        let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
         let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
         let output = await runCommandAndCaptureOutput(

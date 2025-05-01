@@ -421,7 +421,7 @@ public struct GameState: Codable, Equatable, Sendable {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for itemCapacity")
             }
             // Map item's optional capacity Int? to .int, defaulting to 0
-            actualCurrentValue = items[itemID].map { .int($0.capacity ?? 0) }
+            actualCurrentValue = items[itemID].map { .int($0.capacity) }
 
         case .itemName:
             guard case .item(let itemID) = change.entityId else {

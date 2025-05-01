@@ -91,8 +91,15 @@ struct GameStateTests {
 
     // Helper to create a consistent initial state for tests
     func createInitialState() -> GameState {
-        let startRoom = Location(id: "startRoom", name: "Starting Room")
-        let testItem = Item(id: "testItem", name: "Test Item", parent: .location("startRoom"))
+        let startRoom = Location(
+            id: "startRoom",
+            name: "Starting Room"
+        )
+        let testItem = Item(
+            id: "testItem",
+            name: "Test Item",
+            parent: .location("startRoom")
+        )
         let player = Player(in: "startRoom")
         let vocab = Vocabulary.build(items: [testItem]) // Build basic vocab
 
@@ -140,12 +147,26 @@ struct GameStateTests {
     func testInitWithAreas() {
         // Define mock AreaContents with *instance* properties
         struct Area1: AreaContents {
-            let locations: [Location] = [Location(id: "loc1", name: "Area 1 Room")]
-            let items: [Item] = [Item(id: "item1", name: "Area 1 Item", parent: .location("loc1"))]
+            let locations: [Location] = [Location(
+                id: "loc1",
+                name: "Area 1 Room"
+            )]
+            let items: [Item] = [Item(
+                id: "item1",
+                name: "Area 1 Item",
+                parent: .location("loc1")
+            )]
         }
         struct Area2: AreaContents {
-            let locations: [Location] = [Location(id: "loc2", name: "Area 2 Room")]
-            let items: [Item] = [Item(id: "item2", name: "Area 2 Item", parent: .location("loc2"))]
+            let locations: [Location] = [Location(
+                id: "loc2",
+                name: "Area 2 Room"
+            )]
+            let items: [Item] = [Item(
+                id: "item2",
+                name: "Area 2 Item",
+                parent: .location("loc2")
+            )]
         }
 
         let player = Player(in: "loc1")
@@ -166,9 +187,21 @@ struct GameStateTests {
     @Test("Items in Inventory Test")
     func testItemsInInventory() {
         var state = createInitialState() // Make mutable to modify items
-        let item1 = Item(id: "item1", name: "Item 1", parent: .player)
-        let item2 = Item(id: "item2", name: "Item 2", parent: .location("startRoom"))
-        let item3 = Item(id: "item3", name: "Item 3", parent: .player)
+        let item1 = Item(
+            id: "item1",
+            name: "Item 1",
+            parent: .player
+        )
+        let item2 = Item(
+            id: "item2",
+            name: "Item 2",
+            parent: .location("startRoom")
+        )
+        let item3 = Item(
+            id: "item3",
+            name: "Item 3",
+            parent: .player
+        )
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
 
         // Replace itemsInInventory() call
@@ -182,9 +215,21 @@ struct GameStateTests {
     func testItemsInLocation() {
         var state = createInitialState() // Make mutable to modify items
         let locID: LocationID = "startRoom"
-        let item1 = Item(id: "item1", name: "Item 1", parent: .location(locID))
-        let item2 = Item(id: "item2", name: "Item 2", parent: .player)
-        let item3 = Item(id: "item3", name: "Item 3", parent: .location(locID))
+        let item1 = Item(
+            id: "item1",
+            name: "Item 1",
+            parent: .location(locID)
+        )
+        let item2 = Item(
+            id: "item2",
+            name: "Item 2",
+            parent: .player
+        )
+        let item3 = Item(
+            id: "item3",
+            name: "Item 3",
+            parent: .location(locID)
+        )
         let originalTestItem = state.items["testItem"]! // Keep original item in startRoom
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": originalTestItem] // Add/replace items
 
@@ -197,8 +242,16 @@ struct GameStateTests {
     @Test("Item Parent Test") // Renamed from Item Location
     func testItemParent() {
         var state = createInitialState() // Make mutable
-        let item1 = Item(id: "item1", name: "Item 1", parent: .player)
-        let item2 = Item(id: "item2", name: "Item 2", parent: .location("startRoom"))
+        let item1 = Item(
+            id: "item1",
+            name: "Item 1",
+            parent: .player
+        )
+        let item2 = Item(
+            id: "item2",
+            name: "Item 2",
+            parent: .location("startRoom")
+        )
         state.items["item1"] = item1 // Add items
         state.items["item2"] = item2
 
