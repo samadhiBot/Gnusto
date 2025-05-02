@@ -1,12 +1,15 @@
 import Foundation // Needed for Codable conformance for classes
 
 /// Represents a distinct location within the game world.
-public struct Location: Codable, Equatable, Identifiable, Sendable {
+public struct Location: Codable, Equatable, Identifiable, Sendable, DynamicPropertyContainer {
 
     // --- Stored Properties (Alphabetical) ---
 
     // Action handler - Placeholder.
     // public var actionHandlerID: String?
+
+    /// Dictionary holding any dynamic properties associated with this location.
+    public var dynamicProperties: [PropertyID: DynamicProperty]
 
     /// The main description of the location, shown upon entry or with `LOOK` (`LDESC`).
     /// Can be static text or dynamically generated.
@@ -51,12 +54,16 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
         self.properties = Set(properties)
         self.globals = globals
         // self.actionHandlerID = actionHandlerID
+
+        // Initialize dynamic properties
+        self.dynamicProperties = [:]
     }
 
     // --- Codable Conformance ---
     // Classes require explicit implementation
 
     enum CodingKeys: String, CodingKey {
+        case dynamicProperties
         case longDescription
         case exits
         case globals
@@ -75,10 +82,17 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
         name = try container.decode(String.self, forKey: .name)
         properties = try container.decode(Set<LocationProperty>.self, forKey: .properties)
         shortDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .shortDescription)
+
+        // Decode dynamic properties
+        dynamicProperties = try container.decodeIfPresent([String: DynamicProperty].self, forKey: .dynamicProperties) ?? [:]
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        // Encode dynamic properties
+        if !dynamicProperties.isEmpty {
+             try container.encode(dynamicProperties, forKey: .dynamicProperties)
+        }
         try container.encodeIfPresent(longDescription, forKey: .longDescription)
         try container.encode(exits, forKey: .exits)
         try container.encode(globals, forKey: .globals)
@@ -107,5 +121,47 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     /// - Parameter property: The `LocationProperty` to remove.
     public mutating func removeProperty(_ property: LocationProperty) {
         properties.remove(property)
+    }
+}
+
+// MARK: - DynamicPropertyContainer Conformance
+
+extension Location {
+    public func getDynamicProperty(
+        _ key: String
+    ) -> DynamicProperty? {
+        dynamicProperties[key]
+    }
+
+    @MainActor
+    public mutating func setDynamicPropertyValue(
+        _ key: String,
+        value: StateValue
+    ) throws {
+        guard var property = dynamicProperties[key] else {
+            throw ActionError.internalEngineError(
+                "Dynamic property '\(key)' not found for Location '\(id)'. Cannot set value '\(value)'."
+            )
+        }
+
+        try property.setValue(value)
+        dynamicProperties[key] = property
+
+        // IMPORTANT: Caller must handle StateChange and GameState.apply()
+    }
+}
+
+// MARK: - Equatable Conformance (Manual needed due to adding property)
+
+extension Location /* : Equatable */ {
+    public static func == (lhs: Location, rhs: Location) -> Bool {
+        lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.longDescription == rhs.longDescription &&
+        lhs.shortDescription == rhs.shortDescription &&
+        lhs.exits == rhs.exits &&
+        lhs.properties == rhs.properties &&
+        lhs.globals == rhs.globals &&
+        lhs.dynamicProperties == rhs.dynamicProperties // Include comparison
     }
 }

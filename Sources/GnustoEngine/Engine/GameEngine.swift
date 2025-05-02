@@ -713,6 +713,8 @@ public class GameEngine: Sendable {
             "You can't go that way."
         case .invalidIndirectObject(let objectName):
             "You can't use \(theThat(objectName)) for that."
+        case .invalidValue:
+            "A strange buzzing sound indicates something is wrong."
         case .itemAlreadyClosed(let item):
             "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
@@ -759,6 +761,8 @@ public class GameEngine: Sendable {
             customMessage.isEmpty ? "You can't do that." : customMessage
         case .roomIsDark:
             "It's too dark to do that."
+        case .stateValidationFailed:
+            "A strange buzzing sound indicates something is wrong with the state validation."
         case .targetIsNotAContainer(let item):
             "You can't put things in \(theThat(item))."
         case .targetIsNotASurface(let item):
@@ -769,8 +773,6 @@ public class GameEngine: Sendable {
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
             "The \(item(with: keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
-        case .stateValidationFailed: // Provide a user-facing message
-            "A strange buzzing sound indicates something is wrong with the state validation."
         }
         await ioHandler.print(message)
 
@@ -778,14 +780,16 @@ public class GameEngine: Sendable {
         switch actionError {
         case .internalEngineError(let msg):
             logger.error("💥 ActionError: Internal Engine Error: \(msg, privacy: .public)")
+        case .invalidValue(let msg):
+            logger.error("💥 ActionError: Invalid Value: \(msg, privacy: .public)")
         case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
             // Construct the log string first
             let logDetail = """
-            State Validation Failed!
-                - Change: \(String(describing: change))
-                - Expected Old Value: \(String(describing: change.oldValue))
-                - Actual Old Value: \(String(describing: actualOldValue))
-            """
+                State Validation Failed!
+                    - Change: \(String(describing: change))
+                    - Expected Old Value: \(String(describing: change.oldValue))
+                    - Actual Old Value: \(String(describing: actualOldValue))
+                """
             logger.error("💥 ActionError: \(logDetail, privacy: .public)")
         default:
             break // No detailed logging needed for other handled errors

@@ -30,6 +30,9 @@ public enum ActionError: Error, Equatable, Sendable {
     /// The indirect object specified in the command is invalid or missing.
     case invalidIndirectObject(String?)
 
+    /// A value provided for a state change or property update was invalid (e.g., failed validation).
+    case invalidValue(String)
+
     /// Action failed because the target item is already closed.
     case itemAlreadyClosed(ItemID)
 

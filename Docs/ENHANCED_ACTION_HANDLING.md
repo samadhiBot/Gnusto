@@ -136,9 +136,9 @@ public protocol ActionContextProvider {
 
 ### Phase 1: Core Enhancements
 
-- [ ] Extend `ActionHandler` protocol with pipeline support
-- [ ] Implement `ActionResult` and related types
-- [ ] Add state change tracking to `GameState`
+- [x] Extend `ActionHandler` protocol with pipeline support
+- [x] Implement `ActionResult` and related types
+- [x] Add state change tracking to `GameState`
 
 ### Phase 2: Dynamic Properties
 

@@ -1,7 +1,9 @@
 import Foundation // Needed for Codable conformance for classes
 
 /// Represents an interactable object within the game world.
-public struct Item: Codable, Identifiable, Sendable {
+/// Note: Marked @unchecked Sendable due to the type-erased `dynamicProperties` dictionary.
+/// Care must be taken if accessing/mutating this dictionary concurrently.
+public struct Item: Codable, Identifiable, DynamicPropertyContainer, Sendable {
 
     // --- Stored Properties (Alphabetical) ---
 
@@ -10,6 +12,10 @@ public struct Item: Codable, Identifiable, Sendable {
 
     /// The maximum total size of items this item can contain. -1 signifies unlimited capacity (ZILF default).
     public var capacity: Int
+
+    /// Dictionary holding any dynamic properties associated with this item.
+    /// Values are non-generic `DynamicProperty` structs managing `StateValue`.
+    public var dynamicProperties: [PropertyID: DynamicProperty]
 
     // Action handler - Placeholder.
     // var actionHandlerID: String?
@@ -87,6 +93,9 @@ public struct Item: Codable, Identifiable, Sendable {
         self.readableText = readableText
         self.lockKey = lockKey
         // self.actionHandlerID = actionHandlerID
+
+        // Initialize dynamic properties
+        self.dynamicProperties = [:] // Initialize as empty
     }
 
     // MARK: - Codable Conformance
@@ -94,6 +103,7 @@ public struct Item: Codable, Identifiable, Sendable {
     enum CodingKeys: String, CodingKey {
         case adjectives
         case capacity
+        case dynamicProperties
         case shortDescription
         case firstDescription
         case heldText
@@ -126,12 +136,19 @@ public struct Item: Codable, Identifiable, Sendable {
         text = try container.decodeIfPresent(String.self, forKey: .text)
         readableText = try container.decodeIfPresent(String.self, forKey: .readableText)
         lockKey = try container.decodeIfPresent(ItemID.self, forKey: .lockKey)
+
+        // Decode dynamic properties - Now decodes [String: DynamicProperty]
+        dynamicProperties = try container.decodeIfPresent([String: DynamicProperty].self, forKey: .dynamicProperties) ?? [:]
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(adjectives, forKey: .adjectives)
         try container.encode(capacity, forKey: .capacity)
+        // Encode dynamic properties - Encodes [String: DynamicProperty]
+        if !dynamicProperties.isEmpty {
+             try container.encode(dynamicProperties, forKey: .dynamicProperties)
+        }
         try container.encodeIfPresent(shortDescription, forKey: .shortDescription)
         try container.encodeIfPresent(firstDescription, forKey: .firstDescription)
         try container.encodeIfPresent(heldText, forKey: .heldText)
@@ -160,6 +177,42 @@ public struct Item: Codable, Identifiable, Sendable {
     }
 }
 
+// MARK: - DynamicPropertyContainer Conformance
+
+extension Item {
+    public func getDynamicProperty(
+        _ key: String
+    ) -> DynamicProperty? {
+        dynamicProperties[key]
+    }
+
+    @MainActor // Added to match the actor isolation of property.setValue
+    public mutating func setDynamicPropertyValue(
+        _ key: String,
+        value: StateValue
+    ) throws {
+        // Retrieve the existing dynamic property, ensuring it's the correct type.
+        guard var property = dynamicProperties[key] else {
+            // If it doesn't exist, throw an error.
+            // We could potentially create a new DynamicProperty here if desired,
+            // but the current design assumes properties are defined upfront.
+            throw ActionError.internalEngineError(
+                "Dynamic property '\(key)' not found for Item '\(id)'. Cannot set value '\(value)'."
+            )
+        }
+
+        // Use the DynamicProperty's own validation logic.
+        try property.setValue(value)
+
+        // Update the dictionary with the modified (validated) property.
+        dynamicProperties[key] = property
+
+        // IMPORTANT: This only updates the property within the Item struct instance.
+        // The caller (e.g., GameEngine) is responsible for creating a StateChange
+        // and using gameState.apply() to persist this change into the main GameState.
+    }
+}
+
 // MARK: - Convenience Accessors
 
 extension Item {
@@ -169,6 +222,30 @@ extension Item {
     /// - Returns: `true` if the item has the property, `false` otherwise.
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
+    }
+}
+
+// MARK: - Equatable Conformance (Manual)
+
+extension Item: Equatable {
+    public static func == (lhs: Item, rhs: Item) -> Bool {
+        // Compare all properties INCLUDING dynamicProperties, as DynamicProperty is now Equatable.
+        return lhs.id == rhs.id &&
+               lhs.name == rhs.name &&
+               lhs.adjectives == rhs.adjectives &&
+               lhs.synonyms == rhs.synonyms &&
+               lhs.shortDescription == rhs.shortDescription &&
+               lhs.firstDescription == rhs.firstDescription &&
+               lhs.longDescription == rhs.longDescription &&
+               lhs.text == rhs.text &&
+               lhs.heldText == rhs.heldText &&
+               lhs.properties == rhs.properties &&
+               lhs.size == rhs.size &&
+               lhs.capacity == rhs.capacity &&
+               lhs.parent == rhs.parent &&
+               lhs.readableText == rhs.readableText &&
+               lhs.lockKey == rhs.lockKey &&
+               lhs.dynamicProperties == rhs.dynamicProperties
     }
 }
 
