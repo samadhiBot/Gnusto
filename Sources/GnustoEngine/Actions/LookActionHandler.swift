@@ -53,7 +53,7 @@ public struct LookActionHandler: EnhancedActionHandler {
             let baseDescription = await context.engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
-                context.engine: context.engine
+                engine: context.engine
             )
             descriptionLines.append(baseDescription)
         } else {
@@ -62,7 +62,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // 2. Add container/surface contents
         // Pass the Item (ReadOnlyItem) to the helper
-        descriptionLines.append(contentsOf: await describeContents(of: targetItem, context.engine: context.engine))
+        descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: context.engine))
 
         // 3. Prepare state change (mark as touched)
         var stateChanges: [StateChange] = []
@@ -94,7 +94,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
     /// Generates description lines for the contents of a container or surface.
     /// Accepts a Item (ReadOnlyItem).
-    private func describeContents(of item: Item, context.engine: GameEngine) async -> [String] {
+    private func describeContents(of item: Item, engine: GameEngine) async -> [String] {
         var lines: [String] = []
 
         // Container contents
@@ -104,7 +104,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
             if isOpen || isTransparent {
                 // Get snapshots of items *inside* the container
-                let contents = await context.engine.items(withParent: .item(item.id))
+                let contents = await engine.items(withParent: .item(item.id))
                 if contents.isEmpty {
                     lines.append("The \(item.name) is empty.")
                 } else {
@@ -121,7 +121,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Surface contents
         if item.hasProperty(.surface) {
             // Get snapshots of items *on* the surface
-            let itemsOnSurface = await context.engine.items(withParent: .item(item.id))
+            let itemsOnSurface = await engine.items(withParent: .item(item.id))
             if !itemsOnSurface.isEmpty {
                 let itemNames = itemsOnSurface.listWithIndefiniteArticles
                 lines.append("On the \(item.name) is \(itemNames).")

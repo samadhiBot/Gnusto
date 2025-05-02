@@ -75,7 +75,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
 
     // Remove the old perform method
     /*
-    public func perform(command: Command, context.engine: GameEngine) async throws {
+    public func perform(context: ActionContext) async throws {
         // ... old implementation ...
     }
     */

@@ -51,7 +51,7 @@ public struct GoActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
         guard let direction = context.command.direction,
               let currentLoc = await context.engine.location(with: await context.engine.gameState.player.currentLocationID),

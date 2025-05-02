@@ -4,7 +4,7 @@ import Foundation
 struct WaitActionHandler: EnhancedActionHandler {
 
     // Removed original perform method
-    // func perform(command: Command, context.engine: GameEngine) async throws {
+    // func perform(context: ActionContext) async throws {
     //     await context.engine.output("Time passes.")
     //     // Waiting usually just consumes a turn, no further state change needed here.
     // }

@@ -7,11 +7,11 @@ public struct InventoryActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, context.engine: GameEngine) async throws {
+    public func validate(context: ActionContext) async throws {
         // No specific validation needed for basic inventory context.command.
     }
 
-    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // 1. Get inventory item snapshots
         let inventoryItems = await context.engine.items(withParent: .player)
 

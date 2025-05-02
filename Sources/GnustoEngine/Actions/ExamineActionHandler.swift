@@ -7,7 +7,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, context.engine: GameEngine) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Examine what?")
@@ -25,7 +25,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("Examine context.command reached process without direct object.")
         }
@@ -54,18 +54,18 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
         // Priority 2: Container/Door Description
         else if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
-            message = await describeContainerOrDoor(targetItem: targetItem, context.engine: context.engine)
+            message = await describeContainerOrDoor(targetItem: targetItem, engine: context.engine)
         }
         // Priority 3: Surface Description
         else if targetItem.hasProperty(.surface) {
-            message = await describeSurface(targetItem: targetItem, context.engine: context.engine)
+            message = await describeSurface(targetItem: targetItem, engine: context.engine)
         }
         // Priority 4: Dynamic Long Description
         else if let descriptionHandler = targetItem.longDescription {
             message = await context.engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
-                context.engine: context.engine
+                engine: context.engine
             )
         }
         // Fallback: Default Message
@@ -84,15 +84,15 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     // MARK: - Private Helpers (Adapted to return String)
 
     /// Helper function to generate description for containers or doors.
-    private func describeContainerOrDoor(targetItem: Item, context.engine: GameEngine) async -> String {
+    private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, if available
         if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await context.engine.descriptionHandlerRegistry.generateDescription(
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
-                context.engine: context.engine
+                engine: engine
             )
             descriptionParts.append(baseDescription)
         } else {
@@ -103,7 +103,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         let isTransparent = targetItem.hasProperty(.transparent)
 
         if isOpen || isTransparent {
-            let contents = await context.engine.items(withParent: .item(targetItem.id))
+            let contents = await engine.items(withParent: .item(targetItem.id))
             if contents.isEmpty {
                 descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
@@ -117,15 +117,15 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     }
 
     /// Helper function to generate description for surfaces.
-    private func describeSurface(targetItem: Item, context.engine: GameEngine) async -> String {
+    private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, if available
         if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await context.engine.descriptionHandlerRegistry.generateDescription(
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem,
                 using: descriptionHandler,
-                context.engine: context.engine
+                engine: engine
             )
             descriptionParts.append(baseDescription)
         } else {
@@ -133,7 +133,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
 
         // List items on the surface
-        let contents = await context.engine.items(withParent: .item(targetItem.id))
+        let contents = await engine.items(withParent: .item(targetItem.id))
         if !contents.isEmpty {
             let itemNames = contents.listWithIndefiniteArticles
             descriptionParts.append(

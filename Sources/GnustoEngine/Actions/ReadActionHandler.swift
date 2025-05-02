@@ -7,7 +7,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, context.engine: GameEngine) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Read what?")
@@ -60,7 +60,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("READ context.command reached process without direct object.")
         }

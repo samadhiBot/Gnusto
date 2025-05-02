@@ -5,7 +5,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    func validate(command: Command, context.engine: GameEngine) async throws {
+    func validate(context: ActionContext) async throws {
         // 1. Get direct object ID
         guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Turn on what?")
@@ -49,7 +49,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
     }
 
-    func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+    func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("TURN ON context.command reached process without direct object.")
         }
