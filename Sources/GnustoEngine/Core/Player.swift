@@ -1,5 +1,5 @@
 /// Represents the state of the player character.
-public struct Player: Codable, Equatable {
+public struct Player: Codable, Equatable, Sendable {
     /// The maximum weight/size the player can carry.
     public var carryingCapacity: Int = 100 // Example, could be based on SIZE props
 

@@ -24,10 +24,15 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-markdown.git", branch: "main"),
     ],
     targets: [
         .target(
-            name: "GnustoEngine"),
+            name: "GnustoEngine",
+            dependencies: [
+                .product(name: "Markdown", package: "swift-markdown"),
+            ]
+        ),
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],

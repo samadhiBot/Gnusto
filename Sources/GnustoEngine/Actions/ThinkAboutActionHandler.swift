@@ -1,44 +1,72 @@
 import Foundation
 
 /// Action handler for the THINK ABOUT verb (based on Cloak of Darkness).
-public struct ThinkAboutActionHandler: ActionHandler {
+public struct ThinkAboutActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            // No specific prompt in CoD ZIL, invent one.
-            await engine.output("Think about what?")
-            return
+            throw ActionError.customResponse("Think about what?")
         }
 
-        // 2. Check if thinking about self (PLAYER)
-        // Use the conventional ItemID "player"
-        if targetItemID.rawValue == "player" { // Check rawValue against string
-            // CoD message: "Yes, yes, you're very important."
-            await engine.output("Yes, yes, you're very important.")
-            return
-        }
+        // 2. Skip further checks if thinking about self (PLAYER)
+        if targetItemID.rawValue == "player" { return }
 
-        // 3. Check if item exists and is accessible
-        // (Standard reachability check)
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        // 3. Check if item exists
+        guard await engine.item(with: targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
+        // 4. Check reachability
         let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
         guard isReachable else {
-            // Use standard error for inaccessible items
             throw ActionError.itemNotAccessible(targetItemID)
         }
+    }
 
-        // Item is accessible, mark as touched?
-        // CoD ZIL doesn't explicitly set TOUCHBIT here, but it's harmless.
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            // Should be caught by validate
+            throw ActionError.internalEngineError("THINK ABOUT command reached process without direct object.")
+        }
 
-        // 4. Output default message
-        // CoD message: "You contemplate the {object} for a bit, but nothing fruitful comes to mind."
-        await engine.output("You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind.")
+        let message: String
+        var stateChanges: [StateChange] = []
+
+        // Handle thinking about player
+        if targetItemID.rawValue == "player" {
+            message = "Yes, yes, you're very important."
+        } else {
+            // Handle thinking about an item
+            guard let targetItem = await engine.item(with: targetItemID) else {
+                 // Should be caught by validate
+                throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+            }
+
+            // Mark as touched if not already
+            if !targetItem.hasProperty(.touched) {
+                let change = StateChange(
+                    entityId: .item(targetItemID),
+                    propertyKey: .itemProperties,
+                    oldValue: .itemPropertySet(targetItem.properties),
+                    newValue: .itemPropertySet(targetItem.properties.union([.touched]))
+                )
+                stateChanges.append(change)
+            }
+
+            // Set the standard message
+            message = "You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind."
+        }
+
+        // Create result
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
     }
 }

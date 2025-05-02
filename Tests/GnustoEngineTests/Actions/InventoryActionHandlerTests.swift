@@ -22,11 +22,10 @@ struct InventoryActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = InventoryActionHandler()
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
@@ -54,11 +53,10 @@ struct InventoryActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let handler = InventoryActionHandler()
         let command = Command(verbID: "inventory", rawInput: "inventory")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()

@@ -1,7 +1,7 @@
 import Foundation // Needed for Codable conformance for classes
 
-/// Represents an interactable object within the game world. Modeled as a class for reference semantics.
-public final class Item: Codable, Identifiable {
+/// Represents an interactable object within the game world.
+public struct Item: Codable, Identifiable, Sendable {
 
     // --- Stored Properties (Alphabetical) ---
 
@@ -14,16 +14,16 @@ public final class Item: Codable, Identifiable {
     // Action handler - Placeholder.
     // var actionHandlerID: String?
 
-    /// The description shown when the item is examined (`EXAMINE`).
-    public var description: String?
+    /// The short description shown in room listings and when the item is mentioned (ZIL DESC).
+    public var shortDescription: DescriptionHandler?
 
-    /// The description shown when the item is first seen in a room (`FDESC`).
-    public var firstDescription: String?
+    /// The description shown when the item is first seen in a room (ZIL FDESC).
+    public var firstDescription: DescriptionHandler?
 
     /// Text displayed only when the item is held and read (`READ`, requires `ItemProperty.read`).
     public var heldText: String?
 
-    /// The unique identifier for this item. `let` because identity doesn't change.
+    /// The unique identifier for this item (ZIL NAME). `let` because identity doesn't change.
     public let id: ItemID
 
     /// The primary noun used to refer to the item (e.g., "lantern").
@@ -38,8 +38,8 @@ public final class Item: Codable, Identifiable {
     /// The item's size, influencing carrying capacity and container limits. Defaults to 5 per ZILF docs.
     public var size: Int
 
-    /// The description shown when the item is present in a room after the first time (`LDESC`).
-    public var subsequentDescription: String?
+    /// The detailed description shown when examining the item (ZIL LDESC).
+    public var longDescription: DescriptionHandler?
 
     /// Synonyms for the item's name (e.g., ["lamp", "light"]).
     public var synonyms: Set<String>
@@ -53,22 +53,20 @@ public final class Item: Codable, Identifiable {
     /// The key needed to lock/unlock this item (if `.lockable`).
     public var lockKey: ItemID? = nil
 
-    // --- Initialization ---
-
     public init(
         id: ItemID,
         name: String,
         adjectives: String...,
         synonyms: String...,
-        description: String? = nil,
-        firstDescription: String? = nil,
-        subsequentDescription: String? = nil,
+        shortDescription: DescriptionHandler? = nil,
+        firstDescription: DescriptionHandler? = nil,
+        longDescription: DescriptionHandler? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: ItemProperty...,
         size: Int = 5,
         capacity: Int = -1,
-        parent: ParentEntity = .nowhere, // Default parent to .nowhere
+        parent: ParentEntity = .nowhere,
         readableText: String? = nil,
         lockKey: ItemID? = nil
         // actionHandlerID: String? = nil
@@ -77,9 +75,9 @@ public final class Item: Codable, Identifiable {
         self.name = name
         self.adjectives = Set(adjectives)
         self.synonyms = Set(synonyms)
-        self.description = description
+        self.shortDescription = shortDescription
         self.firstDescription = firstDescription
-        self.subsequentDescription = subsequentDescription
+        self.longDescription = longDescription
         self.text = text
         self.heldText = heldText
         self.properties = Set(properties)
@@ -91,49 +89,12 @@ public final class Item: Codable, Identifiable {
         // self.actionHandlerID = actionHandlerID
     }
 
-    init(
-        id: ItemID,
-        name: String,
-        adjectives: Set<String> = [],
-        synonyms: Set<String> = [],
-        description: String? = nil,
-        firstDescription: String? = nil,
-        subsequentDescription: String? = nil,
-        text: String? = nil,
-        heldText: String? = nil,
-        properties: Set<ItemProperty> = [],
-        size: Int = 5,
-        capacity: Int = -1,
-        parent: ParentEntity = .nowhere, // Default parent to .nowhere
-        readableText: String? = nil,
-        lockKey: ItemID? = nil
-        // actionHandlerID: String? = nil
-    ) {
-        self.id = id
-        self.name = name
-        self.adjectives = adjectives
-        self.synonyms = synonyms
-        self.description = description
-        self.firstDescription = firstDescription
-        self.subsequentDescription = subsequentDescription
-        self.text = text
-        self.heldText = heldText
-        self.properties = properties
-        self.size = size
-        self.capacity = capacity
-        self.parent = parent
-        self.readableText = readableText
-        self.lockKey = lockKey
-        // self.actionHandlerID = actionHandlerID
-    }
-
-    // --- Codable Conformance ---
-    // Classes require explicit implementation for Codable
+    // MARK: - Codable Conformance
 
     enum CodingKeys: String, CodingKey {
         case adjectives
         case capacity
-        case description
+        case shortDescription
         case firstDescription
         case heldText
         case id
@@ -141,26 +102,26 @@ public final class Item: Codable, Identifiable {
         case parent
         case properties
         case size
-        case subsequentDescription
+        case longDescription
         case synonyms
         case text
         case readableText
         case lockKey
     }
 
-    public required init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         adjectives = try container.decode(Set<String>.self, forKey: .adjectives)
         capacity = try container.decode(Int.self, forKey: .capacity)
-        description = try container.decodeIfPresent(String.self, forKey: .description)
-        firstDescription = try container.decodeIfPresent(String.self, forKey: .firstDescription)
+        shortDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .shortDescription)
+        firstDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .firstDescription)
         heldText = try container.decodeIfPresent(String.self, forKey: .heldText)
         id = try container.decode(ItemID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
         parent = try container.decode(ParentEntity.self, forKey: .parent)
         properties = try container.decode(Set<ItemProperty>.self, forKey: .properties)
         size = try container.decode(Int.self, forKey: .size)
-        subsequentDescription = try container.decodeIfPresent(String.self, forKey: .subsequentDescription)
+        longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
         synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
         text = try container.decodeIfPresent(String.self, forKey: .text)
         readableText = try container.decodeIfPresent(String.self, forKey: .readableText)
@@ -171,7 +132,7 @@ public final class Item: Codable, Identifiable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(adjectives, forKey: .adjectives)
         try container.encode(capacity, forKey: .capacity)
-        try container.encodeIfPresent(description, forKey: .description)
+        try container.encodeIfPresent(shortDescription, forKey: .shortDescription)
         try container.encodeIfPresent(firstDescription, forKey: .firstDescription)
         try container.encodeIfPresent(heldText, forKey: .heldText)
         try container.encode(id, forKey: .id)
@@ -179,14 +140,29 @@ public final class Item: Codable, Identifiable {
         try container.encode(parent, forKey: .parent)
         try container.encode(properties, forKey: .properties)
         try container.encode(size, forKey: .size)
-        try container.encodeIfPresent(subsequentDescription, forKey: .subsequentDescription)
+        try container.encodeIfPresent(longDescription, forKey: .longDescription)
         try container.encode(synonyms, forKey: .synonyms)
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(readableText, forKey: .readableText)
         try container.encodeIfPresent(lockKey, forKey: .lockKey)
     }
 
-    // --- Convenience Accessors ---
+    /// Adds a property to the item.
+    /// - Parameter property: The `ItemProperty` to add.
+    public mutating func addProperty(_ property: ItemProperty) {
+        properties.insert(property)
+    }
+
+    /// Removes a property from the item.
+    /// - Parameter property: The `ItemProperty` to remove.
+    public mutating func removeProperty(_ property: ItemProperty) {
+        properties.remove(property)
+    }
+}
+
+// MARK: - Convenience Accessors
+
+extension Item {
 
     /// Checks if the item has a specific property.
     /// - Parameter property: The `ItemProperty` to check for.
@@ -194,16 +170,12 @@ public final class Item: Codable, Identifiable {
     public func hasProperty(_ property: ItemProperty) -> Bool {
         properties.contains(property)
     }
+}
 
-    /// Adds a property to the item.
-    /// - Parameter property: The `ItemProperty` to add.
-    public func addProperty(_ property: ItemProperty) {
-        properties.insert(property)
-    }
+// MARK: - Comparable conformance
 
-    /// Removes a property from the item.
-    /// - Parameter property: The `ItemProperty` to remove.
-    public func removeProperty(_ property: ItemProperty) {
-        properties.remove(property)
+extension Item: Comparable {
+    public static func < (lhs: Item, rhs: Item) -> Bool {
+        lhs.id < rhs.id
     }
 }

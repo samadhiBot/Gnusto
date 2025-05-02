@@ -8,6 +8,37 @@ import Testing
 struct DropActionHandlerTests {
     let handler = DropActionHandler()
 
+    // Helper to create the expected StateChange array for successful drop
+    private func expectedDropChanges(
+        itemID: ItemID,
+        oldProperties: Set<ItemProperty>,
+        newLocation: LocationID
+    ) -> [StateChange] {
+        var finalProperties = oldProperties
+        finalProperties.insert(.touched)
+        finalProperties.remove(.worn)
+
+        var changes: [StateChange] = [
+            StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemParent,
+                oldValue: .parentEntity(.player),
+                newValue: .parentEntity(.location(newLocation))
+            )
+        ]
+
+        if oldProperties != finalProperties {
+            changes.append(StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(oldProperties),
+                newValue: .itemPropertySet(finalProperties)
+            ))
+        }
+        // No pronoun changes expected for dropping (currently)
+        return changes
+    }
+
     @Test("Drop item successfully")
     func testDropItemSuccessfully() async throws {
         // Arrange: Create item
@@ -17,6 +48,7 @@ struct DropActionHandlerTests {
             properties: .takable,
             parent: .player
         )
+        let initialProperties = testItem.properties
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -26,30 +58,33 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
+        let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.itemSnapshot(with: "key")?.parent == .player) // Verify setup
+        #expect(engine.item(with: "key")?.parent == .player) // Verify setup
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
-        // Assert
-        // Check item parent changed to current location
-        let finalItemState = engine.itemSnapshot(with: "key")
-        #expect(finalItemState?.parent == .location("startRoom"), "Item should be in the room")
-
-        // Check item still has .touched property (or gained it)
+        // Assert Final State
+        let finalItemState = engine.item(with: "key")
+        #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Dropped.")
+
+        // Assert Change History
+        let expectedChanges = expectedDropChanges(itemID: "key", oldProperties: initialProperties, newLocation: finalLocation)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Drop fails with no direct object")
     func testDropFailsWithNoObject() async throws {
-        // Arrange: Minimal setup
+        // Arrange
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -60,12 +95,11 @@ struct DropActionHandlerTests {
         )
 
         let command = Command(verbID: "drop", rawInput: "drop") // No direct object
-        #expect(command.directObject == nil)
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
-        // Assert
+        // Assert: Expect error from validate()
         let output = await mockIO.flush()
         expectNoDifference(output, "Drop what?")
     }
@@ -89,20 +123,24 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.itemSnapshot(with: "key")?.parent == .location("startRoom"))
+        #expect(engine.item(with: "key")?.parent == .location("startRoom"))
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
-        // Assert: Check item parent DID NOT change
-        let finalItemState = engine.itemSnapshot(with: "key")
+        // Assert Final State (Unchanged)
+        let finalItemState = engine.item(with: "key")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
 
-        // Assert: Check output message
+        // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You don't have the brass key.")
+        expectNoDifference(output, "You aren't holding the brass key.")
+
+        // Assert Change History (Should be empty)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Drop worn item successfully removes worn property")
@@ -114,6 +152,7 @@ struct DropActionHandlerTests {
             properties: .takable, .wearable, .worn, // Start worn
             parent: .player
         )
+        let initialProperties = testItem.properties
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -123,27 +162,57 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
+        let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.itemSnapshot(with: "cloak")?.parent == .player)
-        #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == true)
+        #expect(engine.item(with: "cloak")?.parent == .player)
+        #expect(engine.item(with: "cloak")?.hasProperty(.worn) == true)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "cloak", rawInput: "drop cloak")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
 
-        // Assert
-        // Check item parent changed to current location
-        let finalItemState = engine.itemSnapshot(with: "cloak")
-        #expect(finalItemState?.parent == .location("startRoom"), "Item should be in the room")
-
-        // Check item NO LONGER has .worn property
+        // Assert Final State
+        let finalItemState = engine.item(with: "cloak")
+        #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property")
-        // Check it still has .touched
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
 
-        // Check output message
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Dropped.")
+
+        // Assert Change History
+        let expectedChanges = expectedDropChanges(itemID: "cloak", oldProperties: initialProperties, newLocation: finalLocation)
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Drop fixed item fails")
+    func testDropFixedItemFails() async throws {
+        // Arrange: Fixed item held by player
+        let testItem = Item(
+            id: "sword-in-stone",
+            name: "sword in stone",
+            properties: .fixed, // Item cannot be dropped
+            parent: .player // Hypothetically held
+        )
+        let game = MinimalGame(items: [testItem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(verbID: "drop", directObject: "sword-in-stone", rawInput: "drop sword")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Expect error from validate()
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't drop the sword in stone.")
     }
 }

@@ -1,64 +1,123 @@
 import Foundation
 
 /// Handles the "UNLOCK <DO> WITH <IO>" command.
-public struct UnlockActionHandler: ActionHandler {
+public struct UnlockActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler
+
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
         // 1. Validate command structure: Need DO and IO
-        guard let targetItemID = command.directObject else {
-            await engine.output("Unlock what?")
-            return
+        guard command.directObject != nil else {
+            throw ActionError.prerequisiteNotMet("Unlock what?")
         }
-        guard let keyItemID = command.indirectObject else {
-            // TODO: Zork message for missing instrument?
-            await engine.output("Unlock it with what?")
-            return
+        guard command.indirectObject != nil else {
+            throw ActionError.prerequisiteNotMet("Unlock it with what?")
         }
+
+        // Safely unwrap IDs after checks
+        let targetItemID = command.directObject!
+        let keyItemID = command.indirectObject!
 
         // 2. Get item snapshots
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent target item ID '\(targetItemID)'.")
+        guard let targetItem = await engine.item(with: targetItemID) else {
+            throw ActionError.itemNotAccessible(targetItemID)
         }
-        guard let keyItem = await engine.itemSnapshot(with: keyItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent key item ID '\(keyItemID)'.")
+        guard let keyItem = await engine.item(with: keyItemID) else {
+            throw ActionError.itemNotAccessible(keyItemID)
         }
 
-        // 3. Check reachability (player must hold the key)
+        // 3. Check reachability
         guard keyItem.parent == .player else {
             throw ActionError.itemNotHeld(keyItemID)
         }
-        // Target item must be reachable (held or in location)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
-
-        // Mark items as touched
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
-        await engine.updateItemProperties(itemID: keyItemID, adding: .touched)
 
         // 4. Check item properties
         guard targetItem.hasProperty(.lockable) else {
             throw ActionError.itemNotUnlockable(targetItemID)
         }
         guard targetItem.hasProperty(.locked) else {
-            throw ActionError.itemIsUnlocked(targetItemID)
+            // Target is already unlocked. Don't throw, let process handle the message.
+            return
         }
 
         // 5. Check if it's the correct key
         guard targetItem.lockKey == keyItemID else {
             throw ActionError.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
-
-        // --- Unlock Successful ---
-
-        // 6. Update State
-        await engine.updateItemProperties(itemID: targetItemID, removing: .locked)
-
-        // 7. Output Message
-        // Zork: "The <door> is now unlocked."
-        await engine.output("The \(targetItem.name) is now unlocked.")
     }
+
+    public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        // IDs are guaranteed non-nil by validate
+        let targetItemID = command.directObject!
+        let keyItemID = command.indirectObject!
+
+        // Get snapshots (existence guaranteed by validate)
+        guard let targetItem = await engine.item(with: targetItemID),
+              let keyItem = await engine.item(with: keyItemID) else
+        {
+            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
+        }
+
+        // Handle case: Already unlocked (detected in validate)
+        if !targetItem.hasProperty(.locked) {
+            // Manually construct definite article message
+            return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
+        }
+
+        // --- Unlock Successful: Calculate State Changes ---
+        var stateChanges: [StateChange] = []
+
+        // Change 1: Remove .locked from target
+        let oldTargetProps = targetItem.properties
+        var newTargetProps = oldTargetProps
+        newTargetProps.remove(.locked)
+        newTargetProps.insert(.touched) // Also mark target touched
+
+        if oldTargetProps != newTargetProps {
+            let targetPropsChange = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(oldTargetProps),
+                newValue: .itemPropertySet(newTargetProps)
+            )
+            stateChanges.append(targetPropsChange)
+        }
+
+        // Change 2: Add .touched to key (if needed)
+        let oldKeyProps = keyItem.properties
+        if !oldKeyProps.contains(.touched) {
+            var newKeyProps = oldKeyProps
+            newKeyProps.insert(.touched)
+            let keyPropsChange = StateChange(
+                entityId: .item(keyItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(oldKeyProps),
+                newValue: .itemPropertySet(newKeyProps)
+            )
+            stateChanges.append(keyPropsChange)
+        }
+
+        // --- Prepare Result ---
+        // Manually construct definite article message
+        let message = "The \(targetItem.name) is now unlocked."
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
+    }
+
+    // Default postProcess will print the message
 }

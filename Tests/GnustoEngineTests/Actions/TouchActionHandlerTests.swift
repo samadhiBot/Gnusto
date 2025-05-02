@@ -28,10 +28,10 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "rock", rawInput: "touch rock")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "rock")
+        let finalItemState = engine.item(with: "rock")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -58,10 +58,10 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "key", rawInput: "touch key")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "key")
+        let finalItemState = engine.item(with: "key")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -80,22 +80,22 @@ struct TouchActionHandlerTests {
 
         let command = Command(verbID: "touch", rawInput: "touch")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert
+        // Act & Assert
+        await #expect(throws: ActionError.customResponse("Touch what?")) {
+            try await handler.validate(command: command, engine: engine)
+        }
         let output = await mockIO.flush()
-        expectNoDifference(output, "Touch what?")
+        #expect(output.isEmpty)
     }
 
     @Test("Touch fails item not accessible")
     func testTouchFailsItemNotAccessible() async throws {
-        let ghost = Item(
-            id: "ghost",
-            name: "ghostly form",
+        let figurine = Item(
+            id: "figurine",
+            name: "jade figurine",
             parent: .nowhere
         )
-        let game = MinimalGame(items: [ghost])
+        let game = MinimalGame(items: [figurine])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -104,11 +104,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "ghost", rawInput: "touch ghost")
+        let command = Command(verbID: "touch", directObject: "figurine", rawInput: "touch figurine")
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("ghost")) {
-            try await handler.perform(command: command, engine: engine)
+        await #expect(throws: ActionError.itemNotAccessible("figurine")) {
+            try await handler.validate(command: command, engine: engine)
         }
     }
 
@@ -138,10 +138,10 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "gem", rawInput: "touch gem")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "gem")
+        let finalItemState = engine.item(with: "gem")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -173,10 +173,10 @@ struct TouchActionHandlerTests {
         let command = Command(verbID: "touch", directObject: "book", rawInput: "touch book")
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.itemSnapshot(with: "book")
+        let finalItemState = engine.item(with: "book")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -211,7 +211,7 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("The locked chest is closed.")) {
-            try await handler.perform(command: command, engine: engine)
+            try await handler.validate(command: command, engine: engine)
         }
     }
 }

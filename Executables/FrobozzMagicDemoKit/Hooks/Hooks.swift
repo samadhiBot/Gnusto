@@ -66,7 +66,7 @@ enum Hooks {
     /// - Parameter command: The command about to be executed.
     static func beforeEachTurn(engine: GameEngine, command: Command) async -> Bool {
         // Use safe accessors
-        let messageValue = engine.getGameSpecificStateValue(key: Components.Lantern.Constants.pendingMessageKey)
+        let messageValue = engine.getStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 
         // Check for pending messages from daemons or fuses
         if let pendingMessage = messageValue?.value as? String {
@@ -77,8 +77,8 @@ enum Hooks {
         }
 
         // Add atmospheric messages based on location
-        let locationID = engine.playerLocationID() // Safe accessor
-        let turnCount = engine.playerMoves()      // Safe accessor
+        let locationID = engine.gameState.player.currentLocationID // Safe accessor
+        let turnCount = engine.playerMoves      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
         guard turnCount % 5 == 0 else { return false }
@@ -121,11 +121,11 @@ enum Hooks {
     /// - Returns: `true` if the player has an active light source.
     private static func hasActiveLight(engine: GameEngine) async -> Bool {
         // Get player's directly held items
-        let playerItemIDs = engine.itemSnapshots(withParent: .player).map { $0.id }
+        let playerItemIDs = engine.items(withParent: .player).map { $0.id }
 
         // Check for the lantern specifically
         if playerItemIDs.contains(Components.Lantern.Constants.itemID) {
-            let lantern = engine.itemSnapshot(with: Components.Lantern.Constants.itemID)
+            let lantern = engine.item(with: Components.Lantern.Constants.itemID)
             if lantern?.hasProperty(.on) == true {
                 return true // Lit lantern found
             }
@@ -133,7 +133,7 @@ enum Hooks {
 
         // Check for other light sources (like the glowing gem)
         for itemID in playerItemIDs {
-            let item = engine.itemSnapshot(with: itemID)
+            let item = engine.item(with: itemID)
             // Check if it's a light source BUT NOT the lantern (already checked)
             if itemID != Components.Lantern.Constants.itemID,
                item?.hasProperty(.lightSource) == true

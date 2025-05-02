@@ -47,99 +47,225 @@ public struct StandardParser: Parser {
         }
 
         // 5. Identify Verb (handling multi-word synonyms)
-        var matchedVerbID: VerbID? = nil
+        var matchedVerbIDs: Set<VerbID> = [] // Store all potential verb IDs
         var verbTokenCount = 0
         var verbStartIndex = 0
 
         // Iterate through possible starting positions for the verb
         for i in 0..<significantTokens.count {
             var longestMatchLength = 0
-            var potentialMatchID: VerbID? = nil
+            var potentialMatchIDs: Set<VerbID> = [] // Track IDs for the current longest match length
 
             // Check token sequences starting from index i
             for length in (1...min(4, significantTokens.count - i)).reversed() { // Check up to 4-word verbs, reversed for longest match first
                 let subSequence = significantTokens[i..<(i + length)]
                 let verbPhrase = subSequence.joined(separator: " ")
 
-                if let foundVerbID = vocabulary.verbSynonyms[verbPhrase] {
-                    // Found a potential match
+                // Look up the set of verbs associated with this phrase
+                if let foundVerbIDs = vocabulary.verbSynonyms[verbPhrase] { // Now returns Set<VerbID>?
+                    // Found potential matches
                     if length > longestMatchLength {
+                        // New longest length found, clear previous shorter matches and start fresh
                         longestMatchLength = length
-                        potentialMatchID = foundVerbID
-                        // Don't break yet, continue checking shorter phrases from this start index
-                        // in case a shorter phrase is also a verb (though less likely with longest-first check)
+                        potentialMatchIDs = foundVerbIDs // Assign the whole set
+                        verbTokenCount = length // Store the length of this match
+                        verbStartIndex = i // Store the start index
+                    } else if length == longestMatchLength {
+                        // Same length as the current longest, add these IDs to the set
+                        potentialMatchIDs.formUnion(foundVerbIDs) // Use formUnion to add all IDs
                     }
+                    // If length < longestMatchLength, ignore (we only want the longest matches)
                 }
             }
 
-            // If we found the longest possible match starting at index i, use it and stop searching
+            // If we found any matches of the longest possible length starting at index i, use them and stop searching
             if longestMatchLength > 0 {
-                matchedVerbID = potentialMatchID
-                verbTokenCount = longestMatchLength
-                verbStartIndex = i
-                break // Found the first (and longest) verb match, stop outer loop
+                matchedVerbIDs = potentialMatchIDs // Assign the set of IDs found at the longest length
+                // verbTokenCount and verbStartIndex are already set when longestMatchLength was updated
+                break // Found the first (and longest) verb match group, stop outer loop
             }
         }
 
-        guard let verbID = matchedVerbID else {
-             // No known single or multi-word verb/synonym found
-             return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
+
+        // Ensure at least one verb was matched
+        guard !matchedVerbIDs.isEmpty else {
+            // No known single or multi-word verb/synonym found
+            return .failure(.unknownVerb(significantTokens.first ?? significantTokens.joined(separator: " "))) // Use first word as guess
         }
 
-        // 5b. Get Syntax Rules for the Verb
-        let rules = vocabulary.verbDefinitions[verbID]?.syntax ?? [] // Get rules or empty array
-
-        if rules.isEmpty {
-            // No explicit rules defined for this verb.
-            // Succeed ONLY if the input was just the verb phrase.
-            if significantTokens.count == verbTokenCount {
-                let command = Command(verbID: verbID, rawInput: input)
-                return .success(command)
-            } else {
-                // Verb found, but has extra words and no defined syntax rules.
-                return .failure(.badGrammar("I understand the verb '\(verbID.rawValue)', but not the rest of that sentence."))
+        // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
+        var allPotentialRules: [(verbID: VerbID, rule: SyntaxRule)] = []
+        var verbIDsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
+        for verbID in matchedVerbIDs {
+            if let verbDef = vocabulary.verbDefinitions[verbID] {
+                if !verbDef.syntax.isEmpty {
+                    verbIDsWithRules.insert(verbID)
+                    for rule in verbDef.syntax {
+                        allPotentialRules.append((verbID: verbID, rule: rule))
+                    }
+                }
             }
         }
 
-        // 6. Match Tokens Against Syntax Rules (using the non-empty `rules` array)
+        // Handle cases where verb(s) were matched but NONE have rules, and there are extra tokens
+        if allPotentialRules.isEmpty && significantTokens.count > verbTokenCount {
+            // Provide a generic error based on the *first* matched verb ID (arbitrary choice in ambiguity)
+            let firstMatchedID = matchedVerbIDs.first!
+            return .failure(.badGrammar("I understand the verb '\(firstMatchedID.rawValue)', but not the rest of that sentence."))
+        }
+
+        // 6. Match Tokens Against All Potential Syntax Rules
         var successfulParse: Command? = nil
         var bestError: ParseError? = nil
 
-        for rule in rules {
+        // Pre-calculate input preposition once, as it's the same for all rules
+        let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
+
+        for (verbID, rule) in allPotentialRules { // Iterate through all potential rules
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
-                verbID: verbID,
+                verbID: verbID, // <<< Pass the specific verbID for this rule
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
             )
 
-            if case .success(let command) = matchResult {
-                successfulParse = command
-                bestError = nil // Clear error on success
-                break // Found a match, exit the rule loop immediately
-            } else if case .failure(let currentError) = matchResult {
-                // Update bestError based on priority
-                if bestError == nil || (isResolutionError(currentError) && !isResolutionError(bestError!)) {
+            switch matchResult {
+            case .success(let command): // Command already contains the correct verbID from matchRule
+                // Rule matched structurally. Now check prepositions.
+                if let requiredPrep = rule.requiredPreposition {
+                    // Rule requires a specific preposition
+                    if let inputPrep = inputPreposition {
+                        // Input also has a preposition
+                        if requiredPrep == inputPrep {
+                            // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
+                            successfulParse = command // Command has the correct verbID
+                            bestError = nil // Clear any previous error
+                            break // Found the best possible match for this input
+                        } else {
+                            // PREPOSITIONS MISMATCH - Record error, continue
+                            // Use the specific verbID associated with this rule
+                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(verbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
+                            if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
+                                bestError = mismatchError
+                            }
+                            continue // Try next rule, this one is invalid for this input
+                        }
+                    } else {
+                        // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
+                        // Use the specific verbID associated with this rule
+                        let missingPrepError = ParseError.badGrammar("Verb '\(verbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
+                        if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
+                            bestError = missingPrepError
+                        }
+                        continue // Try next rule, this one is invalid for this input
+                    }
+                } else {
+                    // RULE REQUIRES NO SPECIFIC PREPOSITION
+                    // If the input *also* has no preposition, this is a strong match.
+                    // If the input *does* have a preposition, this is still a structural match,
+                    // but potentially weaker than one where prepositions align. ZIL often ignores extra preps.
+                    // Let's treat this as a potential success but keep looking for a better (preposition-matching) rule.
+                    // However, for simplicity now, let's consider it a success unless we find a better one later.
+                    // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
+                    if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
+                        successfulParse = command // Command has the correct verbID
+                        // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
+                    }
+                    // Continue searching for a potentially better match (e.g., one that uses the input preposition)
+                    continue
+                }
+            case .failure(let currentError):
+                // Structural failure reported by matchRule
+                if bestError == nil || shouldReplaceError(existing: bestError!, new: currentError) {
                      bestError = currentError
                 }
-                // Continue to the next rule
+                // Continue to the next rule (implicit in loop structure)
             }
-            // Removed the potentially problematic extra break check here
-        }
+        } // End rule loop
+        endRuleLoop: // Label for goto
 
         // 7. Return Result
         if let command = successfulParse {
-            return .success(command) // Return success if a rule matched
-        } else if let error = bestError {
-             return .failure(error) // Return the best error if no rule matched
+            return .success(command)
+        } else if let error = bestError { // Otherwise return best error found
+             return .failure(error)
         } else {
-             // This should only happen if 'rules' was empty AND the initial checks failed.
-             // Or if matchRule somehow returned neither success nor failure.
-             return .failure(.internalError("Parsing failed unexpectedly for input: \(input)"))
+            // Handle simple verb-only commands or internal error
+             if allPotentialRules.isEmpty && significantTokens.count == verbTokenCount {
+                 // Input was just a verb phrase matching one or more verbs, none of which had rules.
+                 // Pick the first matched verb ID as the canonical one (arbitrary choice).
+                 let firstMatchedID = matchedVerbIDs.first!
+                 let command = Command(verbID: firstMatchedID, rawInput: input)
+                 return .success(command)
+             } else {
+                 // If we get here, rules existed, but none resulted in success or a recorded error.
+                 // This likely means structural matches occurred, but preposition checks failed,
+                 // or no structural matches occurred at all. bestError should ideally have been set.
+                 // Provide a generic grammar error based on the *first* matched verb ID (arbitrary choice).
+                 let firstMatchedID = matchedVerbIDs.first!
+                 return .failure(.badGrammar("I understood '\(firstMatchedID.rawValue)' but couldn't parse the rest of the sentence with its known grammar rules."))
+             }
         }
+    }
+
+    /// Helper to find the preposition in the input tokens *after* the verb phrase.
+    private func findInputPreposition(tokens: [String], startIndex: Int, vocabulary: Vocabulary) -> String? {
+        for i in startIndex..<tokens.count {
+            let currentToken = tokens[i]
+            if vocabulary.prepositions.contains(currentToken) {
+                // Found the first preposition after the verb phrase.
+                return currentToken
+            }
+            // Removed the early break: Continue searching even if we encounter nouns/adjectives,
+            // as the preposition might appear after the direct object phrase.
+        }
+        // No preposition found in the remaining tokens.
+        return nil
+    }
+
+    /// Determines if a new parsing error should replace the existing best error.
+    /// Prioritizes resolution errors > ambiguity > grammar > other.
+    private func isResolutionError(_ error: ParseError) -> Bool {
+        switch error {
+        case .itemNotInScope, .modifierMismatch, .unknownNoun, .pronounNotSet, .pronounRefersToOutOfScopeItem:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private func isAmbiguityError(_ error: ParseError) -> Bool {
+         switch error {
+         case .ambiguity, .ambiguousPronounReference:
+             return true
+         default:
+             return false
+         }
+    }
+
+     private func isGrammarError(_ error: ParseError) -> Bool {
+         switch error {
+         case .badGrammar:
+             return true
+         default:
+             return false
+         }
+     }
+
+    private func errorPriority(_ error: ParseError) -> Int {
+        if isResolutionError(error) { return 4 }
+        if isAmbiguityError(error) { return 3 }
+        if isGrammarError(error) { return 2 }
+        if case .unknownVerb = error { return 1 }
+        if case .emptyInput = error { return 0 }
+        return 0 // Default lowest priority
+    }
+
+    private func shouldReplaceError(existing: ParseError, new: ParseError) -> Bool {
+        return errorPriority(new) > errorPriority(existing)
     }
 
     /// Splits the input string into lowercase tokens.
@@ -172,16 +298,17 @@ public struct StandardParser: Parser {
         tokens: [String],
         verbStartIndex: Int,
         verbID: VerbID,
+        _debugHook: (() -> Void)? = nil, // Add parameter for debug hook
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
+        _debugHook?() // Call the hook
         var tokenCursor = verbStartIndex + 1
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []
         var matchedPreposition: String? = nil
         var matchedDirection: Direction? = nil
-        var matchedParticle: String? = nil
 
         for patternIndex in 1..<rule.pattern.count {
             let tokenType = rule.pattern[patternIndex]
@@ -218,15 +345,19 @@ public struct StandardParser: Parser {
                 let currentToken = tokens[tokenCursor]
                 let expectedPrep = rule.requiredPreposition
                 let isKnownPrep = vocabulary.prepositions.contains(currentToken)
-                if let required = expectedPrep {
-                    guard currentToken == required else {
-                        return .failure(.badGrammar("Expected preposition '\(required)' but found '\(currentToken)'."))
-                    }
-                } else {
-                    guard isKnownPrep else {
-                         return .failure(.badGrammar("Expected a preposition but found '\(currentToken)'."))
-                    }
+
+                // Check if the current token is a known preposition.
+                // The check for *which* specific preposition is required
+                // happens *after* matchRule returns success.
+                guard isKnownPrep else {
+                    let expectedType = expectedPrep ?? "a preposition"
+                    return .failure(.badGrammar("Expected \(expectedType) but found '\(currentToken)'."))
                 }
+
+                // If the rule *does* require a specific preposition, and the current token
+                // *isn't* it, this specific match attempt might be wrong, but don't fail
+                // the entire rule structurally yet. Store the token found.
+                // The calling function (`parse`) will validate if the required one was present.
                 matchedPreposition = currentToken
                 tokenCursor += 1
 
@@ -259,7 +390,6 @@ public struct StandardParser: Parser {
                 guard currentToken == expectedParticle else {
                     return .failure(.badGrammar("Expected '\(expectedParticle)' after '\(tokens[verbStartIndex])' but found '\(currentToken)'."))
                 }
-                matchedParticle = currentToken
                 tokenCursor += 1
             }
         }
@@ -313,60 +443,23 @@ public struct StandardParser: Parser {
             resolvedIndirectObjectResult = .success(nil)
         }
 
-        var finalVerbID = verbID
-
-        switch verbID.rawValue {
-        case "turn", "switch":
-            guard let particle = matchedParticle else {
-                return .failure(.internalError("Verb '\(verbID.rawValue)' matched rule but particle missing."))
-            }
-            guard particle == "on" || particle == "off" else {
-                return .failure(.badGrammar("Expected 'on' or 'off' after '\(verbID.rawValue)', not '\(particle)'."))
-            }
-            finalVerbID = (particle == "on") ? VerbID("turn_on") : VerbID("turn_off")
-
-        case "blow":
-            guard let particle = matchedParticle else {
-                return .failure(.internalError("Verb 'blow' matched rule but particle missing."))
-            }
-            guard particle == "out" else {
-                return .failure(.badGrammar("Expected 'out' after 'blow', not '\(particle)'."))
-            }
-            finalVerbID = VerbID("turn_off")
-
-        case "light":
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb 'light' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-            finalVerbID = VerbID("turn_on")
-
-        case "extinguish":
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb 'extinguish' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-            finalVerbID = VerbID("turn_off")
-
-        default:
-            guard matchedParticle == nil else {
-                return .failure(.badGrammar("Verb '\(verbID.rawValue)' doesn't take a particle like '\(matchedParticle!)'."))
-            }
-        }
-
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
         case (.success(let doID), .success(let ioID)):
             let command = Command(
-                verbID: finalVerbID,
+                verbID: verbID,
                 directObject: doID,
-                directObjectModifiers: doModsExtracted,
+                directObjectModifiers: modsToUseDO,
                 indirectObject: ioID,
-                indirectObjectModifiers: ioModsExtracted,
+                indirectObjectModifiers: modsToUseIO,
                 preposition: matchedPreposition,
                 direction: matchedDirection,
                 rawInput: originalInput
             )
             return .success(command)
-        case (.failure(let error), _): return .failure(error)
-        case (_, .failure(let error)): return .failure(error)
+        case (.failure(let error), _):
+            return .failure(error)
+        case (_, .failure(let error)):
+            return .failure(error)
         }
     }
 
@@ -635,16 +728,6 @@ public struct StandardParser: Parser {
         }
 
         return boundaryIndex
-    }
-
-    /// Determines if a ParseError is related to object resolution issues.
-    private func isResolutionError(_ error: ParseError) -> Bool {
-        switch error {
-        case .unknownNoun, .itemNotInScope, .modifierMismatch, .ambiguity, .pronounNotSet, .pronounRefersToOutOfScopeItem, .ambiguousPronounReference:
-            return true
-        case .emptyInput, .unknownVerb, .badGrammar, .internalError:
-            return false
-        }
     }
 }
 

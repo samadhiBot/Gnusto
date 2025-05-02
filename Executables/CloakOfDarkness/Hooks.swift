@@ -4,33 +4,29 @@ struct Hooks {
     @MainActor
     public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
         guard location == "bar" else { return false }
-        let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
+        let cloakIsWorn = engine.item(with: "cloak")?.hasProperty(.worn) ?? false
         if cloakIsWorn {
-            engine.updateLocationProperties(id: "bar", removing: .isLit)
+            await engine.applyLocationPropertyChange(locationID: "bar", removing: [LocationProperty.isLit])
         } else {
-            engine.updateLocationProperties(id: "bar", adding: .isLit)
+            await engine.applyLocationPropertyChange(locationID: "bar", adding: [LocationProperty.isLit])
         }
         return false
     }
 
     @MainActor
-    public func beforeTurn(engine: GameEngine, command: Command) async -> Bool {
-        let locationID = engine.playerLocationID()
+    public func beforeTurn(engine: GameEngine, command: Command) async throws -> Bool {
+        let locationID = engine.gameState.player.currentLocationID
         guard locationID == "bar" else { return false } // Only care about the bar
 
-        let cloakIsWorn = engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) ?? false
+        let cloakIsWorn = engine.item(with: "cloak")?.hasProperty(.worn) ?? false
 
         if cloakIsWorn {
             // Ensure bar is dark if cloak is worn
-            engine.updateLocationProperties(id: "bar", removing: .isLit)
+            await engine.applyLocationPropertyChange(locationID: "bar", removing: [LocationProperty.isLit])
 
             // Now check for unsafe actions IN THE DARK
             // Re-check lit status *after* potentially removing it
-            let isLitNow = engine.locationSnapshot(with: locationID)?.properties.contains(.isLit) ?? false
-
-            // --- DEBUG ---
-            await engine.output("[DEBUG] In Hook: verb=\(command.verbID), cloakIsWorn=\(cloakIsWorn), isLitNow=\(isLitNow)", style: .debug)
-            // -----------
+            let isLitNow = engine.location(with: locationID)?.properties.contains(LocationProperty.isLit) ?? false
 
             if !isLitNow { // Should definitely be false here if update worked
                 let verb = command.verbID
@@ -48,17 +44,23 @@ struct Hooks {
 
                 // If the action is NOT specifically allowed, THEN it's an unsafe disturbance.
                 if !isActionAllowedInDark {
-                    await engine.output("[DEBUG] In Hook: Unsafe action detected! verb=\(verb)", style: .debug)
-                    await engine.output("You grope around clumsily in the dark. Better be careful.", style: .normal)
-                    engine.incrementGameSpecificStateCounter(key: "disturbedCounter")
-                    return true // Handled
+                    // Increment counter
+                    let currentCount = engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
+                    await engine.applyGameSpecificStateChange(
+                        key: "disturbedCounter",
+                        value: .int(currentCount + 1)
+                    )
+
+                    // Throw error to display message and halt default action
+                    throw ActionError.prerequisiteNotMet("You grope around clumsily in the dark. Better be careful.")
+                    // return true // Implicitly handled by throwing
                 }
             }
             // If we get here, either the room was somehow still lit, or the verb was safe/leaving.
             return false
         } else {
             // Cloak is not worn, ensure bar is lit
-            engine.updateLocationProperties(id: "bar", adding: .isLit)
+            await engine.applyLocationPropertyChange(locationID: "bar", adding: [LocationProperty.isLit])
             return false // Hook didn't handle the command itself
         }
     }

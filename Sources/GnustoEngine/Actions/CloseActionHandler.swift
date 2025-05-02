@@ -1,73 +1,96 @@
 import Foundation
 
 /// Handles the "CLOSE" command.
-public struct CloseActionHandler: ActionHandler {
+public struct CloseActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler
+
+    public func validate(
+        command: Command,
+        engine: GameEngine
+    ) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Close what?") // Consistent prompt
-            return
+            throw ActionError.prerequisiteNotMet("Close what?")
         }
 
-        // 2. Check if item exists and is accessible
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
-        }
-
-        // Inline reachability check (copied from OpenActionHandler)
-        let currentLocationID = await engine.playerLocationID()
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .item(let parentItemID):
-            guard let parentItem = await engine.itemSnapshot(with: parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
-            }
-            let parentParent = parentItem.parent
-            let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
-            if isParentItemInReach {
-                 if parentItem.hasProperty(.surface) || (parentItem.hasProperty(.container) && parentItem.hasProperty(.open)) {
-                    isReachable = true
-                }
-            }
-        case .player:
-            isReachable = true
-        case .nowhere:
-            isReachable = false
-        }
-        guard isReachable else {
+        // 2. Check if item exists
+        guard let targetItem = await engine.item(with: targetItemID) else {
+            // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // 3. Check if item is closeable (using .openable for now)
+        // 3. Check reachability using ScopeResolver
+        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        guard reachableItems.contains(targetItemID) else {
+            throw ActionError.itemNotAccessible(targetItemID)
+        }
+
+        // 4. Check if item is closeable (using .openable for symmetry)
         guard targetItem.hasProperty(.openable) else {
-            // Use the specific error for close attempts
             throw ActionError.itemNotCloseable(targetItemID)
         }
 
-        // 4. Check if already closed
+        // 5. Check if already closed
         guard targetItem.hasProperty(.open) else {
-            // Zork used dummy messages; let's be specific.
-            throw ActionError.itemAlreadyClosed(targetItemID)
+            // Don't throw, let process handle the specific message
+            return
         }
 
-        // 5. Perform Close Action
-        await engine.updateItemProperties(
-            itemID: targetItemID,
-            adding: .touched,
-            removing: .open
-        )
-
-        // 6. Output Message
-        // If an object handler handled the action (returned true), execute won't call this.
-        // If it returned false, we *always* print the default message.
-        await engine.output("You close the \(targetItem.name).")
+        // Note: Closing doesn't usually depend on locked status.
     }
+
+    public func process(
+        command: Command,
+        engine: GameEngine
+    ) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            // Should be caught by validate, but defensive check.
+            throw ActionError.internalEngineError("Close command reached process without direct object.")
+        }
+        guard let targetItem = await engine.item(with: targetItemID) else {
+            // Should be caught by validate.
+            throw ActionError.internalEngineError("Close command target item disappeared between validate and process.")
+        }
+
+        // Handle "already closed" case detected (but not thrown) in validate
+        if !targetItem.hasProperty(.open) {
+            return ActionResult(success: false, message: "The \(targetItem.name) is already closed.")
+        }
+
+        // --- Calculate State Changes ---
+        var stateChanges: [StateChange] = []
+
+        // Change 1: Properties (remove .open, add .touched)
+        let oldProperties = targetItem.properties
+        var newProperties = oldProperties
+        newProperties.remove(.open) // Remove the open flag
+        newProperties.insert(.touched) // Mark as touched
+
+        if oldProperties != newProperties {
+            let propertiesChange = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(oldProperties),
+                newValue: .itemPropertySet(newProperties)
+            )
+            stateChanges.append(propertiesChange)
+        }
+
+        // Closing doesn't usually affect pronouns like taking does.
+
+        // --- Prepare Result ---
+        return ActionResult(
+            success: true,
+            message: "You close the \(targetItem.name).", // Use plain name
+            stateChanges: stateChanges,
+            sideEffects: []
+        )
+    }
+
+    // Rely on default postProcess to print the message.
 }
 
 // TODO: Add/verify ActionError cases: .itemNotCloseable, .itemAlreadyClosed

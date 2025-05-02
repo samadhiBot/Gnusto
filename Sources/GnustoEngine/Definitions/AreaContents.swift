@@ -8,47 +8,57 @@ public protocol AreaContents {
 }
 
 extension AreaContents {
-    /// Returns all `Item` instances defined as properties within the conforming type.
+    /// Returns all `Item` instances defined within array properties of the conforming type.
     ///
-    /// - Note: Uses reflection (`Mirror`) to find properties of type `Item`.
-    /// - Throws: `fatalError` if duplicate `ItemID`s are found.
-    /// - Returns: An array of all defined `Item` instances.
+    /// - Note: Uses reflection (`Mirror`) to find properties of type `[Item]`.
+    /// - Throws: `fatalError` if duplicate `ItemID`s are found across all arrays.
+    /// - Returns: An array containing all defined `Item` instances from all `[Item]` properties.
     public static var items: [Item] {
         let instance = Self()
+        var allItems: [Item] = []
         var seenIds = Set<ItemID>()
         let mirror = Mirror(reflecting: instance)
 
-        return mirror.children.compactMap { child -> Item? in
-            guard let item = child.value as? Item else { return nil }
-
-            // Validate no duplicate IDs
-            guard !seenIds.contains(item.id) else {
-                fatalError("Duplicate ItemID '\(item.id)' found in \(Self.self).")
+        for child in mirror.children {
+            // Check if the child's value is an array of Items
+            if let itemArray = child.value as? [Item] {
+                for item in itemArray {
+                    // Validate no duplicate IDs across all found items
+                    guard !seenIds.contains(item.id) else {
+                        fatalError("Duplicate ItemID '\(item.id)' found in \(Self.self).")
+                    }
+                    seenIds.insert(item.id)
+                    allItems.append(item)
+                }
             }
-            seenIds.insert(item.id)
-            return item
         }
+        return allItems
     }
 
-    /// Returns all `Location` instances defined as properties within the conforming type.
+    /// Returns all `Location` instances defined within array properties of the conforming type.
     ///
-    /// - Note: Uses reflection (`Mirror`) to find properties of type `Location`.
-    /// - Throws: `fatalError` if duplicate `LocationID`s are found.
-    /// - Returns: An array of all defined `Location` instances.
+    /// - Note: Uses reflection (`Mirror`) to find properties of type `[Location]`.
+    /// - Throws: `fatalError` if duplicate `LocationID`s are found across all arrays.
+    /// - Returns: An array containing all defined `Location` instances from all `[Location]` properties.
     public static var locations: [Location] {
         let instance = Self()
+        var allLocations: [Location] = []
         var seenIds = Set<LocationID>()
         let mirror = Mirror(reflecting: instance)
 
-        return mirror.children.compactMap { child -> Location? in
-            guard let location = child.value as? Location else { return nil }
-
-            // Validate no duplicate IDs
-            guard !seenIds.contains(location.id) else {
-                fatalError("Duplicate LocationID '\(location.id)' found in \(Self.self).")
+        for child in mirror.children {
+            // Check if the child's value is an array of Locations
+            if let locationArray = child.value as? [Location] {
+                for location in locationArray {
+                    // Validate no duplicate IDs across all found locations
+                    guard !seenIds.contains(location.id) else {
+                        fatalError("Duplicate LocationID '\(location.id)' found in \(Self.self).")
+                    }
+                    seenIds.insert(location.id)
+                    allLocations.append(location)
+                }
             }
-            seenIds.insert(location.id)
-            return location
         }
+        return allLocations
     }
 }

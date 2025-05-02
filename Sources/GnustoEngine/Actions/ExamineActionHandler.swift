@@ -1,74 +1,146 @@
 import Foundation
 
 /// Handles the "EXAMINE" command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
-public struct ExamineActionHandler: ActionHandler {
+public struct ExamineActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = command.directObject else {
-            await engine.output("Examine what?") // TODO: Zork message?
-            return
+            throw ActionError.customResponse("Examine what?")
         }
 
-        // 2. Check if item exists and is accessible
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        // 2. Check if item exists
+        guard await engine.item(with: targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
+        // 3. Check reachability
         let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
         guard isReachable else {
-            // Error message like "You can't see any... here" is handled by engine's report(actionError:)
             throw ActionError.itemNotAccessible(targetItemID)
         }
-
-        // Mark as touched regardless of what happens next (standard Zork behavior)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
-
-        // 4. Check if item is readable (Zork V-EXAMINE prioritizes P?TEXT)
-        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
-            await engine.output(text) // Print the readable text
-            return
-        }
-
-        // 5. Check if item is a container or door (Zork V-EXAMINE calls V-LOOK-INSIDE)
-        if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
-            await examineContainerOrDoor(targetItem: targetItem, engine: engine)
-            return
-        }
-
-        // 6. Default: Print generic message (Zork default)
-        await engine.output("There's nothing special about the \(targetItem.name).")
     }
 
-    /// Helper function to handle examining containers or doors.
-    private func examineContainerOrDoor(targetItem: ItemSnapshot, engine: GameEngine) async {
-        // Print the item's main description first, if available
-        if let description = targetItem.description, !description.isEmpty {
-            await engine.output(description)
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            throw ActionError.internalEngineError("Examine command reached process without direct object.")
+        }
+        guard let targetItem = await engine.item(with: targetItemID) else {
+            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+        }
+
+        // --- State Change: Mark as Touched ---
+        var stateChanges: [StateChange] = []
+        let initialProperties = targetItem.properties // Use initial state
+        if !initialProperties.contains(.touched) {
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet(initialProperties.union([.touched]))
+            ))
+        }
+
+        // --- Determine Message ---
+        let message: String
+
+        // Priority 1: Readable Text
+        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
+            message = text
+        }
+        // Priority 2: Container/Door Description
+        else if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
+            message = await describeContainerOrDoor(targetItem: targetItem, engine: engine)
+        }
+        // Priority 3: Surface Description
+        else if targetItem.hasProperty(.surface) {
+            message = await describeSurface(targetItem: targetItem, engine: engine)
+        }
+        // Priority 4: Dynamic Long Description
+        else if let descriptionHandler = targetItem.longDescription {
+            message = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+        }
+        // Fallback: Default Message
+        else {
+            message = "There's nothing special about the \(targetItem.name)."
+        }
+
+        // --- Create Result ---
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
+    }
+
+    // MARK: - Private Helpers (Adapted to return String)
+
+    /// Helper function to generate description for containers or doors.
+    private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
+        var descriptionParts: [String] = []
+
+        // Start with the item's main description, if available
+        if let descriptionHandler = targetItem.longDescription {
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+            descriptionParts.append(baseDescription)
         } else {
-            // Fallback if no specific description
-            await engine.output("You examine the \(targetItem.name).")
+            descriptionParts.append("You examine the \(targetItem.name).")
         }
 
         let isOpen = targetItem.hasProperty(.open)
         let isTransparent = targetItem.hasProperty(.transparent)
 
         if isOpen || isTransparent {
-            let contents = await engine.itemSnapshots(withParent: .item(targetItem.id))
+            let contents = await engine.items(withParent: .item(targetItem.id))
             if contents.isEmpty {
-                await engine.output("The \(targetItem.name) is empty.")
+                descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
-                await engine.output("The \(targetItem.name) contains:")
-                for item in contents {
-                    // TODO: Proper sentence construction with articles
-                    await engine.output("  A \(item.name)")
-                }
+                let itemNames = contents.listWithIndefiniteArticles
+                descriptionParts.append("The \(targetItem.name) contains \(itemNames).")
             }
         } else {
-            // Closed and not transparent
-            await engine.output("The \(targetItem.name) is closed.")
+            descriptionParts.append("The \(targetItem.name) is closed.")
         }
+        return descriptionParts.joined(separator: " ")
+    }
+
+    /// Helper function to generate description for surfaces.
+    private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
+        var descriptionParts: [String] = []
+
+        // Start with the item's main description, if available
+        if let descriptionHandler = targetItem.longDescription {
+            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: descriptionHandler,
+                engine: engine
+            )
+            descriptionParts.append(baseDescription)
+        } else {
+            descriptionParts.append("You examine the \(targetItem.name).")
+        }
+
+        // List items on the surface
+        let contents = await engine.items(withParent: .item(targetItem.id))
+        if !contents.isEmpty {
+            let itemNames = contents.listWithIndefiniteArticles
+            descriptionParts.append(
+                "On the \(targetItem.name) is \(itemNames)."
+            )
+        }
+
+        return descriptionParts.joined(separator: " ")
     }
 }

@@ -22,7 +22,7 @@ extension ForestRegion {
     static let outside = Location(
         id: "outside",
         name: "Forest Path",
-        description: """
+        longDescription: """
                 A winding path leads through a dense forest. To the north, you can see \
                 the entrance to a cave. A small stream flows to the west.
                 """,
@@ -36,7 +36,7 @@ extension ForestRegion {
     static let streamBank = Location(
         id: "streamBank",
         name: "Stream Bank",
-        description: """
+        longDescription: """
                 You stand beside a clear, bubbling stream. The water flows from north to south, \
                 disappearing into thick undergrowth. The forest path is to the east.
                 """,
@@ -55,7 +55,7 @@ extension ForestRegion {
         id: "rustyKey",
         name: "key",
         adjectives: "rusty", "iron",
-        description: "An old, rusty iron key. It looks heavy and ornate.",
+        longDescription: "An old, rusty iron key. It looks heavy and ornate.",
         properties: .takable,
         parent: .location("streamBank") // Key is found here
     )
@@ -66,7 +66,7 @@ extension ForestRegion {
         name: "water",
         adjectives: "clear", "cold",
         synonyms: "stream", "liquid",
-        description: "Clear, cold water that looks refreshing.",
+        longDescription: "Clear, cold water that looks refreshing.",
         properties: .ndesc, // Use .ndesc instead of .scenery
         parent: .location("streamBank")
     )

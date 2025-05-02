@@ -12,10 +12,9 @@ public struct DefinitionRegistry {
     /// Dictionary mapping Daemon IDs to their definitions.
     private let daemonDefinitions: [DaemonID: DaemonDefinition]
 
-    /// Custom handlers for specific verb commands.
-    ///
-    /// These can augment and override the default verb handlers.
-    public let customActionHandlers: [VerbID: ActionHandler]
+    /// Optional closures to provide custom action handlers for specific verbs,
+    /// overriding the default engine handlers.
+    public let customActionHandlers: [VerbID: EnhancedActionHandler]
 
     /// Handlers triggered when an action targets a specific item ID.
     public let objectActionHandlers: [ItemID: ObjectActionHandler]
@@ -33,7 +32,7 @@ public struct DefinitionRegistry {
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
-        customActionHandlers: [VerbID: ActionHandler] = [:],
+        customActionHandlers: [VerbID: EnhancedActionHandler] = [:],
         objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
         roomActionHandlers: [LocationID: RoomActionHandler] = [:]
     ) {
@@ -71,13 +70,5 @@ public struct DefinitionRegistry {
     /// - Returns: The `RoomActionHandler` if found, otherwise `nil`.
     internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? {
         roomActionHandlers[id]
-    }
-
-    /// Fetches an `ActionHandler` by its associated `VerbID`.
-    ///
-    /// - Parameter id: The `VerbID` to look up.
-    /// - Returns: The `ActionHandler` if found, otherwise `nil`.
-    internal func verbActionHandler(for id: VerbID) -> ActionHandler? {
-        customActionHandlers[id]
     }
 }

@@ -1,5 +1,5 @@
 /// Represents a recognized verb in the game's command vocabulary.
-public struct Verb: Codable, Identifiable, Sendable {
+public struct Verb: Codable, Equatable, Identifiable, Sendable {
     /// The unique identifier for this verb (e.g., "take").
     public let id: VerbID
 

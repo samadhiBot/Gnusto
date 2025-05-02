@@ -1,27 +1,23 @@
 import Foundation
 
 /// Handles the "TURN ON" action for items, primarily light sources.
-struct TurnOnActionHandler: ActionHandler {
-    func perform(
-        command: Command,
-        engine: GameEngine
-        // ioHandler is accessed via engine
-    ) async throws {
-        // 1. Get direct object ID from command.
+struct TurnOnActionHandler: EnhancedActionHandler {
+
+    // MARK: - EnhancedActionHandler Methods
+
+    func validate(command: Command, engine: GameEngine) async throws {
+        // 1. Get direct object ID
         guard let targetItemID = command.directObject else {
-            // Zork: "Turn on what?"
-            await engine.output("Turn on what?")
-            return // Not an error, just needs clarification
+            throw ActionError.customResponse("Turn on what?")
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.itemSnapshot(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
-        // 3. Verify the item is reachable.
-        // Special case: Allow turning on a light source in the current location even if dark.
-        let currentLocationID = await engine.playerLocationID()
+        // 3. Verify the item is reachable (with light source exception in dark).
+        let currentLocationID = await engine.gameState.player.currentLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLight = targetItem.hasProperty(.lightSource)
@@ -31,59 +27,77 @@ struct TurnOnActionHandler: ActionHandler {
         if isHeld {
             isNormallyReachable = true
         } else if isInLocation {
-            // Check standard reachability only if the room isn't dark or if it isn't a light source
             if !roomIsDark || !isLight {
                 let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
                 isNormallyReachable = reachableItems.contains(targetItemID)
             } else {
-                // It's a light source in a dark room - allow interaction
-                isNormallyReachable = true
+                isNormallyReachable = true // Allow turning on light in dark room
             }
-        } // If not held or in location, it's definitely not reachable
-
+        }
         guard isNormallyReachable else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // Mark as touched regardless of outcome (standard Zork behavior)
-        await engine.updateItemProperties(itemID: targetItemID, adding: .touched)
-
         // 4. Check if the item has the `.device` property.
-        // Zork V-LAMP-ON checks LIGHTBIT first, but let's check device for broader applicability.
-        // This differs slightly from Zork 1 but makes sense for a general engine.
-        // TODO: Revisit if we need a separate verb for non-light devices.
         guard targetItem.hasProperty(.device) else {
-            // Zork: "You can't turn that on."
-            throw ActionError.prerequisiteNotMet("You can't turn that on.") // Use generic failure
+            throw ActionError.prerequisiteNotMet("You can't turn that on.")
         }
 
         // 5. Check if the item already has the `.on` property.
         if targetItem.hasProperty(.on) {
-            // Zork V-LAMP-ON: "It is already on."
-            await engine.output("It's already on.")
-            return
+            throw ActionError.customResponse("It's already on.")
+        }
+    }
+
+    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = command.directObject else {
+            throw ActionError.internalEngineError("TURN ON command reached process without direct object.")
+        }
+        guard let targetItem = await engine.item(with: targetItemID) else {
+            // Should be caught by validate
+            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
         }
 
-        // 6. Check if it's specifically a light source (for room illumination logic)
-        let isLightSource = targetItem.hasProperty(.lightSource)
+        // --- State Changes ---
+        var stateChanges: [StateChange] = []
+        let initialProperties = targetItem.properties // Use initial state
 
-        // Capture current lit status before turning on
-        let wasLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-
-        // 7. Add the `.on` property to the item.
-        await engine.updateItemProperties(itemID: targetItemID, adding: .on)
-
-        // 8. Print "You turn the [item name] on."
-        // Zork V-LAMP-ON: "The brass lantern is now on."
-        await engine.output("The \(targetItem.name) is now on.")
-
-        // 9. Check if the location was previously dark and is now lit.
-        // Only describe the location if it was dark AND the item turned on is a light source.
-        if isLightSource {
-            let isNowLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-            if !wasLit && isNowLit {
-                await engine.describeCurrentLocation()
-            }
+        // Add touched property change if needed
+        if !initialProperties.contains(.touched) {
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet(initialProperties.union([.touched]))
+            ))
         }
+
+        // Add .on property change (based on initial state + touched)
+        let propertiesAfterTouch = initialProperties.union(stateChanges.isEmpty ? [] : [.touched])
+        let propertiesAfterOn = propertiesAfterTouch.union([.on])
+        // Only add the change if .on was not already present initially
+        if !initialProperties.contains(.on) { // Ensure we only add if it was off
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                // Old value depends on whether touched was added *before* this change conceptually
+                oldValue: .itemPropertySet(propertiesAfterTouch),
+                newValue: .itemPropertySet(propertiesAfterOn)
+            ))
+        }
+
+        // --- Determine Message ---
+        let message = "The \(targetItem.name) is now on."
+
+        // --- Side Effects (Optional) ---
+        // Check if the room became lit. If so, the engine loop will describe it.
+        // No explicit side effect needed here to trigger re-description.
+
+        // --- Create Result ---
+        return ActionResult(
+            success: true,
+            message: message,
+            stateChanges: stateChanges
+        )
     }
 }

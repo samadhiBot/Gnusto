@@ -16,10 +16,9 @@ struct RemoveActionHandlerTests {
             properties: .takable, .wearable, .worn, // Held, wearable, worn
             parent: .player
         )
-
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        var mockParser = MockParser()
         let engine = GameEngine(
             game: game,
             parser: mockParser,
@@ -27,20 +26,43 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
+        mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == true)
+        let initialProperties = engine.item(with: "cloak")?.properties ?? []
+        #expect(initialProperties.contains(.worn) == true)
+        let initialHistory = engine.gameState.changeHistory
+        #expect(initialHistory.isEmpty)
 
         // Act
-        try await handler.perform(command: command, engine: engine)
+        await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = engine.itemSnapshot(with: "cloak")
+        let finalCloakState = engine.item(with: "cloak")
         #expect(finalCloakState?.hasProperty(.worn) == false, "Cloak should NOT have .worn property")
+        #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You take off the cloak.")
+
+        // Assert Change History
+        let expectedChanges = [
+            StateChange(
+                entityId: .item("cloak"),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(initialProperties),
+                newValue: .itemPropertySet([.takable, .wearable, .touched]) // .worn removed, .touched added
+            ),
+            StateChange(
+                entityId: .global,
+                propertyKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet(["cloak"])
+            )
+        ]
+        let finalHistory = engine.gameState.changeHistory
+        expectNoDifference(finalHistory, expectedChanges)
     }
 
     @Test("Remove fails if item not worn (but held)")
@@ -51,73 +73,80 @@ struct RemoveActionHandlerTests {
             properties: .takable, .wearable, // Held, wearable, NOT worn
             parent: .player
         )
-
         let game = MinimalGame(items: [cloak])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "take off cloak")
 
-        // Initial state check
-        #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == false)
-
-        // Act
-        try await handler.perform(command: command, engine: engine)
-
-        // Assert State Unchanged
-        #expect(engine.itemSnapshot(with: "cloak")?.hasProperty(.worn) == false)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You are not wearing the cloak.")
+        // Act & Assert Error (on validate)
+        await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
+            try await handler.validate(command: command, engine: engine)
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        // Cloak is not in inventory in this setup
-        let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let game = MinimalGame() // Cloak doesn't exist here
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
         let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
-        // Assume parser resolved "cloak", handler must verify it's held (or worn, implicitly meaning held)
 
-        // Act & Assert Error
-        // The handler should throw itemNotHeld (or similar check)
+        // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
-             try await handler.perform(command: command, engine: engine)
+             try await handler.validate(command: command, engine: engine)
         }
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
         let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
         // Command with nil directObject
         let command = Command(verbID: "remove", rawInput: "remove")
 
-        // Act
-        try await handler.perform(command: command, engine: engine)
+        // Act & Assert Error (on validate)
+        await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
+             try await handler.validate(command: command, engine: engine)
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
+    }
 
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Remove what?")
+    @Test("Remove fails if item is fixed (cursed)")
+    func testRemoveFailsIfFixed() async throws {
+        let amulet = Item(
+            id: "amulet",
+            name: "cursed amulet",
+            properties: .wearable, .worn, .fixed, // Worn and fixed
+            parent: .player
+        )
+        let game = MinimalGame(items: [amulet])
+        let engine = GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
+
+        // Act & Assert Error (on validate)
+        await #expect(throws: ActionError.itemNotRemovable("amulet")) {
+            try await handler.validate(command: command, engine: engine)
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 }

@@ -1,15 +1,13 @@
 import Foundation
+import OSLog
 
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
 /// and IO handler, and executes player commands using registered ActionHandlers.
 @MainActor
-public class GameEngine {
-
-    // MARK: - Properties
-
+public class GameEngine: Sendable {
     /// The current state of the game world.
-    public private(set) var gameState: GameState
+    public internal(set) var gameState: GameState
 
     /// The parser responsible for understanding player input.
     private let parser: Parser
@@ -24,11 +22,17 @@ public class GameEngine {
     /// The registry holding static game definitions (fuses, daemons, etc.).
     public let registry: DefinitionRegistry
 
+    /// The registry for dynamic description handlers.
+    public let descriptionHandlerRegistry: DescriptionHandlerRegistry
+
     /// Registered handlers for specific verb commands.
-    private var actionHandlers = [VerbID: ActionHandler]()
+    private var actionHandlers = [VerbID: EnhancedActionHandler]()
 
     /// Active timed events (Fuses) - Runtime storage with closures.
     private var activeFuses = [FuseID: Fuse]()
+
+    /// A logger used for unhandled error warnings.
+    private let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
 
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
@@ -49,6 +53,47 @@ public class GameEngine {
     /// and no further action is required.
     public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
+    // MARK: - Default Handlers
+
+    /// Default action handlers provided by the engine.
+    /// Games can override these via the `DefinitionRegistry`.
+    private static let defaultActionHandlers: [VerbID: EnhancedActionHandler] = [
+        // Movement & World Interaction
+        "close": CloseActionHandler(),
+        "examine": ExamineActionHandler(),
+        "go": GoActionHandler(),
+        "insert": InsertActionHandler(),
+        "lock": LockActionHandler(),
+        "look": LookActionHandler(),
+        "open": OpenActionHandler(),
+        "put-on": PutOnActionHandler(),
+        "unlock": UnlockActionHandler(),
+
+        // Inventory Management
+        "drop": DropActionHandler(),
+        "inventory": InventoryActionHandler(),
+        "remove": RemoveActionHandler(),
+        "take": TakeActionHandler(),
+        "wear": WearActionHandler(),
+
+        // Other Actions
+        "listen": ListenActionHandler(),
+        "read": ReadActionHandler(),
+        "smell": SmellActionHandler(),
+        "taste": TasteActionHandler(),
+        "think": ThinkAboutActionHandler(),
+        "touch": TouchActionHandler(),
+        "turn off": TurnOffActionHandler(),
+        "turn on": TurnOnActionHandler(),
+        "wait": WaitActionHandler(),
+
+        // Meta Actions
+        "quit": QuitActionHandler(),
+        "score": ScoreActionHandler(),
+
+        // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
+    ]
+
     // MARK: - Initialization
 
     /// Creates a new `GameEngine` instance from a game definition.
@@ -66,8 +111,9 @@ public class GameEngine {
         self.parser = parser
         self.ioHandler = ioHandler
         self.registry = game.registry
+        self.descriptionHandlerRegistry = DescriptionHandlerRegistry()
         self.actionHandlers = game.registry.customActionHandlers
-            .merging(Self.actionHandlerDefaults) { (custom, _) in custom }
+            .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
 
@@ -83,92 +129,40 @@ public class GameEngine {
         self.activeFuses = fuses
     }
 
-    // Add Placeholder Handler Struct (Temporary)
-    fileprivate struct PlaceholderActionHandler: ActionHandler {
-        let verb: String
+    // MARK: - Fuse & Daemon Management (Runtime Only)
 
-        func perform(
-            command: Command,
-            engine: GameEngine
-        ) async throws {
-            await engine.output("Sorry, the default handler for '\(verb)' is not implemented yet.")
-        }
-    }
-
-    // MARK: - Fuse & Daemon Management
-
-    /// Adds or updates a fuse based on its definition in the registry.
-    /// If a fuse with the same ID already exists, its timer is reset using the provided or default turns.
-    /// - Parameters:
-    ///   - id: The `FuseID` of the fuse to add or update.
-    ///   - overrideTurns: Optional number of turns to set for the fuse. If `nil`, the default turns from the `FuseDefinition` are used.
-    /// - Returns: `true` if the fuse was successfully added or updated, `false` if no definition was found for the ID.
-    @discardableResult
-    public func addFuse(
+    /// Adds or updates a fuse in the ENGINE'S RUNTIME state based on its definition.
+    /// Does NOT modify persistent GameState.
+    /// If a fuse with the same ID already exists, its timer is reset.
+    private func updateRuntimeFuse(
         id: FuseID,
         overrideTurns: Int? = nil
-    ) -> Bool {
-        // 1. Find the definition in the registry.
+    ) throws {
+        // Find definition
         guard let definition = registry.fuseDefinition(for: id) else {
-            // Log warning or error: Attempting to add an undefined fuse.
-            print("Warning: No FuseDefinition found for fuse ID '\(id)'. Cannot add fuse.")
-            // Consider throwing an error or returning a more specific result.
-            return false
+            throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(id)'. Cannot update runtime fuse.")
         }
-
-        // 2. Determine the number of turns.
+        // Determine turns
         let turns = overrideTurns ?? definition.initialTurns
-
-        // 3. Create the runtime Fuse instance.
+        // Create/update runtime instance
         let runtimeFuse = Fuse(id: id, turns: turns, action: definition.action)
-
-        // 4. Update runtime dictionary.
-        activeFuses[id] = runtimeFuse
-
-        // 5. Update persistent state in GameState.
-        gameState.activeFuses[id] = turns
-
-        return true
+        self.activeFuses[id] = runtimeFuse
     }
 
-    /// Removes a fuse by its ID (runtime and persistent state).
-    public func removeFuse(id: FuseID) {
-        // Remove from runtime dictionary
-        activeFuses.removeValue(forKey: id)
-        // Remove from persistent state in GameState
-        gameState.activeFuses.removeValue(forKey: id)
+    /// Removes a fuse from the ENGINE'S RUNTIME state by its ID.
+    /// Does NOT modify persistent GameState.
+    private func removeRuntimeFuse(id: FuseID) {
+        self.activeFuses.removeValue(forKey: id)
     }
 
-    /// Registers a daemon to run periodically by adding its ID to the active set in GameState.
-    /// The daemon must be defined in the registry.
-    /// - Parameter id: The `DaemonID` of the daemon to register.
-    /// - Returns: `true` if the daemon was successfully registered, `false` if no definition was found for the ID.
-    @discardableResult
-    public func registerDaemon(id: DaemonID) -> Bool {
-        // 1. Verify the definition exists in the registry.
-        guard registry.daemonDefinition(for: id) != nil else {
-            print("Warning: No DaemonDefinition found for daemon ID '\(id)'. Cannot register daemon.")
-            return false
-        }
-        // 2. Add the ID to the active set in GameState.
-        gameState.activeDaemons.insert(id)
-        return true
-    }
-
-    /// Unregisters a daemon by removing its ID from the active set in GameState.
-    /// Does nothing if no daemon with the given ID is active.
-    /// - Parameter id: The `DaemonID` to unregister.
-    public func unregisterDaemon(id: DaemonID) {
-        gameState.activeDaemons.remove(id)
-    }
+    // Note: Daemons do not currently have separate runtime state managed by the engine,
+    // they operate directly based on the gameState.activeDaemons set each tick.
+    // Therefore, registerDaemon and unregisterDaemon helpers are no longer needed.
 
     // MARK: - Game Loop
 
     /// Starts and runs the main game loop.
     public func run() async {
-        // Register handlers *after* actor initialization
-        actionHandlers.merge(Self.actionHandlerDefaults) { (custom, _) in custom }
-
         await ioHandler.setup()
         await describeCurrentLocation() // Initial look
 
@@ -211,7 +205,20 @@ public class GameEngine {
         let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
-        gameState.player.moves += 1
+        do {
+            let oldMoves = gameState.player.moves
+            let change = StateChange(
+                entityId: .player,
+                propertyKey: StatePropertyKey.playerMoves,
+                oldValue: StateValue.int(oldMoves),
+                newValue: StateValue.int(oldMoves + 1)
+            )
+            try gameState.apply(change)
+        } catch {
+            // Log error if applying the move increment fails (should be rare)
+            print("Critical Error: Failed to apply player move increment state change: \(error)")
+            // Depending on desired robustness, might want to halt or handle differently.
+        }
 
         // 3. Execute Command or Handle Error
         switch parseResult {
@@ -224,6 +231,19 @@ public class GameEngine {
                 return // Hook might quit
             }
             await execute(command: command)
+
+            // Describe location AFTER executing command if no error occurred during execution
+            // (Errors are handled within execute/report)
+            // Only describe if the command wasn't a quit command (already handled)
+            // Also check if shouldQuit was set during execute
+            if command.verbID != "quit" && !shouldQuit {
+                // TODO: Only describe if the action *might* have changed the view
+                // (e.g., movement, light change, taking/dropping items). LOOK already handles it.
+                if command.verbID != "look" { // Avoid double-description for LOOK
+                    await describeCurrentLocation()
+                }
+            }
+
         case .failure(let error):
             await report(parseError: error)
         }
@@ -240,29 +260,58 @@ public class GameEngine {
         var fusesToExecute: [Fuse] = []
 
         // Create a copy of keys to iterate over, allowing safe modification
-        let fuseIDs = Array(activeFuses.keys)
+        // Need to iterate over the runtime activeFuses managed by the engine
+        let runtimeFuseIDs = Array(self.activeFuses.keys)
 
-        for id in fuseIDs {
-            guard var fuse = activeFuses[id] else { continue } // Ensure fuse wasn't removed
+        for id in runtimeFuseIDs {
+            guard var fuse = self.activeFuses[id] else { continue } // Check runtime fuse
+            let oldTurns = fuse.turnsRemaining
 
             fuse.turnsRemaining -= 1
+            let newTurns = fuse.turnsRemaining
 
-            if fuse.turnsRemaining <= 0 {
+            // Update runtime fuse state immediately
+            self.activeFuses[id] = fuse
+
+            // Create StateChange to update persistent state
+            let updateChange = StateChange(
+                entityId: .global,
+                propertyKey: StatePropertyKey.updateFuseTurns(fuseId: id),
+                oldValue: StateValue.int(oldTurns),
+                newValue: StateValue.int(newTurns)
+            )
+            do {
+                try gameState.apply(updateChange)
+            } catch {
+                print("TickClock Error: Failed to apply fuse turn update for \(id): \(error)")
+                // Consider how to handle this failure - continue or halt?
+            }
+
+            if newTurns <= 0 {
                 expiredFuseIDs.append(id)
                 fusesToExecute.append(fuse)
-                // Remove from persistent state now that it has expired
-                gameState.activeFuses.removeValue(forKey: id)
-            } else {
-                // Update runtime fuse state
-                activeFuses[id] = fuse
-                // Update persistent state with new remaining turns
-                gameState.activeFuses[id] = fuse.turnsRemaining
+
+                // Create StateChange to remove from persistent state
+                let removeChange = StateChange(
+                    entityId: .global,
+                    propertyKey: StatePropertyKey.removeActiveFuse(fuseId: id),
+                    oldValue: StateValue.int(oldTurns),
+                    newValue: StateValue.int(0)
+                )
+                do {
+                    try gameState.apply(removeChange)
+                } catch {
+                    print("TickClock Error: Failed to apply fuse removal for \(id): \(error)")
+                    // Consider how to handle this failure
+                }
             }
+            // Removed direct modification of gameState.activeFuses
         }
 
-        // Remove expired fuses from runtime dictionary *before* executing actions
+        // Remove expired fuses from ENGINE'S runtime dictionary *before* executing actions
+        // Persistent state removal is handled by the StateChange above
         for id in expiredFuseIDs {
-            activeFuses.removeValue(forKey: id)
+            self.activeFuses.removeValue(forKey: id)
         }
 
         // Execute actions of expired fuses
@@ -272,7 +321,7 @@ public class GameEngine {
         }
 
         // --- Process Daemons ---
-        // Execute daemons whose frequency matches the current turn
+        // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
             guard let definition = registry.daemonDefinition(for: daemonID) else {
@@ -294,12 +343,12 @@ public class GameEngine {
 
     /// Looks up and executes the appropriate ActionHandler for the given command.
     /// - Parameter command: The command to execute.
-    private func execute(command: Command) async {
+    func execute(command: Command) async {
         var actionHandled = false
         var actionError: Error? = nil // To store error from object handlers
 
         // --- Room BeforeTurn Hook ---
-        let currentLocationID = playerLocationID()
+        let currentLocationID = gameState.player.currentLocationID
         if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, pass command using correct enum case syntax
@@ -310,7 +359,7 @@ public class GameEngine {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                await ioHandler.print("Error in room beforeTurn handler: \(error)", style: .debug)
+                logger.warning("💥 Error in room beforeTurn handler: \(error, privacy: .public)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -350,7 +399,7 @@ public class GameEngine {
             if let specificError = error as? ActionError {
                 await report(actionError: specificError)
             } else {
-                await ioHandler.print("An unexpected error occurred in an object handler: \(error)", style: .debug)
+                logger.warning("💥 An unexpected error occurred in an object handler: \(error, privacy: .public)")
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {
@@ -363,35 +412,49 @@ public class GameEngine {
             // Correct: Look up the Verb definition directly
             guard let verb = gameState.vocabulary.verbDefinitions[command.verbID] else {
                 // This case should ideally not be reached if parser validates verbs
-                await ioHandler.print("Internal Error: Unknown verb ID '\(command.verbID)' reached execution.", style: .debug)
+                logger.warning("""
+                    💥 Internal Error: Unknown verb ID \
+                    '\(command.verbID.rawValue, privacy: .public)' reached execution.
+                    """)
                 await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                 return
             }
 
-            // If the room is dark and the verb requires light, report the error and stop.
-            if !isLit && verb.requiresLight {
+            // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
+            let isTurnOn = command.verbID == VerbID("turn on") // Special case for turning on lights
+            if !isLit && verb.requiresLight && !isTurnOn {
                 await report(actionError: .roomIsDark)
                 // Do not proceed to execute the handler
             } else {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verbID] else {
                     // No handler registered for this verb (should match vocabulary definition)
-                    await ioHandler.print("Internal Error: No ActionHandler registered for verb ID '\(command.verbID)'.", style: .debug)
+                    logger.warning("""
+                        💥 Internal Error: No ActionHandler registered for verb ID  \
+                        '\(command.verbID.rawValue, privacy: .public)'.
+                        """)
                     await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                     return
                 }
 
-                // Execute the default handler
+                // --- Execute Handler (New Logic) ---
                 do {
-                    try await verbHandler.perform(command: command, engine: self)
-                } catch let actionError as ActionError {
-                    // Handle specific action failures
-                    await report(actionError: actionError)
+                    // Directly use the enhanced handler pipeline
+                    try await verbHandler.validate(command: command, engine: self)
+                    let result = try await verbHandler.process(command: command, engine: self)
+
+                    // Process the result (apply changes, print message)
+                    try await processActionResult(result)
+
+                } catch let actionErr as ActionError {
+                    // Catch ActionError specifically for reporting
+                    await report(actionError: actionErr)
                 } catch {
-                    // Handle unexpected errors during action execution
-                    await ioHandler.print("An unexpected error occurred while performing the action: \(error)", style: .debug)
-                    await ioHandler.print("Sorry, something went wrong.")
+                    // Catch any other unexpected errors from handlers
+                    logger.error("💥 Unexpected error during handler execution: \(error)")
+                    await ioHandler.print("An unexpected problem occurred.")
                 }
+                // --- End Execute Handler ---
             }
         }
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
@@ -402,10 +465,133 @@ public class GameEngine {
                 // Call handler, ignore return value, use correct enum case syntax
                 _ = try await roomHandler(self, RoomActionMessage.afterTurn(command))
             } catch {
-                await ioHandler.print("Error in room afterTurn handler: \(error)", style: .debug)
+                logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }
             // Check if handler quit the game
             if shouldQuit { return }
+        }
+    }
+
+    // MARK: - State Change & Side Effect Application
+
+    /// Processes the result of an action, applying state changes and printing the message.
+    ///
+    /// - Parameter result: The `ActionResult` returned by an `EnhancedActionHandler`.
+    /// - Throws: Re-throws errors encountered during state application.
+    private func processActionResult(_ result: ActionResult) async throws {
+        // 1. Apply State Changes
+        // Errors during apply will propagate up.
+        for change in result.stateChanges {
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.error("""
+                    💥 Failed to apply state change during processActionResult:
+                       - \(error, privacy: .public)
+                       - Change: \(String(describing: change), privacy: .public)
+                    """)
+                throw error // Re-throw the error to be caught by execute()
+            }
+        }
+
+        // 2. Print Result Message
+        await ioHandler.print(result.message)
+
+        // TODO: Handle SideEffects if they are added to ActionResult?
+    }
+
+    /// Applies a single state change to the game state by forwarding to the central `GameState.apply` method.
+    /// - Parameter change: The `StateChange` to apply.
+    /// - Parameter gameState: The GameState instance to modify (passed as inout).
+    /// - Throws: An error if the change cannot be applied (forwarded from `GameState.apply`).
+    private func applyStateChange(_ change: StateChange, gameState: inout GameState) throws {
+        // Forward directly to GameState's apply method, modifying the inout parameter.
+        try gameState.apply(change)
+    }
+
+    /// Processes a single side effect, potentially triggering StateChanges.
+    /// - Parameter effect: The `SideEffect` to process.
+    /// - Throws: An error if processing the side effect fails (e.g., definition not found, apply fails).
+    private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
+        let fuseId = effect.targetId.rawValue // Assuming targetId is FuseID for fuse effects
+        let daemonId = effect.targetId.rawValue // Assuming targetId is DaemonID for daemon effects
+
+        switch effect.type {
+        case .startFuse:
+            // 1. Get definition to find initial turns
+            guard let definition = registry.fuseDefinition(for: fuseId) else {
+                throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(fuseId)' in startFuse side effect.")
+            }
+            // 2. Determine turns (use parameter if provided, else definition)
+            let initialTurns: Int
+            if case .int(let t)? = effect.parameters["turns"] {
+                initialTurns = t
+            } else {
+                initialTurns = definition.initialTurns
+            }
+            // 3. Create StateChange to add to persistent state
+            let addChange = StateChange(
+                entityId: .global,
+                propertyKey: StatePropertyKey.addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
+                // No oldValue for add
+                newValue: StateValue.int(initialTurns)
+            )
+            // 4. Apply the StateChange
+            try gameState.apply(addChange)
+            // 5. Update the engine's runtime fuse state
+            try updateRuntimeFuse(id: fuseId, overrideTurns: initialTurns)
+
+        case .stopFuse:
+            // 1. Get current turns from persistent state for oldValue validation
+            let oldTurns = gameState.activeFuses[fuseId]
+            // 2. Create StateChange to remove from persistent state
+            let removeChange = StateChange(
+                entityId: .global,
+                propertyKey: StatePropertyKey.removeActiveFuse(fuseId: fuseId),
+                oldValue: oldTurns != nil ? StateValue.int(oldTurns!) : nil,
+                newValue: StateValue.int(0)
+            )
+            // 3. Apply the StateChange
+            try gameState.apply(removeChange)
+            // 4. Remove from engine's runtime fuse state
+            removeRuntimeFuse(id: fuseId)
+
+        case .runDaemon:
+            // 1. Check definition exists (required for daemon execution later)
+            guard registry.daemonDefinition(for: daemonId) != nil else {
+                throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(daemonId)' in runDaemon side effect.")
+            }
+            // 2. Check if already active in persistent state
+            let isAlreadyActive = gameState.activeDaemons.contains(daemonId)
+            // 3. Create StateChange only if not already active
+            if !isAlreadyActive {
+                let addDaemonChange = StateChange(
+                    entityId: .global,
+                    propertyKey: StatePropertyKey.addActiveDaemon(daemonId: daemonId),
+                    oldValue: StateValue.bool(false),
+                    newValue: StateValue.bool(true)
+                )
+                // 4. Apply the StateChange
+                try gameState.apply(addDaemonChange)
+            }
+
+        case .stopDaemon:
+            // 1. Check if active in persistent state for oldValue validation
+            let wasActive = gameState.activeDaemons.contains(daemonId)
+            // 2. Create StateChange only if it was active
+            if wasActive {
+                let removeDaemonChange = StateChange(
+                    entityId: .global,
+                    propertyKey: StatePropertyKey.removeActiveDaemon(daemonId: daemonId),
+                    oldValue: StateValue.bool(true),
+                    newValue: StateValue.bool(false)
+                )
+                // 3. Apply the StateChange
+                try gameState.apply(removeDaemonChange)
+            }
+
+        case .scheduleEvent:
+            print("Warning: SideEffectType.scheduleEvent not yet implemented.")
         }
     }
 
@@ -416,22 +602,35 @@ public class GameEngine {
         let locationID = gameState.player.currentLocationID
 
         // 1. Check for light
-        guard scopeResolver.isLocationLit(locationID: locationID) else {
+        let isLitResult = scopeResolver.isLocationLit(locationID: locationID)
+        guard isLitResult else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
             // Do not describe the room or list items.
             return
         }
 
-        // 2. If lit, proceed with description
-        guard let currentLocation = gameState.locations[locationID] else {
-            await ioHandler.print("Error: Current location not found!", style: .debug)
+        // 2. If lit, get snapshot and print name
+        guard let location = location(with: locationID) else {
+            logger.warning("💥 Error: Current location snapshot not found!")
             return
         }
-        await ioHandler.print("--- \(currentLocation.name) ---", style: .strong)
-        await ioHandler.print(currentLocation.description)
+        await ioHandler.print("--- \(location.name) ---", style: .strong)
 
-        // 3. List visible items
+        // 3. Generate and print the description using the handler
+        if let descriptionHandler = location.longDescription {
+            let description = await descriptionHandlerRegistry.generateDescription(
+                for: location,
+                using: descriptionHandler,
+                engine: self
+            )
+            await ioHandler.print(description)
+        } else {
+            // Fallback if no description handler is set
+            await ioHandler.print("You are in \(location.name).") // Default message
+        }
+
+        // 4. List visible items
         await listItemsInLocation(locationID: locationID)
     }
 
@@ -440,17 +639,16 @@ public class GameEngine {
         // 1. Get visible item IDs using ScopeResolver
         let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID)
 
-        // 2. Get the actual Item objects/snapshots for the visible IDs
-        let visibleItems = visibleItemIDs.compactMap { gameState.items[$0] } // Fetch full Item objects
+        // 2. Asynchronously fetch Item objects/snapshots for the visible IDs
+        let visibleItems = visibleItemIDs.compactMap(item(with:))
 
+        // 3. Format and print the list if not empty
         if !visibleItems.isEmpty {
-            await ioHandler.print("You can see:")
-            for item in visibleItems { // Iterate through visible Items
-                // TODO: Use item descriptions (firstDesc, subDesc) based on touched state?
-                // TODO: Proper sentence formatting with articles
-                await ioHandler.print("  A \(item.name)")
-            }
+            // Use the helper to generate a sentence like "a foo, a bar, and a baz"
+            let itemListing = visibleItems.listWithIndefiniteArticles
+            await ioHandler.print("You can see \(itemListing) here.")
         }
+        // No output if no items are visible
     }
 
     /// Displays the status line.
@@ -458,69 +656,79 @@ public class GameEngine {
         guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else { return }
         await ioHandler.showStatusLine(
             roomName: currentLocation.name,
-            score: gameState.player.score, // Use actual score/turns
+            score: gameState.player.score,
             turns: gameState.player.moves
         )
     }
 
     /// Reports a parsing error to the player.
     private func report(parseError: ParseError) async {
-        // Provide more user-friendly messages
-        let message: String
-        switch parseError {
+        let message = switch parseError {
         case .emptyInput:
-            message = "I beg your pardon?" // More classic response
+            "I beg your pardon?"
         case .unknownVerb(let verb):
-            message = "I don't know the verb '\(verb)'."
+            "I don't know the verb '\(verb)'."
         case .unknownNoun(let noun):
-            message = "I don't see any '\(noun)' here."
+            "I don't see any '\(noun)' here."
         case .itemNotInScope(let noun):
-            message = "You can't see any '\(noun)' here."
+            "You can't see any '\(noun)' here."
         case .modifierMismatch(let noun, let modifiers):
-            message = "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
+            "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
         case .ambiguity(let text), .ambiguousPronounReference(let text):
-            message = text // Use the message generated by the parser
+            text
         case .badGrammar(let text):
-            message = text
+            text
         case .pronounNotSet(let pronoun):
-            message = "I don't know what '\(pronoun)' refers to."
+            "I don't know what '\(pronoun)' refers to."
         case .pronounRefersToOutOfScopeItem(let pronoun):
-            message = "You can't see what '\(pronoun)' refers to right now."
-        case .internalError(let details):
-            message = "A weird parsing error occurred: \(details)" // Should be rare
+            "You can't see what '\(pronoun)' refers to right now."
+        case .internalError:
+            "A strange buzzing sound indicates something is wrong."
         }
         await ioHandler.print(message)
+        if case .internalError(let details) = parseError {
+            logger.error("💥 ParseError: \(details, privacy: .public)")
+        }
     }
 
     /// Reports user-friendly messages for action failures to the player.
     private func report(actionError: ActionError) async {
+        // Determine the user-facing message
         let message = switch actionError {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
         case .containerIsFull(let item):
-            "The \(theThat(item)) is full."
+            "\(theThat(item).capitalizedFirst) is full."
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
+        case .customResponse(let message):
+            message
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
-        case .internalEngineError(let msg):
-            // User-facing generic message; more details could be logged.
-            "A strange buzzing sound indicates something is wrong.\n  • \(msg)"
+        case .general(let message):
+            message
+        case .internalEngineError:
+            "A strange buzzing sound indicates something is wrong."
         case .invalidDirection:
             "You can't go that way."
+        case .invalidIndirectObject(let objectName):
+            "You can't use \(theThat(objectName)) for that."
         case .itemAlreadyClosed(let item):
             "\(theThat(item).capitalizedFirst) is already closed."
         case .itemAlreadyOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
+        case .itemIsAlreadyWorn(let item):
+            "You are already wearing \(theThat(item))."
         case .itemIsLocked(let item):
             "\(theThat(item).capitalizedFirst) is locked."
+        case .itemIsNotWorn(let item):
+            "You are not wearing \(theThat(item))."
         case .itemIsUnlocked(let item):
             "\(theThat(item).capitalizedFirst) is already unlocked."
         case .itemNotAccessible(let item):
-            // This often implies visibility/reachability issues.
-            "You don't see \(theThat(item, alternate: "any")) here."
+            "You can't see \(anySuch(item))."
         case .itemNotCloseable(let item):
-            "You can't close \(theThat(item))."
+            "\(theThat(item).capitalizedFirst) is not something you can close."
         case .itemNotDroppable(let item):
             "You can't drop \(theThat(item))."
         case .itemNotEdible(let item):
@@ -548,22 +756,47 @@ public class GameEngine {
         case .playerCannotCarryMore:
             "Your hands are full."
         case .prerequisiteNotMet(let customMessage):
-            // Use the custom message if provided, otherwise a generic one.
             customMessage.isEmpty ? "You can't do that." : customMessage
         case .roomIsDark:
-            // Usually handled by describeCurrentLocation, but a fallback action error.
             "It's too dark to do that."
         case .targetIsNotAContainer(let item):
             "You can't put things in \(theThat(item))."
         case .targetIsNotASurface(let item):
             "You can't put things on \(theThat(item))."
+        case .toolMissing(let tool):
+            "You need \(tool) for that."
+        case .unknownVerb(let verb):
+            "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            // Correct: Calculate keyDesc inline to fix switch expression structure
-            "The \(itemSnapshot(with: keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
+            "The \(item(with: keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
+        case .stateValidationFailed: // Provide a user-facing message
+            "A strange buzzing sound indicates something is wrong with the state validation."
         }
-        // Only print if the message isn't empty (some errors might be handled silently)
-        if !message.isEmpty {
-            await ioHandler.print(message)
+        await ioHandler.print(message)
+
+        // Log detailed errors separately
+        switch actionError {
+        case .internalEngineError(let msg):
+            logger.error("💥 ActionError: Internal Engine Error: \(msg, privacy: .public)")
+        case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
+            // Construct the log string first
+            let logDetail = """
+            State Validation Failed!
+                - Change: \(String(describing: change))
+                - Expected Old Value: \(String(describing: change.oldValue))
+                - Actual Old Value: \(String(describing: actualOldValue))
+            """
+            logger.error("💥 ActionError: \(logDetail, privacy: .public)")
+        default:
+            break // No detailed logging needed for other handled errors
+        }
+    }
+
+    private func anySuch(_ itemID: ItemID) -> String {
+        if let item = item(with: itemID), item.hasProperty(.touched) {
+            "the \(item.name)"
+        } else {
+            "any such thing"
         }
     }
 
@@ -577,337 +810,373 @@ public class GameEngine {
         _ itemID: ItemID,
         alternate: String = "that"
     ) -> String {
-        itemSnapshot(with: itemID)?.theName ?? alternate
+        if let item = item(with: itemID) {
+            "the \(item.name)"
+        } else {
+            alternate
+        }
     }
 
-    // MARK: - State Access Helpers (Public but @MainActor isolated)
-
-    /// Safely retrieves a snapshot of an item by its ID from the current game state.
-    /// This method runs on the GameEngine's actor context.
-    /// - Parameter id: The `ItemID` of the item to retrieve.
-    /// - Returns: An `ItemSnapshot` if the item is found, otherwise `nil`.
-    public func itemSnapshot(with id: ItemID) -> ItemSnapshot? {
-        guard let item = gameState.items[id] else { return nil }
-        return ItemSnapshot(item: item)
-    }
-
-    /// Safely retrieves snapshots of items that have a specific parent entity.
-    /// This method runs on the GameEngine's actor context.
-    /// - Parameter parent: The `ParentEntity` to filter by.
-    /// - Returns: An array of `ItemSnapshot`s for items with the specified parent.
-    public func itemSnapshots(withParent parent: ParentEntity) -> [ItemSnapshot] {
-        return gameState.items.values
-            .filter { $0.parent == parent }
-            .map { ItemSnapshot(item: $0) }
-    }
-
-    /// Safely retrieves the player's current location ID.
-    public func playerLocationID() -> LocationID {
-        return gameState.player.currentLocationID
-    }
-
-    /// Safely retrieves a snapshot of the player's current location.
-    public func playerLocationSnapshot() -> LocationSnapshot? {
-        locationSnapshot(with: gameState.player.currentLocationID)
-    }
-
-    /// Safely retrieves the player's score.
-    public func playerScore() -> Int {
-        return gameState.player.score
-    }
-
-    /// Safely retrieves the player's move count.
-    public func playerMoves() -> Int {
-        return gameState.player.moves
-    }
-
-    /// Checks if the player can carry an item of the given size based on current inventory weight and capacity.
-    /// - Parameter itemSize: The size/weight of the item to potentially carry.
-    /// - Returns: `true` if the player can carry the item, `false` otherwise.
-    public func canPlayerCarry(itemSize: Int) -> Bool {
-        let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
-        let playerCapacity = gameState.player.carryingCapacity
-        // ZIL often allowed exactly matching capacity
-        return (currentWeight + itemSize) <= playerCapacity
-    }
-
-    /// Safely retrieves a snapshot of a location by its ID from the current game state.
-    /// This method runs on the GameEngine's actor context.
-    /// - Parameter id: The `LocationID` of the location to retrieve.
-    /// - Returns: A `LocationSnapshot` if the location is found, otherwise `nil`.
-    public func locationSnapshot(with id: LocationID) -> LocationSnapshot? {
-        guard let location = gameState.locations[id] else { return nil }
-        return LocationSnapshot(location: location)
-    }
-
-    // MARK: - State Mutation Helpers (Public but @MainActor isolated)
-
-    /// Updates the properties of a specific location.
+    /// Returns `the {name}` of an item, or an alternate reference if the name is unknown.
+    ///
     /// - Parameters:
-    ///   - id: The `LocationID` of the location to update.
-    ///   - adding: A set of `LocationProperty` to add. Pass `nil` to ignore.
-    ///   - removing: A set of `LocationProperty` to remove. Pass `nil` to ignore.
-    public func updateLocationProperties(
-        id: LocationID,
-        adding: LocationProperty...,
-        removing: LocationProperty...
-    ) {
-        guard let location = gameState.locations[id] else {
-            // Log warning: Location not found
-            print("Warning: Attempted to update properties for non-existent location '\(id)'.")
+    ///   - itemName: The item name.
+    ///   - alternate: An alternate reference to the item.
+    /// - Returns: `the {name}` of an item, or `that` if name is unknown.
+    private func theThat(
+        _ itemName: String?,
+        alternate: String = "that"
+    ) -> String {
+        if let itemName {
+            "the \(itemName)"
+        } else {
+            alternate
+        }
+    }
+
+    // MARK: - State Query Helpers (Public API for Handlers/Hooks)
+
+    /// Retrieves the current state of a specific location.
+    /// - Parameter id: The `LocationID` of the location to retrieve.
+    /// - Returns: A `Location` struct if the location is found, otherwise `nil`.
+    public func location(with id: LocationID) -> Location? {
+        gameState.locations[id]
+    }
+
+    /// Retrieves the current state of a specific item.
+    /// - Parameter id: The `ItemID` of the item to retrieve.
+    /// - Returns: An `Item` struct if the item is found, otherwise `nil`.
+    public func item(with id: ItemID) -> Item? {
+        gameState.items[id]
+    }
+
+    /// Retrieves the current state of all items with a specific parent.
+    /// - Parameter parent: The `ParentEntity` to filter items by.
+    /// - Returns: An array of `Item` structs for items with the specified parent.
+    public func items(withParent parent: ParentEntity) -> [Item] {
+        gameState.items.values
+            .filter { $0.parent == parent }
+    }
+
+    // MARK: - State Mutation Helpers (Public API for Handlers/Hooks)
+
+    /// Applies a change to a specific item's properties.
+    /// This creates and applies the necessary `StateChange`.
+    /// It logs an error and returns if the item doesn't exist or the change fails.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item to modify.
+    ///   - adding: A set of properties to add (optional).
+    ///   - removing: A set of properties to remove (optional).
+    public func applyItemPropertyChange(
+        itemID: ItemID,
+        adding: Set<ItemProperty> = [],
+        removing: Set<ItemProperty> = []
+    ) async {
+        guard let item = item(with: itemID) else {
+            logger
+                .warning("""
+                    💥 Cannot apply property change to non-existent item \
+                    '\(itemID.rawValue, privacy: .public)'.
+                    """)
             return
         }
-        location.properties.formUnion(adding)
-        location.properties.subtract(removing)
-        // Reassign the modified location object back to the dictionary
-        gameState.locations[id] = location
+        let oldProps = item.properties
+        var newProps = oldProps
+        newProps.formUnion(adding)
+        newProps.subtract(removing)
+
+        // Only apply if there's an actual change
+        if oldProps != newProps {
+            let change = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(oldProps),
+                newValue: .itemPropertySet(newProps)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("""
+                    💥 Failed to apply item property change for \
+                    '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
+            }
+        }
     }
 
-    /// Updates the parent entity of a specific item.
+    /// Applies a change to a global flag.
+    ///
+    /// - Parameters:
+    ///   - flag: The key of the flag to set.
+    ///   - value: The new boolean value for the flag.
+    public func applyFlagChange(flag: String, value: Bool) async {
+        let oldValue = gameState.flags[flag]
+        // Only apply if value is actually changing
+        if oldValue != value {
+            let change = StateChange(
+                entityId: EntityID.global,
+                propertyKey: StatePropertyKey.flag(key: flag),
+                oldValue: oldValue != nil ? StateValue.bool(oldValue!) : nil,
+                newValue: StateValue.bool(value)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("""
+                    💥 Failed to apply flag change for '\(flag, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
+            }
+        }
+    }
+
+    /// Updates the pronoun reference (e.g., "it") to point to a specific item.
+    ///
+    /// - Parameters:
+    ///   - pronoun: The pronoun (e.g., "it").
+    ///   - itemID: The ItemID the pronoun should refer to.
+    public func applyPronounChange(pronoun: String, itemID: ItemID) async {
+        let newSet: Set<ItemID> = [itemID]
+        let oldSet = gameState.pronouns[pronoun]
+
+        if oldSet != newSet {
+            let change = StateChange(
+                entityId: .global,
+                propertyKey: .pronounReference(pronoun: pronoun),
+                oldValue: oldSet != nil ? .itemIDSet(oldSet!) : nil,
+                newValue: .itemIDSet(newSet)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("""
+                    💥 Failed to apply pronoun change for '\(pronoun, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
+            }
+        }
+    }
+
+    /// Moves an item to a new parent entity.
+    ///
     /// - Parameters:
     ///   - itemID: The ID of the item to move.
-    ///   - newParent: The new `ParentEntity` for the item.
-    public func updateItemParent(
-        itemID: ItemID,
-        newParent: ParentEntity
-    ) {
-        guard let item = gameState.items[itemID] else {
-            print("Warning: Attempted to update parent for non-existent item '\(itemID)'.")
+    ///   - newParent: The target parent entity.
+    public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
+        guard let moveItem = item(with: itemID) else {
+            logger.warning(
+                "💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'."
+            )
             return
         }
-        // TODO: Add checks? (e.g., prevent moving item inside itself?)
-        item.parent = newParent
-        gameState.items[itemID] = item
-    }
+        let oldParent = moveItem.parent
 
-    /// Updates the properties of a specific item.
-    /// - Parameters:
-    ///   - itemID: The `ItemID` of the item to update.
-    ///   - adding: A set of `ItemProperty` to add. Pass `nil` to ignore.
-    ///   - removing: A set of `ItemProperty` to remove. Pass `nil` to ignore.
-    public func updateItemProperties(
-        itemID: ItemID,
-        adding: ItemProperty...,
-        removing: ItemProperty...
-    ) {
-        guard let item = gameState.items[itemID] else {
-            print("Warning: Attempted to update properties for non-existent item '\(itemID)'.")
-            return
-        }
-        if !adding.isEmpty {
-            item.properties.formUnion(adding)
-        }
-        if !removing.isEmpty {
-            item.properties.subtract(removing)
-        }
-        gameState.items[itemID] = item
-    }
-
-    /// Updates the exits of a specific location.
-    /// - Parameters:
-    ///   - id: The `LocationID` of the location to update.
-    ///   - adding: A dictionary of `[Direction: Exit]` to add/update. Pass `nil` to ignore.
-    ///   - removing: An array of `Direction`s whose exits should be removed. Pass `nil` to ignore.
-    public func updateLocationExits(
-        id: LocationID,
-        adding: [Direction: Exit] = [:],
-        removing: Direction...
-    ) {
-        guard let location = gameState.locations[id] else {
-            print("Warning: Attempted to update exits for non-existent location '\(id)'.")
-            return
-        }
-        for (direction, exit) in adding {
-            location.exits[direction] = exit
-        }
-        for direction in removing {
-            location.exits.removeValue(forKey: direction)
-        }
-        gameState.locations[id] = location
-    }
-
-    /// Updates the referent for a specific pronoun (e.g., "it").
-    /// - Parameters:
-    ///   - pronoun: The pronoun string (e.g., "it", "them").
-    ///   - itemID: The ID of the item the pronoun now refers to.
-    public func updatePronounReference(
-        pronoun: String,
-        itemID: ItemID
-    ) {
-        // Assumes single item reference for now, like ZIL default
-        gameState.updatePronoun(pronoun.lowercased(), referringTo: itemID)
-    }
-
-    /// Updates the referents for a specific pronoun (e.g., "them").
-    /// - Parameters:
-    ///   - pronoun: The pronoun string (e.g., "it", "them").
-    ///   - itemIDs: The set of item IDs the pronoun now refers to.
-    public func updatePronounReference(
-        pronoun: String,
-        itemIDs: Set<ItemID>
-    ) {
-        gameState.updatePronoun(pronoun.lowercased(), referringTo: itemIDs)
-    }
-
-    /// Updates a value in the game-specific state dictionary.
-    /// Creates the dictionary if it doesn't exist.
-    /// - Parameters:
-    ///   - key: The key for the state value.
-    ///   - value: The `AnyCodable` value to set.
-    public func updateGameSpecificState(key: String, value: AnyCodable) {
-        gameState.gameSpecificState[key] = value
-    }
-
-    /// Increments an integer value stored in the game-specific state.
-    /// Initializes the value to 1 if the key doesn't exist or the current value is not an Int.
-    /// - Parameter key: The key for the integer counter.
-    public func incrementGameSpecificStateCounter(key: String) {
-        let currentValue = gameState.gameSpecificState[key]?.value as? Int ?? 0
-        updateGameSpecificState(key: key, value: AnyCodable(currentValue + 1))
-    }
-
-    /// Safely retrieves a value from the game-specific state dictionary as AnyCodable.
-    /// - Parameter key: The key for the state value.
-    /// - Returns: The `AnyCodable` value if found, otherwise `nil`.
-    public func getGameSpecificStateValue(key: String) -> AnyCodable? {
-        return gameState.gameSpecificState[key]
-    }
-
-    /// Safely retrieves a String value from the game-specific state dictionary.
-    /// Performs the type casting within the MainActor context.
-    /// - Parameter key: The key for the state value.
-    /// - Returns: The `String` value if found and castable, otherwise `nil`.
-    public func getGameSpecificStateString(key: String) -> String? {
-        return gameState.gameSpecificState[key]?.value as? String
-    }
-
-    /// Safely retrieves the value of a boolean flag from the game state.
-    /// - Parameter key: The key for the flag.
-    /// - Returns: The `Bool` value if the flag exists, otherwise `nil`.
-    public func getFlagValue(key: String) -> Bool? {
-        return gameState.flags[key]
-    }
-
-    /// Safely sets the value of a boolean flag in the game state.
-    /// - Parameters:
-    ///   - key: The key for the flag.
-    ///   - value: The `Bool` value to set.
-    public func setFlagValue(key: String, value: Bool) {
-        gameState.flags[key] = value
-    }
-
-    /// Safely removes a key-value pair from the game-specific state dictionary.
-    /// - Parameter key: The key to remove.
-    public func removeGameSpecificStateValue(key: String) {
-        gameState.gameSpecificState.removeValue(forKey: key)
-    }
-
-    /// Safely updates the player's score by a given delta.
-    /// - Parameter delta: The amount to add to the score (can be negative).
-    public func updatePlayerScore(delta: Int) {
-        gameState.player.score += delta
-    }
-
-    // MARK: - Public Accessors & Mutators (Thread-Safe)
-
-    /// Updates the player's current location and triggers the onEnterRoom hook.
-    public func changePlayerLocation(to locationID: LocationID) async {
-        guard gameState.locations[locationID] != nil else {
-            await ioHandler.print("Error: Attempted to move player to invalid location \(locationID)", style: .debug)
-            return
-        }
-        gameState.player.currentLocationID = locationID
-
-        // --- Call the general onEnterRoom hook ---
-        if await onEnterRoom?(self, locationID) ?? false { return }
-
-        // Check if hook quit the game
-        if shouldQuit { return }
-
-        // --- Call RoomActionHandler: On Enter Room ---
-        if let roomHandler = registry.roomActionHandler(for: locationID) {
-            do {
-                // Call handler, ignore return value for onEnter, use correct enum case syntax
-                _ = try await roomHandler(self, RoomActionMessage.onEnter)
-            } catch {
-                await ioHandler.print("Error in room onEnter handler: \(error)", style: .debug)
+        // Check if destination is valid (e.g., Location exists)
+        if case .location(let locID) = newParent {
+            guard location(with: locID) != nil else {
+                logger.warning("""
+                    💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
+                    non-existent location '\(locID.rawValue, privacy: .public)'.
+                    """)
+                return
             }
-            // Check if handler quit the game
-            if shouldQuit { return }
+        } else if case .item(let containerID) = newParent {
+             guard item(with: containerID) != nil else {
+                 logger
+                     .warning("""
+                        💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \
+                        non-existent container '\(containerID.rawValue, privacy: .public)'.
+                        """)
+                return
+            }
+            // TODO: Add container capacity check?
+        }
+
+        if oldParent != newParent {
+            let change = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemParent,
+                oldValue: .parentEntity(oldParent),
+                newValue: .parentEntity(newParent)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)")
+            }
         }
     }
 
-    /// Sets the flag to end the game loop after the current turn.
-    public func quitGame() {
-        shouldQuit = true
-        // Optionally print a final message immediately or let the loop handle it.
-        // await ioHandler.print("Goodbye!") // Can be done here or in run()
+    /// Moves the player to a new location.
+    ///
+    /// - Parameter newLocationID: The ID of the destination location.
+    public func applyPlayerMove(to newLocationID: LocationID) async {
+        let oldLocationID = gameState.player.currentLocationID
+
+        // Check if destination is valid
+        guard location(with: newLocationID) != nil else {
+            logger
+                .warning(
+                    "💥 Cannot move player to non-existent location '\(newLocationID.rawValue, privacy: .public)'."
+                )
+            return
+        }
+
+        if oldLocationID != newLocationID {
+            let change = StateChange(
+                entityId: .player,
+                propertyKey: .playerLocation,
+                oldValue: .locationID(oldLocationID),
+                newValue: .locationID(newLocationID)
+            )
+            do {
+                try gameState.apply(change)
+
+                // --- Trigger onEnterRoom Hook --- (Moved from changePlayerLocation)
+                if let hook = onEnterRoom {
+                    if await hook(self, newLocationID) {
+                        // Hook handled everything, potentially quit game.
+                        return
+                    }
+                }
+
+            } catch {
+                logger.warning(
+                    "💥 Failed to apply player move to '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)"
+                )
+            }
+        }
     }
 
-    // MARK: - Output Helpers
+    /// Retrieves the full change history.
+    ///
+    /// - Returns: An array of `StateChange` objects.
+    public func getChangeHistory() -> [StateChange] {
+        gameState.changeHistory
+    }
 
-    /// Displays text to the player using the configured IOHandler.
+    /// Signals the engine to stop the main game loop after the current turn.
+    public func requestQuit() {
+        self.shouldQuit = true
+    }
+
+    /// Retrieves the current set of item IDs referenced by a pronoun.
+    ///
+    /// - Parameter pronoun: The pronoun string (e.g., "it").
+    /// - Returns: The set of `ItemID`s the pronoun refers to, or `nil` if not set.
+    public func getPronounReference(pronoun: String) -> Set<ItemID>? {
+        gameState.pronouns[pronoun.lowercased()]
+    }
+
+    /// Retrieves the value of a game-specific state variable.
+    ///
+    /// - Parameter key: The key (`GameStateKey`) for the game-specific state variable.
+    /// - Returns: The `StateValue` if found, otherwise `nil`.
+    public func getStateValue(key: GameStateKey) -> StateValue? {
+        gameState.gameSpecificState[key]
+    }
+
+    /// Applies a change to a game-specific state variable.
+    ///
     /// - Parameters:
-    ///   - text: The text to display.
-    ///   - style: The desired text style.
-    ///   - newline: Whether to append a newline (defaults to true).
-    public func output(
-        _ text: String,
-        style: TextStyle = .normal,
-        newline: Bool = true
+    ///   - key: The key (`GameStateKey`) for the game-specific state.
+    ///   - value: The new `StateValue`.
+    public func applyGameSpecificStateChange(key: GameStateKey, value: StateValue) async {
+        let oldValue = gameState.gameSpecificState[key] // Read using GameStateKey
+
+        // Only apply if the value is changing
+        if value != oldValue {
+            let change = StateChange( // Add explicit type
+                entityId: .global,
+                propertyKey: StatePropertyKey.gameSpecificState(key: key), // Use GameStateKey
+                oldValue: oldValue, // Pass the existing StateValue? as oldValue
+                newValue: value
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("💥 Failed to apply game specific state change for key '\(key.rawValue, privacy: .public)': \(error, privacy: .public)")
+            }
+        }
+    }
+
+    /// Applies a change to a specific location's properties.
+    ///
+    /// - Parameters:
+    ///   - locationID: The ID of the location to modify.
+    ///   - adding: A set of properties to add (optional).
+    ///   - removing: A set of properties to remove (optional).
+    public func applyLocationPropertyChange(
+        locationID: LocationID,
+        adding: Set<LocationProperty> = [],
+        removing: Set<LocationProperty> = []
     ) async {
-        await ioHandler.print(text, style: style, newline: newline)
+        guard let location = location(with: locationID) else {
+            logger
+                .warning("""
+                    💥 Cannot apply property change to non-existent location \
+                    '\(locationID.rawValue, privacy: .public)'.
+                    """)
+            return
+        }
+        let oldProps = location.properties
+        var newProps = oldProps
+        newProps.formUnion(adding)
+        newProps.subtract(removing)
+
+        if oldProps != newProps {
+            let change = StateChange(
+                entityId: .location(locationID),
+                propertyKey: .locationProperties,
+                oldValue: .locationPropertySet(oldProps),
+                newValue: .locationPropertySet(newProps)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("""
+                    💥 Failed to apply location property change for \
+                    '\(locationID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
+            }
+        }
     }
 
-    // MARK: - State Query Helpers
-
-    /// Checks if the player currently holds the specified item.
-    /// - Parameter itemID: The ID of the item to check for.
-    /// - Returns: `true` if the player holds the item, `false` otherwise.
-    public func playerHasItem(itemID: ItemID) -> Bool {
-        // Access gameState safely within the MainActor context
-        return gameState.items[itemID]?.parent == .player
-        // Alternative, if itemsInInventory is efficient:
-        // return gameState.itemsInInventory().contains(itemID)
+    /// Retrieves the value of a global flag.
+    ///
+    /// - Parameter key: The key of the flag to retrieve.
+    /// - Returns: The boolean value of the flag, or `false` if not set.
+    public func getFlagValue(key: String) -> Bool {
+        gameState.flags[key] ?? false
     }
-}
 
-extension GameEngine {
-    private static let actionHandlerDefaults: [VerbID: ActionHandler] = [
-        "blow out": TurnOffActionHandler(),
-        "close": CloseActionHandler(),
-        "drop": DropActionHandler(),
-        "examine": LookActionHandler(),
-        "extinguish": TurnOffActionHandler(),
-        "go": GoActionHandler(),
-        "hang": PutActionHandler(),
-        "light": TurnOnActionHandler(),
-        "listen": ListenActionHandler(),
-        "lock": LockActionHandler(),
-        "look": LookActionHandler(),
-        "open": OpenActionHandler(),
-        "put": PutActionHandler(),
-        "read": ReadActionHandler(),
-        "remove": RemoveActionHandler(),
-        "smell": SmellActionHandler(),
-        "take": TakeActionHandler(),
-        "taste": TasteActionHandler(),
-        "think-about": ThinkAboutActionHandler(),
-        "touch": PlaceholderActionHandler(verb: "touch"),
-        "turn_off": TurnOffActionHandler(),
-        "turn_on": TurnOnActionHandler(),
-        "unlock": UnlockActionHandler(),
-        "wait": WaitActionHandler(),
-        "wear": WearActionHandler(),
+    /// Retrieves the optional value of a global flag.
+    ///
+    /// - Parameter key: The key of the flag to retrieve.
+    /// - Returns: The boolean value of the flag if set, otherwise `nil`.
+    public func getOptionalFlagValue(key: String) -> Bool? {
+        gameState.flags[key]
+    }
 
-        // Meta
-        "brief": PlaceholderActionHandler(verb: "brief"), // Placeholder
-        "help": PlaceholderActionHandler(verb: "help"), // Placeholder
-        "inventory": InventoryActionHandler(), // Need to create this
-        "quit": QuitActionHandler(),
-        "restore": PlaceholderActionHandler(verb: "restore"), // Placeholder
-        "save": PlaceholderActionHandler(verb: "save"), // Placeholder
-        "score": ScoreActionHandler(),
-        "verbose": PlaceholderActionHandler(verb: "verbose"), // Placeholder
-    ]
+    // MARK: - Player State Accessors
+
+    /// The player's current score.
+    public var playerScore: Int {
+        gameState.player.score
+    }
+
+    /// The number of turns the player has taken.
+    public var playerMoves: Int {
+        gameState.player.moves
+    }
+
+    /// Checks if the player can carry a given item based on their current inventory weight and capacity.
+    /// - Parameter item: The item to check.
+    /// - Returns: `true` if the player can carry the item, `false` otherwise.
+    public func playerCanCarry(_ item: Item) -> Bool {
+        let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
+        let capacity = gameState.player.carryingCapacity
+        return (currentWeight + item.size) <= capacity
+    }
 }

@@ -1,6 +1,6 @@
 ---
-description: 
-globs: 
+description:
+globs:
 alwaysApply: true
 ---
 # Style Guide
@@ -118,4 +118,22 @@ public init(
     properties: LocationProperty...,
     globals: ItemID...
 ) {...}
+```
+
+- NEVER add redundant type annotations
+
+```swift
+// Wrong:
+let change: StateChange = StateChange(  // Redundant type annotation
+    entityId: EntityID.global,  // Type already specified in function signature
+    propertyKey: StatePropertyKey.gameSpecificState(key: key),  // Type already specified in function signature
+    newValue: value
+)
+
+// Right:
+let change = StateChange(
+    entityId: .global,
+    propertyKey: .gameSpecificState(key: key),
+    newValue: value
+)
 ```

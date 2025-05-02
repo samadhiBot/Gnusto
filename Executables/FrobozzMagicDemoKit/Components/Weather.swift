@@ -24,12 +24,12 @@ extension Components {
                 frequency: 10 // Change every 10 turns
             ) { engine in
                 // Only affects outdoor locations
-                let locationID = engine.playerLocationID()
-                let location = engine.locationSnapshot(with: locationID)
+                let locationID = engine.gameState.player.currentLocationID
+                let location = engine.location(with: locationID)
 
                 // Randomly change the weather
                 let weatherStates = ["sunny", "cloudy", "rainy"]
-                let currentWeather = engine.getGameSpecificStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
+                let currentWeather = engine.getStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
 
                 // Choose a different weather state
                 var newWeather = currentWeather
@@ -76,7 +76,7 @@ extension Components {
             // Set initial weather state using updateGameSpecificState
             // It safely handles nil dictionary and existing keys
             // Needs await for MainActor isolated call
-            if engine.getGameSpecificStateValue(key: Constants.weatherStateKey) == nil {
+            if engine.getStateValue(key: Constants.weatherStateKey) == nil {
                 engine.updateGameSpecificState(key: Constants.weatherStateKey, value: AnyCodable("sunny"))
             }
 

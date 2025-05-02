@@ -1,20 +1,21 @@
 import Foundation
 
 /// Handles movement commands (e.g., "GO NORTH", "NORTH", "N").
-public struct GoActionHandler: ActionHandler {
+public struct GoActionHandler: EnhancedActionHandler {
 
     public init() {}
 
-    public func perform(command: Command, engine: GameEngine) async throws {
-        // 1. Identify Direction (Assume parser sets command.direction)
+    // MARK: - EnhancedActionHandler Methods
+
+    public func validate(command: Command, engine: GameEngine) async throws {
+        // 1. Identify Direction
         guard let direction = command.direction else {
-            // This should be caught by parser ensuring direction commands are valid
             throw ActionError.internalEngineError("Go command processed without a direction.")
         }
 
         // 2. Get Current Location data
-        let currentLocationID = await engine.playerLocationID()
-        guard let currentLoc = await engine.locationSnapshot(with: currentLocationID) else {
+        let currentLocationID = await engine.gameState.player.currentLocationID
+        guard let currentLoc = await engine.location(with: currentLocationID) else {
             throw ActionError.internalEngineError("Player's current location ID '\(currentLocationID)' is invalid.")
         }
 
@@ -25,15 +26,15 @@ public struct GoActionHandler: ActionHandler {
 
         // 4. Check Exit Conditions
 
-        // Check for static blocked message first (highest priority override)
+        // Check for static blocked message first
         if let staticBlockedMessage = exit.blockedMessage {
             throw ActionError.directionIsBlocked(staticBlockedMessage)
         }
 
         // Check required key
         if let keyID = exit.requiredKey {
-            // Correct: Use an engine method to check inventory for concurrency safety
-            let playerHasKey = await engine.playerHasItem(itemID: keyID)
+            let inventory = await engine.items(withParent: .player)
+            let playerHasKey = inventory.contains { $0.id == keyID }
             if !playerHasKey {
                 // TODO: Check Zork message for lacking a key for a passage
                 throw ActionError.directionIsBlocked("You lack the key required to pass.")
@@ -43,27 +44,41 @@ public struct GoActionHandler: ActionHandler {
         // Check door status if applicable
         if exit.isDoor {
             if !exit.isOpen {
-                // Standard message for closed door
                 throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
             }
-            if exit.isLocked {
-                // Standard message for locked door
-                throw ActionError.directionIsBlocked("The \(direction.rawValue) door seems to be locked.")
-            }
+            // Note: Lock check removed - UnlockAction should handle setting isLocked = false when isOpen is set true.
+            // If a door can be open *and* locked, this needs reconsideration. Zork doors usually auto-unlock when opened.
+        }
+    }
+
+    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+        // Validation passed, find exit again (state might have changed, though unlikely for exits)
+        guard let direction = command.direction,
+              let currentLoc = await engine.location(with: await engine.gameState.player.currentLocationID),
+              let exit = currentLoc.exits[direction]
+        else {
+            // Should not happen if validate passed, but defensive check
+            throw ActionError.internalEngineError("Exit disappeared between validate and process for GO command.")
         }
 
-        // --- Movement Successful ---
+        // --- Create State Change ---
+        let oldLocationID = await engine.gameState.player.currentLocationID
+        let newLocationID = exit.destination
 
-        // 5. Update Player Location using the engine method that triggers hooks
-        await engine.changePlayerLocation(to: exit.destination)
+        let change = StateChange(
+            entityId: .player,
+            propertyKey: .playerLocation,
+            oldValue: .locationID(oldLocationID),
+            newValue: .locationID(newLocationID)
+        )
 
-        // 6. Describe New Location
-        // The GameEngine loop usually handles describing the location after a successful turn.
-        // However, explicitly calling it here ensures it happens immediately after movement.
-        await engine.describeCurrentLocation()
-
-        // 7. Output Message (Optional)
-        // Often, just the new location description is sufficient output for movement.
-        // await engine.ioHandler.print("You go \(direction.rawValue).")
+        // --- Create Result ---
+        // Movement itself doesn't usually print a message; the new location description suffices.
+        // The engine's run loop will trigger describeCurrentLocation after state changes.
+        return ActionResult(
+            success: true,
+            message: "", // No specific message for GO action itself
+            stateChanges: [change]
+        )
     }
 }
