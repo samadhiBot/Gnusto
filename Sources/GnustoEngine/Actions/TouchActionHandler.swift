@@ -1,33 +1,33 @@
 import Foundation
 
-/// Handles the "TOUCH" command and its synonyms (e.g., "FEEL", "RUB", "PAT").
+/// Handles the "TOUCH" context.command and its synonyms (e.g., "FEEL", "RUB", "PAT").
 public struct TouchActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, engine: GameEngine) async throws {
+    public func validate(command: Command, context.engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Touch what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
         }
 
         // 3. Check reachability
         // Inline check as ScopeResolver doesn't have this specific logic yet.
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.gameState.player.currentLocationID
         let itemParent = targetItem.parent
         var isReachable = false
         switch itemParent {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await engine.item(with: parentItemID) else {
+            guard let parentItem = await context.engine.item(with: parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
@@ -52,15 +52,15 @@ public struct TouchActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TOUCH command reached process without direct object.")
+    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("TOUCH context.command reached process without direct object.")
         }
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
-        if let targetItem = await engine.item(with: targetItemID) {
+        if let targetItem = await context.engine.item(with: targetItemID) {
             let initialProperties = targetItem.properties // Use initial state
             if !initialProperties.contains(.touched) {
                 stateChanges.append(StateChange(

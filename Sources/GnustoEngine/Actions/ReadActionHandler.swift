@@ -1,32 +1,32 @@
 import Foundation
 
-/// Handles the "READ" command.
+/// Handles the "READ" context.command.
 public struct ReadActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, engine: GameEngine) async throws {
+    public func validate(command: Command, context.engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Read what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
         // 3. Check reachability
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.gameState.player.currentLocationID
         let itemParent = targetItem.parent
         var isReachable = false
         switch itemParent {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await engine.item(with: parentItemID) else {
+            guard let parentItem = await context.engine.item(with: parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
@@ -48,7 +48,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if room is lit (unless item provides light)
-        let isLit = await engine.scopeResolver.isLocationLit(locationID: currentLocationID)
+        let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
         let providesLight = targetItem.hasProperty(.lightSource) && targetItem.hasProperty(.on)
         guard isLit || providesLight else {
             throw ActionError.roomIsDark
@@ -60,11 +60,11 @@ public struct ReadActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("READ command reached process without direct object.")
+    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("READ context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
         }
 

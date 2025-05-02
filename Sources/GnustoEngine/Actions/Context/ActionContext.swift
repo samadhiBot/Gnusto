@@ -51,5 +51,5 @@ public protocol ActionContextProvider: Sendable {
     /// - Returns: An `ActionContext` instance.
     /// - Throws: An error if context generation fails.
     @MainActor
-    func getContext(for command: Command, engine: GameEngine) async throws -> ActionContext
+    func getContext(for context: ActionContext) async throws -> ActionContext
 }

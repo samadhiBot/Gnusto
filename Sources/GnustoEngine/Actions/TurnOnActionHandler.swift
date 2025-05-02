@@ -5,30 +5,30 @@ struct TurnOnActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    func validate(command: Command, engine: GameEngine) async throws {
+    func validate(command: Command, context.engine: GameEngine) async throws {
         // 1. Get direct object ID
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Turn on what?")
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
         // 3. Verify the item is reachable (with light source exception in dark).
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.gameState.player.currentLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLight = targetItem.hasProperty(.lightSource)
-        let roomIsDark = !(await engine.scopeResolver.isLocationLit(locationID: currentLocationID))
+        let roomIsDark = !(await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID))
 
         var isNormallyReachable = false
         if isHeld {
             isNormallyReachable = true
         } else if isInLocation {
             if !roomIsDark || !isLight {
-                let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+                let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
                 isNormallyReachable = reachableItems.contains(targetItemID)
             } else {
                 isNormallyReachable = true // Allow turning on light in dark room
@@ -49,11 +49,11 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
     }
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TURN ON command reached process without direct object.")
+    func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("TURN ON context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
         }
@@ -90,7 +90,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         let message = "The \(targetItem.name) is now on."
 
         // --- Side Effects (Optional) ---
-        // Check if the room became lit. If so, the engine loop will describe it.
+        // Check if the room became lit. If so, the context.engine loop will describe it.
         // No explicit side effect needed here to trigger re-description.
 
         // --- Create Result ---

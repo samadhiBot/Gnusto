@@ -3,12 +3,12 @@ import Foundation
 /// Action handler for the SCORE verb.
 struct ScoreActionHandler: EnhancedActionHandler {
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
         // Fetch current score and turn count
-        let currentScore = await engine.playerScore
-        let turnCount = await engine.playerMoves
+        let currentScore = await context.engine.playerScore
+        let turnCount = await context.engine.playerMoves
 
-        // The SCORE command only reports information, it doesn't change state.
+        // The SCORE context.command only reports information, it doesn't change state.
         let message = "Your score is \(currentScore) in \(turnCount) moves."
 
         return ActionResult(

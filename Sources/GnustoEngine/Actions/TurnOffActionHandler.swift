@@ -5,19 +5,19 @@ struct TurnOffActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    func validate(command: Command, engine: GameEngine) async throws {
+    func validate(command: Command, context.engine: GameEngine) async throws {
         // 1. Get direct object ID
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Turn off what?")
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID.rawValue)'.")
         }
 
         // 3. Verify the item is reachable.
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -33,11 +33,11 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         }
     }
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TURN OFF command reached process without direct object.")
+    func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("TURN OFF context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
              // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN OFF.")
         }
@@ -77,7 +77,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         // Check if location became dark
         let isLightSource = targetItem.hasProperty(.lightSource)
         if isLightSource {
-            let currentLocationID = await engine.gameState.player.currentLocationID
+            let currentLocationID = await context.engine.gameState.player.currentLocationID
 
             // Determine the hypothetical state of the target item *after* changes
             var propsAfterOff = targetItem.properties // Start with current props
@@ -87,7 +87,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
             }
 
             // Check lit status using the hypothetical state of the single changed item
-            let locationIsNowLit = await engine.scopeResolver.isLocationLitAfterSimulatedChange(
+            let locationIsNowLit = await context.engine.scopeResolver.isLocationLitAfterSimulatedChange(
                 locationID: currentLocationID,
                 changedItemID: targetItemID,
                 newItemProperties: propsAfterOff // Pass the hypothetical properties

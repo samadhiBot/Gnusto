@@ -1,23 +1,20 @@
 import Foundation
 
-/// Handles the "REMOVE" command and its synonyms (e.g., "DOFF", "TAKE OFF").
+/// Handles the "REMOVE" context.command and its synonyms (e.g., "DOFF", "TAKE OFF").
 public struct RemoveActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Remove what?")
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await engine.item(with: targetItemID),
+        guard let targetItem = await context.engine.item(with: targetItemID),
               targetItem.parent == .player else
         {
             throw ActionError.itemNotHeld(targetItemID)
@@ -34,13 +31,10 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // IDs and validation guaranteed by validate()
-        let targetItemID = command.directObject!
-        guard let itemSnapshot = await engine.item(with: targetItemID) else {
+        let targetItemID = context.command.directObject!
+        guard let itemSnapshot = await context.engine.item(with: targetItemID) else {
             // Should not happen if validate passed
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for REMOVE.")
         }
@@ -81,7 +75,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
 
     // Remove the old perform method
     /*
-    public func perform(command: Command, engine: GameEngine) async throws {
+    public func perform(command: Command, context.engine: GameEngine) async throws {
         // ... old implementation ...
     }
     */

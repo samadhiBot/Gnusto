@@ -1,23 +1,20 @@
 import Foundation
 
-/// Handles the "DROP" command and its synonyms (e.g., "PUT DOWN").
+/// Handles the "DROP" context.command and its synonyms (e.g., "PUT DOWN").
 public struct DropActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Drop what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // If parser resolved it, but it's gone, treat as inaccessible/not held.
             // For DROP, the more specific error is relevant.
             throw ActionError.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
@@ -35,16 +32,13 @@ public struct DropActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("Drop command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("Drop context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Drop command target item disappeared between validate and process.")
+            throw ActionError.internalEngineError("Drop context.command target item disappeared between validate and process.")
         }
 
         // Handle "not holding" case detected (but not thrown) in validate
@@ -53,7 +47,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         }
 
         // --- Calculate State Changes ---
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.gameState.player.currentLocationID
         var stateChanges: [StateChange] = []
 
         // Change 1: Parent

@@ -1,23 +1,20 @@
 import Foundation
 
-/// Handles the "WEAR" command and its synonyms (e.g., "DON").
+/// Handles the "WEAR" context.command and its synonyms (e.g., "DON").
 public struct WearActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Wear what?")
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await engine.item(with: targetItemID),
+        guard let targetItem = await context.engine.item(with: targetItemID),
               targetItem.parent == .player else
         {
             throw ActionError.itemNotHeld(targetItemID)
@@ -34,13 +31,10 @@ public struct WearActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // IDs and validation guaranteed by validate()
-        let targetItemID = command.directObject!
-        guard let itemSnapshot = await engine.item(with: targetItemID) else {
+        let targetItemID = context.command.directObject!
+        guard let itemSnapshot = await context.engine.item(with: targetItemID) else {
             // Should not happen if validate passed
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
         }

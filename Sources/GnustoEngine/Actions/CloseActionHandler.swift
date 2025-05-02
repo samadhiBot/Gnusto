@@ -1,29 +1,26 @@
 import Foundation
 
-/// Handles the "CLOSE" command.
+/// Handles the "CLOSE" context.command.
 public struct CloseActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Close what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
         // 3. Check reachability using ScopeResolver
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -42,17 +39,14 @@ public struct CloseActionHandler: EnhancedActionHandler {
         // Note: Closing doesn't usually depend on locked status.
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
             // Should be caught by validate, but defensive check.
-            throw ActionError.internalEngineError("Close command reached process without direct object.")
+            throw ActionError.internalEngineError("Close context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Close command target item disappeared between validate and process.")
+            throw ActionError.internalEngineError("Close context.command target item disappeared between validate and process.")
         }
 
         // Handle "already closed" case detected (but not thrown) in validate

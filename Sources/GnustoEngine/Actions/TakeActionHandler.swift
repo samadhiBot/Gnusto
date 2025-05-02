@@ -1,20 +1,17 @@
 import Foundation
 
-/// Handles the "TAKE" command and its synonyms (e.g., "GET").
+/// Handles the "TAKE" context.command and its synonyms (e.g., "GET").
 public struct TakeActionHandler: EnhancedActionHandler {
     public init() {}
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Take what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Use standard not accessible error for non-existent items
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -29,7 +26,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // 4. Check if item is inside something invalid (non-container/non-surface)
         if case .item(let parentID) = targetItem.parent,
-           let parentItem = await engine.item(with: parentID) {
+           let parentItem = await context.engine.item(with: parentID) {
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
             let isContainer = parentItem.hasProperty(.container)
@@ -41,11 +38,11 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 5. Check reachability using ScopeResolver (general check)
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             // Handle specific container closed errors before general unreachability
             if case .item(let parentID) = targetItem.parent,
-               let container = await engine.item(with: parentID),
+               let container = await context.engine.item(with: parentID),
                container.hasProperty(.container),
                !container.hasProperty(.open) {
                 throw ActionError.containerIsClosed(parentID)
@@ -60,21 +57,18 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 7. Check capacity <-- Check added here
-        guard await engine.playerCanCarry(targetItem) else {
+        guard await context.engine.playerCanCarry(targetItem) else {
             throw ActionError.playerCannotCarryMore
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("Take command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("Take context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Take command target item disappeared between validate and process.")
+            throw ActionError.internalEngineError("Take context.command target item disappeared between validate and process.")
         }
 
         // Handle "already have" case detected (but not thrown) in validate
@@ -110,7 +104,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // Change 3: Pronoun ("it")
-        let oldPronounValue = await engine.getPronounReference(pronoun: "it")
+        let oldPronounValue = await context.engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
             entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),

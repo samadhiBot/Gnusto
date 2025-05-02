@@ -1,34 +1,31 @@
 import Foundation
 
-/// Handles the "LOCK <DO> WITH <IO>" command.
+/// Handles the "LOCK <DO> WITH <IO>" context.command.
 public struct LockActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Validate command structure: Need DO and IO
-        guard command.directObject != nil else {
+    public func validate(context: ActionContext) async throws {
+        // 1. Validate context.command structure: Need DO and IO
+        guard context.command.directObject != nil else {
             throw ActionError.prerequisiteNotMet("Lock what?")
         }
-        guard command.indirectObject != nil else {
+        guard context.command.indirectObject != nil else {
             throw ActionError.prerequisiteNotMet("Lock it with what?")
         }
 
         // Safely unwrap IDs after checks
-        let targetItemID = command.directObject!
-        let keyItemID = command.indirectObject!
+        let targetItemID = context.command.directObject!
+        let keyItemID = context.command.indirectObject!
 
         // 2. Get item snapshots
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(with: targetItemID) else {
             // If parser resolved it but it's gone now, treat as inaccessible.
             throw ActionError.itemNotAccessible(targetItemID)
         }
-        guard let keyItem = await engine.item(with: keyItemID) else {
+        guard let keyItem = await context.engine.item(with: keyItemID) else {
             throw ActionError.itemNotAccessible(keyItemID)
         }
 
@@ -36,7 +33,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         guard keyItem.parent == .player else {
             throw ActionError.itemNotHeld(keyItemID)
         }
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -56,18 +53,15 @@ public struct LockActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // IDs are guaranteed non-nil by validate
-        let targetItemID = command.directObject!
-        let keyItemID = command.indirectObject!
+        let targetItemID = context.command.directObject!
+        let keyItemID = context.command.indirectObject!
 
         // Get snapshots (needed for properties)
         // Existence guaranteed by validate
-        guard let targetItem = await engine.item(with: targetItemID),
-              let keyItem = await engine.item(with: keyItemID) else
+        guard let targetItem = await context.engine.item(with: targetItemID),
+              let keyItem = await context.engine.item(with: keyItemID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for LOCK.")
         }

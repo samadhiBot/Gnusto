@@ -7,9 +7,9 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, engine: GameEngine) async throws {
+    public func validate(command: Command, context.engine: GameEngine) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Think about what?")
         }
 
@@ -17,21 +17,21 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
         if targetItemID.rawValue == "player" { return }
 
         // 3. Check if item exists
-        guard await engine.item(with: targetItemID) != nil else {
+        guard await context.engine.item(with: targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
         // 4. Check reachability
-        let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
+        let isReachable = await context.engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
         guard isReachable else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
+    public func process(command: Command, context.engine: GameEngine) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
             // Should be caught by validate
-            throw ActionError.internalEngineError("THINK ABOUT command reached process without direct object.")
+            throw ActionError.internalEngineError("THINK ABOUT context.command reached process without direct object.")
         }
 
         let message: String
@@ -42,7 +42,7 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
             message = "Yes, yes, you're very important."
         } else {
             // Handle thinking about an item
-            guard let targetItem = await engine.item(with: targetItemID) else {
+            guard let targetItem = await context.engine.item(with: targetItemID) else {
                  // Should be caught by validate
                 throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
             }
