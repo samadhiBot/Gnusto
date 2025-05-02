@@ -120,7 +120,7 @@ struct GameEngineTests {
             throwFrom: .process
         )
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("take"): mockTakeHandler]
             )
         )
@@ -191,7 +191,7 @@ struct GameEngineTests {
         let mockLookHandler = MockActionHandler()
 
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("look"): mockLookHandler]
             )
         )
@@ -243,7 +243,7 @@ struct GameEngineTests {
         let mockLookHandler = MockActionHandler()
         let mockTakeHandler = MockActionHandler()
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     VerbID("look"): mockLookHandler,
                     VerbID("take"): mockTakeHandler
@@ -315,7 +315,7 @@ struct GameEngineTests {
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         let mockQuitHandler = MockActionHandler()
         let game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("quit"): mockQuitHandler]
             )
         )
@@ -436,7 +436,7 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     // Only mock inventory
                     VerbID("inventory"): mockInventoryHandler,
@@ -555,7 +555,7 @@ struct GameEngineTests {
         let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey)
         var game = MinimalGame(
             items: [lamp],
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 // Use customActionHandlers directly with the EnhancedActionHandler
                 customActionHandlers: [
                     VerbID("activate"): mockEnhancedHandler // No bridge needed
@@ -655,7 +655,7 @@ struct GameEngineTests {
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(fuseDefinitions: [fuseDef])
+            definitionRegistry: DefinitionRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
 
@@ -685,7 +685,7 @@ struct GameEngineTests {
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
+            definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
         let _ = GameEngine( // Use _ for unused engine
@@ -713,7 +713,7 @@ struct GameEngineTests {
 
         // Initialize game with definitions
         let game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )

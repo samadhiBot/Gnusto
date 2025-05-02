@@ -18,8 +18,9 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case locationName
     case locationProperties
 
-    // Dynamic Properties (Item or Location)
-    case dynamicProperty(key: PropertyID)
+    // Dynamic Values (Stored in Item/Location, logic in Registry)
+    case itemDynamicValue(key: PropertyID)
+    case locationDynamicValue(key: PropertyID)
 
     // Player Properties
     case playerHealth
@@ -48,7 +49,7 @@ extension StatePropertyKey: CustomStringConvertible {
         switch self {
         case .addActiveDaemon(let id): "addActiveDaemon(\(id))"
         case .addActiveFuse(let id, _): "addActiveFuse(\(id))"
-        case .dynamicProperty(let key): "dynamicProperty(\(key.rawValue))"
+        case .itemDynamicValue(let key): "itemDynamicValue(\(key.rawValue))"
         case .flag(let key): "flag(\(key))"
         case .gameSpecificState(let key): "gameSpecificState(\(key.rawValue))"
         case .itemAdjectives: "itemAdjectives"
@@ -63,6 +64,7 @@ extension StatePropertyKey: CustomStringConvertible {
         case .locationExits: "locationExits"
         case .locationName: "locationName"
         case .locationProperties: "locationProperties"
+        case .locationDynamicValue(let key): "locationDynamicValue(\(key.rawValue))"
         case .playerHealth: "playerHealth"
         case .playerInventoryLimit: "playerInventoryLimit"
         case .playerLocation: "playerLocation"

@@ -276,6 +276,28 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             locations[locationID]?.exits = newExits
 
+        // MARK: Dynamic Properties (Item or Location)
+
+        case .itemDynamicValue(let key):
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("EntityID mismatch for itemDynamicValue: expected .item, got \(change.entityId)")
+            }
+            guard items[itemID] != nil else {
+                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemDynamicValue change ('\(key.rawValue)')")
+            }
+            // Directly update the StateValue in the dictionary.
+            // Assumes validation happened *before* StateChange creation.
+            items[itemID]?.dynamicValues[key] = change.newValue
+
+        case .locationDynamicValue(let key):
+             guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("EntityID mismatch for locationDynamicValue: expected .location, got \(change.entityId)")
+            }
+            guard locations[locationID] != nil else {
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationDynamicValue change ('\(key.rawValue)')")
+            }
+            locations[locationID]?.dynamicValues[key] = change.newValue
+
         // MARK: Player Properties
 
         case .playerScore:
@@ -537,11 +559,23 @@ public struct GameState: Codable, Equatable, Sendable {
         case .updateFuseTurns(let fuseId):
             // If fuse doesn't exist, current value is nil
             actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
+
+        case .itemDynamicValue(let key):
+             guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemDynamicValue")
+             }
+             actualCurrentValue = items[itemID]?.dynamicValues[key]
+
+        case .locationDynamicValue(let key):
+             guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationDynamicValue")
+             }
+             actualCurrentValue = locations[locationID]?.dynamicValues[key]
         }
 
         // Perform the validation
-        guard actualOldValue == expectedOldValue else {
-            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualOldValue)
+        guard actualCurrentValue == expectedOldValue else {
+            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
         }
     }
 

@@ -82,28 +82,75 @@ public struct SideEffect {
 }
 ```
 
-### 2. Dynamic Property System
+### 2. Dynamic Logic & State System
+
+This system allows associating dynamic computation and validation logic with specific properties of Items or Locations, while storing the actual state values separately.
 
 ```swift
-/// Enhanced property system for dynamic values
-public struct DynamicProperty<T> {
-    /// The current value
-    public var value: T
+/// A strongly-typed identifier for game properties.
+public struct PropertyID: Hashable, Codable, Sendable { /* ... */ }
 
-    /// The handler for computing the value
-    public let computeHandler: ((Item, GameState) -> T)?
+/// The standard type for storing potentially dynamic state values.
+public enum StateValue: Codable, Sendable { /* ... */ }
 
-    /// The handler for validating changes
-    public let validateHandler: ((T) -> Bool)?
+// --- Game Developer Interaction Points ---
+
+/// Items store their specific state values using PropertyID keys.
+/// (Example structure - actual might differ slightly)
+public struct Item: Sendable, Codable {
+    // ... other properties ...
+    public var dynamicValues: [PropertyID: StateValue]
 }
 
-/// Protocol for objects that can have dynamic properties
-public protocol DynamicPropertyContainer {
-    /// Get a dynamic property
-    func getDynamicProperty<T>(_ key: String) -> DynamicProperty<T>?
+/// Locations also store their state values.
+public struct Location: Sendable, Codable {
+    // ... other properties ...
+    public var dynamicValues: [PropertyID: StateValue]
+}
 
-    /// Set a dynamic property
-    func setDynamicProperty<T>(_ key: String, value: T) throws
+/// Registry for dynamic behavior (part of GameBlueprint or DefinitionRegistry).
+public struct DynamicPropertyRegistry: Sendable {
+    /// Closure type for computing an item property's value.
+    public typealias ItemComputeHandler =
+        (@MainActor @Sendable (Item, GameState) -> StateValue)
+    /// Closure type for validating a new value for an item property.
+    public typealias ItemValidateHandler =
+        (@MainActor @Sendable (Item, StateValue) -> Bool)
+
+    // ... Similar types for Location handlers ...
+
+    /// Registers a compute handler for a specific item property.
+    public func registerItemCompute(
+        key: PropertyID,
+        handler: @escaping ItemComputeHandler
+    ) { /* ... */ }
+
+    /// Registers a validation handler for a specific item property.
+    public func registerItemValidate(
+        key: PropertyID,
+        handler: @escaping ItemValidateHandler
+    ) { /* ... */ }
+
+    // ... Methods to retrieve handlers ...
+}
+
+/// Engine provides helpers to access values (handles registry lookup + state access).
+@MainActor
+public class GameEngine: Sendable {
+    /// Gets the current value, checking compute handlers first.
+    public func getDynamicItemValue(
+        itemID: ItemID,
+        key: PropertyID
+    ) async -> StateValue? { /* ... */ }
+
+    /// Sets a value after checking validate handlers and applying a StateChange.
+    public func setDynamicItemValue(
+        itemID: ItemID,
+        key: PropertyID,
+        newValue: StateValue
+    ) async throws { /* ... */ }
+
+    // ... Similar helpers for Locations ...
 }
 ```
 
@@ -140,11 +187,13 @@ public protocol ActionContextProvider {
 - [x] Implement `ActionResult` and related types
 - [x] Add state change tracking to `GameState`
 
-### Phase 2: Dynamic Properties
+### Phase 2: Dynamic Logic & State System
 
-- [ ] Implement `DynamicProperty` system
-- [ ] Add support to `Item` and `Location`
-- [ ] Create property change tracking
+- [x] Define `PropertyID` type.
+- [x] Create `DynamicPropertyRegistry` for compute/validate handlers.
+- [x] Add `dynamicValues: [PropertyID: StateValue]` to `Item` and `Location`.
+- [x] Update `StatePropertyKey` and `GameState.apply` to handle changes to `dynamicValues`.
+- [x] Implement `GameEngine` helpers (`get/setDynamic...Value`) to orchestrate registry/state access.
 
 ### Phase 3: Context System
 
@@ -220,9 +269,15 @@ public struct EnhancedActionHandler: EnhancedActionHandler {
 // Before
 item.properties["isOpen"] = true
 
-// After
-try item.setDynamicProperty("isOpen", value: true)
-let isOpen = item.getDynamicProperty<Bool>("isOpen")
+// After (Conceptual Example)
+// 1. Define PropertyID
+// extension PropertyID { static let isOpen = PropertyID("isOpen") }
+// 2. Register validation handler (optional, during setup)
+// registry.registerItemValidate(key: .isOpen) { item, newValue in ... }
+// 3. Set value using engine helper (triggers validation & StateChange)
+// try await engine.setDynamicItemValue(itemID: item.id, key: .isOpen, newValue: .bool(true))
+// 4. Get value using engine helper (checks compute handlers)
+// let isOpen = await engine.getDynamicItemValue(itemID: item.id, key: .isOpen)?.toBool ?? false
 ```
 
 ## Conclusion

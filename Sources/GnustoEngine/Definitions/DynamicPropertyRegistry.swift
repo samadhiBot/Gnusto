@@ -1,0 +1,110 @@
+import Foundation
+
+/// A registry to hold dynamically computed logic and validation rules for properties.
+///
+/// This registry separates the behavioral aspects of properties (computation, validation)
+/// from their state storage (which resides in `Item.dynamicValues` or `Location.dynamicValues`).
+public struct DynamicPropertyRegistry: Sendable {
+
+    // MARK: - Handler Type Aliases
+
+    /// Closure type for computing an item property's value.
+    /// Takes the specific Item instance and the current GameState.
+    public typealias ItemComputeHandler =
+        (@MainActor @Sendable (Item, GameState) async throws -> StateValue)
+
+    /// Closure type for validating a new value for an item property.
+    /// Takes the specific Item instance and the proposed new StateValue.
+    /// Returns `true` if the value is valid, `false` otherwise.
+    public typealias ItemValidateHandler =
+        (@MainActor @Sendable (Item, StateValue) async throws -> Bool)
+
+    /// Closure type for computing a location property's value.
+    public typealias LocationComputeHandler =
+        (@MainActor @Sendable (Location, GameState) async throws -> StateValue)
+
+    /// Closure type for validating a new value for a location property.
+    public typealias LocationValidateHandler =
+        (@MainActor @Sendable (Location, StateValue) async throws -> Bool)
+
+    // MARK: - Private Storage
+
+    /// Storage for item compute handlers, keyed by PropertyID.
+    private var itemComputeHandlers: [PropertyID: ItemComputeHandler] = [:]
+    /// Storage for item validate handlers.
+    private var itemValidateHandlers: [PropertyID: ItemValidateHandler] = [:]
+    /// Storage for location compute handlers.
+    private var locationComputeHandlers: [PropertyID: LocationComputeHandler] = [:]
+    /// Storage for location validate handlers.
+    private var locationValidateHandlers: [PropertyID: LocationValidateHandler] = [:]
+
+    // MARK: - Initialization
+
+    public init() { }
+
+    // MARK: - Registration Methods (Items)
+
+    /// Registers a compute handler for a specific item property.
+    /// If a handler already exists for this key, it will be overwritten.
+    /// - Parameters:
+    ///   - key: The `PropertyID` of the property.
+    ///   - handler: The closure to execute for computing the value.
+    public mutating func registerItemCompute(
+        key: PropertyID,
+        handler: @escaping ItemComputeHandler
+    ) {
+        itemComputeHandlers[key] = handler
+    }
+
+    /// Registers a validation handler for a specific item property.
+    /// If a handler already exists for this key, it will be overwritten.
+    /// - Parameters:
+    ///   - key: The `PropertyID` of the property.
+    ///   - handler: The closure to execute for validating a new value.
+    public mutating func registerItemValidate(
+        key: PropertyID,
+        handler: @escaping ItemValidateHandler
+    ) {
+        itemValidateHandlers[key] = handler
+    }
+
+    // MARK: - Registration Methods (Locations)
+
+    /// Registers a compute handler for a specific location property.
+    public mutating func registerLocationCompute(
+        key: PropertyID,
+        handler: @escaping LocationComputeHandler
+    ) {
+        locationComputeHandlers[key] = handler
+    }
+
+    /// Registers a validation handler for a specific location property.
+    public mutating func registerLocationValidate(
+        key: PropertyID,
+        handler: @escaping LocationValidateHandler
+    ) {
+        locationValidateHandlers[key] = handler
+    }
+
+    // MARK: - Retrieval Methods (Internal Access)
+
+    /// Retrieves the compute handler for a specific item property, if one exists.
+    internal func itemComputeHandler(for key: PropertyID) -> ItemComputeHandler? {
+        itemComputeHandlers[key]
+    }
+
+    /// Retrieves the validate handler for a specific item property, if one exists.
+    internal func itemValidateHandler(for key: PropertyID) -> ItemValidateHandler? {
+        itemValidateHandlers[key]
+    }
+
+    /// Retrieves the compute handler for a specific location property, if one exists.
+    internal func locationComputeHandler(for key: PropertyID) -> LocationComputeHandler? {
+        locationComputeHandlers[key]
+    }
+
+    /// Retrieves the validate handler for a specific location property, if one exists.
+    internal func locationValidateHandler(for key: PropertyID) -> LocationValidateHandler? {
+        locationValidateHandlers[key]
+    }
+}

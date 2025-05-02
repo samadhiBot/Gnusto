@@ -4,7 +4,7 @@ import GnustoEngine
 struct CloakOfDarkness: GameBlueprint {
     var state: GameState
 
-    let registry: DefinitionRegistry
+    let definitionRegistry: DefinitionRegistry
 
     @MainActor
     init() {

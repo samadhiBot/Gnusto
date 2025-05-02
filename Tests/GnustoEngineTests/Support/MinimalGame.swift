@@ -2,15 +2,18 @@
 
 struct MinimalGame: GameBlueprint {
     var state: GameState
-    var registry: DefinitionRegistry
+    var definitionRegistry: DefinitionRegistry
+    var dynamicPropertyRegistry: DynamicPropertyRegistry
 
     init(
         player: Player = Player(in: "startRoom"),
         locations: [Location]? = nil,
         items: [Item]? = nil,
-        registry: DefinitionRegistry = DefinitionRegistry()
+        definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
+        dynamicPropertyRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry()
     ) {
-        self.registry = registry
+        self.definitionRegistry = definitionRegistry
+        self.dynamicPropertyRegistry = dynamicPropertyRegistry
 
         let gameLocations = locations ?? [
             Location(
@@ -31,7 +34,7 @@ struct MinimalGame: GameBlueprint {
 
         // Build vocabulary including verbs from custom handlers
         var customVerbs: [Verb] = []
-        for verbID in registry.customActionHandlers.keys {
+        for verbID in definitionRegistry.customActionHandlers.keys {
             // Create a basic definition; requiresLight=false is a safe default for tests
             let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
             customVerbs.append(verbDef)

@@ -19,11 +19,14 @@ public class GameEngine: Sendable {
     /// The resolver for scope and visibility checks.
     lazy var scopeResolver: ScopeResolver = ScopeResolver(engine: self)
 
-    /// The registry holding static game definitions (fuses, daemons, etc.).
-    public let registry: DefinitionRegistry
+    /// The registry holding static game definitions (fuses, daemons, action overrides).
+    public let definitionRegistry: DefinitionRegistry
 
     /// The registry for dynamic description handlers.
     public let descriptionHandlerRegistry: DescriptionHandlerRegistry
+
+    /// The registry for dynamic property computation and validation logic.
+    public let dynamicPropertyRegistry: DynamicPropertyRegistry
 
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: EnhancedActionHandler]()
@@ -110,16 +113,17 @@ public class GameEngine: Sendable {
         self.gameState = game.state
         self.parser = parser
         self.ioHandler = ioHandler
-        self.registry = game.registry
+        self.definitionRegistry = game.definitionRegistry
+        self.dynamicPropertyRegistry = game.dynamicPropertyRegistry
         self.descriptionHandlerRegistry = DescriptionHandlerRegistry()
-        self.actionHandlers = game.registry.customActionHandlers
+        self.actionHandlers = game.definitionRegistry.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
 
         var fuses: [Fuse.ID: Fuse] = [:]
         for (fuseID, turnsRemaining) in game.state.activeFuses {
-            guard let definition = registry.fuseDefinition(for: fuseID) else {
+            guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
                 print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
                 continue
             }
@@ -139,7 +143,7 @@ public class GameEngine: Sendable {
         overrideTurns: Int? = nil
     ) throws {
         // Find definition
-        guard let definition = registry.fuseDefinition(for: id) else {
+        guard let definition = definitionRegistry.fuseDefinition(for: id) else {
             throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(id)'. Cannot update runtime fuse.")
         }
         // Determine turns
@@ -324,7 +328,7 @@ public class GameEngine: Sendable {
         // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
-            guard let definition = registry.daemonDefinition(for: daemonID) else {
+            guard let definition = definitionRegistry.daemonDefinition(for: daemonID) else {
                 print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }
@@ -349,7 +353,7 @@ public class GameEngine: Sendable {
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = gameState.player.currentLocationID
-        if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
+        if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, pass command using correct enum case syntax
                 if try await roomHandler(self, RoomActionMessage.beforeTurn(command)) {
@@ -370,7 +374,7 @@ public class GameEngine: Sendable {
 
         // 1. Check Direct Object Handler
         if let doID = command.directObject,
-           let objectHandler = registry.objectActionHandlers[doID] {
+           let objectHandler = definitionRegistry.objectActionHandlers[doID] {
             do {
                 // Pass the engine and the full command to the handler
                 actionHandled = try await objectHandler(self, command)
@@ -383,7 +387,7 @@ public class GameEngine: Sendable {
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionError == nil, let ioID = command.indirectObject,
-           let objectHandler = registry.objectActionHandlers[ioID] {
+           let objectHandler = definitionRegistry.objectActionHandlers[ioID] {
             do {
                 actionHandled = try await objectHandler(self, command)
             } catch {
@@ -460,7 +464,7 @@ public class GameEngine: Sendable {
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
 
         // --- Room AfterTurn Hook ---
-        if let roomHandler = registry.roomActionHandler(for: currentLocationID) {
+        if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
                 _ = try await roomHandler(self, RoomActionMessage.afterTurn(command))
@@ -519,7 +523,7 @@ public class GameEngine: Sendable {
         switch effect.type {
         case .startFuse:
             // 1. Get definition to find initial turns
-            guard let definition = registry.fuseDefinition(for: fuseId) else {
+            guard let definition = definitionRegistry.fuseDefinition(for: fuseId) else {
                 throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(fuseId)' in startFuse side effect.")
             }
             // 2. Determine turns (use parameter if provided, else definition)
@@ -558,7 +562,7 @@ public class GameEngine: Sendable {
 
         case .runDaemon:
             // 1. Check definition exists (required for daemon execution later)
-            guard registry.daemonDefinition(for: daemonId) != nil else {
+            guard definitionRegistry.daemonDefinition(for: daemonId) != nil else {
                 throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(daemonId)' in runDaemon side effect.")
             }
             // 2. Check if already active in persistent state
@@ -1182,5 +1186,154 @@ public class GameEngine: Sendable {
         let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
         let capacity = gameState.player.carryingCapacity
         return (currentWeight + item.size) <= capacity
+    }
+}
+
+// MARK: - Dynamic Property Accessors
+
+extension GameEngine {
+
+    /// Retrieves the current value of a potentially dynamic item property.
+    /// Checks the `DynamicPropertyRegistry` for a compute handler first.
+    /// If no handler exists, returns the value stored in the item's `dynamicValues`.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item.
+    ///   - key: The `PropertyID` of the desired value.
+    /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
+    @MainActor
+    public func getDynamicItemValue(itemID: ItemID, key: PropertyID) async -> StateValue? {
+        guard let item = gameState.items[itemID] else {
+            logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
+            return nil
+        }
+
+        // Check registry for compute handler
+        if let computeHandler = dynamicPropertyRegistry.itemComputeHandler(for: key) {
+            do {
+                return try await computeHandler(item, gameState)
+            } catch {
+                logger.error("Error computing dynamic value '\(key.rawValue)' for item \(itemID.rawValue): \(error)")
+                // Fall through to return stored value or nil? Or return nil on error? Let's return nil.
+                return nil
+            }
+        } else {
+            // No compute handler, return stored value
+            return item.dynamicValues[key]
+        }
+    }
+
+    /// Retrieves the current value of a potentially dynamic location property.
+    /// (Implementation mirrors getDynamicItemValue)
+    ///
+    /// - Parameters:
+    ///   - locationID: The ID of the location.
+    ///   - key: The `PropertyID` of the desired value.
+    /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
+    @MainActor
+    public func getDynamicLocationValue(locationID: LocationID, key: PropertyID) async -> StateValue? {
+        guard let location = gameState.locations[locationID] else {
+            logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
+            return nil
+        }
+
+        if let computeHandler = dynamicPropertyRegistry.locationComputeHandler(for: key) {
+            do {
+                return try await computeHandler(location, gameState)
+            } catch {
+                logger.error("Error computing dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
+                return nil
+            }
+        } else {
+            return location.dynamicValues[key]
+        }
+    }
+
+
+    /// Sets the value of an item property, performing validation via the `DynamicPropertyRegistry` if applicable.
+    /// Creates and applies the appropriate `StateChange` if validation passes.
+    ///
+    /// - Parameters:
+    ///   - itemID: The ID of the item to modify.
+    ///   - key: The `PropertyID` of the value to set.
+    ///   - newValue: The new `StateValue`.
+    /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
+    @MainActor
+    public func setDynamicItemValue(itemID: ItemID, key: PropertyID, newValue: StateValue) async throws {
+        guard let item = gameState.items[itemID] else {
+            throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
+        }
+
+        // Check registry for validate handler
+        if let validateHandler = dynamicPropertyRegistry.itemValidateHandler(for: key) {
+            do {
+                let isValid = try await validateHandler(item, newValue)
+                if !isValid {
+                    // Use a generic invalid value error, or could the handler throw a more specific one?
+                    // For now, use invalidValue.
+                    throw ActionError.invalidValue("Validation failed for dynamic item value '\(key.rawValue)' on \(itemID.rawValue): \(newValue)")
+                }
+            } catch {
+                // If validator throws, propagate the error
+                logger.error("Error validating dynamic value '\(key.rawValue)' for item \(itemID.rawValue): \(error)")
+                throw error
+            }
+        }
+
+        // Validation passed (or no validator), proceed with StateChange
+        let oldValue = item.dynamicValues[key] // Get current value for oldValue
+
+        // Only apply if value is actually changing
+        if oldValue != newValue {
+            let change = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemDynamicValue(key: key), // Use the new key
+                oldValue: oldValue,
+                newValue: newValue
+            )
+            // Directly apply to gameState (we are already @MainActor async)
+            try await gameState.apply(change)
+        }
+    }
+
+
+    /// Sets the value of a location property, performing validation.
+    /// (Implementation mirrors setDynamicItemValue)
+    ///
+    /// - Parameters:
+    ///   - locationID: The ID of the location to modify.
+    ///   - key: The `PropertyID` of the value to set.
+    ///   - newValue: The new `StateValue`.
+    /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
+    @MainActor
+    public func setDynamicLocationValue(locationID: LocationID, key: PropertyID, newValue: StateValue) async throws {
+         guard let location = gameState.locations[locationID] else {
+            throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
+        }
+
+        if let validateHandler = dynamicPropertyRegistry.locationValidateHandler(for: key) {
+            do {
+                let isValid = try await validateHandler(location, newValue)
+                 if !isValid {
+                    throw ActionError.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
+                }
+            } catch {
+                 logger.error("Error validating dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
+                throw error
+            }
+        }
+
+        let oldValue = location.dynamicValues[key]
+
+        if oldValue != newValue {
+            let change = StateChange(
+                entityId: .location(locationID),
+                propertyKey: .locationDynamicValue(key: key), // Use the new key
+                oldValue: oldValue,
+                newValue: newValue
+            )
+            // Directly apply to gameState (we are already @MainActor async)
+            try await gameState.apply(change)
+        }
     }
 }
