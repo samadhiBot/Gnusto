@@ -539,9 +539,9 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
         }
 
-        // Perform the comparison: expectedOldValue is guaranteed non-nil here.
-        if actualCurrentValue != expectedOldValue {
-            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
+        // Perform the validation
+        guard actualOldValue == expectedOldValue else {
+            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualOldValue)
         }
     }
 
