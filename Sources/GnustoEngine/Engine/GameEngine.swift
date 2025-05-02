@@ -443,12 +443,23 @@ public class GameEngine: Sendable {
 
                 // --- Execute Handler (New Logic) ---
                 do {
+                    // Create the context for this action using a snapshot
+                    let context = ActionContext(
+                        command: command,
+                        engine: self,
+                        stateSnapshot: gameState.snapshot() // Use snapshot()
+                        // contextData is empty by default
+                    )
+
                     // Directly use the enhanced handler pipeline
-                    try await verbHandler.validate(command: command, engine: self)
-                    let result = try await verbHandler.process(command: command, engine: self)
+                    try await verbHandler.validate(context: context)
+                    let result = try await verbHandler.process(context: context)
 
                     // Process the result (apply changes, print message)
                     try await processActionResult(result)
+
+                    // Call postProcess (even if default is empty)
+                    try await verbHandler.postProcess(context: context, result: result)
 
                 } catch let actionErr as ActionError {
                     // Catch ActionError specifically for reporting

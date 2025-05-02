@@ -515,10 +515,11 @@ struct GameEngineTests {
             let itemIDToModify: ItemID
             let flagToSet: String
 
-            func validate(command: Command, engine: GameEngine) async throws { }
+            func validate(context: ActionContext) async throws { }
 
-            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-                guard let item = await engine.item(with: itemIDToModify) else {
+            func process(context: ActionContext) async throws -> ActionResult {
+                // Use snapshot for checks
+                guard let item = context.stateSnapshot.items[itemIDToModify] else {
                     throw ActionError.internalEngineError("Test item missing")
                 }
 
@@ -527,17 +528,17 @@ struct GameEngineTests {
                     entityId: .item(itemIDToModify),
                     propertyKey: .itemProperties,
                     oldValue: .itemPropertySet(item.properties),
-                    newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
+                    newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on]))
                 )
 
-                // Correctly determine oldValue for the flag using the new helper
-                let actualOldFlagValue: Bool? = await engine.getOptionalFlagValue(key: flagToSet)
+                // Get old flag value from snapshot
+                let actualOldFlagValue: Bool? = context.stateSnapshot.flags[flagToSet]
                 let flagOldValueState: StateValue? = actualOldFlagValue != nil ? .bool(actualOldFlagValue!) : nil
 
                 let change2 = StateChange(
                     entityId: .global,
                     propertyKey: .flag(key: flagToSet),
-                    oldValue: flagOldValueState, // Use the correctly determined nil or .bool value
+                    oldValue: flagOldValueState,
                     newValue: .bool(true)
                 )
 
@@ -547,6 +548,9 @@ struct GameEngineTests {
                     stateChanges: [change1, change2]
                 )
             }
+
+            // Add empty postProcess for conformance
+            func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
         let testItemID: ItemID = "testLamp"
