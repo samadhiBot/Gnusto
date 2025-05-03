@@ -261,7 +261,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Uses default description from engine.describe)
         let output = await mockIO.flush()
-        // Corrected Expectation: Full formatted output with default description
+        // Corrected Expectation: Default description with title
         expectNoDifference(output, """
             --- Plain Room ---
             You are in the Plain Room.
@@ -297,7 +297,7 @@ struct LookActionHandlerTests {
         )
 
         // MinimalGame takes flags as variadic arguments
-        var game = MinimalGame(
+        let game = MinimalGame(
             player: Player(in: "dynamicRoom"),
             locations: [dynamicRoom],
             flags: [flagId] // Keep flag initialization
@@ -319,7 +319,7 @@ struct LookActionHandlerTests {
 
         // Assert Output 1 (Should show sparkling description)
         let output1 = await mockIO.flush()
-        // Corrected Expectation: Full formatted output
+        // Corrected Expectation: Dynamic description with title
         expectNoDifference(output1, """
             --- Magic Room ---
             The room *sparkles* brightly via registry.
@@ -332,7 +332,7 @@ struct LookActionHandlerTests {
 
         // Assert Output 2 (Should show normal description)
         let output2 = await mockIO.flush()
-        // Corrected Expectation: Full formatted output
+        // Corrected Expectation: Dynamic description with title
         expectNoDifference(output2, """
             --- Magic Room ---
             The room seems normal via registry.
@@ -500,7 +500,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy wooden box.\nThe wooden box contains a gold coin.")
+        expectNoDifference(output, "A sturdy wooden box. The wooden box contains a gold coin.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "box")
@@ -547,7 +547,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy wooden box.\nThe wooden box is closed.")
+        expectNoDifference(output, "A sturdy wooden box. The wooden box is closed.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "box")
@@ -595,7 +595,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A clear glass jar.\nThe glass jar contains a dead fly.")
+        expectNoDifference(output, "A clear glass jar. The glass jar contains a dead fly.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "jar")
@@ -647,8 +647,10 @@ struct LookActionHandlerTests {
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            A simple wooden table.\nOn the wooden table is a red book and a white candle.
-            """)
+            A simple wooden table. \
+            On the wooden table is a red book and a white candle.
+            """
+        )
 
         // Assert Final State (Surface marked touched)
         let finalItemState = engine.item(with: "table")
