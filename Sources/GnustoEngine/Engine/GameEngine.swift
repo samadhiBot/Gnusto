@@ -1,5 +1,6 @@
 import Foundation
 import OSLog
+import Markdown
 
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
@@ -36,6 +37,10 @@ public class GameEngine: Sendable {
 
     /// A logger used for unhandled error warnings.
     private let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
+
+    /// The maximum line length for description formatting.
+    /// TODO: Make this configurable via init or GameBlueprint?
+    private let maximumDescriptionLength: Int = 100
 
     /// Flag to control the main game loop.
     private var shouldQuit: Bool = false
@@ -1345,6 +1350,109 @@ extension GameEngine {
             )
             // Directly apply to gameState (we are already @MainActor async)
             try gameState.apply(change)
+        }
+    }
+}
+
+// MARK: - Description Generation
+
+extension GameEngine {
+
+    /// Generates the long description for a given item, invoking its dynamic handler if available.
+    /// Applies standard formatting (Markdown, line wrapping).
+    ///
+    /// - Parameter item: The item to describe.
+    /// - Returns: The formatted description string.
+    public func describe(item: Item) async -> String {
+        let rawDescription: String?
+        if let handler = item.longDescription {
+            // Execute the handler with a snapshot of the *current* state
+            // before the action potentially modified it.
+            let stateSnapshot = gameState.snapshot
+            rawDescription = await handler(item, stateSnapshot)
+        } else {
+            rawDescription = nil
+        }
+
+        // Fallback if handler is nil or returns nil
+        let finalRaw = rawDescription ?? "You see nothing special about the \(item.name)."
+
+        return formatDescription(finalRaw)
+    }
+
+    /// Generates the long description for a given location, invoking its dynamic handler if available.
+    /// Applies standard formatting (Markdown, line wrapping).
+    ///
+    /// - Parameter location: The location to describe.
+    /// - Returns: The formatted description string.
+    public func describe(location: Location) async -> String {
+        let rawDescription: String?
+        if let handler = location.longDescription {
+            // Execute the handler with a snapshot of the *current* state
+            // before the action potentially modified it.
+            let stateSnapshot = gameState.snapshot
+            rawDescription = await handler(location, stateSnapshot)
+        } else {
+            rawDescription = nil
+        }
+
+        // Fallback if handler is nil or returns nil
+        let finalRaw = rawDescription ?? "You are in the \(location.name)."
+
+        return formatDescription(finalRaw)
+    }
+
+    /// Helper to format a raw description string using Markdown and apply line wrapping.
+    private func formatDescription(_ raw: String) -> String {
+        let document = Document(parsing: raw)
+        return document.format(options: markupOptions)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    /// Formatting options for Markdown output.
+    private var markupOptions: MarkupFormatter.Options {
+        MarkupFormatter.Options(
+            preferredLineLimit: MarkupFormatter.Options.PreferredLineLimit(
+                maxLength: maximumDescriptionLength,
+                breakWith: .hardBreak
+            )
+        )
+    }
+}
+
+// MARK: - Game State Query Helpers
+
+extension GameEngine {
+
+    /// Generates a natural language list of item names with indefinite articles.
+    /// e.g., [], -> ""
+    /// e.g., [key], -> "a key"
+    /// e.g., [key, lamp], -> "a key and a lamp"
+    /// e.g., [key, lamp, bottle], -> "a key, a lamp, and a bottle"
+    /// - Parameter items: An array of items to list.
+    /// - Returns: A formatted string representing the list.
+    public func listItemsForContents(_ items: [Item]) -> String {
+        guard !items.isEmpty else {
+            return ""
+        }
+
+        // Use the item's name to generate the phrase "a [name]" or "an [name]"
+        let itemPhrases = items.map { item in
+            let name = item.name
+            let firstLetter = name.lowercased().first
+            let article = (firstLetter == "a" || firstLetter == "e" || firstLetter == "i" || firstLetter == "o" || firstLetter == "u") ? "an" : "a"
+            return "\(article) \(name)"
+        }.sorted() // Sort alphabetically for consistent output
+
+        if itemPhrases.count == 1 {
+            return itemPhrases[0]
+        } else if itemPhrases.count == 2 {
+            return "\(itemPhrases[0]) and \(itemPhrases[1])"
+        } else {
+            // All but the last item, joined by commas
+            let initialPart = itemPhrases.dropLast().joined(separator: ", ")
+            // Add the last item with "and"
+            return "\(initialPart), and \(itemPhrases.last!)"
         }
     }
 }

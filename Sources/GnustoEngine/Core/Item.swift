@@ -1,5 +1,8 @@
 import Foundation // Needed for Codable conformance for classes
 
+/// A closure that dynamically generates a description string for an Item based on its state and the overall GameState.
+public typealias ItemDescriptionHandler = @MainActor @Sendable (Item, GameState) async -> String?
+
 /// Represents an interactable object within the game world.
 /// Note: Marked @unchecked Sendable due to the type-erased `dynamicProperties` dictionary.
 /// Care must be taken if accessing/mutating this dictionary concurrently.
@@ -44,7 +47,8 @@ public struct Item: Codable, Identifiable, Sendable {
     public var size: Int
 
     /// The detailed description shown when examining the item (ZIL LDESC).
-    public var longDescription: DescriptionHandler?
+    /// Can be a static string or a dynamic handler closure.
+    public var longDescription: ItemDescriptionHandler?
 
     /// Synonyms for the item's name (e.g., ["lamp", "light"]).
     public var synonyms: Set<String>
@@ -65,7 +69,7 @@ public struct Item: Codable, Identifiable, Sendable {
         synonyms: String...,
         shortDescription: DescriptionHandler? = nil,
         firstDescription: DescriptionHandler? = nil,
-        longDescription: DescriptionHandler? = nil,
+        longDescription: ItemDescriptionHandler? = nil,
         text: String? = nil,
         heldText: String? = nil,
         properties: ItemProperty...,
@@ -111,7 +115,6 @@ public struct Item: Codable, Identifiable, Sendable {
         case parent
         case properties
         case size
-        case longDescription
         case synonyms
         case text
         case readableText
@@ -130,7 +133,7 @@ public struct Item: Codable, Identifiable, Sendable {
         parent = try container.decode(ParentEntity.self, forKey: .parent)
         properties = try container.decode(Set<ItemProperty>.self, forKey: .properties)
         size = try container.decode(Int.self, forKey: .size)
-        longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
+        longDescription = nil // Set to nil on decode as it cannot be persisted
         synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
         text = try container.decodeIfPresent(String.self, forKey: .text)
         readableText = try container.decodeIfPresent(String.self, forKey: .readableText)
@@ -163,7 +166,6 @@ public struct Item: Codable, Identifiable, Sendable {
         try container.encode(parent, forKey: .parent)
         try container.encode(properties, forKey: .properties)
         try container.encode(size, forKey: .size)
-        try container.encodeIfPresent(longDescription, forKey: .longDescription)
         try container.encode(synonyms, forKey: .synonyms)
         try container.encodeIfPresent(text, forKey: .text)
         try container.encodeIfPresent(readableText, forKey: .readableText)
@@ -198,24 +200,26 @@ extension Item {
 // MARK: - Equatable Conformance (Manual)
 
 extension Item: Equatable {
+    // Manually implement Equatable, ignoring the non-comparable closure property.
     public static func == (lhs: Item, rhs: Item) -> Bool {
-        // Compare all properties INCLUDING dynamicValues, as StateValue is now Equatable.
-        return lhs.id == rhs.id &&
-               lhs.name == rhs.name &&
-               lhs.adjectives == rhs.adjectives &&
-               lhs.synonyms == rhs.synonyms &&
-               lhs.shortDescription == rhs.shortDescription &&
-               lhs.firstDescription == rhs.firstDescription &&
-               lhs.longDescription == rhs.longDescription &&
-               lhs.text == rhs.text &&
-               lhs.heldText == rhs.heldText &&
-               lhs.properties == rhs.properties &&
-               lhs.size == rhs.size &&
-               lhs.capacity == rhs.capacity &&
-               lhs.parent == rhs.parent &&
-               lhs.readableText == rhs.readableText &&
-               lhs.lockKey == rhs.lockKey &&
-               lhs.dynamicValues == rhs.dynamicValues
+        // Compare all properties *except* longDescription
+        lhs.adjectives == rhs.adjectives &&
+        lhs.capacity == rhs.capacity &&
+        lhs.dynamicValues == rhs.dynamicValues &&
+        lhs.shortDescription == rhs.shortDescription && // Assumes DescriptionHandler (String) is Equatable
+        lhs.firstDescription == rhs.firstDescription && // Assumes DescriptionHandler (String) is Equatable
+        lhs.heldText == rhs.heldText &&
+        lhs.id == rhs.id &&
+        lhs.name == rhs.name &&
+        lhs.parent == rhs.parent &&
+        lhs.properties == rhs.properties &&
+        lhs.size == rhs.size &&
+        // lhs.longDescription == rhs.longDescription && // Omit closure comparison
+        lhs.synonyms == rhs.synonyms &&
+        lhs.text == rhs.text &&
+        lhs.readableText == rhs.readableText &&
+        lhs.lockKey == rhs.lockKey
+        // Add any other properties if they exist
     }
 }
 

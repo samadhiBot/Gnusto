@@ -1,5 +1,8 @@
 import Foundation // Needed for Codable conformance for classes
 
+/// A closure that dynamically generates a description string for a Location based on its state and the overall GameState.
+public typealias LocationDescriptionHandler = @MainActor @Sendable (Location, GameState) async -> String?
+
 /// Represents a distinct location within the game world.
 public struct Location: Codable, Equatable, Identifiable, Sendable {
 
@@ -14,7 +17,7 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
 
     /// The main description of the location, shown upon entry or with `LOOK` (`LDESC`).
     /// Can be static text or dynamically generated.
-    public var longDescription: DescriptionHandler?
+    public var longDescription: LocationDescriptionHandler?
 
     /// A dictionary mapping directions to exit definitions.
     public var exits: [Direction: Exit]
@@ -40,7 +43,7 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     public init(
         id: LocationID,
         name: String,
-        longDescription: DescriptionHandler? = nil,
+        longDescription: LocationDescriptionHandler? = nil,
         shortDescription: DescriptionHandler? = nil,
         exits: [Direction : Exit] = [:],
         properties: LocationProperty...,
@@ -60,39 +63,44 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
         self.dynamicValues = [:] // Initialize as empty
     }
 
-    // --- Codable Conformance ---
-    // Classes require explicit implementation
+    // MARK: - Codable Conformance
+
+    // NOTE: LocationDescriptionHandler is NOT Codable. Omitting.
 
     enum CodingKeys: String, CodingKey {
         case dynamicValues
-        case longDescription
         case exits
-        case globals
         case id
+        // case longDescription // Omit
         case name
         case properties
-        case shortDescription
     }
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        longDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .longDescription)
-        exits = try container.decode([Direction: Exit].self, forKey: .exits)
-        globals = try container.decode([ItemID].self, forKey: .globals)
         id = try container.decode(LocationID.self, forKey: .id)
         name = try container.decode(String.self, forKey: .name)
+        exits = try container.decode([Direction: Exit].self, forKey: .exits)
         properties = try container.decode(Set<LocationProperty>.self, forKey: .properties)
-        shortDescription = try container.decodeIfPresent(DescriptionHandler.self, forKey: .shortDescription)
+        self.longDescription = nil // Explicitly initialize omitted property
+        self.globals = [] // Initialize omitted property
+        self.shortDescription = nil // Initialize omitted property
 
         // Decode dynamic values
         let stringKeyedValues: [String: StateValue] = try container.decodeIfPresent([String: StateValue].self, forKey: .dynamicValues) ?? [:]
-        dynamicValues = Dictionary(uniqueKeysWithValues: stringKeyedValues.map { (key, value) in
-             (PropertyID(key), value)
-         })
+        // Assign the decoded values
+        self.dynamicValues = Dictionary(uniqueKeysWithValues: stringKeyedValues.map { (key, value) in
+            (PropertyID(key), value)
+        })
     }
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(exits, forKey: .exits)
+        try container.encode(properties, forKey: .properties)
+        // Omit: try container.encodeIfPresent(longDescription, forKey: .longDescription)
         // Encode dynamic values
         if !dynamicValues.isEmpty {
             let stringKeyedValues = Dictionary(uniqueKeysWithValues: dynamicValues.map { (key, value) in
@@ -100,16 +108,9 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
             })
             try container.encode(stringKeyedValues, forKey: .dynamicValues)
         }
-        try container.encodeIfPresent(longDescription, forKey: .longDescription)
-        try container.encode(exits, forKey: .exits)
-        try container.encode(globals, forKey: .globals)
-        try container.encode(id, forKey: .id)
-        try container.encode(name, forKey: .name)
-        try container.encode(properties, forKey: .properties)
-        try container.encodeIfPresent(shortDescription, forKey: .shortDescription)
     }
 
-    // --- Convenience Accessors ---
+    // MARK: - Convenience Accessors
 
     /// Checks if the location has a specific property.
     /// - Parameter property: The `LocationProperty` to check for.
@@ -131,17 +132,15 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-// MARK: - Equatable Conformance (Manual needed due to adding property)
+// MARK: - Equatable Conformance (Manual)
 
-extension Location /* : Equatable */ {
+extension Location {
     public static func == (lhs: Location, rhs: Location) -> Bool {
         lhs.id == rhs.id &&
         lhs.name == rhs.name &&
-        lhs.longDescription == rhs.longDescription &&
-        lhs.shortDescription == rhs.shortDescription &&
         lhs.exits == rhs.exits &&
         lhs.properties == rhs.properties &&
-        lhs.globals == rhs.globals &&
-        lhs.dynamicValues == rhs.dynamicValues // Changed property name
+        lhs.dynamicValues == rhs.dynamicValues
+        // longDescription omitted
     }
 }

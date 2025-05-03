@@ -29,47 +29,50 @@ public struct LookActionHandler: EnhancedActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
+        let engine = context.engine
+        let stateSnapshot = context.stateSnapshot // Use the snapshot provided by context
+
         // LOOK (no object)
         guard let targetItemID = context.command.directObject else {
-            // Generate and print the location description directly.
-            // Since this bypasses the normal ActionResult message printing,
-            // return an empty success result with an empty message.
-            // TODO: Refactor describeCurrentLocation to *return* the string
-            //       so it fits the ActionResult pattern better.
-            await context.engine.describeCurrentLocation()
-            return ActionResult(success: true, message: "") // Message already printed
+            // Get current location from the snapshot
+            let currentLocationID = stateSnapshot.player.currentLocationID
+            guard let currentLocation = await engine.location(with: currentLocationID) else {
+                // Should not happen if player location is valid
+                throw ActionError.internalEngineError("Player is in an invalid location: \(currentLocationID)")
+            }
+
+            // Generate description using the new engine method
+            let description = await engine.describe(location: currentLocation)
+
+            // Return the description in the ActionResult
+            return ActionResult(success: true, message: description)
         }
 
         // EXAMINE [Object]
         // Validation ensures item exists and is reachable
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await engine.item(with: targetItemID) else {
             // This should not happen due to validation, but guard defensively.
             throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
         }
 
-        // 1. Get base description
+        // 1. Get base description using the new engine method
         var descriptionLines: [String] = []
-        if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await context.engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: context.engine
-            )
-            descriptionLines.append(baseDescription)
-        } else {
-            descriptionLines.append("You see nothing special about the \(targetItem.name).")
-        }
+        let baseDescription = await engine.describe(item: targetItem)
+        descriptionLines.append(baseDescription)
 
         // 2. Add container/surface contents
-        // Pass the Item (ReadOnlyItem) to the helper
-        descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: context.engine))
+        // Pass the Item to the helper
+        descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: engine, stateSnapshot: stateSnapshot))
 
         // 3. Prepare state change (mark as touched)
         var stateChanges: [StateChange] = []
-        if !targetItem.hasProperty(.touched) {
-            let oldProperties = targetItem.properties
+        // Use the item from the snapshot for checking properties
+        if let snapshotItem = stateSnapshot.items[targetItemID],
+           !snapshotItem.hasProperty(ItemProperty.touched)
+        {
+            let oldProperties = snapshotItem.properties
             var newProperties = oldProperties
-            newProperties.insert(.touched)
+            newProperties.insert(ItemProperty.touched)
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
@@ -93,24 +96,30 @@ public struct LookActionHandler: EnhancedActionHandler {
     // MARK: - Helper Functions
 
     /// Generates description lines for the contents of a container or surface.
-    /// Accepts a Item (ReadOnlyItem).
-    private func describeContents(of item: Item, engine: GameEngine) async -> [String] {
+    /// Accepts an Item and uses the GameState snapshot for consistency.
+    private func describeContents(
+        of item: Item, // The item definition (might be slightly stale if state changed)
+        engine: GameEngine, // Needed for helper methods like listWithIndefiniteArticles
+        stateSnapshot: GameState // Use snapshot to find items inside/on
+    ) async -> [String] {
         var lines: [String] = []
+        let itemID = item.id
 
-        // Container contents
+        // Container contents - Check properties on the potentially stale item definition
         if item.hasProperty(.container) {
-            let isOpen = item.hasProperty(.open)
-            let isTransparent = item.hasProperty(.transparent)
+            // Check current state (open/closed) from the snapshot
+            let isOpen = stateSnapshot.items[itemID]?.hasProperty(ItemProperty.open) ?? false
+            let isTransparent = item.hasProperty(.transparent) // Transparency is usually static
 
             if isOpen || isTransparent {
-                // Get snapshots of items *inside* the container
-                let contents = await engine.items(withParent: .item(item.id))
+                // Get items *inside* the container from the snapshot
+                let contents = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
                 if contents.isEmpty {
                     lines.append("The \(item.name) is empty.")
                 } else {
-                    lines.append("The \(item.name) contains:")
-                    // TODO: Proper sentence construction with articles/grouping
-                    lines.append(contentsOf: contents.map { "  A \($0.name)" }.sorted())
+                    lines.append(
+                        "The \(item.name) contains \(contents.listWithIndefiniteArticles)."
+                    )
                 }
             } else {
                 // Closed and not transparent
@@ -118,12 +127,13 @@ public struct LookActionHandler: EnhancedActionHandler {
             }
         }
 
-        // Surface contents
+        // Surface contents - Check property on item definition
         if item.hasProperty(.surface) {
-            // Get snapshots of items *on* the surface
-            let itemsOnSurface = await engine.items(withParent: .item(item.id))
+            // Get items *on* the surface from the snapshot
+            let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
             if !itemsOnSurface.isEmpty {
-                let itemNames = itemsOnSurface.listWithIndefiniteArticles
+                // Use engine helper for formatting
+                let itemNames = await engine.listItemsForContents(Array(itemsOnSurface))
                 lines.append("On the \(item.name) is \(itemNames).")
             }
             // No message needed if surface is empty
