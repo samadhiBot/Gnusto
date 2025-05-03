@@ -17,19 +17,12 @@ public struct Item: Codable, Identifiable, Sendable {
 
     /// Storage for state values that might have associated dynamic behavior (computation/validation)
     /// defined externally in the `DynamicPropertyRegistry`.
+    /// Use `PropertyID` constants (e.g., `.longDescription`, `.itemReadText`) as keys.
+    /// Values are typically `StateValue.string` for descriptions/text.
     public var dynamicValues: [PropertyID: StateValue]
 
     // Action handler - Placeholder.
     // var actionHandlerID: String?
-
-    /// The short description shown in room listings and when the item is mentioned (ZIL DESC).
-    public var shortDescription: DescriptionHandler?
-
-    /// The description shown when the item is first seen in a room (ZIL FDESC).
-    public var firstDescription: DescriptionHandler?
-
-    /// Text displayed only when the item is held and read (`READ`, requires `ItemProperty.read`).
-    public var heldText: String?
 
     /// The unique identifier for this item (ZIL NAME). `let` because identity doesn't change.
     public let id: ItemID
@@ -46,18 +39,8 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The item's size, influencing carrying capacity and container limits. Defaults to 5 per ZILF docs.
     public var size: Int
 
-    /// The detailed description shown when examining the item (ZIL LDESC).
-    /// Can be a static string or a dynamic handler closure.
-    public var longDescription: DescriptionHandler?
-
     /// Synonyms for the item's name (e.g., ["lamp", "light"]).
     public var synonyms: Set<String>
-
-    /// Text displayed when the item is read (`READ`, requires `ItemProperty.read`).
-    public var text: String?
-
-    /// The text content if the item is `.readable`.
-    public var readableText: String? = nil
 
     /// The key needed to lock/unlock this item (if `.lockable`).
     public var lockKey: ItemID? = nil
@@ -67,16 +50,15 @@ public struct Item: Codable, Identifiable, Sendable {
         name: String,
         adjectives: String...,
         synonyms: String...,
-        shortDescription: DescriptionHandler? = nil,
-        firstDescription: DescriptionHandler? = nil,
-        longDescription: DescriptionHandler? = nil,
-        text: String? = nil,
+        shortDescription: String? = nil,
+        firstDescription: String? = nil,
+        longDescription: String? = nil,
+        readText: String? = nil,      // Renamed from 'text'/'readableText'
         heldText: String? = nil,
         properties: ItemProperty...,
         size: Int = 5,
         capacity: Int = -1,
         parent: ParentEntity = .nowhere,
-        readableText: String? = nil,
         lockKey: ItemID? = nil
         // actionHandlerID: String? = nil
     ) {
@@ -84,26 +66,57 @@ public struct Item: Codable, Identifiable, Sendable {
         self.name = name
         self.adjectives = Set(adjectives)
         self.synonyms = Set(synonyms)
-        self.shortDescription = shortDescription
-        self.firstDescription = firstDescription
-        self.longDescription = longDescription
-        self.text = text
-        self.heldText = heldText
         self.properties = Set(properties)
         self.size = size
         self.capacity = capacity
         self.parent = parent
-        self.readableText = readableText
         self.lockKey = lockKey
         // self.actionHandlerID = actionHandlerID
 
         // Initialize dynamic values
-        self.dynamicValues = [:] // Initialize as empty, game definition populates
+        var initialValues: [PropertyID: StateValue] = [:]
+        if let value = shortDescription { initialValues[GnustoEngine.PropertyID.shortDescription] = GnustoEngine.StateValue.string(value) }
+        if let value = firstDescription { initialValues[GnustoEngine.PropertyID.itemFirstDescription] = GnustoEngine.StateValue.string(value) }
+        if let value = longDescription { initialValues[GnustoEngine.PropertyID.longDescription] = GnustoEngine.StateValue.string(value) }
+        if let value = readText { initialValues[GnustoEngine.PropertyID.itemReadText] = GnustoEngine.StateValue.string(value) }
+        if let value = heldText { initialValues[GnustoEngine.PropertyID.itemHeldText] = GnustoEngine.StateValue.string(value) }
+        self.dynamicValues = initialValues
     }
 
     // MARK: - Codable Conformance
 
-    // Codable conformance will be synthesized (DescriptionHandler is Codable)
+    private enum CodingKeys: String, CodingKey {
+        case id, name, adjectives, synonyms, properties, size, capacity, parent, lockKey, dynamicValues
+        // Note: Removed keys for old description properties
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(ItemID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        adjectives = try container.decode(Set<String>.self, forKey: .adjectives)
+        synonyms = try container.decode(Set<String>.self, forKey: .synonyms)
+        properties = try container.decode(Set<ItemProperty>.self, forKey: .properties)
+        size = try container.decode(Int.self, forKey: .size)
+        capacity = try container.decode(Int.self, forKey: .capacity)
+        parent = try container.decode(ParentEntity.self, forKey: .parent)
+        lockKey = try container.decodeIfPresent(ItemID.self, forKey: .lockKey)
+        dynamicValues = try container.decode([PropertyID: StateValue].self, forKey: .dynamicValues)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(adjectives, forKey: .adjectives)
+        try container.encode(synonyms, forKey: .synonyms)
+        try container.encode(properties, forKey: .properties)
+        try container.encode(size, forKey: .size)
+        try container.encode(capacity, forKey: .capacity)
+        try container.encode(parent, forKey: .parent)
+        try container.encodeIfPresent(lockKey, forKey: .lockKey)
+        try container.encode(dynamicValues, forKey: .dynamicValues)
+    }
 
     /// Adds a property to the item.
     /// - Parameter property: The `ItemProperty` to add.
@@ -130,9 +143,9 @@ extension Item {
     }
 }
 
-// MARK: - Equatable Conformance (Manual)
+// MARK: - Equatable Conformance
 
-// Equatable conformance will be synthesized (DescriptionHandler is Equatable)
+// Equatable conformance will be synthesized
 
 // MARK: - Comparable conformance
 
