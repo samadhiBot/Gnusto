@@ -97,7 +97,13 @@ struct ReadActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.customResponse("Read what?")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         let output = await mockIO.flush()
         #expect(output.isEmpty)
@@ -128,7 +134,13 @@ struct ReadActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("scroll")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -155,7 +167,13 @@ struct ReadActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotReadable("rock")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -193,7 +211,13 @@ struct ReadActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.roomIsDark) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 

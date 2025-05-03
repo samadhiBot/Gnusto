@@ -447,7 +447,7 @@ public class GameEngine: Sendable {
                     let context = ActionContext(
                         command: command,
                         engine: self,
-                        stateSnapshot: gameState.snapshot() // Use snapshot()
+                        stateSnapshot: gameState.snapshot
                         // contextData is empty by default
                     )
 
@@ -1303,7 +1303,7 @@ extension GameEngine {
                 newValue: newValue
             )
             // Directly apply to gameState (we are already @MainActor async)
-            try await gameState.apply(change)
+            try gameState.apply(change)
         }
     }
 
@@ -1344,7 +1344,7 @@ extension GameEngine {
                 newValue: newValue
             )
             // Directly apply to gameState (we are already @MainActor async)
-            try await gameState.apply(change)
+            try gameState.apply(change)
         }
     }
 }

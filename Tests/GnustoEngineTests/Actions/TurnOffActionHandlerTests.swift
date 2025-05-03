@@ -82,7 +82,13 @@ struct TurnOffActionHandlerTests {
         let command = Command(verbID: "turn off", directObject: "book", rawInput: "turn off book")
 
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -110,7 +116,13 @@ struct TurnOffActionHandlerTests {
 
         // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -217,7 +229,13 @@ struct TurnOffActionHandlerTests {
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already off.")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         // Check state remains unchanged - touched should NOT be added if validation fails
@@ -248,7 +266,13 @@ struct TurnOffActionHandlerTests {
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = engine.item(with: "lamp")

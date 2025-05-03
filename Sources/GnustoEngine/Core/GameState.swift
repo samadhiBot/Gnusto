@@ -116,6 +116,21 @@ public struct GameState: Codable, Equatable, Sendable {
         )
     }
 
+    @MainActor
+    var snapshot: GameState {
+        GameState(
+            locations: Array(locations.values),
+            items: Array(items.values),
+            player: player,
+            vocabulary: vocabulary,
+            flags: flags,
+            pronouns: pronouns,
+            activeFuses: activeFuses,
+            activeDaemons: activeDaemons,
+            gameSpecificState: gameSpecificState
+        )
+    }
+
     // MARK: - State Mutation
 
     /// Applies a `StateChange` to the game state, modifying the relevant property and recording the change.

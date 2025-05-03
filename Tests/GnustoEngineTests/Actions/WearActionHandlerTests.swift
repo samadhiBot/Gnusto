@@ -78,7 +78,13 @@ struct WearActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -102,7 +108,13 @@ struct WearActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotWearable("rock")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -127,7 +139,13 @@ struct WearActionHandlerTests {
         // Act & Assert Error (on validate)
         // Assuming the linter issue with ActionError is temporary
         await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -146,7 +164,13 @@ struct WearActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }

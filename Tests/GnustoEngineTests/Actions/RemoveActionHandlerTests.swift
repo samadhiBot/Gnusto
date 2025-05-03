@@ -84,7 +84,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -102,7 +108,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -121,7 +133,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -145,7 +163,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotRemovable("amulet")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }

@@ -82,7 +82,13 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.customResponse("Touch what?")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         let output = await mockIO.flush()
         #expect(output.isEmpty)
@@ -108,7 +114,13 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("figurine")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -211,7 +223,13 @@ struct TouchActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("The locked chest is closed.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 }

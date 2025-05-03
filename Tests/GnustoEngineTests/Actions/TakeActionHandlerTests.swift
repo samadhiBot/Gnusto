@@ -402,7 +402,13 @@ struct TakeActionHandlerTests {
 
         // Act & Assert: Expect validate to throw playerCannotCarryMore
         await #expect(throws: ActionError.playerCannotCarryMore) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         // Assert no output was printed by the handler itself during validation

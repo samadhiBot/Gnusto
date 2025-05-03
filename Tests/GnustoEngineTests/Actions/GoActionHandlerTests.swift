@@ -80,7 +80,13 @@ struct GoActionHandlerTests {
         )
 
         await #expect(throws: ActionError.directionIsBlocked("A wall blocks your path.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         let output = await mockIO.flush()
@@ -119,7 +125,13 @@ struct GoActionHandlerTests {
         )
 
         await #expect(throws: ActionError.invalidDirection) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         let output = await mockIO.flush()

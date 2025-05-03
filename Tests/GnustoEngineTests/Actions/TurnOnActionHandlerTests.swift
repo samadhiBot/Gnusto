@@ -117,7 +117,13 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already on.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
@@ -150,7 +156,13 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
-            try await handler.validate(command: command, engine: engine) // Changed to validate
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            ) // Changed to validate
         }
 
         let finalItemState = engine.item(with: "lamp")
