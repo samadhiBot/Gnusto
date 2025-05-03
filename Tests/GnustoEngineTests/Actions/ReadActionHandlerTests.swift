@@ -12,9 +12,9 @@ struct ReadActionHandlerTests {
         let book = Item(
             id: "book",
             name: "dusty book",
+            readText: "It reads: \"Beware the Grue!\"",
             properties: .takable, .readable,
-            parent: .player,
-            readableText: "It reads: \"Beware the Grue!\""
+            parent: .player
         )
 
         let game = MinimalGame(items: [book])
@@ -44,9 +44,9 @@ struct ReadActionHandlerTests {
         let sign = Item(
             id: "sign",
             name: "warning sign",
+            readText: "DANGER AHEAD",
             properties: .readable,
-            parent: .location("litRoom"),
-            readableText: "DANGER AHEAD"
+            parent: .location("litRoom")
         )
         let litRoom = Location(
             id: "litRoom",
@@ -115,9 +115,9 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
+            readText: "Secrets within",
             properties: .readable,
-            parent: .nowhere,
-            readableText: "Secrets within"
+            parent: .nowhere
         )
 
         let game = MinimalGame(items: [scroll])
@@ -183,9 +183,9 @@ struct ReadActionHandlerTests {
         let map = Item(
             id: "map",
             name: "folded map",
+            readText: "X marks the spot",
             properties: .takable, .readable,
-            parent: .location("darkRoom"),
-            readableText: "X marks the spot"
+            parent: .location("darkRoom")
         )
         let darkRoom = Location(
             id: "darkRoom",
@@ -227,9 +227,9 @@ struct ReadActionHandlerTests {
         let blankPaper = Item(
             id: "paper",
             name: "blank paper",
+            readText: "",
             properties: .takable, .readable,
-            parent: .player,
-            readableText: ""
+            parent: .player
         )
 
         let game = MinimalGame(items: [blankPaper])
@@ -259,9 +259,9 @@ struct ReadActionHandlerTests {
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",
+            readText: "Ancient Runes",
             properties: .lightSource, .on, .readable,
             parent: .location("darkRoom"),
-            readableText: "Ancient Runes"
         )
         let darkRoom = Location(
             id: "darkRoom",
@@ -314,7 +314,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "scroll")?.hasProperty(ItemProperty.touched) == false)
+        #expect(engine.item(with: "scroll")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
 
@@ -327,7 +327,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "scroll")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Read item with empty text")
@@ -350,7 +350,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "note")?.hasProperty(ItemProperty.touched) == false)
+        #expect(engine.item(with: "note")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
 
@@ -363,7 +363,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "note")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Read item with nil text")
@@ -385,7 +385,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "tablet")?.hasProperty(ItemProperty.touched) == false)
+        #expect(engine.item(with: "tablet")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -398,7 +398,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "tablet")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Read item not accessible")
@@ -505,7 +505,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-         #expect(engine.item(with: "tablet")?.hasProperty(ItemProperty.touched) == false)
+         #expect(engine.item(with: "tablet")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -518,7 +518,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "tablet")
-        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
+        #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
     @Test("Read item requires direct object")
@@ -540,5 +540,115 @@ struct ReadActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Read what?")
+    }
+
+    @Test("Read item inside held container")
+    func testReadItemInsideHeldContainer() async throws {
+        // Arrange
+        let box = Item(id: "box", name: "wooden box", properties: .takable, .container, .open, parent: .player)
+        let note = Item(
+            id: "note",
+            name: "folded note",
+            readText: "Meet at midnight.",
+            properties: ItemProperty.readable,
+            parent: .item("box")
+        )
+
+        let game = MinimalGame(items: [box, note])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Meet at midnight.")
+
+        // Assert Final State
+        let finalItemState = engine.item(with: "note")
+        #expect(finalItemState?.hasProperty(.touched) == true)
+    }
+
+    @Test("Read item inside container in room")
+    func testReadItemInsideContainerInRoom() async throws {
+        // Arrange
+        let chest = Item(
+            id: "chest",
+            name: "iron chest",
+            properties: .container, .open,
+            parent: .location("startRoom")
+        )
+        let letter = Item(
+            id: "letter",
+            name: "sealed letter",
+            readText: "Important news.",
+            properties: ItemProperty.readable,
+            parent: .item("chest")
+        )
+
+        let game = MinimalGame(items: [chest, letter])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let command = Command(verbID: "read", directObject: "letter", rawInput: "read letter")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Important news.")
+
+        // Assert Final State
+        let finalItemState = engine.item(with: "letter")
+        #expect(finalItemState?.hasProperty(.touched) == true)
+    }
+
+    @Test("Read fails item inside closed container")
+    func testReadFailsItemInsideClosedContainer() async throws {
+        // Arrange
+        let lockedBox = Item(
+            id: "lockedBox",
+            name: "locked box",
+            properties: .container, .lockable,
+            parent: .location("startRoom")
+        )
+        let secret = Item(
+            id: "secret",
+            name: "secret paper",
+            readText: "Top Secret!",
+            properties: ItemProperty.readable,
+            parent: .item("lockedBox")
+        )
+
+        let game = MinimalGame(items: [lockedBox, secret])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let command = Command(verbID: "read", directObject: "secret", rawInput: "read secret")
+
+        // Act & Assert
+        await engine.execute(command: command)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
+
+        // Also assert the item wasn't touched
+        let finalSecretState = engine.item(with: "secret")
+        #expect(finalSecretState?.hasProperty(.touched) == false)
     }
 }

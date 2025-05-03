@@ -2,18 +2,18 @@ import Foundation
 
 /// Represents cardinal and other directions used for navigation and spatial representation.
 public enum Direction: String, CaseIterable, Codable, Hashable, Sendable {
-    case north = "n"
-    case northeast = "ne"
-    case east = "e"
-    case southeast = "se"
-    case south = "s"
-    case southwest = "sw"
-    case west = "w"
-    case northwest = "nw"
-    case up = "u"
-    case down = "d"
-    case inside = "in"
-    case outside = "out"
+    case down = "down" 
+    case east = "east" 
+    case inside = "in" 
+    case north = "north" 
+    case northeast = "northeast" 
+    case northwest = "northwest" 
+    case outside = "out" 
+    case south = "south" 
+    case southeast = "southeast" 
+    case southwest = "southwest" 
+    case up = "up" 
+    case west = "west" 
 }
 
 // MARK: - Comparable

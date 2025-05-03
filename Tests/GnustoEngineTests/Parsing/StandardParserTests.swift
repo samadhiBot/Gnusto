@@ -872,8 +872,8 @@ struct StandardParserTests {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in,
-            "out": .out
+            "in": .inside,
+            "out": .outside
         ]
 
         for (input, expectedDirection) in directionMap {
@@ -901,8 +901,8 @@ struct StandardParserTests {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in,
-            "out": .out
+            "in": .inside,
+            "out": .outside
         ]
 
         for (directionWord, expectedDirection) in directionMap {

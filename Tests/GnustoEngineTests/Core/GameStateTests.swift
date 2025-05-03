@@ -366,7 +366,7 @@ struct GameStateTests {
         // modifies a *copy*. To persist, reassign to the dictionary.
         // This test might need rethinking if direct mutation isn't the goal.
         var woh = state.locations[Self.locWOH]!
-        woh.longDescription = "A new description."
+        woh.dynamicValues[.longDescription] = .string("A new description.")
         state.locations[Self.locWOH] = woh
 
         var lantern = state.items[Self.itemLantern]!
@@ -385,8 +385,7 @@ struct GameStateTests {
 
         // Assertions for the valid modifications:
         #expect(
-            state.locations[Self.locWOH]?.longDescription?
-                .rawStaticDescription == "A new description."
+            state.locations[Self.locWOH]?.dynamicValues[.longDescription] == .string("A new description.")
         )
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
@@ -426,7 +425,7 @@ struct GameStateTests {
 
         // Check content of locations (comparing key properties)
         #expect(decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
-        #expect(decodedState.locations[Self.locNorth]?.longDescription == originalState.locations[Self.locNorth]?.longDescription)
+        #expect(decodedState.locations[Self.locNorth]?.dynamicValues[.longDescription] == originalState.locations[Self.locNorth]?.dynamicValues[.longDescription])
 
         // Check content of items (comparing key properties, including parent)
         #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)
@@ -553,5 +552,118 @@ struct GameStateTests {
         // Verify state hasn't changed unexpectedly
         #expect(gameState.activeFuses == ["existingFuse": 5]) // Fuse should still be present
         #expect(gameState.changeHistory.isEmpty) // Apply should fail before adding to history
+    }
+
+    @Test("apply - Modify Location Properties - Set")
+    func testApplyModifyLocationPropertiesSet() {
+        var state = createInitialState()
+        // Add the location explicitly before applying the change
+        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc")
+        state.locations["testLoc"] = testLoc
+
+        let change = StateChange(
+            entityId: .location("testLoc"),
+            propertyKey: .locationProperties,
+            oldValue: .locationPropertySet([]),
+            newValue: .locationPropertySet([.inherentlyLit])
+        )
+        try? state.apply(change)
+
+        #expect(change.entityId == .location("testLoc"))
+        #expect(change.propertyKey == .locationProperties)
+        if case .locationPropertySet(let oldProps) = change.oldValue { #expect(oldProps.isEmpty) }
+        else { Issue.record("OldValue wrong type") }
+        if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps == [.inherentlyLit]) }
+        else { Issue.record("NewValue wrong type") }
+        // Verify description remains untouched initially
+        #expect(state.locations["testLoc"]?.dynamicValues[.longDescription] == .string("Original Desc"))
+    }
+
+    @Test("apply - Modify Location Properties - Remove")
+    func testApplyModifyLocationPropertiesRemove() {
+        var state = createInitialState()
+        // Add the location explicitly before applying the change
+        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc", properties: .inherentlyLit)
+        state.locations["testLoc"] = testLoc
+
+        let change = StateChange(
+            entityId: .location("testLoc"),
+            propertyKey: .locationProperties,
+            oldValue: .locationPropertySet([.inherentlyLit]),
+            newValue: .locationPropertySet([])
+        )
+        try? state.apply(change)
+
+        #expect(change.entityId == .location("testLoc"))
+        #expect(change.propertyKey == .locationProperties)
+        if case .locationPropertySet(let oldProps) = change.oldValue { #expect(oldProps == [.inherentlyLit]) }
+        else { Issue.record("OldValue wrong type") }
+        if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps.isEmpty) }
+        else { Issue.record("NewValue wrong type") }
+        // Verify description remains untouched
+        #expect(state.locations["testLoc"]?.dynamicValues[.longDescription] == .string("Original Desc"))
+    }
+
+    @Test("apply - Modify Location Dynamic Value")
+    func testApplyModifyLocationDynamicValue() {
+        var state = createInitialState()
+        // Add the location explicitly before applying the change
+        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc")
+        state.locations["testLoc"] = testLoc
+
+        let change = StateChange(
+            entityId: .location("testLoc"),
+            propertyKey: .locationDynamicValue(key: .longDescription),
+            oldValue: .string("Original Desc"),
+            newValue: .string("Updated Desc")
+        )
+        try? state.apply(change)
+
+        #expect(change.entityId == .location("testLoc"))
+        #expect(change.propertyKey == .locationDynamicValue(key: .longDescription))
+        #expect(change.oldValue == .string("Original Desc"))
+        #expect(change.newValue == .string("Updated Desc"))
+        // Ensure properties are untouched
+        #expect(state.locations["testLoc"]?.properties.isEmpty == true)
+    }
+
+    @Test("apply - Validation Failure - OldValue Mismatch")
+    func testApplyValidationFailureOldValueMismatch() {
+        var state = createInitialState()
+        // Try to change a property, but provide the wrong oldValue
+        let incorrectChange = StateChange(
+            entityId: .location("startRoom"),
+            propertyKey: .locationDynamicValue(key: .longDescription),
+            oldValue: .string("Wrong Old Description"), // Incorrect old value
+            newValue: .string("New Description")
+        )
+        let correctChange = StateChange(
+            entityId: .location("startRoom"),
+            propertyKey: .locationDynamicValue(key: .longDescription),
+            oldValue: state.locations["startRoom"]?.dynamicValues[.longDescription], // Correct old value
+            newValue: .string("New Description")
+        )
+
+        do {
+            try state.apply(incorrectChange)
+            Issue.record("Expected apply to throw ActionError.stateValidationFailed, but it did not throw.")
+        } catch let error as ActionError {
+            if case .stateValidationFailed = error {
+                // Correct error type thrown, test passes this part
+            } else {
+                Issue.record("Expected ActionError.stateValidationFailed, but got \(error)")
+            }
+        } catch {
+            Issue.record("Expected ActionError, but got unexpected error type: \(error)")
+        }
+
+        // Verify the state hasn't changed
+        #expect(state.locations["startRoom"]?.dynamicValues[.longDescription] == correctChange.oldValue)
+        #expect(state.changeHistory.isEmpty) // No change should be recorded
+
+        // Now apply the correct change
+        try? state.apply(correctChange) // Use try? as we don't care about the error here
+        #expect(state.locations["startRoom"]?.dynamicValues[.longDescription] == correctChange.newValue)
+        #expect(state.changeHistory.count == 1)
     }
 }

@@ -24,7 +24,7 @@ struct ItemTests {
             shortDescription: "The brass lantern is here.",
             firstDescription: "A shiny brass lantern rests here.",
             longDescription: "A sturdy brass lantern.",
-            text: "Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"",
+            readText: "Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\"",
             heldText: "It feels warm.",
             properties: .takable, .lightSource, .on, .openable,
             size: 10,
@@ -43,16 +43,15 @@ struct ItemTests {
         #expect(item.name == defaultItemName)
         #expect(item.adjectives.isEmpty)
         #expect(item.synonyms.isEmpty)
-        #expect(item.shortDescription == nil)
-        #expect(item.firstDescription == nil)
-        #expect(item.longDescription == nil)
-        #expect(item.text == nil)
-        #expect(item.heldText == nil)
+        #expect(item.dynamicValues[.shortDescription] == nil)
+        #expect(item.dynamicValues[.itemFirstDescription] == nil)
+        #expect(item.dynamicValues[.longDescription] == nil)
+        #expect(item.dynamicValues[.itemReadText] == nil)
+        #expect(item.dynamicValues[.itemHeldText] == nil)
         #expect(item.properties.isEmpty)
         #expect(item.size == 5) // ZILF default
         #expect(item.capacity == -1) // ZILF default
         #expect(item.parent == .nowhere) // Check default parent
-        #expect(item.readableText == nil)
         #expect(item.lockKey == nil)
     }
 
@@ -64,16 +63,15 @@ struct ItemTests {
         #expect(item.name == "lantern")
         #expect(item.adjectives == ["brass", "shiny"])
         #expect(item.synonyms == ["lamp", "light"])
-        #expect(item.shortDescription?.rawStaticDescription == "The brass lantern is here.")
-        #expect(item.firstDescription?.rawStaticDescription == "A shiny brass lantern rests here.")
-        #expect(item.longDescription?.rawStaticDescription == "A sturdy brass lantern.")
-        #expect(item.text == "Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"", "Text mismatch")
-        #expect(item.heldText == "It feels warm.")
+        #expect(item.dynamicValues[.shortDescription] == .string("The brass lantern is here."))
+        #expect(item.dynamicValues[.itemFirstDescription] == .string("A shiny brass lantern rests here."))
+        #expect(item.dynamicValues[.longDescription] == .string("A sturdy brass lantern."))
+        #expect(item.dynamicValues[.itemReadText] == .string("Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\""))
+        #expect(item.dynamicValues[.itemHeldText] == .string("It feels warm."))
         #expect(item.properties == [.takable, .lightSource, .on, .openable])
         #expect(item.size == 10)
         #expect(item.capacity == 5)
         #expect(item.parent == .player) // Check custom parent
-        #expect(item.readableText == nil)
         #expect(item.lockKey == nil)
     }
 
@@ -110,7 +108,7 @@ struct ItemTests {
     @Test("Item Codable Conformance")
     func testItemCodable() throws {
         var originalItem = createCustomItem()
-        originalItem.readableText = "Readable text."
+        originalItem.dynamicValues[.itemReadText] = .string("Readable text.")
         originalItem.lockKey = "key1"
 
         let encoder = JSONEncoder()
@@ -124,16 +122,15 @@ struct ItemTests {
         #expect(decodedItem.name == originalItem.name)
         #expect(decodedItem.adjectives == originalItem.adjectives)
         #expect(decodedItem.synonyms == originalItem.synonyms)
-        #expect(decodedItem.shortDescription == originalItem.shortDescription)
-        #expect(decodedItem.firstDescription == originalItem.firstDescription)
-        #expect(decodedItem.longDescription == originalItem.longDescription)
-        #expect(decodedItem.text == originalItem.text)
-        #expect(decodedItem.heldText == originalItem.heldText)
+        #expect(decodedItem.dynamicValues[.shortDescription] == originalItem.dynamicValues[.shortDescription])
+        #expect(decodedItem.dynamicValues[.itemFirstDescription] == originalItem.dynamicValues[.itemFirstDescription])
+        #expect(decodedItem.dynamicValues[.longDescription] == originalItem.dynamicValues[.longDescription])
+        #expect(decodedItem.dynamicValues[.itemReadText] == originalItem.dynamicValues[.itemReadText])
+        #expect(decodedItem.dynamicValues[.itemHeldText] == originalItem.dynamicValues[.itemHeldText])
         #expect(decodedItem.properties == originalItem.properties)
         #expect(decodedItem.size == originalItem.size)
         #expect(decodedItem.capacity == originalItem.capacity)
         #expect(decodedItem.parent == originalItem.parent)
-        #expect(decodedItem.readableText == originalItem.readableText)
         #expect(decodedItem.lockKey == originalItem.lockKey)
     }
 

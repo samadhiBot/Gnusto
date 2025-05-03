@@ -38,10 +38,9 @@ struct LocationTests {
 
         #expect(location.id == defaultLocationID)
         #expect(location.name == defaultLocationName)
-        // Check the static description within the DescriptionHandler
-        #expect(location.longDescription?.rawStaticDescription == "A nondescript room.")
-        #expect(location.longDescription?.id == nil)
-        #expect(location.shortDescription == nil) // Verify shortDescription is nil by default
+        // Check dynamicValues for descriptions
+        #expect(location.dynamicValues[.longDescription] == .string("A nondescript room."))
+        #expect(location.dynamicValues[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
         #expect(location.properties.isEmpty)
         #expect(location.globals.isEmpty)
@@ -54,9 +53,9 @@ struct LocationTests {
 
         #expect(location.id == "livingRoom")
         #expect(location.name == "Living Room")
-        #expect(location.longDescription?.rawStaticDescription == "A comfortably furnished living room. There are exits west and east.")
-        #expect(location.longDescription?.id == nil)
-        #expect(location.shortDescription == nil)
+        // Check dynamicValues for descriptions
+        #expect(location.dynamicValues[.longDescription] == .string("A comfortably furnished living room. There are exits west and east."))
+        #expect(location.dynamicValues[.shortDescription] == nil)
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
         #expect(location.exits[.east]?.blockedMessage == "A solid wall blocks your path.")
@@ -98,8 +97,8 @@ struct LocationTests {
     @Test("Location Codable Conformance")
     func testLocationCodable() throws {
         var originalLocation = createCustomLocation()
-        // Add a short description for thorough testing
-        originalLocation.shortDescription = "A comfy room."
+        // Add a short description for thorough testing by setting dynamic value
+        originalLocation.dynamicValues[.shortDescription] = .string("A comfy room.")
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -111,9 +110,9 @@ struct LocationTests {
         // Verify key properties after decoding
         #expect(decodedLocation.id == originalLocation.id)
         #expect(decodedLocation.name == originalLocation.name)
-        // Compare DescriptionHandlers
-        #expect(decodedLocation.longDescription == originalLocation.longDescription)
-        #expect(decodedLocation.shortDescription == originalLocation.shortDescription)
+        // Compare dynamicValues for descriptions
+        #expect(decodedLocation.dynamicValues[.longDescription] == originalLocation.dynamicValues[.longDescription])
+        #expect(decodedLocation.dynamicValues[.shortDescription] == originalLocation.dynamicValues[.shortDescription])
         #expect(decodedLocation.exits.count == originalLocation.exits.count)
         #expect(decodedLocation.exits[.west]?.destination == originalLocation.exits[.west]?.destination)
         #expect(decodedLocation.exits[.east]?.blockedMessage == originalLocation.exits[.east]?.blockedMessage)
@@ -127,22 +126,25 @@ struct LocationTests {
         var location2 = location1 // Assign creates a copy for structs
 
         let originalName = location1.name // Capture original values
-        let originalDesc = location1.longDescription
+        let originalDescValue = location1.dynamicValues[.longDescription] // Capture original dynamic value
 
         // Modify the copy (location2)
         location2.name = "Renamed Room"
         location2.addProperty(.visited)
-        location2.longDescription = "An updated room."
+        // Set dynamic value for description
+        location2.dynamicValues[.longDescription] = .string("An updated room.")
 
         // Assert that the original (location1) is unchanged
         #expect(location1.name == originalName) // Check against captured default
         #expect(!location1.hasProperty(.visited))
-        #expect(location1.longDescription?.rawStaticDescription == originalDesc?.rawStaticDescription)
+        // Check original dynamic value
+        #expect(location1.dynamicValues[.longDescription] == originalDescValue)
 
         // Assert that location2 has the changes
         #expect(location2.name == "Renamed Room")
         #expect(location2.hasProperty(.visited))
-        #expect(location2.longDescription?.rawStaticDescription == "An updated room.")
+        // Check new dynamic value
+        #expect(location2.dynamicValues[.longDescription] == .string("An updated room."))
 
         // Assert that location1 and location2 are now different
         #expect(location1 != location2)

@@ -40,7 +40,7 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
-        expectNoDifference(output, "It's just a rock.")
+        expectNoDifference(output, "It’s just a rock.")
     }
 
     @Test("Examine simple object (held)")
@@ -396,7 +396,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "There's nothing special about the small pebble.")
+        expectNoDifference(output, "You see nothing special about the small pebble.")
     }
 
     @Test("Examine simple object with dynamic description (realistic state)")
@@ -453,5 +453,44 @@ struct ExamineActionHandlerTests {
         let output2 = await mockIO.flush()
         // Test expects the dynamically computed description
         expectNoDifference(output2, "The mood stone glows a soft red.")
+    }
+
+    @Test("Examine surface item (shows description and contained items)")
+    func testExamineSurfaceItem() async throws {
+        // Arrange
+        let table = Item(
+            id: "table",
+            name: "sturdy table",
+            longDescription: "A sturdy table.",
+            properties: .surface,
+            parent: .location("startRoom")
+        )
+        let book = Item(
+            id: "book",
+            name: "dusty book",
+            parent: .item(table.id)
+        )
+
+        let game = MinimalGame(items: [table, book])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verbID: "examine",
+            directObject: "table",
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "A sturdy table. On the sturdy table is a dusty book.")
     }
 }
