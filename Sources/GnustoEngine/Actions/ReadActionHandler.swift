@@ -82,7 +82,9 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // --- Determine Message ---
         let message: String
-        if let textToRead = targetItem.readableText, !textToRead.isEmpty {
+        // Fetch text from dynamic values
+        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .itemReadText)
+        if let textToRead = readTextValue?.toString, !textToRead.isEmpty {
             message = textToRead
         } else {
             message = "There's nothing written on the \(targetItem.name)."

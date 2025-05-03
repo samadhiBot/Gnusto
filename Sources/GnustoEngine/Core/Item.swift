@@ -74,12 +74,22 @@ public struct Item: Codable, Identifiable, Sendable {
         // self.actionHandlerID = actionHandlerID
 
         // Initialize dynamic values
-        var initialValues: [PropertyID: StateValue] = [:]
-        if let value = shortDescription { initialValues[GnustoEngine.PropertyID.shortDescription] = GnustoEngine.StateValue.string(value) }
-        if let value = firstDescription { initialValues[GnustoEngine.PropertyID.itemFirstDescription] = GnustoEngine.StateValue.string(value) }
-        if let value = longDescription { initialValues[GnustoEngine.PropertyID.longDescription] = GnustoEngine.StateValue.string(value) }
-        if let value = readText { initialValues[GnustoEngine.PropertyID.itemReadText] = GnustoEngine.StateValue.string(value) }
-        if let value = heldText { initialValues[GnustoEngine.PropertyID.itemHeldText] = GnustoEngine.StateValue.string(value) }
+        var initialValues = [PropertyID: StateValue]()
+        if let shortDescription {
+            initialValues[GnustoEngine.PropertyID.shortDescription] = .string(shortDescription)
+        }
+        if let firstDescription {
+            initialValues[GnustoEngine.PropertyID.itemFirstDescription] = .string(firstDescription)
+        }
+        if let longDescription {
+            initialValues[GnustoEngine.PropertyID.longDescription] = .string(longDescription)
+        }
+        if let readText {
+            initialValues[GnustoEngine.PropertyID.itemReadText] = .string(readText)
+        }
+        if let heldText {
+            initialValues[GnustoEngine.PropertyID.itemHeldText] = .string(heldText)
+        }
         self.dynamicValues = initialValues
     }
 

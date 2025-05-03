@@ -15,4 +15,11 @@ extension Item {
         let vowels: Set<Character> = ["a", "e", "i", "o", "u"]
         return vowels.contains(firstChar) ? "an \(name)" : "a \(name)"
     }
+    
+    /// The item's name prepended with a definite article ("the").
+    ///
+    /// This is only useful in optional item scenarios, e.g. `item?.withDefiniteArticle ?? "it"`.
+    var withDefiniteArticle: String {
+        "the \(name)"
+    }
 }

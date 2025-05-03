@@ -204,7 +204,7 @@ public protocol ActionContextProvider {
 ### Phase 4: Migration
 
 - [x] Update existing action handlers to use new system
-- [ ] Add support for dynamic descriptions
+- [x] Add support for dynamic descriptions
 - [ ] Implement state-dependent behavior
 
 ## Testing Strategy

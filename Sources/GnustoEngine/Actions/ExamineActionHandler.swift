@@ -48,8 +48,9 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // --- Determine Message ---
         let message: String
 
-        // Priority 1: Readable Text
-        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
+        // Priority 1: Readable Text (Check dynamic value)
+        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .itemReadText)
+        if targetItem.hasProperty(.readable), let text = readTextValue?.toString, !text.isEmpty {
             message = text
         }
         // Priority 2: Container/Door Description
@@ -62,17 +63,12 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
         // Priority 4: Dynamic Long Description
         else {
-            // Use the registry to generate the description
-            message = if let handler = targetItem.longDescription {
-                await context.engine.descriptionHandlerRegistry.generateDescription(
-                    for: targetItem,
-                    using: handler,
-                    engine: context.engine
-                )
-            } else {
-                // Fallback if no handler
-                "There's nothing special about the \(targetItem.name)."
-            }
+            // Use the registry to generate the description using the item ID and key
+            message = await context.engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem.id,
+                key: .longDescription,
+                engine: context.engine
+            )
         }
 
         // --- Create Result ---
@@ -89,16 +85,12 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, using the registry
-        let baseDescription = if let handler = targetItem.longDescription {
-            await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: handler,
-                engine: engine
-            )
-        } else {
-            "You examine the \(targetItem.name)."
-        }
+        // Start with the item's main description, using the registry with ID and key
+        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+            for: targetItem.id,
+            key: .longDescription,
+            engine: engine
+        )
         descriptionParts.append(baseDescription)
 
         let isOpen = targetItem.hasProperty(.open)
@@ -122,16 +114,12 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, using the registry
-        let baseDescription = if let handler = targetItem.longDescription {
-            await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: handler,
-                engine: engine
-            )
-        } else {
-            "You examine the \(targetItem.name)."
-        }
+        // Start with the item's main description, using the registry with ID and key
+        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+            for: targetItem.id,
+            key: .longDescription,
+            engine: engine
+        )
         descriptionParts.append(baseDescription)
 
         // List items on the surface

@@ -40,7 +40,7 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
-        expectNoDifference(output, "It’s just a rock.")
+        expectNoDifference(output, "It's just a rock.")
     }
 
     @Test("Examine simple object (held)")
@@ -86,9 +86,9 @@ struct ExamineActionHandlerTests {
             id: "scroll",
             name: "ancient scroll",
             longDescription: "A rolled up scroll.",
-            properties: .readable,
-            parent: .location("startRoom"),
-            readableText: "FROBOZZ"
+            readText: "FROBOZZ",
+            properties: ItemProperty.readable,
+            parent: .location("startRoom")
         )
 
         let game = MinimalGame(items: [scroll])
@@ -111,7 +111,7 @@ struct ExamineActionHandlerTests {
 
         // Assert
         let finalItemState = engine.item(with: "scroll")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "FROBOZZ") // Should print the readableText
     }
@@ -123,7 +123,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             longDescription: "A plain wooden box.",
-            properties: .container, .openable, .open,
+            properties: ItemProperty.container, ItemProperty.openable, ItemProperty.open,
             parent: .location("startRoom")
         )
         let gem = Item(
@@ -164,7 +164,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             longDescription: "A plain wooden box.",
-            properties: .container, .openable, .open,
+            properties: ItemProperty.container, ItemProperty.openable, ItemProperty.open,
             parent: .location("startRoom")
         )
 
@@ -198,7 +198,7 @@ struct ExamineActionHandlerTests {
             id: "box",
             name: "wooden box",
             longDescription: "A plain wooden box.",
-            properties: .container, .openable, // Closed by default
+            properties: ItemProperty.container, ItemProperty.openable,
             parent: .location("startRoom")
         )
 
@@ -232,7 +232,7 @@ struct ExamineActionHandlerTests {
             id: "bottle",
             name: "glass bottle",
             longDescription: "A clear glass bottle.",
-            properties: .container, .transparent, // Closed by default, but transparent
+            properties: ItemProperty.container, ItemProperty.transparent,
             parent: .location("startRoom")
         )
         let water = Item(
@@ -405,8 +405,9 @@ struct ExamineActionHandlerTests {
         let moodStone = Item(
             id: "stone",
             name: "mood stone",
-            longDescription: .id("mood_stone_desc"),
-            properties: .device,
+            // Provide a base description; dynamic logic will override
+            longDescription: "A smooth mood stone.",
+            properties: ItemProperty.device, // Qualify
             parent: .location("startRoom")
         )
 
@@ -419,11 +420,12 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
 
-        // Register the dynamic handler - reads item's state
-        engine.descriptionHandlerRegistry.registerItemHandler(id: "mood_stone_desc") { item, _ in
-            // Use hasProperty on the snapshot
-            let color = item.hasProperty(.on) ? "red" : "blue"
-            return "The mood stone glows a soft \(color)."
+        // Register dynamic compute handler for the long description
+        engine.dynamicPropertyRegistry.registerItemCompute(key: .longDescription) { item, _ in
+            // Check ItemProperty.on
+            let color = item.hasProperty(ItemProperty.on) ? "red" : "blue"
+            // Return StateValue.string
+            return .string("The mood stone glows a soft \(color).")
         }
 
         let command = Command(
@@ -436,18 +438,20 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output1 = await mockIO.flush()
+        // Test expects the dynamically computed description
         expectNoDifference(output1, "The mood stone glows a soft blue.")
 
         // Change the item's state directly via the engine by adding the .on property
-        await engine.applyItemPropertyChange(itemID: "stone", adding: [ItemProperty.on])
+        await engine.applyItemPropertyChange(itemID: "stone", adding: [ItemProperty.on]) // Qualify
 
         // Assert intermediate state change
-        #expect(engine.item(with: "stone")?.hasProperty(.on) == true)
+        #expect(engine.item(with: "stone")?.hasProperty(ItemProperty.on) == true) // Qualify
 
         // Act 2: Examine when red (isOn: true)
         await engine.execute(command: command)
 
         let output2 = await mockIO.flush()
+        // Test expects the dynamically computed description
         expectNoDifference(output2, "The mood stone glows a soft red.")
     }
 }

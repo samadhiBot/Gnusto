@@ -16,8 +16,8 @@ struct DirectionTests {
         #expect(Direction.southwest.rawValue == "southwest")
         #expect(Direction.up.rawValue == "up")
         #expect(Direction.down.rawValue == "down")
-        #expect(Direction.in.rawValue == "in")
-        #expect(Direction.out.rawValue == "out")
+        #expect(Direction.inside.rawValue == "in")
+        #expect(Direction.outside.rawValue == "out")
     }
 
     @Test("Direction CaseIterable")
@@ -25,7 +25,7 @@ struct DirectionTests {
         #expect(Direction.allCases.count == 12)
         // Check a few key cases are present
         #expect(Direction.allCases.contains(.north))
-        #expect(Direction.allCases.contains(.in))
+        #expect(Direction.allCases.contains(.inside))
         #expect(Direction.allCases.contains(.southeast))
     }
 

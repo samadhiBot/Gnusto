@@ -13,11 +13,9 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
 
     /// Storage for state values that might have associated dynamic behavior (computation/validation)
     /// defined externally in the `DynamicPropertyRegistry`.
+    /// Use `PropertyID` constants (e.g., `.longDescription`) as keys.
+    /// Values are typically `StateValue.string` for descriptions.
     public var dynamicValues: [PropertyID: StateValue]
-
-    /// The main description of the location, shown upon entry or with `LOOK` (`LDESC`).
-    /// Can be static text or dynamically generated.
-    public var longDescription: DescriptionHandler?
 
     /// A dictionary mapping directions to exit definitions.
     public var exits: [Direction: Exit]
@@ -35,16 +33,12 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     /// A set of properties defining the location's characteristics (e.g., lit, outside).
     public var properties: Set<LocationProperty>
 
-    /// The short description of the location, potentially used in specific contexts (e.g., brief summaries).
-    /// Can be static text or dynamically generated.
-    public var shortDescription: DescriptionHandler?
-
     // --- Initialization ---
     public init(
         id: LocationID,
         name: String,
-        longDescription: DescriptionHandler? = nil,
-        shortDescription: DescriptionHandler? = nil,
+        longDescription: String? = nil,
+        shortDescription: String? = nil,
         exits: [Direction : Exit] = [:],
         properties: LocationProperty...,
         globals: ItemID...
@@ -52,20 +46,44 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     ) {
         self.id = id
         self.name = name
-        self.longDescription = longDescription
-        self.shortDescription = shortDescription
         self.exits = exits
         self.properties = Set(properties)
         self.globals = globals
         // self.actionHandlerID = actionHandlerID
 
         // Initialize dynamic values
-        self.dynamicValues = [:] // Initialize as empty
+        var initialValues = [PropertyID: StateValue]()
+        if let value = longDescription { initialValues[.longDescription] = .string(value) }
+        if let value = shortDescription { initialValues[.shortDescription] = .string(value) }
+        self.dynamicValues = initialValues
     }
 
     // MARK: - Codable Conformance
 
-    // Codable conformance will be synthesized (DescriptionHandler is Codable)
+    private enum CodingKeys: String, CodingKey {
+        case id, name, exits, properties, globals, dynamicValues
+        // Note: Removed keys for old description properties
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(LocationID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        exits = try container.decode([Direction: Exit].self, forKey: .exits)
+        properties = try container.decode(Set<LocationProperty>.self, forKey: .properties)
+        globals = try container.decode([ItemID].self, forKey: .globals)
+        dynamicValues = try container.decode([PropertyID: StateValue].self, forKey: .dynamicValues)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encode(exits, forKey: .exits)
+        try container.encode(properties, forKey: .properties)
+        try container.encode(globals, forKey: .globals)
+        try container.encode(dynamicValues, forKey: .dynamicValues)
+    }
 
     // MARK: - Convenience Accessors
 
@@ -89,6 +107,6 @@ public struct Location: Codable, Equatable, Identifiable, Sendable {
     }
 }
 
-// MARK: - Equatable Conformance (Manual)
+// MARK: - Equatable Conformance
 
-// Equatable conformance will be synthesized (DescriptionHandler is Equatable)
+// Equatable conformance should still be synthesized correctly

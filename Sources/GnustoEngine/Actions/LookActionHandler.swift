@@ -51,40 +51,12 @@ public struct LookActionHandler: EnhancedActionHandler {
                 throw ActionError.internalEngineError("Player is in an invalid location: \(currentLocationID)")
             }
 
-            var descriptionLines: [String] = []
+            // Call helper to print description, passing the snapshot
+            await describeLocation(currentLocation, engine: engine, showVerbose: true, stateSnapshot: stateSnapshot)
 
-            // 3. Add Title
-            descriptionLines.append("--- \(currentLocation.name) ---")
-
-            // 4. Add Location Description (dynamic or default)
-            let baseDescription = if let handler = currentLocation.longDescription {
-                await engine.descriptionHandlerRegistry.generateDescription(
-                    for: currentLocation,
-                    using: handler,
-                    engine: engine
-                )
-            } else {
-                // Default if location has no longDescription
-                "You are in the \(currentLocation.name)."
-            }
-            descriptionLines.append(baseDescription)
-
-            // 5. Add Visible Items List
-            let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: currentLocationID)
-            let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] } // Get full Item objects from snapshot
-
-            if !visibleItems.isEmpty {
-                // Use engine helper to format the list (assuming one exists or creating a temporary one)
-                // TODO: Ensure GameEngine has a suitable list formatting helper for location contents
-                // For now, using the existing contents helper as a placeholder logic:
-                descriptionLines.append(
-                    "You can see \(visibleItems.listWithIndefiniteArticles) here."
-                )
-            }
-
-            // 6. Combine and return
-            let finalMessage = descriptionLines.joined(separator: "\n")
-            return ActionResult(success: true, message: finalMessage) // No state change for LOOK
+            // LOOK itself doesn't change state or usually have a message beyond the description printed by the helper.
+            // Explicitly initialize the struct.
+            return ActionResult(success: true, message: "", stateChanges: [], sideEffects: [])
         }
 
         // EXAMINE [Object]
@@ -96,16 +68,11 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // 1. Get base description using the registry
         var descriptionLines: [String] = []
-        let baseDescription = if let handler = targetItem.longDescription {
-            await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: handler,
-                engine: engine
-            )
-        } else {
-            // Default if item has no longDescription
-            "You see nothing special about the \(targetItem.name)."
-        }
+        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+            for: targetItem.id, // Use item ID
+            key: .longDescription, // Specify the key
+            engine: engine
+        )
         descriptionLines.append(baseDescription)
 
         // 2. Add container/surface contents
@@ -192,5 +159,88 @@ public struct LookActionHandler: EnhancedActionHandler {
             // No message needed if surface is empty
         }
         return lines
+    }
+
+    /// Describes the current location in detail.
+    private func describeLocation(
+        _ location: Location,
+        engine: GameEngine,
+        showVerbose: Bool,
+        stateSnapshot: GameState // Add stateSnapshot parameter
+    ) async {
+        // Print location name using an assumed available style
+        await engine.ioHandler.print(location.name, style: .normal) // Assume .normal exists
+
+        // Print long description (potentially dynamic)
+        let longDesc = await engine.descriptionHandlerRegistry.generateDescription(
+            for: location.id,
+            key: .longDescription,
+            engine: engine
+        )
+        await engine.ioHandler.print(longDesc)
+
+        // List visible items, passing the snapshot
+        await listVisibleItems(in: location, engine: engine, showVerbose: showVerbose, stateSnapshot: stateSnapshot)
+
+        // Print obvious exits
+        // TODO: Consider visibility/obstructions
+        let exits = location.exits
+        if !exits.isEmpty {
+            let exitStrings = exits.keys.sorted().map { $0.rawValue }
+            await engine.ioHandler.print(
+                "Obvious exits: \(exitStrings.joined(separator: ", "))",
+                style: .normal // Assume .normal exists
+            )
+        }
+    }
+
+    /// Lists items visible in the location.
+    private func listVisibleItems(
+        in location: Location,
+        engine: GameEngine,
+        showVerbose: Bool,
+        stateSnapshot: GameState // Add stateSnapshot parameter
+    ) async {
+        // Use the correct ScopeResolver method
+        let scope = await engine.scopeResolver.visibleItemsIn(locationID: location.id)
+
+        // Separate items that have been seen before from those that haven't
+        // TODO: Implement the "seen" tracking mechanism (likely using a Flag or Player property)
+        // For now, assume all are seen (use short description)
+
+        var descriptions = [String]()
+        for itemID in scope {
+            // Skip self (player)
+            guard itemID != .player else { continue }
+
+            // Use the state snapshot to get the item data
+            guard let item = stateSnapshot.items[itemID] else {
+                // Log error? Skip?
+                continue
+            }
+
+            // Determine which description to use (first vs. short)
+            // This requires tracking if the item has been "seen" in this location before.
+            let descriptionKey: PropertyID = .shortDescription // Default to short for now
+
+            let desc = await engine.descriptionHandlerRegistry.generateDescription(
+                for: item.id,
+                key: descriptionKey,
+                engine: engine
+            )
+
+            // Add condition flags (e.g., "(providing light)", "(open)")
+            // TODO: Add condition flags
+            let formattedDesc = desc // Placeholder
+
+            descriptions.append(formattedDesc)
+        }
+
+        if !descriptions.isEmpty {
+            // TODO: Group similar items (e.g., "There are three coins here.")
+            for desc in descriptions {
+                await engine.ioHandler.print(desc)
+            }
+        }
     }
 }

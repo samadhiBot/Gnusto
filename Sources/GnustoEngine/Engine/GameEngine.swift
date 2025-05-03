@@ -27,7 +27,7 @@ public class GameEngine: Sendable {
     public let descriptionHandlerRegistry: DescriptionHandlerRegistry
 
     /// The registry for dynamic property computation and validation logic.
-    public let dynamicPropertyRegistry: DynamicPropertyRegistry
+    public var dynamicPropertyRegistry: DynamicPropertyRegistry
 
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: EnhancedActionHandler]()
@@ -638,17 +638,12 @@ public class GameEngine: Sendable {
         await ioHandler.print("--- \(location.name) ---", style: .strong)
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
-        if let descriptionHandler = location.longDescription { // Now DescriptionHandler?
-            let description = await descriptionHandlerRegistry.generateDescription(
-                for: location,
-                using: descriptionHandler, // Pass the DescriptionHandler struct
-                engine: self
-            )
-            await ioHandler.print(description)
-        } else {
-            // Fallback if no description handler is set
-            await ioHandler.print("You are in \(location.name).") // Default message
-        }
+        let description = await descriptionHandlerRegistry.generateDescription(
+            for: location.id,
+            key: .longDescription,
+            engine: self
+        )
+        await ioHandler.print(description)
 
         // 4. List visible items
         await listItemsInLocation(locationID: locationID)

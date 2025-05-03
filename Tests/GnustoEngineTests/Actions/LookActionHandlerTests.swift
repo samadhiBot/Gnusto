@@ -275,24 +275,12 @@ struct LookActionHandlerTests {
     func testLookWithDynamicLocationDescription() async throws {
         // Arrange
         let flagId: FlagID = "special_flag"
-        let descriptionHandlerId: DescriptionHandlerID = "magic_room_desc"
-
-        // Define the dynamic handler closure
-        // Corrected signature: async, takes Location, uses 'in' correctly
-        let dynamicHandlerClosure: DynamicLocationDescriptionHandler = { // Use correct type alias
-            // Parameters are (Location, GameEngine)
-            _, engine async in // Use '_' for unused location, add async
-            let isFlagOn = engine.isFlagSet(flagId)
-            return isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."
-        }
-
-        // Create the DescriptionHandler struct instance using the ID
-        let handler = DescriptionHandler.id(descriptionHandlerId)
 
         let dynamicRoom = Location(
             id: "dynamicRoom",
             name: "Magic Room",
-            longDescription: handler, // Assign the handler struct instance here
+            // Provide a default description; dynamic logic will override
+            longDescription: "The room seems normal.",
             properties: .inherentlyLit
         )
 
@@ -301,16 +289,19 @@ struct LookActionHandlerTests {
             player: Player(in: "dynamicRoom"),
             locations: [dynamicRoom],
             flags: [flagId] // Keep flag initialization
-            // Handler registration happens via GameEngine setup now
         )
 
         let mockIO = await MockIOHandler()
-        // Register the handler with the engine's registry
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
-        engine.descriptionHandlerRegistry.registerLocationHandler( // Call on registry
-            id: descriptionHandlerId, // Use 'id' parameter name
-            handler: dynamicHandlerClosure
-        )
+
+        // Register dynamic compute handler for the location's long description
+        engine.dynamicPropertyRegistry.registerLocationCompute(key: .longDescription) { _, gameEngine in
+            // Use the passed engine to check the flag
+            let isFlagOn = engine.isFlagSet(flagId)
+            let text = isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."
+            // Return StateValue.string
+            return .string(text)
+        }
 
         let command = Command(verbID: "look", rawInput: "look")
 
