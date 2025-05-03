@@ -41,8 +41,17 @@ public struct LookActionHandler: EnhancedActionHandler {
                 throw ActionError.internalEngineError("Player is in an invalid location: \(currentLocationID)")
             }
 
-            // Generate description using the new engine method
-            let description = await engine.describe(location: currentLocation)
+            // Generate description using the registry
+            let description = if let handler = currentLocation.longDescription {
+                await engine.descriptionHandlerRegistry.generateDescription(
+                    for: currentLocation,
+                    using: handler,
+                    engine: engine
+                )
+            } else {
+                // Default if location has no longDescription
+                "You are in the \(currentLocation.name)."
+            }
 
             // Return the description in the ActionResult
             return ActionResult(success: true, message: description)
@@ -55,9 +64,18 @@ public struct LookActionHandler: EnhancedActionHandler {
             throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
         }
 
-        // 1. Get base description using the new engine method
+        // 1. Get base description using the registry
         var descriptionLines: [String] = []
-        let baseDescription = await engine.describe(item: targetItem)
+        let baseDescription = if let handler = targetItem.longDescription {
+            await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: handler,
+                engine: engine
+            )
+        } else {
+            // Default if item has no longDescription
+            "You see nothing special about the \(targetItem.name)."
+        }
         descriptionLines.append(baseDescription)
 
         // 2. Add container/surface contents
@@ -100,7 +118,7 @@ public struct LookActionHandler: EnhancedActionHandler {
     private func describeContents(
         of item: Item, // The item definition (might be slightly stale if state changed)
         engine: GameEngine, // Needed for helper methods like listWithIndefiniteArticles
-        stateSnapshot: GameState // Use snapshot to find items inside/on
+        stateSnapshot: GameState // Use snapshot to find current items inside/on
     ) async -> [String] {
         var lines: [String] = []
         let itemID = item.id
@@ -118,7 +136,8 @@ public struct LookActionHandler: EnhancedActionHandler {
                     lines.append("The \(item.name) is empty.")
                 } else {
                     lines.append(
-                        "The \(item.name) contains \(contents.listWithIndefiniteArticles)."
+                        // Use engine helper for formatting list
+                        "The \(item.name) contains \(await engine.listItemsForContents(Array(contents)))."
                     )
                 }
             } else {
@@ -131,9 +150,11 @@ public struct LookActionHandler: EnhancedActionHandler {
         if item.hasProperty(.surface) {
             // Get items *on* the surface from the snapshot
             let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
+            // Filter out the item itself if it somehow lists itself (e.g., bug)
+            let itemsToDescribe = itemsOnSurface.filter { $0.id != itemID }
             if !itemsOnSurface.isEmpty {
                 // Use engine helper for formatting
-                let itemNames = await engine.listItemsForContents(Array(itemsOnSurface))
+                let itemNames = await engine.listItemsForContents(Array(itemsToDescribe))
                 lines.append("On the \(item.name) is \(itemNames).")
             }
             // No message needed if surface is empty

@@ -637,9 +637,18 @@ public class GameEngine: Sendable {
         }
         await ioHandler.print("--- \(location.name) ---", style: .strong)
 
-        // 3. Generate and print the description using the NEW engine describe method
-        let description = await self.describe(location: location)
-        await ioHandler.print(description)
+        // 3. Generate and print the description using the DescriptionHandlerRegistry
+        if let descriptionHandler = location.longDescription { // Now DescriptionHandler?
+            let description = await descriptionHandlerRegistry.generateDescription(
+                for: location,
+                using: descriptionHandler, // Pass the DescriptionHandler struct
+                engine: self
+            )
+            await ioHandler.print(description)
+        } else {
+            // Fallback if no description handler is set
+            await ioHandler.print("You are in \(location.name).") // Default message
+        }
 
         // 4. List visible items
         await listItemsInLocation(locationID: locationID)
@@ -1342,72 +1351,6 @@ extension GameEngine {
             // Directly apply to gameState (we are already @MainActor async)
             try gameState.apply(change)
         }
-    }
-}
-
-// MARK: - Description Generation
-
-extension GameEngine {
-
-    /// Generates the long description for a given item, invoking its dynamic handler if available.
-    /// Applies standard formatting (Markdown, line wrapping).
-    ///
-    /// - Parameter item: The item to describe.
-    /// - Returns: The formatted description string.
-    public func describe(item: Item) async -> String {
-        let rawDescription: String?
-        if let handler = item.longDescription {
-            // Execute the handler with a snapshot of the *current* state
-            // before the action potentially modified it.
-            let stateSnapshot = gameState.snapshot
-            rawDescription = await handler(item, stateSnapshot)
-        } else {
-            rawDescription = nil
-        }
-
-        // Fallback if handler is nil or returns nil
-        let finalRaw = rawDescription ?? "You see nothing special about the \(item.name)."
-
-        return formatDescription(finalRaw)
-    }
-
-    /// Generates the long description for a given location, invoking its dynamic handler if available.
-    /// Applies standard formatting (Markdown, line wrapping).
-    ///
-    /// - Parameter location: The location to describe.
-    /// - Returns: The formatted description string.
-    public func describe(location: Location) async -> String {
-        let rawDescription: String?
-        if let handler = location.longDescription {
-            // Execute the handler with a snapshot of the *current* state
-            // before the action potentially modified it.
-            let stateSnapshot = gameState.snapshot
-            rawDescription = await handler(location, stateSnapshot)
-        } else {
-            rawDescription = nil
-        }
-
-        // Fallback if handler is nil or returns nil
-        let finalRaw = rawDescription ?? "You are in the \(location.name)."
-
-        return formatDescription(finalRaw)
-    }
-
-    /// Helper to format a raw description string using Markdown and apply line wrapping.
-    private func formatDescription(_ raw: String) -> String {
-        let document = Document(parsing: raw)
-        return document.format(options: markupOptions)
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    /// Formatting options for Markdown output.
-    private var markupOptions: MarkupFormatter.Options {
-        MarkupFormatter.Options(
-            preferredLineLimit: MarkupFormatter.Options.PreferredLineLimit(
-                maxLength: maximumDescriptionLength,
-                breakWith: .hardBreak
-            )
-        )
     }
 }
 

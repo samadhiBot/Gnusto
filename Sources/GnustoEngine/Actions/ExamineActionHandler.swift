@@ -62,8 +62,17 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
         // Priority 4: Dynamic Long Description
         else {
-            // Use the new engine describe method which handles nil handlers internally
-            message = await context.engine.describe(item: targetItem)
+            // Use the registry to generate the description
+            message = if let handler = targetItem.longDescription {
+                await context.engine.descriptionHandlerRegistry.generateDescription(
+                    for: targetItem,
+                    using: handler,
+                    engine: context.engine
+                )
+            } else {
+                // Fallback if no handler
+                "There's nothing special about the \(targetItem.name)."
+            }
         }
 
         // --- Create Result ---
@@ -80,8 +89,16 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, using the new engine method
-        let baseDescription = await engine.describe(item: targetItem)
+        // Start with the item's main description, using the registry
+        let baseDescription = if let handler = targetItem.longDescription {
+            await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: handler,
+                engine: engine
+            )
+        } else {
+            "You examine the \(targetItem.name)."
+        }
         descriptionParts.append(baseDescription)
 
         let isOpen = targetItem.hasProperty(.open)
@@ -105,8 +122,16 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, using the new engine method
-        let baseDescription = await engine.describe(item: targetItem)
+        // Start with the item's main description, using the registry
+        let baseDescription = if let handler = targetItem.longDescription {
+            await engine.descriptionHandlerRegistry.generateDescription(
+                for: targetItem,
+                using: handler,
+                engine: engine
+            )
+        } else {
+            "You examine the \(targetItem.name)."
+        }
         descriptionParts.append(baseDescription)
 
         // List items on the surface

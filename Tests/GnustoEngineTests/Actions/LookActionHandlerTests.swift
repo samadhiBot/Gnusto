@@ -239,7 +239,7 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Plain Room",
-            // No longDescription provided
+            // No longDescription provided - should be nil by default
             properties: .inherentlyLit
         )
 
@@ -272,13 +272,13 @@ struct LookActionHandlerTests {
         // Define the dynamic handler closure
         @Sendable func dynamicDescHandler(location: Location, state: GameState) async -> String? {
             let isFlagOn = state.flags["special_flag"] ?? false
-            return isFlagOn ? "The room *sparkles* brightly." : "The room seems normal."
+            return isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."
         }
 
         let dynamicRoom = Location(
             id: "dynamicRoom",
             name: "Magic Room",
-            longDescription: dynamicDescHandler, // Assign the closure
+            longDescription: .id("magic_room_desc"), // Use ID
             properties: .inherentlyLit
         )
 
@@ -290,6 +290,12 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
+        // Register the handler with the engine's registry
+        engine.descriptionHandlerRegistry.registerLocationHandler(
+            id: "magic_room_desc",
+            handler: dynamicDescHandler
+        )
+
         let command = Command(verbID: "look", rawInput: "look")
 
         // Act 1: Flag is ON
@@ -299,7 +305,7 @@ struct LookActionHandlerTests {
         let output1 = await mockIO.flush()
         expectNoDifference(output1, """
             --- Magic Room ---
-            The room *sparkles* brightly.
+            The room *sparkles* brightly via registry.
             """
         )
 
@@ -311,7 +317,7 @@ struct LookActionHandlerTests {
         let output2 = await mockIO.flush()
         expectNoDifference(output2, """
             --- Magic Room ---
-            The room seems normal.
+            The room seems normal via registry.
             """
         )
     }
