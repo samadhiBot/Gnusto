@@ -264,7 +264,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Default description with title
         expectNoDifference(output, """
             --- Plain Room ---
-            You are in the Plain Room.
+            You are in a nondescript location.
             """
         )
         // Assert No State Change

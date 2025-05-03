@@ -166,10 +166,9 @@ public struct LookActionHandler: EnhancedActionHandler {
         _ location: Location,
         engine: GameEngine,
         showVerbose: Bool,
-        stateSnapshot: GameState // Add stateSnapshot parameter
+        stateSnapshot: GameState
     ) async {
-        // Print location name using an assumed available style
-        await engine.ioHandler.print(location.name, style: .normal) // Assume .normal exists
+        await engine.ioHandler.print("--- \(location.name) ---", style: .strong)
 
         // Print long description (potentially dynamic)
         let longDesc = await engine.descriptionHandlerRegistry.generateDescription(
@@ -177,6 +176,7 @@ public struct LookActionHandler: EnhancedActionHandler {
             key: .longDescription,
             engine: engine
         )
+
         await engine.ioHandler.print(longDesc)
 
         // List visible items, passing the snapshot
@@ -202,45 +202,18 @@ public struct LookActionHandler: EnhancedActionHandler {
         stateSnapshot: GameState // Add stateSnapshot parameter
     ) async {
         // Use the correct ScopeResolver method
-        let scope = await engine.scopeResolver.visibleItemsIn(locationID: location.id)
+        let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: location.id)
 
-        // Separate items that have been seen before from those that haven't
-        // TODO: Implement the "seen" tracking mechanism (likely using a Flag or Player property)
-        // For now, assume all are seen (use short description)
+        // Filter out the player if present in scope (shouldn't happen normally)
+        let itemIDsToDescribe = visibleItemIDs.filter { $0 != .player }
 
-        var descriptions = [String]()
-        for itemID in scope {
-            // Skip self (player)
-            guard itemID != .player else { continue }
+        guard !itemIDsToDescribe.isEmpty else { return } // Exit if no items to list
 
-            // Use the state snapshot to get the item data
-            guard let item = stateSnapshot.items[itemID] else {
-                // Log error? Skip?
-                continue
-            }
-
-            // Determine which description to use (first vs. short)
-            // This requires tracking if the item has been "seen" in this location before.
-            let descriptionKey: PropertyID = .shortDescription // Default to short for now
-
-            let desc = await engine.descriptionHandlerRegistry.generateDescription(
-                for: item.id,
-                key: descriptionKey,
-                engine: engine
-            )
-
-            // Add condition flags (e.g., "(providing light)", "(open)")
-            // TODO: Add condition flags
-            let formattedDesc = desc // Placeholder
-
-            descriptions.append(formattedDesc)
-        }
-
-        if !descriptions.isEmpty {
-            // TODO: Group similar items (e.g., "There are three coins here.")
-            for desc in descriptions {
-                await engine.ioHandler.print(desc)
-            }
+        // Original implementation using sentence format: - RESTORE THIS
+        let visibleItems = itemIDsToDescribe.compactMap { stateSnapshot.items[$0] }
+        if !visibleItems.isEmpty {
+            let itemListing = visibleItems.listWithIndefiniteArticles
+            await engine.ioHandler.print("You can see \(itemListing) here.")
         }
     }
 }
