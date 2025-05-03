@@ -15,8 +15,8 @@ public struct GameState: Codable, Equatable, Sendable {
     /// All locations defined in the game, indexed by their `LocationID`.
     public internal(set) var locations: [LocationID: Location]
 
-    /// Global boolean flags, indexed by String key.
-    public internal(set) var flags: [String: Bool]
+    /// The set of currently active global flags.
+    public internal(set) var flags: Set<FlagID>
 
     /// The current state of the player.
     public internal(set) var player: Player
@@ -30,7 +30,7 @@ public struct GameState: Codable, Equatable, Sendable {
     /// Pronoun references, mapping String pronouns ("it", "them") to specific item ID sets.
     public internal(set) var pronouns: [String: Set<ItemID>]
 
-    /// Game-specific key-value storage for miscellaneous state. Uses String keys.
+    /// Game-specific key-value storage for miscellaneous state.
     public internal(set) var gameSpecificState: [GameStateKey: StateValue]
 
     /// A history of all state changes applied to this game state instance.
@@ -46,7 +46,7 @@ public struct GameState: Codable, Equatable, Sendable {
         items: [Item],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: [String: Bool] = [:],
+        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
@@ -70,7 +70,7 @@ public struct GameState: Codable, Equatable, Sendable {
         areas: [AreaContents.Type],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: [String: Bool] = [:],
+        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
@@ -364,15 +364,27 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // MARK: Global/Misc Properties
 
-        case .flag(let key):
-            // Expecting .bool
-            guard case .bool(let newValue) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for flag \(key): expected .bool, got \(change.newValue)")
-            }
-            guard change.entityId == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for flag: expected .global, got \(change.entityId)")
-            }
-            flags[key] = newValue // Use String key
+        case .setFlag(let flagID):
+            // The convention is that setting a flag corresponds to a newValue of .bool(true)
+            guard change.newValue == .bool(true) else {
+                 print("Warning: setFlag StateChange newValue was not .bool(true), was \(String(describing: change.newValue)). Proceeding anyway.")
+                 return // Exit scope if newValue is not as expected
+             }
+             guard change.entityId == .global else {
+                 throw ActionError.internalEngineError("EntityID mismatch for setFlag: expected .global, got \(change.entityId)")
+             }
+             flags.insert(flagID)
+
+        case .clearFlag(let flagID):
+            // The convention is that clearing a flag corresponds to a newValue of .bool(false)
+            guard change.newValue == .bool(false) else {
+                 print("Warning: clearFlag StateChange newValue was not .bool(false), was \(String(describing: change.newValue)). Proceeding anyway.")
+                 return // Exit scope if newValue is not as expected
+             }
+             guard change.entityId == .global else {
+                 throw ActionError.internalEngineError("EntityID mismatch for clearFlag: expected .global, got \(change.entityId)")
+             }
+             flags.remove(flagID)
 
         case .gameSpecificState(let key):
             guard change.entityId == .global else {
@@ -548,8 +560,17 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue = nil // Skip validation
 
         // Global/Misc Properties
-        case .flag(let key):
-            actualCurrentValue = flags[key].map { .bool($0) }
+        case .setFlag(let flagID):
+            // Before setting, the flag should *not* have been present.
+            // The expected old value should be .bool(false) or nil.
+            let flagWasSet = flags.contains(flagID)
+            actualCurrentValue = .bool(flagWasSet)
+
+        case .clearFlag(let flagID):
+            // Before clearing, the flag *should* have been present.
+            // The expected old value should be .bool(true).
+            let flagWasSet = flags.contains(flagID)
+            actualCurrentValue = .bool(flagWasSet)
 
         case .gameSpecificState(let key):
              actualCurrentValue = gameSpecificState[key]
@@ -605,7 +626,7 @@ public struct GameState: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([ItemID: Item].self, forKey: .items)
         locations = try container.decode([LocationID: Location].self, forKey: .locations)
-        flags = try container.decodeIfPresent([String: Bool].self, forKey: .flags) ?? [:]
+        flags = try container.decodeIfPresent(Set<FlagID>.self, forKey: .flags) ?? []
         player = try container.decode(Player.self, forKey: .player)
         activeFuses = try container.decodeIfPresent([Fuse.ID: Int].self, forKey: .activeFuses) ?? [:]
         activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []

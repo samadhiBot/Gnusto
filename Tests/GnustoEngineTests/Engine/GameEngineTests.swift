@@ -531,13 +531,15 @@ struct GameEngineTests {
                     newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on]))
                 )
 
-                // Get old flag value from snapshot
-                let actualOldFlagValue: Bool? = context.stateSnapshot.flags[flagToSet]
-                let flagOldValueState: StateValue? = actualOldFlagValue != nil ? .bool(actualOldFlagValue!) : nil
+                // Get old flag value from snapshot using FlagID and engine helper
+                let flagID = FlagID(flagToSet)
+                // Use the engine context to check the flag state before the change
+                let actualOldFlagValue = await context.engine.isFlagSet(flagID)
+                let flagOldValueState: StateValue? = actualOldFlagValue ? .bool(true) : nil // Simpler conversion
 
                 let change2 = StateChange(
                     entityId: .global,
-                    propertyKey: .flag(key: flagToSet),
+                    propertyKey: .setFlag(flagID),
                     oldValue: flagOldValueState,
                     newValue: .bool(true)
                 )
@@ -554,9 +556,9 @@ struct GameEngineTests {
         }
 
         let testItemID: ItemID = "testLamp"
-        let testFlagKey = "lampLit"
+        let testFlagKey: FlagID = "lampLit" // Use FlagID type
         let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
-        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey)
+        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
         var game = MinimalGame(
             items: [lamp],
             definitionRegistry: DefinitionRegistry(
@@ -585,7 +587,7 @@ struct GameEngineTests {
         )
 
         // Ensure initial state
-        #expect(engine.gameState.flags[testFlagKey] == nil)
+        #expect(!engine.isFlagSet(testFlagKey))
         #expect(engine.item(with: testItemID)?.hasProperty(.on) == false)
         #expect(engine.getChangeHistory().isEmpty)
 
@@ -595,7 +597,7 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(engine.gameState.flags[testFlagKey] == true, "Flag should be set")
+        #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
         #expect(engine.item(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
         #expect(engine.item(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
 
@@ -628,7 +630,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityId == .global &&
-                    change.propertyKey == StatePropertyKey.flag(key: testFlagKey) &&
+                    change.propertyKey == StatePropertyKey.setFlag(testFlagKey) &&
                     change.newValue == StateValue.bool(true)
             },
             "History should contain flag change to true for \(testFlagKey)"

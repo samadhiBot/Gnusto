@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 import Testing
 
@@ -1009,126 +1010,101 @@ struct GameStateApplyTests {
 
     // MARK: - Global Flag Tests
 
-    @Test("Apply valid global flag change (add new)")
-    func testApplyValidGlobalFlagChangeAddNew() async throws {
-        // Given
+    @Test("Apply valid flag change (set true)")
+    func testApplyValidFlagSet() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "newFlag"
-        #expect(gameState.flags[flagKey] == nil)
+        let flagID: FlagID = "testFlag"
+
+        // Initial state check
+        #expect(!gameState.flags.contains(flagID))
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: nil, // Expecting nil for a new flag
+            propertyKey: .setFlag(flagID),
+            oldValue: nil, // Or .bool(false)
             newValue: .bool(true)
         )
 
-        // When
         try gameState.apply(change)
 
-        // Then
-        #expect(gameState.flags[flagKey] == true)
-        #expect(gameState.changeHistory.last == change)
+        // Assert final state
+        #expect(gameState.flags.contains(flagID))
+        #expect(gameState.changeHistory.count == 1)
+        #expect(gameState.changeHistory.first == change)
     }
 
-    @Test("Apply valid global flag change (modify existing)")
-    func testApplyValidGlobalFlagChangeModify() async throws {
-        // Given
+    @Test("Apply valid flag change (set false)")
+    func testApplyValidFlagClear() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "gameStarted" // Exists in sample state
-        let initialValue = gameState.flags[flagKey]
-        #expect(initialValue == true)
+        let flagID: FlagID = "testFlagInitiallyTrue"
+        gameState.flags.insert(flagID) // Pre-set the flag
+
+        // Initial state check
+        #expect(gameState.flags.contains(flagID))
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(initialValue!), // Correct old value
+            propertyKey: .clearFlag(flagID),
+            oldValue: .bool(true), // Expecting it was true
             newValue: .bool(false)
         )
 
-        // When
         try gameState.apply(change)
 
-        // Then
-        #expect(gameState.flags[flagKey] == false)
-        #expect(gameState.changeHistory.last == change)
+        // Assert final state
+        #expect(!gameState.flags.contains(flagID))
+        #expect(gameState.changeHistory.count == 1)
+        #expect(gameState.changeHistory.first == change)
     }
 
-    @Test("Apply global flag change with invalid oldValue (existing flag)")
-    func testApplyInvalidGlobalFlagChangeOldValueExisting() async throws {
-        // Given
+    @Test("Apply flag change with invalid old value fails")
+    func testApplyFlagChangeInvalidOldValue() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "gameStarted"
-        let actualOldValue = gameState.flags[flagKey]
-        #expect(actualOldValue == true)
-        let incorrectOldValue = false // Incorrect
+        let flagID: FlagID = "testFlag"
+        let actualOldValue = gameState.flags.contains(flagID) // false
+        #expect(actualOldValue == false)
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(incorrectOldValue),
-            newValue: .bool(false)
-        )
-
-        // When & Then
-        var thrownError: Error? = nil
-        do {
-            try gameState.apply(change)
-            Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
-        }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
-            // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
-            }
-        } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
-        }
-
-        // Verify state unchanged
-        #expect(gameState.flags[flagKey] == actualOldValue)
-        #expect(gameState.changeHistory.isEmpty)
-    }
-
-    @Test("Apply global flag change with invalid oldValue (new flag)")
-    func testApplyInvalidGlobalFlagChangeOldValueNew() async throws {
-        // Given
-        var gameState = await helper.createSampleGameState()
-        let flagKey = "newFlag"
-        #expect(gameState.flags[flagKey] == nil)
-        let incorrectOldValue = true // Should expect nil
-
-        let change = StateChange(
-            entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(incorrectOldValue),
+            propertyKey: .setFlag(flagID), // Attempt to set
+            oldValue: .bool(true), // INCORRECT: Expecting true, but it's false
             newValue: .bool(true)
         )
 
-        // When & Then
-        var thrownError: Error? = nil
+        var validationErrorThrown = false
         do {
             try gameState.apply(change)
-            Issue.record("Expected apply to throw an error, but it succeeded.")
+        } catch ActionError.stateValidationFailed(let failedChange, let reportedActualValue) {
+            validationErrorThrown = true
+            expectNoDifference(failedChange, change)
+            #expect(reportedActualValue == .bool(false)) // actual value was false
         } catch {
-            thrownError = error
+            Issue.record("Threw unexpected error type: \(error)")
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
-            // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
-            }
-        } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
-        }
-
-        // Verify state unchanged
-        #expect(gameState.flags[flagKey] == nil)
+        #expect(validationErrorThrown)
+        // Assert state unchanged
+        #expect(gameState.flags.contains(flagID) == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
+    }
+
+    @Test("Apply flag change with nil old value succeeds")
+    func testApplyFlagChangeNilOldValue() async throws {
+        var gameState = await helper.createSampleGameState()
+        let flagID: FlagID = "testFlag"
+        #expect(!gameState.flags.contains(flagID))
+
+        let change = StateChange(
+            entityId: .global,
+            propertyKey: .setFlag(flagID),
+            oldValue: nil, // No validation expected
+            newValue: .bool(true)
+        )
+
+        try gameState.apply(change)
+
+        // Assert final state
+        #expect(gameState.flags.contains(flagID))
+        #expect(gameState.changeHistory.count == 1)
     }
 
     // MARK: - Pronoun Reference Tests

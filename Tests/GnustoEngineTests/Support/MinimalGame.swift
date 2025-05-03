@@ -9,6 +9,7 @@ struct MinimalGame: GameBlueprint {
         player: Player = Player(in: "startRoom"),
         locations: [Location]? = nil,
         items: [Item]? = nil,
+        flags: [FlagID]? = nil,
         definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
         dynamicPropertyRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry()
     ) {

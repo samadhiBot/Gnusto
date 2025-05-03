@@ -82,13 +82,14 @@ struct ActionResultTests {
     func testStateChangeInitializationGlobalFlag() {
         let change = StateChange(
             entityId: .global,
-            propertyKey: .flag(key: "lightsOut"),
+            propertyKey: .setFlag("lightsOut"),
             oldValue: StateValue.bool(false),
             newValue: StateValue.bool(true)
         )
 
-        #expect(change.propertyKey == StatePropertyKey.flag(key: "lightsOut"))
+        #expect(change.propertyKey == StatePropertyKey.setFlag("lightsOut"))
         #expect(change.newValue == StateValue.bool(true))
+        #expect(change.oldValue == StateValue.bool(false))
     }
 
     @Test("StateChange Initialization for Game Specific State")
@@ -166,7 +167,7 @@ struct ActionResultTests {
             .itemProperties,
             .locationProperties,
             .playerScore,
-            .flag(key: "testFlag"),
+            .setFlag("testFlag"),
             .gameSpecificState(key: "testCounter")
         ]
 

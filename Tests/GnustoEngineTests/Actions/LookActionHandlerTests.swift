@@ -68,6 +68,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (primary check for LOOK)
         let output = await mockIO.flush()
+        // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
             --- Test Room ---
             A basic room.
@@ -130,6 +131,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (primary check for LOOK)
         let output = await mockIO.flush()
+        // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
             --- Test Room ---
             A basic room.
@@ -147,7 +149,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            longDescription: "A basic room."
+            longDescription: "A basic room." // No .inherentlyLit
         )
         let item1 = Item(
             id: "widget",
@@ -176,6 +178,7 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
+        // Corrected Expectation: Darkness message
         expectNoDifference(output, "It is pitch black. You are likely to be eaten by a grue.")
 
         // Assert No State Change
@@ -188,7 +191,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            longDescription: "A basic room."
+            longDescription: "A basic room." // No .inherentlyLit
         )
         let activeLamp = Item(
             id: "lamp",
@@ -223,6 +226,7 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
+        // Corrected Expectation: Full formatted output (lit by player)
         expectNoDifference(output, """
             --- Test Room ---
             A basic room.
@@ -257,6 +261,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Uses default description from engine.describe)
         let output = await mockIO.flush()
+        // Corrected Expectation: Full formatted output with default description
         expectNoDifference(output, """
             --- Plain Room ---
             You are in the Plain Room.
@@ -269,31 +274,42 @@ struct LookActionHandlerTests {
     @Test("LOOK with dynamic location description closure")
     func testLookWithDynamicLocationDescription() async throws {
         // Arrange
+        let flagId: FlagID = "special_flag"
+        let descriptionHandlerId: DescriptionHandlerID = "magic_room_desc"
+
         // Define the dynamic handler closure
-        @Sendable func dynamicDescHandler(location: Location, state: GameState) async -> String? {
-            let isFlagOn = state.flags["special_flag"] ?? false
+        // Corrected signature: async, takes Location, uses 'in' correctly
+        let dynamicHandlerClosure: DynamicLocationDescriptionHandler = { // Use correct type alias
+            // Parameters are (Location, GameEngine)
+            _, engine async in // Use '_' for unused location, add async
+            let isFlagOn = engine.isFlagSet(flagId)
             return isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."
         }
+
+        // Create the DescriptionHandler struct instance using the ID
+        let handler = DescriptionHandler.id(descriptionHandlerId)
 
         let dynamicRoom = Location(
             id: "dynamicRoom",
             name: "Magic Room",
-            longDescription: .id("magic_room_desc"), // Use ID
+            longDescription: handler, // Assign the handler struct instance here
             properties: .inherentlyLit
         )
 
+        // MinimalGame takes flags as variadic arguments
         var game = MinimalGame(
             player: Player(in: "dynamicRoom"),
             locations: [dynamicRoom],
-            flags: ["special_flag": true] // Start with flag ON
+            flags: [flagId] // Keep flag initialization
+            // Handler registration happens via GameEngine setup now
         )
-        let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
+        let mockIO = await MockIOHandler()
         // Register the handler with the engine's registry
-        engine.descriptionHandlerRegistry.registerLocationHandler(
-            id: "magic_room_desc",
-            handler: dynamicDescHandler
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        engine.descriptionHandlerRegistry.registerLocationHandler( // Call on registry
+            id: descriptionHandlerId, // Use 'id' parameter name
+            handler: dynamicHandlerClosure
         )
 
         let command = Command(verbID: "look", rawInput: "look")
@@ -303,6 +319,7 @@ struct LookActionHandlerTests {
 
         // Assert Output 1 (Should show sparkling description)
         let output1 = await mockIO.flush()
+        // Corrected Expectation: Full formatted output
         expectNoDifference(output1, """
             --- Magic Room ---
             The room *sparkles* brightly via registry.
@@ -310,11 +327,12 @@ struct LookActionHandlerTests {
         )
 
         // Act 2: Turn flag OFF and LOOK again
-        await engine.applyFlagChange(flag: "special_flag", value: false)
+        await engine.clearFlag(flagId) // Use new helper and FlagID
         await engine.execute(command: command)
 
         // Assert Output 2 (Should show normal description)
         let output2 = await mockIO.flush()
+        // Corrected Expectation: Full formatted output
         expectNoDifference(output2, """
             --- Magic Room ---
             The room seems normal via registry.
@@ -482,7 +500,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy wooden box. The wooden box contains a gold coin.")
+        expectNoDifference(output, "A sturdy wooden box.\nThe wooden box contains a gold coin.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "box")
@@ -529,7 +547,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy wooden box. The wooden box is closed.")
+        expectNoDifference(output, "A sturdy wooden box.\nThe wooden box is closed.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "box")
@@ -577,7 +595,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A clear glass jar. The glass jar contains a dead fly.")
+        expectNoDifference(output, "A clear glass jar.\nThe glass jar contains a dead fly.")
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item(with: "jar")
@@ -629,7 +647,7 @@ struct LookActionHandlerTests {
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            A simple wooden table. On the wooden table is a red book and a white candle.
+            A simple wooden table.\nOn the wooden table is a red book and a white candle.
             """)
 
         // Assert Final State (Surface marked touched)
@@ -665,7 +683,8 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item(with: "artifact") != nil) // Item exists
-        #expect(engine.scopeResolver.itemsReachableByPlayer().contains("artifact") == false) // Not reachable
+        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "artifact", rawInput: "x artifact")

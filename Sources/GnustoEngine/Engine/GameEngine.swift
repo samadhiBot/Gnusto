@@ -929,28 +929,46 @@ public class GameEngine: Sendable {
         }
     }
 
-    /// Applies a change to a global flag.
+    /// Sets a global flag by applying a `.setFlag` state change.
+    /// Logs a warning and returns if the state change application fails.
+    /// Does nothing if the flag is already set.
     ///
-    /// - Parameters:
-    ///   - flag: The key of the flag to set.
-    ///   - value: The new boolean value for the flag.
-    public func applyFlagChange(flag: String, value: Bool) async {
-        let oldValue = gameState.flags[flag]
-        // Only apply if value is actually changing
-        if oldValue != value {
+    /// - Parameter id: The `FlagID` of the flag to set.
+    public func setFlag(_ id: FlagID) async {
+        // Only apply if the flag isn't already set
+        if !gameState.flags.contains(id) {
             let change = StateChange(
-                entityId: EntityID.global,
-                propertyKey: StatePropertyKey.flag(key: flag),
-                oldValue: oldValue != nil ? StateValue.bool(oldValue!) : nil,
-                newValue: StateValue.bool(value)
+                entityId: .global,
+                propertyKey: .setFlag(id),
+                oldValue: .bool(false), // Expecting it was false
+                newValue: .bool(true)
             )
             do {
                 try gameState.apply(change)
             } catch {
-                logger.warning("""
-                    💥 Failed to apply flag change for '\(flag, privacy: .public)': \
-                    \(error, privacy: .public)
-                    """)
+                logger.warning("💥 Failed to apply .setFlag change for '\(id.rawValue, privacy: .public)': \(error, privacy: .public)")
+            }
+        }
+    }
+
+    /// Clears a global flag by applying a `.clearFlag` state change.
+    /// Logs a warning and returns if the state change application fails.
+    /// Does nothing if the flag is already clear.
+    ///
+    /// - Parameter id: The `FlagID` of the flag to clear.
+    public func clearFlag(_ id: FlagID) async {
+        // Only apply if the flag is currently set
+        if gameState.flags.contains(id) {
+            let change = StateChange(
+                entityId: .global,
+                propertyKey: .clearFlag(id),
+                oldValue: .bool(true), // Expecting it was true
+                newValue: .bool(false)
+            )
+            do {
+                try gameState.apply(change)
+            } catch {
+                logger.warning("💥 Failed to apply .clearFlag change for '\(id.rawValue, privacy: .public)': \(error, privacy: .public)")
             }
         }
     }
@@ -1167,23 +1185,18 @@ public class GameEngine: Sendable {
         }
     }
 
-    /// Retrieves the value of a global flag.
+    /// Checks if a specific global flag is currently set.
     ///
-    /// - Parameter key: The key of the flag to retrieve.
-    /// - Returns: The boolean value of the flag, or `false` if not set.
-    public func getFlagValue(key: String) -> Bool {
-        gameState.flags[key] ?? false
+    /// - Parameter id: The `FlagID` to check.
+    /// - Returns: `true` if the flag is present in the `GameState.flags` set, `false` otherwise.
+    public func isFlagSet(_ id: FlagID) -> Bool {
+        gameState.flags.contains(id)
     }
+}
 
-    /// Retrieves the optional value of a global flag.
-    ///
-    /// - Parameter key: The key of the flag to retrieve.
-    /// - Returns: The boolean value of the flag if set, otherwise `nil`.
-    public func getOptionalFlagValue(key: String) -> Bool? {
-        gameState.flags[key]
-    }
+// MARK: - Player State Accessors
 
-    // MARK: - Player State Accessors
+extension GameEngine {
 
     /// The player's current score.
     public var playerScore: Int {

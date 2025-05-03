@@ -31,7 +31,8 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case playerStrength
 
     // Global/Misc Properties
-    case flag(key: String)
+    case setFlag(_ id: FlagID)
+    case clearFlag(_ id: FlagID)
     case gameSpecificState(key: GameStateKey)
     case pronounReference(pronoun: String)
 
@@ -50,7 +51,8 @@ extension StatePropertyKey: CustomStringConvertible {
         case .addActiveDaemon(let id): "addActiveDaemon(\(id))"
         case .addActiveFuse(let id, _): "addActiveFuse(\(id))"
         case .itemDynamicValue(let key): "itemDynamicValue(\(key.rawValue))"
-        case .flag(let key): "flag(\(key))"
+        case .setFlag(let id): "setFlag(\(id.rawValue))"
+        case .clearFlag(let id): "clearFlag(\(id.rawValue))"
         case .gameSpecificState(let key): "gameSpecificState(\(key.rawValue))"
         case .itemAdjectives: "itemAdjectives"
         case .itemCapacity: "itemCapacity"

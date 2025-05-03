@@ -76,7 +76,7 @@ struct GameStateTests {
         let items = createSampleItems()
         let locations = createSampleLocations()
         let player = createSamplePlayer()
-        let flags = ["gameStarted": true]
+        let flags: Set<FlagID> = ["gameStarted"]
         let pronouns: [String: Set<ItemID>] = ["it": [Self.itemMailbox]]
 
         return GameState(
@@ -110,7 +110,7 @@ struct GameStateTests {
             vocabulary: vocab
         )
         // Add some initial values if needed by tests
-        state.flags["testFlag"] = false
+        state.flags.insert("gameStarted") // Example: Add a starting flag
         state.pronouns["it"] = ["testItem"]
         state.gameSpecificState["counter"] = .int(0)
         state.activeFuses = ["testFuse": 10]
@@ -131,15 +131,14 @@ struct GameStateTests {
         #expect(state.locations.count == 1)
         #expect(state.locations["startRoom"]?.name == "Starting Room")
         #expect(state.player.currentLocationID == "startRoom")
-        #expect(state.flags["testFlag"] == false)
+        #expect(state.flags.contains(FlagID("gameStarted")))
+        #expect(!state.flags.contains(FlagID("testFlag")))
         #expect(state.pronouns["it"] == ["testItem"])
         #expect(state.activeFuses.count == 1)
         #expect(state.activeDaemons.count == 1)
         #expect(state.changeHistory.isEmpty)
-        // Check specific game state value correctly
         #expect(state.gameSpecificState["counter"] == .int(0))
 
-        // Check vocabulary is not nil and has some content
         #expect(!state.vocabulary.verbDefinitions.isEmpty || !state.vocabulary.items.isEmpty)
     }
 
@@ -179,7 +178,7 @@ struct GameStateTests {
         #expect(state.items["item1"] != nil)
         #expect(state.items["item2"] != nil)
         #expect(state.items["item1"]?.parent == .location("loc1"))
-        #expect(!state.vocabulary.items.isEmpty) // Check if item nouns were added
+        #expect(!state.vocabulary.items.isEmpty)
     }
 
     // MARK: - Helper Methods Tests
@@ -350,7 +349,7 @@ struct GameStateTests {
         #expect(state.player.currentLocationID == Self.locWOH)
 
         // Check other state properties
-        #expect(state.flags == ["gameStarted": true])
+        #expect(state.flags == Set([FlagID("gameStarted")]))
         #expect(state.pronouns == ["it": [Self.itemMailbox]])
 
         // Check derived inventory
