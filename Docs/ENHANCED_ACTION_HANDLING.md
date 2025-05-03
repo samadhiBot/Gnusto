@@ -203,7 +203,7 @@ public protocol ActionContextProvider {
 
 ### Phase 4: Migration
 
-- [ ] Update existing action handlers to use new system
+- [x] Update existing action handlers to use new system
 - [ ] Add support for dynamic descriptions
 - [ ] Implement state-dependent behavior
 
