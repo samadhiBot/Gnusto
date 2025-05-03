@@ -40,7 +40,7 @@ struct ExamineActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         // Expect the actual description now
-        expectNoDifference(output, "It’s just a rock.")
+        expectNoDifference(output, "It's just a rock.")
     }
 
     @Test("Examine simple object (held)")
@@ -342,6 +342,7 @@ struct ExamineActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
+            longDescription: "It's just a rock.",
             parent: .location(darkRoom.id)
         )
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [rock])

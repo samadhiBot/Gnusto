@@ -233,6 +233,89 @@ struct LookActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
+    @Test("LOOK with nil location description uses default")
+    func testLookWithDefaultLocationDescription() async throws {
+        // Arrange
+        let litRoom = Location(
+            id: "litRoom",
+            name: "Plain Room",
+            // No longDescription provided
+            properties: .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: [litRoom]
+        )
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+
+        let command = Command(verbID: "look", rawInput: "look")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output (Uses default description from engine.describe)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            --- Plain Room ---
+            You are in the Plain Room.
+            """
+        )
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("LOOK with dynamic location description closure")
+    func testLookWithDynamicLocationDescription() async throws {
+        // Arrange
+        // Define the dynamic handler closure
+        @Sendable func dynamicDescHandler(location: Location, state: GameState) async -> String? {
+            let isFlagOn = state.flags["special_flag"] ?? false
+            return isFlagOn ? "The room *sparkles* brightly." : "The room seems normal."
+        }
+
+        let dynamicRoom = Location(
+            id: "dynamicRoom",
+            name: "Magic Room",
+            longDescription: dynamicDescHandler, // Assign the closure
+            properties: .inherentlyLit
+        )
+
+        var game = MinimalGame(
+            player: Player(in: "dynamicRoom"),
+            locations: [dynamicRoom],
+            flags: ["special_flag": true] // Start with flag ON
+        )
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+
+        let command = Command(verbID: "look", rawInput: "look")
+
+        // Act 1: Flag is ON
+        await engine.execute(command: command)
+
+        // Assert Output 1 (Should show sparkling description)
+        let output1 = await mockIO.flush()
+        expectNoDifference(output1, """
+            --- Magic Room ---
+            The room *sparkles* brightly.
+            """
+        )
+
+        // Act 2: Turn flag OFF and LOOK again
+        await engine.applyFlagChange(flag: "special_flag", value: false)
+        await engine.execute(command: command)
+
+        // Assert Output 2 (Should show normal description)
+        let output2 = await mockIO.flush()
+        expectNoDifference(output2, """
+            --- Magic Room ---
+            The room seems normal.
+            """
+        )
+    }
+
     // --- LOOK AT / EXAMINE Tests ---
 
     @Test("LOOK AT item shows description and marks touched")

@@ -637,18 +637,9 @@ public class GameEngine: Sendable {
         }
         await ioHandler.print("--- \(location.name) ---", style: .strong)
 
-        // 3. Generate and print the description using the handler
-        if let descriptionHandler = location.longDescription {
-            let description = await descriptionHandlerRegistry.generateDescription(
-                for: location,
-                using: descriptionHandler,
-                engine: self
-            )
-            await ioHandler.print(description)
-        } else {
-            // Fallback if no description handler is set
-            await ioHandler.print("You are in \(location.name).") // Default message
-        }
+        // 3. Generate and print the description using the NEW engine describe method
+        let description = await self.describe(location: location)
+        await ioHandler.print(description)
 
         // 4. List visible items
         await listItemsInLocation(locationID: locationID)
