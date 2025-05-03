@@ -451,7 +451,6 @@ struct DescriptionHandlerRegistryTests {
             name: "widget"
         )
         let (engine, registry) = await setupTestEnvironment(items: [testItem]) // Use helper
-        let mockIO = engine.ioHandler as! MockIOHandler
 
         // DO NOT register "dynamicTest"
 

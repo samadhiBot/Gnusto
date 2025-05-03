@@ -34,15 +34,30 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // LOOK (no object)
         guard let targetItemID = context.command.directObject else {
-            // Get current location from the snapshot
             let currentLocationID = stateSnapshot.player.currentLocationID
+
+            // 1. Check for darkness FIRST
+            if await engine.scopeResolver.isLocationLit(locationID: currentLocationID) == false {
+                return ActionResult(
+                    success: true,
+                    message: "It is pitch black. You are likely to be eaten by a grue."
+                    // No state changes for looking in the dark
+                )
+            }
+
+            // 2. Location is lit, proceed with description
             guard let currentLocation = await engine.location(with: currentLocationID) else {
-                // Should not happen if player location is valid
+                // Should not happen if player location is valid and not dark
                 throw ActionError.internalEngineError("Player is in an invalid location: \(currentLocationID)")
             }
 
-            // Generate description using the registry
-            let description = if let handler = currentLocation.longDescription {
+            var descriptionLines: [String] = []
+
+            // 3. Add Title
+            descriptionLines.append("--- \(currentLocation.name) ---")
+
+            // 4. Add Location Description (dynamic or default)
+            let baseDescription = if let handler = currentLocation.longDescription {
                 await engine.descriptionHandlerRegistry.generateDescription(
                     for: currentLocation,
                     using: handler,
@@ -52,9 +67,24 @@ public struct LookActionHandler: EnhancedActionHandler {
                 // Default if location has no longDescription
                 "You are in the \(currentLocation.name)."
             }
+            descriptionLines.append(baseDescription)
 
-            // Return the description in the ActionResult
-            return ActionResult(success: true, message: description)
+            // 5. Add Visible Items List
+            let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: currentLocationID)
+            let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] } // Get full Item objects from snapshot
+
+            if !visibleItems.isEmpty {
+                // Use engine helper to format the list (assuming one exists or creating a temporary one)
+                // TODO: Ensure GameEngine has a suitable list formatting helper for location contents
+                // For now, using the existing contents helper as a placeholder logic:
+                descriptionLines.append(
+                    "You can see \(visibleItems.listWithIndefiniteArticles) here."
+                )
+            }
+
+            // 6. Combine and return
+            let finalMessage = descriptionLines.joined(separator: "\n")
+            return ActionResult(success: true, message: finalMessage) // No state change for LOOK
         }
 
         // EXAMINE [Object]
@@ -137,7 +167,7 @@ public struct LookActionHandler: EnhancedActionHandler {
                 } else {
                     lines.append(
                         // Use engine helper for formatting list
-                        "The \(item.name) contains \(await engine.listItemsForContents(Array(contents)))."
+                        "The \(item.name) contains \(contents.listWithIndefiniteArticles)."
                     )
                 }
             } else {
@@ -154,8 +184,10 @@ public struct LookActionHandler: EnhancedActionHandler {
             let itemsToDescribe = itemsOnSurface.filter { $0.id != itemID }
             if !itemsOnSurface.isEmpty {
                 // Use engine helper for formatting
-                let itemNames = await engine.listItemsForContents(Array(itemsToDescribe))
-                lines.append("On the \(item.name) is \(itemNames).")
+                let isAre = itemsToDescribe.count == 1 ? "is" : "are"
+                lines.append(
+                    "On the \(item.name) \(isAre) \(itemsToDescribe.listWithIndefiniteArticles)."
+                )
             }
             // No message needed if surface is empty
         }

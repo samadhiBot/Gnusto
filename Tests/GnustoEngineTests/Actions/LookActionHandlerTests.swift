@@ -685,7 +685,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item(with: "artifact") != nil) // Item exists
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(engine.gameState.changeHistory.isEmpty == true)
 

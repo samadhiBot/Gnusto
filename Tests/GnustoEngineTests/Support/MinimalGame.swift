@@ -46,7 +46,8 @@ struct MinimalGame: GameBlueprint {
             locations: gameLocations,
             items: gameItems,
             player: player,
-            vocabulary: vocabulary // Provide the constructed vocabulary
+            vocabulary: vocabulary, // Provide the constructed vocabulary
+            flags: Set(flags ?? []) // Pass the initial flags here
         )
     }
 }
