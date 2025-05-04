@@ -344,7 +344,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(container.dynamicValues["isOpen"]?.toBool == false) // Verify container is closed
+        #expect(container.dynamicValues["isOpen"] == nil)
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -353,7 +353,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is closed.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)

@@ -529,7 +529,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item(with: "box")?.hasProperty(.touched) == false)
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -576,7 +576,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item(with: "jar")?.hasProperty(.touched) == false)
-        #expect(engine.item(with: "jar")?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(engine.item(with: "jar")?.dynamicValues["isOpen"] == nil)
         #expect(engine.item(with: "jar")?.hasProperty(.transparent) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 

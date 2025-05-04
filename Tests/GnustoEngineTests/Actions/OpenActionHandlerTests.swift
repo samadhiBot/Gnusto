@@ -29,7 +29,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
@@ -80,7 +80,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
         #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 

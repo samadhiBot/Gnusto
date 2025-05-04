@@ -31,7 +31,10 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // 5. Check if already closed (using dynamic property)
-        let isOpen = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .isOpen)?.toBool ?? false
+        let isOpen = await context.engine.getDynamicItemValue(
+            itemID: targetItemID,
+            key: .isOpen
+        )?.toBool ?? false
         guard isOpen else {
             // Don't throw, let process handle the specific message "That's already closed."
             return
@@ -51,10 +54,15 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // Handle "already closed" case detected (but not thrown) in validate
-        let isOpen = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .isOpen)?.toBool ?? true // Assume open if not found
+        let isOpen = await context.engine.getDynamicItemValue(
+            itemID: targetItemID,
+            key: .isOpen
+        )?.toBool ?? false
         if !isOpen {
-            // Use standard Zork message for already closed
-            return ActionResult(success: false, message: "That's already closed.")
+            return ActionResult(
+                success: false,
+                message: "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
+            )
         }
 
         // --- Calculate State Changes ---

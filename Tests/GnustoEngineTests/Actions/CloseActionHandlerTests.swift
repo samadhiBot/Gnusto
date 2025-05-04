@@ -243,7 +243,7 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool ?? false == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
