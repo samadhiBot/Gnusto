@@ -89,7 +89,7 @@ public struct Item: Codable, Identifiable, Sendable {
         // self.actionHandlerID = actionHandlerID
 
         // Initialize dynamic values
-        var initialValues = [PropertyID: StateValue]()
+        var initialValues = dynamicValues
         if let shortDescription {
             initialValues[.shortDescription] = .string(shortDescription)
         }

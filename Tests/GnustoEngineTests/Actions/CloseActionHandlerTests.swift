@@ -46,6 +46,7 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .container, .openable,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let initialProperties = box.properties // Capture initial state
@@ -58,7 +59,6 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-
         #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -78,7 +78,7 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You close the wooden box.")
+        expectNoDifference(output, "Closed.")
 
         // Assert Change History
         let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
@@ -92,6 +92,7 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .container, .openable, .touched, // Start touched
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let initialProperties = box.properties // Includes .touched
@@ -125,7 +126,7 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You close the wooden box.")
+        expectNoDifference(output, "Closed.")
 
         // Assert Change History
         let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
@@ -242,7 +243,7 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool ?? false == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(

@@ -27,28 +27,34 @@ public struct PropertyID: Hashable, Comparable, Codable, ExpressibleByStringLite
 
 public extension PropertyID {
     // --- General ---
-    /// Indicates whether an entity is currently considered "lit".
-    /// Typically computed based on light sources in scope.
-    static let isLit = PropertyID("isLit")
 
     /// The current carrying capacity of a container item.
     /// Might be computed based on contents or other factors.
     static let currentCapacity = PropertyID("currentCapacity")
 
-    // --- Descriptions ---
-    /// The primary, detailed description (ZIL LDESC).
-    static let longDescription = PropertyID("longDescription")
-    /// The shorter description used in lists or brief mentions (ZIL SDESC).
-    static let shortDescription = PropertyID("shortDescription")
-    /// The description shown the first time an item is seen in a room (ZIL FDESC). (Item only)
-    static let itemFirstDescription = PropertyID("itemFirstDescription")
-    /// Text read from an item (ZIL RTEXT/TEXT). (Item only)
-    static let itemReadText = PropertyID("itemReadText")
-    /// Text read only when item is held (ZIL HTEXT). (Item only)
-    static let itemHeldText = PropertyID("itemHeldText")
+    /// Indicates whether an entity is currently considered "lit".
+    /// Typically computed based on light sources in scope.
+    static let isLit = PropertyID("isLit")
 
     /// Boolean state indicating whether a container item is currently open.
     static let isOpen = PropertyID("isOpen")
+
+    // --- Descriptions ---
+
+    /// The primary, detailed description (ZIL LDESC).
+    static let longDescription = PropertyID("longDescription")
+
+    /// The shorter description used in lists or brief mentions (ZIL SDESC).
+    static let shortDescription = PropertyID("shortDescription")
+
+    /// The description shown the first time an item is seen in a room (ZIL FDESC). (Item only)
+    static let itemFirstDescription = PropertyID("itemFirstDescription")
+
+    /// Text read from an item (ZIL RTEXT/TEXT). (Item only)
+    static let itemReadText = PropertyID("itemReadText")
+
+    /// Text read only when item is held (ZIL HTEXT). (Item only)
+    static let itemHeldText = PropertyID("itemHeldText")
 
     // Add other standard property IDs as needed, e.g., for lock states,
     // open/closed states, specific game mechanics, etc.
