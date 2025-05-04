@@ -30,9 +30,10 @@ public struct CloseActionHandler: EnhancedActionHandler {
             throw ActionError.itemNotCloseable(targetItemID)
         }
 
-        // 5. Check if already closed
-        guard targetItem.hasProperty(.open) else {
-            // Don't throw, let process handle the specific message
+        // 5. Check if already closed (using dynamic property)
+        let isOpen = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .isOpen)?.toBool ?? false
+        guard isOpen else {
+            // Don't throw, let process handle the specific message "That's already closed."
             return
         }
 
@@ -50,27 +51,36 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // Handle "already closed" case detected (but not thrown) in validate
-        if !targetItem.hasProperty(.open) {
-            return ActionResult(success: false, message: "The \(targetItem.name) is already closed.")
+        let isOpen = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .isOpen)?.toBool ?? true // Assume open if not found
+        if !isOpen {
+            // Use standard Zork message for already closed
+            return ActionResult(success: false, message: "That's already closed.")
         }
 
         // --- Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
-        // Change 1: Properties (remove .open, add .touched)
-        let oldProperties = targetItem.properties
-        var newProperties = oldProperties
-        newProperties.remove(.open) // Remove the open flag
-        newProperties.insert(.touched) // Mark as touched
+        // Change 1: Set dynamic property isOpen to false
+        // This call applies the state change internally.
+        try await context.engine.setDynamicItemValue(
+            itemID: targetItemID,
+            key: .isOpen,
+            newValue: .bool(false)
+        )
 
-        if oldProperties != newProperties {
-            let propertiesChange = StateChange(
+        // Change 2: Properties (add .touched)
+        let oldProperties = targetItem.properties
+        var touchedStateChange: StateChange? = nil
+        if !oldProperties.contains(.touched) {
+            var newProperties = oldProperties
+            newProperties.insert(.touched) // Mark as touched
+            touchedStateChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemPropertySet(oldProperties),
                 newValue: .itemPropertySet(newProperties)
             )
-            stateChanges.append(propertiesChange)
+            stateChanges.append(touchedStateChange!)
         }
 
         // Closing doesn't usually affect pronouns like taking does.
@@ -78,8 +88,8 @@ public struct CloseActionHandler: EnhancedActionHandler {
         // --- Prepare Result ---
         return ActionResult(
             success: true,
-            message: "You close the \(targetItem.name).", // Use plain name
-            stateChanges: stateChanges,
+            message: "Closed.", // Standard Zork message
+            stateChanges: stateChanges, // Only includes touched change if needed
             sideEffects: []
         )
     }

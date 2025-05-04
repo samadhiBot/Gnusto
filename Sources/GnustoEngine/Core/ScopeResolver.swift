@@ -173,7 +173,10 @@ public struct ScopeResolver: Sendable {
             // A) Check if it's an accessible container
             if currentItem.hasProperty(.container) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
-                if currentItem.hasProperty(.open) || currentItem.hasProperty(.transparent) {
+                // Check dynamic property for open state
+                let isOpen = engine.gameState.items[currentItem.id]?.dynamicValues[.isOpen]?.toBool ?? false
+                let isTransparent = currentItem.hasProperty(.transparent)
+                if isOpen || isTransparent {
                     // Find items directly inside this container
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
                     let insideIDs = itemsInside.map { $0.id }

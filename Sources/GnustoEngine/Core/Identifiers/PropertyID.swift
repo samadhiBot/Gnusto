@@ -47,6 +47,8 @@ public extension PropertyID {
     /// Text read only when item is held (ZIL HTEXT). (Item only)
     static let itemHeldText = PropertyID("itemHeldText")
 
+    /// Boolean state indicating whether a container item is currently open.
+    static let isOpen = PropertyID("isOpen")
 
     // Add other standard property IDs as needed, e.g., for lock states,
     // open/closed states, specific game mechanics, etc.

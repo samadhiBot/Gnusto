@@ -93,7 +93,8 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         )
         descriptionParts.append(baseDescription)
 
-        let isOpen = targetItem.hasProperty(.open)
+        // Check dynamic property for open state
+        let isOpen = await engine.getDynamicItemValue(itemID: targetItem.id, key: .isOpen)?.toBool ?? false
         let isTransparent = targetItem.hasProperty(.transparent)
 
         if isOpen || isTransparent {

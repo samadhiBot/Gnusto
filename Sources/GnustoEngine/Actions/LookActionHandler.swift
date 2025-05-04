@@ -122,8 +122,8 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // Container contents - Check properties on the potentially stale item definition
         if item.hasProperty(.container) {
-            // Check current state (open/closed) from the snapshot
-            let isOpen = stateSnapshot.items[itemID]?.hasProperty(ItemProperty.open) ?? false
+            // Check current state (open/closed) using dynamic value from the snapshot
+            let isOpen = stateSnapshot.items[itemID]?.dynamicValues[.isOpen]?.toBool ?? false
             let isTransparent = item.hasProperty(.transparent) // Transparency is usually static
 
             if isOpen || isTransparent {

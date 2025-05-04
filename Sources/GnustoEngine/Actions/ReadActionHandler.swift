@@ -34,7 +34,9 @@ public struct ReadActionHandler: EnhancedActionHandler {
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
             if isParentItemInReach {
                 // Check if parent allows access (surface or open container)
-                if parentItem.hasProperty(.surface) || (parentItem.hasProperty(.container) && parentItem.hasProperty(.open)) {
+                let isParentContainer = parentItem.hasProperty(.container)
+                let isParentOpen = isParentContainer ? (await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false) : false
+                if parentItem.hasProperty(.surface) || (isParentContainer && isParentOpen) {
                     isReachable = true
                 }
             }

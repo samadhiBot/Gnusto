@@ -16,8 +16,7 @@ struct WaitActionHandler: EnhancedActionHandler {
         return ActionResult(
             success: true,
             message: "Time passes.",
-            stateChanges: [],
-            sideEffects: []
+            stateChanges: []
         )
     }
 

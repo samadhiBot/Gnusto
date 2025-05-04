@@ -608,9 +608,11 @@ public struct StandardParser: Parser {
                          if item.parent == .player || item.parent == .location(currentLocationID) { meetsScopeCondition = true }
                          else if case .item(let containerID) = item.parent {
                              if let container = allItems[containerID],
-                                (container.parent == .player || container.parent == .location(currentLocationID)),
-                                (container.hasProperty(.container) && container.hasProperty(.open)) || container.hasProperty(.surface) {
-                                 meetsScopeCondition = true
+                                (container.parent == .player || container.parent == .location(currentLocationID)) {
+                                 let isContainerOpen = container.dynamicValues[.isOpen]?.toBool ?? false
+                                 if (container.hasProperty(.container) && isContainerOpen) || container.hasProperty(.surface) {
+                                     meetsScopeCondition = true
+                                 }
                              }
                          } else if gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false {
                               meetsScopeCondition = true
@@ -622,7 +624,8 @@ public struct StandardParser: Parser {
                     }
                 }
 
-                if (item.hasProperty(.container) && item.hasProperty(.open)) || item.hasProperty(.surface) {
+                let isContainerOpen = item.dynamicValues[.isOpen]?.toBool ?? false
+                if (item.hasProperty(.container) && isContainerOpen) || item.hasProperty(.surface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }
             }

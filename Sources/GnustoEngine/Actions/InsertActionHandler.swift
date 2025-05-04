@@ -49,7 +49,9 @@ struct InsertActionHandler: EnhancedActionHandler {
         guard containerItem.hasProperty(.container) else {
             throw ActionError.targetIsNotAContainer(containerID)
         }
-        guard containerItem.hasProperty(.open) else {
+        // Check dynamic property for open state
+        let isOpen = await context.engine.getDynamicItemValue(itemID: containerID, key: .isOpen)?.toBool ?? false
+        guard isOpen else {
             throw ActionError.containerIsClosed(containerID)
         }
 

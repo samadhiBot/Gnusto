@@ -83,8 +83,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         return ActionResult(
             success: true,
             message: "Dropped.", // Zork 1 message
-            stateChanges: stateChanges,
-            sideEffects: []
+            stateChanges: stateChanges
         )
     }
 

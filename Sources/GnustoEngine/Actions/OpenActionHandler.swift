@@ -30,12 +30,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
             throw ActionError.itemNotOpenable(targetItemID)
         }
 
-        // 4. Check if already open
-        guard !targetItem.hasProperty(.open) else {
-            throw ActionError.itemAlreadyOpen(targetItemID)
-        }
-
-        // 5. Check if locked
+        // 4. Check if locked
         if targetItem.hasProperty(.locked) {
             throw ActionError.itemIsLocked(targetItemID)
         }
@@ -51,25 +46,44 @@ public struct OpenActionHandler: EnhancedActionHandler {
             throw ActionError.internalEngineError("Open context.command target item disappeared between validate and process.")
         }
 
-        // Calculate the new properties
-        var newProperties = targetItem.properties
-        newProperties.insert(.open)
-        newProperties.insert(.touched)
+        // Check if already open using dynamic property
+        let isOpen = await context.engine.getDynamicItemValue(
+            itemID: targetItemID,
+            key: .isOpen
+        )?.toBool ?? false
+        guard !isOpen else {
+            throw ActionError.itemAlreadyOpen(targetItemID)
+        }
 
-        // Create the state change
-        let stateChange = StateChange(
-            entityId: .item(targetItemID),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(targetItem.properties), // Record old state
-            newValue: .itemPropertySet(newProperties)
+        // Set the dynamic value for 'isOpen' to true
+        // This function call applies the state change internally but returns Void.
+        try await context.engine.setDynamicItemValue(
+            itemID: targetItemID,
+            key: .isOpen,
+            newValue: .bool(true)
         )
+
+        // Update the 'touched' property - This remains a static property for now.
+        // TODO: Consider if 'touched' should also be dynamic or handled differently.
+        var touchedProperties = targetItem.properties
+        let alreadyTouched = touchedProperties.contains(.touched)
+        var touchedStateChange: StateChange?
+        if !alreadyTouched {
+            touchedProperties.insert(.touched)
+            touchedStateChange = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemProperties,
+                oldValue: .itemPropertySet(targetItem.properties), // Original properties before touch
+                newValue: .itemPropertySet(touchedProperties)     // Properties with .touched added
+            )
+        }
 
         // Prepare the result
         return ActionResult(
             success: true,
             message: "You open the \(targetItem.name).",
-            stateChanges: [stateChange],
-            sideEffects: []
+            // Only include touched change if it happened. The open change is applied by setDynamicItemValue.
+            stateChanges: touchedStateChange.map { [$0] } ?? []
         )
     }
 

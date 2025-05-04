@@ -44,7 +44,9 @@ public struct TakeActionHandler: EnhancedActionHandler {
             if case .item(let parentID) = targetItem.parent,
                let container = await context.engine.item(with: parentID),
                container.hasProperty(.container),
-               !container.hasProperty(.open) {
+               // Check dynamic property for open state
+               await context.engine.getDynamicItemValue(itemID: parentID, key: .isOpen)?.toBool == false
+            {
                 throw ActionError.containerIsClosed(parentID)
             }
             // If not reachable for other reasons (e.g., too far, darkness affecting scope)
@@ -117,8 +119,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         return ActionResult(
             success: true,
             message: "Taken.",
-            stateChanges: stateChanges,
-            sideEffects: []
+            stateChanges: stateChanges
         )
     }
 

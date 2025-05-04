@@ -17,7 +17,6 @@ public enum ItemProperty: String, Codable, CaseIterable, Sendable {
     case narticle     // NARTICLEBIT: Suppress default article ("a", "the")
     case ndesc        // NDESCBIT: Suppress automatic description in room contents
     case on           // ONBIT: Is currently switched on
-    case open         // OPENBIT: Is currently open (for containers/doors)
     case openable     // OPENABLEBIT: Can be opened/closed by player
     case person       // PERSONBIT: An NPC or the player
     case plural       // PLURALBIT: Grammatically plural

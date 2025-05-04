@@ -17,14 +17,23 @@ public struct Item: Codable, Identifiable, Sendable {
 
     /// Storage for state values that might have associated dynamic behavior (computation/validation)
     /// defined externally in the `DynamicPropertyRegistry`.
-    /// Use `PropertyID` constants (e.g., `.longDescription`, `.itemReadText`) as keys.
-    /// Values are typically `StateValue.string` for descriptions/text.
+    ///
+    /// Use this for mutable state that changes during gameplay (e.g., open/closed status, charge level,
+    /// description text that depends on game state). Values are keyed by `PropertyID` constants
+    /// (e.g., `.longDescription`, `.itemReadText`, `.isOpen`).
+    ///
+    /// This dictionary represents the *current state* of the item's dynamic aspects.
+    /// Access and modification should typically go through `GameEngine` helper methods
+    /// (like `getDynamicItemValue`, `setDynamicItemValue`) to ensure any associated
+    /// computation or validation logic is correctly applied.
+    ///
+    /// Values are typically represented using the `StateValue` enum (e.g., `.string`, `.bool`, `.int`).
     public var dynamicValues: [PropertyID: StateValue]
 
     // Action handler - Placeholder.
     // var actionHandlerID: String?
 
-    /// The unique identifier for this item (ZIL NAME). `let` because identity doesn't change.
+    /// Represents the unique identifier for this item.
     public let id: ItemID
 
     /// The primary noun used to refer to the item (e.g., "lantern").
@@ -33,7 +42,12 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The entity that currently contains or supports this item.
     public var parent: ParentEntity
 
-    /// The set of properties defining the item's characteristics and capabilities.
+    /// The set of inherent, relatively static properties defining the item's fundamental
+    /// characteristics and capabilities (e.g., is it a container, a light source, wearable?).
+    ///
+    /// These properties define *what* the item *is* or *can do* fundamentally, and are less
+    /// likely to change frequently during gameplay compared to `dynamicValues`. They are
+    /// represented by the `ItemProperty` enum.
     public var properties: Set<ItemProperty>
 
     /// The item's size, influencing carrying capacity and container limits. Defaults to 5 per ZILF docs.
