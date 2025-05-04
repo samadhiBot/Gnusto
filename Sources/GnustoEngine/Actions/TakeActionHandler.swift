@@ -29,8 +29,8 @@ public struct TakeActionHandler: EnhancedActionHandler {
            let parentItem = await context.engine.item(with: parentID) {
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
-            let isContainer = parentItem.hasProperty(.container)
-            let isSurface = parentItem.hasProperty(.surface)
+            let isContainer = parentItem.flag(.isContainer)
+            let isSurface = parentItem.flag(.isSurface)
             if !isContainer && !isSurface {
                 // Custom message similar to Zork's, using the plain name.
                 throw ActionError.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
@@ -43,7 +43,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
             // Handle specific container closed errors before general unreachability
             if case .item(let parentID) = targetItem.parent,
                let container = await context.engine.item(with: parentID),
-               container.hasProperty(.container),
+               container.flag(.isContainer),
                // Check dynamic property for open state
                await context.engine.getDynamicItemValue(itemID: parentID, key: .isOpen)?.toBool == false
             {
@@ -54,7 +54,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 6. Check if the item is takable
-        guard targetItem.hasProperty(.takable) else {
+        guard targetItem.flag(.isTakable) else {
             throw ActionError.itemNotTakable(targetItemID)
         }
 
@@ -90,19 +90,15 @@ public struct TakeActionHandler: EnhancedActionHandler {
         )
         stateChanges.append(parentChange)
 
-        // Change 2: Properties (add .touched)
-        let oldProperties = targetItem.properties
-        var newProperties = oldProperties
-        newProperties.insert(.touched)
-
-        if oldProperties != newProperties {
-            let propertiesChange = StateChange(
+        // Change 2: Set `.itemTouched` flag if not already set
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             )
-            stateChanges.append(propertiesChange)
+            stateChanges.append(touchedChange)
         }
 
         // Change 3: Pronoun ("it")

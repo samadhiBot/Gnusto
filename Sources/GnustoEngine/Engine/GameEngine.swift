@@ -812,7 +812,7 @@ public class GameEngine: Sendable {
     }
 
     private func anySuch(_ itemID: ItemID) -> String {
-        if let item = item(with: itemID), item.hasProperty(.touched) {
+        if let item = item(with: itemID), item.flag(.itemTouched) {
             "the \(item.name)"
         } else {
             "any such thing"
@@ -878,51 +878,6 @@ public class GameEngine: Sendable {
     }
 
     // MARK: - State Mutation Helpers (Public API for Handlers/Hooks)
-
-    /// Applies a change to a specific item's properties.
-    /// This creates and applies the necessary `StateChange`.
-    /// It logs an error and returns if the item doesn't exist or the change fails.
-    ///
-    /// - Parameters:
-    ///   - itemID: The ID of the item to modify.
-    ///   - adding: A set of properties to add (optional).
-    ///   - removing: A set of properties to remove (optional).
-    public func applyItemPropertyChange(
-        itemID: ItemID,
-        adding: Set<ItemProperty> = [],
-        removing: Set<ItemProperty> = []
-    ) async {
-        guard let item = item(with: itemID) else {
-            logger
-                .warning("""
-                    💥 Cannot apply property change to non-existent item \
-                    '\(itemID.rawValue, privacy: .public)'.
-                    """)
-            return
-        }
-        let oldProps = item.properties
-        var newProps = oldProps
-        newProps.formUnion(adding)
-        newProps.subtract(removing)
-
-        // Only apply if there's an actual change
-        if oldProps != newProps {
-            let change = StateChange(
-                entityId: .item(itemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProps),
-                newValue: .itemPropertySet(newProps)
-            )
-            do {
-                try gameState.apply(change)
-            } catch {
-                logger.warning("""
-                    💥 Failed to apply item property change for \
-                    '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)
-                    """)
-            }
-        }
-    }
 
     /// Sets a global flag by applying a `.setFlag` state change.
     /// Logs a warning and returns if the state change application fails.
@@ -1134,48 +1089,6 @@ public class GameEngine: Sendable {
                 try gameState.apply(change)
             } catch {
                 logger.warning("💥 Failed to apply game specific state change for key '\(key.rawValue, privacy: .public)': \(error, privacy: .public)")
-            }
-        }
-    }
-
-    /// Applies a change to a specific location's properties.
-    ///
-    /// - Parameters:
-    ///   - locationID: The ID of the location to modify.
-    ///   - adding: A set of properties to add (optional).
-    ///   - removing: A set of properties to remove (optional).
-    public func applyLocationPropertyChange(
-        locationID: LocationID,
-        adding: Set<LocationProperty> = [],
-        removing: Set<LocationProperty> = []
-    ) async {
-        guard let location = location(with: locationID) else {
-            logger
-                .warning("""
-                    💥 Cannot apply property change to non-existent location \
-                    '\(locationID.rawValue, privacy: .public)'.
-                    """)
-            return
-        }
-        let oldProps = location.properties
-        var newProps = oldProps
-        newProps.formUnion(adding)
-        newProps.subtract(removing)
-
-        if oldProps != newProps {
-            let change = StateChange(
-                entityId: .location(locationID),
-                propertyKey: .locationProperties,
-                oldValue: .locationPropertySet(oldProps),
-                newValue: .locationPropertySet(newProps)
-            )
-            do {
-                try gameState.apply(change)
-            } catch {
-                logger.warning("""
-                    💥 Failed to apply location property change for \
-                    '\(locationID.rawValue, privacy: .public)': \(error, privacy: .public)
-                    """)
             }
         }
     }

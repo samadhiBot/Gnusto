@@ -33,9 +33,9 @@ public struct TouchActionHandler: EnhancedActionHandler {
             let parentParent = parentItem.parent
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
             if isParentItemInReach {
-                if parentItem.hasProperty(.surface) {
+                if parentItem.flag(.isSurface) {
                     isReachable = true
-                } else if parentItem.hasProperty(.container) {
+                } else if parentItem.flag(.isContainer) {
                     // Check dynamic property for open state
                     let isParentOpen = await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false
                     guard isParentOpen else {
@@ -63,13 +63,12 @@ public struct TouchActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
         if let targetItem = await context.engine.item(with: targetItemID) {
-            let initialProperties = targetItem.properties // Use initial state
-            if !initialProperties.contains(.touched) {
+            if targetItem.dynamicValues[.itemTouched] != .bool(true) {
                 stateChanges.append(StateChange(
                     entityId: .item(targetItemID),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(initialProperties),
-                    newValue: .itemPropertySet(initialProperties.union([.touched]))
+                    propertyKey: .itemDynamicValue(key: .itemTouched),
+                    oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                    newValue: .bool(true)
                 ))
             }
         } else {

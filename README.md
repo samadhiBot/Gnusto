@@ -9,6 +9,17 @@ The project is organized into two main directories:
 - **Sources/GnustoEngine:** Contains the core engine code.
 - **Executables:** Contains example games and demos built using the engine.
 
+## Core Concepts
+
+- **Game World:** Defined by `Location` and `Item` objects.
+- **State Management:** Centralized in `GameState`, mutated via `StateChange` objects within `ActionResult`.
+- **Entities (`Item`, `Location`):**
+  - Have static definition data (ID, name, vocabulary words).
+  - Have dynamic state stored in a `[PropertyID: StateValue]` dictionary (`dynamicValues`). This includes boolean flags (like `isContainer`, `isLit`), numeric values, string data, or entity references.
+  - Can have optional `description` strings and `descriptionHandlerId`s for dynamic text generation.
+  - Can have optional `objectActionHandlerId`s (Items) or `roomActionHandlerId`s (Locations) to override default action logic.
+- **Actions:** Player input is parsed into `Command` objects. `ActionHandler`s (or `EnhancedActionHandler`s) process these commands, interacting with `GameState` via `GameEngine` helpers and returning `ActionResult`s.
+
 ## Core Engine Features
 
 ### Item System

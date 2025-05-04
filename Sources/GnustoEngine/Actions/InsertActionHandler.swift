@@ -46,7 +46,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
 
         // 4. Target Checks (Specific to INSERT)
-        guard containerItem.hasProperty(.container) else {
+        guard containerItem.flag(.isContainer) else {
             throw ActionError.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
@@ -94,28 +94,22 @@ struct InsertActionHandler: EnhancedActionHandler {
         ))
 
         // Change 2: Mark item touched
-        let oldItemProps = itemToInsertSnapshot.properties
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
+        if itemToInsertSnapshot.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: itemToInsertSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 
         // Change 3: Mark container touched
-        let oldContainerProps = containerSnapshot.properties
-        if !oldContainerProps.contains(.touched) {
-            var newContainerProps = oldContainerProps
-            newContainerProps.insert(.touched)
+        if containerSnapshot.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldContainerProps),
-                newValue: .itemPropertySet(newContainerProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: containerSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

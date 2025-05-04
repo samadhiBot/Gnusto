@@ -1149,6 +1149,119 @@ struct GameEngineTests {
         // TODO: Implementation
     }
 
+    @Test("ReportActionError: .itemWithNoDescription")
+    func testReportErrorItemWithNoDescription() async throws {
+        // Arrange
+        let itemID: ItemID = "magicBox"
+        let game = MinimalGame()
+        let item = Item(id: itemID, name: "Magic Box")
+        let registry = DefinitionRegistry()
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
+
+        // Act
+        let desc = await engine.getDescription(for: .item(id: itemID))
+
+        // Assert
+        #expect(desc == "Magic Box")
+    }
+
+    @Test("ReportActionError: .itemWithStaticDescription")
+    func testReportErrorItemWithStaticDescription() async throws {
+        // Arrange
+        let itemID: ItemID = "magicBox"
+        let game = MinimalGame()
+        let item = Item(id: itemID, name: "Magic Box", description: "Default box desc.")
+        let registry = DefinitionRegistry()
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
+
+        // Act
+        let desc = await engine.getDescription(for: .item(id: itemID))
+
+        // Assert
+        #expect(desc == "Default box desc.")
+    }
+
+    @Test("ReportActionError: .itemWithHandler")
+    func testReportErrorItemWithHandler() async throws {
+        // Arrange
+        let itemID: ItemID = "magicBox"
+        let handlerID: DescriptionHandlerID = "boxDesc"
+        let item = Item(id: itemID, name: "Magic Box", description: "Default box desc.", descriptionHandlerId: handlerID)
+        let registry = DefinitionRegistry()
+        registry.registerDescriptionHandler(id: handlerID) { _, _, _ in "Magic description!" }
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
+
+        // Act
+        let desc = await engine.getDescription(for: .item(id: itemID))
+
+        // Assert
+        #expect(desc == "Magic description!")
+    }
+
+    @Test("ReportActionError: .locationWithNoDescription")
+    func testReportErrorLocationWithNoDescription() async throws {
+        // Arrange
+        let locID: LocationID = "hall"
+        let game = MinimalGame()
+        let location = Location(id: locID, name: "Grand Hall")
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(locations: [location], playerLocation: locID)
+
+        // Act
+        let desc = await engine.getDescription(for: .location(id: locID))
+
+        // Assert
+        #expect(desc == "Grand Hall")
+    }
+
+    @Test("ReportActionError: .locationWithStaticDescription")
+    func testReportErrorLocationWithStaticDescription() async throws {
+        // Arrange
+        let locID: LocationID = "hall"
+        let location = Location(id: locID, name: "Grand Hall", description: "A vast hall.")
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(locations: [location], playerLocation: locID)
+
+        // Act
+        let desc = await engine.getDescription(for: .location(id: locID))
+
+        // Assert
+        #expect(desc == "A vast hall.")
+    }
+
+    @Test("ReportActionError: .locationWithHandler")
+    func testReportErrorLocationWithHandler() async throws {
+        // Arrange
+        let locID: LocationID = "cave"
+        let handlerID: DescriptionHandlerID = "caveDesc"
+        let location = Location(id: locID, name: "Echoing Cave", description: "Default cave desc.", descriptionHandlerId: handlerID)
+        let registry = DefinitionRegistry()
+        registry.registerDescriptionHandler(id: handlerID) { _, _, _ in "Echoing description!" }
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(locations: [location], definitionRegistry: registry, playerLocation: locID)
+
+        // Act
+        let desc = await engine.getDescription(for: .location(id: locID))
+
+        // Assert
+        #expect(desc == "Echoing description!")
+    }
+
+    @Test("ReportActionError: .applyActionResult_Success")
+    func testApplyActionResult_Success() async throws {
+        let itemID: ItemID = "lamp"
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(
+            items: [Item(id: itemID, name: "Lamp", isOn: false)] // Start with lamp off
+        )
+
+        let turnOnChanges = [
+            StateChange(
+                entityId: .item(id: itemID),
+                propertyKey: .itemDynamicValue(key: .isOn),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            ),
+            StateChange(
+                entityId: .item(id: itemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
 } // End of struct GameEngineTests
 
 // Helper extension for OutputCall checks (optional)

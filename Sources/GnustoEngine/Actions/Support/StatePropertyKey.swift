@@ -7,7 +7,6 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case itemCapacity
     case itemName
     case itemParent
-    case itemProperties
     case itemSize
     case itemSynonyms
     case itemValue
@@ -16,7 +15,6 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case locationDescription
     case locationExits
     case locationName
-    case locationProperties
 
     // Dynamic Values (Stored in Item/Location, logic in Registry)
     case itemDynamicValue(key: PropertyID)
@@ -58,14 +56,12 @@ extension StatePropertyKey: CustomStringConvertible {
         case .itemCapacity: "itemCapacity"
         case .itemName: "itemName"
         case .itemParent: "itemParent"
-        case .itemProperties: "itemProperties"
         case .itemSize: "itemSize"
         case .itemSynonyms: "itemSynonyms"
         case .itemValue: "itemValue"
         case .locationDescription: "locationDescription"
         case .locationExits: "locationExits"
         case .locationName: "locationName"
-        case .locationProperties: "locationProperties"
         case .locationDynamicValue(let key): "locationDynamicValue(\(key.rawValue))"
         case .playerHealth: "playerHealth"
         case .playerInventoryLimit: "playerInventoryLimit"

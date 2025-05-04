@@ -26,12 +26,12 @@ public struct OpenActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if item is openable
-        guard targetItem.hasProperty(.openable) else {
+        guard targetItem.flag(.isOpenable) else {
             throw ActionError.itemNotOpenable(targetItemID)
         }
 
         // 4. Check if locked
-        if targetItem.hasProperty(.locked) {
+        if targetItem.flag(.isLocked) {
             throw ActionError.itemIsLocked(targetItemID)
         }
     }
@@ -63,27 +63,24 @@ public struct OpenActionHandler: EnhancedActionHandler {
             newValue: .bool(true)
         )
 
-        // Update the 'touched' property - This remains a static property for now.
-        // TODO: Consider if 'touched' should also be dynamic or handled differently.
-        var touchedProperties = targetItem.properties
-        let alreadyTouched = touchedProperties.contains(.touched)
-        var touchedStateChange: StateChange?
-        if !alreadyTouched {
-            touchedProperties.insert(.touched)
-            touchedStateChange = StateChange(
+        // Update the 'touched' flag - Create a state change if not already touched
+        var stateChanges: [StateChange] = []
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(targetItem.properties), // Original properties before touch
-                newValue: .itemPropertySet(touchedProperties)     // Properties with .touched added
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             )
+            stateChanges.append(touchedChange)
         }
 
         // Prepare the result
         return ActionResult(
             success: true,
             message: "You open the \(targetItem.name).",
-            // Only include touched change if it happened. The open change is applied by setDynamicItemValue.
-            stateChanges: touchedStateChange.map { [$0] } ?? []
+            // Only includes touched change if it happened. The open change is applied by setDynamicItemValue.
+            stateChanges: stateChanges
         )
     }
 

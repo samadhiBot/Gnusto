@@ -47,7 +47,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         }
 
         // 4. Target Checks (Specific to PUT ON)
-        guard surfaceItem.hasProperty(.surface) else {
+        guard surfaceItem.flag(.isSurface) else {
             throw ActionError.targetIsNotASurface(surfaceID)
         }
         // TODO: Add surface capacity/volume checks?
@@ -79,28 +79,22 @@ struct PutOnActionHandler: EnhancedActionHandler {
         ))
 
         // Change 2: Mark item touched
-        let oldItemProps = itemToPutSnapshot.properties
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
+        if itemToPutSnapshot.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(itemToPutID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: itemToPutSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 
         // Change 3: Mark surface touched
-        let oldSurfaceProps = surfaceSnapshot.properties
-        if !oldSurfaceProps.contains(.touched) {
-            var newSurfaceProps = oldSurfaceProps
-            newSurfaceProps.insert(.touched)
+        if surfaceSnapshot.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(surfaceID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldSurfaceProps),
-                newValue: .itemPropertySet(newSurfaceProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: surfaceSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

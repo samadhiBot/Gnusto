@@ -20,7 +20,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         let currentLocationID = await context.engine.gameState.player.currentLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
-        let isLight = targetItem.hasProperty(.lightSource)
+        let isLight = targetItem.flag(.isLightSource)
         let roomIsDark = !(await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID))
 
         var isNormallyReachable = false
@@ -39,12 +39,12 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if the item has the `.device` property.
-        guard targetItem.hasProperty(.device) else {
+        guard targetItem.flag(.isDevice) else {
             throw ActionError.prerequisiteNotMet("You can't turn that on.")
         }
 
         // 5. Check if the item already has the `.on` property.
-        if targetItem.hasProperty(.on) {
+        if targetItem.flag(.isOn) {
             throw ActionError.customResponse("It's already on.")
         }
     }
@@ -60,29 +60,24 @@ struct TurnOnActionHandler: EnhancedActionHandler {
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
-        let initialProperties = targetItem.properties // Use initial state
 
-        // Add touched property change if needed
-        if !initialProperties.contains(.touched) {
+        // Change 1: Add .touched property change if needed
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet(initialProperties.union([.touched]))
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 
-        // Add .on property change (based on initial state + touched)
-        let propertiesAfterTouch = initialProperties.union(stateChanges.isEmpty ? [] : [.touched])
-        let propertiesAfterOn = propertiesAfterTouch.union([.on])
-        // Only add the change if .on was not already present initially
-        if !initialProperties.contains(.on) { // Ensure we only add if it was off
+        // Change 2: Add .on property change (only if currently off)
+        if targetItem.dynamicValues[.isOn] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                // Old value depends on whether touched was added *before* this change conceptually
-                oldValue: .itemPropertySet(propertiesAfterTouch),
-                newValue: .itemPropertySet(propertiesAfterOn)
+                propertyKey: .itemDynamicValue(key: .isOn),
+                oldValue: targetItem.dynamicValues[.isOn] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

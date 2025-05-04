@@ -195,19 +195,6 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             items[itemID]?.parent = newParent
 
-        case .itemProperties:
-            // Expecting an .itemPropertySet for itemProperties
-            guard case .itemPropertySet(let newProperties) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemProperties: expected .itemPropertySet, got \(change.newValue)")
-            }
-            guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemProperties: expected .item, got \(change.entityId)")
-            }
-            guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemProperties change")
-            }
-            items[itemID]?.properties = newProperties
-
         case .itemSize:
             // Expecting an .int for itemSize
             guard case .int(let newSize) = change.newValue else {
@@ -264,19 +251,6 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
-
-        case .locationProperties:
-            // Expecting a .locationPropertySet for locationProperties
-            guard case .locationPropertySet(let newProperties) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for locationProperties: expected .locationPropertySet, got \(change.newValue)")
-            }
-            guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationProperties: expected .location, got \(change.entityId)")
-            }
-            guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationProperties change")
-            }
-            locations[locationID]?.properties = newProperties
 
         case .locationExits:
             // Expecting .locationExits
@@ -493,13 +467,6 @@ public struct GameState: Codable, Equatable, Sendable {
             // Map item's parent ParentEntity to .parentEntity
             actualCurrentValue = items[itemID].map { .parentEntity($0.parent) }
 
-        case .itemProperties:
-            guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemProperties")
-            }
-            // Map item's properties Set<ItemProperty> to .itemPropertySet
-            actualCurrentValue = items[itemID].map { .itemPropertySet($0.properties) }
-
         case .itemSize:
             guard case .item(let id) = change.entityId else {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize")
@@ -523,17 +490,6 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .locationDescription:
              throw ActionError.internalEngineError("Old value validation cannot be performed on locationDescription.")
-
-        case .locationProperties:
-            guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationProperties")
-            }
-            // Map location's properties Set<LocationProperty> to .locationPropertySet
-            actualCurrentValue = if let properties = locations[locationID]?.properties {
-                .locationPropertySet(properties)
-            } else {
-                nil
-            }
 
         case .locationExits:
             guard case .location(let locationID) = change.entityId else {

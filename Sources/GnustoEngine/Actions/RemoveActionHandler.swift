@@ -21,12 +21,12 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if the (held) item is currently worn
-        guard targetItem.hasProperty(.worn) else {
+        guard targetItem.flag(.isWorn) else {
             throw ActionError.itemIsNotWorn(targetItemID)
         }
 
         // 4. Check if the item is fixed (e.g., cursed amulet)
-        guard !targetItem.hasProperty(.fixed) else {
+        guard !targetItem.flag(.isFixed) else {
             throw ActionError.itemNotRemovable(targetItemID)
         }
     }
@@ -41,18 +41,23 @@ public struct RemoveActionHandler: EnhancedActionHandler {
 
         var stateChanges: [StateChange] = []
 
-        // Calculate property changes: Remove .worn, add .touched
-        let oldProps = itemSnapshot.properties
-        var newProps = oldProps
-        newProps.remove(.worn)
-        newProps.insert(.touched) // Taking off implies touching
-
-        if oldProps != newProps {
+        // Change 1: Set `.isWorn` to false
+        if itemSnapshot.dynamicValues[.isWorn] == .bool(true) { // Only change if currently worn
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProps),
-                newValue: .itemPropertySet(newProps)
+                propertyKey: .itemDynamicValue(key: .isWorn),
+                oldValue: .bool(true),
+                newValue: .bool(false)
+            ))
+        }
+
+        // Change 2: Set `.itemTouched` to true (if not already)
+        if itemSnapshot.dynamicValues[.itemTouched] != .bool(true) {
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: itemSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

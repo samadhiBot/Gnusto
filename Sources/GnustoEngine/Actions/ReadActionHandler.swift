@@ -34,9 +34,9 @@ public struct ReadActionHandler: EnhancedActionHandler {
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
             if isParentItemInReach {
                 // Check if parent allows access (surface or open container)
-                let isParentContainer = parentItem.hasProperty(.container)
+                let isParentContainer = parentItem.flag(.isContainer)
                 let isParentOpen = isParentContainer ? (await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false) : false
-                if parentItem.hasProperty(.surface) || (isParentContainer && isParentOpen) {
+                if parentItem.flag(.isSurface) || (isParentContainer && isParentOpen) {
                     isReachable = true
                 }
             }
@@ -51,13 +51,13 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // 4. Check if room is lit (unless item provides light)
         let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-        let providesLight = targetItem.hasProperty(.lightSource) && targetItem.hasProperty(.on)
+        let providesLight = targetItem.flag(.isLightSource) && targetItem.flag(.isOn)
         guard isLit || providesLight else {
             throw ActionError.roomIsDark
         }
 
         // 5. Check if item is readable
-        guard targetItem.hasProperty(.readable) else {
+        guard targetItem.flag(.isReadable) else {
             throw ActionError.itemNotReadable(targetItemID)
         }
     }
@@ -72,13 +72,12 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        let initialProperties = targetItem.properties // Use initial state
-        if !initialProperties.contains(.touched) {
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet(initialProperties.union([.touched]))
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

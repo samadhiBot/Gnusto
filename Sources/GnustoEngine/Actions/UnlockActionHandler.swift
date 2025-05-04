@@ -38,10 +38,10 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check item properties
-        guard targetItem.hasProperty(.lockable) else {
+        guard targetItem.flag(.isLockable) else {
             throw ActionError.itemNotUnlockable(targetItemID)
         }
-        guard targetItem.hasProperty(.locked) else {
+        guard targetItem.flag(.isLocked) else {
             // Target is already unlocked. Don't throw, let process handle the message.
             return
         }
@@ -65,7 +65,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // Handle case: Already unlocked (detected in validate)
-        if !targetItem.hasProperty(.locked) {
+        if !targetItem.flag(.isLocked) {
             // Manually construct definite article message
             return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
         }
@@ -73,34 +73,37 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         // --- Unlock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
-        // Change 1: Remove .locked from target
-        let oldTargetProps = targetItem.properties
-        var newTargetProps = oldTargetProps
-        newTargetProps.remove(.locked)
-        newTargetProps.insert(.touched) // Also mark target touched
-
-        if oldTargetProps != newTargetProps {
-            let targetPropsChange = StateChange(
+        // Change 1: Remove .locked from target (if currently locked)
+        if targetItem.dynamicValues[.isLocked] == .bool(true) {
+            let lockedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldTargetProps),
-                newValue: .itemPropertySet(newTargetProps)
+                propertyKey: .itemDynamicValue(key: .isLocked),
+                oldValue: .bool(true),
+                newValue: .bool(false)
             )
-            stateChanges.append(targetPropsChange)
+            stateChanges.append(lockedChange)
         }
 
-        // Change 2: Add .touched to key (if needed)
-        let oldKeyProps = keyItem.properties
-        if !oldKeyProps.contains(.touched) {
-            var newKeyProps = oldKeyProps
-            newKeyProps.insert(.touched)
-            let keyPropsChange = StateChange(
-                entityId: .item(keyItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldKeyProps),
-                newValue: .itemPropertySet(newKeyProps)
+        // Change 2: Add .touched to target (if not already set)
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            let targetTouchedChange = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             )
-            stateChanges.append(keyPropsChange)
+            stateChanges.append(targetTouchedChange)
+        }
+
+        // Change 3: Add .touched to key (if not already set)
+        if keyItem.dynamicValues[.itemTouched] != .bool(true) {
+            let keyTouchedChange = StateChange(
+                entityId: .item(keyItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: keyItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
+            )
+            stateChanges.append(keyTouchedChange)
         }
 
         // --- Prepare Result ---

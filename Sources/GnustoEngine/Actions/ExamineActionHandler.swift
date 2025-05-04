@@ -35,13 +35,12 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        let initialProperties = targetItem.properties // Use initial state
-        if !initialProperties.contains(.touched) {
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet(initialProperties.union([.touched]))
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 
@@ -50,15 +49,15 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // Priority 1: Readable Text (Check dynamic value)
         let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .itemReadText)
-        if targetItem.hasProperty(.readable), let text = readTextValue?.toString, !text.isEmpty {
+        if targetItem.flag(.isReadable), let text = readTextValue?.toString, !text.isEmpty {
             message = text
         }
         // Priority 2: Container/Door Description
-        else if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
+        else if targetItem.flag(.isContainer) || targetItem.flag(.isDoor) {
             message = await describeContainerOrDoor(targetItem: targetItem, engine: context.engine)
         }
         // Priority 3: Surface Description
-        else if targetItem.hasProperty(.surface) {
+        else if targetItem.flag(.isSurface) {
             message = await describeSurface(targetItem: targetItem, engine: context.engine)
         }
         // Priority 4: Dynamic Long Description
@@ -95,7 +94,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // Check dynamic property for open state
         let isOpen = await engine.getDynamicItemValue(itemID: targetItem.id, key: .isOpen)?.toBool ?? false
-        let isTransparent = targetItem.hasProperty(.transparent)
+        let isTransparent = targetItem.flag(.isTransparent)
 
         if isOpen || isTransparent {
             let contents = await engine.items(withParent: .item(targetItem.id))

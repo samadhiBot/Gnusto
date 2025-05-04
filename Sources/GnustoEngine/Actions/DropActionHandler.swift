@@ -27,7 +27,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if item is droppable (not fixed)
-        if targetItem.hasProperty(.fixed) {
+        if targetItem.flag(.isFixed) {
             throw ActionError.itemNotDroppable(targetItemID)
         }
     }
@@ -59,20 +59,26 @@ public struct DropActionHandler: EnhancedActionHandler {
         )
         stateChanges.append(parentChange)
 
-        // Change 2: Properties (add .touched, remove .worn)
-        let oldProperties = targetItem.properties
-        var newProperties = oldProperties
-        newProperties.insert(.touched) // Ensure it's marked touched
-        newProperties.remove(.worn)   // No longer worn if dropped
-
-        if oldProperties != newProperties {
-            let propertiesChange = StateChange(
+        // Change 2: Ensure `.itemTouched` is true
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             )
-            stateChanges.append(propertiesChange)
+            stateChanges.append(touchedChange)
+        }
+
+        // Change 3: Ensure `.isWorn` is false
+        if targetItem.dynamicValues[.isWorn] == .bool(true) { // Only add change if it was worn
+            let wornChange = StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemDynamicValue(key: .isWorn),
+                oldValue: .bool(true),
+                newValue: .bool(false)
+            )
+            stateChanges.append(wornChange)
         }
 
         // Dropping usually doesn't affect pronouns unless maybe it was the last thing referred to?

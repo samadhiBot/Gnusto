@@ -21,12 +21,12 @@ public struct WearActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if the (held) item is wearable
-        guard targetItem.hasProperty(.wearable) else {
+        guard targetItem.flag(.isWearable) else {
             throw ActionError.itemNotWearable(targetItemID)
         }
 
         // 4. Check if already worn
-        guard !targetItem.hasProperty(.worn) else {
+        guard !targetItem.flag(.isWorn) else {
             throw ActionError.itemIsAlreadyWorn(targetItemID)
         }
     }
@@ -41,18 +41,23 @@ public struct WearActionHandler: EnhancedActionHandler {
 
         var stateChanges: [StateChange] = []
 
-        // Calculate property changes: Add .worn and .touched
-        let oldProps = itemSnapshot.properties
-        var newProps = oldProps
-        newProps.insert(.worn)
-        newProps.insert(.touched) // Wearing implies touching
-
-        if oldProps != newProps {
+        // Change 1: Add .worn (if not already worn)
+        if itemSnapshot.dynamicValues[.isWorn] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProps),
-                newValue: .itemPropertySet(newProps)
+                propertyKey: .itemDynamicValue(key: .isWorn),
+                oldValue: itemSnapshot.dynamicValues[.isWorn] ?? .bool(false),
+                newValue: .bool(true)
+            ))
+        }
+
+        // Change 2: Add .touched (if not already touched)
+        if itemSnapshot.dynamicValues[.itemTouched] != .bool(true) {
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: itemSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             ))
         }
 

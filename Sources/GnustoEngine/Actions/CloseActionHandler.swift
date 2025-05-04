@@ -26,7 +26,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if item is closeable (using .openable for symmetry)
-        guard targetItem.hasProperty(.openable) else {
+        guard targetItem.flag(.isOpenable) else {
             throw ActionError.itemNotCloseable(targetItemID)
         }
 
@@ -70,25 +70,23 @@ public struct CloseActionHandler: EnhancedActionHandler {
 
         // Change 1: Set dynamic property isOpen to false
         // This call applies the state change internally.
+        // NOTE: The state change for `isOpen` is generated *inside* setDynamicItemValue.
+        // We only need to manually create the change for `.itemTouched` here.
         try await context.engine.setDynamicItemValue(
             itemID: targetItemID,
             key: .isOpen,
             newValue: .bool(false)
         )
 
-        // Change 2: Properties (add .touched)
-        let oldProperties = targetItem.properties
-        var touchedStateChange: StateChange? = nil
-        if !oldProperties.contains(.touched) {
-            var newProperties = oldProperties
-            newProperties.insert(.touched) // Mark as touched
-            touchedStateChange = StateChange(
+        // Change 2: Set `.itemTouched` flag if not already set
+        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false), // Current value (or default false)
+                newValue: .bool(true)
             )
-            stateChanges.append(touchedStateChange!)
+            stateChanges.append(touchedChange)
         }
 
         // Closing doesn't usually affect pronouns like taking does.

@@ -81,18 +81,15 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // 3. Prepare state change (mark as touched)
         var stateChanges: [StateChange] = []
-        // Use the item from the snapshot for checking properties
+        // Use the item from the snapshot for checking state
         if let snapshotItem = stateSnapshot.items[targetItemID],
-           !snapshotItem.hasProperty(ItemProperty.touched)
+           snapshotItem.dynamicValues[.itemTouched] != .bool(true) // Check dynamicValue
         {
-            let oldProperties = snapshotItem.properties
-            var newProperties = oldProperties
-            newProperties.insert(ItemProperty.touched)
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
+                propertyKey: .itemDynamicValue(key: .itemTouched), // Use dynamic value key
+                oldValue: snapshotItem.dynamicValues[.itemTouched] ?? .bool(false),
+                newValue: .bool(true)
             )
             stateChanges.append(propertiesChange)
         }
@@ -120,11 +117,11 @@ public struct LookActionHandler: EnhancedActionHandler {
         var lines: [String] = []
         let itemID = item.id
 
-        // Container contents - Check properties on the potentially stale item definition
-        if item.hasProperty(.container) {
+        // Container contents - Check flags on the potentially stale item definition
+        if item.flag(.isContainer) { // Use flag()
             // Check current state (open/closed) using dynamic value from the snapshot
             let isOpen = stateSnapshot.items[itemID]?.dynamicValues[.isOpen]?.toBool ?? false
-            let isTransparent = item.hasProperty(.transparent) // Transparency is usually static
+            let isTransparent = item.flag(.isTransparent) // Use flag()
 
             if isOpen || isTransparent {
                 // Get items *inside* the container from the snapshot
@@ -143,8 +140,8 @@ public struct LookActionHandler: EnhancedActionHandler {
             }
         }
 
-        // Surface contents - Check property on item definition
-        if item.hasProperty(.surface) {
+        // Surface contents - Check flag on item definition
+        if item.flag(.isSurface) { // Use flag()
             // Get items *on* the surface from the snapshot
             let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
             // Filter out the item itself if it somehow lists itself (e.g., bug)
