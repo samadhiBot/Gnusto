@@ -45,7 +45,8 @@ struct StandardParserTests {
             Item(
                 id: "backpack",
                 name: "backpack",
-                properties: .container, .open, .takable,
+                properties: .container, .takable,
+                dynamicValues: [.isOpen: true],
                 capacity: 20,
                 parent: .player
             ),

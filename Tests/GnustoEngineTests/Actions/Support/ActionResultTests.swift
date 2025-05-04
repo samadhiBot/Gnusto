@@ -12,8 +12,8 @@ struct ActionResultTests {
         let change = StateChange(
             entityId: .item("lamp"),
             propertyKey: .itemProperties,
-            oldValue: StateValue.itemPropertySet([.lightSource]),
-            newValue: StateValue.itemPropertySet([ItemProperty.lightSource, ItemProperty.on])
+            oldValue: .itemPropertySet([.lightSource]),
+            newValue: .itemPropertySet([.lightSource, .on])
         )
         let effect = SideEffect(
             type: .startFuse,
@@ -53,15 +53,15 @@ struct ActionResultTests {
     func testStateChangeInitialization() {
         let change = StateChange(
             entityId: .item("door"),
-            propertyKey: .itemProperties,
-            oldValue: StateValue.itemPropertySet([ItemProperty.openable]),
-            newValue: StateValue.itemPropertySet([ItemProperty.openable, ItemProperty.open])
+            propertyKey: .itemDynamicValue(key: "isOpen"),
+            oldValue: false,
+            newValue: true
         )
 
         #expect(change.entityId == .item("door"))
-        #expect(change.propertyKey == .itemProperties)
-        #expect(change.oldValue == StateValue.itemPropertySet([ItemProperty.openable]))
-        #expect(change.newValue == StateValue.itemPropertySet([ItemProperty.openable, ItemProperty.open]))
+        #expect(change.propertyKey == .itemDynamicValue(key: ".isOpen"))
+        #expect(change.oldValue == false)
+        #expect(change.newValue == true)
     }
 
     @Test("StateChange Initialization without Old Value")

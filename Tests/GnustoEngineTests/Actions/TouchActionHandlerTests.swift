@@ -130,7 +130,8 @@ struct TouchActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .open,
+            properties: .container,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let gem = Item(

@@ -97,7 +97,12 @@ struct TakeActionHandlerTests {
     @Test("Take item fails when already held")
     func testTakeItemFailsWhenAlreadyHeld() async throws {
         // Arrange
-        let testItem = Item(id: "key", name: "brass key", properties: .takable, parent: .player)
+        let testItem = Item(
+            id: "key",
+            name: "brass key",
+            properties: .takable,
+            parent: .player
+        )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -215,8 +220,19 @@ struct TakeActionHandlerTests {
     @Test("Take item successfully from open container in room")
     func testTakeItemSuccessfullyFromOpenContainerInRoom() async throws {
         // Arrange
-        let container = Item(id: "box", name: "wooden box", properties: .container, .open, parent: .location("startRoom"))
-        let itemInContainer = Item(id: "gem", name: "ruby gem", properties: .takable, parent: .item("box"))
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            properties: .container,
+            dynamicValues: [.isOpen: true],
+            parent: .location("startRoom")
+        )
+        let itemInContainer = Item(
+            id: "gem",
+            name: "ruby gem",
+            properties: .takable,
+            parent: .item("box")
+        )
         let initialParent = itemInContainer.parent
         let initialProperties = itemInContainer.properties
 
@@ -255,8 +271,19 @@ struct TakeActionHandlerTests {
     @Test("Take item successfully from open container held by player")
     func testTakeItemSuccessfullyFromOpenContainerHeld() async throws {
         // Arrange
-        let container = Item(id: "pouch", name: "leather pouch", properties: .container, .open, .takable, parent: .player)
-        let itemInContainer = Item(id: "coin", name: "gold coin", properties: .takable, parent: .item("pouch"))
+        let container = Item(
+            id: "pouch",
+            name: "leather pouch",
+            properties: .container, .takable,
+            dynamicValues: [.isOpen: true],
+            parent: .player
+        )
+        let itemInContainer = Item(
+            id: "coin",
+            name: "gold coin",
+            properties: .takable,
+            parent: .item("pouch")
+        )
         let initialParent = itemInContainer.parent
         let initialProperties = itemInContainer.properties
 
@@ -420,7 +447,14 @@ struct TakeActionHandlerTests {
     @Test("Take wearable item successfully (not worn)")
     func testTakeWearableItemSuccessfully() async throws {
         // Arrange
-        let testItem = Item(id: "cloak", name: "dark cloak", properties: .takable, .wearable, size: 2, parent: .location("startRoom"))
+        let testItem = Item(
+            id: "cloak",
+            name: "dark cloak",
+            properties: .takable,
+            .wearable,
+            size: 2,
+            parent: .location("startRoom")
+        )
         let initialParent = testItem.parent
         let initialProperties = testItem.properties
         // Define player with capacity
@@ -459,8 +493,19 @@ struct TakeActionHandlerTests {
     @Test("Take item successfully from surface in room")
     func testTakeItemSuccessfullyFromSurface() async throws {
         // Arrange
-        let surfaceItem = Item(id: "table", name: "wooden table", properties: .surface, parent: .location("startRoom"))
-        let itemOnSurface = Item(id: "book", name: "old book", properties: .takable, .read, parent: .item(surfaceItem.id))
+        let surfaceItem = Item(
+            id: "table",
+            name: "wooden table",
+            properties: .surface,
+            parent: .location("startRoom")
+        )
+        let itemOnSurface = Item(
+            id: "book",
+            name: "old book",
+            properties: .takable,
+            .read,
+            parent: .item(surfaceItem.id)
+        )
         let initialParent = itemOnSurface.parent
         let initialProperties = itemOnSurface.properties
         // Define player with capacity
@@ -550,7 +595,13 @@ struct TakeActionHandlerTests {
     @Test("Take item at exact capacity")
     func testTakeItemAtExactCapacity() async throws {
         // Arrange: Player has capacity 10, holds item size 7, tries to take item size 3
-        let heldItem = Item(id: "sword", name: "sword", properties: .takable, size: 7, parent: .player)
+        let heldItem = Item(
+            id: "sword",
+            name: "sword",
+            properties: .takable,
+            size: 7,
+            parent: .player
+        )
         let itemToTake = Item(
             id: "key",
             name: "brass key",

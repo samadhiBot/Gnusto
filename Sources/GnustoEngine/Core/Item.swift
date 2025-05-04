@@ -70,6 +70,7 @@ public struct Item: Codable, Identifiable, Sendable {
         readText: String? = nil,      // Renamed from 'text'/'readableText'
         heldText: String? = nil,
         properties: ItemProperty...,
+        dynamicValues: [PropertyID: StateValue] = [:],
         size: Int = 5,
         capacity: Int = -1,
         parent: ParentEntity = .nowhere,
@@ -90,19 +91,19 @@ public struct Item: Codable, Identifiable, Sendable {
         // Initialize dynamic values
         var initialValues = [PropertyID: StateValue]()
         if let shortDescription {
-            initialValues[GnustoEngine.PropertyID.shortDescription] = .string(shortDescription)
+            initialValues[.shortDescription] = .string(shortDescription)
         }
         if let firstDescription {
-            initialValues[GnustoEngine.PropertyID.itemFirstDescription] = .string(firstDescription)
+            initialValues[.itemFirstDescription] = .string(firstDescription)
         }
         if let longDescription {
-            initialValues[GnustoEngine.PropertyID.longDescription] = .string(longDescription)
+            initialValues[.longDescription] = .string(longDescription)
         }
         if let readText {
-            initialValues[GnustoEngine.PropertyID.itemReadText] = .string(readText)
+            initialValues[.itemReadText] = .string(readText)
         }
         if let heldText {
-            initialValues[GnustoEngine.PropertyID.itemHeldText] = .string(heldText)
+            initialValues[.itemHeldText] = .string(heldText)
         }
         self.dynamicValues = initialValues
     }

@@ -339,7 +339,8 @@ struct ScopeResolverTests {
     let baseOpenBox = Item(
         id: "openBox",
         name: "open box",
-        properties: .container, .open,
+        properties: .container,
+        dynamicValues: [.isOpen: true],
         parent: .player
     )
     let baseClosedBox = Item(
@@ -437,7 +438,8 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container, .open,
+            properties: .container,
+            dynamicValues: [.isOpen: true],
             parent: .player
         )
         let itemInBox = Item(
@@ -520,7 +522,8 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container, .open,
+            properties: .container,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let itemInBox = Item(
@@ -608,7 +611,8 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container, .open,
+            properties: .container,
+            dynamicValues: [.isOpen: true],
             parent: .location(darkRoom.id)
         )
         let itemInBox = Item(

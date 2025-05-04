@@ -17,7 +17,6 @@ struct ItemPropertyTests {
         #expect(ItemProperty.narticle.rawValue == "narticle")
         #expect(ItemProperty.ndesc.rawValue == "ndesc")
         #expect(ItemProperty.on.rawValue == "on")
-        #expect(ItemProperty.open.rawValue == "open")
         #expect(ItemProperty.openable.rawValue == "openable")
         #expect(ItemProperty.person.rawValue == "person")
         #expect(ItemProperty.plural.rawValue == "plural")

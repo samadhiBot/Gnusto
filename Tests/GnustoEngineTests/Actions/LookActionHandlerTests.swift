@@ -463,7 +463,8 @@ struct LookActionHandlerTests {
             id: "box",
             name: "wooden box",
             longDescription: "A sturdy wooden box.",
-            properties: .container, .openable, .open,
+            properties: .container, .openable,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let coin = Item(

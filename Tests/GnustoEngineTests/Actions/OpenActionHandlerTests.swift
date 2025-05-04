@@ -39,8 +39,9 @@ struct OpenActionHandlerTests {
 
         // Assert State Change
         let finalItemState = engine.item(with: "box")
-        let expectedProperties: Set<ItemProperty> = [.container, .openable, .open, .touched]
+        let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open and .touched properties")
+        #expect(finalItemState?.dynamicValues == ["isOpen": true])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -90,8 +91,9 @@ struct OpenActionHandlerTests {
 
         // Assert State Change
         let finalItemState = engine.item(with: "box")
-        let expectedProperties: Set<ItemProperty> = [.container, .openable, .open, .touched]
+        let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open property and retain .touched")
+        #expect(finalItemState?.dynamicValues == ["isOpen": true])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -192,7 +194,8 @@ struct OpenActionHandlerTests {
         let openBox = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .open, // Starts open
+            properties: .container, .openable,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
 

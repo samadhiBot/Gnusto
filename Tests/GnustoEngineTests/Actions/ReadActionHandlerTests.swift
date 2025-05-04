@@ -545,7 +545,13 @@ struct ReadActionHandlerTests {
     @Test("Read item inside held container")
     func testReadItemInsideHeldContainer() async throws {
         // Arrange
-        let box = Item(id: "box", name: "wooden box", properties: .takable, .container, .open, parent: .player)
+        let box = Item(
+            id: "box",
+            name: "wooden box",
+            properties: .takable, .container,
+            dynamicValues: [.isOpen: true],
+            parent: .player
+        )
         let note = Item(
             id: "note",
             name: "folded note",
@@ -582,7 +588,8 @@ struct ReadActionHandlerTests {
         let chest = Item(
             id: "chest",
             name: "iron chest",
-            properties: .container, .open,
+            properties: .container,
+            dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
         let letter = Item(

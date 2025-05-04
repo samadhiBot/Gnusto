@@ -102,3 +102,9 @@ extension StateValue {
         }
     }
 }
+
+extension StateValue: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: Bool) {
+        self = .bool(value)
+    }
+}
