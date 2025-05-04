@@ -38,9 +38,10 @@ struct RemoveActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = engine.item(with: "cloak")
-        #expect(finalCloakState?.hasProperty(.worn) == false, "Cloak should NOT have .worn property")
-        #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property") // Ensure touched is added
+        let finalCloakState = await engine.item(with: "cloak")
+        #expect(finalCloakState?.parent == .location("startRoom"))
+        #expect(finalCloakState?.flag(.isWorn) == false, "Cloak should NOT have .worn property")
+        #expect(finalCloakState?.flag(.itemTouched) == true, "Cloak should have .touched property") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
@@ -49,17 +50,23 @@ struct RemoveActionHandlerTests {
         // Assert Change History
         let expectedChanges = [
             StateChange(
-                entityId: .item("cloak"),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet([.takable, .wearable, .touched]) // .worn removed, .touched added
+                entityId: .item(id: "cloak"),
+                propertyKey: .itemParent,
+                oldValue: .parent(.player),
+                newValue: .parent(.location(id: "startRoom"))
             ),
             StateChange(
-                entityId: .global,
-                propertyKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
-                newValue: .itemIDSet(["cloak"])
-            )
+                entityId: .item(id: "cloak"),
+                propertyKey: .itemDynamicValue(key: .isWorn),
+                oldValue: .bool(true),
+                newValue: .bool(false)
+            ),
+            StateChange(
+                entityId: .item(id: "cloak"),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false), // Assuming not touched before removal
+                newValue: .bool(true)
+            ),
         ]
         let finalHistory = engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)

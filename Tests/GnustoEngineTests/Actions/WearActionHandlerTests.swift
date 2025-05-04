@@ -14,8 +14,9 @@ struct WearActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, // Held, wearable
-            parent: .player
+            parent: .player,
+            isTakable: true,
+            isWearable: true
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -29,30 +30,32 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialProperties = engine.item(with: "cloak")?.properties ?? []
-        let initialHistory = engine.gameState.changeHistory // Capture initial state
-        #expect(initialProperties.contains(.worn) == false)
-        #expect(initialHistory.isEmpty)
+        let initialItem = await engine.item(with: "cloak")
+        #expect(initialItem?.flag(PropertyID.isWorn) == false)
+        #expect(engine.gameState.changeHistory.isEmpty)
 
-        // Act - Use engine.execute for success case
         await engine.execute(command: command)
 
-        // Assert State Change
-        let finalCloakState = engine.item(with: "cloak")
-        #expect(finalCloakState?.hasProperty(.worn) == true, "Cloak should have .worn property")
-        #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property")
+        let finalCloakState = await engine.item(with: "cloak")
+        #expect(finalCloakState?.parent == .player)
+        #expect(finalCloakState?.flag(PropertyID.isWorn) == true, "Cloak should have .worn property")
+        #expect(finalCloakState?.flag(PropertyID.itemTouched) == true, "Cloak should have .touched property")
 
-        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You put on the cloak.")
 
-        // Assert Change History
         let expectedChanges = [
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet([.takable, .wearable, .worn, .touched])
+                propertyKey: .itemDynamicValue(key: .isWorn),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            ),
+            StateChange(
+                entityId: .item("cloak"),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
             ),
             StateChange(
                 entityId: .global,
@@ -67,16 +70,15 @@ struct WearActionHandlerTests {
 
     @Test("Wear fails if item not held")
     func testWearItemNotHeld() async throws {
-        let game = MinimalGame() // Cloak doesn't exist here
+        let game = MinimalGame()
         let engine = GameEngine(
             game: game,
-            parser: MockParser(), // Parser needed for engine init
-            ioHandler: await MockIOHandler() // IOHandler needed for engine init
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
-        // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
             try await handler.validate(
                 context: ActionContext(
@@ -94,8 +96,8 @@ struct WearActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "rock",
-            properties: .takable, // Held, but not wearable
-            parent: .player
+            parent: .player,
+            isTakable: true
         )
         let game = MinimalGame(items: [rock])
         let engine = GameEngine(
@@ -106,7 +108,6 @@ struct WearActionHandlerTests {
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
 
-        // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotWearable("rock")) {
             try await handler.validate(
                 context: ActionContext(
@@ -124,8 +125,10 @@ struct WearActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, .worn, // Held, wearable, already worn
-            parent: .player
+            parent: .player,
+            isTakable: true,
+            isWearable: true,
+            isWorn: true
         )
         let game = MinimalGame(items: [cloak])
         let engine = GameEngine(
@@ -136,8 +139,6 @@ struct WearActionHandlerTests {
 
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
-        // Act & Assert Error (on validate)
-        // Assuming the linter issue with ActionError is temporary
         await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
              try await handler.validate(
                 context: ActionContext(
@@ -159,10 +160,8 @@ struct WearActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        // Command with nil directObject
         let command = Command(verbID: "wear", rawInput: "wear")
 
-        // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
              try await handler.validate(
                 context: ActionContext(

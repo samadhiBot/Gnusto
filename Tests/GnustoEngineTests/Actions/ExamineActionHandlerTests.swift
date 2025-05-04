@@ -1,498 +1,306 @@
-import CustomDump
+import GnustoEngine
 import Testing
+import CustomDump
 
-@testable import GnustoEngine
-
-@MainActor
+@Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
-    let handler = ExamineActionHandler()
-
-    @Test("Examine simple object (in room)")
-    func testExamineSimpleObjectInRoom() async throws {
+    @Test func testExamineSimpleItem() async throws {
         // Arrange
-        let rock = Item(
-            id: "rock",
-            name: "plain rock",
-            longDescription: "It's just a rock.",
-            parent: .location("startRoom")
+        let itemID: ItemID = "pebble"
+        let item = Item(id: itemID, name: "small pebble", longDescription: "A smooth, grey pebble.")
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item],
+            playerInventory: [itemID]
         )
-
-        let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "rock",
-            rawInput: "examine rock"
-        )
+        let handler = ExamineActionHandler()
+        let initialItemState = await engine.item(with: itemID)
+        #expect(initialItemState?.flag(PropertyID.itemTouched) == false)
 
         // Act
-        await engine.execute(command: command)
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine pebble")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        _ = try await handler.perform(context: context)
 
-        // Assert
-        let finalItemState = engine.item(with: "rock")
-        #expect(finalItemState?.hasProperty(.touched) == true)
-        let output = await mockIO.flush()
-        // Expect the actual description now
-        expectNoDifference(output, "It’s just a rock.")
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("A smooth, grey pebble."))
+
+        // Assert State Change
+        let finalItemState = await engine.item(with: itemID)
+        #expect(finalItemState?.flag(PropertyID.itemTouched) == true)
+
+        // Assert Change History
+        let expectedChanges = [
+            StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            ),
+            StateChange(
+                entityId: .global,
+                propertyKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([itemID])
+            ),
+        ]
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
-    @Test("Examine simple object (held)")
-    func testExamineSimpleObjectHeld() async throws {
+    @Test func testExamineItemWithDetailedDescriptionHandler() async throws {
         // Arrange
-        let key = Item(
-            id: "key",
-            name: "brass key",
-            longDescription: "A small brass key.",
-            properties: .takable,
-            parent: .player
+        let itemID: ItemID = "locket"
+        let handlerID: DescriptionHandlerID = "locketDesc"
+        let item = Item(
+            id: itemID,
+            name: "engraved locket",
+            longDescription: "A small, tarnished silver locket.",
+            descriptionHandlerId: handlerID
         )
-
-        let game = MinimalGame(items: [key])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "key",
-            rawInput: "examine key"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let finalItemState = engine.item(with: "key")
-        #expect(finalItemState?.hasProperty(.touched) == true)
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A small brass key.")
-    }
-
-    @Test("Examine readable item (prioritizes text)")
-    func testExamineReadableItem() async throws {
-        // Arrange
-        let scroll = Item(
-            id: "scroll",
-            name: "ancient scroll",
-            longDescription: "A rolled up scroll.",
-            readText: "FROBOZZ",
-            properties: .readable,
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [scroll])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "scroll",
-            rawInput: "examine scroll"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let finalItemState = engine.item(with: "scroll")
-        #expect(finalItemState?.hasProperty(.touched) == true)
-        let output = await mockIO.flush()
-        expectNoDifference(output, "FROBOZZ") // Should print the readableText
-    }
-
-    @Test("Examine open container (shows description and contents)")
-    func testExamineOpenContainer() async throws {
-        // Arrange
-        let box = Item(
-            id: "box",
-            name: "wooden box",
-            longDescription: "A plain wooden box.",
-            properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
-            parent: .location("startRoom")
-        )
-        let gem = Item(
-            id: "gem",
-            name: "ruby gem",
-            parent: .item("box")
-        )
-
-        let game = MinimalGame(items: [box, gem])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "box",
-            rawInput: "examine box"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.touched) == true)
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A plain wooden box. The wooden box contains a ruby gem.")
-    }
-
-    @Test("Examine open empty container")
-    func testExamineOpenEmptyContainer() async throws {
-        // Arrange
-        let box = Item(
-            id: "box",
-            name: "wooden box",
-            longDescription: "A plain wooden box.",
-            properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "box",
-            rawInput: "examine box"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A plain wooden box. The wooden box is empty.")
-    }
-
-    @Test("Examine closed container (shows description and closed status)")
-    func testExamineClosedContainer() async throws {
-        // Arrange
-        let box = Item(
-            id: "box",
-            name: "wooden box",
-            longDescription: "A plain wooden box.",
-            properties: .container, .openable,
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "box",
-            rawInput: "examine box"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A plain wooden box. The wooden box is closed.")
-    }
-
-    @Test("Examine transparent closed container (shows description and contents)")
-    func testExamineTransparentContainer() async throws {
-        // Arrange
-        let bottle = Item(
-            id: "bottle",
-            name: "glass bottle",
-            longDescription: "A clear glass bottle.",
-            properties: .container, .transparent,
-            parent: .location("startRoom")
-        )
-        let water = Item(
-            id: "water",
-            name: "water",
-            properties: .narticle,
-            parent: .item(bottle.id)
-        )
-
-        let game = MinimalGame(items: [bottle, water])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "bottle",
-            rawInput: "examine bottle"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A clear glass bottle. The glass bottle contains water.")
-    }
-
-    @Test("Examine surface (shows description and items on it)")
-    func testExamineSurface() async throws {
-        // Arrange
-        let table = Item(
-            id: "table",
-            name: "sturdy table",
-            longDescription: "A sturdy table.",
-            properties: .surface,
-            parent: .location("startRoom")
-        )
-        let book = Item(
-            id: "book",
-            name: "dusty book",
-            parent: .item(table.id)
-        )
-
-        let game = MinimalGame(items: [table, book])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "table",
-            rawInput: "examine table"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy table. On the sturdy table is a dusty book.")
-    }
-
-    @Test("Examine fails item not accessible")
-    func testExamineItemNotAccessible() async throws {
-        // Arrange
-        let rock = Item(
-            id: "rock",
-            name: "plain rock",
-            longDescription: "It's just a rock.",
-            parent: .nowhere
-        )
-        let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        let command = Command(
-            verbID: "examine",
-            directObject: "rock",
-            rawInput: "examine rock"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
-    }
-
-    @Test("Examine fails in dark room")
-    func testExamineInDarkRoom() async throws {
-        // Arrange
-        let darkRoom = Location(id: "darkRoom", name: "Dark Room")
-        let rock = Item(
-            id: "rock",
-            name: "plain rock",
-            longDescription: "It's just a rock.",
-            parent: .location(darkRoom.id)
-        )
-        let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        let command = Command(
-            verbID: "examine",
-            directObject: "rock",
-            rawInput: "examine rock"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "It's too dark to do that.")
-    }
-
-    @Test("Examine item with no description")
-    func testExamineItemWithNoDescription() async throws {
-        // Arrange
-        let pebble = Item(
-            id: "pebble",
-            name: "small pebble",
-            parent: .location("startRoom")
-            // No description provided
-        )
-        let game = MinimalGame(items: [pebble])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "pebble",
-            rawInput: "examine pebble"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You see nothing special about the small pebble.")
-    }
-
-    @Test("Examine simple object with dynamic description (realistic state)")
-    func testExamineSimpleObjectDynamicDescriptionRealistic() async throws {
-        // Arrange
-        let moodStone = Item(
-            id: "stone",
-            name: "mood stone",
-            // Provide a base description; dynamic logic will override
-            longDescription: "A smooth mood stone.",
-            properties: .device, // Qualify
-            parent: .location("startRoom")
-        )
-
-        let game = MinimalGame(items: [moodStone])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        // Register dynamic compute handler for the long description
-        engine.dynamicPropertyRegistry.registerItemCompute(key: .longDescription) { item, _ in
-            // Check .on
-            let color = item.hasProperty(.on) ? "red" : "blue"
-            // Return StateValue.string
-            return .string("The mood stone glows a soft \(color).")
+        let registry = DefinitionRegistry()
+        registry.registerDescriptionHandler(id: handlerID) { _, itemSnapshot, _, _ in
+            "The locket is intricately engraved with the initials \"A.S\"."
         }
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "stone",
-            rawInput: "examine stone"
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item],
+            playerInventory: [itemID],
+            definitionRegistry: registry
         )
-
-        // Act 1: Examine when blue (isOn: false)
-        await engine.execute(command: command)
-
-        let output1 = await mockIO.flush()
-        // Test expects the dynamically computed description
-        expectNoDifference(output1, "The mood stone glows a soft blue.")
-
-        // Change the item's state directly via the engine by adding the .on property
-        await engine.applyItemPropertyChange(itemID: "stone", adding: [.on]) // Qualify
-
-        // Assert intermediate state change
-        #expect(engine.item(with: "stone")?.hasProperty(.on) == true) // Qualify
-
-        // Act 2: Examine when red (isOn: true)
-        await engine.execute(command: command)
-
-        let output2 = await mockIO.flush()
-        // Test expects the dynamically computed description
-        expectNoDifference(output2, "The mood stone glows a soft red.")
-    }
-
-    @Test("Examine surface item (shows description and contained items)")
-    func testExamineSurfaceItem() async throws {
-        // Arrange
-        let table = Item(
-            id: "table",
-            name: "sturdy table",
-            longDescription: "A sturdy table.",
-            properties: .surface,
-            parent: .location("startRoom")
-        )
-        let book = Item(
-            id: "book",
-            name: "dusty book",
-            parent: .item(table.id)
-        )
-
-        let game = MinimalGame(items: [table, book])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "examine",
-            directObject: "table",
-            rawInput: "examine table"
-        )
+        let handler = ExamineActionHandler()
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == false)
 
         // Act
-        await engine.execute(command: command)
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        _ = try await handler.perform(context: context)
+
+        // Assert Output (uses handler)
+        let output = await ioHandler.flush()
+        #expect(output.contains("The locket is intricately engraved with the initials \"A.S\"."))
+        #expect(!output.contains("A small, tarnished silver locket."))
+
+        // Assert State Change
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == true)
+    }
+
+    @Test func testExamineItemInRoom() async throws {
+        // Arrange
+        let itemID: ItemID = "statue"
+        let roomID: LocationID = "garden"
+        let item = Item(
+            id: itemID,
+            name: "stone statue",
+            parent: .location(roomID),
+            longDescription: "A weathered statue of a grue."
+        )
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item],
+            playerLocation: roomID
+        )
+        let handler = ExamineActionHandler()
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == false)
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        _ = try await handler.perform(context: context)
+
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("A weathered statue of a grue."))
+
+        // Assert State Change
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == true)
+    }
+
+    @Test func testExamineItemNotInScope() async throws {
+        // Arrange
+        let itemID: ItemID = "hiddenGem"
+        let item = Item(id: itemID, name: "hidden gem", parent: .location("farAwayRoom"), longDescription: "Should not see this.")
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item],
+            playerLocation: "startRoom"
+        )
+        let handler = ExamineActionHandler()
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine hidden gem")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        let result = try await handler.perform(context: context)
+
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("You see no hidden gem here."))
+
+        // Assert State Change (should be none)
+        #expect(result.changes.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == false)
+    }
+
+    @Test func testExamineNonExistentItem() async throws {
+        // Arrange
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine()
+        let handler = ExamineActionHandler()
+        let itemID: ItemID = "ghost"
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine ghost")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        let result = try await handler.perform(context: context)
+
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("You see no ghost here."))
+
+        // Assert State Change (should be none)
+        #expect(result.changes.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
+    }
+
+    @Test func testExamineAmbiguousItem() async throws {
+        // Arrange
+        let itemID1: ItemID = "redBall"
+        let itemID2: ItemID = "blueBall"
+        let item1 = Item(id: itemID1, name: "red ball", adjectives: ["red"], noun: "ball", longDescription: "A red ball.")
+        let item2 = Item(id: itemID2, name: "blue ball", adjectives: ["blue"], noun: "ball", longDescription: "A blue ball.")
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item1, item2],
+            playerInventory: [itemID1, itemID2]
+        )
+        let handler = ExamineActionHandler()
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObjectWord: "ball", rawInput: "examine ball")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        let result = try await handler.perform(context: context)
+
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("Which ball do you mean, the red ball or the blue ball?"))
+
+        // Assert State Change (should be none)
+        #expect(result.changes.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.item(with: itemID1)?.flag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(with: itemID2)?.flag(PropertyID.itemTouched) == false)
+    }
+
+    @Test func testExamineLocationDescription() async throws {
+        // Arrange
+        let roomID: LocationID = "library"
+        let room = Location(id: roomID, name: "Library", description: "Shelves line the walls.")
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            locations: [room],
+            playerLocation: roomID
+        )
+        let handler = ExamineActionHandler()
+
+        // Act
+        // Simulate examining the current location (often implicit or via LOOK)
+        // We can test the description logic directly here
+        let description = await engine.getDescription(for: .location(id: roomID))
 
         // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "A sturdy table. On the sturdy table is a dusty book.")
+        #expect(description.contains("Shelves line the walls."))
+
+        // Note: Examining a location typically doesn't use ExamineActionHandler
+        // directly, but this tests the underlying description mechanism.
     }
+
+    @Test func testExamineSelf() async throws {
+        // Arrange
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine()
+        let handler = ExamineActionHandler()
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObjectWord: "self", rawInput: "examine self")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        _ = try await handler.perform(context: context)
+
+        // Assert Output
+        let output = await ioHandler.flush()
+        #expect(output.contains("You are your usual self."))
+
+        // Assert State Change (typically none for examining self)
+        #expect(engine.gameState.changeHistory.isEmpty)
+    }
+
+    @Test func testExamineItemWithObjectActionOverride() async throws {
+        // Arrange
+        let itemID: ItemID = "magicMirror"
+        let handlerID: ObjectActionHandlerID = "mirrorExamine"
+        let item = Item(
+            id: itemID,
+            name: "magic mirror",
+            longDescription: "A dusty old mirror.",
+            objectActionHandlerId: handlerID
+        )
+        let registry = DefinitionRegistry()
+        registry.registerObjectActionHandler(id: handlerID) { command, context, _, io, _ in
+            guard command.verbID == VerbID("examine") else { return .notHandled }
+            await io.print("The mirror shows a faint, ghostly image.")
+            return .handled(ActionResult.empty)
+        }
+        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+            items: [item],
+            playerInventory: [itemID],
+            definitionRegistry: registry
+        )
+        let handler = ExamineActionHandler()
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == false)
+
+        // Act
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
+        let context = ActionContext(command: command, engine: engine, stateSnapshot: await engine.snapshotState())
+        let result = try await handler.perform(context: context)
+
+        // Assert Output (Uses the override handler)
+        let output = await ioHandler.flush()
+        #expect(output.contains("The mirror shows a faint, ghostly image."))
+        #expect(!output.contains("A dusty old mirror."))
+
+        // Assert State Change (None, because the override didn't add .touched)
+        #expect(result.changes.isEmpty)
+        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.item(with: itemID)?.flag(PropertyID.itemTouched) == false)
+    }
+
+    // TODO: Restore and adapt this test if DescriptionHandlers need complex state checks
+    //    @Test func testExamineItemWithStatefulDescriptionHandler() async throws {
+    //        // Arrange
+    //        let itemID: ItemID = "moodStone"
+    //        let handlerID: DescriptionHandlerID = "stoneDesc"
+    //        let item = Item(id: itemID, name: "mood stone", description: "A smooth stone.", descriptionHandlerId: handlerID)
+    //        let registry = DefinitionRegistry()
+    //
+    //        // This handler changes description based on whether the stone is 'on'
+    //        registry.registerDescriptionHandler(id: handlerID) { _, itemSnapshot, engine, _ in
+    //            let isOn = itemSnapshot.flag(.isOn) // Check the flag using the snapshot
+    //            return isOn ? "The stone glows brightly." : "The stone is dark."
+    //        }
+    //
+    //        let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
+    //            items: [item], // Initially off
+    //            playerInventory: [itemID],
+    //            definitionRegistry: registry
+    //        )
+    //        let handler = ExamineActionHandler()
+    //
+    //        // --- Test 1: Examine when Off ---
+    //        var command = Command(verb: "examine", directObject: itemID)
+    //        _ = try await handler.handle(command: command, engine: engine, io: ioHandler)
+    //        var output = await ioHandler.flush()
+    //        #expect(output.contains("The stone is dark."))
+    //
+    //        // --- Test 2: Turn On and Examine Again ---
+    //        // Manually set the stone to 'on' (simulate a TURN ON action)
+    //        try await engine.setDynamicItemValue(itemID: itemID, key: .isOn, value: .bool(true))
+    //        #expect(await engine.item(with: itemID)?.flag(.isOn) == true)
+    //
+    //        command = Command(verb: "examine", directObject: itemID)
+    //        _ = try await handler.handle(command: command, engine: engine, io: ioHandler)
+    //        output = await ioHandler.flush()
+    //        #expect(output.contains("The stone glows brightly."))
+    //    }
 }

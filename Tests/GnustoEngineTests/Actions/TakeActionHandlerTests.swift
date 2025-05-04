@@ -8,38 +8,53 @@ import Testing
 struct TakeActionHandlerTests {
     let handler = TakeActionHandler()
 
-    // Helper to create the expected StateChange array for successful take
+    // Helper function to generate expected state changes for a successful 'take'
     private func expectedTakeChanges(
         itemID: ItemID,
-        oldParent: ParentEntity,
-        oldProperties: Set<ItemProperty>,
-        oldPronounIt: Set<ItemID>?
+        initialParent: ParentEntity,
+        finalParent: ParentEntity = .player, // Default final parent is player
+        initialTouched: Bool,
+        finalTouched: Bool = true, // Default is true after taking
+        initialLight: Bool? = nil, // Optional initial light state
+        finalLight: Bool? = nil    // Optional final light state
     ) -> [StateChange] {
-        var finalProperties = oldProperties
-        finalProperties.insert(.touched)
-
-        var changes: [StateChange] = [
+        var changes = [
+            // Parent change
             StateChange(
-                entityId: .item(itemID),
+                entityId: .item(id: itemID),
                 propertyKey: .itemParent,
-                oldValue: .parentEntity(oldParent),
-                newValue: .parentEntity(.player)
-            )
+                oldValue: .parent(initialParent),
+                newValue: .parent(finalParent)
+            ),
         ]
 
-        if oldProperties != finalProperties {
+        // Add touched change only if it actually changes
+        if initialTouched != finalTouched {
             changes.append(StateChange(
-                entityId: .item(itemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(finalProperties)
+                entityId: .item(id: itemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(initialTouched),
+                newValue: .bool(finalTouched)
             ))
         }
 
+        // Add light change only if it actually changes
+        if initialLight != finalLight,
+           let finalLightValue = finalLight // Ensure finalLight is not nil if different
+        {
+            changes.append(StateChange(
+                entityId: .item(id: itemID),
+                propertyKey: .itemDynamicValue(key: .itemLight), // Assuming .itemLight is the correct ID
+                oldValue: initialLight.map { .bool($0) }, // Map optional Bool to optional StateValue
+                newValue: .bool(finalLightValue)
+            ))
+        }
+
+        // Add pronoun change (assuming 'it' always refers to the taken item now)
         changes.append(StateChange(
             entityId: .global,
             propertyKey: .pronounReference(pronoun: "it"),
-            oldValue: oldPronounIt != nil ? .itemIDSet(oldPronounIt!) : nil,
+            oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
             newValue: .itemIDSet([itemID])
         ))
 
@@ -90,7 +105,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "key", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "key",
+            initialParent: initialParent,
+            initialTouched: false // Key starts untouched
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -264,7 +283,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "gem", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "gem",
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -315,7 +338,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "coin", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "coin",
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -486,7 +513,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "cloak", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "cloak",
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -538,7 +569,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: itemOnSurface.id, oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: itemOnSurface.id,
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -586,7 +621,11 @@ struct TakeActionHandlerTests {
 
         // Assert Change History
         // Properties shouldn't change, so helper should only generate parent and pronoun changes
-        let expectedChanges = expectedTakeChanges(itemID: "key", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "key",
+            initialParent: initialParent,
+            initialTouched: true
+        )
         #expect(expectedChanges.count == 2, "Expected only parent and pronoun changes")
         #expect(!expectedChanges.contains { $0.propertyKey == .itemProperties }, "Should not contain property change")
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
@@ -642,7 +681,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "key", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "key",
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -694,7 +737,11 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        let expectedChanges = expectedTakeChanges(itemID: "fly", oldParent: initialParent, oldProperties: initialProperties, oldPronounIt: initialPronounIt)
+        let expectedChanges = expectedTakeChanges(
+            itemID: "fly",
+            initialParent: initialParent,
+            initialTouched: false
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 

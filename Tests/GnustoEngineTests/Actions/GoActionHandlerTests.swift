@@ -137,4 +137,179 @@ struct GoActionHandlerTests {
         let output = await mockIO.flush()
         #expect(output.isEmpty, "Expected no output when direction is invalid.")
     }
+
+    @Test("Go to adjacent room successfully")
+    func testGoToAdjacentRoomSuccessfully() async throws {
+        // Arrange
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            exits: [.north: Exit(destination: "hall")],
+            inherentlyLit: true
+        )
+        let hall = Location(
+            id: "hall",
+            name: "Hall",
+            description: "A long hall.",
+            inherentlyLit: true
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+
+        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "hall")
+        // Output handled by GameEngine's look after move, not tested here directly
+    }
+
+    @Test("Go fails with no exit in direction")
+    func testGoFailsWithNoExit() async throws {
+        // Arrange
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            inherentlyLit: true
+            // No exit north
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+
+        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't go that way.")
+    }
+
+    @Test("Go fails with locked door")
+    func testGoFailsWithLockedDoor() async throws {
+        // Arrange
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            exits: [.north: Exit(destination: "vault", isLocked: true)], // Locked exit
+            inherentlyLit: true
+        )
+        let vault = Location(
+            id: "vault",
+            name: "Vault",
+            description: "A secure vault.",
+            inherentlyLit: true
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, vault])
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+
+        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The way is locked.") // Assuming a generic locked message
+    }
+
+    @Test("Go fails with conditional exit (condition not met)")
+    func testGoFailsWithConditionalExit() async throws {
+        // Arrange
+        let conditionFlag = "gateOpen"
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            exits: [.east: Exit(destination: "garden", conditionFlag: conditionFlag)],
+            inherentlyLit: true
+        )
+        let garden = Location(
+            id: "garden",
+            name: "Garden",
+            description: "A beautiful garden.",
+            inherentlyLit: true
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+
+        // Ensure condition flag is initially false
+        #expect(await engine.flag(.gameSpecificState(key: conditionFlag)) == false)
+
+        let command = Command(verbID: "go", direction: .east, rawInput: "go east")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        // Output depends on how conditional failures are handled, maybe default 'You can't go that way.'
+    }
+
+    @Test("Go succeeds with conditional exit (condition met)")
+    func testGoSucceedsWithConditionalExit() async throws {
+        // Arrange
+        let conditionFlag = "gateOpen"
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            exits: [.east: Exit(destination: "garden", conditionFlag: conditionFlag)],
+            inherentlyLit: true
+        )
+        let garden = Location(
+            id: "garden",
+            name: "Garden",
+            description: "A beautiful garden.",
+            inherentlyLit: true
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+
+        // Set the condition flag to true
+        try await engine.setGlobalFlag(key: conditionFlag, value: true)
+        #expect(await engine.flag(.gameSpecificState(key: conditionFlag)) == true)
+
+        let command = Command(verbID: "go", direction: .east, rawInput: "go east")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "garden") // Player moved
+    }
+
+    @Test("Go fails with no direction")
+    func testGoFailsWithNoDirection() async throws {
+        // Arrange
+        let foyer = Location(
+            id: "foyer",
+            name: "Foyer",
+            description: "A grand foyer.",
+            inherentlyLit: true
+        )
+        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
+        let mockIO = await MockIOHandler()
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+
+        let command = Command(verbID: "go", rawInput: "go") // No direction
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Go where?")
+    }
 }

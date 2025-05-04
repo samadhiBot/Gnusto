@@ -31,8 +31,9 @@ struct InsertActionHandlerTests {
     private func expectedInsertChanges(
         itemToInsertID: ItemID,
         containerID: ItemID,
-        oldItemProps: Set<ItemProperty>,
-        oldContainerProps: Set<ItemProperty>
+        initialParent: ParentEntity,
+        initialItemTouched: Bool,
+        initialContainerTouched: Bool
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
@@ -40,31 +41,27 @@ struct InsertActionHandlerTests {
         changes.append(StateChange(
             entityId: .item(itemToInsertID),
             propertyKey: .itemParent,
-            oldValue: .parentEntity(.player),
+            oldValue: .parentEntity(initialParent),
             newValue: .parentEntity(.item(containerID))
         ))
 
-        // Change 2: Item touched
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
+        // Change 2: Item touched (if needed)
+        if !initialItemTouched {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
             ))
         }
 
-        // Change 3: Container touched
-        if !oldContainerProps.contains(.touched) {
-            var newContainerProps = oldContainerProps
-            newContainerProps.insert(.touched)
+        // Change 3: Container touched (if needed)
+        if !initialContainerTouched {
             changes.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldContainerProps),
-                newValue: .itemPropertySet(newContainerProps)
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
             ))
         }
 
@@ -87,17 +84,19 @@ struct InsertActionHandlerTests {
         let initialCoin = Item(
             id: "coin",
             name: "gold coin",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            isTakable: true
         )
         let initialBox = Item(
             id: "openBox", name: "open box",
-            properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            dynamicValues: [.isOpen: .bool(true)],
+            isContainer: true,
+            isOpenable: true
         )
-        let initialCoinProps = initialCoin.properties
-        let initialBoxProps = initialBox.properties
+        let initialParent = initialCoin.parent
+        let initialItemTouched = initialCoin.flag(PropertyID.itemTouched)
+        let initialContainerTouched = initialBox.flag(PropertyID.itemTouched)
 
         let game = MinimalGame(items: [initialCoin, initialBox])
         let mockIO = await MockIOHandler()
@@ -119,28 +118,23 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the open box.")
 
         // Assert Final State
-        guard let finalCoinState = engine.item(with: "coin") else {
-            Issue.record("Final coin snapshot was nil")
-            return
-        }
+        let finalCoinState = try #require(await engine.item(with: "coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
-        #expect(finalCoinState.hasProperty(.touched) == true, "Coin should be touched")
+        #expect(finalCoinState.flag(PropertyID.itemTouched) == true, "Coin should be touched")
 
-        guard let finalBoxState = engine.item(with: "openBox") else {
-            Issue.record("Final box snapshot was nil")
-            return
-        }
-        #expect(finalBoxState.hasProperty(.touched) == true, "Box should be touched")
+        let finalBoxState = try #require(await engine.item(with: "openBox"))
+        #expect(finalBoxState.flag(PropertyID.itemTouched) == true, "Box should be touched")
 
         // Assert Pronoun
-        #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Change History
         let expectedChanges = expectedInsertChanges(
             itemToInsertID: "coin",
             containerID: "openBox",
-            oldItemProps: initialCoinProps,
-            oldContainerProps: initialBoxProps
+            initialParent: initialParent,
+            initialItemTouched: initialItemTouched,
+            initialContainerTouched: initialContainerTouched
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -151,9 +145,9 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "openBox",
             name: "open box",
-            properties: .container,
-            dynamicValues: [.isOpen: true],
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            dynamicValues: [.isOpen: .bool(true)],
+            isContainer: true
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -184,7 +178,8 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .player
+            parent: .player,
+            isTakable: true
         )
         let game = MinimalGame(items: [coin])
         let mockIO = await MockIOHandler()
@@ -215,14 +210,15 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            isTakable: true
         )
         let box = Item(
             id: "openBox",
             name: "open box",
-            properties: .container,
-            dynamicValues: [.isOpen: true],
             parent: .location("startRoom"),
+            dynamicValues: [.isOpen: .bool(true)],
+            isContainer: true
         )
         let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()

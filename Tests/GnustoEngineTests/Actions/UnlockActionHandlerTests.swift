@@ -8,52 +8,55 @@ import Testing
 struct UnlockActionHandlerTests {
 
     // --- Test Setup ---
-    let box = Item(
-        id: "box",
-        name: "wooden box",
-        properties: .container, .openable, .lockable, // Base properties
-        lockKey: "key"
-    )
-
-    let key = Item(
-        id: "key",
-        name: "small key",
-        properties: .takable
-    )
+    // Removed redundant setup, using inline initialization in tests
 
     // --- Helper ---
     private func expectedUnlockChanges(
         targetItemID: ItemID,
         keyItemID: ItemID,
-        oldTargetProps: Set<ItemProperty>,
-        oldKeyProps: Set<ItemProperty>
+        initialTargetLocked: Bool,
+        initialTargetTouched: Bool,
+        initialKeyTouched: Bool
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
-        // Target changes: Remove .locked, add .touched
-        var newTargetProps = oldTargetProps
-        newTargetProps.remove(.locked)
-        newTargetProps.insert(.touched)
-        if oldTargetProps != newTargetProps {
+        // Target change: Unlock (if it was locked)
+        if initialTargetLocked {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldTargetProps),
-                newValue: .itemPropertySet(newTargetProps)
+                propertyKey: .itemDynamicValue(key: .isLocked),
+                oldValue: .bool(true),
+                newValue: .bool(false)
             ))
         }
 
-        // Key changes: Add .touched (if needed)
-        if !oldKeyProps.contains(.touched) {
-            var newKeyProps = oldKeyProps
-            newKeyProps.insert(.touched)
+        // Target change: Touch (if not already touched)
+        if !initialTargetTouched {
             changes.append(StateChange(
-                entityId: .item(keyItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldKeyProps),
-                newValue: .itemPropertySet(newKeyProps)
+                entityId: .item(targetItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
             ))
         }
+
+        // Key change: Touch (if not already touched)
+        if !initialKeyTouched {
+            changes.append(StateChange(
+                entityId: .item(keyItemID),
+                propertyKey: .itemDynamicValue(key: .itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            ))
+        }
+
+        // Add pronoun change
+        changes.append(StateChange(
+            entityId: .global,
+            propertyKey: .pronounReference(pronoun: "it"),
+            oldValue: nil, // Assuming previous 'it' is irrelevant for this action
+            newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target are relevant
+        ))
 
         return changes
     }
@@ -66,18 +69,19 @@ struct UnlockActionHandlerTests {
         let initialBox = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .lockable, .locked, // Start locked
             parent: .location("startRoom"),
-            lockKey: "key"
+            lockKey: "key",
+            isContainer: true,
+            isLockable: true, // Alphabetized flags
+            isLocked: true, // Start locked
+            isOpenable: true
         )
         let initialKey = Item(
             id: "key",
             name: "small key",
-            properties: .takable,
-            parent: .player // Key is held
+            parent: .player, // Key is held
+            isTakable: true
         )
-        let initialBoxProps = initialBox.properties
-        let initialKeyProps = initialKey.properties
 
         let game = MinimalGame(items: [initialBox, initialKey])
         let mockIO = await MockIOHandler()
@@ -89,11 +93,9 @@ struct UnlockActionHandlerTests {
         )
 
         // Check initial state
-        guard let initialBoxSnapshot = engine.item(with: "box") else {
-            Issue.record("Initial box snapshot was nil")
-            return
-        }
-        #expect(initialBoxSnapshot.hasProperty(.locked) == true)
+        let initialBoxSnapshot = try #require(await engine.item(with: "box"))
+        #expect(initialBoxSnapshot.flag(PropertyID.isLocked) == true) // Qualified PropertyID
+        let initialKeySnapshot = try #require(await engine.item(with: "key"))
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -107,25 +109,20 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        guard let finalBoxState = engine.item(with: "box") else {
-            Issue.record("Final box snapshot was nil")
-            return
-        }
-        #expect(finalBoxState.hasProperty(.locked) == false, "Box should be unlocked")
-        #expect(finalBoxState.hasProperty(.touched) == true, "Box should be touched")
+        let finalBoxState = try #require(await engine.item(with: "box"))
+        #expect(finalBoxState.flag(PropertyID.isLocked) == false, "Box should be unlocked") // Qualified PropertyID
+        #expect(finalBoxState.flag(PropertyID.itemTouched) == true, "Box should be touched") // Qualified PropertyID
 
-        guard let finalKeyState = engine.item(with: "key") else {
-            Issue.record("Final key snapshot was nil")
-            return
-        }
-        #expect(finalKeyState.hasProperty(.touched) == true, "Key should be touched")
+        let finalKeyState = try #require(await engine.item(with: "key"))
+        #expect(finalKeyState.flag(PropertyID.itemTouched) == true, "Key should be touched") // Qualified PropertyID
 
         // Assert Change History
         let expectedChanges = expectedUnlockChanges(
             targetItemID: "box",
             keyItemID: "key",
-            oldTargetProps: initialBoxProps,
-            oldKeyProps: initialKeyProps
+            initialTargetLocked: initialBoxSnapshot.flag(PropertyID.isLocked), // Qualified PropertyID
+            initialTargetTouched: initialBoxSnapshot.flag(PropertyID.itemTouched), // Qualified PropertyID
+            initialKeyTouched: initialKeySnapshot.flag(PropertyID.itemTouched) // Qualified PropertyID
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -133,7 +130,7 @@ struct UnlockActionHandlerTests {
     @Test("Unlock fails with no direct object")
     func testUnlockFailsNoDirectObject() async throws {
         // Arrange: Player holds key
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -163,9 +160,11 @@ struct UnlockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container, .lockable, .locked,
             parent: .location("startRoom"),
-            lockKey: "key"
+            lockKey: "key",
+            isContainer: true,
+            isLockable: true,
+            isLocked: true
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -194,10 +193,11 @@ struct UnlockActionHandlerTests {
     func testUnlockFailsKeyNotHeld() async throws {
         // Arrange: Key is in the room, not held; box is locked
         let box = Item(
-            id: "box", name: "box", properties: .container, .lockable, .locked,
-            parent: .location("startRoom"), lockKey: "key"
+            id: "box", name: "box",
+            parent: .location("startRoom"), lockKey: "key",
+            isContainer: true, isLockable: true, isLocked: true
         )
-        let key = Item(id: "key", name: "key", parent: .location("startRoom")) // Key also in room
+        let key = Item(id: "key", name: "key", parent: .location("startRoom"), isTakable: true) // Key also in room
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -225,12 +225,13 @@ struct UnlockActionHandlerTests {
     func testUnlockFailsTargetNotReachable() async throws {
         // Arrange: Box is locked in another room, player holds key
         let box = Item(
-            id: "box", name: "box", properties: .container, .lockable, .locked,
-            parent: .location("otherRoom"), lockKey: "key"
+            id: "box", name: "box",
+            parent: .location("otherRoom"), lockKey: "key",
+            isContainer: true, isLockable: true, isLocked: true
         )
-        let key = Item(id: "key", name: "key", parent: .player)
-        let room1 = Location(id: "startRoom", name: "Start", properties: .inherentlyLit)
-        let room2 = Location(id: "otherRoom", name: "Other", properties: .inherentlyLit) // Both rooms lit
+        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
+        let room1 = Location(id: "startRoom", name: "Start", description: "", inherentlyLit: true) // Correct parameter name
+        let room2 = Location(id: "otherRoom", name: "Other", description: "", inherentlyLit: true) // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -258,7 +259,7 @@ struct UnlockActionHandlerTests {
     func testUnlockFailsTargetNotUnlockable() async throws {
         // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(id: "pebble", name: "pebble", parent: .location("startRoom")) // Not lockable
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -288,15 +289,17 @@ struct UnlockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container, .lockable, .locked,
             parent: .location("startRoom"),
-            lockKey: "key"
+            lockKey: "key",
+            isContainer: true,
+            isLockable: true,
+            isLocked: true
         )
         let wrongKey = Item(
             id: "wrongkey",
             name: "bent key",
-            properties: .takable,
-            parent: .player // Player holds this
+            parent: .player, // Player holds this
+            isTakable: true
         )
         let game = MinimalGame(items: [box, wrongKey])
         let mockIO = await MockIOHandler()
@@ -327,11 +330,12 @@ struct UnlockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container, .lockable, // Start unlocked
             parent: .location("startRoom"),
-            lockKey: "key"
+            lockKey: "key",
+            isContainer: true,
+            isLockable: true // Start unlocked
         )
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -340,11 +344,8 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        guard let initialBoxSnapshot = engine.item(with: "box") else {
-            Issue.record("Initial box snapshot was nil")
-            return
-        }
-        #expect(initialBoxSnapshot.hasProperty(.locked) == false)
+        let initialBoxSnapshot = try #require(await engine.item(with: "box"))
+        #expect(initialBoxSnapshot.flag(PropertyID.isLocked) == false) // Qualified PropertyID
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
