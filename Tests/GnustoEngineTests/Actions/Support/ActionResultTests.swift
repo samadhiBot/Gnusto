@@ -53,13 +53,13 @@ struct ActionResultTests {
     func testStateChangeInitialization() {
         let change = StateChange(
             entityId: .item("door"),
-            propertyKey: .itemDynamicValue(key: "isOpen"),
+            propertyKey: .itemDynamicValue(key: .isOpen),
             oldValue: false,
             newValue: true
         )
 
         #expect(change.entityId == .item("door"))
-        #expect(change.propertyKey == .itemDynamicValue(key: ".isOpen"))
+        #expect(change.propertyKey == .itemDynamicValue(key: .isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
     }

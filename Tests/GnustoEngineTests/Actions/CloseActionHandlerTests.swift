@@ -81,7 +81,26 @@ struct CloseActionHandlerTests {
         expectNoDifference(output, "Closed.")
 
         // Assert Change History
-        let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
+        // Construct the expected change for isOpen going from true to false
+        let expectedOpenChange = StateChange(
+            entityId: .item("box"),
+            propertyKey: .itemDynamicValue(key: .isOpen),
+            oldValue: .bool(true),
+            newValue: .bool(false)
+        )
+
+        // Construct the expected change for adding .touched
+        var expectedTouchedProps = initialProperties
+        expectedTouchedProps.insert(.touched)
+        let expectedTouchedChange = StateChange(
+            entityId: .item("box"),
+            propertyKey: .itemProperties,
+            oldValue: .itemPropertySet(initialProperties),
+            newValue: .itemPropertySet(expectedTouchedProps)
+        )
+
+        // The history should contain both changes
+        let expectedChanges = [expectedOpenChange, expectedTouchedChange]
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -95,7 +114,6 @@ struct CloseActionHandlerTests {
             dynamicValues: [.isOpen: true],
             parent: .location("startRoom")
         )
-        let initialProperties = box.properties // Includes .touched
 
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -129,7 +147,16 @@ struct CloseActionHandlerTests {
         expectNoDifference(output, "Closed.")
 
         // Assert Change History
-        let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
+        // Construct the expected change for isOpen going from true to false
+        let expectedOpenChange = StateChange(
+            entityId: .item("box"),
+            propertyKey: .itemDynamicValue(key: .isOpen),
+            oldValue: .bool(true),
+            newValue: .bool(false)
+        )
+
+        // Since it starts touched, only the isOpen change should be present
+        let expectedChanges = [expectedOpenChange]
         // Change should still happen because .open is removed
         #expect(!expectedChanges.isEmpty)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
@@ -257,7 +284,7 @@ struct CloseActionHandlerTests {
 
         // Assert Final State (Unchanged)
         let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.dynamicValues["isOpen"]?.toBool == false)
+        #expect(finalItemState?.dynamicValues["isOpen"]?.toBool == nil)
 
         // Assert Output
         let output = await mockIO.flush()

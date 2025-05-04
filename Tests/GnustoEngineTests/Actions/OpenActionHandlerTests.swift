@@ -48,15 +48,29 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        #expect(engine.gameState.changeHistory.count == 1)
-        let recordedChange = engine.gameState.changeHistory.first
-        let expectedChange = StateChange(
+        #expect(engine.gameState.changeHistory.count == 2)
+
+        // Change 1: isOpen becomes true (applied internally)
+        let expectedOpenChange = StateChange(
+            entityId: .item("box"),
+            propertyKey: .itemDynamicValue(key: .isOpen),
+            oldValue: nil, // Or .bool(false) if explicitly set
+            newValue: .bool(true)
+        )
+
+        // Change 2: .touched added to properties (returned by handler)
+        var expectedTouchedProps = initialProperties
+        expectedTouchedProps.insert(.touched)
+        let expectedTouchedChange = StateChange(
             entityId: .item("box"),
             propertyKey: .itemProperties,
             oldValue: .itemPropertySet(initialProperties),
-            newValue: .itemPropertySet(expectedProperties)
+            newValue: .itemPropertySet(expectedTouchedProps)
         )
-        expectNoDifference(recordedChange, expectedChange)
+
+        // Verify both changes are present (order might matter)
+        let expectedChanges = [expectedOpenChange, expectedTouchedChange]
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Open item that is already touched")
@@ -101,15 +115,18 @@ struct OpenActionHandlerTests {
 
         // Assert Change History
         #expect(engine.gameState.changeHistory.count == 1)
-        let recordedChange = engine.gameState.changeHistory.first
-        let expectedChange = StateChange(
+
+        // Change 1: isOpen becomes true (applied internally)
+        let expectedOpenChange = StateChange(
             entityId: .item("box"),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(initialProperties),
-            newValue: .itemPropertySet(expectedProperties)
+            propertyKey: .itemDynamicValue(key: .isOpen),
+            oldValue: nil, // Or .bool(false) if explicitly set
+            newValue: .bool(true)
         )
-        // Change should still happen because .open is added
-        expectNoDifference(recordedChange, expectedChange)
+
+        // Since it starts touched, only the isOpen change should be present
+        let expectedChanges = [expectedOpenChange]
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
     @Test("Open fails with no direct object")

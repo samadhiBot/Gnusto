@@ -304,7 +304,6 @@ struct ReadActionHandlerTests {
             properties: ItemProperty.readable,
             parent: .location("startRoom")
         )
-        let initialProperties = scroll.properties
 
         let game = MinimalGame(items: [scroll])
         let mockIO = await MockIOHandler()
@@ -340,7 +339,6 @@ struct ReadActionHandlerTests {
             properties: ItemProperty.readable,
             parent: .location("startRoom")
         )
-        let initialProperties = note.properties
 
         let game = MinimalGame(items: [note])
         let mockIO = await MockIOHandler()
@@ -375,7 +373,6 @@ struct ReadActionHandlerTests {
             properties: ItemProperty.readable,
             parent: .location("startRoom")
         )
-        let initialProperties = tablet.properties
 
         let game = MinimalGame(items: [tablet])
         let mockIO = await MockIOHandler()
@@ -495,7 +492,6 @@ struct ReadActionHandlerTests {
             properties: ItemProperty.readable, ItemProperty.lightSource, ItemProperty.on,
             parent: .location(darkRoom.id)
         )
-        let initialProperties = glowingTablet.properties
 
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
         let mockIO = await MockIOHandler()
