@@ -240,7 +240,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.item(with: "box")
         #expect(finalContainerState?.parent == .location("startRoom"))
-        #expect(finalContainerState?.hasProperty(.open) == true)
+        #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
 
         // Assert Output
@@ -280,7 +280,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.item(with: "pouch")
         #expect(finalContainerState?.parent == .player)
-        #expect(finalContainerState?.hasProperty(.open) == true)
+        #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Output
@@ -317,7 +317,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(container.hasProperty(.open) == false) // Verify container is closed
+        #expect(container.dynamicValues["isOpen"]?.toBool == false) // Verify container is closed
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 

@@ -217,7 +217,7 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(chest.hasProperty(.open) == false) // Verify closed
+        #expect(chest.dynamicValues["isOpen"]?.toBool == false) // Verify closed
 
         let command = Command(verbID: "touch", directObject: "coin", rawInput: "touch coin")
 

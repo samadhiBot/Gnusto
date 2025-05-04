@@ -12,20 +12,21 @@ struct CloseActionHandlerTests {
     private func expectedCloseChanges(
         itemID: ItemID,
         oldProperties: Set<ItemProperty>
-    ) -> StateChange? {
+    ) -> [StateChange] {
         var finalProperties = oldProperties
         finalProperties.insert(.touched)
 
         if oldProperties != finalProperties {
-            return StateChange(
+            let change = StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemPropertySet(oldProperties),
                 newValue: .itemPropertySet(finalProperties)
             )
+            return [change]
         }
         // No pronoun changes expected for closing
-        return nil
+        return []
     }
 
     // Helper to create the expected StateChange for setting isOpen to false
@@ -58,7 +59,7 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -72,7 +73,7 @@ struct CloseActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
+        #expect(finalItemState?.dynamicValues["isOpen"]?.toBool == false, "Item should lose .open property")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should gain .touched property")
 
         // Assert Output
@@ -104,7 +105,7 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -119,7 +120,7 @@ struct CloseActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
+        #expect(finalItemState?.dynamicValues["isOpen"]?.toBool == false, "Item should lose .open property")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should still have .touched property")
 
         // Assert Output
@@ -241,7 +242,7 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "box")?.hasProperty(.open) == false)
+        #expect(engine.item(with: "box")?.dynamicValues["isOpen"]?.toBool == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -255,7 +256,7 @@ struct CloseActionHandlerTests {
 
         // Assert Final State (Unchanged)
         let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false)
+        #expect(finalItemState?.dynamicValues["isOpen"]?.toBool == false)
 
         // Assert Output
         let output = await mockIO.flush()

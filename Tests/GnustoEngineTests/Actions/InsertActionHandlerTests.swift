@@ -23,7 +23,8 @@ struct InsertActionHandlerTests {
     let openBox = Item(
         id: "openBox",
         name: "open box",
-        properties: .container, .openable, .open // Starts open
+        properties: .container, .openable,
+
     )
 
     // --- Helper ---
