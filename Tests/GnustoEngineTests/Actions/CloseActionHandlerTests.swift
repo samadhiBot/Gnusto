@@ -12,23 +12,30 @@ struct CloseActionHandlerTests {
     private func expectedCloseChanges(
         itemID: ItemID,
         oldProperties: Set<ItemProperty>
-    ) -> [StateChange] {
+    ) -> StateChange? {
         var finalProperties = oldProperties
-        finalProperties.remove(.open)
         finalProperties.insert(.touched)
 
-        var changes: [StateChange] = []
-
         if oldProperties != finalProperties {
-            changes.append(StateChange(
+            return StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemProperties,
                 oldValue: .itemPropertySet(oldProperties),
                 newValue: .itemPropertySet(finalProperties)
-            ))
+            )
         }
         // No pronoun changes expected for closing
-        return changes
+        return nil
+    }
+
+    // Helper to create the expected StateChange for setting isOpen to false
+    private func expectedIsOpenFalseChange(itemID: ItemID) -> StateChange {
+        StateChange(
+            entityId: .item(itemID),
+            propertyKey: .itemDynamicValue(key: .isOpen),
+            oldValue: .bool(true), // Assumes it was true before closing
+            newValue: .bool(false)
+        )
     }
 
     @Test("Close item successfully")
@@ -37,7 +44,7 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .open,
+            properties: .container, .openable,
             parent: .location("startRoom")
         )
         let initialProperties = box.properties // Capture initial state
@@ -83,7 +90,7 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .open, .touched, // Start touched
+            properties: .container, .openable, .touched, // Start touched
             parent: .location("startRoom")
         )
         let initialProperties = box.properties // Includes .touched
@@ -159,7 +166,7 @@ struct CloseActionHandlerTests {
                 Item(
                     id: "box",
                     name: "wooden box",
-                    properties: .container, .openable, .open,
+                    properties: .container, .openable,
                     parent: .nowhere
                 ),
             ]
