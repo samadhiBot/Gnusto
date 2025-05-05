@@ -41,7 +41,7 @@ struct RemoveActionHandlerTests {
         let finalCloakState = await engine.item("cloak")
         #expect(finalCloakState?.parent == .location("startRoom"))
         #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .worn property")
-        #expect(finalCloakState?.hasFlag(.itemTouched) == true, "Cloak should have .touched property") // Ensure touched is added
+        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
@@ -63,7 +63,7 @@ struct RemoveActionHandlerTests {
             ),
             StateChange(
                 entityId: .item(id: "cloak"),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false), // Assuming not touched before removal
                 newValue: .bool(true)
             ),

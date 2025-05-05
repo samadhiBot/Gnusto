@@ -59,12 +59,12 @@ public struct DropActionHandler: EnhancedActionHandler {
         )
         stateChanges.append(parentChange)
 
-        // Change 2: Ensure `.itemTouched` is true
-        if targetItem.attributes[.itemTouched] != .bool(true) {
+        // Change 2: Ensure `.isTouched` is true
+        if targetItem.attributes[.isTouched] != .bool(true) {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(touchedChange)

@@ -187,7 +187,7 @@ struct ActionResultTests {
     )
     private let change2 = StateChange(
         entityId: .item(id: "lamp"),
-        propertyKey: .itemAttribute(.itemTouched),
+        propertyKey: .itemAttribute(.isTouched),
         oldValue: .bool(false),
         newValue: .bool(true)
     )
@@ -220,7 +220,7 @@ struct ActionResultTests {
         #expect(
             mergedResult.changes.contains {
                 $0.entityId == .item(id: "lamp") &&
-                $0.propertyKey == .itemAttribute(.itemTouched) &&
+                $0.propertyKey == .itemAttribute(.isTouched) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2
             }
@@ -552,7 +552,7 @@ struct ActionResultTests {
             message: .init(text: "Take lamp."),
             changes: [
                 createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parent(.location(id: "room")), newValue: .parent(.player)),
-                createTestItemChange(id: "lamp", key: .itemTouched, oldValue: .bool(false), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(false), newValue: .bool(true)),
             ]
         )
         let result2 = ActionResult(
@@ -560,7 +560,7 @@ struct ActionResultTests {
             changes: [
                 createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true)),
                 // Touched again, but should coalesce with the previous touched change
-                createTestItemChange(id: "lamp", key: .itemTouched, oldValue: .bool(true), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(true), newValue: .bool(true)),
             ]
         )
         let result3 = ActionResult(
@@ -568,7 +568,7 @@ struct ActionResultTests {
             changes: [
                 createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parent(.player), newValue: .parent(.location(id: "floor"))),
                 // Touched again
-                createTestItemChange(id: "lamp", key: .itemTouched, oldValue: .bool(true), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(true), newValue: .bool(true)),
             ]
         )
         // ... existing code ...
@@ -578,7 +578,7 @@ struct ActionResultTests {
         #expect(parentChange.oldValue == .parent(.location(id: "room")))
         #expect(parentChange.newValue == .parent(.location(id: "floor")))
 
-        let touchedChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemAttribute(.itemTouched) })
+        let touchedChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemAttribute(.isTouched) })
         #expect(touchedChange.oldValue == .bool(false))
         #expect(touchedChange.newValue == .bool(true)) // Ends up true
 

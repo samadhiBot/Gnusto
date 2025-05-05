@@ -10,10 +10,7 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "small pebble",
-            parent: .location("startRoom"),
-            attributes: [
-                .description: "A smooth, grey pebble."
-            ]
+            description: "A smooth, grey pebble."
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
@@ -21,7 +18,7 @@ struct ExamineActionHandlerTests {
         )
         let handler = ExamineActionHandler()
         let initialItemState = await engine.item(itemID)
-        #expect(initialItemState?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(initialItemState?.hasFlag(PropertyID.isTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine pebble")
@@ -34,13 +31,13 @@ struct ExamineActionHandlerTests {
 
         // Assert State Change
         let finalItemState = await engine.item(itemID)
-        #expect(finalItemState?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true)
 
         // Assert Change History
         let expectedChanges = [
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ),
@@ -61,9 +58,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "engraved locket",
-            parent: .location("startRoom"),
+            description: "A small, tarnished silver locket.",
             attributes: [
-                .description: "A small, tarnished silver locket.",
                 .descriptionHandlerId: handlerID
             ]
         )
@@ -77,7 +73,7 @@ struct ExamineActionHandlerTests {
             definitionRegistry: registry
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
@@ -90,7 +86,7 @@ struct ExamineActionHandlerTests {
         #expect(!output.contains("A small, tarnished silver locket."))
 
         // Assert State Change
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == true)
     }
 
     @Test func testExamineItemInRoom() async throws {
@@ -100,17 +96,15 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "stone statue",
-            parent: .location(roomID),
-            attributes: [
-                .description: "A weathered statue of a grue."
-            ]
+            description: "A weathered statue of a grue.",
+            parent: .location(roomID)
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
             playerLocation: roomID
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
@@ -122,7 +116,7 @@ struct ExamineActionHandlerTests {
         #expect(output.contains("A weathered statue of a grue."))
 
         // Assert State Change
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == true)
     }
 
     @Test func testExamineItemNotInScope() async throws {
@@ -131,10 +125,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "hidden gem",
-            parent: .location("farAwayRoom"),
-            attributes: [
-                .description: "Should not see this."
-            ]
+            description: "Should not see this.",
+            parent: .location("farAwayRoom")
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
@@ -154,7 +146,7 @@ struct ExamineActionHandlerTests {
         // Assert State Change (should be none)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
     }
 
     @Test func testExamineNonExistentItem() async throws {
@@ -184,21 +176,19 @@ struct ExamineActionHandlerTests {
         let item1 = Item(
             id: itemID1,
             name: "red ball",
-            parent: .location("startRoom"),
-            adjectives: "red",
-            synonyms: "ball",
+            description: "A red ball.",
             attributes: [
-                .description: "A red ball."
+                .adjectives: "red",
+                .synonyms: "ball",
             ]
         )
         let item2 = Item(
             id: itemID2,
             name: "blue ball",
-            parent: .location("startRoom"),
-            adjectives: "blue",
-            synonyms: "ball",
+            description: "A blue ball.",
             attributes: [
-                .description: "A blue ball."
+                .adjectives: .stringSet(["blue"]),
+                .synonyms: .stringSet(["ball"])
             ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
@@ -219,8 +209,8 @@ struct ExamineActionHandlerTests {
         // Assert State Change (should be none)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID1)?.hasFlag(PropertyID.itemTouched) == false)
-        #expect(await engine.item(itemID2)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID1)?.hasFlag(PropertyID.isTouched) == false)
+        #expect(await engine.item(itemID2)?.hasFlag(PropertyID.isTouched) == false)
     }
 
     @Test func testExamineLocationDescription() async throws {
@@ -270,8 +260,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "magic mirror",
+            description: "A dusty old mirror.",
             attributes: [
-                .description: "A dusty old mirror.",
                 .objectActionHandlerId: handlerID
             ]
         )
@@ -287,7 +277,7 @@ struct ExamineActionHandlerTests {
             definitionRegistry: registry
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
@@ -302,7 +292,7 @@ struct ExamineActionHandlerTests {
         // Assert State Change (None, because the override didn't add .touched)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
     }
 
     // TODO: Restore and adapt this test if DescriptionHandlers need complex state checks

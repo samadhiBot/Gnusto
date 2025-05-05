@@ -432,7 +432,7 @@ struct GameEngineTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            properties: LocationProperty.inherentlyLit
+            inherentlyLit: true
         )
 
         let game = MinimalGame(
@@ -562,13 +562,14 @@ struct GameEngineTests {
         let lamp = Item(
             id: testItemID,
             name: "lamp",
-            parent: .nowhere,
             attributes: [
                 .isTakable: true
             ]
         )
         let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
-        var game = MinimalGame(
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let game = MinimalGame(
+            locations: [startRoom],
             items: [lamp],
             definitionRegistry: DefinitionRegistry(
                 // Use customActionHandlers directly with the EnhancedActionHandler
@@ -577,7 +578,6 @@ struct GameEngineTests {
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -608,7 +608,7 @@ struct GameEngineTests {
         // Check final state
         #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
         #expect(engine.item(testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
-        #expect(engine.item(testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
+        #expect(engine.item(testItemID)?.hasFlag(.isTouched), "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = engine.getChangeHistory()
@@ -757,7 +757,7 @@ struct GameEngineTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            properties: LocationProperty.inherentlyLit // Qualify LocationProperty
+            inherentlyLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -778,7 +778,7 @@ struct GameEngineTests {
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
@@ -796,7 +796,7 @@ struct GameEngineTests {
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
@@ -817,10 +817,13 @@ struct GameEngineTests {
         let target = Item(
             id: "box",
             name: "box",
-            properties: .container, .openable,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+            ],
             parent: .location("startRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -842,7 +845,7 @@ struct GameEngineTests {
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
         let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
@@ -863,7 +866,7 @@ struct GameEngineTests {
             properties: .takable,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
@@ -896,7 +899,7 @@ struct GameEngineTests {
             in: "startRoom",
             carryingCapacity: 10 // Set low capacity
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
@@ -913,7 +916,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -936,7 +939,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -965,7 +968,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.north: blockedExit],
-            properties: LocationProperty.inherentlyLit
+            inherentlyLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -984,10 +987,13 @@ struct GameEngineTests {
         let container = Item(
             id: "box",
             name: "box",
-            properties: .container, .openable,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+            ],
             parent: .location("startRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [container])
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
@@ -1007,10 +1013,12 @@ struct GameEngineTests {
             name: "chest",
             properties: .container, .openable, .lockable,
             parent: .location("startRoom"),
-            lockKey: "key1"
+            attributes: [
+                .lockKey: "key1"
+            ]
         )
         let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
@@ -1033,7 +1041,7 @@ struct GameEngineTests {
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
         let item = Item(id: "book", name: "book", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
@@ -1054,7 +1062,7 @@ struct GameEngineTests {
             properties: .fixed,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
@@ -1075,7 +1083,7 @@ struct GameEngineTests {
             properties: .wearable, .worn, .fixed,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
@@ -1098,7 +1106,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.up: conditionalExit],
-            properties: LocationProperty.inherentlyLit
+            inherentlyLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -1137,14 +1145,29 @@ struct GameEngineTests {
             name: "chest",
             properties: .container, .lockable, .locked,
             parent: .location("startRoom"),
-            lockKey: "key1"
+            attributes: [
+                .lockKey: "key1"
+            ]
         )
-        let wrongKey = Item(id: "key2", name: "wrong key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let wrongKey = Item(
+            id: "key2",
+            name: "wrong key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
-        let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
+        let command = Command(
+            verbID: "unlock",
+            directObject: "chest",
+            indirectObject: "key2",
+            preposition: "with",
+            rawInput: "unlock chest with key2"
+        )
         let output = await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key2",
@@ -1163,7 +1186,7 @@ struct GameEngineTests {
         // Arrange
         let itemID: ItemID = "magicBox"
         let game = MinimalGame()
-        let item = Item(id: itemID, name: "Magic Box", parent: .nowhere)
+        let item = Item(id: itemID, name: "Magic Box")
         let registry = DefinitionRegistry()
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
 
@@ -1182,10 +1205,7 @@ struct GameEngineTests {
         let item = Item(
             id: itemID,
             name: "Magic Box",
-            parent: .nowhere,
-            attributes: [
-                .description: "Default box desc."
-            ]
+            description: "Default box desc."
         )
         let registry = DefinitionRegistry()
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
@@ -1205,9 +1225,8 @@ struct GameEngineTests {
         let item = Item(
             id: itemID,
             name: "Magic Box",
-            parent: .nowhere,
+            description: "Default box desc.",
             attributes: [
-                .description: "Default box desc.",
                 .descriptionHandlerId: handlerID
             ]
         )
@@ -1241,7 +1260,11 @@ struct GameEngineTests {
     func testReportErrorLocationWithStaticDescription() async throws {
         // Arrange
         let locID: LocationID = "hall"
-        let location = Location(id: locID, name: "Grand Hall", description: "A vast hall.")
+        let location = Location(
+            id: locID,
+            name: "Grand Hall",
+            description: "A vast hall."
+        )
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(locations: [location], playerLocation: locID)
 
         // Act
@@ -1256,7 +1279,14 @@ struct GameEngineTests {
         // Arrange
         let locID: LocationID = "cave"
         let handlerID: DescriptionHandlerID = "caveDesc"
-        let location = Location(id: locID, name: "Echoing Cave", description: "Default cave desc.", descriptionHandlerId: handlerID)
+        let location = Location(
+            id: locID,
+            name: "Echoing Cave",
+            description: "Default cave desc.",
+            attributes: [
+                .descriptionHandlerId: handlerID
+            ]
+        )
         let registry = DefinitionRegistry()
         registry.registerDescriptionHandler(id: handlerID) { _, _, _ in "Echoing description!" }
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(locations: [location], definitionRegistry: registry, playerLocation: locID)
@@ -1271,17 +1301,14 @@ struct GameEngineTests {
     @Test("ReportActionError: .applyActionResult_Success")
     func testApplyActionResult_Success() async throws {
         let itemID: ItemID = "lamp"
-        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(
-            items: [Item(
-                id: itemID,
-                name: "Lamp",
-                parent: .nowhere,
-                attributes: [
-                    .isOn: false // Start with lamp off
-                ]
-            )]
-        )
-
+        let items = [Item(
+            id: itemID,
+            name: "Lamp",
+            attributes: [
+                .isOn: false // Start with lamp off
+            ]
+        )]
+        let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: items)
         let turnOnChanges = [
             StateChange(
                 entityId: .item(id: itemID),
@@ -1291,7 +1318,7 @@ struct GameEngineTests {
             ),
             StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             )
@@ -1306,7 +1333,7 @@ struct GameEngineTests {
         // Verify the state changes
         let finalLamp = engine.item(itemID)
         #expect(finalLamp?.hasProperty(.on) == true)
-        #expect(finalLamp?.hasProperty(.touched) == true)
+        #expect(finalLamp?.hasFlag(.isTouched))
     }
 
     @Test("ReportActionError: .itemSnapshot")
@@ -1315,7 +1342,6 @@ struct GameEngineTests {
         let lamp = Item(
             id: testItemID,
             name: "lamp",
-            parent: .nowhere,
             attributes: [
                 .isTakable: true
             ]
@@ -1337,7 +1363,10 @@ struct GameEngineTests {
         let container = Item(
             id: "box",
             name: "box",
-            properties: .container, .openable,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+            ],
             parent: .location("startRoom")
         )
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [itemToPut, container])
@@ -1393,9 +1422,7 @@ struct GameEngineTests {
     func testFindItemCandidates_Global() async throws {
         let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
         let globalItem = Item(
-            id: "rug",
-            name: "rug",
-            parent: .location("startRoom")
+            id: "rug"
         )
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item, globalItem])
         await engine.addItems(item, globalItem)
@@ -1427,7 +1454,7 @@ struct GameEngineTests {
     @Test("ReportActionError: .getDescriptionForItem_NoDescription")
     func testGetDescriptionForItem_NoDescription() async throws {
         let itemID: ItemID = "box"
-        let item = Item(id: itemID, name: "Magic Box", parent: .nowhere)
+        let item = Item(id: itemID, name: "Magic Box")
         let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
         let desc = await engine.getDescription(for: .item(id: itemID))
         #expect(desc == "Magic Box")
@@ -1439,10 +1466,7 @@ struct GameEngineTests {
         let item = Item(
             id: itemID,
             name: "Magic Box",
-            parent: .nowhere,
-            attributes: [
-                .description: "Default box desc."
-            ]
+            description: "Default box desc."
         )
         let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
         let desc = await engine.getDescription(for: .item(id: itemID))
@@ -1456,9 +1480,8 @@ struct GameEngineTests {
         let item = Item(
             id: itemID,
             name: "Magic Box",
-            parent: .nowhere,
+            description: "Default box desc.",
             attributes: [
-                .description: "Default box desc.",
                 .descriptionHandlerId: handlerID
             ]
         )
@@ -1475,7 +1498,6 @@ struct GameEngineTests {
         let items = [Item(
             id: itemID,
             name: "Lamp",
-            parent: .nowhere,
             attributes: [
                 .isOn: false // Start with lamp off
             ]
@@ -1490,7 +1512,7 @@ struct GameEngineTests {
             ),
             StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             )
@@ -1505,7 +1527,7 @@ struct GameEngineTests {
         // Verify the state changes
         let finalLamp = engine.item(itemID)
         #expect(finalLamp?.hasProperty(.on) == true)
-        #expect(finalLamp?.hasProperty(.touched) == true)
+        #expect(finalLamp?.hasFlag(.isTouched))
     }
 }
 

@@ -73,7 +73,7 @@ struct CloseActionHandlerTests {
         // Assert State Change
         let finalBox = await engine.item("box")
         #expect(finalBox?.attributes[.isOpen] == .bool(false)) // Qualified key
-        #expect(finalBox?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(finalBox?.hasFlag(PropertyID.isTouched) == true)
 
         // Assert Output
         let output = await mockIO.flush()
@@ -89,7 +89,7 @@ struct CloseActionHandlerTests {
             ),
             StateChange(
                 entityId: .item("box"),
-                propertyKey: .itemAttribute(.itemTouched), // Correct key
+                propertyKey: .itemAttribute(.isTouched), // Correct key
                 oldValue: .bool(false), // Assuming not touched before close
                 newValue: .bool(true)
             ),

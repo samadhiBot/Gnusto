@@ -366,7 +366,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("rock")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Item should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "rock", oldProperties: initialProperties)
@@ -405,7 +405,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("pebble")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Item should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "pebble", oldProperties: initialProperties)
@@ -432,7 +432,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("stone")?.hasProperty(.touched) == true)
+        #expect(engine.item("stone")?.hasFlag(.isTouched))
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "stone", rawInput: "x stone")
@@ -446,7 +446,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State (remains touched)
         let finalItemState = engine.item("stone")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should still be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Item should still be marked touched")
 
         // Assert Change History (Should be empty)
         let expectedChanges = expectedLookChanges(itemID: "stone", oldProperties: initialProperties)
@@ -496,7 +496,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item("box")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "box", oldProperties: initialProperties)
@@ -543,7 +543,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item("box")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "box", oldProperties: initialProperties)
@@ -591,7 +591,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State (Container marked touched)
         let finalItemState = engine.item("jar")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "jar", oldProperties: initialProperties)
@@ -646,7 +646,7 @@ struct LookActionHandlerTests {
 
         // Assert Final State (Surface marked touched)
         let finalItemState = engine.item("table")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Surface should be marked touched")
+        #expect(finalItemState?.hasFlag(.isTouched), "Surface should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "table", oldProperties: initialProperties)

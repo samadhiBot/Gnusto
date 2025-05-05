@@ -71,19 +71,19 @@ public struct CloseActionHandler: EnhancedActionHandler {
         // Change 1: Set dynamic property isOpen to false
         // This call applies the state change internally.
         // NOTE: The state change for `isOpen` is generated *inside* setDynamicItemValue.
-        // We only need to manually create the change for `.itemTouched` here.
+        // We only need to manually create the change for `.isTouched` here.
         try await context.engine.setDynamicItemValue(
             itemID: targetItemID,
             key: .isOpen,
             newValue: .bool(false)
         )
 
-        // Change 2: Set `.itemTouched` flag if not already set
-        if targetItem.attributes[.itemTouched] != .bool(true) {
+        // Change 2: Set `.isTouched` flag if not already set
+        if targetItem.attributes[.isTouched] != .bool(true) {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false), // Current value (or default false)
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: targetItem.attributes[.isTouched] ?? .bool(false), // Current value (or default false)
                 newValue: .bool(true)
             )
             stateChanges.append(touchedChange)

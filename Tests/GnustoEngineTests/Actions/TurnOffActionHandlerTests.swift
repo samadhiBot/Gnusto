@@ -47,7 +47,7 @@ struct TurnOffActionHandlerTests {
             """)
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("TURN OFF fails for non-light source")
@@ -150,7 +150,7 @@ struct TurnOffActionHandlerTests {
 
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now off.")
@@ -193,7 +193,7 @@ struct TurnOffActionHandlerTests {
 
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -241,7 +241,7 @@ struct TurnOffActionHandlerTests {
         // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
 
     @Test("Try to turn off non-device item")
@@ -277,7 +277,7 @@ struct TurnOffActionHandlerTests {
         // Check state remains unchanged - touched should NOT be added if validation fails
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
-        #expect(finalItemState?.hasFlag(.itemTouched) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
 
     @Test("Try to turn off item not accessible")
@@ -348,7 +348,7 @@ struct TurnOffActionHandlerTests {
         // Assert
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -397,7 +397,7 @@ struct TurnOffActionHandlerTests {
         // Assert
         let finalItemState = engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
-        #expect(finalItemState?.hasFlag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """

@@ -19,10 +19,8 @@ public struct Item: Codable, Identifiable, Sendable {
     public init(
         id: ItemID,
         name: String,
-        parent: ParentEntity = .nowhere,
-        adjectives: String...,
-        synonyms: String...,
         description: String? = nil,
+        parent: ParentEntity = .nowhere,
         attributes: [PropertyID: StateValue] = [:]
     ) {
         self.id = id
@@ -31,12 +29,6 @@ public struct Item: Codable, Identifiable, Sendable {
         var initial = attributes
         if let description {
             initial[.longDescription] = .string(description)
-        }
-        if !adjectives.isEmpty {
-            initial[.adjectives] = .stringSet(Set(adjectives))
-        }
-        if !synonyms.isEmpty {
-            initial[.synonyms] = .stringSet(Set(synonyms))
         }
         self.attributes = initial
     }

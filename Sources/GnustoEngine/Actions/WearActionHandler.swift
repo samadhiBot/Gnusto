@@ -52,11 +52,11 @@ public struct WearActionHandler: EnhancedActionHandler {
         }
 
         // Change 2: Add .touched (if not already touched)
-        if itemSnapshot.attributes[.itemTouched] != .bool(true) {
+        if itemSnapshot.attributes[.isTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: itemSnapshot.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }

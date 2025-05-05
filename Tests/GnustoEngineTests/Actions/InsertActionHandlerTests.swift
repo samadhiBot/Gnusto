@@ -49,7 +49,7 @@ struct InsertActionHandlerTests {
         if !initialItemTouched {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -59,7 +59,7 @@ struct InsertActionHandlerTests {
         if !initialContainerTouched {
             changes.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -95,8 +95,8 @@ struct InsertActionHandlerTests {
             isOpenable: true
         )
         let initialParent = initialCoin.parent
-        let initialItemTouched = initialCoin.hasFlag(PropertyID.itemTouched)
-        let initialContainerTouched = initialBox.hasFlag(PropertyID.itemTouched)
+        let initialItemTouched = initialCoin.hasFlag(PropertyID.isTouched)
+        let initialContainerTouched = initialBox.hasFlag(PropertyID.isTouched)
 
         let game = MinimalGame(items: [initialCoin, initialBox])
         let mockIO = await MockIOHandler()
@@ -120,10 +120,10 @@ struct InsertActionHandlerTests {
         // Assert Final State
         let finalCoinState = try #require(await engine.item("coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
-        #expect(finalCoinState.hasFlag(PropertyID.itemTouched) == true, "Coin should be touched")
+        #expect(finalCoinState.hasFlag(PropertyID.isTouched) == true, "Coin should be touched")
 
         let finalBoxState = try #require(await engine.item("openBox"))
-        #expect(finalBoxState.hasFlag(PropertyID.itemTouched) == true, "Box should be touched")
+        #expect(finalBoxState.hasFlag(PropertyID.isTouched) == true, "Box should be touched")
 
         // Assert Pronoun
         #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
@@ -591,7 +591,7 @@ struct InsertActionHandlerTests {
         let finalItemState = try #require(await engine.item("key"))
         #expect(finalItemState.parent == .item("box"))
         let finalContainerState = try #require(await engine.item("box"))
-        #expect(finalContainerState.hasFlag(PropertyID.itemTouched) == true)
+        #expect(finalContainerState.hasFlag(PropertyID.isTouched) == true)
 
         // Assert Pronoun
         #expect(await engine.getPronounReference(pronoun: "it") == ["key"])

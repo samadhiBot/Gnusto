@@ -34,7 +34,7 @@ struct UnlockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -44,7 +44,7 @@ struct UnlockActionHandlerTests {
         if !initialKeyTouched {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -115,18 +115,18 @@ struct UnlockActionHandlerTests {
         // Assert Final State
         let finalBoxState = try #require(await engine.item("box"))
         #expect(finalBoxState.hasFlag(PropertyID.isLocked) == false, "Box should be unlocked") // Qualified PropertyID
-        #expect(finalBoxState.hasFlag(PropertyID.itemTouched) == true, "Box should be touched") // Qualified PropertyID
+        #expect(finalBoxState.hasFlag(PropertyID.isTouched) == true, "Box should be touched") // Qualified PropertyID
 
         let finalKeyState = try #require(await engine.item("key"))
-        #expect(finalKeyState.hasFlag(PropertyID.itemTouched) == true, "Key should be touched") // Qualified PropertyID
+        #expect(finalKeyState.hasFlag(PropertyID.isTouched) == true, "Key should be touched") // Qualified PropertyID
 
         // Assert Change History
         let expectedChanges = expectedUnlockChanges(
             targetItemID: "box",
             keyItemID: "key",
             initialTargetLocked: initialBoxSnapshot.hasFlag(PropertyID.isLocked), // Qualified PropertyID
-            initialTargetTouched: initialBoxSnapshot.hasFlag(PropertyID.itemTouched), // Qualified PropertyID
-            initialKeyTouched: initialKeySnapshot.hasFlag(PropertyID.itemTouched) // Qualified PropertyID
+            initialTargetTouched: initialBoxSnapshot.hasFlag(PropertyID.isTouched), // Qualified PropertyID
+            initialKeyTouched: initialKeySnapshot.hasFlag(PropertyID.isTouched) // Qualified PropertyID
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }

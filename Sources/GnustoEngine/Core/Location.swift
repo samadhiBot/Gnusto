@@ -23,7 +23,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         name: String,
         description: String? = nil,
         exits: [Direction: Exit] = [:],
-        inherentlyLit: Bool = false,
+        isLit: Bool = false,
         attributes: [PropertyID: StateValue] = [:]
     ) {
         self.id = id
@@ -33,7 +33,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         if let description {
             initial[.longDescription] = .string(description)
         }
-        initial[.inherentlyLit] = .bool(inherentlyLit)
+        initial[.inherentlyLit] = .bool(isLit)
         self.attributes = initial
     }
 

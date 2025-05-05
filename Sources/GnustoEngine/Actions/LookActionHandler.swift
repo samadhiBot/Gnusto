@@ -83,12 +83,12 @@ public struct LookActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         // Use the item from the snapshot for checking state
         if let snapshotItem = stateSnapshot.items[targetItemID],
-           snapshotItem.attributes[.itemTouched] != .bool(true) // Check dynamicValue
+           snapshotItem.attributes[.isTouched] != .bool(true) // Check dynamicValue
         {
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched), // Use dynamic value key
-                oldValue: snapshotItem.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched), // Use dynamic value key
+                oldValue: snapshotItem.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(propertiesChange)

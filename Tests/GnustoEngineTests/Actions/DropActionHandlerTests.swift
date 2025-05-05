@@ -30,7 +30,7 @@ struct DropActionHandlerTests {
         if !initialTouched {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -62,7 +62,7 @@ struct DropActionHandlerTests {
             ]
         )
         let initialParent = testItem.parent
-        let initialTouched = testItem.hasFlag(PropertyID.itemTouched)
+        let initialTouched = testItem.hasFlag(PropertyID.isTouched)
         let initialWorn = testItem.hasFlag(PropertyID.isWorn)
 
         let game = MinimalGame(items: [testItem])
@@ -86,7 +86,7 @@ struct DropActionHandlerTests {
         // Assert Final State
         let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
-        #expect(finalItemState?.hasFlag(PropertyID.itemTouched) == true, "Item should have .touched property") // Qualified
+        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true, "Item should have .touched property") // Qualified
 
         // Assert Output
         let output = await mockIO.flush()
@@ -180,7 +180,7 @@ struct DropActionHandlerTests {
             ]
         )
         let initialParent = testItem.parent
-        let initialTouched = testItem.hasFlag(PropertyID.itemTouched)
+        let initialTouched = testItem.hasFlag(PropertyID.isTouched)
         let initialWorn = testItem.hasFlag(PropertyID.isWorn)
 
         let game = MinimalGame(items: [testItem])
@@ -206,7 +206,7 @@ struct DropActionHandlerTests {
         let finalItemState = await engine.item("cloak")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasFlag(PropertyID.isWorn) == false, "Item should NOT have .worn property") // Qualified
-        #expect(finalItemState?.hasFlag(PropertyID.itemTouched) == true, "Item should have .touched property") // Qualified
+        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true, "Item should have .touched property") // Qualified
 
         // Assert Output
         let output = await mockIO.flush()

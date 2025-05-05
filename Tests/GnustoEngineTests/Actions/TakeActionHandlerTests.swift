@@ -32,7 +32,7 @@ struct TakeActionHandlerTests {
         if initialTouched != finalTouched {
             changes.append(StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemAttribute(.itemTouched),
+                propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(initialTouched),
                 newValue: .bool(finalTouched)
             ))
@@ -97,7 +97,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -272,7 +272,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("gem")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         let finalContainerState = engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
         #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
@@ -327,7 +327,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("coin")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         let finalContainerState = engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
         #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
@@ -504,7 +504,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("cloak")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         #expect(finalItemState?.hasProperty(.worn) == false)
         #expect(engine.getPronounReference(pronoun: "it") == ["cloak"])
 
@@ -559,7 +559,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item(itemOnSurface.id)
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         let finalSurfaceState = engine.item(surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
         #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
@@ -612,7 +612,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true) // Still touched
+        #expect(finalItemState?.hasFlag(.isTouched)) // Still touched
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -673,7 +673,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player) // Should succeed
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -729,7 +729,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("fly")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        #expect(finalItemState?.hasFlag(.isTouched))
         #expect(engine.getPronounReference(pronoun: "it") == ["fly"])
 
         // Assert Output

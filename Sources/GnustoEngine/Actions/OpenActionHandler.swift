@@ -65,11 +65,11 @@ public struct OpenActionHandler: EnhancedActionHandler {
 
         // Update the 'touched' flag - Create a state change if not already touched
         var stateChanges: [StateChange] = []
-        if targetItem.attributes[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != .bool(true) {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(touchedChange)

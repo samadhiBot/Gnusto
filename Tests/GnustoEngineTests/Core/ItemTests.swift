@@ -19,17 +19,22 @@ struct ItemTests {
         Item(
             id: "customItem",
             name: "lantern",
-            adjectives: "brass", "shiny",
-            synonyms: "lamp", "light",
-            shortDescription: "The brass lantern is here.",
-            firstDescription: "A shiny brass lantern rests here.",
             description: "A sturdy brass lantern.",
-            readText: "Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\"",
-            heldText: "It feels warm.",
-            properties: .takable, .lightSource, .on, .openable,
-            size: 10,
-            capacity: 5,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .adjectives: .stringSet(["brass", "shiny"]),
+                .synonyms: .stringSet(["lamp", "light"]),
+                .shortDescription: "The brass lantern is here.",
+                .firstDescription: "A shiny brass lantern rests here.",
+                .readText: "Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"",
+                .readWhileHeldText: "It feels warm.",
+                .isTakable: true,
+                .isLightSource: true,
+                .isOn: true,
+                .isOpenable: true,
+                .size: 10,
+                .capacity: 5
+            ]
         )
     }
 
@@ -65,7 +70,7 @@ struct ItemTests {
         #expect(item.attributes[.shortDescription] == .string("The brass lantern is here."))
         #expect(item.attributes[.firstDescription] == .string("A shiny brass lantern rests here."))
         #expect(item.attributes[.longDescription] == .string("A sturdy brass lantern."))
-        #expect(item.attributes[.readText] == .string("Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\""))
+        #expect(item.attributes[.readText] == .string("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""))
         #expect(item.attributes[.readWhileHeldText] == .string("It feels warm."))
         #expect(item.hasFlag(.isTakable))
         #expect(item.hasFlag(.isLightSource))
@@ -129,7 +134,6 @@ struct ItemTests {
         #expect(decodedItem.attributes[.longDescription] == originalItem.attributes[.longDescription])
         #expect(decodedItem.attributes[.readText] == originalItem.attributes[.readText])
         #expect(decodedItem.attributes[.readWhileHeldText] == originalItem.attributes[.readWhileHeldText])
-        #expect(decodedItem.properties == originalItem.properties)
         #expect(decodedItem.size == originalItem.size)
         #expect(decodedItem.capacity == originalItem.capacity)
         #expect(decodedItem.parent == originalItem.parent)

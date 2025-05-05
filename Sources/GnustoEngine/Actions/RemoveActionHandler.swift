@@ -51,12 +51,12 @@ public struct RemoveActionHandler: EnhancedActionHandler {
             ))
         }
 
-        // Change 2: Set `.itemTouched` to true (if not already)
-        if itemSnapshot.attributes[.itemTouched] != .bool(true) {
+        // Change 2: Set `.isTouched` to true (if not already)
+        if itemSnapshot.attributes[.isTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: itemSnapshot.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }

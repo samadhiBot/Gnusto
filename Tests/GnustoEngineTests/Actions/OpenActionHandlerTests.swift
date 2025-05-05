@@ -86,7 +86,7 @@ struct OpenActionHandlerTests {
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
-                .itemTouched: true // Already touched
+                .isTouched: true // Already touched
             ]
         )
 
@@ -101,7 +101,7 @@ struct OpenActionHandlerTests {
 
         // Initial state check
         #expect(engine.item("box")?.attributes["isOpen"] == nil)
-        #expect(engine.item("box")?.hasProperty(.touched) == true)
+        #expect(engine.item("box")?.hasFlag(.isTouched))
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")

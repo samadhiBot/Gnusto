@@ -89,6 +89,14 @@ extension StateValue {
 
 // MARK: - Conformances
 
+extension StateValue: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = String
+
+    public init(arrayLiteral elements: ArrayLiteralElement...) {
+        self = .stringSet(Set(elements))
+    }
+}
+
 extension StateValue: ExpressibleByBooleanLiteral {
     public init(booleanLiteral value: BooleanLiteralType) {
         self = .bool(value)
@@ -102,10 +110,7 @@ extension StateValue: ExpressibleByIntegerLiteral {
 }
 
 extension StateValue: ExpressibleByStringLiteral {
-    /// Initializes a `PropertyID` using a string literal.
-    /// - Parameter value: The string literal representing the property ID.
     public init(stringLiteral value: String) {
-        // Consider adding validation or normalization if needed (e.g., lowercase)
         self = .string(value)
     }
 }

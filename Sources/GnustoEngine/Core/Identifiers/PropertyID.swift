@@ -155,7 +155,7 @@ public extension PropertyID {
     static let isTool = PropertyID("isTool")
 
     /// TOUCHBIT: Player has interacted with it (used for brief mode descriptions).
-    static let itemTouched = PropertyID("itemTouched")
+    static let isTouched = PropertyID("isTouched")
 
     /// TRANSBIT: Contents are visible even if closed.
     static let isTransparent = PropertyID("isTransparent")

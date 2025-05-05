@@ -46,11 +46,11 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .touched property change if needed
-        if targetItem.attributes[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.itemTouched),
-                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }
