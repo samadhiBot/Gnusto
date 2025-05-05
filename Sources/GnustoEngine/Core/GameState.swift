@@ -154,7 +154,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAdjectives change")
             }
-            items[itemID]?.adjectives = newAdjectives
+            items[itemID]?.attributes[.adjectives] = .stringSet(newAdjectives)
 
         case .itemCapacity:
             // Expecting an .int for itemCapacity
@@ -167,7 +167,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemCapacity change")
             }
-            items[itemID]?.capacity = newCapacity // Assuming Item has capacity
+            items[itemID]?.attributes[.capacity] = .int(newCapacity)
 
         case .itemName:
             // Expecting a .string for itemName
@@ -206,7 +206,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSize change")
             }
-            items[itemID]?.size = newSize
+            items[itemID]?.attributes[.size] = .int(newSize)
 
         case .itemSynonyms:
             // Expecting a .stringSet for itemSynonyms
@@ -219,7 +219,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSynonyms change")
             }
-            items[itemID]?.synonyms = newSynonyms
+            items[itemID]?.attributes[.synonyms] = .stringSet(newSynonyms)
 
         case .itemValue:
             // Expecting an .int for itemValue

@@ -47,7 +47,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // 5. Check if it's the correct key
-        guard targetItem.lockKey == keyItemID else {
+        guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
             throw ActionError.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
     }

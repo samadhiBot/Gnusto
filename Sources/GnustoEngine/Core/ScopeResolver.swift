@@ -34,7 +34,7 @@ public struct ScopeResolver: Sendable {
         }
 
         // 2. Check if the location has the dynamic .isLit flag set (e.g., by hooks).
-        if location.flag(.locationIsLit) {
+        if location.hasFlag(.isLit) {
             return true
         }
 

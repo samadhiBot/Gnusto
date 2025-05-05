@@ -33,7 +33,7 @@ public extension PropertyID {
     static let capacity = PropertyID("capacity")
 
     /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    static let localItems = PropertyID("localItems")
+    static let localGlobals = PropertyID("localGlobals")
 
     /// The key needed to lock/unlock an item (if `.isLockable`).
     static let lockKey = PropertyID("lockKey")

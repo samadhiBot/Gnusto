@@ -640,7 +640,7 @@ public class GameEngine: Sendable {
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await descriptionHandlerRegistry.generateDescription(
             for: location.id,
-            key: .description,
+            key: .longDescription,
             engine: self
         )
         await ioHandler.print(description)

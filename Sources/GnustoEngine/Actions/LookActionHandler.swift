@@ -70,7 +70,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         var descriptionLines: [String] = []
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id, // Use item ID
-            key: .description, // Specify the key
+            key: .longDescription, // Specify the key
             engine: engine
         )
         descriptionLines.append(baseDescription)
@@ -170,7 +170,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Print long description (potentially dynamic)
         let longDesc = await engine.descriptionHandlerRegistry.generateDescription(
             for: location.id,
-            key: .description,
+            key: .longDescription,
             engine: engine
         )
 

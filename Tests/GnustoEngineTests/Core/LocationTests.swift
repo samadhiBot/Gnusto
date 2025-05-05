@@ -39,7 +39,7 @@ struct LocationTests {
         #expect(location.id == defaultLocationID)
         #expect(location.name == defaultLocationName)
         // Check attributes for descriptions
-        #expect(location.attributes[.description] == .string("A nondescript room."))
+        #expect(location.attributes[.longDescription] == .string("A nondescript room."))
         #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
         #expect(location.properties.isEmpty)
@@ -54,7 +54,7 @@ struct LocationTests {
         #expect(location.id == "livingRoom")
         #expect(location.name == "Living Room")
         // Check attributes for descriptions
-        #expect(location.attributes[.description] == .string("A comfortably furnished living room. There are exits west and east."))
+        #expect(location.attributes[.longDescription] == .string("A comfortably furnished living room. There are exits west and east."))
         #expect(location.attributes[.shortDescription] == nil)
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
@@ -111,7 +111,7 @@ struct LocationTests {
         #expect(decodedLocation.id == originalLocation.id)
         #expect(decodedLocation.name == originalLocation.name)
         // Compare attributes for descriptions
-        #expect(decodedLocation.attributes[.description] == originalLocation.attributes[.description])
+        #expect(decodedLocation.attributes[.longDescription] == originalLocation.attributes[.longDescription])
         #expect(decodedLocation.attributes[.shortDescription] == originalLocation.attributes[.shortDescription])
         #expect(decodedLocation.exits.count == originalLocation.exits.count)
         #expect(decodedLocation.exits[.west]?.destination == originalLocation.exits[.west]?.destination)
@@ -126,25 +126,25 @@ struct LocationTests {
         var location2 = location1 // Assign creates a copy for structs
 
         let originalName = location1.name // Capture original values
-        let originalDescValue = location1.attributes[.description] // Capture original dynamic value
+        let originalDescValue = location1.attributes[.longDescription] // Capture original dynamic value
 
         // Modify the copy (location2)
         location2.name = "Renamed Room"
         location2.addProperty(.visited)
         // Set dynamic value for description
-        location2.attributes[.description] = .string("An updated room.")
+        location2.attributes[.longDescription] = .string("An updated room.")
 
         // Assert that the original (location1) is unchanged
         #expect(location1.name == originalName) // Check against captured default
         #expect(!location1.hasProperty(.visited))
         // Check original dynamic value
-        #expect(location1.attributes[.description] == originalDescValue)
+        #expect(location1.attributes[.longDescription] == originalDescValue)
 
         // Assert that location2 has the changes
         #expect(location2.name == "Renamed Room")
         #expect(location2.hasProperty(.visited))
         // Check new dynamic value
-        #expect(location2.attributes[.description] == .string("An updated room."))
+        #expect(location2.attributes[.longDescription] == .string("An updated room."))
 
         // Assert that location1 and location2 are now different
         #expect(location1 != location2)

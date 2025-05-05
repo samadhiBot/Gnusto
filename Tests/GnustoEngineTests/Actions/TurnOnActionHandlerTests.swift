@@ -34,8 +34,8 @@ struct TurnOnActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "lamp")
-        #expect(finalItemState?.flag(.isOn) == true)
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isOn) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now on.")
@@ -81,8 +81,8 @@ struct TurnOnActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "lamp")
-        #expect(finalItemState?.flag(.isOn) == true)
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isOn) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
         let output = await mockIO.flush()
         // Assert: Only expect the direct handler message
@@ -128,8 +128,8 @@ struct TurnOnActionHandlerTests {
 
         // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
         let finalItemState = await engine.item(with: "lamp")
-        #expect(finalItemState?.flag(.isOn) == true) // Should still be on
-        #expect(finalItemState?.flag(.itemTouched) == false) // Should NOT be touched
+        #expect(finalItemState?.hasFlag(.isOn) == true) // Should still be on
+        #expect(finalItemState?.hasFlag(.itemTouched) == false) // Should NOT be touched
     }
 
     @Test("Try to turn on non-device item")
@@ -166,8 +166,8 @@ struct TurnOnActionHandlerTests {
         }
 
         let finalItemState = await engine.item(with: "lamp")
-        #expect(finalItemState?.flag(.isOn) == false) // Should not gain .on
-        #expect(finalItemState?.flag(.itemTouched) == false) // Should NOT be touched
+        #expect(finalItemState?.hasFlag(.isOn) == false) // Should not gain .on
+        #expect(finalItemState?.hasFlag(.itemTouched) == false) // Should NOT be touched
     }
 
     @Test("Try to turn on item not accessible")
@@ -232,8 +232,8 @@ struct TurnOnActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "radio")
-        #expect(finalItemState?.flag(.isOn) == true)
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isOn) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
         let output = await mockIO.flush()
         // Only expect the turn on message, no room description
@@ -271,8 +271,8 @@ struct TurnOnActionHandlerTests {
 
         // Assert: Same expectations
         let finalItemState = await engine.item(with: "lamp")
-        #expect(finalItemState?.flag(.isOn) == true)
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.isOn) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now on.")

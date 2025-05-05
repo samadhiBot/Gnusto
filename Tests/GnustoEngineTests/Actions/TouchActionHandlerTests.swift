@@ -62,7 +62,7 @@ struct TouchActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "key")
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -155,7 +155,7 @@ struct TouchActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "gem")
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -190,7 +190,7 @@ struct TouchActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "book")
-        #expect(finalItemState?.flag(.itemTouched) == true)
+        #expect(finalItemState?.hasFlag(.itemTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }

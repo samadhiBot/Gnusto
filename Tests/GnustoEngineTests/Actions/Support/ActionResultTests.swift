@@ -396,8 +396,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         // Validate applied state
-        #expect(await engine.item(with: "lamp")?.flag(.isOn) == true)
-        #expect(await engine.location(with: "cave")?.flag(.locationIsLit) == true)
+        #expect(await engine.item(with: "lamp")?.hasFlag(.isOn) == true)
+        #expect(await engine.location(with: "cave")?.hasFlag(.locationIsLit) == true)
         #expect(engine.state.playerLocation == "cave")
         #expect(engine.state.gameSpecificState["puzzleSolved"] == .bool(true))
     }
@@ -424,7 +424,7 @@ struct ActionResultTests {
         )
         // ... existing code ...
         // Validate state hasn't changed
-        #expect(await engine.item(with: "lamp")?.flag(.isOn) == true)
+        #expect(await engine.item(with: "lamp")?.hasFlag(.isOn) == true)
     }
 
     // Helper to create a simple item for testing ActionResult merging

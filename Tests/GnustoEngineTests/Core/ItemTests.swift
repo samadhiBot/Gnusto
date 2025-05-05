@@ -45,14 +45,13 @@ struct ItemTests {
         #expect(item.synonyms.isEmpty)
         #expect(item.attributes[.shortDescription] == nil)
         #expect(item.attributes[.firstDescription] == nil)
-        #expect(item.attributes[.description] == nil)
+        #expect(item.attributes[.longDescription] == nil)
         #expect(item.attributes[.readText] == nil)
         #expect(item.attributes[.readWhileHeldText] == nil)
-        #expect(item.properties.isEmpty)
         #expect(item.size == 5) // ZILF default
         #expect(item.capacity == -1) // ZILF default
         #expect(item.parent == .nowhere) // Check default parent
-        #expect(item.lockKey == nil)
+        #expect(item.attributes[.lockKey] == nil)
     }
 
     @Test("Item Custom Initialization")
@@ -65,14 +64,17 @@ struct ItemTests {
         #expect(item.synonyms == ["lamp", "light"])
         #expect(item.attributes[.shortDescription] == .string("The brass lantern is here."))
         #expect(item.attributes[.firstDescription] == .string("A shiny brass lantern rests here."))
-        #expect(item.attributes[.description] == .string("A sturdy brass lantern."))
+        #expect(item.attributes[.longDescription] == .string("A sturdy brass lantern."))
         #expect(item.attributes[.readText] == .string("Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\""))
         #expect(item.attributes[.readWhileHeldText] == .string("It feels warm."))
-        #expect(item.properties == [.takable, .lightSource, .on, .openable])
+        #expect(item.hasFlag(.isTakable))
+        #expect(item.hasFlag(.isLightSource))
+        #expect(item.hasFlag(.isOn))
+        #expect(item.hasFlag(.isOpenable))
         #expect(item.size == 10)
         #expect(item.capacity == 5)
         #expect(item.parent == .player) // Check custom parent
-        #expect(item.lockKey == nil)
+        #expect(item.attributes[.lockKey] == nil)
     }
 
     @Test("Item Property Management")
@@ -109,7 +111,7 @@ struct ItemTests {
     func testItemCodable() throws {
         var originalItem = createCustomItem()
         originalItem.attributes[.readText] = .string("Readable text.")
-        originalItem.lockKey = "key1"
+        originalItem.attributes[.lockKey] = "key1"
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys] // For easier debugging
@@ -124,14 +126,14 @@ struct ItemTests {
         #expect(decodedItem.synonyms == originalItem.synonyms)
         #expect(decodedItem.attributes[.shortDescription] == originalItem.attributes[.shortDescription])
         #expect(decodedItem.attributes[.firstDescription] == originalItem.attributes[.firstDescription])
-        #expect(decodedItem.attributes[.description] == originalItem.attributes[.description])
+        #expect(decodedItem.attributes[.longDescription] == originalItem.attributes[.longDescription])
         #expect(decodedItem.attributes[.readText] == originalItem.attributes[.readText])
         #expect(decodedItem.attributes[.readWhileHeldText] == originalItem.attributes[.readWhileHeldText])
         #expect(decodedItem.properties == originalItem.properties)
         #expect(decodedItem.size == originalItem.size)
         #expect(decodedItem.capacity == originalItem.capacity)
         #expect(decodedItem.parent == originalItem.parent)
-        #expect(decodedItem.lockKey == originalItem.lockKey)
+        #expect(decodedItem.attributes[.lockKey] == originalItem.attributes[.lockKey])
     }
 
     @Test("Item Value Semantics")

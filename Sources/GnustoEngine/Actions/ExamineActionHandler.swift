@@ -65,7 +65,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
             // Use the registry to generate the description using the item ID and key
             message = await context.engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem.id,
-                key: .description,
+                key: .longDescription,
                 engine: context.engine
             )
         }
@@ -87,7 +87,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id,
-            key: .description,
+            key: .longDescription,
             engine: engine
         )
         descriptionParts.append(baseDescription)
@@ -117,7 +117,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id,
-            key: .description,
+            key: .longDescription,
             engine: engine
         )
         descriptionParts.append(baseDescription)

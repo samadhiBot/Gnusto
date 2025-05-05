@@ -601,7 +601,7 @@ public struct StandardParser: Parser {
                     if mustBeHeld { meetsScopeCondition = (item.parent == .player) }
                     else if mustBeOnGround { meetsScopeCondition = (item.parent == .location(currentLocationID)) }
                     else if mustBeInRoom {
-                        let isGlobal = gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false
+                        let isGlobal = gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false
                         meetsScopeCondition = (item.parent == .location(currentLocationID) || isGlobal)
                     }
                     else {
@@ -614,7 +614,7 @@ public struct StandardParser: Parser {
                                      meetsScopeCondition = true
                                  }
                              }
-                         } else if gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false {
+                         } else if gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false {
                               meetsScopeCondition = true
                          }
                     }
@@ -633,17 +633,17 @@ public struct StandardParser: Parser {
 
         gatherRecursive(parentEntity: .player)
         gatherRecursive(parentEntity: .location(currentLocationID))
-
+        
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
-             if let location = gameState.locations[currentLocationID] {
-                for itemID in location.globals {
+            if let location = gameState.locations[currentLocationID] {
+                for itemID in location.localGlobals {
                     if let globalItem = allItems[itemID], checkItemConditions(globalItem) {
-                         candidates[itemID] = globalItem
+                        candidates[itemID] = globalItem
                     }
                 }
             }
         }
-
+        
         return candidates
     }
 

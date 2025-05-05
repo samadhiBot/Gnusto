@@ -87,62 +87,79 @@ extension StateValue {
     }
 }
 
+// MARK: - Conformances
+
 extension StateValue: ExpressibleByBooleanLiteral {
-    public init(booleanLiteral value: Bool) {
+    public init(booleanLiteral value: BooleanLiteralType) {
         self = .bool(value)
+    }
+}
+
+extension StateValue: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: IntegerLiteralType) {
+        self = .int(value)
+    }
+}
+
+extension StateValue: ExpressibleByStringLiteral {
+    /// Initializes a `PropertyID` using a string literal.
+    /// - Parameter value: The string literal representing the property ID.
+    public init(stringLiteral value: String) {
+        // Consider adding validation or normalization if needed (e.g., lowercase)
+        self = .string(value)
     }
 }
 
 // MARK: - Codable Conformance
 
-extension StateValue {
-    private enum CodingKeys: String, CodingKey {
-        case type
-        case boolValue
-        case intValue
-        case stringValue
-        case stringSetValue
-        case itemIDValue
-        case itemIDSetValue
-        case locationIDValue
-        case locationExitsValue
-        case parentEntityValue
-    }
-
-    private enum ValueType: String, Codable {
-        case bool, int, string, stringSet, itemID, itemIDSet, locationID, locationExits, parentEntity
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        let type = try container.decode(ValueType.self, forKey: .type)
-
-        switch type {
-        case .bool: self = .bool(try container.decode(Bool.self, forKey: .boolValue))
-        case .int: self = .int(try container.decode(Int.self, forKey: .intValue))
-        case .string: self = .string(try container.decode(String.self, forKey: .stringValue))
-        case .stringSet: self = .stringSet(try container.decode(Set<String>.self, forKey: .stringSetValue))
-        case .itemID: self = .itemID(try container.decode(ItemID.self, forKey: .itemIDValue))
-        case .itemIDSet: self = .itemIDSet(try container.decode(Set<ItemID>.self, forKey: .itemIDSetValue))
-        case .locationID: self = .locationID(try container.decode(LocationID.self, forKey: .locationIDValue))
-        case .locationExits: self = .locationExits(try container.decode([Direction: Exit].self, forKey: .locationExitsValue))
-        case .parentEntity: self = .parentEntity(try container.decode(ParentEntity.self, forKey: .parentEntityValue))
-        }
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        switch self {
-        case .bool(let value): try container.encode(ValueType.bool, forKey: .type); try container.encode(value, forKey: .boolValue)
-        case .int(let value): try container.encode(ValueType.int, forKey: .type); try container.encode(value, forKey: .intValue)
-        case .string(let value): try container.encode(ValueType.string, forKey: .type); try container.encode(value, forKey: .stringValue)
-        case .stringSet(let value): try container.encode(ValueType.stringSet, forKey: .type); try container.encode(value, forKey: .stringSetValue)
-        case .itemID(let value): try container.encode(ValueType.itemID, forKey: .type); try container.encode(value, forKey: .itemIDValue)
-        case .itemIDSet(let value): try container.encode(ValueType.itemIDSet, forKey: .type); try container.encode(value, forKey: .itemIDSetValue)
-        case .locationID(let value): try container.encode(ValueType.locationID, forKey: .type); try container.encode(value, forKey: .locationIDValue)
-        case .locationExits(let value): try container.encode(ValueType.locationExits, forKey: .type); try container.encode(value, forKey: .locationExitsValue)
-        case .parentEntity(let value): try container.encode(ValueType.parentEntity, forKey: .type); try container.encode(value, forKey: .parentEntityValue)
-        }
-    }
-}
+//extension StateValue {
+//    private enum CodingKeys: String, CodingKey {
+//        case type
+//        case boolValue
+//        case intValue
+//        case stringValue
+//        case stringSetValue
+//        case itemIDValue
+//        case itemIDSetValue
+//        case locationIDValue
+//        case locationExitsValue
+//        case parentEntityValue
+//    }
+//
+//    private enum ValueType: String, Codable {
+//        case bool, int, string, stringSet, itemID, itemIDSet, locationID, locationExits, parentEntity
+//    }
+//
+//    public init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        let type = try container.decode(ValueType.self, forKey: .type)
+//
+//        switch type {
+//        case .bool: self = .bool(try container.decode(Bool.self, forKey: .boolValue))
+//        case .int: self = .int(try container.decode(Int.self, forKey: .intValue))
+//        case .string: self = .string(try container.decode(String.self, forKey: .stringValue))
+//        case .stringSet: self = .stringSet(try container.decode(Set<String>.self, forKey: .stringSetValue))
+//        case .itemID: self = .itemID(try container.decode(ItemID.self, forKey: .itemIDValue))
+//        case .itemIDSet: self = .itemIDSet(try container.decode(Set<ItemID>.self, forKey: .itemIDSetValue))
+//        case .locationID: self = .locationID(try container.decode(LocationID.self, forKey: .locationIDValue))
+//        case .locationExits: self = .locationExits(try container.decode([Direction: Exit].self, forKey: .locationExitsValue))
+//        case .parentEntity: self = .parentEntity(try container.decode(ParentEntity.self, forKey: .parentEntityValue))
+//        }
+//    }
+//
+//    public func encode(to encoder: Encoder) throws {
+//        var container = encoder.container(keyedBy: CodingKeys.self)
+//
+//        switch self {
+//        case .bool(let value): try container.encode(ValueType.bool, forKey: .type); try container.encode(value, forKey: .boolValue)
+//        case .int(let value): try container.encode(ValueType.int, forKey: .type); try container.encode(value, forKey: .intValue)
+//        case .string(let value): try container.encode(ValueType.string, forKey: .type); try container.encode(value, forKey: .stringValue)
+//        case .stringSet(let value): try container.encode(ValueType.stringSet, forKey: .type); try container.encode(value, forKey: .stringSetValue)
+//        case .itemID(let value): try container.encode(ValueType.itemID, forKey: .type); try container.encode(value, forKey: .itemIDValue)
+//        case .itemIDSet(let value): try container.encode(ValueType.itemIDSet, forKey: .type); try container.encode(value, forKey: .itemIDSetValue)
+//        case .locationID(let value): try container.encode(ValueType.locationID, forKey: .type); try container.encode(value, forKey: .locationIDValue)
+//        case .locationExits(let value): try container.encode(ValueType.locationExits, forKey: .type); try container.encode(value, forKey: .locationExitsValue)
+//        case .parentEntity(let value): try container.encode(ValueType.parentEntity, forKey: .type); try container.encode(value, forKey: .parentEntityValue)
+//        }
+//    }
+//}

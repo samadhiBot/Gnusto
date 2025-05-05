@@ -244,7 +244,7 @@ struct GoActionHandlerTests {
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Ensure condition flag is initially false
-        #expect(await engine.flag(.gameSpecificState(key: conditionFlag)) == false)
+        #expect(await engine.hasFlag(.gameSpecificState(key: conditionFlag)) == false)
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 
@@ -278,7 +278,7 @@ struct GoActionHandlerTests {
 
         // Set the condition flag to true
         try await engine.setGlobalFlag(key: conditionFlag, value: true)
-        #expect(await engine.flag(.gameSpecificState(key: conditionFlag)) == true)
+        #expect(await engine.hasFlag(.gameSpecificState(key: conditionFlag)) == true)
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 

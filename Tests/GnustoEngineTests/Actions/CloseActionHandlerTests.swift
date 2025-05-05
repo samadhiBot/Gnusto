@@ -71,7 +71,7 @@ struct CloseActionHandlerTests {
         // Assert State Change
         let finalBox = await engine.item(with: "box")
         #expect(finalBox?.dynamicValues[PropertyID.isOpen] == .bool(false)) // Qualified key
-        #expect(finalBox?.flag(PropertyID.itemTouched) == true)
+        #expect(finalBox?.hasFlag(PropertyID.itemTouched) == true)
 
         // Assert Output
         let output = await mockIO.flush()

@@ -41,4 +41,9 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     public func hasFlag(_ id: PropertyID) -> Bool {
         attributes[id] == .bool(true)
     }
+    
+    /// <#Description#>
+    public var localGlobals: Set<ItemID> {
+        attributes[.localGlobals]?.toItemIDs ?? []
+    }
 }
