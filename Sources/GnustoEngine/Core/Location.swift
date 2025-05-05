@@ -22,14 +22,14 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         id: LocationID,
         name: String,
         exits: [Direction: Exit] = [:],
-        isLit: Bool = false,
+        inherentlyLit: Bool = false,
         attributes: [PropertyID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
         self.exits = exits
         var initial = attributes
-        initial[.inherentlyLit] = .bool(isLit)
+        initial[.inherentlyLit] = .bool(inherentlyLit)
         self.attributes = initial
     }
 

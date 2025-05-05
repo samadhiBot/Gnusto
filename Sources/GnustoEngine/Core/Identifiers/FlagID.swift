@@ -1,4 +1,4 @@
-/// A type-safe identifier for a global game flag.
+/// A global game flag identifier.
 ///
 /// Flags represent boolean states within the game that are not tied to a specific
 /// item or location (e.g., "met_wizard", "puzzle_solved").

@@ -61,7 +61,7 @@ struct CloseActionHandlerTests {
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
         // Initial state check
-        let initialBox = await engine.item(with: "box")
+        let initialBox = await engine.item("box")
         #expect(initialBox?.dynamicValues[PropertyID.isOpen] == .bool(true)) // Qualified key
         #expect(engine.gameState.changeHistory.isEmpty)
 
@@ -69,7 +69,7 @@ struct CloseActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalBox = await engine.item(with: "box")
+        let finalBox = await engine.item("box")
         #expect(finalBox?.dynamicValues[PropertyID.isOpen] == .bool(false)) // Qualified key
         #expect(finalBox?.hasFlag(PropertyID.itemTouched) == true)
 

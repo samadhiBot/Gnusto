@@ -33,7 +33,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item(with: "lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
@@ -80,7 +80,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item(with: "lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
@@ -127,7 +127,7 @@ struct TurnOnActionHandlerTests {
         }
 
         // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
-        let finalItemState = await engine.item(with: "lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true) // Should still be on
         #expect(finalItemState?.hasFlag(.itemTouched) == false) // Should NOT be touched
     }
@@ -165,7 +165,7 @@ struct TurnOnActionHandlerTests {
             ) // Changed to validate
         }
 
-        let finalItemState = await engine.item(with: "lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false) // Should not gain .on
         #expect(finalItemState?.hasFlag(.itemTouched) == false) // Should NOT be touched
     }
@@ -231,7 +231,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item(with: "radio")
+        let finalItemState = await engine.item("radio")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.itemTouched) == true)
 
@@ -270,7 +270,7 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert: Same expectations
-        let finalItemState = await engine.item(with: "lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.itemTouched) == true)
 

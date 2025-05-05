@@ -14,7 +14,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
         }
 
@@ -27,7 +27,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await context.engine.item(with: parentItemID) else {
+            guard let parentItem = await context.engine.item(parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
@@ -62,7 +62,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
-        if let targetItem = await context.engine.item(with: targetItemID) {
+        if let targetItem = await context.engine.item(targetItemID) {
             if targetItem.attributes[.itemTouched] != .bool(true) {
                 stateChanges.append(StateChange(
                     entityId: .item(targetItemID),

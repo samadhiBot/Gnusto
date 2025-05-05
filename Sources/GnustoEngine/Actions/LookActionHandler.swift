@@ -14,7 +14,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         }
 
         // EXAMINE [Object] - Ensure item exists and is reachable
-        guard let _ = await context.engine.item(with: targetItemID) else {
+        guard let _ = await context.engine.item(targetItemID) else {
             // Should not happen if parser resolved correctly, but safety first.
             // Or perhaps the item *just* disappeared.
             throw ActionError.itemNotAccessible(targetItemID)
@@ -61,7 +61,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // EXAMINE [Object]
         // Validation ensures item exists and is reachable
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await engine.item(targetItemID) else {
             // This should not happen due to validation, but guard defensively.
             throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
         }

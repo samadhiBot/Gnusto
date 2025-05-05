@@ -41,7 +41,7 @@ public class DescriptionHandlerRegistry {
         itemID: ItemID,
         engine: GameEngine
     ) -> String {
-        let item = engine.item(with: itemID)
+        let item = engine.item(itemID)
         switch key {
         case .longDescription:
             return "You see nothing special about \(item?.withDefiniteArticle ?? "it")."

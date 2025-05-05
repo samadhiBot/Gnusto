@@ -10,15 +10,15 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
         guard let containerID = context.command.indirectObject else {
             // Fetch name for better error message if possible
-            let itemName = context.engine.item(with: itemToInsertID)?.name ?? "item"
+            let itemName = context.engine.item(itemToInsertID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item Snapshots
-        guard let itemToInsert = context.engine.item(with: itemToInsertID) else {
+        guard let itemToInsert = context.engine.item(itemToInsertID) else {
             throw ActionError.itemNotAccessible(itemToInsertID)
         }
-        guard let containerItem = context.engine.item(with: containerID) else {
+        guard let containerItem = context.engine.item(containerID) else {
             throw ActionError.itemNotAccessible(containerID)
         }
 
@@ -41,7 +41,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             if parentItemID == itemToInsertID {
                 throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
             }
-            guard let parentItem = context.engine.item(with: parentItemID) else { break }
+            guard let parentItem = context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
@@ -59,7 +59,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = context.engine.items(withParent: .item(containerID))
+            let itemsInside = context.engine.items(in: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
@@ -74,8 +74,8 @@ struct InsertActionHandler: EnhancedActionHandler {
         let containerID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToInsertSnapshot = context.engine.item(with: itemToInsertID),
-              let containerSnapshot = context.engine.item(with: containerID) else
+        guard let itemToInsertSnapshot = context.engine.item(itemToInsertID),
+              let containerSnapshot = context.engine.item(containerID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for INSERT.")
         }

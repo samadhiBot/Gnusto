@@ -13,7 +13,7 @@ struct ExamineActionHandlerTests {
             playerInventory: [itemID]
         )
         let handler = ExamineActionHandler()
-        let initialItemState = await engine.item(with: itemID)
+        let initialItemState = await engine.item(itemID)
         #expect(initialItemState?.hasFlag(PropertyID.itemTouched) == false)
 
         // Act
@@ -26,7 +26,7 @@ struct ExamineActionHandlerTests {
         #expect(output.contains("A smooth, grey pebble."))
 
         // Assert State Change
-        let finalItemState = await engine.item(with: itemID)
+        let finalItemState = await engine.item(itemID)
         #expect(finalItemState?.hasFlag(PropertyID.itemTouched) == true)
 
         // Assert Change History
@@ -67,7 +67,7 @@ struct ExamineActionHandlerTests {
             definitionRegistry: registry
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
@@ -80,7 +80,7 @@ struct ExamineActionHandlerTests {
         #expect(!output.contains("A small, tarnished silver locket."))
 
         // Assert State Change
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == true)
     }
 
     @Test func testExamineItemInRoom() async throws {
@@ -98,7 +98,7 @@ struct ExamineActionHandlerTests {
             playerLocation: roomID
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
@@ -110,7 +110,7 @@ struct ExamineActionHandlerTests {
         #expect(output.contains("A weathered statue of a grue."))
 
         // Assert State Change
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == true)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == true)
     }
 
     @Test func testExamineItemNotInScope() async throws {
@@ -135,7 +135,7 @@ struct ExamineActionHandlerTests {
         // Assert State Change (should be none)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
     }
 
     @Test func testExamineNonExistentItem() async throws {
@@ -182,8 +182,8 @@ struct ExamineActionHandlerTests {
         // Assert State Change (should be none)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(with: itemID1)?.hasFlag(PropertyID.itemTouched) == false)
-        #expect(await engine.item(with: itemID2)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID1)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID2)?.hasFlag(PropertyID.itemTouched) == false)
     }
 
     @Test func testExamineLocationDescription() async throws {
@@ -248,7 +248,7 @@ struct ExamineActionHandlerTests {
             definitionRegistry: registry
         )
         let handler = ExamineActionHandler()
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
 
         // Act
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
@@ -263,7 +263,7 @@ struct ExamineActionHandlerTests {
         // Assert State Change (None, because the override didn't add .touched)
         #expect(result.changes.isEmpty)
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(with: itemID)?.hasFlag(PropertyID.itemTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(PropertyID.itemTouched) == false)
     }
 
     // TODO: Restore and adapt this test if DescriptionHandlers need complex state checks
@@ -296,7 +296,7 @@ struct ExamineActionHandlerTests {
     //        // --- Test 2: Turn On and Examine Again ---
     //        // Manually set the stone to 'on' (simulate a TURN ON action)
     //        try await engine.setDynamicItemValue(itemID: itemID, key: .isOn, value: .bool(true))
-    //        #expect(await engine.item(with: itemID)?.hasFlag(.isOn) == true)
+    //        #expect(await engine.item(itemID)?.hasFlag(.isOn) == true)
     //
     //        command = Command(verb: "examine", directObject: itemID)
     //        _ = try await handler.handle(command: command, engine: engine, io: ioHandler)

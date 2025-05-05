@@ -10,15 +10,15 @@ struct PutOnActionHandler: EnhancedActionHandler {
             throw ActionError.prerequisiteNotMet("Put what?") // Changed from Insert
         }
         guard let surfaceID = context.command.indirectObject else {
-            let itemName = context.engine.item(with: itemToPutID)?.name ?? "item"
+            let itemName = context.engine.item(itemToPutID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
         }
 
         // 2. Get Item Snapshots
-        guard let itemToPut = context.engine.item(with: itemToPutID) else {
+        guard let itemToPut = context.engine.item(itemToPutID) else {
             throw ActionError.itemNotAccessible(itemToPutID)
         }
-        guard let surfaceItem = context.engine.item(with: surfaceID) else {
+        guard let surfaceItem = context.engine.item(surfaceID) else {
             throw ActionError.itemNotAccessible(surfaceID)
         }
 
@@ -42,7 +42,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
                 // Slightly awkward message, but covers the case
                 throw ActionError.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
             }
-            guard let parentItem = context.engine.item(with: parentItemID) else { break }
+            guard let parentItem = context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
@@ -59,8 +59,8 @@ struct PutOnActionHandler: EnhancedActionHandler {
         let surfaceID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToPutSnapshot = context.engine.item(with: itemToPutID),
-              let surfaceSnapshot = context.engine.item(with: surfaceID) else
+        guard let itemToPutSnapshot = context.engine.item(itemToPutID),
+              let surfaceSnapshot = context.engine.item(surfaceID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for PUT ON.")
         }

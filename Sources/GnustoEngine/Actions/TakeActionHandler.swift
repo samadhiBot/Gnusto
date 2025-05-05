@@ -11,7 +11,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // Use standard not accessible error for non-existent items
             throw ActionError.itemNotAccessible(targetItemID)
         }
@@ -26,7 +26,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // 4. Check if item is inside something invalid (non-container/non-surface)
         if case .item(let parentID) = targetItem.parent,
-           let parentItem = await context.engine.item(with: parentID) {
+           let parentItem = await context.engine.item(parentID) {
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
             let isContainer = parentItem.hasFlag(.isContainer)
@@ -42,7 +42,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         guard reachableItems.contains(targetItemID) else {
             // Handle specific container closed errors before general unreachability
             if case .item(let parentID) = targetItem.parent,
-               let container = await context.engine.item(with: parentID),
+               let container = await context.engine.item(parentID),
                container.hasFlag(.isContainer),
                // Check dynamic property for open state
                await context.engine.getDynamicItemValue(itemID: parentID, key: .isOpen)?.toBool == false
@@ -68,7 +68,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("Take context.command reached process without direct object.")
         }
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate.
             throw ActionError.internalEngineError("Take context.command target item disappeared between validate and process.")
         }

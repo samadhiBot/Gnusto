@@ -8,7 +8,7 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The primary noun used to refer to the item (ZIL: `DESC`).
     public var name: String
 
-    /// The entity that currently contains or supports this item (.
+    /// The entity that currently contains or supports this item (ZIL: `IN`)
     public var parent: ParentEntity
 
     /// A dictionary that holds the item's current attributes.
@@ -28,8 +28,12 @@ public struct Item: Codable, Identifiable, Sendable {
         self.name = name
         self.parent = parent
         var initial = attributes
-        initial[.adjectives] = .stringSet(Set(adjectives))
-        initial[.synonyms] = .stringSet(Set(synonyms))
+        if !adjectives.isEmpty {
+            initial[.adjectives] = .stringSet(Set(adjectives))
+        }
+        if !synonyms.isEmpty {
+            initial[.synonyms] = .stringSet(Set(synonyms))
+        }
         self.attributes = initial
     }
 

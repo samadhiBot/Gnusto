@@ -14,7 +14,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // If parser resolved it, but it's gone, treat as inaccessible/not held.
             // For DROP, the more specific error is relevant.
             throw ActionError.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
@@ -36,7 +36,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("Drop context.command reached process without direct object.")
         }
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate.
             throw ActionError.internalEngineError("Drop context.command target item disappeared between validate and process.")
         }

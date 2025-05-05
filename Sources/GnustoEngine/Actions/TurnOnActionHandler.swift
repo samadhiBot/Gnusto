@@ -12,7 +12,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
@@ -53,7 +53,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("TURN ON context.command reached process without direct object.")
         }
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
         }

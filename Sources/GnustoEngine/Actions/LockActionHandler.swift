@@ -21,11 +21,11 @@ public struct LockActionHandler: EnhancedActionHandler {
         let keyItemID = context.command.indirectObject!
 
         // 2. Get item snapshots
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             // If parser resolved it but it's gone now, treat as inaccessible.
             throw ActionError.itemNotAccessible(targetItemID)
         }
-        guard let keyItem = await context.engine.item(with: keyItemID) else {
+        guard let keyItem = await context.engine.item(keyItemID) else {
             throw ActionError.itemNotAccessible(keyItemID)
         }
 
@@ -60,8 +60,8 @@ public struct LockActionHandler: EnhancedActionHandler {
 
         // Get snapshots (needed for properties)
         // Existence guaranteed by validate
-        guard let targetItem = await context.engine.item(with: targetItemID),
-              let keyItem = await context.engine.item(with: keyItemID) else
+        guard let targetItem = await context.engine.item(targetItemID),
+              let keyItem = await context.engine.item(keyItemID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for LOCK.")
         }

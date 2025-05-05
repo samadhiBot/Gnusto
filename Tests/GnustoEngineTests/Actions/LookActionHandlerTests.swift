@@ -352,7 +352,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "rock")?.hasProperty(.touched) == false)
+        #expect(engine.item("rock")?.hasProperty(.touched) == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "x rock")
@@ -365,7 +365,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "It looks like a rock.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "rock")
+        let finalItemState = engine.item("rock")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should be marked touched")
 
         // Assert Change History
@@ -391,7 +391,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "pebble")?.hasProperty(.touched) == false)
+        #expect(engine.item("pebble")?.hasProperty(.touched) == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", directObject: "pebble", rawInput: "l pebble")
@@ -404,7 +404,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You see nothing special about the small pebble.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "pebble")
+        let finalItemState = engine.item("pebble")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should be marked touched")
 
         // Assert Change History
@@ -432,7 +432,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "stone")?.hasProperty(.touched) == true)
+        #expect(engine.item("stone")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "stone", rawInput: "x stone")
@@ -445,7 +445,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A familiar smooth stone.")
 
         // Assert Final State (remains touched)
-        let finalItemState = engine.item(with: "stone")
+        let finalItemState = engine.item("stone")
         #expect(finalItemState?.hasProperty(.touched) == true, "Item should still be marked touched")
 
         // Assert Change History (Should be empty)
@@ -482,7 +482,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "box")?.hasProperty(.touched) == false)
+        #expect(engine.item("box")?.hasProperty(.touched) == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -495,7 +495,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A sturdy wooden box. The wooden box contains a gold coin.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item(with: "box")
+        let finalItemState = engine.item("box")
         #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -528,8 +528,8 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "box")?.hasProperty(.touched) == false)
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item("box")?.hasProperty(.touched) == false)
+        #expect(engine.item("box")?.dynamicValues["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -542,7 +542,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A sturdy wooden box. The wooden box is closed.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item(with: "box")
+        let finalItemState = engine.item("box")
         #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -575,9 +575,9 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "jar")?.hasProperty(.touched) == false)
-        #expect(engine.item(with: "jar")?.dynamicValues["isOpen"] == nil)
-        #expect(engine.item(with: "jar")?.hasProperty(.transparent) == true)
+        #expect(engine.item("jar")?.hasProperty(.touched) == false)
+        #expect(engine.item("jar")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item("jar")?.hasProperty(.transparent) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "jar", rawInput: "x jar")
@@ -590,7 +590,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A clear glass jar. The glass jar contains a dead fly.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item(with: "jar")
+        let finalItemState = engine.item("jar")
         #expect(finalItemState?.hasProperty(.touched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -628,7 +628,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "table")?.hasProperty(.touched) == false)
+        #expect(engine.item("table")?.hasProperty(.touched) == false)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "table", rawInput: "x table")
@@ -645,7 +645,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Surface marked touched)
-        let finalItemState = engine.item(with: "table")
+        let finalItemState = engine.item("table")
         #expect(finalItemState?.hasProperty(.touched) == true, "Surface should be marked touched")
 
         // Assert Change History
@@ -676,7 +676,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "artifact") != nil) // Item exists
+        #expect(engine.item("artifact") != nil) // Item exists
         let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -691,7 +691,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
-        let finalItemState = engine.item(with: "artifact")
+        let finalItemState = engine.item("artifact")
         #expect(finalItemState?.hasProperty(.touched) == false)
         #expect(finalItemState?.parent == .location("otherRoom"))
 

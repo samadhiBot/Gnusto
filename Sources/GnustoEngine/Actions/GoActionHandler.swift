@@ -33,7 +33,7 @@ public struct GoActionHandler: EnhancedActionHandler {
 
         // Check required key
         if let keyID = exit.requiredKey {
-            let inventory = await context.engine.items(withParent: .player)
+            let inventory = await context.engine.items(in: .player)
             let playerHasKey = inventory.contains { $0.id == keyID }
             if !playerHasKey {
                 // TODO: Check Zork message for lacking a key for a passage

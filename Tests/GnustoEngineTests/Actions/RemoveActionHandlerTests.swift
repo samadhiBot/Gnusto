@@ -29,7 +29,7 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        let initialProperties = engine.item(with: "cloak")?.properties ?? []
+        let initialProperties = engine.item("cloak")?.properties ?? []
         #expect(initialProperties.contains(.worn) == true)
         let initialHistory = engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
@@ -38,7 +38,7 @@ struct RemoveActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = await engine.item(with: "cloak")
+        let finalCloakState = await engine.item("cloak")
         #expect(finalCloakState?.parent == .location("startRoom"))
         #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .worn property")
         #expect(finalCloakState?.hasFlag(.itemTouched) == true, "Cloak should have .touched property") // Ensure touched is added

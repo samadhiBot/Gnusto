@@ -118,11 +118,11 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the open box.")
 
         // Assert Final State
-        let finalCoinState = try #require(await engine.item(with: "coin"))
+        let finalCoinState = try #require(await engine.item("coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
         #expect(finalCoinState.hasFlag(PropertyID.itemTouched) == true, "Coin should be touched")
 
-        let finalBoxState = try #require(await engine.item(with: "openBox"))
+        let finalBoxState = try #require(await engine.item("openBox"))
         #expect(finalBoxState.hasFlag(PropertyID.itemTouched) == true, "Box should be touched")
 
         // Assert Pronoun
@@ -476,7 +476,7 @@ struct InsertActionHandlerTests {
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInside = engine.items(withParent: .item("fullBox"))
+        let itemsInside = engine.items(in: .item("fullBox"))
         let initialLoad = itemsInside.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 6)
 
@@ -490,7 +490,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The nearly full box is full.") // ActionError.containerIsFull
 
         // Assert No State Change
-        #expect(engine.item(with: "coin")?.parent == .player) // Coin still held
+        #expect(engine.item("coin")?.parent == .player) // Coin still held
         #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -526,7 +526,7 @@ struct InsertActionHandlerTests {
         let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInsideInitial = engine.items(withParent: .item("exactBox"))
+        let itemsInsideInitial = engine.items(in: .item("exactBox"))
         let initialLoad = itemsInsideInitial.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 5)
 
@@ -540,9 +540,9 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the half-full box.") // Success message
 
         // Assert Final State
-        #expect(engine.item(with: "coin")?.parent == .item("exactBox")) // Coin is in box
+        #expect(engine.item("coin")?.parent == .item("exactBox")) // Coin is in box
         // Final state check - Calculate manually
-        let itemsInsideFinal = engine.items(withParent: .item("exactBox"))
+        let itemsInsideFinal = engine.items(in: .item("exactBox"))
         let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
         #expect(finalLoad == 10) // Box is now full
 

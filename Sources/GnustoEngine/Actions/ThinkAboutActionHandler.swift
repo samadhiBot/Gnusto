@@ -17,7 +17,7 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
         if targetItemID.rawValue == "player" { return }
 
         // 3. Check if item exists
-        guard await context.engine.item(with: targetItemID) != nil else {
+        guard await context.engine.item(targetItemID) != nil else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
@@ -42,7 +42,7 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
             message = "Yes, yes, you're very important."
         } else {
             // Handle thinking about an item
-            guard let targetItem = await context.engine.item(with: targetItemID) else {
+            guard let targetItem = await context.engine.item(targetItemID) else {
                  // Should be caught by validate
                 throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
             }

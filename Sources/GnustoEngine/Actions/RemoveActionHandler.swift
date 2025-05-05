@@ -14,7 +14,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await context.engine.item(with: targetItemID),
+        guard let targetItem = await context.engine.item(targetItemID),
               targetItem.parent == .player else
         {
             throw ActionError.itemNotHeld(targetItemID)
@@ -34,7 +34,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // IDs and validation guaranteed by validate()
         let targetItemID = context.command.directObject!
-        guard let itemSnapshot = await context.engine.item(with: targetItemID) else {
+        guard let itemSnapshot = await context.engine.item(targetItemID) else {
             // Should not happen if validate passed
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for REMOVE.")
         }

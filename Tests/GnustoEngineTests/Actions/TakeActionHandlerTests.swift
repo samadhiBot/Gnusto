@@ -95,7 +95,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -135,7 +135,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
 
         // Assert Output
@@ -178,7 +178,7 @@ struct TakeActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check that the player is still holding nothing
-        #expect(engine.items(withParent: .player).isEmpty == true)
+        #expect(engine.items(in: .player).isEmpty == true)
     }
 
     @Test("Take item fails when not takable")
@@ -212,7 +212,7 @@ struct TakeActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item(with: "rock")
+        let finalItemState = engine.item("rock")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
     }
 
@@ -270,10 +270,10 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "gem")
+        let finalItemState = engine.item("gem")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
-        let finalContainerState = engine.item(with: "box")
+        let finalContainerState = engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
         #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
@@ -325,10 +325,10 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "coin")
+        let finalItemState = engine.item("coin")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
-        let finalContainerState = engine.item(with: "pouch")
+        let finalContainerState = engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
         #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
@@ -386,7 +386,7 @@ struct TakeActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item(with: "gem")
+        let finalItemState = engine.item("gem")
         #expect(finalItemState?.parent == .item("box"), "Item should still be in the box")
     }
 
@@ -430,7 +430,7 @@ struct TakeActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item(with: "chip")
+        let finalItemState = engine.item("chip")
         #expect(finalItemState?.parent == .item("statue"), "Chip should still be parented to statue")
     }
 
@@ -502,7 +502,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "cloak")
+        let finalItemState = engine.item("cloak")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
         #expect(finalItemState?.hasProperty(.worn) == false)
@@ -557,10 +557,10 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: itemOnSurface.id)
+        let finalItemState = engine.item(itemOnSurface.id)
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
-        let finalSurfaceState = engine.item(with: surfaceItem.id)
+        let finalSurfaceState = engine.item(surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
         #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
 
@@ -610,7 +610,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true) // Still touched
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -671,7 +671,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player) // Should succeed
         #expect(finalItemState?.hasProperty(.touched) == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -727,7 +727,7 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "fly")
+        let finalItemState = engine.item("fly")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasProperty(.touched) == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["fly"])
@@ -783,7 +783,7 @@ struct TakeActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item(with: "shield")
+        let finalItemState = engine.item("shield")
         #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
     }
 }

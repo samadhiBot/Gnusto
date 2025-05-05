@@ -29,7 +29,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.attributes["isOpen"] == nil)
+        #expect(engine.item("box")?.attributes["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
@@ -38,7 +38,7 @@ struct OpenActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalItemState = engine.item(with: "box")
+        let finalItemState = engine.item("box")
         let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open and .touched properties")
         #expect(finalItemState?.attributes == ["isOpen": true])
@@ -94,8 +94,8 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.attributes["isOpen"] == nil)
-        #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
+        #expect(engine.item("box")?.attributes["isOpen"] == nil)
+        #expect(engine.item("box")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
@@ -104,7 +104,7 @@ struct OpenActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalItemState = engine.item(with: "box")
+        let finalItemState = engine.item("box")
         let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open property and retain .touched")
         #expect(finalItemState?.attributes == ["isOpen": true])

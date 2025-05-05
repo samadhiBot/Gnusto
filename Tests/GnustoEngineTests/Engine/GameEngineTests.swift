@@ -468,7 +468,7 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.items(withParent: .player).isEmpty == true)
+        #expect(engine.items(in: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -483,13 +483,13 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = engine.item(with: "startItem")
+        let finalPebbleSnapshot = engine.item("startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.items(withParent: .player)
+        let finalInventorySnapshots = engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.items(withParent: .location("startRoom"))
+        let finalRoomSnapshots = engine.items(in: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
@@ -588,7 +588,7 @@ struct GameEngineTests {
 
         // Ensure initial state
         #expect(!engine.isFlagSet(testFlagKey))
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == false)
+        #expect(engine.item(testItemID)?.hasProperty(.on) == false)
         #expect(engine.getChangeHistory().isEmpty)
 
         // Act
@@ -598,8 +598,8 @@ struct GameEngineTests {
         // Then
         // Check final state
         #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
+        #expect(engine.item(testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
+        #expect(engine.item(testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = engine.getChangeHistory()

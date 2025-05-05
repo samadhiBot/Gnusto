@@ -14,7 +14,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
         }
 
@@ -26,7 +26,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await context.engine.item(with: parentItemID) else {
+            guard let parentItem = await context.engine.item(parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
@@ -66,7 +66,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         guard let targetItemID = context.command.directObject else {
             throw ActionError.internalEngineError("READ context.command reached process without direct object.")
         }
-        guard let targetItem = await context.engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
         }
 

@@ -655,7 +655,7 @@ public class GameEngine: Sendable {
         let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID)
 
         // 2. Asynchronously fetch Item objects/snapshots for the visible IDs
-        let visibleItems = visibleItemIDs.compactMap(item(with:))
+        let visibleItems = visibleItemIDs.compactMap(item(_:))
 
         // 3. Format and print the list if not empty
         if !visibleItems.isEmpty {
@@ -787,7 +787,7 @@ public class GameEngine: Sendable {
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            "The \(item(with: keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
+            "The \(item(keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
         }
         await ioHandler.print(message)
 
@@ -812,7 +812,7 @@ public class GameEngine: Sendable {
     }
 
     private func anySuch(_ itemID: ItemID) -> String {
-        if let item = item(with: itemID), item.hasFlag(.itemTouched) {
+        if let item = item(itemID), item.hasFlag(.itemTouched) {
             "the \(item.name)"
         } else {
             "any such thing"
@@ -829,7 +829,7 @@ public class GameEngine: Sendable {
         _ itemID: ItemID,
         alternate: String = "that"
     ) -> String {
-        if let item = item(with: itemID) {
+        if let item = item(itemID) {
             "the \(item.name)"
         } else {
             alternate
@@ -865,14 +865,14 @@ public class GameEngine: Sendable {
     /// Retrieves the current state of a specific item.
     /// - Parameter id: The `ItemID` of the item to retrieve.
     /// - Returns: An `Item` struct if the item is found, otherwise `nil`.
-    public func item(with id: ItemID) -> Item? {
+    public func item(_ id: ItemID) -> Item? {
         gameState.items[id]
     }
 
     /// Retrieves the current state of all items with a specific parent.
     /// - Parameter parent: The `ParentEntity` to filter items by.
     /// - Returns: An array of `Item` structs for items with the specified parent.
-    public func items(withParent parent: ParentEntity) -> [Item] {
+    public func items(in parent: ParentEntity) -> [Item] {
         gameState.items.values
             .filter { $0.parent == parent }
     }
@@ -956,7 +956,7 @@ public class GameEngine: Sendable {
     ///   - itemID: The ID of the item to move.
     ///   - newParent: The target parent entity.
     public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
-        guard let moveItem = item(with: itemID) else {
+        guard let moveItem = item(itemID) else {
             logger.warning(
                 "💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'."
             )
@@ -974,7 +974,7 @@ public class GameEngine: Sendable {
                 return
             }
         } else if case .item(let containerID) = newParent {
-             guard item(with: containerID) != nil else {
+             guard item(containerID) != nil else {
                  logger
                      .warning("""
                         💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \

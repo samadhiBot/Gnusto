@@ -70,17 +70,21 @@ struct UnlockActionHandlerTests {
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true, // Alphabetized flags
-            isLocked: true, // Start locked
-            isOpenable: true
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true,
+                .isOpenable: true,
+            ]
         )
         let initialKey = Item(
             id: "key",
             name: "small key",
             parent: .player, // Key is held
-            isTakable: true
+            attributes: [
+                .isTakable: true,
+            ]
         )
 
         let game = MinimalGame(items: [initialBox, initialKey])
@@ -93,9 +97,9 @@ struct UnlockActionHandlerTests {
         )
 
         // Check initial state
-        let initialBoxSnapshot = try #require(await engine.item(with: "box"))
+        let initialBoxSnapshot = try #require(engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(PropertyID.isLocked) == true) // Qualified PropertyID
-        let initialKeySnapshot = try #require(await engine.item(with: "key"))
+        let initialKeySnapshot = try #require(engine.item("key"))
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -109,11 +113,11 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        let finalBoxState = try #require(await engine.item(with: "box"))
+        let finalBoxState = try #require(await engine.item("box"))
         #expect(finalBoxState.hasFlag(PropertyID.isLocked) == false, "Box should be unlocked") // Qualified PropertyID
         #expect(finalBoxState.hasFlag(PropertyID.itemTouched) == true, "Box should be touched") // Qualified PropertyID
 
-        let finalKeyState = try #require(await engine.item(with: "key"))
+        let finalKeyState = try #require(await engine.item("key"))
         #expect(finalKeyState.hasFlag(PropertyID.itemTouched) == true, "Key should be touched") // Qualified PropertyID
 
         // Assert Change History
@@ -130,7 +134,14 @@ struct UnlockActionHandlerTests {
     @Test("Unlock fails with no direct object")
     func testUnlockFailsNoDirectObject() async throws {
         // Arrange: Player holds key
-        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ]
+        )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -161,10 +172,12 @@ struct UnlockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true,
-            isLocked: true
+            attributes: [
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true,
+                .lockKey: "key",
+            ]
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -193,9 +206,15 @@ struct UnlockActionHandlerTests {
     func testUnlockFailsKeyNotHeld() async throws {
         // Arrange: Key is in the room, not held; box is locked
         let box = Item(
-            id: "box", name: "box",
-            parent: .location("startRoom"), lockKey: "key",
-            isContainer: true, isLockable: true, isLocked: true
+            id: "box",
+            name: "box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true,
+                .lockKey: "key",
+            ]
         )
         let key = Item(id: "key", name: "key", parent: .location("startRoom"), isTakable: true) // Key also in room
         let game = MinimalGame(items: [box, key])
@@ -344,7 +363,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(await engine.item(with: "box"))
+        let initialBoxSnapshot = try #require(await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(PropertyID.isLocked) == false) // Qualified PropertyID
         #expect(engine.gameState.changeHistory.isEmpty == true)
 

@@ -32,7 +32,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "book")
+        let finalItemState = engine.item("book")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "It reads: \"Beware the Grue!\"")
@@ -74,7 +74,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "sign")
+        let finalItemState = engine.item("sign")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "DANGER AHEAD")
@@ -247,7 +247,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "paper")
+        let finalItemState = engine.item("paper")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "There's nothing written on the blank paper.")
@@ -288,7 +288,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "tablet")
+        let finalItemState = engine.item("tablet")
         #expect(finalItemState?.hasProperty(.touched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "Ancient Runes")
@@ -313,7 +313,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "scroll")?.hasProperty(.touched) == false)
+        #expect(engine.item("scroll")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
 
@@ -325,7 +325,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Beware the Grue!")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "scroll")
+        let finalItemState = engine.item("scroll")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -348,7 +348,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "note")?.hasProperty(.touched) == false)
+        #expect(engine.item("note")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
 
@@ -360,7 +360,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the blank note.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "note")
+        let finalItemState = engine.item("note")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -382,7 +382,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item(with: "tablet")?.hasProperty(.touched) == false)
+        #expect(engine.item("tablet")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -394,7 +394,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the stone tablet.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "tablet")
+        let finalItemState = engine.item("tablet")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -501,7 +501,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-         #expect(engine.item(with: "tablet")?.hasProperty(.touched) == false)
+         #expect(engine.item("tablet")?.hasProperty(.touched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -513,7 +513,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Luminous secrets!")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "tablet")
+        let finalItemState = engine.item("tablet")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -574,7 +574,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Meet at midnight.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "note")
+        let finalItemState = engine.item("note")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -614,7 +614,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Important news.")
 
         // Assert Final State
-        let finalItemState = engine.item(with: "letter")
+        let finalItemState = engine.item("letter")
         #expect(finalItemState?.hasProperty(.touched) == true)
     }
 
@@ -651,7 +651,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Also assert the item wasn't touched
-        let finalSecretState = engine.item(with: "secret")
+        let finalSecretState = engine.item("secret")
         #expect(finalSecretState?.hasProperty(.touched) == false)
     }
 }
