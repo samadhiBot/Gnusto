@@ -1,7 +1,4 @@
-import Foundation // Needed for Codable conformance for classes
-
-/// A closure that dynamically generates a description string for an Item based on its state and the overall GameState.
-public typealias ItemDescriptionHandler = @MainActor @Sendable (Item, GameState) async -> String?
+import Foundation
 
 /// Represents an interactive object in the game world.
 public struct Item: Codable, Identifiable, Sendable {
@@ -16,7 +13,7 @@ public struct Item: Codable, Identifiable, Sendable {
 
     /// A dictionary that holds the item's current attributes.
     ///
-    /// Some attributes are static under normal circumstances, but all can change if necessary.
+    /// Some attributes are static under normal circumstances, but any can change when necessary.
     public var attributes: [PropertyID: StateValue]
 
     public init(
@@ -43,7 +40,7 @@ public struct Item: Codable, Identifiable, Sendable {
 //        case id, name, adjectives, synonyms, size, capacity, parent, lockKey, attributes
 //    }
 
-    // init(from:) and encode(to:) implicitly handle dynamicValues
+    // init(from:) and encode(to:) implicitly handle attributes
     // No changes needed here unless we want custom logic beyond default Codable behavior.
 
     // MARK: - Convenience Accessors
@@ -58,7 +55,7 @@ public struct Item: Codable, Identifiable, Sendable {
         attributes[.capacity]?.toInt ?? .max
     }
 
-    /// Checks if a boolean flag is set in the item's `dynamicValues`.
+    /// Checks if a boolean flag is set in the item's `attributes`.
     /// - Parameter id: The `PropertyID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
     public func flag(_ id: PropertyID) -> Bool {

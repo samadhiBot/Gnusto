@@ -366,7 +366,7 @@ struct GameStateTests {
         // modifies a *copy*. To persist, reassign to the dictionary.
         // This test might need rethinking if direct mutation isn't the goal.
         var woh = state.locations[Self.locWOH]!
-        woh.dynamicValues[.description] = .string("A new description.")
+        woh.attributes[.description] = .string("A new description.")
         state.locations[Self.locWOH] = woh
 
         var lantern = state.items[Self.itemLantern]!
@@ -385,7 +385,7 @@ struct GameStateTests {
 
         // Assertions for the valid modifications:
         #expect(
-            state.locations[Self.locWOH]?.dynamicValues[.description] == .string("A new description.")
+            state.locations[Self.locWOH]?.attributes[.description] == .string("A new description.")
         )
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
@@ -425,7 +425,7 @@ struct GameStateTests {
 
         // Check content of locations (comparing key properties)
         #expect(decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
-        #expect(decodedState.locations[Self.locNorth]?.dynamicValues[.description] == originalState.locations[Self.locNorth]?.dynamicValues[.description])
+        #expect(decodedState.locations[Self.locNorth]?.attributes[.description] == originalState.locations[Self.locNorth]?.attributes[.description])
 
         // Check content of items (comparing key properties, including parent)
         #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)
@@ -576,7 +576,7 @@ struct GameStateTests {
         if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps == [.inherentlyLit]) }
         else { Issue.record("NewValue wrong type") }
         // Verify description remains untouched initially
-        #expect(state.locations["testLoc"]?.dynamicValues[.description] == .string("Original Desc"))
+        #expect(state.locations["testLoc"]?.attributes[.description] == .string("Original Desc"))
     }
 
     @Test("apply - Modify Location Properties - Remove")
@@ -601,7 +601,7 @@ struct GameStateTests {
         if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps.isEmpty) }
         else { Issue.record("NewValue wrong type") }
         // Verify description remains untouched
-        #expect(state.locations["testLoc"]?.dynamicValues[.description] == .string("Original Desc"))
+        #expect(state.locations["testLoc"]?.attributes[.description] == .string("Original Desc"))
     }
 
     @Test("apply - Modify Location Dynamic Value")
@@ -640,7 +640,7 @@ struct GameStateTests {
         let correctChange = StateChange(
             entityId: .location("startRoom"),
             propertyKey: .locationDynamicValue(key: .description),
-            oldValue: state.locations["startRoom"]?.dynamicValues[.description], // Correct old value
+            oldValue: state.locations["startRoom"]?.attributes[.description], // Correct old value
             newValue: .string("New Description")
         )
 
@@ -658,12 +658,12 @@ struct GameStateTests {
         }
 
         // Verify the state hasn't changed
-        #expect(state.locations["startRoom"]?.dynamicValues[.description] == correctChange.oldValue)
+        #expect(state.locations["startRoom"]?.attributes[.description] == correctChange.oldValue)
         #expect(state.changeHistory.isEmpty) // No change should be recorded
 
         // Now apply the correct change
         try? state.apply(correctChange) // Use try? as we don't care about the error here
-        #expect(state.locations["startRoom"]?.dynamicValues[.description] == correctChange.newValue)
+        #expect(state.locations["startRoom"]?.attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }
 }

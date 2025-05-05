@@ -26,21 +26,22 @@ public struct PropertyID: Hashable, Comparable, Codable, ExpressibleByStringLite
 // MARK: - General Property IDs
 
 public extension PropertyID {
-    /// Adjectives associated with the item (e.g., "brass", "small"), used for disambiguation.
+    /// Adjectives associated with an item (e.g., "brass", "small"), used for disambiguation.
     static let adjectives = PropertyID("adjectives")
 
     /// The carrying capacity of a container item.
     static let capacity = PropertyID("capacity")
 
-    /// The key needed to lock/unlock this item (if `.isLockable`).
+    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
+    static let localItems = PropertyID("localItems")
+
+    /// The key needed to lock/unlock an item (if `.isLockable`).
     static let lockKey = PropertyID("lockKey")
 
     /// An item's size, influencing carrying capacity and container limits.
-    ///
-    /// An item's default size is 5 if unspecified, per ZILF docs.
     static let size = PropertyID("size")
 
-    /// Synonyms for the item's name (e.g., "lamp", "light").
+    /// Synonyms for an item (e.g., "lamp", "light").
     static let synonyms = PropertyID("synonyms")
 }
 

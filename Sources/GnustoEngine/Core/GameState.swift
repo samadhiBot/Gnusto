@@ -285,7 +285,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationDynamicValue change ('\(key.rawValue)')")
             }
-            locations[locationID]?.dynamicValues[key] = change.newValue
+            locations[locationID]?.attributes[key] = change.newValue
 
         // MARK: Player Properties
 
@@ -562,7 +562,7 @@ public struct GameState: Codable, Equatable, Sendable {
              guard case .location(let locationID) = change.entityId else {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for locationDynamicValue")
              }
-             actualCurrentValue = locations[locationID]?.dynamicValues[key]
+             actualCurrentValue = locations[locationID]?.attributes[key]
         }
 
         // Perform the validation

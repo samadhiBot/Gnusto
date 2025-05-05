@@ -1132,7 +1132,7 @@ extension GameEngine {
 
     /// Retrieves the current value of a potentially dynamic item property.
     /// Checks the `DynamicPropertyRegistry` for a compute handler first.
-    /// If no handler exists, returns the value stored in the item's `dynamicValues`.
+    /// If no handler exists, returns the value stored in the item's `attributes`.
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item.
@@ -1182,7 +1182,7 @@ extension GameEngine {
                 return nil
             }
         } else {
-            return location.dynamicValues[key]
+            return location.attributes[key]
         }
     }
 
@@ -1260,7 +1260,7 @@ extension GameEngine {
             }
         }
 
-        let oldValue = location.dynamicValues[key]
+        let oldValue = location.attributes[key]
 
         if oldValue != newValue {
             let change = StateChange(

@@ -3,7 +3,7 @@ import Foundation
 /// A registry to hold dynamically computed logic and validation rules for properties.
 ///
 /// This registry separates the behavioral aspects of properties (computation, validation)
-/// from their state storage (which resides in `Item.dynamicValues` or `Location.dynamicValues`).
+/// from their state storage (which resides in `Item.attributes` or `Location.attributes`).
 public struct DynamicPropertyRegistry: Sendable {
 
     // MARK: - Handler Type Aliases

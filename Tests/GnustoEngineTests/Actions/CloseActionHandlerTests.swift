@@ -107,7 +107,7 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
-            // dynamicValues: [.isOpen: .bool(false)] is the default
+            // attributes: [.isOpen: .bool(false)] is the default
             isContainer: true,
             isOpenable: true
         )

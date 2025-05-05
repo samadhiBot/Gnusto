@@ -26,7 +26,7 @@ struct DynamicPropertyTests {
         var testItem = Item(
             id: TestIDs.testItem,
             name: "widget",
-//            dynamicValues: initialItemValues, // Set manually after init if needed
+//            attributes: initialItemValues, // Set manually after init if needed
             parent: .location(TestIDs.testLocation)
         )
         testItem.attributes = initialItemValues // Assign initial values
@@ -34,7 +34,7 @@ struct DynamicPropertyTests {
         var testLocation = Location(
             id: TestIDs.testLocation,
             name: "Test Chamber",
-//            dynamicValues: initialLocationValues // Set manually after init if needed
+//            attributes: initialLocationValues // Set manually after init if needed
         )
         testLocation.dynamicValues = initialLocationValues // Assign initial values
 
