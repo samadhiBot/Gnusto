@@ -180,13 +180,13 @@ struct ActionResultTests {
 
     // Example StateChanges for testing
     private let change1 = StateChange(
-        entityId: .item(id: "lamp"),
+        entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isOn),
         oldValue: .bool(false),
         newValue: .bool(true)
     )
     private let change2 = StateChange(
-        entityId: .item(id: "lamp"),
+        entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isTouched),
         oldValue: .bool(false),
         newValue: .bool(true)
@@ -211,7 +211,7 @@ struct ActionResultTests {
         // Check specific merged changes (adjust based on what change1, change2 etc. represent)
         #expect(
             mergedResult.changes.contains {
-                $0.entityId == .item(id: "lamp") &&
+                $0.entityId == .item("lamp") &&
                 $0.propertyKey == .itemAttribute(.isOn) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2 (no change for this specific prop)
@@ -219,7 +219,7 @@ struct ActionResultTests {
         )
         #expect(
             mergedResult.changes.contains {
-                $0.entityId == .item(id: "lamp") &&
+                $0.entityId == .item("lamp") &&
                 $0.propertyKey == .itemAttribute(.isTouched) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2
@@ -235,7 +235,7 @@ struct ActionResultTests {
         )
         #expect(
             mergedResult.changes.contains {
-                $0.entityId == .item(id: "key") &&
+                $0.entityId == .item("key") &&
                 $0.propertyKey == .itemParent &&
                 $0.oldValue == .parent(.player) &&
                 $0.newValue == .parent(.location(id: "hall"))
@@ -269,7 +269,7 @@ struct ActionResultTests {
             message: .init(text: "Turned on lamp and noted visit."),
             changes: [
                 StateChange( // Turn lamp on
-                    entityId: .item(id: "lamp"),
+                    entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
@@ -297,7 +297,7 @@ struct ActionResultTests {
             message: .init(text: "Turned on lamp."),
             changes: [
                 StateChange(
-                    entityId: .item(id: "lamp"),
+                    entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // Expects lamp to be off
                     newValue: .bool(true)
@@ -315,7 +315,7 @@ struct ActionResultTests {
             message: .init(text: "Turned on non-existent lamp."),
             changes: [
                 StateChange(
-                    entityId: .item(id: "lamp"), // Refers to non-existent item
+                    entityId: .item("lamp"), // Refers to non-existent item
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
@@ -333,7 +333,7 @@ struct ActionResultTests {
             message: .init(text: "Incorrect property key."),
             changes: [
                 StateChange(
-                    entityId: .item(id: "lamp"),
+                    entityId: .item("lamp"),
                     propertyKey: .locationAttribute(.locationVisited), // Wrong key type for item
                     oldValue: .bool(false),
                     newValue: .bool(true)
@@ -366,7 +366,7 @@ struct ActionResultTests {
             changes: [
                 // Turn lamp on
                 StateChange(
-                    entityId: .item(id: "lamp"),
+                    entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
@@ -415,7 +415,7 @@ struct ActionResultTests {
             message: .init(text: "Failed to apply."),
             changes: [
                 StateChange(
-                    entityId: .item(id: "lamp"),
+                    entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // This validation will fail
                     newValue: .bool(true)
@@ -435,7 +435,7 @@ struct ActionResultTests {
         newValue: StateValue
     ) -> StateChange {
         StateChange(
-            entityId: .item(id: id),
+            entityId: .item(id),
             propertyKey: .itemAttribute(key),
             oldValue: oldValue,
             newValue: newValue
@@ -502,8 +502,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         #expect(mergedResult.changes.count == 2)
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.isOn) })
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "torch") && $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item("lamp") && $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item("torch") && $0.propertyKey == .itemAttribute(.isOn) })
     }
 
     @Test func testMergeOverlappingChanges_SameEntityDifferentProperty() throws {
@@ -521,8 +521,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         #expect(mergedResult.changes.count == 2)
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.isOn) })
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.itemValue) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item("lamp") && $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item("lamp") && $0.propertyKey == .itemAttribute(.itemValue) })
     }
 
     @Test func testMergeOverlappingChanges_SameEntitySameProperty() throws {
@@ -541,7 +541,7 @@ struct ActionResultTests {
         // ... existing code ...
         #expect(mergedResult.changes.count == 1) // Should coalesce
         let finalChange = try #require(mergedResult.changes.first)
-        #expect(finalChange.entityId == .item(id: "lamp"))
+        #expect(finalChange.entityId == .item("lamp"))
         #expect(finalChange.propertyKey == .itemAttribute(.isOn))
         #expect(finalChange.oldValue == .bool(false)) // Original old value from result1
         #expect(finalChange.newValue == .bool(false)) // Final new value from result2
@@ -551,7 +551,7 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "Take lamp."),
             changes: [
-                createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parent(.location(id: "room")), newValue: .parent(.player)),
+                createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parentEntity(.location(id: "room")), newValue: .parentEntity(.player)),
                 createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(false), newValue: .bool(true)),
             ]
         )
@@ -566,7 +566,7 @@ struct ActionResultTests {
         let result3 = ActionResult(
             message: .init(text: "Drop lamp."),
             changes: [
-                createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parent(.player), newValue: .parent(.location(id: "floor"))),
+                createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parentEntity(.player), newValue: .parentEntity(.location(id: "floor"))),
                 // Touched again
                 createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(true), newValue: .bool(true)),
             ]

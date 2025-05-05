@@ -50,19 +50,19 @@ struct RemoveActionHandlerTests {
         // Assert Change History
         let expectedChanges = [
             StateChange(
-                entityId: .item(id: "cloak"),
+                entityId: .item("cloak"),
                 propertyKey: .itemParent,
-                oldValue: .parent(.player),
-                newValue: .parent(.location(id: "startRoom"))
+                oldValue: .parentEntity(.player),
+                newValue: .parentEntity(.location(id: "startRoom"))
             ),
             StateChange(
-                entityId: .item(id: "cloak"),
+                entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             ),
             StateChange(
-                entityId: .item(id: "cloak"),
+                entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false), // Assuming not touched before removal
                 newValue: .bool(true)

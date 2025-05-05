@@ -21,17 +21,17 @@ struct TakeActionHandlerTests {
         var changes = [
             // Parent change
             StateChange(
-                entityId: .item(id: itemID),
+                entityId: .item(itemID),
                 propertyKey: .itemParent,
-                oldValue: .parent(initialParent),
-                newValue: .parent(finalParent)
+                oldValue: .parentEntity(initialParent),
+                newValue: .parentEntity(finalParent)
             ),
         ]
 
         // Add touched change only if it actually changes
         if initialTouched != finalTouched {
             changes.append(StateChange(
-                entityId: .item(id: itemID),
+                entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(initialTouched),
                 newValue: .bool(finalTouched)
@@ -43,9 +43,9 @@ struct TakeActionHandlerTests {
            let finalLightValue = finalLight // Ensure finalLight is not nil if different
         {
             changes.append(StateChange(
-                entityId: .item(id: itemID),
-                propertyKey: .itemAttribute(.itemLight), // Assuming .itemLight is the correct ID
-                oldValue: initialLight.map { .bool($0) }, // Map optional Bool to optional StateValue
+                entityId: .item(itemID),
+                propertyKey: .itemAttribute(.isLit),
+                oldValue: initialLight.map { .bool($0) },
                 newValue: .bool(finalLightValue)
             ))
         }

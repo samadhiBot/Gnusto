@@ -11,22 +11,43 @@ struct CloseActionHandlerTests {
     // Helper to create the expected StateChange array for successful close
     private func expectedCloseChanges(
         itemID: ItemID,
-        oldProperties: Set<ItemProperty>
+        initialAttributes: [PropertyID: StateValue]
     ) -> [StateChange] {
-        var finalProperties = oldProperties
-        finalProperties.insert(.touched)
+        var changes: [StateChange] = []
 
-        if oldProperties != finalProperties {
-            let change = StateChange(
+        // Change 1: isOpen becomes false
+        changes.append(
+            StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(finalProperties)
+                propertyKey: .itemAttribute(.isOpen),
+                oldValue: .bool(true), // Assume it was open before closing
+                newValue: .bool(false)
             )
-            return [change]
+        )
+
+        // Change 2: Item touched (if needed)
+        if initialAttributes[.isTouched] != .bool(true) {
+            changes.append(
+                StateChange(
+                    entityId: .item(itemID),
+                    propertyKey: .itemAttribute(.isTouched),
+                    oldValue: .bool(false),
+                    newValue: .bool(true)
+                )
+            )
         }
-        // No pronoun changes expected for closing
-        return []
+
+        // Change 3: Pronoun "it"
+        changes.append(
+             StateChange(
+                 entityId: .global,
+                 propertyKey: .pronounReference(pronoun: "it"),
+                 oldValue: nil,
+                 newValue: .itemIDSet([itemID])
+             )
+        )
+
+        return changes
     }
 
     // Helper to create the expected StateChange for setting isOpen to false
@@ -63,7 +84,7 @@ struct CloseActionHandlerTests {
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
         // Initial state check
-        let initialBox = await engine.item("box")
+        let initialBox = engine.item("box")
         #expect(initialBox?.attributes[.isOpen] == .bool(true)) // Qualified key
         #expect(engine.gameState.changeHistory.isEmpty)
 
@@ -71,7 +92,7 @@ struct CloseActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalBox = await engine.item("box")
+        let finalBox = engine.item("box")
         #expect(finalBox?.attributes[.isOpen] == .bool(false)) // Qualified key
         #expect(finalBox?.hasFlag(PropertyID.isTouched) == true)
 
@@ -80,26 +101,7 @@ struct CloseActionHandlerTests {
         expectNoDifference(output, "You close the wooden box.")
 
         // Assert Change History
-        let expectedChanges = [
-            StateChange(
-                entityId: .item("box"),
-                propertyKey: .itemAttribute(.isOpen), // Correct key
-                oldValue: .bool(true),
-                newValue: .bool(false)
-            ),
-            StateChange(
-                entityId: .item("box"),
-                propertyKey: .itemAttribute(.isTouched), // Correct key
-                oldValue: .bool(false), // Assuming not touched before close
-                newValue: .bool(true)
-            ),
-            StateChange(
-                entityId: .global,
-                propertyKey: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Assuming previous 'it' is irrelevant
-                newValue: .itemIDSet(["box"])
-            )
-        ]
+        let expectedChanges = expectedCloseChanges(itemID: "box", initialAttributes: initialBox?.attributes ?? [:])
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 

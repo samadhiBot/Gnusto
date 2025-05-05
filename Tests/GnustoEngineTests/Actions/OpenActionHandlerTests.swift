@@ -6,19 +6,59 @@ import Testing
 @MainActor
 @Suite("OpenActionHandler Tests")
 struct OpenActionHandlerTests {
-    let handler = OpenActionHandler()
+    // Helper function for expected state changes during a successful open
+    private func expectedOpenChanges(
+        itemID: ItemID,
+        initialAttributes: [PropertyID: StateValue]?
+    ) -> [StateChange] {
+        var changes: [StateChange] = []
+
+        // Change 1: isOpen becomes true
+        changes.append(
+            StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemAttribute(.isOpen),
+                oldValue: initialAttributes?[.isOpen] ?? .bool(false), // Check initial state
+                newValue: .bool(true)
+            )
+        )
+
+        // Change 2: Item touched (if needed)
+        if initialAttributes?[.isTouched] != .bool(true) {
+            changes.append(
+                StateChange(
+                    entityId: .item(itemID),
+                    propertyKey: .itemAttribute(.isTouched),
+                    oldValue: initialAttributes?[.isTouched] ?? .bool(false),
+                    newValue: .bool(true)
+                )
+            )
+        }
+
+        // Change 3: Pronoun "it"
+        changes.append(
+            StateChange(
+                entityId: .global,
+                propertyKey: .pronounReference(pronoun: "it"),
+                oldValue: nil, // Assume no prior "it" for simplicity
+                newValue: .itemIDSet([itemID])
+            )
+        )
+
+        return changes
+    }
 
     @Test("Open item successfully")
     func testOpenItemSuccessfully() async throws {
         // Arrange
-        var closedBox = Item(
+        let closedBox = Item(
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true
-                // Starts closed (no .isOpen)
+                // Starts closed (no .isOpen attribute)
             ]
         )
 
@@ -32,54 +72,35 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item("box")?.attributes["isOpen"] == nil)
+        let initialBoxState = engine.item("box")
+        #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
+        #expect(!initialBoxState!.hasFlag(.isTouched), "Box should start untouched")
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
 
-        // Act: Call the engine's execute method to use the full enhanced pipeline
+        // Act: Call the engine's execute method
         await engine.execute(command: command)
-
-        // Assert State Change
-        let finalItemState = engine.item("box")
-        let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
-        #expect(finalItemState?.properties == expectedProperties, "Item should gain .open and .touched properties")
-        #expect(finalItemState?.attributes == ["isOpen": true])
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        #expect(engine.gameState.changeHistory.count == 2)
-
-        // Change 1: isOpen becomes true (applied internally)
-        let expectedOpenChange = StateChange(
-            entityId: .item("box"),
-            propertyKey: .itemAttribute(.isOpen),
-            oldValue: nil, // Or .bool(false) if explicitly set
-            newValue: .bool(true)
-        )
-
-        // Change 2: .touched added to properties (returned by handler)
-        var expectedTouchedProps = expectedProperties
-        expectedTouchedProps.insert(.touched)
-        let expectedTouchedChange = StateChange(
-            entityId: .item("box"),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(expectedProperties),
-            newValue: .itemPropertySet(expectedTouchedProps)
-        )
-
-        // Verify both changes are present (order might matter)
-        let expectedChanges = [expectedOpenChange, expectedTouchedChange]
+        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+
+        // Optional: Verify final state via snapshot if needed for complex scenarios,
+        // but primarily rely on change history for handler correctness.
+        let finalBoxState = engine.item("box")
+        #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
+        #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should be touched")
     }
 
     @Test("Open item that is already touched")
     func testOpenItemAlreadyTouched() async throws {
         // Arrange: Item is openable, closed, and already touched
-        var closedBox = Item(
+        let closedBox = Item(
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
@@ -100,8 +121,9 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item("box")?.attributes["isOpen"] == nil)
-        #expect(engine.item("box")?.hasFlag(.isTouched))
+        let initialBoxState = engine.item("box")
+        #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
+        #expect(initialBoxState!.hasFlag(.isTouched), "Box should start touched")
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
@@ -109,30 +131,20 @@ struct OpenActionHandlerTests {
         // Act: Call the engine's execute method
         await engine.execute(command: command)
 
-        // Assert State Change
-        let finalItemState = engine.item("box")
-        let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
-        #expect(finalItemState?.properties == expectedProperties, "Item should gain .open property and retain .touched")
-        #expect(finalItemState?.attributes == ["isOpen": true])
-
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        #expect(engine.gameState.changeHistory.count == 1)
-
-        // Change 1: isOpen becomes true (applied internally)
-        let expectedOpenChange = StateChange(
-            entityId: .item("box"),
-            propertyKey: .itemAttribute(.isOpen),
-            oldValue: nil, // Or .bool(false) if explicitly set
-            newValue: .bool(true)
-        )
-
-        // Since it starts touched, only the isOpen change should be present
-        let expectedChanges = [expectedOpenChange]
+        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
+        // Should not include .isTouched change as it was already true
+        #expect(expectedChanges.count == 2) // isOpen + pronoun
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+
+        // Optional: Verify final state
+        let finalBoxState = engine.item("box")
+        #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
+        #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should still be touched")
     }
 
     @Test("Open fails with no direct object")
@@ -167,8 +179,8 @@ struct OpenActionHandlerTests {
             name: "box",
             parent: .nowhere,
             attributes: [
-                .isOpenable: true,
-                .isOpen: true // Setting initial state to open for this test
+                .isOpenable: true
+                // Don't need .isOpen: true here, it's not reachable anyway
             ]
         )
         let game = MinimalGame(items: [box])
@@ -182,7 +194,8 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        // Updated expected message for inaccessible items
+        expectNoDifference(output, "You see no box here.")
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -213,7 +226,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't open the heavy rock.")
+        expectNoDifference(output, "That's not something you can open.") // More standard message
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -225,12 +238,12 @@ struct OpenActionHandlerTests {
         let openBox = Item(
             id: "box",
             name: "wooden box",
+            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true // Already open
-            ],
-            parent: .location("startRoom")
+            ]
         )
 
         let game = MinimalGame(items: [openBox])
@@ -249,7 +262,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is already open.")
+        expectNoDifference(output, "It's already open.") // More standard message
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -261,12 +274,12 @@ struct OpenActionHandlerTests {
         let lockedChest = Item(
             id: "chest",
             name: "iron chest",
+            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isLocked: true // Locked
-            ],
-            parent: .location("startRoom")
+            ]
         ) // Locked
 
         let game = MinimalGame(items: [lockedChest])
@@ -285,7 +298,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The iron chest is locked.")
+        expectNoDifference(output, "The iron chest appears to be locked.") // More standard message
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
