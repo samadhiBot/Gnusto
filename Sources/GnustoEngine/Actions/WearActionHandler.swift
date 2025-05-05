@@ -21,12 +21,12 @@ public struct WearActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if the (held) item is wearable
-        guard targetItem.flag(.isWearable) else {
+        guard targetItem.hasFlag(.isWearable) else {
             throw ActionError.itemNotWearable(targetItemID)
         }
 
         // 4. Check if already worn
-        guard !targetItem.flag(.isWorn) else {
+        guard !targetItem.hasFlag(.isWorn) else {
             throw ActionError.itemIsAlreadyWorn(targetItemID)
         }
     }

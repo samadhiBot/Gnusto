@@ -39,10 +39,10 @@ public struct LockActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check item properties
-        guard targetItem.flag(.isLockable) else {
+        guard targetItem.hasFlag(.isLockable) else {
             throw ActionError.itemNotLockable(targetItemID)
         }
-        guard !targetItem.flag(.isLocked) else {
+        guard !targetItem.hasFlag(.isLocked) else {
             // Don't throw, let process handle the message
             return
         }
@@ -67,7 +67,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         }
 
         // Handle case: Already locked (detected in validate)
-        if targetItem.flag(.isLocked) {
+        if targetItem.hasFlag(.isLocked) {
             // Manually construct definite article message
             return ActionResult(success: false, message: "The \(targetItem.name) is already locked.")
         }

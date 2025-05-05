@@ -38,10 +38,10 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check item properties
-        guard targetItem.flag(.isLockable) else {
+        guard targetItem.hasFlag(.isLockable) else {
             throw ActionError.itemNotUnlockable(targetItemID)
         }
-        guard targetItem.flag(.isLocked) else {
+        guard targetItem.hasFlag(.isLocked) else {
             // Target is already unlocked. Don't throw, let process handle the message.
             return
         }
@@ -65,7 +65,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         }
 
         // Handle case: Already unlocked (detected in validate)
-        if !targetItem.flag(.isLocked) {
+        if !targetItem.hasFlag(.isLocked) {
             // Manually construct definite article message
             return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
         }

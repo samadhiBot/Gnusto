@@ -95,7 +95,7 @@ struct InsertActionHandlerTests {
             isOpenable: true
         )
         let initialParent = initialCoin.parent
-        let initialItemTouched = initialCoin.flag(PropertyID.itemTouched)
+        let initialItemTouched = initialCoin.hasFlag(PropertyID.itemTouched)
         let initialContainerTouched = initialBox.flag(PropertyID.itemTouched)
 
         let game = MinimalGame(items: [initialCoin, initialBox])

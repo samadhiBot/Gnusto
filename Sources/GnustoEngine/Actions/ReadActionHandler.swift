@@ -51,13 +51,13 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // 4. Check if room is lit (unless item provides light)
         let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-        let providesLight = targetItem.flag(.isLightSource) && targetItem.flag(.isOn)
+        let providesLight = targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isOn)
         guard isLit || providesLight else {
             throw ActionError.roomIsDark
         }
 
         // 5. Check if item is readable
-        guard targetItem.flag(.isReadable) else {
+        guard targetItem.hasFlag(.isReadable) else {
             throw ActionError.itemNotReadable(targetItemID)
         }
     }

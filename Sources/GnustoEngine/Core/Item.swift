@@ -33,16 +33,6 @@ public struct Item: Codable, Identifiable, Sendable {
         self.attributes = initial
     }
 
-    // MARK: - Codable Conformance
-
-//    private enum CodingKeys: String, CodingKey {
-//        // Removed 'properties'
-//        case id, name, adjectives, synonyms, size, capacity, parent, lockKey, attributes
-//    }
-
-    // init(from:) and encode(to:) implicitly handle attributes
-    // No changes needed here unless we want custom logic beyond default Codable behavior.
-
     // MARK: - Convenience Accessors
 
     /// Adjectives associated with the item (e.g., "brass", "small" for lantern).
@@ -58,7 +48,7 @@ public struct Item: Codable, Identifiable, Sendable {
     /// Checks if a boolean flag is set in the item's `attributes`.
     /// - Parameter id: The `PropertyID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
-    public func flag(_ id: PropertyID) -> Bool {
+    public func hasFlag(_ id: PropertyID) -> Bool {
         attributes[id] == .bool(true)
     }
     

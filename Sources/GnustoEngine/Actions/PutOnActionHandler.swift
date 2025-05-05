@@ -47,7 +47,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         }
 
         // 4. Target Checks (Specific to PUT ON)
-        guard surfaceItem.flag(.isSurface) else {
+        guard surfaceItem.hasFlag(.isSurface) else {
             throw ActionError.targetIsNotASurface(surfaceID)
         }
         // TODO: Add surface capacity/volume checks?

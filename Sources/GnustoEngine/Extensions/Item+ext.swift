@@ -6,7 +6,7 @@ extension Item {
     /// Uses the simple rule: "an" if the string starts with a vowel (a, e, i, o, u), ignoring case,
     /// and "a" otherwise. Handles empty strings gracefully.
     var withIndefiniteArticle: String {
-        guard !flag(.suppressArticle), let firstChar = name.first?.lowercased() else {
+        guard !hasFlag(.suppressArticle), let firstChar = name.first?.lowercased() else {
             return name
         }
         let vowels: Set<Character> = ["a", "e", "i", "o", "u"]

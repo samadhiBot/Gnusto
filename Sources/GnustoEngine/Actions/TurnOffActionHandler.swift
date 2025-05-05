@@ -23,12 +23,12 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if the item has the `.device` property.
-        guard targetItem.flag(.isDevice) else {
+        guard targetItem.hasFlag(.isDevice) else {
             throw ActionError.prerequisiteNotMet("You can't turn that off.")
         }
 
         // 5. Check if the item is already off (lacks `.on`).
-        guard targetItem.flag(.isOn) else {
+        guard targetItem.hasFlag(.isOn) else {
             throw ActionError.customResponse("It's already off.")
         }
     }
@@ -70,13 +70,13 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         messageParts.append("The \(targetItem.name) is now off.")
 
         // Check if location became dark
-        let isLightSourceBeingTurnedOff = targetItem.flag(.isLightSource)
+        let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         if isLightSourceBeingTurnedOff {
             let currentLocationID = await context.engine.gameState.player.currentLocationID
             let currentLocation = await context.engine.location(with: currentLocationID)
 
             // 1. Is the room inherently lit?
-            let locationIsInherentlyLit = currentLocation?.flag(.inherentlyLit) ?? false
+            let locationIsInherentlyLit = currentLocation?.hasFlag(.inherentlyLit) ?? false
 
             if !locationIsInherentlyLit {
                 // 2. Check for other active light sources (inventory or location)
@@ -85,8 +85,8 @@ struct TurnOffActionHandler: EnhancedActionHandler {
                     guard item.id != targetItemID else { return false } // Exclude the item being turned off
                     let isInPlayerInventory = item.parent == .player
                     let isInCurrentLocation = item.parent == .location(currentLocationID)
-                    let providesLight = item.flag(.isLightSource)
-                    let isOn = item.flag(.isOn)
+                    let providesLight = item.hasFlag(.isLightSource)
+                    let isOn = item.hasFlag(.isOn)
                     return (isInPlayerInventory || isInCurrentLocation) && providesLight && isOn
                 }
 

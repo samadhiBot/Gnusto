@@ -46,7 +46,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
 
         // 4. Target Checks (Specific to INSERT)
-        guard containerItem.flag(.isContainer) else {
+        guard containerItem.hasFlag(.isContainer) else {
             throw ActionError.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state

@@ -49,15 +49,15 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // Priority 1: Readable Text (Check dynamic value)
         let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .readText)
-        if targetItem.flag(.isReadable), let text = readTextValue?.toString, !text.isEmpty {
+        if targetItem.hasFlag(.isReadable), let text = readTextValue?.toString, !text.isEmpty {
             message = text
         }
         // Priority 2: Container/Door Description
-        else if targetItem.flag(.isContainer) || targetItem.flag(.isDoor) {
+        else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
             message = await describeContainerOrDoor(targetItem: targetItem, engine: context.engine)
         }
         // Priority 3: Surface Description
-        else if targetItem.flag(.isSurface) {
+        else if targetItem.hasFlag(.isSurface) {
             message = await describeSurface(targetItem: targetItem, engine: context.engine)
         }
         // Priority 4: Dynamic Long Description
@@ -94,7 +94,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // Check dynamic property for open state
         let isOpen = await engine.getDynamicItemValue(itemID: targetItem.id, key: .isOpen)?.toBool ?? false
-        let isTransparent = targetItem.flag(.isTransparent)
+        let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {
             let contents = await engine.items(withParent: .item(targetItem.id))

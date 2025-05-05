@@ -587,8 +587,8 @@ public struct StandardParser: Parser {
         let mustBeContainer = requiredConditions.contains(.container)
 
         func checkItemConditions(_ item: Item) -> Bool {
-            if mustBePerson && !item.flag(.isPerson) { return false }
-            if mustBeContainer && !item.flag(.isContainer) { return false }
+            if mustBePerson && !item.hasFlag(.isPerson) { return false }
+            if mustBeContainer && !item.hasFlag(.isContainer) { return false }
             return true
         }
 
@@ -610,7 +610,7 @@ public struct StandardParser: Parser {
                              if let container = allItems[containerID],
                                 (container.parent == .player || container.parent == .location(currentLocationID)) {
                                  let isContainerOpen = container.attributes[.isOpen]?.toBool ?? false
-                                 if (container.flag(.isContainer) && isContainerOpen) || container.flag(.isSurface) {
+                                 if (container.hasFlag(.isContainer) && isContainerOpen) || container.hasFlag(.isSurface) {
                                      meetsScopeCondition = true
                                  }
                              }
@@ -625,7 +625,7 @@ public struct StandardParser: Parser {
                 }
 
                 let isContainerOpen = item.attributes[.isOpen]?.toBool ?? false
-                if (item.flag(.isContainer) && isContainerOpen) || item.flag(.isSurface) {
+                if (item.hasFlag(.isContainer) && isContainerOpen) || item.hasFlag(.isSurface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }
             }

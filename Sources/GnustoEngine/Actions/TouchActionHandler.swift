@@ -33,9 +33,9 @@ public struct TouchActionHandler: EnhancedActionHandler {
             let parentParent = parentItem.parent
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
             if isParentItemInReach {
-                if parentItem.flag(.isSurface) {
+                if parentItem.hasFlag(.isSurface) {
                     isReachable = true
-                } else if parentItem.flag(.isContainer) {
+                } else if parentItem.hasFlag(.isContainer) {
                     // Check dynamic property for open state
                     let isParentOpen = await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false
                     guard isParentOpen else {

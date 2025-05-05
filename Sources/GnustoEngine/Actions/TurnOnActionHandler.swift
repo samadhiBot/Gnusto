@@ -20,7 +20,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         let currentLocationID = await context.engine.gameState.player.currentLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
-        let isLight = targetItem.flag(.isLightSource)
+        let isLight = targetItem.hasFlag(.isLightSource)
         let roomIsDark = !(await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID))
 
         var isNormallyReachable = false
@@ -39,12 +39,12 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if the item has the `.device` property.
-        guard targetItem.flag(.isDevice) else {
+        guard targetItem.hasFlag(.isDevice) else {
             throw ActionError.prerequisiteNotMet("You can't turn that on.")
         }
 
         // 5. Check if the item already has the `.on` property.
-        if targetItem.flag(.isOn) {
+        if targetItem.hasFlag(.isOn) {
             throw ActionError.customResponse("It's already on.")
         }
     }

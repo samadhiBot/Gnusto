@@ -27,7 +27,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if item is droppable (not fixed)
-        if targetItem.flag(.isFixed) {
+        if targetItem.hasFlag(.isFixed) {
             throw ActionError.itemNotDroppable(targetItemID)
         }
     }

@@ -26,12 +26,12 @@ public struct OpenActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if item is openable
-        guard targetItem.flag(.isOpenable) else {
+        guard targetItem.hasFlag(.isOpenable) else {
             throw ActionError.itemNotOpenable(targetItemID)
         }
 
         // 4. Check if locked
-        if targetItem.flag(.isLocked) {
+        if targetItem.hasFlag(.isLocked) {
             throw ActionError.itemIsLocked(targetItemID)
         }
     }

@@ -21,12 +21,12 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check if the (held) item is currently worn
-        guard targetItem.flag(.isWorn) else {
+        guard targetItem.hasFlag(.isWorn) else {
             throw ActionError.itemIsNotWorn(targetItemID)
         }
 
         // 4. Check if the item is fixed (e.g., cursed amulet)
-        guard !targetItem.flag(.isFixed) else {
+        guard !targetItem.hasFlag(.isFixed) else {
             throw ActionError.itemNotRemovable(targetItemID)
         }
     }

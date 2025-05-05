@@ -29,7 +29,7 @@ public struct ScopeResolver: Sendable {
         }
 
         // 1. Check if the location is inherently lit.
-        if location.flag(.inherentlyLit) {
+        if location.hasFlag(.inherentlyLit) {
             return true
         }
 
@@ -41,7 +41,7 @@ public struct ScopeResolver: Sendable {
         // 3. Check if the player is carrying an active light source.
         let playerInventory = gameState.items.values.filter { $0.parent == .player }
         let playerHasActiveLight = playerInventory.contains { item in
-            item.flag(.isLightSource) && item.flag(.isOn)
+            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
         }
         if playerHasActiveLight {
             return true
@@ -50,7 +50,7 @@ public struct ScopeResolver: Sendable {
         // 4. Check if there is an active light source directly in the location.
         let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
         let locationHasActiveLight = itemsInLocation.contains { item in
-            item.flag(.isLightSource) && item.flag(.isOn)
+            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
         }
         if locationHasActiveLight {
             return true
@@ -82,7 +82,7 @@ public struct ScopeResolver: Sendable {
 
         // 3. Filter out items with the .invisible property.
         let visibleItems = itemsDirectlyInLocation.filter { item in
-            !item.flag(.isInvisible)
+            !item.hasFlag(.isInvisible)
         }
 
         // 4. Return the IDs of the visible items.
@@ -115,11 +115,11 @@ public struct ScopeResolver: Sendable {
             guard let currentItem = gameState.items[currentItemID] else { continue }
 
             // A) Check if it's an accessible container
-            if currentItem.flag(.isContainer) && !processedContainers.contains(currentItem.id) {
+            if currentItem.hasFlag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
                 // Check dynamic property for open state
                 let isOpen = engine.gameState.items[currentItem.id]?.attributes[.isOpen]?.toBool ?? false
-                let isTransparent = currentItem.flag(.isTransparent)
+                let isTransparent = currentItem.hasFlag(.isTransparent)
                 if isOpen || isTransparent {
                     // Find items directly inside this container
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
@@ -135,7 +135,7 @@ public struct ScopeResolver: Sendable {
             }
 
             // B) Check if it's a surface
-            if currentItem.flag(.isSurface) {
+            if currentItem.hasFlag(.isSurface) {
                 // Find items directly on this surface
                 let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
                 let onSurfaceIDs = itemsOnSurface.map { $0.id }

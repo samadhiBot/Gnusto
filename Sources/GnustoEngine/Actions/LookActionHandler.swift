@@ -118,10 +118,10 @@ public struct LookActionHandler: EnhancedActionHandler {
         let itemID = item.id
 
         // Container contents - Check flags on the potentially stale item definition
-        if item.flag(.isContainer) { // Use flag()
+        if item.hasFlag(.isContainer) { // Use flag()
             // Check current state (open/closed) using dynamic value from the snapshot
             let isOpen = stateSnapshot.items[itemID]?.attributes[.isOpen]?.toBool ?? false
-            let isTransparent = item.flag(.isTransparent) // Use flag()
+            let isTransparent = item.hasFlag(.isTransparent) // Use flag()
 
             if isOpen || isTransparent {
                 // Get items *inside* the container from the snapshot
@@ -141,7 +141,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         }
 
         // Surface contents - Check flag on item definition
-        if item.flag(.isSurface) { // Use flag()
+        if item.hasFlag(.isSurface) { // Use flag()
             // Get items *on* the surface from the snapshot
             let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
             // Filter out the item itself if it somehow lists itself (e.g., bug)

@@ -812,7 +812,7 @@ public class GameEngine: Sendable {
     }
 
     private func anySuch(_ itemID: ItemID) -> String {
-        if let item = item(with: itemID), item.flag(.itemTouched) {
+        if let item = item(with: itemID), item.hasFlag(.itemTouched) {
             "the \(item.name)"
         } else {
             "any such thing"

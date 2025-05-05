@@ -32,7 +32,7 @@ struct TouchActionHandlerTests {
 
         // Assert
         let finalItemState = await engine.item(with: "rock")
-        #expect(finalItemState?.flag(.itemTouched) == true, "Item should gain .touched property")
+        #expect(finalItemState?.hasFlag(.itemTouched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }

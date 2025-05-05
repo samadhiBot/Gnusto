@@ -26,7 +26,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // 4. Check if item is closeable (using .openable for symmetry)
-        guard targetItem.flag(.isOpenable) else {
+        guard targetItem.hasFlag(.isOpenable) else {
             throw ActionError.itemNotCloseable(targetItemID)
         }
 

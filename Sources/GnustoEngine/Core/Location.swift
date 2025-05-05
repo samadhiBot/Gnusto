@@ -38,7 +38,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     /// Checks if a boolean flag is set in the location's `attributes`.
     /// - Parameter id: The `PropertyID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
-    public func flag(_ id: PropertyID) -> Bool {
+    public func hasFlag(_ id: PropertyID) -> Bool {
         attributes[id] == .bool(true)
     }
 }
