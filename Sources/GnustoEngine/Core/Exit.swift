@@ -18,7 +18,7 @@ public struct Exit: Codable, Equatable, Sendable {
     public var isDoor: Bool = false
 
     /// If `isDoor` is true, indicates if the door is currently open.
-    public var isOpen: Bool = true // Doors often start open unless specified
+    public var isOpen: Bool = true
 
     /// If `isDoor` is true, indicates if the door is locked.
     public var isLocked: Bool = false

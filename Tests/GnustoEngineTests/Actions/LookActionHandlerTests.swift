@@ -33,8 +33,8 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Test Room",
-            longDescription: "A basic room.",
-            properties: .inherentlyLit
+            description: "A basic room.",
+            inherentlyLit: true
         )
         let item1 = Item(
             id: "widget",
@@ -85,8 +85,8 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Test Room",
-            longDescription: "A basic room.",
-            properties: .inherentlyLit
+            description: "A basic room.",
+            inherentlyLit: true
         )
         let item1 = Item(
             id: "apple",
@@ -149,7 +149,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            longDescription: "A basic room." // No .inherentlyLit
+            description: "A basic room." // No .inherentlyLit
         )
         let item1 = Item(
             id: "widget",
@@ -191,7 +191,7 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Test Room",
-            longDescription: "A basic room." // No .inherentlyLit
+            description: "A basic room." // No .inherentlyLit
         )
         let activeLamp = Item(
             id: "lamp",
@@ -244,7 +244,7 @@ struct LookActionHandlerTests {
             id: "litRoom",
             name: "Plain Room",
             // No longDescription provided - should be nil by default
-            properties: .inherentlyLit
+            inherentlyLit: true
         )
 
         let game = MinimalGame(
@@ -280,8 +280,8 @@ struct LookActionHandlerTests {
             id: "dynamicRoom",
             name: "Magic Room",
             // Provide a default description; dynamic logic will override
-            longDescription: "The room seems normal.",
-            properties: .inherentlyLit
+            description: "The room seems normal.",
+            inherentlyLit: true
         )
 
         // MinimalGame takes flags as variadic arguments
@@ -339,7 +339,7 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "rock",
             name: "plain rock",
-            longDescription: "It looks like a rock.",
+            description: "It looks like a rock.",
             parent: .location("startRoom")
         )
         let initialProperties = item.properties
@@ -418,7 +418,7 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "stone",
             name: "smooth stone",
-            longDescription: "A familiar smooth stone.",
+            description: "A familiar smooth stone.",
             properties: .touched,
             parent: .location("startRoom")
         )
@@ -462,7 +462,7 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            longDescription: "A sturdy wooden box.",
+            description: "A sturdy wooden box.",
             properties: .container, .openable,
             attributes: [.isOpen: true],
             parent: .location("startRoom")
@@ -509,7 +509,7 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            longDescription: "A sturdy wooden box.",
+            description: "A sturdy wooden box.",
             properties: .container, .openable,
             parent: .location("startRoom")
         )
@@ -556,7 +556,7 @@ struct LookActionHandlerTests {
         let jar = Item(
             id: "jar",
             name: "glass jar",
-            longDescription: "A clear glass jar.",
+            description: "A clear glass jar.",
             properties: .container, .openable, .transparent,
             parent: .location("startRoom")
         )
@@ -604,7 +604,7 @@ struct LookActionHandlerTests {
         let table = Item(
             id: "table",
             name: "wooden table",
-            longDescription: "A simple wooden table.",
+            description: "A simple wooden table.",
             properties: .surface,
             parent: .location("startRoom")
         )
@@ -661,7 +661,7 @@ struct LookActionHandlerTests {
             name: "glowing artifact",
             parent: .location("otherRoom")
         )
-        let room1 = Location(id: "startRoom", name: "Start Room", properties: .inherentlyLit)
+        let room1 = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
         let room2 = Location(id: "otherRoom", name: "Other Room")
 
         let game = MinimalGame(

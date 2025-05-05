@@ -70,10 +70,12 @@ struct LockActionHandlerTests {
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true, // Start unlocked
-            isOpenable: true
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isOpenable: true
+            ]
         )
         let initialKey = Item(
             id: "key",
@@ -169,9 +171,11 @@ struct LockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true // Unlocked
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -201,8 +205,12 @@ struct LockActionHandlerTests {
         // Arrange: Key is in the room, not held; box is unlocked
         let box = Item(
             id: "box", name: "box",
-            parent: .location("startRoom"), lockKey: "key",
-            isContainer: true, isLockable: true
+            parent: .location("startRoom"),
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
         )
         let key = Item(
             id: "key",
@@ -240,8 +248,12 @@ struct LockActionHandlerTests {
         // Arrange: Box is unlocked in another room, player holds key
         let box = Item(
             id: "box", name: "box",
-            parent: .location("otherRoom"), lockKey: "key",
-            isContainer: true, isLockable: true
+            parent: .location("otherRoom"),
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
         )
         let key = Item(
             id: "key",
@@ -318,9 +330,11 @@ struct LockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
         )
         let wrongKey = Item(
             id: "wrongkey",
@@ -360,10 +374,12 @@ struct LockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true,
-            isLocked: true // Start locked
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true // Start locked
+            ]
         )
         let key = Item(
             id: "key",

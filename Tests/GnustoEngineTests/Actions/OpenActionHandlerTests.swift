@@ -11,13 +11,16 @@ struct OpenActionHandlerTests {
     @Test("Open item successfully")
     func testOpenItemSuccessfully() async throws {
         // Arrange
-        let initialProperties: Set<ItemProperty> = [.container, .openable]
         var closedBox = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+                // Starts closed (no .isOpen)
+            ]
         )
-        closedBox.properties = initialProperties
 
         let game = MinimalGame(items: [closedBox])
         let mockIO = await MockIOHandler()
@@ -59,12 +62,12 @@ struct OpenActionHandlerTests {
         )
 
         // Change 2: .touched added to properties (returned by handler)
-        var expectedTouchedProps = initialProperties
+        var expectedTouchedProps = expectedProperties
         expectedTouchedProps.insert(.touched)
         let expectedTouchedChange = StateChange(
             entityId: .item("box"),
             propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(initialProperties),
+            oldValue: .itemPropertySet(expectedProperties),
             newValue: .itemPropertySet(expectedTouchedProps)
         )
 
@@ -76,13 +79,16 @@ struct OpenActionHandlerTests {
     @Test("Open item that is already touched")
     func testOpenItemAlreadyTouched() async throws {
         // Arrange: Item is openable, closed, and already touched
-        let initialProperties: Set<ItemProperty> = [.container, .openable, .touched]
         var closedBox = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .itemTouched: true // Already touched
+            ]
         )
-        closedBox.properties = initialProperties
 
         let game = MinimalGame(items: [closedBox])
         let mockIO = await MockIOHandler()
@@ -219,8 +225,11 @@ struct OpenActionHandlerTests {
         let openBox = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable,
-            attributes: [.isOpen: true],
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true // Already open
+            ],
             parent: .location("startRoom")
         )
 
@@ -252,7 +261,11 @@ struct OpenActionHandlerTests {
         let lockedChest = Item(
             id: "chest",
             name: "iron chest",
-            properties: .container, .openable, .locked,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isLocked: true // Locked
+            ],
             parent: .location("startRoom")
         ) // Locked
 

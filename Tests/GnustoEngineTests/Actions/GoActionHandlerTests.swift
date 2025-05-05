@@ -13,15 +13,15 @@ struct GoActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            longDescription: "You are here.",
+            description: "You are here.",
             exits: [.north: Exit(destination: "end")],
-            properties: .inherentlyLit
+            inherentlyLit: true
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
-            longDescription: "You went there.",
-            properties: .inherentlyLit
+            description: "You went there.",
+            inherentlyLit: true
         )
 
         let game = MinimalGame(
@@ -52,13 +52,13 @@ struct GoActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            longDescription: "You are here.",
+            description: "You are here.",
             exits: [.north: Exit(destination: "end", blockedMessage: "A wall blocks your path.")]
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
-            longDescription: "You went there."
+            description: "You went there."
         )
 
         let game = MinimalGame(
@@ -98,12 +98,12 @@ struct GoActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            longDescription: "You are here."
+            description: "You are here."
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
-            longDescription: "You went there."
+            description: "You went there."
         )
 
         let game = MinimalGame(

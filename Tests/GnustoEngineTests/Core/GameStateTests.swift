@@ -51,14 +51,14 @@ struct GameStateTests {
             Location(
                 id: Self.locWOH,
                 name: "West of House",
-                longDescription: "You are standing west of a white house.",
+                description: "You are standing west of a white house.",
                 exits: [.north: Exit(destination: Self.locNorth)]
                 // items: // Removed
             ),
             Location(
                 id: Self.locNorth,
                 name: "North of House",
-                longDescription: "You are north of the house.",
+                description: "You are north of the house.",
                 exits: [.south: Exit(destination: Self.locWOH)]
             )
         ]
@@ -558,7 +558,7 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesSet() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc")
+        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc")
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
@@ -583,7 +583,7 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesRemove() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc", properties: .inherentlyLit)
+        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc", inherentlyLit: true)
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
@@ -608,7 +608,7 @@ struct GameStateTests {
     func testApplyModifyLocationAttribute() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc")
+        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc")
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(

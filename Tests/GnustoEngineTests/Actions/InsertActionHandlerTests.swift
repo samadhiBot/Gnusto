@@ -261,12 +261,12 @@ struct InsertActionHandlerTests {
         let room1 = Location(
             id: "startRoom",
             name: "Start",
-            properties: .inherentlyLit
+            inherentlyLit: true
         )
         let room2 = Location(
             id: "otherRoom",
             name: "Other",
-            properties: .inherentlyLit
+            inherentlyLit: true
         )
         let game = MinimalGame(
             locations: [room1, room2],
@@ -554,6 +554,245 @@ struct InsertActionHandlerTests {
             oldContainerProps: initialBoxProps
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Insert into reachable container successfully")
+    func testInsertIntoReachableContainerSuccessfully() async throws {
+        // Arrange: Player holds key, box is in the room
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true // Starts open
+            ]
+        )
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true) // Assuming lit for test
+
+        let game = MinimalGame(locations: [room], items: [itemToInsert, container])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "box", preposition: "in", rawInput: "put key in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You put the small key in the wooden box.")
+
+        // Assert Final State
+        let finalItemState = try #require(await engine.item("key"))
+        #expect(finalItemState.parent == .item("box"))
+        let finalContainerState = try #require(await engine.item("box"))
+        #expect(finalContainerState.hasFlag(PropertyID.itemTouched) == true)
+
+        // Assert Pronoun
+        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
+
+        // Assert Change History
+        let expectedChanges = expectedInsertChanges(
+            itemToInsertID: "key",
+            containerID: "box",
+            initialParent: .player,
+            initialItemTouched: false,
+            initialContainerTouched: false
+        )
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Insert into self not allowed")
+    func testInsertIntoSelfNotAllowed() async throws {
+        // Arrange: Player holds open container
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .player,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true
+            ]
+        )
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room], items: [container])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "box", indirectObject: "box", preposition: "in", rawInput: "put box in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put something in itself.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert into item not in reach")
+    func testInsertIntoItemNotInReach() async throws {
+        // Arrange: Player holds key, container is in another room
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .location("otherRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true
+            ]
+        )
+        let room1 = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room1, room2], items: [itemToInsert, container])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "box", preposition: "in", rawInput: "put key in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert into target not a container")
+    func testInsertIntoTargetNotAContainer() async throws {
+        // Arrange: Target is a rock (not a container)
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let target = Item(id: "rock", name: "smooth rock", parent: .location("startRoom"))
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room], items: [itemToInsert, target])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "rock", preposition: "in", rawInput: "put key in rock")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put things in the rock.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert into closed container")
+    func testInsertIntoClosedContainer() async throws {
+        // Arrange: Container is closed
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+                // Closed by default
+            ]
+        )
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room], items: [itemToInsert, container])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "box", preposition: "in", rawInput: "put key in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The wooden box is closed.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert into container that is full")
+    func testInsertIntoContainerThatIsFull() async throws {
+        // Arrange: Container has capacity 1, already contains an item
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let existingItem = Item(id: "gem", name: "shiny gem", parent: .item("box"), size: 1)
+        let container = Item(
+            id: "box",
+            name: "wooden box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .capacity: 1 // Set capacity
+            ]
+        )
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room], items: [itemToInsert, existingItem, container])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "box", preposition: "in", rawInput: "put key in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The wooden box is full.") // ActionError.containerIsFull
+
+        // Assert No State Change
+        #expect(engine.item("key")?.parent == .player) // Key still held
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("Insert item too large for container")
+    func testInsertItemTooLargeForContainer() async throws {
+        // Arrange: Item size is 5, container capacity is 3
+        let itemToInsert = Item(id: "key", name: "large key", parent: .player, size: 5)
+        let container = Item(
+            id: "box",
+            name: "small box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .capacity: 3 // Set capacity
+            ]
+        )
+        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+
+        let game = MinimalGame(locations: [room], items: [itemToInsert, container])
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "key", indirectObject: "box", preposition: "in", rawInput: "put key in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The small box is too small for the large key.") // ActionError.itemTooLargeForContainer
+
+        // Assert No State Change
+        #expect(engine.item("key")?.parent == .player) // Key still held
+        #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
     // TODO: Add capacity check test when implemented

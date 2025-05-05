@@ -13,7 +13,7 @@ struct LocationTests {
         Location(
             id: defaultLocationID,
             name: defaultLocationName,
-            longDescription: "A nondescript room."
+            description: "A nondescript room."
         )
     }
 
@@ -23,9 +23,9 @@ struct LocationTests {
         return Location(
             id: "livingRoom",
             name: "Living Room",
-            longDescription: "A comfortably furnished living room. There are exits west and east.",
+            description: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
-            properties: .inherentlyLit, .sacred,
+            inherentlyLit: true, .sacred,
             globals: "rug", "fireplace"
         )
     }

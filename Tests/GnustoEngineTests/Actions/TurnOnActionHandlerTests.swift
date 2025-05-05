@@ -13,7 +13,7 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
             parent: .player
         )
@@ -47,12 +47,12 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            longDescription: "This is a dark room that should now be lit."
+            description: "This is a dark room that should now be lit."
         )
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
             parent: .location(darkRoom.id)
         )
@@ -99,7 +99,7 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
             parent: .player
         )
@@ -138,7 +138,7 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .takable,
             parent: .player
         )
@@ -176,7 +176,7 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
             parent: .nowhere // Not accessible
         )
@@ -202,12 +202,12 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            longDescription: "A dark room."
+            description: "A dark room."
         )
         let radio = Item(
             id: "radio",
             name: "portable radio",
-            longDescription: "A portable radio.",
+            description: "A portable radio.",
             properties: .device, .takable,
             parent: .player
         )
@@ -250,7 +250,7 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
             parent: .player
         )

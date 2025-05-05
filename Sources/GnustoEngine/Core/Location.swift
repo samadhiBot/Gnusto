@@ -21,6 +21,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     public init(
         id: LocationID,
         name: String,
+        description: String? = nil,
         exits: [Direction: Exit] = [:],
         inherentlyLit: Bool = false,
         attributes: [PropertyID: StateValue] = [:]
@@ -29,19 +30,30 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.name = name
         self.exits = exits
         var initial = attributes
+        if let description {
+            initial[.longDescription] = .string(description)
+        }
         initial[.inherentlyLit] = .bool(inherentlyLit)
         self.attributes = initial
     }
 
     // MARK: - Convenience Accessors
 
-    /// Checks if a boolean flag is set in the location's `attributes`.
+    /// Checks if a flag is set in the location's `attributes`.
+    ///
     /// - Parameter id: The `PropertyID` of the flag to check.
-    /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
+    /// - Returns: `true` if the flag is set to `true`, or `false` otherwise.
     public func hasFlag(_ id: PropertyID) -> Bool {
         attributes[id] == .bool(true)
     }
     
+    /// Checks whether the location is inherently lit, such as a location lit by sunlight.
+    ///
+    /// - Returns: Whether the location is inherently lit.
+    public func isInherentlyLit() -> Bool {
+        attributes[.inherentlyLit]?.toBool ?? false
+    }
+
     /// <#Description#>
     public var localGlobals: Set<ItemID> {
         attributes[.localGlobals]?.toItemIDs ?? []

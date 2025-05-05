@@ -17,7 +17,7 @@ struct GameEngineTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -424,8 +424,10 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             name: "pebble",
-            properties: .takable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true
+            ]
         )
         let startRoom = Location(
             id: "startRoom",
@@ -555,9 +557,16 @@ struct GameEngineTests {
             func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
-        let testItemID: ItemID = "testLamp"
+        let testItemID: ItemID = "lamp"
         let testFlagKey: FlagID = "lampLit" // Use FlagID type
-        let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
+        let lamp = Item(
+            id: testItemID,
+            name: "lamp",
+            parent: .nowhere,
+            attributes: [
+                .isTakable: true
+            ]
+        )
         let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
         var game = MinimalGame(
             items: [lamp],
@@ -1154,7 +1163,7 @@ struct GameEngineTests {
         // Arrange
         let itemID: ItemID = "magicBox"
         let game = MinimalGame()
-        let item = Item(id: itemID, name: "Magic Box")
+        let item = Item(id: itemID, name: "Magic Box", parent: .nowhere)
         let registry = DefinitionRegistry()
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
 
@@ -1170,7 +1179,14 @@ struct GameEngineTests {
         // Arrange
         let itemID: ItemID = "magicBox"
         let game = MinimalGame()
-        let item = Item(id: itemID, name: "Magic Box", description: "Default box desc.")
+        let item = Item(
+            id: itemID,
+            name: "Magic Box",
+            parent: .nowhere,
+            attributes: [
+                .description: "Default box desc."
+            ]
+        )
         let registry = DefinitionRegistry()
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
 
@@ -1186,7 +1202,15 @@ struct GameEngineTests {
         // Arrange
         let itemID: ItemID = "magicBox"
         let handlerID: DescriptionHandlerID = "boxDesc"
-        let item = Item(id: itemID, name: "Magic Box", description: "Default box desc.", descriptionHandlerId: handlerID)
+        let item = Item(
+            id: itemID,
+            name: "Magic Box",
+            parent: .nowhere,
+            attributes: [
+                .description: "Default box desc.",
+                .descriptionHandlerId: handlerID
+            ]
+        )
         let registry = DefinitionRegistry()
         registry.registerDescriptionHandler(id: handlerID) { _, _, _ in "Magic description!" }
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item], definitionRegistry: registry)
@@ -1248,21 +1272,242 @@ struct GameEngineTests {
     func testApplyActionResult_Success() async throws {
         let itemID: ItemID = "lamp"
         let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(
-            items: [Item(id: itemID, name: "Lamp", isOn: false)] // Start with lamp off
+            items: [Item(
+                id: itemID,
+                name: "Lamp",
+                parent: .nowhere,
+                attributes: [
+                    .isOn: false // Start with lamp off
+                ]
+            )]
         )
 
         let turnOnChanges = [
             StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemDynamicValue(key: .isOn),
+                propertyKey: .itemAttribute(.isOn),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ),
             StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
-} // End of struct GameEngineTests
+                newValue: .bool(true)
+            )
+        ]
+        let result = ActionResult(
+            success: true,
+            message: "Lamp turned on!",
+            stateChanges: turnOnChanges
+        )
+        await engine.applyActionResult(result)
+
+        // Verify the state changes
+        let finalLamp = engine.item(itemID)
+        #expect(finalLamp?.hasProperty(.on) == true)
+        #expect(finalLamp?.hasProperty(.touched) == true)
+    }
+
+    @Test("ReportActionError: .itemSnapshot")
+    func testItemSnapshot() async throws {
+        let testItemID: ItemID = "lamp"
+        let lamp = Item(
+            id: testItemID,
+            name: "lamp",
+            parent: .nowhere,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [lamp])
+        await engine.addItems(lamp)
+    }
+
+    @Test("ReportActionError: .itemsSnapshot")
+    func testItemsSnapshot() async throws {
+        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [pebble])
+        await engine.addItems(pebble)
+    }
+
+    @Test("ReportActionError: .itemsInContainer")
+    func testItemsInContainer() async throws {
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let container = Item(
+            id: "box",
+            name: "box",
+            properties: .container, .openable,
+            parent: .location("startRoom")
+        )
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [itemToPut, container])
+        await engine.addItems(itemToPut, container)
+    }
+
+    @Test("ReportActionError: .itemsOnSurface")
+    func testItemsOnSurface() async throws {
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [itemToPut, target])
+        await engine.addItems(itemToPut, target)
+    }
+
+    @Test("ReportActionError: .itemInInventory")
+    func testItemInInventory() async throws {
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [itemToPut, target])
+        await engine.addItems(itemToPut, target)
+    }
+
+    @Test("ReportActionError: .itemInReach")
+    func testItemInReach() async throws {
+        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [itemToPut, target])
+        await engine.addItems(itemToPut, target)
+    }
+
+    @Test("ReportActionError: .findItemCandidates_Match")
+    func testFindItemCandidates_Match() async throws {
+        let key = Item(
+            id: "key1",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [key])
+        await engine.addItems(key)
+    }
+
+    @Test("ReportActionError: .findItemCandidates_NoMatch")
+    func testFindItemCandidates_NoMatch() async throws {
+        let item = Item(id: "book", name: "book", parent: .location("startRoom"))
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
+        await engine.addItems(item)
+    }
+
+    @Test("ReportActionError: .findItemCandidates_Global")
+    func testFindItemCandidates_Global() async throws {
+        let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
+        let globalItem = Item(
+            id: "rug",
+            name: "rug",
+            parent: .location("startRoom")
+        )
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [item, globalItem])
+        await engine.addItems(item, globalItem)
+    }
+
+    @Test("ReportActionError: .findItemCandidates_MultipleMatches")
+    func testFindItemCandidates_MultipleMatches() async throws {
+        let box = Item(id: "box", name: "box", parent: .location("startRoom"))
+        let wrongKey = Item(
+            id: "key2",
+            name: "wrong key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let correctKey = Item(
+            id: "key1",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let (engine, _, _) = await GnustoEngineTestScaffold.setupEngine(items: [box, wrongKey, correctKey])
+        await engine.addItems(box, wrongKey, correctKey)
+    }
+
+    @Test("ReportActionError: .getDescriptionForItem_NoDescription")
+    func testGetDescriptionForItem_NoDescription() async throws {
+        let itemID: ItemID = "box"
+        let item = Item(id: itemID, name: "Magic Box", parent: .nowhere)
+        let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
+        let desc = await engine.getDescription(for: .item(id: itemID))
+        #expect(desc == "Magic Box")
+    }
+
+    @Test("ReportActionError: .getDescriptionForItem_StaticDescription")
+    func testGetDescriptionForItem_StaticDescription() async throws {
+        let itemID: ItemID = "box"
+        let item = Item(
+            id: itemID,
+            name: "Magic Box",
+            parent: .nowhere,
+            attributes: [
+                .description: "Default box desc."
+            ]
+        )
+        let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
+        let desc = await engine.getDescription(for: .item(id: itemID))
+        #expect(desc == "Default box desc.")
+    }
+
+    @Test("ReportActionError: .getDescriptionForItem_Handler")
+    func testGetDescriptionForItem_Handler() async throws {
+        let itemID: ItemID = "box"
+        let handlerID: DescriptionHandlerID = "boxHandler"
+        let item = Item(
+            id: itemID,
+            name: "Magic Box",
+            parent: .nowhere,
+            attributes: [
+                .description: "Default box desc.",
+                .descriptionHandlerId: handlerID
+            ]
+        )
+        let registry = DefinitionRegistry()
+        registry.registerDescriptionHandler(id: handlerID) { _, _, _ in "Magic description!" }
+        let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: [item])
+        let desc = await engine.getDescription(for: .item(id: itemID))
+        #expect(desc == "Magic description!")
+    }
+
+    @Test("ReportActionError: .applyStateChangeUpdatesItem")
+    func testApplyStateChangeUpdatesItem() async throws {
+        let itemID: ItemID = "lamp"
+        let items = [Item(
+            id: itemID,
+            name: "Lamp",
+            parent: .nowhere,
+            attributes: [
+                .isOn: false // Start with lamp off
+            ]
+        )]
+        let (engine, _) = await GnustoEngineTestScaffold.setupEngine(items: items)
+        let turnOnChanges = [
+            StateChange(
+                entityId: .item(id: itemID),
+                propertyKey: .itemAttribute(.isOn),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            ),
+            StateChange(
+                entityId: .item(id: itemID),
+                propertyKey: .itemAttribute(.itemTouched),
+                oldValue: .bool(false),
+                newValue: .bool(true)
+            )
+        ]
+        let result = ActionResult(
+            success: true,
+            message: "Lamp turned on!",
+            stateChanges: turnOnChanges
+        )
+        await engine.applyActionResult(result)
+
+        // Verify the state changes
+        let finalLamp = engine.item(itemID)
+        #expect(finalLamp?.hasProperty(.on) == true)
+        #expect(finalLamp?.hasProperty(.touched) == true)
+    }
+}
 
 // Helper extension for OutputCall checks (optional)
 extension [MockIOHandler.OutputCall] {

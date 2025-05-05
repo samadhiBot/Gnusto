@@ -229,8 +229,8 @@ struct PutOnActionHandlerTests {
         // Arrange: Table is in another room, player holds book
         let book = Item(id: "book", name: "heavy book", parent: .player)
         let table = Item(id: "table", name: "sturdy table", properties: .surface, parent: .location("otherRoom"))
-        let room1 = Location(id: "startRoom", name: "Start", properties: .inherentlyLit)
-        let room2 = Location(id: "otherRoom", name: "Other", properties: .inherentlyLit)
+        let room1 = Location(id: "startRoom", name: "Start", inherentlyLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other", inherentlyLit: true)
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

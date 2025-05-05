@@ -12,7 +12,7 @@ struct ExamineActionHandlerTests {
             name: "small pebble",
             parent: .location("startRoom"),
             attributes: [
-                .longDescription: "A smooth, grey pebble."
+                .description: "A smooth, grey pebble."
             ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
@@ -63,7 +63,7 @@ struct ExamineActionHandlerTests {
             name: "engraved locket",
             parent: .location("startRoom"),
             attributes: [
-                .longDescription: "A small, tarnished silver locket.",
+                .description: "A small, tarnished silver locket.",
                 .descriptionHandlerId: handlerID
             ]
         )
@@ -102,7 +102,7 @@ struct ExamineActionHandlerTests {
             name: "stone statue",
             parent: .location(roomID),
             attributes: [
-                .longDescription: "A weathered statue of a grue."
+                .description: "A weathered statue of a grue."
             ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
@@ -133,7 +133,7 @@ struct ExamineActionHandlerTests {
             name: "hidden gem",
             parent: .location("farAwayRoom"),
             attributes: [
-                .longDescription: "Should not see this."
+                .description: "Should not see this."
             ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
@@ -188,7 +188,7 @@ struct ExamineActionHandlerTests {
             adjectives: "red",
             synonyms: "ball",
             attributes: [
-                .longDescription: "A red ball."
+                .description: "A red ball."
             ]
         )
         let item2 = Item(
@@ -198,7 +198,7 @@ struct ExamineActionHandlerTests {
             adjectives: "blue",
             synonyms: "ball",
             attributes: [
-                .longDescription: "A blue ball."
+                .description: "A blue ball."
             ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
@@ -271,7 +271,7 @@ struct ExamineActionHandlerTests {
             id: itemID,
             name: "magic mirror",
             attributes: [
-                .longDescription: "A dusty old mirror.",
+                .description: "A dusty old mirror.",
                 .objectActionHandlerId: handlerID
             ]
         )

@@ -22,12 +22,16 @@ public struct Item: Codable, Identifiable, Sendable {
         parent: ParentEntity = .nowhere,
         adjectives: String...,
         synonyms: String...,
+        description: String? = nil,
         attributes: [PropertyID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
         self.parent = parent
         var initial = attributes
+        if let description {
+            initial[.longDescription] = .string(description)
+        }
         if !adjectives.isEmpty {
             initial[.adjectives] = .stringSet(Set(adjectives))
         }

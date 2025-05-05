@@ -23,7 +23,7 @@ struct ItemTests {
             synonyms: "lamp", "light",
             shortDescription: "The brass lantern is here.",
             firstDescription: "A shiny brass lantern rests here.",
-            longDescription: "A sturdy brass lantern.",
+            description: "A sturdy brass lantern.",
             readText: "Engraved on the bottom: \\\"Property of Frobozz Magic Lantern Co.\\\"",
             heldText: "It feels warm.",
             properties: .takable, .lightSource, .on, .openable,

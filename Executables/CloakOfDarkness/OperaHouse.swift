@@ -6,7 +6,7 @@ struct OperaHouse: AreaContents {
     let bar = Location(
         id: "bar",
         name: "Bar",
-        longDescription: """
+        description: """
             The bar, much rougher than you'd have guessed after the opulence
             of the foyer to the north, is completely empty. There seems to be 
             some sort of message scrawled in the sawdust on the floor.
@@ -30,14 +30,14 @@ struct OperaHouse: AreaContents {
     let cloakroom = Location(
         id: "cloakroom",
         name: "Cloakroom",
-        longDescription: """
+        description: """
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
             """,
         exits: [
             .east: Exit(destination: "foyer"),
         ],
-        properties: .inherentlyLit
+        inherentlyLit: true
     )
 
     let hook = Item(
@@ -54,7 +54,7 @@ struct OperaHouse: AreaContents {
     let foyer = Location(
         id: "foyer",
         name: "Foyer of the Opera House",
-        longDescription: """
+        description: """
                 You are standing in a spacious hall, splendidly decorated in red
                 and gold, with glittering chandeliers overhead. The entrance from
                 the street is to the north, and there are doorways south and west.
@@ -70,7 +70,7 @@ struct OperaHouse: AreaContents {
                     """
             )
         ],
-        properties: .inherentlyLit
+        inherentlyLit: true
     )
 
     // MARK: - Items

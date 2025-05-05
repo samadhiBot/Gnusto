@@ -12,13 +12,13 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here."
+            description: "You are here."
         )
         let lamp = Item(
             id: "lamp",
             name: "lamp",
             shortDescription: "A brass lamp",
-            longDescription: "A brass lamp is here.",
+            description: "A brass lamp is here.",
             properties: .lightSource, .device, .on,
             parent: .player
         )
@@ -55,14 +55,14 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here.",
-            properties: .inherentlyLit
+            description: "You are here.",
+            inherentlyLit: true
         )
         let book = Item(
             id: "book",
             name: "book",
             shortDescription: "A dusty book",
-            longDescription: "A dusty book lies here.",
+            description: "A dusty book lies here.",
             parent: .location(room.id)
         )
 
@@ -97,7 +97,7 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here."
+            description: "You are here."
         )
 
         let game = MinimalGame(
@@ -131,7 +131,7 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
             size: 10,
             parent: .player
@@ -161,12 +161,12 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            longDescription: "This room will become dark."
+            description: "This room will become dark."
         )
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
             size: 10,
             parent: .location(darkRoom.id)
@@ -211,7 +211,7 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable,
             size: 10,
             parent: .player
@@ -249,7 +249,7 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .takable, .on,
             size: 10,
             parent: .player
@@ -285,7 +285,7 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
+            description: "A brass lantern.",
             properties: .device, .lightSource, .takable, .on,
             size: 10,
             parent: .nowhere
@@ -321,7 +321,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -370,7 +370,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
