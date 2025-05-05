@@ -11,7 +11,7 @@ struct CloseActionHandlerTests {
     // Helper to create the expected StateChange array for successful close
     private func expectedCloseChanges(
         itemID: ItemID,
-        initialAttributes: [PropertyID: StateValue]
+        initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
@@ -94,7 +94,7 @@ struct CloseActionHandlerTests {
         // Assert State Change
         let finalBox = engine.item("box")
         #expect(finalBox?.attributes[.isOpen] == .bool(false)) // Qualified key
-        #expect(finalBox?.hasFlag(PropertyID.isTouched) == true)
+        #expect(finalBox?.hasFlag(AttributeID.isTouched) == true)
 
         // Assert Output
         let output = await mockIO.flush()

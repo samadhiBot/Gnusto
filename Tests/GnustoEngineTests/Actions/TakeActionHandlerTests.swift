@@ -13,10 +13,8 @@ struct TakeActionHandlerTests {
         itemID: ItemID,
         initialParent: ParentEntity,
         finalParent: ParentEntity = .player, // Default final parent is player
-        initialTouched: Bool,
-        finalTouched: Bool = true, // Default is true after taking
-        initialLight: Bool? = nil, // Optional initial light state
-        finalLight: Bool? = nil    // Optional final light state
+        initialAttributes: [AttributeID: StateValue], // Use initial attributes map
+        finalAttributes: [AttributeID: StateValue]? = nil // Optional final attributes map
     ) -> [StateChange] {
         var changes = [
             // Parent change
@@ -28,26 +26,24 @@ struct TakeActionHandlerTests {
             ),
         ]
 
-        // Add touched change only if it actually changes
-        if initialTouched != finalTouched {
-            changes.append(StateChange(
-                entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(initialTouched),
-                newValue: .bool(finalTouched)
-            ))
-        }
+        // Determine final attributes, default to initial if not provided
+        let effectiveFinalAttributes = finalAttributes ?? initialAttributes
 
-        // Add light change only if it actually changes
-        if initialLight != finalLight,
-           let finalLightValue = finalLight // Ensure finalLight is not nil if different
-        {
-            changes.append(StateChange(
-                entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isLit),
-                oldValue: initialLight.map { .bool($0) },
-                newValue: .bool(finalLightValue)
-            ))
+        // Add attribute changes dynamically by comparing initial and final maps
+        let allKeys = Set(initialAttributes.keys).union(effectiveFinalAttributes.keys)
+        for key in allKeys {
+            let oldValue = initialAttributes[key]
+            let newValue = effectiveFinalAttributes[key]
+
+            // Use nil-coalescing or direct comparison where appropriate
+            if oldValue != newValue {
+                changes.append(StateChange(
+                    entityId: .item(itemID),
+                    propertyKey: .itemAttribute(key),
+                    oldValue: oldValue, // Can be nil
+                    newValue: newValue  // Can be nil
+                ))
+            }
         }
 
         // Add pronoun change (assuming 'it' always refers to the taken item now)
@@ -58,7 +54,29 @@ struct TakeActionHandlerTests {
             newValue: .itemIDSet([itemID])
         ))
 
-        return changes
+        // Ensure touched is set if not already true
+        let initialIsTouched = initialAttributes[.isTouched] // is Optional(StateValue)
+        if initialIsTouched != .bool(true) { // Correctly compares Optional != Non-optional
+            let touchedChange = StateChange(
+                entityId: .item(itemID),
+                propertyKey: .itemAttribute(.isTouched),
+                oldValue: initialIsTouched, // Keep original old value (nil or .bool(false))
+                newValue: .bool(true)
+            )
+
+            // Avoid adding duplicate change if already handled by the general attribute comparison
+            if let existingIndex = changes.firstIndex(where: { $0.propertyKey == .itemAttribute(.isTouched) }) {
+                // If a change exists, make sure its newValue is true
+                if changes[existingIndex].newValue != .bool(true) {
+                    changes[existingIndex] = touchedChange
+                }
+            } else {
+                // If no change exists yet, add it
+                changes.append(touchedChange)
+            }
+        }
+
+        return changes.sorted() // Sort for consistent comparison
     }
 
     @Test("Take item successfully")
@@ -67,12 +85,14 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            size: 3,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .size: 3
+            ]
         )
         let initialParent = testItem.parent
-        let initialProperties = testItem.properties
+        let initialAttributes = testItem.attributes // Capture initial attributes
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -97,7 +117,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true) // Use convenience accessor
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -105,12 +125,13 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
+        // Pass the initial attributes map to the helper
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,
-            initialTouched: false // Key starts untouched
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item fails when already held")
@@ -119,8 +140,8 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            parent: .player
+            parent: .player, // Already held
+            attributes: [.isTakable: true]
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -152,8 +173,8 @@ struct TakeActionHandlerTests {
         let nonexistentItem = Item(
             id: "figurine",
             name: "jade figurine",
-            properties: .takable,
-            parent: .nowhere
+            parent: .nowhere, // Not in scope
+            attributes: [.isTakable: true]
         )
 
         let game = MinimalGame(items: [nonexistentItem])
@@ -183,12 +204,13 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when not takable")
     func testTakeItemFailsWhenNotTakable() async throws {
-        // Arrange: Create item *without* .takable property
+        // Arrange: Create item *without* .isTakable attribute
         let testItem = Item(
             id: "rock",
             name: "heavy rock",
             parent: .location("startRoom")
-        ) // No .takable
+            // No .isTakable: true
+        )
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -242,18 +264,20 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "box",
             name: "wooden box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpen: true // Explicitly open
+            ]
         )
         let itemInContainer = Item(
             id: "gem",
             name: "ruby gem",
-            properties: .takable,
-            parent: .item("box")
+            parent: .item("box"),
+            attributes: [.isTakable: true]
         )
         let initialParent = itemInContainer.parent
-        let initialProperties = itemInContainer.properties
+        let initialAttributes = itemInContainer.attributes // Capture initial
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
@@ -272,10 +296,10 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("gem")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalContainerState = engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
-        #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
+        #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
         #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
 
         // Assert Output
@@ -286,9 +310,9 @@ struct TakeActionHandlerTests {
         let expectedChanges = expectedTakeChanges(
             itemID: "gem",
             initialParent: initialParent,
-            initialTouched: false
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item successfully from open container held by player")
@@ -297,18 +321,21 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "pouch",
             name: "leather pouch",
-            properties: .container, .takable,
-            attributes: [.isOpen: true],
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isContainer: true,
+                .isOpen: true, // Explicitly open
+                .isTakable: true // Player must be able to hold it
+            ]
         )
         let itemInContainer = Item(
             id: "coin",
             name: "gold coin",
-            properties: .takable,
-            parent: .item("pouch")
+            parent: .item("pouch"),
+            attributes: [.isTakable: true]
         )
         let initialParent = itemInContainer.parent
-        let initialProperties = itemInContainer.properties
+        let initialAttributes = itemInContainer.attributes // Capture initial
 
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
@@ -327,10 +354,10 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("coin")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalContainerState = engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
-        #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
+        #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
         #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Output
@@ -341,9 +368,9 @@ struct TakeActionHandlerTests {
         let expectedChanges = expectedTakeChanges(
             itemID: "coin",
             initialParent: initialParent,
-            initialTouched: false
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item fails from closed container")
@@ -352,14 +379,14 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, // Closed by default
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isContainer: true] // Closed by default (no .isOpen)
         )
         let itemInContainer = Item(
             id: "gem",
             name: "ruby gem",
-            properties: .takable,
-            parent: .item("box")
+            parent: .item("box"),
+            attributes: [.isTakable: true]
         )
 
         let game = MinimalGame(items: [container, itemInContainer])
@@ -371,7 +398,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(container.attributes["isOpen"] == nil)
+        #expect(engine.item("box")?.hasFlag(.isOpen) == false) // Verify closed
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -379,7 +406,8 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        let output = await mockIO.flush()
+        let output = await mockIO.flush() // Define output before using it
+        // ScopeResolver will prevent seeing it, standard message
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
@@ -392,18 +420,18 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails from non-container item")
     func testTakeItemFailsFromNonContainer() async throws {
-        // Arrange: Create a non-container and an item 'inside' it (logically impossible but test setup)
+        // Arrange: Create a non-container and an item 'inside' it
         let nonContainer = Item(
             id: "statue",
             name: "stone statue",
-            properties: .takable, // Not a container
             parent: .location("startRoom")
+            // Not a container by default
         )
         let itemInside = Item(
             id: "chip",
             name: "stone chip",
-            properties: .takable,
-            parent: .item("statue")
+            parent: .item("statue"),
+            attributes: [.isTakable: true]
         )
 
         let game = MinimalGame(items: [nonContainer, itemInside])
@@ -415,9 +443,15 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(nonContainer.hasProperty(.container) == false) // Verify statue is not container
+        #expect(engine.item("statue")?.hasFlag(.isContainer) == false) // Verify statue is not container
 
-        let command = Command(verbID: "take", directObject: "chip", rawInput: "take chip from statue") // Target the chip
+        // Command targets the chip, but context is "from statue"
+        let command = Command(
+            verbID: "take",
+            directObject: "chip",
+            indirectObject: "statue", // Specify source
+            rawInput: "take chip from statue"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -440,11 +474,15 @@ struct TakeActionHandlerTests {
         let heavyItem = Item(
             id: "heavy",
             name: "heavy thing",
-            properties: .takable,
-            size: 101, // Exceeds default capacity (100)
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .size: 101 // Exceeds default capacity (100) if player has 0
+            ]
         )
-        let game = MinimalGame(items: [heavyItem])
+        // Player with capacity 0
+        let player = Player(in: "startRoom", carryingCapacity: 0)
+        let game = MinimalGame(player: player, items: [heavyItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -454,20 +492,18 @@ struct TakeActionHandlerTests {
         )
         let command = Command(verbID: "take", directObject: "heavy", rawInput: "take heavy")
 
-        // Act & Assert: Expect validate to throw playerCannotCarryMore
-        await #expect(throws: ActionError.playerCannotCarryMore) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
+        // We need to use the engine.execute to get the standard error message
+        await engine.execute(command: command)
 
-        // Assert no output was printed by the handler itself during validation
+        // Assert Output
         let output = await mockIO.flush()
-        #expect(output.isEmpty, "No output should be printed by handler on error")
+        expectNoDifference(output, "Your hands are full.") // Check standard message
+
+        // Assert no state changes occurred
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        // Assert item is still in the room
+        #expect(engine.item("heavy")?.parent == .location("startRoom"))
     }
 
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
@@ -477,13 +513,15 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "cloak",
             name: "dark cloak",
-            properties: .takable,
-            .wearable,
-            size: 2,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .isWearable: true,
+                .size: 2
+            ]
         )
         let initialParent = testItem.parent
-        let initialProperties = testItem.properties
+        let initialAttributes = testItem.attributes // Capture initial
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -504,8 +542,8 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("cloak")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
-        #expect(finalItemState?.hasProperty(.worn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
+        #expect(finalItemState?.hasFlag(.isWorn) == false) // Not worn
         #expect(engine.getPronounReference(pronoun: "it") == ["cloak"])
 
         // Assert Output
@@ -516,9 +554,9 @@ struct TakeActionHandlerTests {
         let expectedChanges = expectedTakeChanges(
             itemID: "cloak",
             initialParent: initialParent,
-            initialTouched: false
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item successfully from surface in room")
@@ -527,18 +565,20 @@ struct TakeActionHandlerTests {
         let surfaceItem = Item(
             id: "table",
             name: "wooden table",
-            properties: .surface,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isSurface: true]
         )
         let itemOnSurface = Item(
             id: "book",
             name: "old book",
-            properties: .takable,
-            .read,
-            parent: .item(surfaceItem.id)
+            parent: .item(surfaceItem.id),
+            attributes: [
+                .isTakable: true,
+                .isReadable: true
+            ]
         )
         let initialParent = itemOnSurface.parent
-        let initialProperties = itemOnSurface.properties
+        let initialAttributes = itemOnSurface.attributes // Capture initial
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -559,7 +599,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item(itemOnSurface.id)
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalSurfaceState = engine.item(surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
         #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
@@ -572,9 +612,9 @@ struct TakeActionHandlerTests {
         let expectedChanges = expectedTakeChanges(
             itemID: itemOnSurface.id,
             initialParent: initialParent,
-            initialTouched: false
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item that is already touched")
@@ -583,12 +623,15 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            properties: .takable, .touched, // Start with .touched
-            size: 3,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .isTouched: true, // Start touched
+                .size: 3
+            ]
         )
         let initialParent = testItem.parent
-        let initialProperties = testItem.properties // Includes .touched
+        let initialAttributes = testItem.attributes // Includes .isTouched: true
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -612,7 +655,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched)) // Still touched
+        #expect(finalItemState?.hasFlag(.isTouched) == true) // Still touched
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -620,16 +663,19 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        // Properties shouldn't change, so helper should only generate parent and pronoun changes
+        // Helper should only generate parent and pronoun changes as attributes didn't change
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,
-            initialTouched: true
+            initialAttributes: initialAttributes
         )
+        // Since isTouched was already true, no change for it should be generated.
+        // Only parent and pronoun changes are expected.
         #expect(expectedChanges.count == 2, "Expected only parent and pronoun changes")
-        #expect(!expectedChanges.contains { $0.propertyKey == .itemProperties }, "Should not contain property change")
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        #expect(!expectedChanges.contains { $0.propertyKey == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
+
 
     @Test("Take item at exact capacity")
     func testTakeItemAtExactCapacity() async throws {
@@ -637,19 +683,23 @@ struct TakeActionHandlerTests {
         let heldItem = Item(
             id: "sword",
             name: "sword",
-            properties: .takable,
-            size: 7,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .size: 7
+            ]
         )
         let itemToTake = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            size: 3,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .size: 3
+            ]
         )
         let initialParent = itemToTake.parent
-        let initialProperties = itemToTake.properties
+        let initialAttributes = itemToTake.attributes // Capture initial
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -673,7 +723,7 @@ struct TakeActionHandlerTests {
         // Assert Final State
         let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .player) // Should succeed
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
@@ -684,9 +734,9 @@ struct TakeActionHandlerTests {
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,
-            initialTouched: false
+            initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item from transparent container")
@@ -695,17 +745,20 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "jar",
             name: "glass jar",
-            properties: .container, .transparent, // Closed by default, but transparent
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isTransparent: true // Closed by default, but transparent
+            ]
         )
         let itemInContainer = Item(
             id: "fly",
             name: "dead fly",
-            properties: .takable,
-            parent: .item("jar")
+            parent: .item("jar"),
+            attributes: [.isTakable: true]
         )
         let initialParent = itemInContainer.parent
-        let initialProperties = itemInContainer.properties
+        let initialAttributes = itemInContainer.attributes // Capture initial
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -722,27 +775,22 @@ struct TakeActionHandlerTests {
         let command = Command(verbID: "take", directObject: "fly", rawInput: "take fly")
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(engine.item("jar")?.hasFlag(.isOpen) == false) // Verify closed
+        #expect(engine.item("jar")?.hasFlag(.isTransparent) == true) // Verify transparent
 
-        // Act: Should succeed because ScopeResolver sees through transparent containers
+        // Act: ScopeResolver sees through transparent containers, but TakeActionHandler should still check if container is open
         await engine.execute(command: command)
 
-        // Assert Final State
-        let finalItemState = engine.item("fly")
-        #expect(finalItemState?.parent == .player)
-        #expect(finalItemState?.hasFlag(.isTouched))
-        #expect(engine.getPronounReference(pronoun: "it") == ["fly"])
-
-        // Assert Output
+        // Assert Output - Should fail because container is closed
         let output = await mockIO.flush()
-        expectNoDifference(output, "Taken.")
+        expectNoDifference(output, "You have to open the glass jar first.") // Updated expected message
 
-        // Assert Change History
-        let expectedChanges = expectedTakeChanges(
-            itemID: "fly",
-            initialParent: initialParent,
-            initialTouched: false
-        )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        // Assert: Check item parent DID NOT change
+        let finalItemState = engine.item("fly")
+        #expect(finalItemState?.parent == .item("jar"), "Fly should still be in the jar")
     }
 
     @Test("Take item fails due to player capacity")
@@ -751,16 +799,20 @@ struct TakeActionHandlerTests {
         let itemHeld = Item(
             id: "sword",
             name: "sword",
-            properties: .takable,
-            size: 8,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .size: 8
+            ]
         )
         let itemToTake = Item(
             id: "shield",
             name: "shield",
-            properties: .takable,
-            size: 7,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .size: 7
+            ]
         )
         // Define player with low capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
@@ -785,5 +837,12 @@ struct TakeActionHandlerTests {
         // Assert: Check item parent DID NOT change
         let finalItemState = engine.item("shield")
         #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
+    }
+}
+
+// Helper to sort StateChange arrays for comparison
+extension Array where Element == StateChange {
+    func sorted() -> [StateChange] {
+        sorted(by: { $0 < $1 })
     }
 }

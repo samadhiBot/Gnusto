@@ -17,8 +17,8 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case locationName
 
     // Dynamic Values (Stored in Item/Location, logic in Registry)
-    case itemAttribute(PropertyID)
-    case locationAttribute(PropertyID)
+    case itemAttribute(AttributeID)
+    case locationAttribute(AttributeID)
 
     // Player Properties
     case playerHealth

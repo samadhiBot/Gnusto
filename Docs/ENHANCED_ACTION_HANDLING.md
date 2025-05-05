@@ -88,24 +88,24 @@ This system allows associating dynamic computation and validation logic with spe
 
 ```swift
 /// A strongly-typed identifier for game properties.
-public struct PropertyID: Hashable, Codable, Sendable { /* ... */ }
+public struct AttributeID: Hashable, Codable, Sendable { /* ... */ }
 
 /// The standard type for storing potentially dynamic state values.
 public enum StateValue: Codable, Sendable { /* ... */ }
 
 // --- Game Developer Interaction Points ---
 
-/// Items store their specific state values using PropertyID keys.
+/// Items store their specific state values using AttributeID keys.
 /// (Example structure - actual might differ slightly)
 public struct Item: Sendable, Codable {
     // ... other properties ...
-    public var attributes: [PropertyID: StateValue]
+    public var attributes: [AttributeID: StateValue]
 }
 
 /// Locations also store their state values.
 public struct Location: Sendable, Codable {
     // ... other properties ...
-    public var attributes: [PropertyID: StateValue]
+    public var attributes: [AttributeID: StateValue]
 }
 
 /// Registry for dynamic behavior (part of GameBlueprint or DefinitionRegistry).
@@ -121,13 +121,13 @@ public struct DynamicPropertyRegistry: Sendable {
 
     /// Registers a compute handler for a specific item property.
     public func registerItemCompute(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping ItemComputeHandler
     ) { /* ... */ }
 
     /// Registers a validation handler for a specific item property.
     public func registerItemValidate(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping ItemValidateHandler
     ) { /* ... */ }
 
@@ -140,13 +140,13 @@ public class GameEngine: Sendable {
     /// Gets the current value, checking compute handlers first.
     public func getDynamicItemValue(
         itemID: ItemID,
-        key: PropertyID
+        key: AttributeID
     ) async -> StateValue? { /* ... */ }
 
     /// Sets a value after checking validate handlers and applying a StateChange.
     public func setDynamicItemValue(
         itemID: ItemID,
-        key: PropertyID,
+        key: AttributeID,
         newValue: StateValue
     ) async throws { /* ... */ }
 
@@ -189,9 +189,9 @@ public protocol ActionContextProvider {
 
 ### Phase 2: Dynamic Logic & State System
 
-- [x] Define `PropertyID` type.
+- [x] Define `AttributeID` type.
 - [x] Create `DynamicPropertyRegistry` for compute/validate handlers.
-- [x] Add `attributes: [PropertyID: StateValue]` to `Item` and `Location`.
+- [x] Add `attributes: [AttributeID: StateValue]` to `Item` and `Location`.
 - [x] Update `StatePropertyKey` and `GameState.apply` to handle changes to `attributes`.
 - [x] Implement `GameEngine` helpers (`get/setDynamic...Value`) to orchestrate registry/state access.
 
@@ -270,8 +270,8 @@ public struct EnhancedActionHandler: EnhancedActionHandler {
 item.properties["isOpen"] = true
 
 // After (Conceptual Example)
-// 1. Define PropertyID
-// extension PropertyID { static let isOpen = PropertyID("isOpen") }
+// 1. Define AttributeID
+// extension AttributeID { static let isOpen = AttributeID("isOpen") }
 // 2. Register validation handler (optional, during setup)
 // registry.registerItemValidate(key: .isOpen) { item, newValue in ... }
 // 3. Set value using engine helper (triggers validation & StateChange)

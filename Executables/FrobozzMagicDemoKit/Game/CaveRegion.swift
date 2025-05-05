@@ -154,45 +154,55 @@ extension CaveRegion {
 extension CaveRegion {
     // Player tool found at start
     static let brassLantern = Item(
-        id: Components.Lantern.Constants.itemID,
-        name: "lantern",
-        adjectives: "brass",
-        synonyms: "lamp", "light",
-        description: "A sturdy brass lantern, useful for exploring dark places.",
-        properties: .takable, .lightSource, .device,
-        parent: .location("startRoom")
+        id: "brassLantern",
+        name: "brass lantern",
+        description: "A brass lantern, currently off.",
+        parent: .location(darkChamber.id),
+        attributes: [
+            .isTakable: .bool(true),
+            .isLightSource: .bool(true),
+            .isDevice: .bool(true)
+        ]
     )
 
     // Treasure room items
     static let goldCrown = Item(
         id: "goldCrown",
         name: "crown",
-        adjectives: "gold", "golden",
         description: "A magnificent golden crown, adorned with precious jewels.",
-        properties: .takable, .wearable,
         parent: .item("stonePedestal") // Placed on the pedestal
+        attributes: [
+            .adjectives: "gold", "golden",
+            .isTakable: true,
+            .isWearable: true,
+        ]
     )
 
     static let stonePedestal = Item(
         id: "stonePedestal",
         name: "pedestal",
-        adjectives: "stone",
         description: "A weathered stone pedestal in the center of the room.",
-        properties: .surface, .ndesc, // Use .ndesc instead of .scenery, imply !takable
         parent: .location("treasureRoom")
+        attributes: [
+            adjectives: "stone",
+            .isSurface: true,
+            .suppressDescription: true,
+        ]
     )
 
     // Iron Door puzzle items (door itself)
     static let ironDoor = Item(
         id: "ironDoor",
         name: "door",
-        adjectives: "iron", "massive",
         description: """
                 A massive door made of solid iron. Ancient runes are inscribed around its
                 frame. There's a keyhole below the handle.
                 """,
-        properties: .door, .lockable, .locked, .openable, // Added .openable
         parent: .location("ironDoorRoom"),
+        attributes: [
+            adjectives: "iron", "massive",
+            .door, .lockable, .locked, .openable, // Added .openable
+        ]
         lockKey: "rustyKey" // Set the key required
     )
 
@@ -200,58 +210,68 @@ extension CaveRegion {
     static let woodenChest = Item(
         id: "woodenChest",
         name: "chest",
-        adjectives: "wooden", "old",
         description: "An old wooden chest with brass fittings. The lid is currently closed.",
-        properties: .container, .openable, // Starts closed (no .open property)
         parent: .location("crystalGrotto")
+        attributes: [
+            .container, .openable, // Starts closed (no .open property)
+        ]
     )
 
+    adjectives: "wooden", "old",
     static let silverCoin = Item(
         id: "silverCoin",
         name: "coin",
-        adjectives: "silver", "ancient",
         description: "An ancient silver coin with unfamiliar markings.",
-        properties: .takable,
         parent: .item("woodenChest") // Inside the chest
+        attributes: [
+            .istakeable: true,
+        ]
     )
 
+    adjectives: "silver", "ancient",
     // Hidden Vault items
     static let mysteriousAltar = Item(
         id: "mysteriousAltar",
         name: "altar",
-        adjectives: "mysterious", "stone",
         description: """
                 A stone altar with intricate carvings. A shallow basin on top contains an \
                 iridescent liquid that seems to shift colors as you watch.
                 """,
-        properties: .ndesc, // Use .ndesc instead of .scenery
         parent: .location("hiddenVault")
+        attributes: [
+            .ndesc, // Use .ndesc instead of .scenery
+            adjectives: "mysterious", "stone",
+        ]
     )
 
     static let largeGem = Item(
         id: "largeGem",
         name: "gem",
-        adjectives: "large", "glowing",
         synonyms: "crystal", "stone",
         description: """
                 A large gem that seems to pulse with an inner light. As you examine it, \
                 the color shifts between deep blue and violet.
                 """,
-        properties: .takable, .lightSource, // Provides light, might not need .on
         parent: .location("hiddenVault") // On the altar? Or just in the room?
+        attributes: [
+            adjectives: "large", "glowing",
+            .istakeable: true, .lightSource, // Provides light, might not need .on
+        ]
     )
 
     // Underground Pool items
     static let darkPool = Item(
         id: "darkPool",
         name: "pool",
-        adjectives: "dark", "still",
         synonyms: "water",
         description: """
                 The water is perfectly still and incredibly clear. Looking down, you can see \
                 small, strange artifacts scattered on the bottom, just out of reach.
                 """,
-        properties: .ndesc, // Use .ndesc instead of .scenery
         parent: .location("undergroundPool")
+        attributes: [
+            adjectives: "dark", "still",
+            .ndesc, // Use .ndesc instead of .scenery
+        ]
     )
 }

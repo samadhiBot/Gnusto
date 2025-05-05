@@ -29,14 +29,14 @@ public struct DynamicPropertyRegistry: Sendable {
 
     // MARK: - Private Storage
 
-    /// Storage for item compute handlers, keyed by PropertyID.
-    private var itemComputeHandlers: [PropertyID: ItemComputeHandler] = [:]
+    /// Storage for item compute handlers, keyed by AttributeID.
+    private var itemComputeHandlers: [AttributeID: ItemComputeHandler] = [:]
     /// Storage for item validate handlers.
-    private var itemValidateHandlers: [PropertyID: ItemValidateHandler] = [:]
+    private var itemValidateHandlers: [AttributeID: ItemValidateHandler] = [:]
     /// Storage for location compute handlers.
-    private var locationComputeHandlers: [PropertyID: LocationComputeHandler] = [:]
+    private var locationComputeHandlers: [AttributeID: LocationComputeHandler] = [:]
     /// Storage for location validate handlers.
-    private var locationValidateHandlers: [PropertyID: LocationValidateHandler] = [:]
+    private var locationValidateHandlers: [AttributeID: LocationValidateHandler] = [:]
 
     // MARK: - Initialization
 
@@ -47,10 +47,10 @@ public struct DynamicPropertyRegistry: Sendable {
     /// Registers a compute handler for a specific item property.
     /// If a handler already exists for this key, it will be overwritten.
     /// - Parameters:
-    ///   - key: The `PropertyID` of the property.
+    ///   - key: The `AttributeID` of the property.
     ///   - handler: The closure to execute for computing the value.
     public mutating func registerItemCompute(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping ItemComputeHandler
     ) {
         itemComputeHandlers[key] = handler
@@ -59,10 +59,10 @@ public struct DynamicPropertyRegistry: Sendable {
     /// Registers a validation handler for a specific item property.
     /// If a handler already exists for this key, it will be overwritten.
     /// - Parameters:
-    ///   - key: The `PropertyID` of the property.
+    ///   - key: The `AttributeID` of the property.
     ///   - handler: The closure to execute for validating a new value.
     public mutating func registerItemValidate(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping ItemValidateHandler
     ) {
         itemValidateHandlers[key] = handler
@@ -72,7 +72,7 @@ public struct DynamicPropertyRegistry: Sendable {
 
     /// Registers a compute handler for a specific location property.
     public mutating func registerLocationCompute(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping LocationComputeHandler
     ) {
         locationComputeHandlers[key] = handler
@@ -80,7 +80,7 @@ public struct DynamicPropertyRegistry: Sendable {
 
     /// Registers a validation handler for a specific location property.
     public mutating func registerLocationValidate(
-        key: PropertyID,
+        key: AttributeID,
         handler: @escaping LocationValidateHandler
     ) {
         locationValidateHandlers[key] = handler
@@ -89,22 +89,22 @@ public struct DynamicPropertyRegistry: Sendable {
     // MARK: - Retrieval Methods (Internal Access)
 
     /// Retrieves the compute handler for a specific item property, if one exists.
-    internal func itemComputeHandler(for key: PropertyID) -> ItemComputeHandler? {
+    internal func itemComputeHandler(for key: AttributeID) -> ItemComputeHandler? {
         itemComputeHandlers[key]
     }
 
     /// Retrieves the validate handler for a specific item property, if one exists.
-    internal func itemValidateHandler(for key: PropertyID) -> ItemValidateHandler? {
+    internal func itemValidateHandler(for key: AttributeID) -> ItemValidateHandler? {
         itemValidateHandlers[key]
     }
 
     /// Retrieves the compute handler for a specific location property, if one exists.
-    internal func locationComputeHandler(for key: PropertyID) -> LocationComputeHandler? {
+    internal func locationComputeHandler(for key: AttributeID) -> LocationComputeHandler? {
         locationComputeHandlers[key]
     }
 
     /// Retrieves the validate handler for a specific location property, if one exists.
-    internal func locationValidateHandler(for key: PropertyID) -> LocationValidateHandler? {
+    internal func locationValidateHandler(for key: AttributeID) -> LocationValidateHandler? {
         locationValidateHandlers[key]
     }
 }

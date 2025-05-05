@@ -14,14 +14,14 @@ public struct Item: Codable, Identifiable, Sendable {
     /// A dictionary that holds the item's current attributes.
     ///
     /// Some attributes are static under normal circumstances, but any can change when necessary.
-    public var attributes: [PropertyID: StateValue]
+    public var attributes: [AttributeID: StateValue]
 
     public init(
         id: ItemID,
         name: String,
         description: String? = nil,
         parent: ParentEntity = .nowhere,
-        attributes: [PropertyID: StateValue] = [:]
+        attributes: [AttributeID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
@@ -46,9 +46,9 @@ public struct Item: Codable, Identifiable, Sendable {
     }
 
     /// Checks if a boolean flag is set in the item's `attributes`.
-    /// - Parameter id: The `PropertyID` of the flag to check.
+    /// - Parameter id: The `AttributeID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
-    public func hasFlag(_ id: PropertyID) -> Bool {
+    public func hasFlag(_ id: AttributeID) -> Bool {
         attributes[id] == .bool(true)
     }
     

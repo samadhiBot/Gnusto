@@ -28,8 +28,8 @@ struct PutOnActionHandlerTests {
     private func expectedPutOnChanges(
         itemToPutID: ItemID,
         surfaceID: ItemID,
-        oldItemAttributes: [PropertyID: StateValue],
-        oldSurfaceAttributes: [PropertyID: StateValue]
+        oldItemAttributes: [AttributeID: StateValue],
+        oldSurfaceAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 

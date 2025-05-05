@@ -2,7 +2,7 @@ import Foundation
 
 /// A unique identifier for a piece of contextual data relevant to an action.
 ///
-/// Unlike `PropertyID` which identifies stored state, `ContextID` typically identifies
+/// Unlike `AttributeID` which identifies stored state, `ContextID` typically identifies
 /// transient information calculated or gathered specifically for the current action execution.
 public struct ContextID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String

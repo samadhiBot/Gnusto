@@ -14,7 +14,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     /// A dictionary that holds the location's current attributes.
     ///
     /// Some attributes are static under normal circumstances, but any can change when necessary.
-    public var attributes: [PropertyID: StateValue]
+    public var attributes: [AttributeID: StateValue]
 
     // MARK: - Initializer
 
@@ -24,7 +24,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         description: String? = nil,
         exits: [Direction: Exit] = [:],
         isLit: Bool = false,
-        attributes: [PropertyID: StateValue] = [:]
+        attributes: [AttributeID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
@@ -41,9 +41,9 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
 
     /// Checks if a flag is set in the location's `attributes`.
     ///
-    /// - Parameter id: The `PropertyID` of the flag to check.
+    /// - Parameter id: The `AttributeID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, or `false` otherwise.
-    public func hasFlag(_ id: PropertyID) -> Bool {
+    public func hasFlag(_ id: AttributeID) -> Bool {
         attributes[id] == .bool(true)
     }
     

@@ -1136,10 +1136,10 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item.
-    ///   - key: The `PropertyID` of the desired value.
+    ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
     @MainActor
-    public func getDynamicItemValue(itemID: ItemID, key: PropertyID) async -> StateValue? {
+    public func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
             logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
             return nil
@@ -1165,10 +1165,10 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The ID of the location.
-    ///   - key: The `PropertyID` of the desired value.
+    ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
     @MainActor
-    public func getDynamicLocationValue(locationID: LocationID, key: PropertyID) async -> StateValue? {
+    public func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
             logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
             return nil
@@ -1192,11 +1192,11 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item to modify.
-    ///   - key: The `PropertyID` of the value to set.
+    ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
     @MainActor
-    public func setDynamicItemValue(itemID: ItemID, key: PropertyID, newValue: StateValue) async throws {
+    public func setDynamicItemValue(itemID: ItemID, key: AttributeID, newValue: StateValue) async throws {
         guard let item = gameState.items[itemID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
         }
@@ -1239,11 +1239,11 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The ID of the location to modify.
-    ///   - key: The `PropertyID` of the value to set.
+    ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
     @MainActor
-    public func setDynamicLocationValue(locationID: LocationID, key: PropertyID, newValue: StateValue) async throws {
+    public func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
          guard let location = gameState.locations[locationID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }

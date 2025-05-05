@@ -22,12 +22,12 @@ public class DescriptionHandlerRegistry {
     ///
     /// - Parameters:
     ///   - itemID: The ID of the item.
-    ///   - key: The `PropertyID` representing the desired description (e.g., `.longDescription`).
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.
     public func generateDescription(
         for itemID: ItemID,
-        key: PropertyID,
+        key: AttributeID,
         engine: GameEngine
     ) async -> String {
         let stateValue = await engine.getDynamicItemValue(itemID: itemID, key: key)
@@ -37,7 +37,7 @@ public class DescriptionHandlerRegistry {
 
     /// Provides a default description string when a dynamic or static one isn't found.
     private func defaultItemDescription(
-        for key: PropertyID,
+        for key: AttributeID,
         itemID: ItemID,
         engine: GameEngine
     ) -> String {
@@ -65,12 +65,12 @@ public class DescriptionHandlerRegistry {
     ///
     /// - Parameters:
     ///   - locationID: The ID of the location.
-    ///   - key: The `PropertyID` representing the desired description (e.g., `.longDescription`).
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.
     public func generateDescription(
         for locationID: LocationID,
-        key: PropertyID,
+        key: AttributeID,
         engine: GameEngine
     ) async -> String {
         let stateValue = await engine.getDynamicLocationValue(locationID: locationID, key: key)
@@ -80,7 +80,7 @@ public class DescriptionHandlerRegistry {
 
     /// Provides a default description string when a dynamic or static one isn't found.
     private func defaultLocationDescription(
-        for key: PropertyID,
+        for key: AttributeID,
         locationID: LocationID,
         engine: GameEngine
     ) -> String {

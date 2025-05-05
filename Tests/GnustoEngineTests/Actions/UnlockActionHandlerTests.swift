@@ -98,7 +98,7 @@ struct UnlockActionHandlerTests {
 
         // Check initial state
         let initialBoxSnapshot = try #require(engine.item("box"))
-        #expect(initialBoxSnapshot.hasFlag(PropertyID.isLocked) == true) // Qualified PropertyID
+        #expect(initialBoxSnapshot.hasFlag(AttributeID.isLocked) == true) // Qualified AttributeID
         let initialKeySnapshot = try #require(engine.item("key"))
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -114,19 +114,19 @@ struct UnlockActionHandlerTests {
 
         // Assert Final State
         let finalBoxState = try #require(await engine.item("box"))
-        #expect(finalBoxState.hasFlag(PropertyID.isLocked) == false, "Box should be unlocked") // Qualified PropertyID
-        #expect(finalBoxState.hasFlag(PropertyID.isTouched) == true, "Box should be touched") // Qualified PropertyID
+        #expect(finalBoxState.hasFlag(AttributeID.isLocked) == false, "Box should be unlocked") // Qualified AttributeID
+        #expect(finalBoxState.hasFlag(AttributeID.isTouched) == true, "Box should be touched") // Qualified AttributeID
 
         let finalKeyState = try #require(await engine.item("key"))
-        #expect(finalKeyState.hasFlag(PropertyID.isTouched) == true, "Key should be touched") // Qualified PropertyID
+        #expect(finalKeyState.hasFlag(AttributeID.isTouched) == true, "Key should be touched") // Qualified AttributeID
 
         // Assert Change History
         let expectedChanges = expectedUnlockChanges(
             targetItemID: "box",
             keyItemID: "key",
-            initialTargetLocked: initialBoxSnapshot.hasFlag(PropertyID.isLocked), // Qualified PropertyID
-            initialTargetTouched: initialBoxSnapshot.hasFlag(PropertyID.isTouched), // Qualified PropertyID
-            initialKeyTouched: initialKeySnapshot.hasFlag(PropertyID.isTouched) // Qualified PropertyID
+            initialTargetLocked: initialBoxSnapshot.hasFlag(AttributeID.isLocked), // Qualified AttributeID
+            initialTargetTouched: initialBoxSnapshot.hasFlag(AttributeID.isTouched), // Qualified AttributeID
+            initialKeyTouched: initialKeySnapshot.hasFlag(AttributeID.isTouched) // Qualified AttributeID
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -416,7 +416,7 @@ let box = Item(
             ioHandler: mockIO
         )
         let initialBoxSnapshot = try #require(await engine.item("box"))
-        #expect(initialBoxSnapshot.hasFlag(PropertyID.isLocked) == false) // Qualified PropertyID
+        #expect(initialBoxSnapshot.hasFlag(AttributeID.isLocked) == false) // Qualified AttributeID
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")

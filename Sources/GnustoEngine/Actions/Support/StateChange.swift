@@ -1,3 +1,5 @@
+import Foundation
+
 /// Represents a change in game state.
 public struct StateChange: Codable, Sendable, Equatable {
     /// The entity being changed (can be Item, Location, Player, or Global context).
@@ -11,6 +13,9 @@ public struct StateChange: Codable, Sendable, Equatable {
 
     /// The value of the property after the change.
     public let newValue: StateValue
+    
+    /// When the state change occurred.
+    public let created: Date
 
     /// Creates a new state change record.
     /// - Parameters:
@@ -28,5 +33,14 @@ public struct StateChange: Codable, Sendable, Equatable {
         self.propertyKey = propertyKey
         self.oldValue = oldValue
         self.newValue = newValue
+        self.created = .now
+    }
+}
+
+// MARK: - Conformances
+
+extension StateChange: Comparable {
+    public static func < (lhs: StateChange, rhs: StateChange) -> Bool {
+        lhs.created < rhs.created
     }
 }

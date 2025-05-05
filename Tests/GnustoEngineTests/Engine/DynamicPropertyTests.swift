@@ -10,16 +10,16 @@ struct DynamicPropertyTests {
     enum TestIDs {
         static let testItem: ItemID = "testItem"
         static let testLocation: LocationID = "testLocation"
-        static let computedProp: PropertyID = "computedProp"
-        static let validatedProp: PropertyID = "validatedProp"
-        static let simpleProp: PropertyID = "simpleProp"
+        static let computedProp: AttributeID = "computedProp"
+        static let validatedProp: AttributeID = "validatedProp"
+        static let simpleProp: AttributeID = "simpleProp"
     }
 
     // Helper to create a basic engine setup for testing
     @MainActor
     private func createTestEngine(
-        initialItemValues: [PropertyID: StateValue] = [:],
-        initialLocationValues: [PropertyID: StateValue] = [:],
+        initialItemValues: [AttributeID: StateValue] = [:],
+        initialLocationValues: [AttributeID: StateValue] = [:],
         dynamicRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry(),
         ioHandler: IOHandler
     ) -> GameEngine {

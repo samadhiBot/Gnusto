@@ -8,7 +8,7 @@ import CustomDump
 struct ExamineActionHandlerTests {
     private func expectedExamineChanges(
         itemID: ItemID,
-        initialAttributes: [PropertyID: StateValue]?
+        initialAttributes: [AttributeID: StateValue]?
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
@@ -51,7 +51,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.hasFlag(PropertyID.isTouched) == false)
+        #expect(initialItemState?.hasFlag(AttributeID.isTouched) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine pebble")
@@ -61,7 +61,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "A smooth, grey pebble.")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true)
+        #expect(finalItemState?.hasFlag(AttributeID.isTouched) == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -96,7 +96,7 @@ struct ExamineActionHandlerTests {
             definitionRegistry: registry
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.hasFlag(PropertyID.isTouched) == false)
+        #expect(initialItemState?.hasFlag(AttributeID.isTouched) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
@@ -106,7 +106,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "The locket is intricately engraved with the initials \"A.S\".")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true)
+        #expect(finalItemState?.hasFlag(AttributeID.isTouched) == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -138,7 +138,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.hasFlag(PropertyID.isTouched) == false)
+        #expect(initialItemState?.hasFlag(AttributeID.isTouched) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
@@ -148,7 +148,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "A weathered statue of a grue.")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.hasFlag(PropertyID.isTouched) == true)
+        #expect(finalItemState?.hasFlag(AttributeID.isTouched) == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -187,7 +187,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "You see no hidden gem here.")
 
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(AttributeID.isTouched) == false)
     }
 
     @Test func testExamineNonExistentItem() async throws {
@@ -257,8 +257,8 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "Which ball do you mean, the red ball or the blue ball?")
 
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID1)?.hasFlag(PropertyID.isTouched) == false)
-        #expect(await engine.item(itemID2)?.hasFlag(PropertyID.isTouched) == false)
+        #expect(await engine.item(itemID1)?.hasFlag(AttributeID.isTouched) == false)
+        #expect(await engine.item(itemID2)?.hasFlag(AttributeID.isTouched) == false)
     }
 
     @Test func testExamineSelf() async throws {
@@ -294,7 +294,7 @@ struct ExamineActionHandlerTests {
             parent: .player
         )
 //        var dynamicPropertyRegistry = DynamicPropertyRegistry()
-//        dynamicPropertyRegistry.registerItemCompute(key: <#T##PropertyID#>, handler: <#T##DynamicPropertyRegistry.ItemComputeHandler##DynamicPropertyRegistry.ItemComputeHandler##(Item, GameState) async throws -> StateValue#>)
+//        dynamicPropertyRegistry.registerItemCompute(key: <#T##AttributeID#>, handler: <#T##DynamicPropertyRegistry.ItemComputeHandler##DynamicPropertyRegistry.ItemComputeHandler##(Item, GameState) async throws -> StateValue#>)
 //        let objectHandler: ObjectActionHandler = { command, context, itemID, io, engine in
 //            guard command.verbID == VerbID("examine") else { return .objectAction(.notHandled) }
 //            await io.print("The mirror shows a faint, ghostly image.")
@@ -315,7 +315,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.hasFlag(PropertyID.isTouched) == false)
+        #expect(initialItemState?.hasFlag(AttributeID.isTouched) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
@@ -325,6 +325,6 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "The mirror shows a faint, ghostly image.")
 
         #expect(engine.gameState.changeHistory.isEmpty)
-        #expect(await engine.item(itemID)?.hasFlag(PropertyID.isTouched) == false)
+        #expect(await engine.item(itemID)?.hasFlag(AttributeID.isTouched) == false)
     }
 }

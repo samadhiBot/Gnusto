@@ -8,7 +8,7 @@ struct OperaHouse: AreaContents {
         name: "Bar",
         description: """
             The bar, much rougher than you'd have guessed after the opulence
-            of the foyer to the north, is completely empty. There seems to be 
+            of the foyer to the north, is completely empty. There seems to be
             some sort of message scrawled in the sawdust on the floor.
             """,
         exits: [
@@ -19,10 +19,13 @@ struct OperaHouse: AreaContents {
 
     let message = Item(
         id: "message",
-        name: "message",
-        properties: .ndesc, .read,
+        name: "crumpled message",
+        description: "A message appears to be written on the note.",
         parent: .location("bar"),
-        readableText: "You have won!"
+        attributes: [
+            .hasNoDescription: .bool(true),
+            .isReadable: .bool(true)
+        ]
     )
 
     // MARK: - Cloakroom
@@ -43,10 +46,11 @@ struct OperaHouse: AreaContents {
     let hook = Item(
         id: "hook",
         name: "small brass hook",
-        adjectives: "small", "brass",
-        synonyms: "peg",
-        properties: .surface,
-        parent: .location("cloakroom")
+        description: "It's just a small brass hook, firmly fixed to the wall.",
+        parent: .location("cloakroom"),
+        attributes: [
+            .isSurface: .bool(true)
+        ]
     )
 
     // MARK: - Foyer of the Opera House
@@ -77,9 +81,13 @@ struct OperaHouse: AreaContents {
 
     let cloak = Item(
         id: "cloak",
-        name: "cloak",
-        adjectives: "handsome", "velvet",
-        properties: .takable, .wearable, .worn,
-        parent: .player
+        name: "velvet cloak",
+        description: "A handsome velvet cloak, of exquisite quality.",
+        parent: .location("cloakroom"),
+        attributes: [
+            .isTakable: .bool(true),
+            .isWearable: .bool(true),
+            .isWorn: .bool(true)
+        ]
     )
 }
