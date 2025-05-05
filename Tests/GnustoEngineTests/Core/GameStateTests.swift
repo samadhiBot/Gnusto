@@ -583,7 +583,7 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesRemove() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc", inherentlyLit: true)
+        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc", isLit: true)
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(

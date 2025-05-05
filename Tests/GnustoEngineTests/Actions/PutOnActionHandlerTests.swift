@@ -250,8 +250,8 @@ struct PutOnActionHandlerTests {
                 .isSurface: true
             ]
         )
-        let room1 = Location(id: "startRoom", name: "Start", inherentlyLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other", inherentlyLit: true)
+        let room1 = Location(id: "startRoom", name: "Start", isLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other", isLit: true)
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

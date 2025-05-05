@@ -432,7 +432,7 @@ struct GameEngineTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            inherentlyLit: true
+            isLit: true
         )
 
         let game = MinimalGame(
@@ -567,7 +567,7 @@ struct GameEngineTests {
             ]
         )
         let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(
             locations: [startRoom],
             items: [lamp],
@@ -757,7 +757,7 @@ struct GameEngineTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -778,7 +778,7 @@ struct GameEngineTests {
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
@@ -796,7 +796,7 @@ struct GameEngineTests {
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
@@ -823,7 +823,7 @@ struct GameEngineTests {
             ],
             parent: .location("startRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -845,7 +845,7 @@ struct GameEngineTests {
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
         let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
@@ -866,7 +866,7 @@ struct GameEngineTests {
             properties: .takable,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
@@ -899,7 +899,7 @@ struct GameEngineTests {
             in: "startRoom",
             carryingCapacity: 10 // Set low capacity
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
@@ -916,7 +916,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -939,7 +939,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -968,7 +968,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.north: blockedExit],
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -993,7 +993,7 @@ struct GameEngineTests {
             ],
             parent: .location("startRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [container])
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
@@ -1018,7 +1018,7 @@ struct GameEngineTests {
             ]
         )
         let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
@@ -1041,7 +1041,7 @@ struct GameEngineTests {
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
         let item = Item(id: "book", name: "book", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
@@ -1062,7 +1062,7 @@ struct GameEngineTests {
             properties: .fixed,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
@@ -1083,7 +1083,7 @@ struct GameEngineTests {
             properties: .wearable, .worn, .fixed,
             parent: .player
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
@@ -1106,7 +1106,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.up: conditionalExit],
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -1157,7 +1157,7 @@ struct GameEngineTests {
                 .isTakable: true
             ]
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 

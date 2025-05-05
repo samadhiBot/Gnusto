@@ -21,7 +21,7 @@ struct MinimalGame: GameBlueprint {
                 id: "startRoom",
                 name: "Void",
                 description: "An empty void.",
-                inherentlyLit: true
+                isLit: true
             )
         ]
         let gameItems = items ?? [

@@ -15,13 +15,13 @@ struct GoActionHandlerTests {
             name: "Start Room",
             description: "You are here.",
             exits: [.north: Exit(destination: "end")],
-            inherentlyLit: true
+            isLit: true
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
             description: "You went there.",
-            inherentlyLit: true
+            isLit: true
         )
 
         let game = MinimalGame(
@@ -146,13 +146,13 @@ struct GoActionHandlerTests {
             name: "Foyer",
             description: "A grand foyer.",
             exits: [.north: Exit(destination: "hall")],
-            inherentlyLit: true
+            isLit: true
         )
         let hall = Location(
             id: "hall",
             name: "Hall",
             description: "A long hall.",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
@@ -174,7 +174,7 @@ struct GoActionHandlerTests {
             id: "foyer",
             name: "Foyer",
             description: "A grand foyer.",
-            inherentlyLit: true
+            isLit: true
             // No exit north
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
@@ -200,13 +200,13 @@ struct GoActionHandlerTests {
             name: "Foyer",
             description: "A grand foyer.",
             exits: [.north: Exit(destination: "vault", isLocked: true)], // Locked exit
-            inherentlyLit: true
+            isLit: true
         )
         let vault = Location(
             id: "vault",
             name: "Vault",
             description: "A secure vault.",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, vault])
         let mockIO = await MockIOHandler()
@@ -232,13 +232,13 @@ struct GoActionHandlerTests {
             name: "Foyer",
             description: "A grand foyer.",
             exits: [.east: Exit(destination: "garden", conditionFlag: conditionFlag)],
-            inherentlyLit: true
+            isLit: true
         )
         let garden = Location(
             id: "garden",
             name: "Garden",
             description: "A beautiful garden.",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
@@ -265,13 +265,13 @@ struct GoActionHandlerTests {
             name: "Foyer",
             description: "A grand foyer.",
             exits: [.east: Exit(destination: "garden", conditionFlag: conditionFlag)],
-            inherentlyLit: true
+            isLit: true
         )
         let garden = Location(
             id: "garden",
             name: "Garden",
             description: "A beautiful garden.",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
@@ -296,7 +296,7 @@ struct GoActionHandlerTests {
             id: "foyer",
             name: "Foyer",
             description: "A grand foyer.",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()

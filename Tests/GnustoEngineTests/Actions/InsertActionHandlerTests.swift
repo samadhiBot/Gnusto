@@ -261,12 +261,12 @@ struct InsertActionHandlerTests {
         let room1 = Location(
             id: "startRoom",
             name: "Start",
-            inherentlyLit: true
+            isLit: true
         )
         let room2 = Location(
             id: "otherRoom",
             name: "Other",
-            inherentlyLit: true
+            isLit: true
         )
         let game = MinimalGame(
             locations: [room1, room2],
@@ -570,7 +570,7 @@ struct InsertActionHandlerTests {
                 .isOpen: true // Starts open
             ]
         )
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true) // Assuming lit for test
+        let room = Location(id: "startRoom", name: "Room", isLit: true) // Assuming lit for test
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         let mockIO = await MockIOHandler()
@@ -620,7 +620,7 @@ struct InsertActionHandlerTests {
                 .isOpen: true
             ]
         )
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+        let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [container])
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -652,8 +652,8 @@ struct InsertActionHandlerTests {
                 .isOpen: true
             ]
         )
-        let room1 = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other Room", inherentlyLit: true)
+        let room1 = Location(id: "startRoom", name: "Start Room", isLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other Room", isLit: true)
 
         let game = MinimalGame(locations: [room1, room2], items: [itemToInsert, container])
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -676,7 +676,7 @@ struct InsertActionHandlerTests {
         // Arrange: Target is a rock (not a container)
         let itemToInsert = Item(id: "key", name: "small key", parent: .player)
         let target = Item(id: "rock", name: "smooth rock", parent: .location("startRoom"))
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+        let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, target])
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -708,7 +708,7 @@ struct InsertActionHandlerTests {
                 // Closed by default
             ]
         )
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+        let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -742,7 +742,7 @@ struct InsertActionHandlerTests {
                 .capacity: 1 // Set capacity
             ]
         )
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+        let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, existingItem, container])
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -776,7 +776,7 @@ struct InsertActionHandlerTests {
                 .capacity: 3 // Set capacity
             ]
         )
-        let room = Location(id: "startRoom", name: "Room", inherentlyLit: true)
+        let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         #expect(engine.gameState.changeHistory.isEmpty == true)

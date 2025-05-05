@@ -30,7 +30,7 @@ extension ForestRegion {
             .north: Exit(destination: "startRoom"), // Exit to CaveRegion
             .west: Exit(destination: "streamBank"),
         ],
-        inherentlyLit: true, .outside
+        isLit: true, .outside
     )
 
     static let streamBank = Location(
@@ -43,7 +43,7 @@ extension ForestRegion {
         exits: [
             .east: Exit(destination: "outside"),
         ],
-        inherentlyLit: true, .outside
+        isLit: true, .outside
     )
 }
 

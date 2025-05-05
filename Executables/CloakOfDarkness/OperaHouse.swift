@@ -37,7 +37,7 @@ struct OperaHouse: AreaContents {
         exits: [
             .east: Exit(destination: "foyer"),
         ],
-        inherentlyLit: true
+        isLit: true
     )
 
     let hook = Item(
@@ -70,7 +70,7 @@ struct OperaHouse: AreaContents {
                     """
             )
         ],
-        inherentlyLit: true
+        isLit: true
     )
 
     // MARK: - Items

@@ -263,8 +263,8 @@ struct LockActionHandlerTests {
                 .isTakable: true
             ]
         )
-        let room1 = Location(id: "startRoom", name: "Start", description: "", inherentlyLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other", description: "", inherentlyLit: true)
+        let room1 = Location(id: "startRoom", name: "Start", description: "", isLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other", description: "", isLit: true)
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

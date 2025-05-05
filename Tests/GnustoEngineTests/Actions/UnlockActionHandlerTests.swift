@@ -272,12 +272,12 @@ let box = Item(
         let room1 = Location(
             id: "startRoom",
             name: "Start",
-            inherentlyLit: true
+            isLit: true
         ) // Correct parameter name
         let room2 = Location(
             id: "otherRoom",
             name: "Other",
-            inherentlyLit: true
+            isLit: true
         ) // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()

@@ -34,7 +34,7 @@ struct LookActionHandlerTests {
             id: "litRoom",
             name: "Test Room",
             description: "A basic room.",
-            inherentlyLit: true
+            isLit: true
         )
         let item1 = Item(
             id: "widget",
@@ -86,7 +86,7 @@ struct LookActionHandlerTests {
             id: "litRoom",
             name: "Test Room",
             description: "A basic room.",
-            inherentlyLit: true
+            isLit: true
         )
         let item1 = Item(
             id: "apple",
@@ -244,7 +244,7 @@ struct LookActionHandlerTests {
             id: "litRoom",
             name: "Plain Room",
             // No longDescription provided - should be nil by default
-            inherentlyLit: true
+            isLit: true
         )
 
         let game = MinimalGame(
@@ -281,7 +281,7 @@ struct LookActionHandlerTests {
             name: "Magic Room",
             // Provide a default description; dynamic logic will override
             description: "The room seems normal.",
-            inherentlyLit: true
+            isLit: true
         )
 
         // MinimalGame takes flags as variadic arguments
@@ -661,7 +661,7 @@ struct LookActionHandlerTests {
             name: "glowing artifact",
             parent: .location("otherRoom")
         )
-        let room1 = Location(id: "startRoom", name: "Start Room", inherentlyLit: true)
+        let room1 = Location(id: "startRoom", name: "Start Room", isLit: true)
         let room2 = Location(id: "otherRoom", name: "Other Room")
 
         let game = MinimalGame(

@@ -52,7 +52,7 @@ struct ReadActionHandlerTests {
             id: "litRoom",
             name: "Bright Room",
             description: "It's bright here.",
-            inherentlyLit: true
+            isLit: true
         )
 
         let game = MinimalGame(

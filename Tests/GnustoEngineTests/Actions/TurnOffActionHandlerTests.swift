@@ -56,7 +56,7 @@ struct TurnOffActionHandlerTests {
             id: "room",
             name: "Test Room",
             description: "You are here.",
-            inherentlyLit: true
+            isLit: true
         )
         let book = Item(
             id: "book",

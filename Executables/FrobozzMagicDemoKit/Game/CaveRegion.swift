@@ -45,7 +45,7 @@ extension CaveRegion {
             .south: Exit(destination: "outside"), // Exit to ForestRegion
             .east: Exit(destination: "narrowPassage"),
         ],
-        inherentlyLit: true
+        isLit: true
     )
 
     // Main cave areas
@@ -145,7 +145,7 @@ extension CaveRegion {
         exits: [
             .up: Exit(destination: "crystalGrotto"),
         ],
-        inherentlyLit: true // Fungi provide light
+        isLit: true // Fungi provide light
     )
 }
 
