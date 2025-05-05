@@ -272,13 +272,11 @@ let box = Item(
         let room1 = Location(
             id: "startRoom",
             name: "Start",
-            description: "",
             inherentlyLit: true
         ) // Correct parameter name
         let room2 = Location(
             id: "otherRoom",
             name: "Other",
-            description: "",
             inherentlyLit: true
         ) // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
