@@ -76,33 +76,33 @@ public struct LockActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .locked to target (if not already set)
-        if targetItem.dynamicValues[.isLocked] != .bool(true) {
+        if targetItem.attributes[.isLocked] != .bool(true) {
             let lockedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .isLocked),
-                oldValue: targetItem.dynamicValues[.isLocked] ?? .bool(false),
+                oldValue: targetItem.attributes[.isLocked] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(lockedChange)
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.itemTouched] != .bool(true) {
             let targetTouchedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(targetTouchedChange)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if keyItem.dynamicValues[.itemTouched] != .bool(true) {
+        if keyItem.attributes[.itemTouched] != .bool(true) {
             let keyTouchedChange = StateChange(
                 entityId: .item(keyItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: keyItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: keyItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(keyTouchedChange)

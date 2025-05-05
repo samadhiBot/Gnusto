@@ -48,11 +48,11 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
             }
 
             // Mark as touched if not already
-            if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            if targetItem.attributes[.itemTouched] != .bool(true) {
                 let change = StateChange(
                     entityId: .item(targetItemID),
                     propertyKey: .itemDynamicValue(key: .itemTouched),
-                    oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                    oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                     newValue: .bool(true)
                 )
                 stateChanges.append(change)

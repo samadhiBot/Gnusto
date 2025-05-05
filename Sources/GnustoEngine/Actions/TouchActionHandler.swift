@@ -63,11 +63,11 @@ public struct TouchActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
         if let targetItem = await context.engine.item(with: targetItemID) {
-            if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+            if targetItem.attributes[.itemTouched] != .bool(true) {
                 stateChanges.append(StateChange(
                     entityId: .item(targetItemID),
                     propertyKey: .itemDynamicValue(key: .itemTouched),
-                    oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                    oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                     newValue: .bool(true)
                 ))
             }

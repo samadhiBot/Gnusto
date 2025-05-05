@@ -46,17 +46,17 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .touched property change if needed
-        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }
 
         // Change 2: Remove .on property change (only if currently on)
-        if targetItem.dynamicValues[.isOn] == .bool(true) {
+        if targetItem.attributes[.isOn] == .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .isOn),
@@ -76,7 +76,7 @@ struct TurnOffActionHandler: EnhancedActionHandler {
             let currentLocation = await context.engine.location(with: currentLocationID)
 
             // 1. Is the room inherently lit?
-            let locationIsInherentlyLit = currentLocation?.flag(.locationInherentlyLit) ?? false
+            let locationIsInherentlyLit = currentLocation?.flag(.inherentlyLit) ?? false
 
             if !locationIsInherentlyLit {
                 // 2. Check for other active light sources (inventory or location)

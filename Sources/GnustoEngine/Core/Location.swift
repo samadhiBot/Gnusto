@@ -6,9 +6,6 @@ public typealias DescriptionHandlerID = String
 /// A type alias for the unique identifier of a `RoomActionHandler`.
 public typealias RoomActionHandlerID = String
 
-/// A closure that dynamically generates a description string for a Location based on its state and the overall GameState.
-public typealias LocationDescriptionHandler = @MainActor @Sendable (Location, GameState) async -> String?
-
 /// Represents a location (room) within the game world.
 public struct Location: Codable, Identifiable, Equatable, Sendable {
     // --- Stored Properties (Alphabetical) ---
@@ -76,18 +73,18 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
 
         // Initialize dynamic values from parameters and flags
         var initialValues = dynamicValues
-        initialValues[.longDescription] = .string(description)
+        initialValues[.description] = .string(description)
 
         // Set boolean flags
-        if inherentlyLit { initialValues[.locationInherentlyLit] = .bool(true) }
+        if inherentlyLit { initialValues[.inherentlyLit] = .bool(true) }
         if isLit { initialValues[.locationIsLit] = .bool(true) }
-        if noMagic { initialValues[.locationNoMagic] = .bool(true) }
-        if isOutside { initialValues[.locationIsOutside] = .bool(true) }
-        if isSacred { initialValues[.locationIsSacred] = .bool(true) }
-        if descriptionChanged { initialValues[.locationDescriptionChanged] = .bool(true) }
-        if isLand { initialValues[.locationIsLand] = .bool(true) } else { initialValues[.locationIsLand] = .bool(false) }
-        if visited { initialValues[.locationVisited] = .bool(true) }
-        if isWater { initialValues[.locationIsWater] = .bool(true) }
+        if noMagic { initialValues[.breaksMagic] = .bool(true) }
+        if isOutside { initialValues[.isOutside] = .bool(true) }
+        if isSacred { initialValues[.isSacred] = .bool(true) }
+        if descriptionChanged { initialValues[.isChanged] = .bool(true) }
+        if isLand { initialValues[.isLand] = .bool(true) } else { initialValues[.isLand] = .bool(false) }
+        if visited { initialValues[.isVisited] = .bool(true) }
+        if isWater { initialValues[.isWater] = .bool(true) }
 
         self.dynamicValues = initialValues
     }
@@ -112,12 +109,12 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         dynamicValues = try container.decodeIfPresent([PropertyID: StateValue].self, forKey: .dynamicValues) ?? [:]
 
         // Ensure longDescription exists if migrating from old format without dynamicValues
-        if dynamicValues[.longDescription] == nil {
+        if dynamicValues[.description] == nil {
             // Attempt to recover from potential older format (this might need adjustment based on actual old structure)
             // If there was a separate 'description' field, we might try decoding that.
             // For now, default to empty if missing entirely.
             // TODO: Verify migration strategy from older saves if necessary.
-            dynamicValues[.longDescription] = .string("") // Default or try decoding old field
+            dynamicValues[.description] = .string("") // Default or try decoding old field
             print("Warning: Migrating Location \(id) with potentially missing longDescription in dynamicValues.")
         }
     }

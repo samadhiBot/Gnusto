@@ -29,7 +29,7 @@ public struct ScopeResolver: Sendable {
         }
 
         // 1. Check if the location is inherently lit.
-        if location.flag(.locationInherentlyLit) {
+        if location.flag(.inherentlyLit) {
             return true
         }
 
@@ -118,7 +118,7 @@ public struct ScopeResolver: Sendable {
             if currentItem.flag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
                 // Check dynamic property for open state
-                let isOpen = engine.gameState.items[currentItem.id]?.dynamicValues[.isOpen]?.toBool ?? false
+                let isOpen = engine.gameState.items[currentItem.id]?.attributes[.isOpen]?.toBool ?? false
                 let isTransparent = currentItem.flag(.isTransparent)
                 if isOpen || isTransparent {
                     // Find items directly inside this container

@@ -43,15 +43,15 @@ public class DescriptionHandlerRegistry {
     ) -> String {
         let item = engine.item(with: itemID)
         switch key {
-        case .longDescription:
+        case .description:
             return "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
         case .shortDescription:
             return "\(item?.withIndefiniteArticle.capitalizedFirst ?? "An item")."
-        case .itemFirstDescription:
+        case .firstDescription:
             return "There is \(item?.withIndefiniteArticle ?? "something") here."
-        case .itemReadText:
+        case .readText:
             return "There is nothing written on \(item?.withDefiniteArticle ?? "it")."
-        case .itemHeldText:
+        case .readWhileHeldText:
             return "Holding \(item?.withDefiniteArticle ?? "it") reveals nothing special."
         default:
             return "\(item?.withDefiniteArticle.capitalizedFirst ?? "It") seems indescribable."
@@ -87,7 +87,7 @@ public class DescriptionHandlerRegistry {
         // Consider fetching location name
         // let locationName = await engine.locationSnapshot(locationID)?.name ?? "place"
         switch key {
-        case .longDescription:
+        case .description:
             return "You are in a nondescript location."
         case .shortDescription:
             return "A location."

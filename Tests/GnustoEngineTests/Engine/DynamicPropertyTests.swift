@@ -29,7 +29,7 @@ struct DynamicPropertyTests {
 //            dynamicValues: initialItemValues, // Set manually after init if needed
             parent: .location(TestIDs.testLocation)
         )
-        testItem.dynamicValues = initialItemValues // Assign initial values
+        testItem.attributes = initialItemValues // Assign initial values
 
         var testLocation = Location(
             id: TestIDs.testLocation,
@@ -71,7 +71,7 @@ struct DynamicPropertyTests {
 
         // Verify new value in GameState
         let updatedItem = engine.gameState.items[TestIDs.testItem]
-        #expect(updatedItem?.dynamicValues[TestIDs.simpleProp] == StateValue.int(20))
+        #expect(updatedItem?.attributes[TestIDs.simpleProp] == StateValue.int(20))
 
         // Verify getting the value again works
         let finalValue = await engine.getDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.simpleProp)
@@ -98,7 +98,7 @@ struct DynamicPropertyTests {
 
         // Verify value in GameState
         let updatedItem = engine.gameState.items[TestIDs.testItem]
-        #expect(updatedItem?.dynamicValues[TestIDs.validatedProp] == StateValue.int(5))
+        #expect(updatedItem?.attributes[TestIDs.validatedProp] == StateValue.int(5))
     }
 
     @Test("Set Validated Item Value - Failure")
@@ -124,13 +124,13 @@ struct DynamicPropertyTests {
 
         // Verify value in GameState hasn't changed
         let item = engine.gameState.items[TestIDs.testItem]
-        #expect(item?.dynamicValues[TestIDs.validatedProp] == StateValue.int(1))
+        #expect(item?.attributes[TestIDs.validatedProp] == StateValue.int(1))
 
         // Attempt to set wrong type
          await #expect(throws: ActionError.self) {
              try await engine.setDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.validatedProp, newValue: StateValue.string("invalid"))
         }
-         #expect(item?.dynamicValues[TestIDs.validatedProp] == StateValue.int(1))
+         #expect(item?.attributes[TestIDs.validatedProp] == StateValue.int(1))
     }
 
     // TODO: Add tests for Location dynamic properties

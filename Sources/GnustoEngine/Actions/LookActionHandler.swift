@@ -70,7 +70,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         var descriptionLines: [String] = []
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id, // Use item ID
-            key: .longDescription, // Specify the key
+            key: .description, // Specify the key
             engine: engine
         )
         descriptionLines.append(baseDescription)
@@ -83,12 +83,12 @@ public struct LookActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         // Use the item from the snapshot for checking state
         if let snapshotItem = stateSnapshot.items[targetItemID],
-           snapshotItem.dynamicValues[.itemTouched] != .bool(true) // Check dynamicValue
+           snapshotItem.attributes[.itemTouched] != .bool(true) // Check dynamicValue
         {
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched), // Use dynamic value key
-                oldValue: snapshotItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: snapshotItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
             stateChanges.append(propertiesChange)
@@ -120,7 +120,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Container contents - Check flags on the potentially stale item definition
         if item.flag(.isContainer) { // Use flag()
             // Check current state (open/closed) using dynamic value from the snapshot
-            let isOpen = stateSnapshot.items[itemID]?.dynamicValues[.isOpen]?.toBool ?? false
+            let isOpen = stateSnapshot.items[itemID]?.attributes[.isOpen]?.toBool ?? false
             let isTransparent = item.flag(.isTransparent) // Use flag()
 
             if isOpen || isTransparent {
@@ -170,7 +170,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Print long description (potentially dynamic)
         let longDesc = await engine.descriptionHandlerRegistry.generateDescription(
             for: location.id,
-            key: .longDescription,
+            key: .description,
             engine: engine
         )
 

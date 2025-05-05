@@ -42,7 +42,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if itemSnapshot.dynamicValues[.isWorn] == .bool(true) { // Only change if currently worn
+        if itemSnapshot.attributes[.isWorn] == .bool(true) { // Only change if currently worn
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .isWorn),
@@ -52,11 +52,11 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         }
 
         // Change 2: Set `.itemTouched` to true (if not already)
-        if itemSnapshot.dynamicValues[.itemTouched] != .bool(true) {
+        if itemSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: itemSnapshot.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: itemSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }

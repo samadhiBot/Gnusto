@@ -609,7 +609,7 @@ public struct StandardParser: Parser {
                          else if case .item(let containerID) = item.parent {
                              if let container = allItems[containerID],
                                 (container.parent == .player || container.parent == .location(currentLocationID)) {
-                                 let isContainerOpen = container.dynamicValues[.isOpen]?.toBool ?? false
+                                 let isContainerOpen = container.attributes[.isOpen]?.toBool ?? false
                                  if (container.flag(.isContainer) && isContainerOpen) || container.flag(.isSurface) {
                                      meetsScopeCondition = true
                                  }
@@ -624,7 +624,7 @@ public struct StandardParser: Parser {
                     }
                 }
 
-                let isContainerOpen = item.dynamicValues[.isOpen]?.toBool ?? false
+                let isContainerOpen = item.attributes[.isOpen]?.toBool ?? false
                 if (item.flag(.isContainer) && isContainerOpen) || item.flag(.isSurface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }

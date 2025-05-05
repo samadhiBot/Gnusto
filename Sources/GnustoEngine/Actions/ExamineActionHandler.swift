@@ -35,11 +35,11 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }
@@ -48,7 +48,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         let message: String
 
         // Priority 1: Readable Text (Check dynamic value)
-        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .itemReadText)
+        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .readText)
         if targetItem.flag(.isReadable), let text = readTextValue?.toString, !text.isEmpty {
             message = text
         }
@@ -65,7 +65,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
             // Use the registry to generate the description using the item ID and key
             message = await context.engine.descriptionHandlerRegistry.generateDescription(
                 for: targetItem.id,
-                key: .longDescription,
+                key: .description,
                 engine: context.engine
             )
         }
@@ -87,7 +87,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id,
-            key: .longDescription,
+            key: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)
@@ -117,7 +117,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
             for: targetItem.id,
-            key: .longDescription,
+            key: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)

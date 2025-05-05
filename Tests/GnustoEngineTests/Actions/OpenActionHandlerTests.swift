@@ -29,7 +29,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item(with: "box")?.attributes["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
@@ -41,7 +41,7 @@ struct OpenActionHandlerTests {
         let finalItemState = engine.item(with: "box")
         let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open and .touched properties")
-        #expect(finalItemState?.dynamicValues == ["isOpen": true])
+        #expect(finalItemState?.attributes == ["isOpen": true])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -94,7 +94,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        #expect(engine.item(with: "box")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item(with: "box")?.attributes["isOpen"] == nil)
         #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -107,7 +107,7 @@ struct OpenActionHandlerTests {
         let finalItemState = engine.item(with: "box")
         let expectedProperties: Set<ItemProperty> = [.container, .openable, .touched]
         #expect(finalItemState?.properties == expectedProperties, "Item should gain .open property and retain .touched")
-        #expect(finalItemState?.dynamicValues == ["isOpen": true])
+        #expect(finalItemState?.attributes == ["isOpen": true])
 
         // Assert Output
         let output = await mockIO.flush()

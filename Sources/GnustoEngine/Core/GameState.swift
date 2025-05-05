@@ -276,7 +276,7 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             // Directly update the StateValue in the dictionary.
             // Assumes validation happened *before* StateChange creation.
-            items[itemID]?.dynamicValues[key] = change.newValue
+            items[itemID]?.attributes[key] = change.newValue
 
         case .locationDynamicValue(let key):
              guard case .location(let locationID) = change.entityId else {
@@ -556,7 +556,7 @@ public struct GameState: Codable, Equatable, Sendable {
              guard case .item(let itemID) = change.entityId else {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for itemDynamicValue")
              }
-             actualCurrentValue = items[itemID]?.dynamicValues[key]
+             actualCurrentValue = items[itemID]?.attributes[key]
 
         case .locationDynamicValue(let key):
              guard case .location(let locationID) = change.entityId else {

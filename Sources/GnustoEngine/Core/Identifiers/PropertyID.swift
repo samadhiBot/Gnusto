@@ -23,133 +23,185 @@ public struct PropertyID: Hashable, Comparable, Codable, ExpressibleByStringLite
     }
 }
 
-// MARK: - Standard Property IDs
+// MARK: - General Property IDs
 
 public extension PropertyID {
-    // --- General ---
+    /// Adjectives associated with the item (e.g., "brass", "small"), used for disambiguation.
+    static let adjectives = PropertyID("adjectives")
 
-    /// The current carrying capacity of a container item.
-    /// Might be computed based on contents or other factors.
-    static let currentCapacity = PropertyID("currentCapacity")
+    /// The carrying capacity of a container item.
+    static let capacity = PropertyID("capacity")
 
-    /// Indicates whether an entity is currently considered "lit".
-    /// Typically computed based on light sources in scope.
-    static let isLit = PropertyID("isLit")
+    /// The key needed to lock/unlock this item (if `.isLockable`).
+    static let lockKey = PropertyID("lockKey")
 
-    /// Boolean state indicating whether a container item is currently open.
-    static let isOpen = PropertyID("isOpen")
+    /// An item's size, influencing carrying capacity and container limits.
+    ///
+    /// An item's default size is 5 if unspecified, per ZILF docs.
+    static let size = PropertyID("size")
 
-    // --- Descriptions ---
+    /// Synonyms for the item's name (e.g., "lamp", "light").
+    static let synonyms = PropertyID("synonyms")
+}
 
-    /// The primary, detailed description (ZIL LDESC).
+// MARK: - Descriptions
+
+public extension PropertyID {
+    /// The description shown the first time an item is seen (ZIL `FDESC`).
+    static let firstDescription = PropertyID("firstDescription")
+
+    /// The primary, detailed description (ZIL `LDESC`).
     static let longDescription = PropertyID("longDescription")
 
-    /// The shorter description used in lists or brief mentions (ZIL SDESC).
+    /// The shorter description used in lists or brief mentions (ZIL `SDESC`).
     static let shortDescription = PropertyID("shortDescription")
 
-    /// The description shown the first time an item is seen in a room (ZIL FDESC). (Item only)
-    static let itemFirstDescription = PropertyID("itemFirstDescription")
+    /// Text that can be read from an item (ZIL `RTEXT/TEXT`).
+    static let readText = PropertyID("readText")
 
-    /// Text read from an item (ZIL RTEXT/TEXT). (Item only)
-    static let itemReadText = PropertyID("itemReadText")
+    /// Text that can be read from an item while holding it (ZILF `TEXT-HELD`).
+    static let readWhileHeldText = PropertyID("readWhileHeldText")
+}
 
-    /// Text read only when item is held (ZIL HTEXT). (Item only)
-    static let itemHeldText = PropertyID("itemHeldText")
+// MARK: - Item Flags
 
-    // --- Item Flags (Migrated from ItemProperty) ---
+public extension PropertyID {
+    /// ACTORBIT: Is a non-player character.
+    static let isCharacter = PropertyID("isCharacter")
+
+    /// CLIMBBIT: Can be climbed.
+    static let isClimbable: PropertyID = "isClimbable"
 
     /// FIGHTBIT: Can participate in combat.
     static let isCombatReady = PropertyID("isCombatReady")
+
     /// CONTBIT: Can hold other items.
     static let isContainer = PropertyID("isContainer")
+
     /// DEVICEBIT: Can be turned on/off (ZILF specific).
     static let isDevice = PropertyID("isDevice")
+
     /// DOORBIT: Functions as a door.
     static let isDoor = PropertyID("isDoor")
-    /// EDIBLEBIT: Can be eaten.
+
+    /// EDIBLEBIT / FOODBIT: Can be eaten.
     static let isEdible = PropertyID("isEdible")
+
     /// Can be equipped (e.g., weapon, shield).
     static let isEquippable = PropertyID("isEquippable")
+
     /// FEMALEBIT: Grammatically female.
     static let isFemale = PropertyID("isFemale")
+
     /// Cannot be taken or moved (scenery).
     static let isFixed = PropertyID("isFixed")
-    /// Can be burned.
+
+    /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = PropertyID("isFlammable")
-    /// INVISIBLE: Not normally seen.
+
+    /// INVISIBLE: Not normally seen (object is invisible).
     static let isInvisible = PropertyID("isInvisible")
+
     /// Can be used to lock/unlock.
     static let isKey = PropertyID("isKey")
+
     /// LIGHTBIT: Provides light when active/on.
     static let isLightSource = PropertyID("isLightSource")
-    /// Can be locked/unlocked (needs `lockKey`).
+
+    /// Indicates whether an entity is currently considered "lit".
+    static let isLit = PropertyID("isLit")
+
+    /// LOCKBIT: Can be locked/unlocked (needs `lockKey`).
     static let isLockable = PropertyID("isLockable")
-    /// LOCKEDBIT: Is locked.
+
+    /// LOCKED: Is locked.
     static let isLocked = PropertyID("isLocked")
+
     /// NARTICLEBIT: Suppress default article ("a", "the").
     static let suppressArticle = PropertyID("suppressArticle")
+
     /// NDESCBIT: Suppress automatic description in room contents.
     static let suppressDescription = PropertyID("suppressDescription")
+
     /// ONBIT: Is currently switched on.
     static let isOn = PropertyID("isOn") // Note: Potential overlap with computed isLit? Review needed.
+
+    /// OPENBIT: Whether a container item is currently open.
+    static let isOpen = PropertyID("isOpen")
+
     /// OPENABLEBIT: Can be opened/closed by player.
     static let isOpenable = PropertyID("isOpenable") // Note: Different from `isOpen` state.
+
     /// PERSONBIT: An NPC or the player.
     static let isPerson = PropertyID("isPerson")
+
     /// PLURALBIT: Grammatically plural.
     static let isPlural = PropertyID("isPlural")
-    /// READBIT: Can be read (might have TEXT property). - Deprecated? Use `itemReadText` check.
-    // static let isRead = PropertyID("isRead") // Consider if needed vs checking for itemReadText
-    /// Can be read (implies text content).
+
+    /// READBIT: Can be read (implies text content).
     static let isReadable = PropertyID("isReadable")
+
     /// SEARCHBIT: Can be searched.
     static let isSearchable = PropertyID("isSearchable")
+
     /// SURFACEBIT: Items can be placed *on* it.
     static let isSurface = PropertyID("isSurface")
+
     /// TAKEBIT: Can be picked up.
     static let isTakable = PropertyID("isTakable")
+
+    /// TOOLBIT: Is a tool (specific game logic).
+    static let isTool = PropertyID("isTool")
+
     /// TOUCHBIT: Player has interacted with it (used for brief mode descriptions).
     static let itemTouched = PropertyID("itemTouched")
+
     /// TRANSBIT: Contents are visible even if closed.
     static let isTransparent = PropertyID("isTransparent")
+
     /// TRYTAKEBIT: Needs special check before taking.
     static let requiresTryTake = PropertyID("requiresTryTake")
+
+    /// VEHBIT: Is a vehicle.
+    static let isVehicle = PropertyID("isVehicle")
+
     /// VOWELBIT: Name starts with vowel (for "an").
     static let startsWithVowel = PropertyID("startsWithVowel")
+    
+    /// WEAPONBIT: Is a weapon.
+    static let isWeapon = PropertyID("isWeapon")
+
     /// WEARBIT: Can be worn.
     static let isWearable = PropertyID("isWearable")
+
     /// WORNBIT: Is currently being worn.
     static let isWorn = PropertyID("isWorn")
+}
 
-    // --- Location Flags (Migrated from LocationProperty) ---
+// MARK: - Location Flags
 
+public extension PropertyID {
     /// RLIGHTBIT: Location is inherently lit (e.g., outdoors).
-    static let locationInherentlyLit = PropertyID("locationInherentlyLit")
-
-    /// Location is currently lit (set by engine based on light sources or inherent lit status).
-    static let locationIsLit = PropertyID("locationIsLit") // Note: Conflict with general `isLit`? Consider renaming/merging.
-
-    /// Magic does not function here.
-    static let locationNoMagic = PropertyID("locationNoMagic")
+    static let inherentlyLit = PropertyID("inherentlyLit")
 
     /// Location is considered outdoors.
-    static let locationIsOutside = PropertyID("locationIsOutside")
+    static let isOutside = PropertyID("isOutside")
 
-    /// Profanity is discouraged or disallowed here.
-    static let locationIsSacred = PropertyID("locationIsSacred")
+    /// Location is sacred, thus profanity is discouraged or disallowed here.
+    static let isSacred = PropertyID("isSacred")
 
-    /// RMUNGBIT: Room description has been changed.
-    static let locationDescriptionChanged = PropertyID("locationDescriptionChanged")
+    /// RMUNGBIT: Location description has been changed.
+    static let isChanged = PropertyID("isChanged")
 
-    /// RLANDBIT: Room is land, not water/air.
-    static let locationIsLand = PropertyID("locationIsLand")
+    /// RLANDBIT: Location is land, not water/air.
+    static let isLand = PropertyID("isLand")
 
     /// The player has visited this location previously.
-    static let locationVisited = PropertyID("locationVisited")
+    static let isVisited = PropertyID("isVisited")
 
     /// The location contains or is primarily composed of water.
-    static let locationIsWater = PropertyID("locationIsWater")
+    static let isWater = PropertyID("locationIsWater")
 
-    // Add other standard property IDs as needed, e.g., for lock states,
-    // open/closed states, specific game mechanics, etc.
+    /// Magic does not function here.
+    static let breaksMagic = PropertyID("breaksMagic")
 }

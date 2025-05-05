@@ -72,11 +72,11 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if targetItem.dynamicValues[.itemTouched] != .bool(true) {
+        if targetItem.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemDynamicValue(key: .itemTouched),
-                oldValue: targetItem.dynamicValues[.itemTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
         }
@@ -84,7 +84,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         // --- Determine Message ---
         let message: String
         // Fetch text from dynamic values
-        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .itemReadText)
+        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .readText)
         if let textToRead = readTextValue?.toString, !textToRead.isEmpty {
             message = textToRead
         } else {

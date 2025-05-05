@@ -640,7 +640,7 @@ public class GameEngine: Sendable {
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await descriptionHandlerRegistry.generateDescription(
             for: location.id,
-            key: .longDescription,
+            key: .description,
             engine: self
         )
         await ioHandler.print(description)
@@ -1156,7 +1156,7 @@ extension GameEngine {
             }
         } else {
             // No compute handler, return stored value
-            return item.dynamicValues[key]
+            return item.attributes[key]
         }
     }
 
@@ -1218,7 +1218,7 @@ extension GameEngine {
         }
 
         // Validation passed (or no validator), proceed with StateChange
-        let oldValue = item.dynamicValues[key] // Get current value for oldValue
+        let oldValue = item.attributes[key] // Get current value for oldValue
 
         // Only apply if value is actually changing
         if oldValue != newValue {

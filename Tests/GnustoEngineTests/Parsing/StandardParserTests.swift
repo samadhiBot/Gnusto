@@ -584,7 +584,7 @@ struct StandardParserTests {
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["note"]?.parent == .item("chest"))
-        #expect(initState.items["chest"]?.dynamicValues["isOpen"] == nil)
+        #expect(initState.items["chest"]?.attributes["isOpen"] == nil)
 
         // Only the key should be resolved from "them" because the note is out of scope
         let result = parser.parse(input: "drop them", vocabulary: vocabulary, gameState: initState)
