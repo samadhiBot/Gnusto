@@ -891,7 +891,7 @@ public class GameEngine: Sendable {
                 entityId: .global,
                 propertyKey: .setFlag(id),
                 oldValue: .bool(false), // Expecting it was false
-                newValue: .bool(true)
+                newValue: true,
             )
             do {
                 try gameState.apply(change)
@@ -912,7 +912,7 @@ public class GameEngine: Sendable {
             let change = StateChange(
                 entityId: .global,
                 propertyKey: .clearFlag(id),
-                oldValue: .bool(true), // Expecting it was true
+                oldValue: true, // Expecting it was true
                 newValue: .bool(false)
             )
             do {

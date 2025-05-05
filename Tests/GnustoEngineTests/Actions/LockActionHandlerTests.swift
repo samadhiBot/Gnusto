@@ -26,7 +26,7 @@ struct LockActionHandlerTests {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -36,7 +36,7 @@ struct LockActionHandlerTests {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -46,7 +46,7 @@ struct LockActionHandlerTests {
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -97,7 +97,7 @@ struct LockActionHandlerTests {
 
         // Check initial state
         let initialBoxSnapshot = try #require(await engine.item("box"))
-        #expect(initialBoxSnapshot.hasFlag(AttributeID.isLocked) == false) // Qualified
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified
         let initialKeySnapshot = try #require(await engine.item("key"))
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -113,19 +113,19 @@ struct LockActionHandlerTests {
 
         // Assert Final State
         let finalBoxState = try #require(await engine.item("box"))
-        #expect(finalBoxState.hasFlag(AttributeID.isLocked) == true, "Box should be locked") // Qualified
-        #expect(finalBoxState.hasFlag(AttributeID.isTouched) == true, "Box should be touched") // Qualified
+        #expect(finalBoxState.hasFlag(.isLocked) == true, "Box should be locked") // Qualified
+        #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched") // Qualified
 
         let finalKeyState = try #require(await engine.item("key"))
-        #expect(finalKeyState.hasFlag(AttributeID.isTouched) == true, "Key should be touched") // Qualified
+        #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched") // Qualified
 
         // Assert Change History
         let expectedChanges = expectedLockChanges(
             targetItemID: "box",
             keyItemID: "key",
-            initialTargetLocked: initialBoxSnapshot.hasFlag(AttributeID.isLocked), // Qualified
-            initialTargetTouched: initialBoxSnapshot.hasFlag(AttributeID.isTouched), // Qualified
-            initialKeyTouched: initialKeySnapshot.hasFlag(AttributeID.isTouched) // Qualified
+            initialTargetLocked: initialBoxSnapshot.hasFlag(.isLocked), // Qualified
+            initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched), // Qualified
+            initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched) // Qualified
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -398,7 +398,7 @@ struct LockActionHandlerTests {
             ioHandler: mockIO
         )
         let initialBoxSnapshot = try #require(await engine.item("box"))
-        #expect(initialBoxSnapshot.hasFlag(AttributeID.isLocked) == true) // Qualified
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "lock", directObject: "box", indirectObject: "key", rawInput: "lock box with key")

@@ -77,7 +77,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

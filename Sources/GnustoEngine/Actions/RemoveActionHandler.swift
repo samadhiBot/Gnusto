@@ -46,7 +46,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isWorn),
-                oldValue: .bool(true),
+                oldValue: true,
                 newValue: .bool(false)
             ))
         }
@@ -57,7 +57,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

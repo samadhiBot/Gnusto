@@ -78,7 +78,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
             let lockedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
-                oldValue: .bool(true),
+                oldValue: true,
                 newValue: .bool(false)
             )
             stateChanges.append(lockedChange)
@@ -90,7 +90,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(targetTouchedChange)
         }
@@ -101,7 +101,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: keyItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(keyTouchedChange)
         }

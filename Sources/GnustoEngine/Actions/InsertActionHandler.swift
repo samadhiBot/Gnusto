@@ -99,7 +99,7 @@ struct InsertActionHandler: EnhancedActionHandler {
                 entityId: .item(itemToInsertID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: itemToInsertSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -109,7 +109,7 @@ struct InsertActionHandler: EnhancedActionHandler {
                 entityId: .item(containerID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: containerSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

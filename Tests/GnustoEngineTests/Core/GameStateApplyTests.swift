@@ -1022,7 +1022,7 @@ struct GameStateApplyTests {
             entityId: .global,
             propertyKey: .setFlag(flagID),
             oldValue: nil, // Or .bool(false)
-            newValue: .bool(true)
+            newValue: true,
         )
 
         try gameState.apply(change)
@@ -1045,7 +1045,7 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .global,
             propertyKey: .clearFlag(flagID),
-            oldValue: .bool(true), // Expecting it was true
+            oldValue: true, // Expecting it was true
             newValue: .bool(false)
         )
 
@@ -1067,8 +1067,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .global,
             propertyKey: .setFlag(flagID), // Attempt to set
-            oldValue: .bool(true), // INCORRECT: Expecting true, but it's false
-            newValue: .bool(true)
+            oldValue: true, // INCORRECT: Expecting true, but it's false
+            newValue: true,
         )
 
         var validationErrorThrown = false
@@ -1097,7 +1097,7 @@ struct GameStateApplyTests {
             entityId: .global,
             propertyKey: .setFlag(flagID),
             oldValue: nil, // No validation expected
-            newValue: .bool(true)
+            newValue: true,
         )
 
         try gameState.apply(change)

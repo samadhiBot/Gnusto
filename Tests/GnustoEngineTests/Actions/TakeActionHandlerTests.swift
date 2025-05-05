@@ -61,7 +61,7 @@ struct TakeActionHandlerTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: initialIsTouched, // Keep original old value (nil or .bool(false))
-                newValue: .bool(true)
+                newValue: true,
             )
 
             // Avoid adding duplicate change if already handled by the general attribute comparison

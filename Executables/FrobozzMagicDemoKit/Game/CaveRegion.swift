@@ -159,9 +159,9 @@ extension CaveRegion {
         description: "A brass lantern, currently off.",
         parent: .location(darkChamber.id),
         attributes: [
-            .isTakable: .bool(true),
-            .isLightSource: .bool(true),
-            .isDevice: .bool(true)
+            .isTakable: true,
+            .isLightSource: true,
+            .isDevice: true,
         ]
     )
 

@@ -8,7 +8,7 @@ struct Hooks {
         if cloakIsWorn {
             try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(false))
         } else {
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(true))
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
         }
         return false
     }
@@ -60,7 +60,7 @@ struct Hooks {
             return false
         } else {
             // Cloak is not worn, ensure bar is lit
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(true))
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
             return false // Hook didn't handle the command itself
         }
     }

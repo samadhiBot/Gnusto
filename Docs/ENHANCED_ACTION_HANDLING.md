@@ -275,7 +275,7 @@ item.properties["isOpen"] = true
 // 2. Register validation handler (optional, during setup)
 // registry.registerItemValidate(key: .isOpen) { item, newValue in ... }
 // 3. Set value using engine helper (triggers validation & StateChange)
-// try await engine.setDynamicItemValue(itemID: item.id, key: .isOpen, newValue: .bool(true))
+// try await engine.setDynamicItemValue(itemID: item.id, key: .isOpen, newValue: true,)
 // 4. Get value using engine helper (checks compute handlers)
 // let isOpen = await engine.getDynamicItemValue(itemID: item.id, key: .isOpen)?.toBool ?? false
 ```

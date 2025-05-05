@@ -33,15 +33,15 @@ struct WearActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         let initialItem = engine.item("cloak")
-        #expect(initialItem?.hasFlag(AttributeID.isWorn) == false)
+        #expect(initialItem?.hasFlag(.isWorn) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         await engine.execute(command: command)
 
         let finalCloakState = engine.item("cloak")
         #expect(finalCloakState?.parent == .player)
-        #expect(finalCloakState?.hasFlag(AttributeID.isWorn) == true, "Cloak should have .worn property")
-        #expect(finalCloakState?.hasFlag(AttributeID.isTouched) == true, "Cloak should have .touched property")
+        #expect(finalCloakState?.hasFlag(.isWorn) == true, "Cloak should have .worn property")
+        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property")
 
         let output = await mockIO.flush()
         expectNoDifference(output, "You put on the cloak.")
@@ -51,13 +51,13 @@ struct WearActionHandlerTests {
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ),
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ),
             StateChange(
                 entityId: .global,

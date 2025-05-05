@@ -47,7 +47,7 @@ public struct WearActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isWorn),
                 oldValue: itemSnapshot.attributes[.isWorn] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -57,7 +57,7 @@ public struct WearActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

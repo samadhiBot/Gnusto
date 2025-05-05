@@ -60,7 +60,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
         try await context.engine.setDynamicItemValue(
             itemID: targetItemID,
             key: .isOpen,
-            newValue: .bool(true)
+            newValue: true,
         )
 
         // Update the 'touched' flag - Create a state change if not already touched
@@ -70,7 +70,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(touchedChange)
         }

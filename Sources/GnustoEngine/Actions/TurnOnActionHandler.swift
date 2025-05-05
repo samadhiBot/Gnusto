@@ -67,7 +67,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -77,7 +77,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isOn),
                 oldValue: targetItem.attributes[.isOn] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

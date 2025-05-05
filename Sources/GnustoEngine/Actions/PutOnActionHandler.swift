@@ -84,7 +84,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
                 entityId: .item(itemToPutID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: itemToPutSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -94,7 +94,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
                 entityId: .item(surfaceID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: surfaceSnapshot.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

@@ -84,7 +84,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false), // Current value (or default false)
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(touchedChange)
         }

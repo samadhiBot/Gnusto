@@ -183,19 +183,19 @@ struct ActionResultTests {
         entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isOn),
         oldValue: .bool(false),
-        newValue: .bool(true)
+        newValue: true,
     )
     private let change2 = StateChange(
         entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isTouched),
         oldValue: .bool(false),
-        newValue: .bool(true)
+        newValue: true,
     )
     private let change3 = StateChange(
         entityId: .location(id: "cave"),
         propertyKey: .locationAttribute(.locationVisited),
         oldValue: .bool(false),
-        newValue: .bool(true)
+        newValue: true,
     )
 
     // Example ActionResult for testing
@@ -272,13 +272,13 @@ struct ActionResultTests {
                     entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 ),
                 StateChange( // Mark cave visited
                     entityId: .location(id: "cave"),
                     propertyKey: .locationAttribute(.locationVisited),
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 ),
             ]
         )
@@ -290,7 +290,7 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            attributes: [.isOn: .bool(true)] // Lamp is ALREADY on
+            attributes: [.isOn: true,] // Lamp is ALREADY on
         )
 
         let result = ActionResult(
@@ -300,7 +300,7 @@ struct ActionResultTests {
                     entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // Expects lamp to be off
-                    newValue: .bool(true)
+                    newValue: true,
                 )
             ]
         )
@@ -318,7 +318,7 @@ struct ActionResultTests {
                     entityId: .item("lamp"), // Refers to non-existent item
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 )
             ]
         )
@@ -336,7 +336,7 @@ struct ActionResultTests {
                     entityId: .item("lamp"),
                     propertyKey: .locationAttribute(.locationVisited), // Wrong key type for item
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 )
             ]
         )
@@ -350,7 +350,7 @@ struct ActionResultTests {
             name: "Brass Lamp",
             attributes: [
                 .isOn: .bool(false),
-                .isLightSource: .bool(true) // Mark as light source
+                .isLightSource: true, // Mark as light source
             ]
         )
         engine.state.locations["cave"] = Location(
@@ -369,14 +369,14 @@ struct ActionResultTests {
                     entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 ),
                 // Mark cave as lit (perhaps by an action)
                 StateChange(
                     entityId: .location(id: "cave"),
                     propertyKey: .locationAttribute(.locationIsLit), // Use the isLit flag
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 ),
                 // Change player location
                 StateChange(
@@ -390,7 +390,7 @@ struct ActionResultTests {
                     entityId: .global,
                     propertyKey: .gameSpecificState(key: "puzzleSolved"),
                     oldValue: .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 ),
             ]
         )
@@ -408,7 +408,7 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            attributes: [.isOn: .bool(true)] // Lamp starts 'on'
+            attributes: [.isOn: true,] // Lamp starts 'on'
         )
 
         let result = ActionResult(
@@ -418,7 +418,7 @@ struct ActionResultTests {
                     entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // This validation will fail
-                    newValue: .bool(true)
+                    newValue: true,
                 )
             ]
         )
@@ -472,13 +472,13 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "First action."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true))
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,)
             ]
         )
         let result2 = ActionResult(
             message: .init(text: "Second action."),
             changes: [
-                createTestLocationChange(id: "room", key: .locationVisited, oldValue: .bool(false), newValue: .bool(true))
+                createTestLocationChange(id: "room", key: .locationVisited, oldValue: .bool(false), newValue: true,)
             ]
         )
         // ... existing code ...
@@ -491,13 +491,13 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "Action 1."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true))
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,)
             ]
         )
         let result2 = ActionResult(
             message: .init(text: "Action 2."),
             changes: [
-                createTestItemChange(id: "torch", key: .isOn, oldValue: .bool(false), newValue: .bool(true)) // Different item
+                createTestItemChange(id: "torch", key: .isOn, oldValue: .bool(false), newValue: true,) // Different item
             ]
         )
         // ... existing code ...
@@ -510,7 +510,7 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "Action 1."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true))
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,)
             ]
         )
         let result2 = ActionResult(
@@ -529,13 +529,13 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "Action 1."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true)) // Lamp Off -> On
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,) // Lamp Off -> On
             ]
         )
         let result2 = ActionResult(
             message: .init(text: "Action 2."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(true), newValue: .bool(false)) // Lamp On -> Off
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: true, newValue: .bool(false)) // Lamp On -> Off
             ]
         )
         // ... existing code ...
@@ -552,15 +552,15 @@ struct ActionResultTests {
             message: .init(text: "Take lamp."),
             changes: [
                 createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parentEntity(.location(id: "room")), newValue: .parentEntity(.player)),
-                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(false), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(false), newValue: true,),
             ]
         )
         let result2 = ActionResult(
             message: .init(text: "Turn on lamp."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,),
                 // Touched again, but should coalesce with the previous touched change
-                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(true), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: true, newValue: true,),
             ]
         )
         let result3 = ActionResult(
@@ -568,7 +568,7 @@ struct ActionResultTests {
             changes: [
                 createTestItemChange(id: "lamp", key: .itemParent, oldValue: .parentEntity(.player), newValue: .parentEntity(.location(id: "floor"))),
                 // Touched again
-                createTestItemChange(id: "lamp", key: .isTouched, oldValue: .bool(true), newValue: .bool(true)),
+                createTestItemChange(id: "lamp", key: .isTouched, oldValue: true, newValue: true,),
             ]
         )
         // ... existing code ...
@@ -591,7 +591,7 @@ struct ActionResultTests {
         let result1 = ActionResult(
             message: .init(text: "Action 1."),
             changes: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true))
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: true,)
             ]
         )
         let emptyResult = ActionResult.empty // Or ActionResult(message: .empty, changes: [])

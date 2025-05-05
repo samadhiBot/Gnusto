@@ -58,14 +58,14 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isWorn),
-                oldValue: .bool(true),
+                oldValue: true,
                 newValue: .bool(false)
             ),
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false), // Assuming not touched before removal
-                newValue: .bool(true)
+                newValue: true,
             ),
         ]
         let finalHistory = engine.gameState.changeHistory

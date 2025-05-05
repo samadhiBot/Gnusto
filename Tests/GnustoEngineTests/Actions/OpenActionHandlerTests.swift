@@ -19,7 +19,7 @@ struct OpenActionHandlerTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOpen),
                 oldValue: initialAttributes?[.isOpen] ?? .bool(false), // Check initial state
-                newValue: .bool(true)
+                newValue: true,
             )
         )
 
@@ -30,7 +30,7 @@ struct OpenActionHandlerTests {
                     entityId: .item(itemID),
                     propertyKey: .itemAttribute(.isTouched),
                     oldValue: initialAttributes?[.isTouched] ?? .bool(false),
-                    newValue: .bool(true)
+                    newValue: true,
                 )
             )
         }

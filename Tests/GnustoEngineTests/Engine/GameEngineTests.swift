@@ -197,7 +197,7 @@ struct GameEngineTests {
 
         // Initialize room with isLit: true
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
-        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: .bool(true)])
+        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
         var game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
@@ -255,7 +255,7 @@ struct GameEngineTests {
 
         // Initialize room with isLit: true
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
-        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: .bool(true)])
+        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
         var game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
@@ -443,7 +443,7 @@ struct GameEngineTests {
             name: "pebble",
             parent: .location("startRoom"),
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let startRoom = Location(
@@ -547,14 +547,14 @@ struct GameEngineTests {
                     entityId: .item(itemIDToModify),
                     propertyKey: .itemAttribute(.isTouched),
                     oldValue: item.attributes[.isTouched],
-                    newValue: .bool(true)
+                    newValue: true,
                 )
 
                 let change2 = StateChange(
                     entityId: .item(itemIDToModify),
                     propertyKey: .itemAttribute(.isOn),
                     oldValue: item.attributes[.isOn],
-                    newValue: .bool(true)
+                    newValue: true,
                 )
 
                 // Get old flag value from snapshot using FlagID and engine helper
@@ -567,7 +567,7 @@ struct GameEngineTests {
                     entityId: .global,
                     propertyKey: .setFlag(flagID),
                     oldValue: flagOldValueState,
-                    newValue: .bool(true)
+                    newValue: true,
                 )
 
                 return ActionResult(
@@ -587,7 +587,7 @@ struct GameEngineTests {
             id: testItemID,
             name: "lamp",
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
@@ -842,8 +842,8 @@ struct GameEngineTests {
             name: "box",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isOpenable: .bool(true)
+                .isContainer: true,
+                .isOpenable: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -888,7 +888,7 @@ struct GameEngineTests {
             name: "rock",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -911,7 +911,7 @@ struct GameEngineTests {
             name: "sword",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true),
+                .isTakable: true,
                 .size: .int(8)
             ],
         )
@@ -920,7 +920,7 @@ struct GameEngineTests {
             name: "shield",
             parent: .location("startRoom"),
             attributes: [
-                .isTakable: .bool(true),
+                .isTakable: true,
                 .size: .int(7)
             ],
         )
@@ -1018,8 +1018,8 @@ struct GameEngineTests {
             name: "box",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isOpenable: .bool(true)
+                .isContainer: true,
+                .isOpenable: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -1042,9 +1042,9 @@ struct GameEngineTests {
             name: "chest",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isOpenable: .bool(true),
-                .isLockable: .bool(true),
+                .isContainer: true,
+                .isOpenable: true,
+                .isLockable: true,
                 .lockKey: .string("key1")
             ],
         )
@@ -1052,7 +1052,7 @@ struct GameEngineTests {
             id: "key1",
             name: "key",
             parent: .player,
-            attributes: [.isTakable: .bool(true)],
+            attributes: [.isTakable: true,],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let player = Player(in: "startRoom")
@@ -1101,7 +1101,7 @@ struct GameEngineTests {
             name: "statue",
             parent: .player,
             attributes: [
-                .isFixed: .bool(true)
+                .isFixed: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -1124,9 +1124,9 @@ struct GameEngineTests {
             name: "cursed amulet",
             parent: .player,
             attributes: [
-                .isWearable: .bool(true),
-                .isWorn: .bool(true),
-                .isFixed: .bool(true)
+                .isWearable: true,
+                .isWorn: true,
+                .isFixed: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -1195,9 +1195,9 @@ struct GameEngineTests {
             name: "chest",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isLockable: .bool(true),
-                .isLocked: .bool(true),
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true,
                 .lockKey: .string("key1")
             ],
         )
@@ -1206,7 +1206,7 @@ struct GameEngineTests {
             name: "wrong key",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ],
         )
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
@@ -1384,13 +1384,13 @@ struct GameEngineTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOn),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ),
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: nil,
-                newValue: .bool(true)
+                newValue: true,
             )
         ]
         let result = ActionResult(
@@ -1413,7 +1413,7 @@ struct GameEngineTests {
             id: testItemID,
             name: "lamp",
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let game = MinimalGame(items: [lamp]) // Use MinimalGame
@@ -1449,8 +1449,8 @@ struct GameEngineTests {
             name: "box",
             parent: .location("startRoom"), // Ensure parent is first
             attributes: [
-                .isContainer: .bool(true),
-                .isOpenable: .bool(true)
+                .isContainer: true,
+                .isOpenable: true,
             ]
         )
         let game = MinimalGame(items: [itemToPut, container]) // Use MinimalGame
@@ -1500,7 +1500,7 @@ struct GameEngineTests {
             name: "key",
             parent: .player, // Ensure parent is first
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let game = MinimalGame(items: [key]) // Use MinimalGame
@@ -1541,7 +1541,7 @@ struct GameEngineTests {
             name: "wrong key",
             parent: .player, // Ensure parent is first
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let correctKey = Item(
@@ -1549,7 +1549,7 @@ struct GameEngineTests {
             name: "key",
             parent: .player, // Ensure parent is first
             attributes: [
-                .isTakable: .bool(true)
+                .isTakable: true,
             ]
         )
         let game = MinimalGame(items: [box, wrongKey, correctKey]) // Use MinimalGame
@@ -1628,13 +1628,13 @@ struct GameEngineTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOn),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ),
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: nil,
-                newValue: .bool(true)
+                newValue: true,
             )
         ]
         let result = ActionResult(

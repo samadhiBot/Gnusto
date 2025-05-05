@@ -81,7 +81,7 @@ public struct LockActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
                 oldValue: targetItem.attributes[.isLocked] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(lockedChange)
         }
@@ -92,7 +92,7 @@ public struct LockActionHandler: EnhancedActionHandler {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(targetTouchedChange)
         }
@@ -103,7 +103,7 @@ public struct LockActionHandler: EnhancedActionHandler {
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: keyItem.attributes[.isTouched] ?? .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             )
             stateChanges.append(keyTouchedChange)
         }

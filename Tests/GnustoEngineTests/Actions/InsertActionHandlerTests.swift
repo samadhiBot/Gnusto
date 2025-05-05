@@ -6,25 +6,32 @@ import Testing
 @MainActor
 @Suite("InsertActionHandler Tests")
 struct InsertActionHandlerTests {
+    let handler = InsertActionHandler()
 
     // --- Test Setup ---
     let coin = Item(
         id: "coin",
         name: "gold coin",
-        properties: .takable
+        attributes: [.isTakable: true,]
     )
 
     let box = Item(
         id: "box",
         name: "wooden box",
-        properties: .container, .openable // Starts closed
+        attributes: [
+            .isContainer: true,
+            .isOpenable: true,
+        ]
     )
 
     let openBox = Item(
         id: "openBox",
         name: "open box",
-        properties: .container, .openable,
-        attributes: [.isOpen: true]
+        attributes: [
+            .isContainer: true,
+            .isOpenable: true,
+            .isOpen: true,
+        ]
     )
 
     // --- Helper ---
@@ -32,8 +39,8 @@ struct InsertActionHandlerTests {
         itemToInsertID: ItemID,
         containerID: ItemID,
         initialParent: ParentEntity,
-        initialItemTouched: Bool,
-        initialContainerTouched: Bool
+        initialItemAttributes: [AttributeID: StateValue],
+        initialContainerAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
@@ -46,22 +53,22 @@ struct InsertActionHandlerTests {
         ))
 
         // Change 2: Item touched (if needed)
-        if !initialItemTouched {
+        if initialItemAttributes[.isTouched] != .bool(true) {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
         // Change 3: Container touched (if needed)
-        if !initialContainerTouched {
+        if initialContainerAttributes[.isTouched] != .bool(true) {
             changes.append(StateChange(
                 entityId: .item(containerID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -85,18 +92,20 @@ struct InsertActionHandlerTests {
             id: "coin",
             name: "gold coin",
             parent: .player,
-            isTakable: true
+            attributes: [.isTakable: true,]
         )
         let initialBox = Item(
             id: "openBox", name: "open box",
             parent: .location("startRoom"),
-            attributes: [.isOpen: .bool(true)],
-            isContainer: true,
-            isOpenable: true
+            attributes: [
+                .isOpen: true,
+                .isContainer: true,
+                .isOpenable: true,
+            ]
         )
         let initialParent = initialCoin.parent
-        let initialItemTouched = initialCoin.hasFlag(AttributeID.isTouched)
-        let initialContainerTouched = initialBox.hasFlag(AttributeID.isTouched)
+        let initialItemAttributes = initialCoin.attributes
+        let initialContainerAttributes = initialBox.attributes
 
         let game = MinimalGame(items: [initialCoin, initialBox])
         let mockIO = await MockIOHandler()
@@ -120,10 +129,10 @@ struct InsertActionHandlerTests {
         // Assert Final State
         let finalCoinState = try #require(await engine.item("coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
-        #expect(finalCoinState.hasFlag(AttributeID.isTouched) == true, "Coin should be touched")
+        #expect(finalCoinState.attributes[.isTouched] == .bool(true), "Coin should be touched")
 
         let finalBoxState = try #require(await engine.item("openBox"))
-        #expect(finalBoxState.hasFlag(AttributeID.isTouched) == true, "Box should be touched")
+        #expect(finalBoxState.attributes[.isTouched] == .bool(true), "Box should be touched")
 
         // Assert Pronoun
         #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
@@ -133,8 +142,8 @@ struct InsertActionHandlerTests {
             itemToInsertID: "coin",
             containerID: "openBox",
             initialParent: initialParent,
-            initialItemTouched: initialItemTouched,
-            initialContainerTouched: initialContainerTouched
+            initialItemAttributes: initialItemAttributes,
+            initialContainerAttributes: initialContainerAttributes
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -146,8 +155,10 @@ struct InsertActionHandlerTests {
             id: "openBox",
             name: "open box",
             parent: .location("startRoom"),
-            attributes: [.isOpen: .bool(true)],
-            isContainer: true
+            attributes: [
+                .isOpen: true,
+                .isContainer: true,
+            ],
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -179,7 +190,7 @@ struct InsertActionHandlerTests {
             id: "coin",
             name: "gold coin",
             parent: .player,
-            isTakable: true
+            attributes: [.isTakable: true,]
         )
         let game = MinimalGame(items: [coin])
         let mockIO = await MockIOHandler()
@@ -211,14 +222,13 @@ struct InsertActionHandlerTests {
             id: "coin",
             name: "gold coin",
             parent: .location("startRoom"),
-            isTakable: true
+            attributes: [.isTakable: true,]
         )
         let box = Item(
             id: "openBox",
             name: "open box",
             parent: .location("startRoom"),
-            attributes: [.isOpen: .bool(true)],
-            isContainer: true
+            attributes: [.isOpen: true, .isContainer: true, .isOpenable: true,]
         )
         let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()
@@ -249,29 +259,20 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: true,]
         )
         let box = Item(
-            id: "openBox",
-            name: "open box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .location("otherRoom"),
+            id: "distantBox",
+            name: "distant box",
+            parent: .nowhere,
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ]
         )
-        let room1 = Location(
-            id: "startRoom",
-            name: "Start",
-            isLit: true
-        )
-        let room2 = Location(
-            id: "otherRoom",
-            name: "Other",
-            isLit: true
-        )
-        let game = MinimalGame(
-            locations: [room1, room2],
-            items: [coin, box]
-        )
+        let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -281,13 +282,7 @@ struct InsertActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(
-            verbID: "insert",
-            directObject: "coin",
-            indirectObject: "openBox",
-            preposition: "in",
-            rawInput: "put coin in box"
-        )
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "distantBox", preposition: "in", rawInput: "put coin in distant box")
 
         // Act
         await engine.execute(command: command)
@@ -302,18 +297,22 @@ struct InsertActionHandlerTests {
 
     @Test("Insert fails when target not a container")
     func testInsertFailsTargetNotContainer() async throws {
-        // Arrange: Target is a rock (not container), player holds coin
+        // Arrange: Player holds coin, target is statue (not container)
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: true,]
         )
-        let rock = Item(
-            id: "rock",
-            name: "rock",
-            parent: .location("startRoom")
-        ) // Not a container
-        let game = MinimalGame(items: [coin, rock])
+        let statue = Item(
+            id: "statue",
+            name: "stone statue",
+            parent: .location("startRoom"),
+            attributes: [
+                .isOpenable: .bool(false)
+            ]
+        )
+        let game = MinimalGame(items: [coin, statue])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = GameEngine(
@@ -323,7 +322,7 @@ struct InsertActionHandlerTests {
         )
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "rock", preposition: "in", rawInput: "put coin in rock")
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "statue", preposition: "in", rawInput: "put coin in statue")
 
         // Act
         await engine.execute(command: command)
@@ -342,13 +341,16 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .player
+            parent: .player,
         )
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+            ],
         ) // Closed
         let game = MinimalGame(items: [coin, box])
         let mockIO = await MockIOHandler()
@@ -379,9 +381,8 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .player
+            parent: .player,
+            attributes: [.isOpen: true,],
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -412,16 +413,14 @@ struct InsertActionHandlerTests {
         let bag = Item(
             id: "bag",
             name: "bag",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .player
+            parent: .player,
+            attributes: [.isOpen: true,],
         )
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .item("bag")
+            parent: .item("bag"),
+            attributes: [.isOpen: true,],
         )
         let game = MinimalGame(items: [bag, box])
         let mockIO = await MockIOHandler()
@@ -453,22 +452,29 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            size: 5,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .size: 5
+            ]
         )
         let existingItem = Item(
             id: "rock",
             name: "rock",
-            size: 6,
-            parent: .item("fullBox")
+            parent: .item("fullBox"),
+            attributes: [
+                .size: 6,
+            ]
         )
         let box = Item(
             id: "fullBox",
             name: "nearly full box",
-            properties: .container, .openable,
-            attributes: [.isOpen: true],
-            capacity: 10,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .capacity: 10,
+            ]
         )
         let game = MinimalGame(items: [coin, box, existingItem])
         let mockIO = await MockIOHandler()
@@ -500,22 +506,29 @@ struct InsertActionHandlerTests {
         let initialCoin = Item(
             id: "coin",
             name: "gold coin",
-            size: 5,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .size: 5
+            ]
         )
         let existingItem = Item(
             id: "rock",
             name: "rock",
-            size: 5,
-            parent: .item("exactBox")
+            parent: .item("exactBox"),
+            attributes: [
+                .size: 5
+            ]
         )
         let initialBox = Item(
             id: "exactBox",
             name: "half-full box",
-            properties: .container, .openable,
-            attributes: [.isOpen: true],
-            capacity: 10,
             parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .capacity: 10,
+            ]
         )
         let initialCoinProps = initialCoin.properties
         let initialBoxProps = initialBox.properties
@@ -559,16 +572,16 @@ struct InsertActionHandlerTests {
     @Test("Insert into reachable container successfully")
     func testInsertIntoReachableContainerSuccessfully() async throws {
         // Arrange: Player holds key, box is in the room
-        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player),
         let container = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true // Starts open
-            ]
+            ],
+            parent: .location("startRoom"),
         )
         let room = Location(id: "startRoom", name: "Room", isLit: true) // Assuming lit for test
 
@@ -591,7 +604,7 @@ struct InsertActionHandlerTests {
         let finalItemState = try #require(await engine.item("key"))
         #expect(finalItemState.parent == .item("box"))
         let finalContainerState = try #require(await engine.item("box"))
-        #expect(finalContainerState.hasFlag(AttributeID.isTouched) == true)
+        #expect(finalContainerState.hasFlag(.isTouched) == true)
 
         // Assert Pronoun
         #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
@@ -601,9 +614,8 @@ struct InsertActionHandlerTests {
             itemToInsertID: "key",
             containerID: "box",
             initialParent: .player,
-            initialItemTouched: false,
-            initialContainerTouched: false
-        )
+            initialItemAttributes: [:],
+            initialContainerAttributes: [:])
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -613,12 +625,12 @@ struct InsertActionHandlerTests {
         let container = Item(
             id: "box",
             name: "wooden box",
-            parent: .player,
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true
-            ]
+            ],
+            parent: .player,
         )
         let room = Location(id: "startRoom", name: "Room", isLit: true)
 
@@ -641,16 +653,16 @@ struct InsertActionHandlerTests {
     @Test("Insert into item not in reach")
     func testInsertIntoItemNotInReach() async throws {
         // Arrange: Player holds key, container is in another room
-        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player),
         let container = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("otherRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true
-            ]
+            ],
+            parent: .location("otherRoom"),
         )
         let room1 = Location(id: "startRoom", name: "Start Room", isLit: true)
         let room2 = Location(id: "otherRoom", name: "Other Room", isLit: true)
@@ -674,8 +686,8 @@ struct InsertActionHandlerTests {
     @Test("Insert into target not a container")
     func testInsertIntoTargetNotAContainer() async throws {
         // Arrange: Target is a rock (not a container)
-        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
-        let target = Item(id: "rock", name: "smooth rock", parent: .location("startRoom"))
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player),
+        let target = Item(id: "rock", name: "smooth rock", parent: .location("startRoom")),
         let room = Location(id: "startRoom", name: "Room", isLit: true)
 
         let game = MinimalGame(locations: [room], items: [itemToInsert, target])
@@ -697,16 +709,15 @@ struct InsertActionHandlerTests {
     @Test("Insert into closed container")
     func testInsertIntoClosedContainer() async throws {
         // Arrange: Container is closed
-        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player),
         let container = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
-                .isOpenable: true
-                // Closed by default
-            ]
+                .isOpenable: true,
+            ],
+            parent: .location("startRoom"),
         )
         let room = Location(id: "startRoom", name: "Room", isLit: true)
 
@@ -729,18 +740,18 @@ struct InsertActionHandlerTests {
     @Test("Insert into container that is full")
     func testInsertIntoContainerThatIsFull() async throws {
         // Arrange: Container has capacity 1, already contains an item
-        let itemToInsert = Item(id: "key", name: "small key", parent: .player)
-        let existingItem = Item(id: "gem", name: "shiny gem", parent: .item("box"), size: 1)
+        let itemToInsert = Item(id: "key", name: "small key", parent: .player),
+        let existingItem = Item(id: "gem", name: "shiny gem", parent: .item("box"), size: 1),
         let container = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
-                .capacity: 1 // Set capacity
-            ]
+                .capacity: 1
+            ],
+            parent: .location("startRoom"),
         )
         let room = Location(id: "startRoom", name: "Room", isLit: true)
 
@@ -764,17 +775,17 @@ struct InsertActionHandlerTests {
     @Test("Insert item too large for container")
     func testInsertItemTooLargeForContainer() async throws {
         // Arrange: Item size is 5, container capacity is 3
-        let itemToInsert = Item(id: "key", name: "large key", parent: .player, size: 5)
+        let itemToInsert = Item(id: "key", name: "large key", parent: .player, size: 5),
         let container = Item(
             id: "box",
             name: "small box",
-            parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
-                .capacity: 3 // Set capacity
-            ]
+                .capacity: 3
+            ],
+            parent: .location("startRoom"),
         )
         let room = Location(id: "startRoom", name: "Room", isLit: true)
 
@@ -795,5 +806,478 @@ struct InsertActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty == true)
     }
 
-    // TODO: Add capacity check test when implemented
+    // Helper to setup game state for nested container tests
+    private func setupNestedContainerTest() async -> (GameEngine, MockIOHandler) {
+        let outerBox = Item(
+            id: "outerBox", name: "large box",
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .location("startRoom"),
+        )
+        let innerBox = Item(
+            id: "innerBox", name: "small box",
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .item("outerBox"),
+        )
+        let coin = Item(
+            id: "coin", name: "shiny coin",
+            parent: .player,
+            attributes: [.isTakable: true,]
+        )
+
+        let game = MinimalGame(items: [outerBox, innerBox, coin])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        return (engine, mockIO)
+    }
+
+    @Test("Insert into nested container (outer box)")
+    func testInsertIntoNestedOuter() async throws {
+        // Arrange
+        let (engine, mockIO) = await setupNestedContainerTest()
+        let initialCoin = try #require(await engine.item("coin"))
+        let initialOuterBox = try #require(await engine.item("outerBox"))
+        let initialParent = initialCoin.parent
+        let initialItemAttributes = initialCoin.attributes
+        let initialContainerAttributes = initialOuterBox.attributes
+
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "outerBox", preposition: "in", rawInput: "put coin in large box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You put the shiny coin in the large box.")
+
+        // Assert State
+        let finalCoin = try #require(await engine.item("coin"))
+        #expect(finalCoin.parent == .item("outerBox"))
+
+        // Assert History
+        let expectedChanges = expectedInsertChanges(
+            itemToInsertID: "coin",
+            containerID: "outerBox",
+            initialParent: initialParent,
+            initialItemAttributes: initialItemAttributes,
+            initialContainerAttributes: initialContainerAttributes
+        )
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Insert into nested container (inner box)")
+    func testInsertIntoNestedInner() async throws {
+        // Arrange
+        let (engine, mockIO) = await setupNestedContainerTest()
+        let initialCoin = try #require(await engine.item("coin"))
+        let initialInnerBox = try #require(await engine.item("innerBox"))
+        let initialParent = initialCoin.parent
+        let initialItemAttributes = initialCoin.attributes
+        let initialContainerAttributes = initialInnerBox.attributes
+
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "innerBox", preposition: "in", rawInput: "put coin in small box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You put the shiny coin in the small box.")
+
+        // Assert State
+        let finalCoin = try #require(await engine.item("coin"))
+        #expect(finalCoin.parent == .item("innerBox"))
+
+        // Assert History
+        let expectedChanges = expectedInsertChanges(
+            itemToInsertID: "coin",
+            containerID: "innerBox",
+            initialParent: initialParent,
+            initialItemAttributes: initialItemAttributes,
+            initialContainerAttributes: initialContainerAttributes
+        )
+        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+    }
+
+    @Test("Insert into self fails")
+    func testInsertIntoSelfFails() async throws {
+        // Arrange: Player holds a bag (which is a container)
+        let bag = Item(
+            id: "bag", name: "cloth bag",
+            attributes: [
+                .isTakable: true,
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .player,
+        )
+        let game = MinimalGame(items: [bag])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "bag", indirectObject: "bag", preposition: "in", rawInput: "put bag in bag")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush() // Initialize mockIO
+        expectNoDifference(output, "Putting the cloth bag into itself would be বোকা.") // Zorkian message
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true) // Use engine instance
+    }
+
+    @Test("Insert into nested container that contains itself indirectly (A in B, put B in A)")
+    func testInsertIntoIndirectSelfContainer() async throws {
+        // Arrange: Box A contains Box B. Player holds Box B. Try putting B into A.
+        let boxA = Item(
+            id: "boxA", name: "box A",
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .location("startRoom"),
+        )
+        let boxB = Item(
+            id: "boxB", name: "box B",
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .isTakable: true,
+            ],
+            parent: .item("boxA"),
+        )
+
+        let game = MinimalGame(items: [boxA, boxB])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
+
+        // Player needs to take Box B first
+        await engine.execute(command: Command(verbID: "take", directObject: "boxB", rawInput: "take box B"))
+        _ = await mockIO.flush() // Discard take output
+        #expect(await engine.item("boxB")?.parent == .player)
+
+        let command = Command(verbID: "insert", directObject: "boxB", indirectObject: "boxA", preposition: "in", rawInput: "put box B in box A")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush() // Initialize mockIO
+        expectNoDifference(output, "You can't put the box B inside the box A, because the box A is inside the box B!") // Zorkian message
+
+        // Assert No State Change (other than taking the box)
+        let history = engine.gameState.changeHistory // Use engine instance
+        #expect(history.count > 0) // Take action happened
+        #expect(history.last?.propertyKey != .itemParent) // Insert action did not happen
+    }
+
+    @Test("Insert into deeply nested container that contains itself indirectly")
+    func testInsertIntoDeepIndirectSelfContainer() async throws {
+        // Arrange: A contains B, B contains C. Player holds C. Try putting C into A.
+        let boxA = Item(
+            id: "boxA", name: "box A", attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .location("startRoom"),
+        )
+        let boxB = Item(
+            id: "boxB", name: "box B", attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .item("boxA"),
+        )
+        let boxC = Item(
+            id: "boxC", name: "box C", attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .isTakable: true,
+            ],
+            parent: .item("boxB"),
+        )
+
+        let game = MinimalGame(items: [boxA, boxB, boxC])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
+
+        // Player needs to take Box C first (requires opening A and B)
+        await engine.execute(command: Command(verbID: "take", directObject: "boxC", rawInput: "take box C"))
+        _ = await mockIO.flush() // Discard take output
+        #expect(await engine.item("boxC")?.parent == .player)
+
+        let command = Command(verbID: "insert", directObject: "boxC", indirectObject: "boxA", preposition: "in", rawInput: "put box C in box A")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush() // Initialize mockIO
+        expectNoDifference(output, "You can't put the box C inside the box A, because the box A is inside the box C!") // Zorkian message
+
+        // Assert No State Change (other than taking the box)
+        let history = engine.gameState.changeHistory // Use engine instance
+        #expect(history.count > 0) // Take action happened
+        #expect(history.last?.propertyKey != .itemParent || history.last?.entityId != .item("boxC")) // Insert action did not happen for boxC
+    }
+
+    // --- Validation Tests (using handler.validate for focused error checks) ---
+
+    let handler = InsertActionHandler() // Instance for validation tests
+
+    @Test("Validation fails when item not held")
+    func testValidationItemNotHeld() async throws {
+        // Arrange: Coin is in the room, not held; box is open
+        let coin = Item(
+            id: "coin", name: "gold coin", parent: .location("startRoom"),
+            attributes: [.isTakable: true,]
+        )
+        let box = Item(
+            id: "openBox", name: "open box", parent: .location("startRoom"),
+            attributes: [.isOpen: true, .isContainer: true, .isOpenable: true,]
+        )
+        let game = MinimalGame(items: [coin, box])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "openBox", preposition: "in", rawInput: "put coin in box")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.itemNotHeld("coin")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when target not reachable")
+    func testValidationTargetNotReachable() async throws {
+        // Arrange: Box is nowhere, player holds coin
+        let coin = Item(
+            id: "coin", name: "gold coin", parent: .player,
+            attributes: [.isTakable: true,]
+        )
+        let box = Item(
+            id: "distantBox", name: "distant box", parent: .nowhere,
+            attributes: [.isContainer: true, .isOpenable: true, .isOpen: true,]
+        )
+        let game = MinimalGame(items: [coin, box])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "distantBox", preposition: "in", rawInput: "put coin in distant box")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.indirectObjectNotAccessible("distantBox")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when target not a container")
+    func testValidationTargetNotContainer() async throws {
+        // Arrange: Target is a statue (not a container)
+        let coin = Item(
+            id: "coin", name: "gold coin", parent: .player,
+            attributes: [.isTakable: true,]
+        )
+        let statue = Item(
+            id: "statue", name: "stone statue", parent: .location("startRoom"),
+        )
+        let game = MinimalGame(items: [coin, statue])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "statue", preposition: "in", rawInput: "put coin in statue")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.itemNotAContainer("statue")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when target is closed")
+    func testValidationTargetClosed() async throws {
+        // Arrange: Box is closed
+        let coin = Item(
+            id: "coin", name: "gold coin", parent: .player,
+            attributes: [.isTakable: true,]
+        )
+        let box = Item(
+            id: "closedBox", name: "closed box", parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+            ]
+        )
+        let game = MinimalGame(items: [coin, box])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "coin", indirectObject: "closedBox", preposition: "in", rawInput: "put coin in closed box")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.containerIsClosed("closedBox")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when item is too large for container")
+    func testValidationItemTooLarge() async throws {
+        // Arrange: Boulder is size 10, box capacity is 5
+        let boulder = Item(
+            id: "boulder", name: "huge boulder", parent: .player,
+            attributes: [.isTakable: true, .size: 10]
+        )
+        let box = Item(
+            id: "box", name: "small box", parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .capacity: 5
+            ]
+        )
+        let game = MinimalGame(items: [boulder, box])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "boulder", indirectObject: "box", preposition: "in", rawInput: "put boulder in box")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.itemTooLargeForContainer(item: "boulder", container: "box")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when inserting into self")
+    func testValidationInsertIntoSelf() async throws {
+        // Arrange: Player holds a bag (which is a container)
+        let bag = Item(
+            id: "bag", name: "cloth bag", parent: .player,
+            attributes: [
+                .isTakable: true,
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ]
+        )
+        let game = MinimalGame(items: [bag])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let command = Command(verbID: "insert", directObject: "bag", indirectObject: "bag", preposition: "in", rawInput: "put bag in bag")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.customResponse("Putting the cloth bag into itself would be বোকা.")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty) // Use instance engine
+    }
+
+    @Test("Validation fails when inserting into indirect self container")
+    func testValidationInsertIntoIndirectSelf() async throws {
+        // Arrange: A contains B. Player holds B. Try putting B into A.
+        let boxA = Item(
+            id: "boxA", name: "box A", attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .location("startRoom"),
+        )
+        let boxB = Item(
+            id: "boxB", name: "box B", attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+                .isTakable: true,
+            ],
+            parent: .item("boxA"),
+        )
+
+        let game = MinimalGame(items: [boxA, boxB])
+        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+
+        // Player needs to take Box B first
+        await engine.execute(command: Command(verbID: "take", directObject: "boxB", rawInput: "take box B"))
+        _ = await MockIOHandler().flush() // Discard take output (needs own mockIO instance for flush)
+        #expect(await engine.item("boxB")?.parent == .player)
+
+        let command = Command(verbID: "insert", directObject: "boxB", indirectObject: "boxA", preposition: "in", rawInput: "put box B in box A")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.customResponse("You can't put the box B inside the box A, because the box A is inside the box B!")) { // Correct error type
+            try await handler.validate(
+                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+            )
+        }
+        // Check history, but don't expect it to be empty due to 'take'
+        let history = engine.gameState.changeHistory
+        #expect(history.count > 0)
+        #expect(history.last?.propertyKey != .itemParent || history.last?.entityId != .item("boxB")) // Insert didn't happen for boxB
+    }
+
+    @Test("Insert fails when item is fixed (scenery)")
+    func testInsertFailsItemIsFixed() async throws {
+        // Arrange: Player holds trophy (scenery), box is open
+        let trophy = Item(
+            id: "trophy",
+            name: "glass trophy",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .scenery: true,
+            ]
+        )
+        let box = Item(
+            id: "openBox",
+            name: "open box",
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true,
+            ],
+            parent: .location("startRoom"),
+        )
+        let game = MinimalGame(items: [trophy, box])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(verbID: "insert", directObject: "trophy", indirectObject: "box", preposition: "in", rawInput: "put trophy in box")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put things in the glass trophy.")
+
+        // Assert No State Change
+        #expect(engine.gameState.changeHistory.isEmpty == true)
+    }
 }

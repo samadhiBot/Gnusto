@@ -23,8 +23,8 @@ struct OperaHouse: AreaContents {
         description: "A message appears to be written on the note.",
         parent: .location("bar"),
         attributes: [
-            .hasNoDescription: .bool(true),
-            .isReadable: .bool(true)
+            .hasNoDescription: true,
+            .isReadable: true,
         ]
     )
 
@@ -49,7 +49,7 @@ struct OperaHouse: AreaContents {
         description: "It's just a small brass hook, firmly fixed to the wall.",
         parent: .location("cloakroom"),
         attributes: [
-            .isSurface: .bool(true)
+            .isSurface: true,
         ]
     )
 
@@ -85,9 +85,9 @@ struct OperaHouse: AreaContents {
         description: "A handsome velvet cloak, of exquisite quality.",
         parent: .location("cloakroom"),
         attributes: [
-            .isTakable: .bool(true),
-            .isWearable: .bool(true),
-            .isWorn: .bool(true)
+            .isTakable: true,
+            .isWearable: true,
+            .isWorn: true,
         ]
     )
 }

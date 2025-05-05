@@ -47,7 +47,7 @@ struct PutOnActionHandlerTests {
                 entityId: .item(itemToPutID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 
@@ -57,7 +57,7 @@ struct PutOnActionHandlerTests {
                 entityId: .item(surfaceID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ))
         }
 

@@ -21,7 +21,7 @@ struct LookActionHandlerTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true,
             ),
             StateChange(
                 entityId: .global,
