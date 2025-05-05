@@ -53,7 +53,7 @@ struct OpenActionHandlerTests {
         // Change 1: isOpen becomes true (applied internally)
         let expectedOpenChange = StateChange(
             entityId: .item("box"),
-            propertyKey: .itemDynamicValue(key: .isOpen),
+            propertyKey: .itemAttribute(.isOpen),
             oldValue: nil, // Or .bool(false) if explicitly set
             newValue: .bool(true)
         )
@@ -119,7 +119,7 @@ struct OpenActionHandlerTests {
         // Change 1: isOpen becomes true (applied internally)
         let expectedOpenChange = StateChange(
             entityId: .item("box"),
-            propertyKey: .itemDynamicValue(key: .isOpen),
+            propertyKey: .itemAttribute(.isOpen),
             oldValue: nil, // Or .bool(false) if explicitly set
             newValue: .bool(true)
         )
@@ -156,7 +156,15 @@ struct OpenActionHandlerTests {
     @Test("Open fails item not accessible")
     func testOpenFailsItemNotAccessible() async throws {
         // Arrange
-        let box = Item(id: "box", name: "box", properties: .openable, parent: .nowhere)
+        let box = Item(
+            id: "box",
+            name: "box",
+            parent: .nowhere,
+            attributes: [
+                .isOpenable: true,
+                .isOpen: true // Setting initial state to open for this test
+            ]
+        )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -212,7 +220,7 @@ struct OpenActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("startRoom")
         )
 

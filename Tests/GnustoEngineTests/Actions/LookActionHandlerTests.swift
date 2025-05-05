@@ -464,7 +464,7 @@ struct LookActionHandlerTests {
             name: "wooden box",
             longDescription: "A sturdy wooden box.",
             properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("startRoom")
         )
         let coin = Item(
@@ -529,7 +529,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item("box")?.hasProperty(.touched) == false)
-        #expect(engine.item("box")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item("box")?.attributes["isOpen"] == nil)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -576,7 +576,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(engine.item("jar")?.hasProperty(.touched) == false)
-        #expect(engine.item("jar")?.dynamicValues["isOpen"] == nil)
+        #expect(engine.item("jar")?.attributes["isOpen"] == nil)
         #expect(engine.item("jar")?.hasProperty(.transparent) == true)
         #expect(engine.gameState.changeHistory.isEmpty == true)
 

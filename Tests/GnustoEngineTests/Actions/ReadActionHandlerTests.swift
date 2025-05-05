@@ -545,7 +545,7 @@ struct ReadActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .takable, .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .player
         )
         let note = Item(
@@ -585,7 +585,7 @@ struct ReadActionHandlerTests {
             id: "chest",
             name: "iron chest",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("startRoom")
         )
         let letter = Item(

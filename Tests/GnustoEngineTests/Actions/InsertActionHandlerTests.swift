@@ -24,7 +24,7 @@ struct InsertActionHandlerTests {
         id: "openBox",
         name: "open box",
         properties: .container, .openable,
-        dynamicValues: [.isOpen: true]
+        attributes: [.isOpen: true]
     )
 
     // --- Helper ---
@@ -49,7 +49,7 @@ struct InsertActionHandlerTests {
         if !initialItemTouched {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -59,7 +59,7 @@ struct InsertActionHandlerTests {
         if !initialContainerTouched {
             changes.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -90,7 +90,7 @@ struct InsertActionHandlerTests {
         let initialBox = Item(
             id: "openBox", name: "open box",
             parent: .location("startRoom"),
-            dynamicValues: [.isOpen: .bool(true)],
+            attributes: [.isOpen: .bool(true)],
             isContainer: true,
             isOpenable: true
         )
@@ -146,7 +146,7 @@ struct InsertActionHandlerTests {
             id: "openBox",
             name: "open box",
             parent: .location("startRoom"),
-            dynamicValues: [.isOpen: .bool(true)],
+            attributes: [.isOpen: .bool(true)],
             isContainer: true
         )
         let game = MinimalGame(items: [box])
@@ -217,7 +217,7 @@ struct InsertActionHandlerTests {
             id: "openBox",
             name: "open box",
             parent: .location("startRoom"),
-            dynamicValues: [.isOpen: .bool(true)],
+            attributes: [.isOpen: .bool(true)],
             isContainer: true
         )
         let game = MinimalGame(items: [coin, box])
@@ -255,7 +255,7 @@ struct InsertActionHandlerTests {
             id: "openBox",
             name: "open box",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("otherRoom"),
         )
         let room1 = Location(
@@ -380,7 +380,7 @@ struct InsertActionHandlerTests {
             id: "box",
             name: "box",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .player
         )
         let game = MinimalGame(items: [box])
@@ -413,14 +413,14 @@ struct InsertActionHandlerTests {
             id: "bag",
             name: "bag",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .player
         )
         let box = Item(
             id: "box",
             name: "box",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .item("bag")
         )
         let game = MinimalGame(items: [bag, box])
@@ -466,7 +466,7 @@ struct InsertActionHandlerTests {
             id: "fullBox",
             name: "nearly full box",
             properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             capacity: 10,
             parent: .location("startRoom")
         )
@@ -513,7 +513,7 @@ struct InsertActionHandlerTests {
             id: "exactBox",
             name: "half-full box",
             properties: .container, .openable,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             capacity: 10,
             parent: .location("startRoom"),
         )

@@ -99,13 +99,13 @@ public enum StateValue: Codable, Sendable { /* ... */ }
 /// (Example structure - actual might differ slightly)
 public struct Item: Sendable, Codable {
     // ... other properties ...
-    public var dynamicValues: [PropertyID: StateValue]
+    public var attributes: [PropertyID: StateValue]
 }
 
 /// Locations also store their state values.
 public struct Location: Sendable, Codable {
     // ... other properties ...
-    public var dynamicValues: [PropertyID: StateValue]
+    public var attributes: [PropertyID: StateValue]
 }
 
 /// Registry for dynamic behavior (part of GameBlueprint or DefinitionRegistry).
@@ -191,8 +191,8 @@ public protocol ActionContextProvider {
 
 - [x] Define `PropertyID` type.
 - [x] Create `DynamicPropertyRegistry` for compute/validate handlers.
-- [x] Add `dynamicValues: [PropertyID: StateValue]` to `Item` and `Location`.
-- [x] Update `StatePropertyKey` and `GameState.apply` to handle changes to `dynamicValues`.
+- [x] Add `attributes: [PropertyID: StateValue]` to `Item` and `Location`.
+- [x] Update `StatePropertyKey` and `GameState.apply` to handle changes to `attributes`.
 - [x] Implement `GameEngine` helpers (`get/setDynamic...Value`) to orchestrate registry/state access.
 
 ### Phase 3: Context System

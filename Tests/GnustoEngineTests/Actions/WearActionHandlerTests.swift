@@ -13,10 +13,12 @@ struct WearActionHandlerTests {
     func testWearItemSuccess() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "cloak",
+            name: "velvet cloak",
             parent: .player,
-            isTakable: true,
-            isWearable: true
+            attributes: [
+                .isWearable: true,
+                .isTakable: true
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -30,13 +32,13 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialItem = await engine.item("cloak")
+        let initialItem = engine.item("cloak")
         #expect(initialItem?.hasFlag(PropertyID.isWorn) == false)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         await engine.execute(command: command)
 
-        let finalCloakState = await engine.item("cloak")
+        let finalCloakState = engine.item("cloak")
         #expect(finalCloakState?.parent == .player)
         #expect(finalCloakState?.hasFlag(PropertyID.isWorn) == true, "Cloak should have .worn property")
         #expect(finalCloakState?.hasFlag(PropertyID.itemTouched) == true, "Cloak should have .touched property")
@@ -47,13 +49,13 @@ struct WearActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemDynamicValue(key: .isWorn),
+                propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ),
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ),
@@ -95,9 +97,11 @@ struct WearActionHandlerTests {
     func testWearItemNotWearable() async throws {
         let rock = Item(
             id: "rock",
-            name: "rock",
+            name: "heavy rock",
             parent: .player,
-            isTakable: true
+            attributes: [
+                .isTakable: true
+            ]
         )
         let game = MinimalGame(items: [rock])
         let engine = GameEngine(
@@ -124,11 +128,13 @@ struct WearActionHandlerTests {
     func testWearItemAlreadyWorn() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "cloak",
+            name: "velvet cloak",
             parent: .player,
-            isTakable: true,
-            isWearable: true,
-            isWorn: true
+            attributes: [
+                .isWearable: true,
+                .isTakable: true,
+                .isWorn: true
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let engine = GameEngine(

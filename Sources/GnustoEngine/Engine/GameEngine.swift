@@ -1224,7 +1224,7 @@ extension GameEngine {
         if oldValue != newValue {
             let change = StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemDynamicValue(key: key), // Use the new key
+                propertyKey: .itemAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
             )
@@ -1265,7 +1265,7 @@ extension GameEngine {
         if oldValue != newValue {
             let change = StateChange(
                 entityId: .location(locationID),
-                propertyKey: .locationDynamicValue(key: key), // Use the new key
+                propertyKey: .locationAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
             )

@@ -24,7 +24,7 @@ struct UnlockActionHandlerTests {
         if initialTargetLocked {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .isLocked),
+                propertyKey: .itemAttribute(.isLocked),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             ))
@@ -34,7 +34,7 @@ struct UnlockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -44,7 +44,7 @@ struct UnlockActionHandlerTests {
         if !initialKeyTouched {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -216,7 +216,14 @@ struct UnlockActionHandlerTests {
                 .lockKey: "key",
             ]
         )
-        let key = Item(id: "key", name: "key", parent: .location("startRoom"), isTakable: true) // Key also in room
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+            ]
+        )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -243,14 +250,37 @@ struct UnlockActionHandlerTests {
     @Test("Unlock fails when target not reachable")
     func testUnlockFailsTargetNotReachable() async throws {
         // Arrange: Box is locked in another room, player holds key
-        let box = Item(
-            id: "box", name: "box",
-            parent: .location("otherRoom"), lockKey: "key",
-            isContainer: true, isLockable: true, isLocked: true
+let box = Item(
+    id: "box",
+    name: "box",
+    parent: .location("otherRoom"),
+    attributes: [
+        .isContainer: true,
+        .isLockable: true,
+        .isLocked: true,
+        .lockKey: "key",
+    ]
+)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ]
         )
-        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
-        let room1 = Location(id: "startRoom", name: "Start", description: "", inherentlyLit: true) // Correct parameter name
-        let room2 = Location(id: "otherRoom", name: "Other", description: "", inherentlyLit: true) // Correct parameter name
+        let room1 = Location(
+            id: "startRoom",
+            name: "Start",
+            description: "",
+            inherentlyLit: true
+        ) // Correct parameter name
+        let room2 = Location(
+            id: "otherRoom",
+            name: "Other",
+            description: "",
+            inherentlyLit: true
+        ) // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -277,8 +307,19 @@ struct UnlockActionHandlerTests {
     @Test("Unlock fails when target not lockable/unlockable")
     func testUnlockFailsTargetNotUnlockable() async throws {
         // Arrange: Target lacks .lockable, player holds key
-        let pebble = Item(id: "pebble", name: "pebble", parent: .location("startRoom")) // Not lockable
-        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
+        let pebble = Item(
+            id: "pebble",
+            name: "pebble",
+            parent: .location("startRoom")
+        ) // Not lockable
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ]
+        )
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -309,16 +350,20 @@ struct UnlockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true,
-            isLocked: true
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true
+            ]
         )
         let wrongKey = Item(
             id: "wrongkey",
             name: "bent key",
             parent: .player, // Player holds this
-            isTakable: true
+            attributes: [
+                .isTakable: true,
+            ]
         )
         let game = MinimalGame(items: [box, wrongKey])
         let mockIO = await MockIOHandler()
@@ -350,11 +395,20 @@ struct UnlockActionHandlerTests {
             id: "box",
             name: "box",
             parent: .location("startRoom"),
-            lockKey: "key",
-            isContainer: true,
-            isLockable: true // Start unlocked
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true // Start unlocked
+            ]
         )
-        let key = Item(id: "key", name: "key", parent: .player, isTakable: true)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ]
+        )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

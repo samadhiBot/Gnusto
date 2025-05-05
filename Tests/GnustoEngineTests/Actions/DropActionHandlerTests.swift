@@ -30,7 +30,7 @@ struct DropActionHandlerTests {
         if !initialTouched {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ))
@@ -40,7 +40,7 @@ struct DropActionHandlerTests {
         if initialWorn {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemDynamicValue(key: .isWorn),
+                propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             ))

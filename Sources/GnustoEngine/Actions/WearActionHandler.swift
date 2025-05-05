@@ -45,7 +45,7 @@ public struct WearActionHandler: EnhancedActionHandler {
         if itemSnapshot.attributes[.isWorn] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .isWorn),
+                propertyKey: .itemAttribute(.isWorn),
                 oldValue: itemSnapshot.attributes[.isWorn] ?? .bool(false),
                 newValue: .bool(true)
             ))
@@ -55,7 +55,7 @@ public struct WearActionHandler: EnhancedActionHandler {
         if itemSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: itemSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))

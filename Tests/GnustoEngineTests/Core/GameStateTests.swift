@@ -605,7 +605,7 @@ struct GameStateTests {
     }
 
     @Test("apply - Modify Location Dynamic Value")
-    func testApplyModifyLocationDynamicValue() {
+    func testApplyModifyLocationAttribute() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
         let testLoc = Location(id: "testLoc", name: "Test Location", longDescription: "Original Desc")
@@ -613,14 +613,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationDynamicValue(key: .description),
+            propertyKey: .locationAttribute(.description),
             oldValue: .string("Original Desc"),
             newValue: .string("Updated Desc")
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationDynamicValue(key: .description))
+        #expect(change.propertyKey == .locationAttribute(.description))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
@@ -633,13 +633,13 @@ struct GameStateTests {
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationDynamicValue(key: .description),
+            propertyKey: .locationAttribute(.description),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationDynamicValue(key: .description),
+            propertyKey: .locationAttribute(.description),
             oldValue: state.locations["startRoom"]?.attributes[.longDescription], // Correct old value
             newValue: .string("New Description")
         )

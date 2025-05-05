@@ -36,7 +36,7 @@ struct DynamicPropertyTests {
             name: "Test Chamber",
 //            attributes: initialLocationValues // Set manually after init if needed
         )
-        testLocation.dynamicValues = initialLocationValues // Assign initial values
+        testLocation.attributes = initialLocationValues // Assign initial values
 
         let blueprint = MinimalGame(
             locations: [testLocation],

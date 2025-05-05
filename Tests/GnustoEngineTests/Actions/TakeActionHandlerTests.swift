@@ -32,7 +32,7 @@ struct TakeActionHandlerTests {
         if initialTouched != finalTouched {
             changes.append(StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(initialTouched),
                 newValue: .bool(finalTouched)
             ))
@@ -44,7 +44,7 @@ struct TakeActionHandlerTests {
         {
             changes.append(StateChange(
                 entityId: .item(id: itemID),
-                propertyKey: .itemDynamicValue(key: .itemLight), // Assuming .itemLight is the correct ID
+                propertyKey: .itemAttribute(.itemLight), // Assuming .itemLight is the correct ID
                 oldValue: initialLight.map { .bool($0) }, // Map optional Bool to optional StateValue
                 newValue: .bool(finalLightValue)
             ))
@@ -243,7 +243,7 @@ struct TakeActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("startRoom")
         )
         let itemInContainer = Item(
@@ -275,7 +275,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
-        #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
+        #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
 
         // Assert Output
@@ -298,7 +298,7 @@ struct TakeActionHandlerTests {
             id: "pouch",
             name: "leather pouch",
             properties: .container, .takable,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .player
         )
         let itemInContainer = Item(
@@ -330,7 +330,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasProperty(.touched) == true)
         let finalContainerState = engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
-        #expect(finalContainerState?.dynamicValues["isOpen"]?.toBool == true)
+        #expect(finalContainerState?.attributes["isOpen"]?.toBool == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Output
@@ -371,7 +371,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(container.dynamicValues["isOpen"] == nil)
+        #expect(container.attributes["isOpen"] == nil)
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 

@@ -77,8 +77,22 @@ struct PutOnActionHandlerTests {
     @Test("Put item on surface successfully")
     func testPutOnItemSuccessfully() async throws {
         // Arrange: Player holds book, table is reachable
-        let initialBook = Item(id: "book", name: "heavy book", properties: .takable, parent: .player)
-        let initialTable = Item(id: "table", name: "sturdy table", properties: .surface, parent: .location("startRoom"))
+        let initialBook = Item(
+            id: "book",
+            name: "heavy book",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let initialTable = Item(
+            id: "table",
+            name: "sturdy table",
+            parent: .location("startRoom"),
+            attributes: [
+                .isSurface: true
+            ]
+        )
         let initialBookProps = initialBook.properties
         let initialTableProps = initialTable.properties
 
@@ -244,7 +258,14 @@ struct PutOnActionHandlerTests {
     func testPutOnFailsTargetNotSurface() async throws {
         // Arrange: Target is a box (not surface), player holds book
         let book = Item(id: "book", name: "heavy book", parent: .player)
-        let box = Item(id: "box", name: "box", properties: .container, parent: .location("startRoom")) // Not a surface
+        let box = Item(
+            id: "box",
+            name: "box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true // Not a surface
+            ]
+        )
         let game = MinimalGame(items: [book, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -271,7 +292,14 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails self-insertion")
     func testPutOnFailsSelfInsertion() async throws {
         // Arrange: Player holds table
-        let table = Item(id: "table", name: "table", properties: .surface, .takable, parent: .player)
+        let table = Item(
+            id: "table",
+            name: "table",
+            parent: .player,
+            attributes: [
+                .isSurface: true
+            ]
+        )
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -298,8 +326,23 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails recursive insertion")
     func testPutOnFailsRecursiveInsertion() async throws {
         // Arrange: Player holds tray, tray is on table
-        let tray = Item(id: "tray", name: "silver tray", properties: .surface, .takable, parent: .player)
-        let table = Item(id: "table", name: "table", properties: .surface, parent: .item("tray")) // Table is *on* tray (setup for recursive fail)
+        let tray = Item(
+            id: "tray",
+            name: "silver tray",
+            parent: .player,
+            attributes: [
+                .isSurface: true,
+                .isTakable: true
+            ]
+        )
+        let table = Item(
+            id: "table",
+            name: "table",
+            parent: .item("tray"),
+            attributes: [
+                .isSurface: true // Table is also a surface
+            ]
+        )
         let game = MinimalGame(items: [tray, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

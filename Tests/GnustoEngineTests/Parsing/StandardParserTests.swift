@@ -46,7 +46,7 @@ struct StandardParserTests {
                 id: "backpack",
                 name: "backpack",
                 properties: .container, .takable,
-                dynamicValues: [.isOpen: true],
+                attributes: [.isOpen: true],
                 capacity: 20,
                 parent: .player
             ),
@@ -646,8 +646,17 @@ struct StandardParserTests {
     func testDirectInventoryPreferredOverContainer() throws {
         // Create a temporary state where 'key' is held and a temp key is in backpack
         var itemsDict = self.gameState.items // Base items copy
-        let tempKeyInBackpack = Item(id: "tempKeyInBackpack", name: "key", adjectives: "temp", parent: .item("backpack"))
+        let tempKeyInBackpack = Item(
+            id: "tempKeyInBackpack",
+            name: "key",
+            parent: .item("backpack"),
+            adjectives: "temp"
+        )
+        let tempKeyOnGround = Item(id: "tempKeyOnGround", name: "key", adjectives: "temp", parent: .location("startRoom"))
+        let permKey = Item(id: "permKey", name: "key", adjectives: "perm", parent: .location("startRoom"))
         itemsDict[tempKeyInBackpack.id] = tempKeyInBackpack
+        itemsDict[tempKeyOnGround.id] = tempKeyOnGround
+        itemsDict[permKey.id] = permKey
         let initState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values), // Pass the modified copy's values
@@ -659,10 +668,14 @@ struct StandardParserTests {
         // Verify setup
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["tempKeyInBackpack"]?.parent == .item("backpack"))
+        #expect(initState.items["tempKeyOnGround"]?.parent == .location("startRoom"))
+        #expect(initState.items["permKey"]?.parent == .location("startRoom"))
 
         // Update vocab temporarily ONLY for this test's state
         var tempVocabulary = vocabulary
         tempVocabulary.items["key", default: []].insert(tempKeyInBackpack.id)
+        tempVocabulary.items["key", default: []].insert(tempKeyOnGround.id)
+        tempVocabulary.items["key", default: []].insert(permKey.id)
 
         // Parsing "take key" might become ambiguous IF the parser finds both.
         // Let's test with the modifier to target the *real* key.

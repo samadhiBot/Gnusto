@@ -57,13 +57,13 @@ struct RemoveActionHandlerTests {
             ),
             StateChange(
                 entityId: .item(id: "cloak"),
-                propertyKey: .itemDynamicValue(key: .isWorn),
+                propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             ),
             StateChange(
                 entityId: .item(id: "cloak"),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false), // Assuming not touched before removal
                 newValue: .bool(true)
             ),

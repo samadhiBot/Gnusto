@@ -131,7 +131,7 @@ struct TouchActionHandlerTests {
             id: "box",
             name: "wooden box",
             properties: .container,
-            dynamicValues: [.isOpen: true],
+            attributes: [.isOpen: true],
             parent: .location("startRoom")
         )
         let gem = Item(
@@ -218,7 +218,7 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(chest.dynamicValues["isOpen"] == nil) // Verify closed
+        #expect(chest.attributes["isOpen"] == nil) // Verify closed
 
         let command = Command(verbID: "touch", directObject: "coin", rawInput: "touch coin")
 

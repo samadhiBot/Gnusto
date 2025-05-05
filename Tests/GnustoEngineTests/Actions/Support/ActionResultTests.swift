@@ -53,13 +53,13 @@ struct ActionResultTests {
     func testStateChangeInitialization() {
         let change = StateChange(
             entityId: .item("door"),
-            propertyKey: .itemDynamicValue(key: .isOpen),
+            propertyKey: .itemAttribute(.isOpen),
             oldValue: false,
             newValue: true
         )
 
         #expect(change.entityId == .item("door"))
-        #expect(change.propertyKey == .itemDynamicValue(key: .isOpen))
+        #expect(change.propertyKey == .itemAttribute(.isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
     }
@@ -181,19 +181,19 @@ struct ActionResultTests {
     // Example StateChanges for testing
     private let change1 = StateChange(
         entityId: .item(id: "lamp"),
-        propertyKey: .itemDynamicValue(key: .isOn),
+        propertyKey: .itemAttribute(.isOn),
         oldValue: .bool(false),
         newValue: .bool(true)
     )
     private let change2 = StateChange(
         entityId: .item(id: "lamp"),
-        propertyKey: .itemDynamicValue(key: .itemTouched),
+        propertyKey: .itemAttribute(.itemTouched),
         oldValue: .bool(false),
         newValue: .bool(true)
     )
     private let change3 = StateChange(
         entityId: .location(id: "cave"),
-        propertyKey: .locationDynamicValue(key: .locationVisited),
+        propertyKey: .locationAttribute(.locationVisited),
         oldValue: .bool(false),
         newValue: .bool(true)
     )
@@ -212,7 +212,7 @@ struct ActionResultTests {
         #expect(
             mergedResult.changes.contains {
                 $0.entityId == .item(id: "lamp") &&
-                $0.propertyKey == .itemDynamicValue(key: .isOn) &&
+                $0.propertyKey == .itemAttribute(.isOn) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2 (no change for this specific prop)
             }
@@ -220,7 +220,7 @@ struct ActionResultTests {
         #expect(
             mergedResult.changes.contains {
                 $0.entityId == .item(id: "lamp") &&
-                $0.propertyKey == .itemDynamicValue(key: .itemTouched) &&
+                $0.propertyKey == .itemAttribute(.itemTouched) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2
             }
@@ -228,7 +228,7 @@ struct ActionResultTests {
         #expect(
             mergedResult.changes.contains {
                 $0.entityId == .location(id: "cave") &&
-                $0.propertyKey == .locationDynamicValue(key: .locationVisited) &&
+                $0.propertyKey == .locationAttribute(.locationVisited) &&
                 $0.oldValue == .bool(false) && // From result1
                 $0.newValue == .bool(true)     // From result2
             }
@@ -257,12 +257,12 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            dynamicValues: [.isOn: .bool(false)] // Start with lamp off
+            attributes: [.isOn: .bool(false)] // Start with lamp off
         )
         engine.state.locations["cave"] = Location(
             id: "cave",
             name: "Dark Cave",
-            dynamicValues: [.locationVisited: .bool(false)] // Start unvisited
+            attributes: [.locationVisited: .bool(false)] // Start unvisited
         )
 
         let result = ActionResult(
@@ -270,13 +270,13 @@ struct ActionResultTests {
             changes: [
                 StateChange( // Turn lamp on
                     entityId: .item(id: "lamp"),
-                    propertyKey: .itemDynamicValue(key: .isOn),
+                    propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 ),
                 StateChange( // Mark cave visited
                     entityId: .location(id: "cave"),
-                    propertyKey: .locationDynamicValue(key: .locationVisited),
+                    propertyKey: .locationAttribute(.locationVisited),
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 ),
@@ -290,7 +290,7 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            dynamicValues: [.isOn: .bool(true)] // Lamp is ALREADY on
+            attributes: [.isOn: .bool(true)] // Lamp is ALREADY on
         )
 
         let result = ActionResult(
@@ -298,7 +298,7 @@ struct ActionResultTests {
             changes: [
                 StateChange(
                     entityId: .item(id: "lamp"),
-                    propertyKey: .itemDynamicValue(key: .isOn),
+                    propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // Expects lamp to be off
                     newValue: .bool(true)
                 )
@@ -316,7 +316,7 @@ struct ActionResultTests {
             changes: [
                 StateChange(
                     entityId: .item(id: "lamp"), // Refers to non-existent item
-                    propertyKey: .itemDynamicValue(key: .isOn),
+                    propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 )
@@ -334,7 +334,7 @@ struct ActionResultTests {
             changes: [
                 StateChange(
                     entityId: .item(id: "lamp"),
-                    propertyKey: .locationDynamicValue(key: .locationVisited), // Wrong key type for item
+                    propertyKey: .locationAttribute(.locationVisited), // Wrong key type for item
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 )
@@ -348,7 +348,7 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            dynamicValues: [
+            attributes: [
                 .isOn: .bool(false),
                 .isLightSource: .bool(true) // Mark as light source
             ]
@@ -356,7 +356,7 @@ struct ActionResultTests {
         engine.state.locations["cave"] = Location(
             id: "cave",
             name: "Dark Cave",
-            dynamicValues: [
+            attributes: [
                 .locationInherentlyLit: .bool(false) // Not lit initially
             ]
         )
@@ -367,14 +367,14 @@ struct ActionResultTests {
                 // Turn lamp on
                 StateChange(
                     entityId: .item(id: "lamp"),
-                    propertyKey: .itemDynamicValue(key: .isOn),
+                    propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 ),
                 // Mark cave as lit (perhaps by an action)
                 StateChange(
                     entityId: .location(id: "cave"),
-                    propertyKey: .locationDynamicValue(key: .locationIsLit), // Use the isLit flag
+                    propertyKey: .locationAttribute(.locationIsLit), // Use the isLit flag
                     oldValue: .bool(false),
                     newValue: .bool(true)
                 ),
@@ -408,7 +408,7 @@ struct ActionResultTests {
         engine.state.items["lamp"] = Item(
             id: "lamp",
             name: "Brass Lamp",
-            dynamicValues: [.isOn: .bool(true)] // Lamp starts 'on'
+            attributes: [.isOn: .bool(true)] // Lamp starts 'on'
         )
 
         let result = ActionResult(
@@ -416,7 +416,7 @@ struct ActionResultTests {
             changes: [
                 StateChange(
                     entityId: .item(id: "lamp"),
-                    propertyKey: .itemDynamicValue(key: .isOn),
+                    propertyKey: .itemAttribute(.isOn),
                     oldValue: .bool(false), // This validation will fail
                     newValue: .bool(true)
                 )
@@ -436,7 +436,7 @@ struct ActionResultTests {
     ) -> StateChange {
         StateChange(
             entityId: .item(id: id),
-            propertyKey: .itemDynamicValue(key: key),
+            propertyKey: .itemAttribute(key),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -451,7 +451,7 @@ struct ActionResultTests {
     ) -> StateChange {
         StateChange(
             entityId: .location(id: id),
-            propertyKey: .locationDynamicValue(key: key),
+            propertyKey: .locationAttribute(key),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -483,8 +483,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         #expect(mergedResult.changes.count == 2)
-        #expect(mergedResult.changes.contains { $0.propertyKey == .itemDynamicValue(key: .isOn) })
-        #expect(mergedResult.changes.contains { $0.propertyKey == .locationDynamicValue(key: .locationVisited) })
+        #expect(mergedResult.changes.contains { $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.propertyKey == .locationAttribute(.locationVisited) })
     }
 
     @Test func testMergeOverlappingChanges_DifferentEntities() throws {
@@ -502,8 +502,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         #expect(mergedResult.changes.count == 2)
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemDynamicValue(key: .isOn) })
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "torch") && $0.propertyKey == .itemDynamicValue(key: .isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "torch") && $0.propertyKey == .itemAttribute(.isOn) })
     }
 
     @Test func testMergeOverlappingChanges_SameEntityDifferentProperty() throws {
@@ -521,8 +521,8 @@ struct ActionResultTests {
         )
         // ... existing code ...
         #expect(mergedResult.changes.count == 2)
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemDynamicValue(key: .isOn) })
-        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemDynamicValue(key: .itemValue) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.isOn) })
+        #expect(mergedResult.changes.contains { $0.entityId == .item(id: "lamp") && $0.propertyKey == .itemAttribute(.itemValue) })
     }
 
     @Test func testMergeOverlappingChanges_SameEntitySameProperty() throws {
@@ -542,7 +542,7 @@ struct ActionResultTests {
         #expect(mergedResult.changes.count == 1) // Should coalesce
         let finalChange = try #require(mergedResult.changes.first)
         #expect(finalChange.entityId == .item(id: "lamp"))
-        #expect(finalChange.propertyKey == .itemDynamicValue(key: .isOn))
+        #expect(finalChange.propertyKey == .itemAttribute(.isOn))
         #expect(finalChange.oldValue == .bool(false)) // Original old value from result1
         #expect(finalChange.newValue == .bool(false)) // Final new value from result2
     }
@@ -578,11 +578,11 @@ struct ActionResultTests {
         #expect(parentChange.oldValue == .parent(.location(id: "room")))
         #expect(parentChange.newValue == .parent(.location(id: "floor")))
 
-        let touchedChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemDynamicValue(key: .itemTouched) })
+        let touchedChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemAttribute(.itemTouched) })
         #expect(touchedChange.oldValue == .bool(false))
         #expect(touchedChange.newValue == .bool(true)) // Ends up true
 
-        let isOnChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemDynamicValue(key: .isOn) })
+        let isOnChange = try #require(mergedResult.changes.first { $0.propertyKey == .itemAttribute(.isOn) })
         #expect(isOnChange.oldValue == .bool(false))
         #expect(isOnChange.newValue == .bool(true))
     }

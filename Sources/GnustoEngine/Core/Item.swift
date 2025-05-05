@@ -19,10 +19,10 @@ public struct Item: Codable, Identifiable, Sendable {
     public init(
         id: ItemID,
         name: String,
-        parent: ParentEntity,
+        parent: ParentEntity = .nowhere,
         adjectives: String...,
         synonyms: String...,
-        attributes: [PropertyID: StateValue]
+        attributes: [PropertyID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name

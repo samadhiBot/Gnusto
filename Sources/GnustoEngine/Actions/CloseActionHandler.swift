@@ -82,7 +82,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.itemTouched] != .bool(true) {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: targetItem.attributes[.itemTouched] ?? .bool(false), // Current value (or default false)
                 newValue: .bool(true)
             )

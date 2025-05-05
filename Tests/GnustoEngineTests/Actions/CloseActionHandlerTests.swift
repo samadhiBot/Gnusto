@@ -33,7 +33,7 @@ struct CloseActionHandlerTests {
     private func expectedIsOpenFalseChange(itemID: ItemID) -> StateChange {
         StateChange(
             entityId: .item(itemID),
-            propertyKey: .itemDynamicValue(key: .isOpen),
+            propertyKey: .itemAttribute(.isOpen),
             oldValue: .bool(true), // Assumes it was true before closing
             newValue: .bool(false)
         )
@@ -45,9 +45,11 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
-            dynamicValues: [.isOpen: .bool(true)], // Start open
-            isContainer: true,
-            isOpenable: true
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true // Start open
+            ]
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -62,7 +64,7 @@ struct CloseActionHandlerTests {
 
         // Initial state check
         let initialBox = await engine.item("box")
-        #expect(initialBox?.dynamicValues[PropertyID.isOpen] == .bool(true)) // Qualified key
+        #expect(initialBox?.attributes[.isOpen] == .bool(true)) // Qualified key
         #expect(engine.gameState.changeHistory.isEmpty)
 
         // Act
@@ -70,7 +72,7 @@ struct CloseActionHandlerTests {
 
         // Assert State Change
         let finalBox = await engine.item("box")
-        #expect(finalBox?.dynamicValues[PropertyID.isOpen] == .bool(false)) // Qualified key
+        #expect(finalBox?.attributes[.isOpen] == .bool(false)) // Qualified key
         #expect(finalBox?.hasFlag(PropertyID.itemTouched) == true)
 
         // Assert Output
@@ -81,13 +83,13 @@ struct CloseActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityId: .item("box"),
-                propertyKey: .itemDynamicValue(key: .isOpen), // Correct key
+                propertyKey: .itemAttribute(.isOpen), // Correct key
                 oldValue: .bool(true),
                 newValue: .bool(false)
             ),
             StateChange(
                 entityId: .item("box"),
-                propertyKey: .itemDynamicValue(key: .itemTouched), // Correct key
+                propertyKey: .itemAttribute(.itemTouched), // Correct key
                 oldValue: .bool(false), // Assuming not touched before close
                 newValue: .bool(true)
             ),
@@ -107,9 +109,11 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "wooden box",
             parent: .location("startRoom"),
-            // attributes: [.isOpen: .bool(false)] is the default
-            isContainer: true,
-            isOpenable: true
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+                // Starts closed by default (no .isOpen: true)
+            ]
         )
         let game = MinimalGame(items: [box])
         let engine = GameEngine(
@@ -169,9 +173,10 @@ struct CloseActionHandlerTests {
             id: "box",
             name: "distant box",
             parent: .nowhere,
-            dynamicValues: [.isOpen: .bool(true)], // Open, but not accessible
-            isContainer: true,
-            isOpenable: true
+            attributes: [
+                .isOpenable: true,
+                .isOpen: true // Start open
+            ]
         )
         let game = MinimalGame(items: [box])
         let engine = GameEngine(

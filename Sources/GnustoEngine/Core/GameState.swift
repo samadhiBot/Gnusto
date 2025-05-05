@@ -265,25 +265,25 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             locations[locationID]?.exits = newExits
 
-        // MARK: Dynamic Properties (Item or Location)
+        // MARK: Attributes (Item or Location)
 
-        case .itemDynamicValue(let key):
+        case .itemAttribute(let key):
             guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemDynamicValue: expected .item, got \(change.entityId)")
+                throw ActionError.internalEngineError("EntityID mismatch for itemAttribute: expected .item, got \(change.entityId)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemDynamicValue change ('\(key.rawValue)')")
+                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAttribute change ('\(key.rawValue)')")
             }
             // Directly update the StateValue in the dictionary.
             // Assumes validation happened *before* StateChange creation.
             items[itemID]?.attributes[key] = change.newValue
 
-        case .locationDynamicValue(let key):
+        case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationDynamicValue: expected .location, got \(change.entityId)")
+                throw ActionError.internalEngineError("EntityID mismatch for locationAttribute: expected .location, got \(change.entityId)")
             }
             guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationDynamicValue change ('\(key.rawValue)')")
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationAttribute change ('\(key.rawValue)')")
             }
             locations[locationID]?.attributes[key] = change.newValue
 
@@ -552,15 +552,15 @@ public struct GameState: Codable, Equatable, Sendable {
             // If fuse doesn't exist, current value is nil
             actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
 
-        case .itemDynamicValue(let key):
+        case .itemAttribute(let key):
              guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemDynamicValue")
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemAttribute")
              }
              actualCurrentValue = items[itemID]?.attributes[key]
 
-        case .locationDynamicValue(let key):
+        case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationDynamicValue")
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationAttribute")
              }
              actualCurrentValue = locations[locationID]?.attributes[key]
         }

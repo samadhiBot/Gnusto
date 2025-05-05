@@ -63,7 +63,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.itemTouched] != .bool(true) {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: targetItem.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             )
@@ -74,7 +74,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isWorn] == .bool(true) { // Only add change if it was worn
             let wornChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemDynamicValue(key: .isWorn),
+                propertyKey: .itemAttribute(.isWorn),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             )

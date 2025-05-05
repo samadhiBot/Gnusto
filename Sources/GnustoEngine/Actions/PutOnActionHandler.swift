@@ -82,7 +82,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         if itemToPutSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(itemToPutID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: itemToPutSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
@@ -92,7 +92,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         if surfaceSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(surfaceID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: surfaceSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))

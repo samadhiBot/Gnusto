@@ -97,7 +97,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         if itemToInsertSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: itemToInsertSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))
@@ -107,7 +107,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         if containerSnapshot.attributes[.itemTouched] != .bool(true) {
             stateChanges.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: containerSnapshot.attributes[.itemTouched] ?? .bool(false),
                 newValue: .bool(true)
             ))

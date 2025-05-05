@@ -7,7 +7,14 @@ struct ExamineActionHandlerTests {
     @Test func testExamineSimpleItem() async throws {
         // Arrange
         let itemID: ItemID = "pebble"
-        let item = Item(id: itemID, name: "small pebble", longDescription: "A smooth, grey pebble.")
+        let item = Item(
+            id: itemID,
+            name: "small pebble",
+            parent: .location("startRoom"),
+            attributes: [
+                .longDescription: "A smooth, grey pebble."
+            ]
+        )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
             playerInventory: [itemID]
@@ -33,7 +40,7 @@ struct ExamineActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemDynamicValue(key: .itemTouched),
+                propertyKey: .itemAttribute(.itemTouched),
                 oldValue: .bool(false),
                 newValue: .bool(true)
             ),
@@ -54,8 +61,11 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "engraved locket",
-            longDescription: "A small, tarnished silver locket.",
-            descriptionHandlerId: handlerID
+            parent: .location("startRoom"),
+            attributes: [
+                .longDescription: "A small, tarnished silver locket.",
+                .descriptionHandlerId: handlerID
+            ]
         )
         let registry = DefinitionRegistry()
         registry.registerDescriptionHandler(id: handlerID) { _, itemSnapshot, _, _ in
@@ -91,7 +101,9 @@ struct ExamineActionHandlerTests {
             id: itemID,
             name: "stone statue",
             parent: .location(roomID),
-            longDescription: "A weathered statue of a grue."
+            attributes: [
+                .longDescription: "A weathered statue of a grue."
+            ]
         )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
@@ -116,7 +128,14 @@ struct ExamineActionHandlerTests {
     @Test func testExamineItemNotInScope() async throws {
         // Arrange
         let itemID: ItemID = "hiddenGem"
-        let item = Item(id: itemID, name: "hidden gem", parent: .location("farAwayRoom"), longDescription: "Should not see this.")
+        let item = Item(
+            id: itemID,
+            name: "hidden gem",
+            parent: .location("farAwayRoom"),
+            attributes: [
+                .longDescription: "Should not see this."
+            ]
+        )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item],
             playerLocation: "startRoom"
@@ -162,8 +181,26 @@ struct ExamineActionHandlerTests {
         // Arrange
         let itemID1: ItemID = "redBall"
         let itemID2: ItemID = "blueBall"
-        let item1 = Item(id: itemID1, name: "red ball", adjectives: ["red"], noun: "ball", longDescription: "A red ball.")
-        let item2 = Item(id: itemID2, name: "blue ball", adjectives: ["blue"], noun: "ball", longDescription: "A blue ball.")
+        let item1 = Item(
+            id: itemID1,
+            name: "red ball",
+            parent: .location("startRoom"),
+            adjectives: "red",
+            synonyms: "ball",
+            attributes: [
+                .longDescription: "A red ball."
+            ]
+        )
+        let item2 = Item(
+            id: itemID2,
+            name: "blue ball",
+            parent: .location("startRoom"),
+            adjectives: "blue",
+            synonyms: "ball",
+            attributes: [
+                .longDescription: "A blue ball."
+            ]
+        )
         let (engine, _, ioHandler) = await GnustoEngineTestScaffold.setupEngine(
             items: [item1, item2],
             playerInventory: [itemID1, itemID2]
@@ -233,8 +270,10 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "magic mirror",
-            longDescription: "A dusty old mirror.",
-            objectActionHandlerId: handlerID
+            attributes: [
+                .longDescription: "A dusty old mirror.",
+                .objectActionHandlerId: handlerID
+            ]
         )
         let registry = DefinitionRegistry()
         registry.registerObjectActionHandler(id: handlerID) { command, context, _, io, _ in
