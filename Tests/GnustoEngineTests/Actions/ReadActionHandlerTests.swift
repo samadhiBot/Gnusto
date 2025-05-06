@@ -36,7 +36,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.item("book")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "It reads: \"Beware the Grue!\"")
     }
@@ -82,7 +82,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.item("sign")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "DANGER AHEAD")
     }
@@ -263,7 +263,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.item("paper")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "There's nothing written on the blank paper.")
     }
@@ -308,7 +308,7 @@ struct ReadActionHandlerTests {
 
         // Assert
         let finalItemState = engine.item("tablet")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "Ancient Runes")
     }
@@ -347,7 +347,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("scroll")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read item with empty text")
@@ -384,7 +384,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("note")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read item with nil text")
@@ -420,7 +420,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("tablet")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read item not accessible")
@@ -547,7 +547,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("tablet")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read item requires direct object")
@@ -613,7 +613,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("note")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read item inside container in room")
@@ -657,7 +657,7 @@ struct ReadActionHandlerTests {
 
         // Assert Final State
         let finalItemState = engine.item("letter")
-        #expect(finalItemState?.hasFlag(.isTouched))
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("Read fails item inside closed container")

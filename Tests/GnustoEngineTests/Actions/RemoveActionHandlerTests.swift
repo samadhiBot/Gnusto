@@ -56,7 +56,7 @@ struct RemoveActionHandlerTests {
                 entityId: .item("cloak"),
                 propertyKey: .itemParent,
                 oldValue: .parentEntity(.player),
-                newValue: .parentEntity(.location(id: "startRoom"))
+                newValue: .parentEntity(.location("startRoom"))
             ),
             StateChange(
                 entityId: .item("cloak"),
