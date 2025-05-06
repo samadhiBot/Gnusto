@@ -85,7 +85,7 @@ struct CloseActionHandlerTests {
 
         // Initial state check
         let initialBox = engine.item("box")
-        #expect(initialBox?.attributes[.isOpen] == true) // Qualified key
+        #expect(initialBox?.attributes[.isOpen] == true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         // Act
@@ -93,8 +93,8 @@ struct CloseActionHandlerTests {
 
         // Assert State Change
         let finalBox = engine.item("box")
-        #expect(finalBox?.attributes[.isOpen] == false) // Qualified key
-        #expect(finalBox?.hasFlag(.isTouched) == true)
+        #expect(finalBox?.attributes[.isOpen] == false)
+        #expect(finalBox?.attributes[.isTouched] == true)
 
         // Assert Output
         let output = await mockIO.flush()

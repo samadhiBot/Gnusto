@@ -23,11 +23,8 @@ public class GameEngine: Sendable {
     /// The registry holding static game definitions (fuses, daemons, action overrides).
     public let definitionRegistry: DefinitionRegistry
 
-    /// The registry for dynamic description handlers.
-    public let descriptionHandlerRegistry: DescriptionHandlerRegistry
-
-    /// The registry for dynamic property computation and validation logic.
-    public var dynamicPropertyRegistry: DynamicPropertyRegistry
+    /// The registry for dynamic attribute computation and validation logic.
+    public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: EnhancedActionHandler]()
@@ -61,47 +58,6 @@ public class GameEngine: Sendable {
     /// and no further action is required.
     public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
 
-    // MARK: - Default Handlers
-
-    /// Default action handlers provided by the engine.
-    /// Games can override these via the `DefinitionRegistry`.
-    private static let defaultActionHandlers: [VerbID: EnhancedActionHandler] = [
-        // Movement & World Interaction
-        "close": CloseActionHandler(),
-        "examine": ExamineActionHandler(),
-        "go": GoActionHandler(),
-        "insert": InsertActionHandler(),
-        "lock": LockActionHandler(),
-        "look": LookActionHandler(),
-        "open": OpenActionHandler(),
-        "put-on": PutOnActionHandler(),
-        "unlock": UnlockActionHandler(),
-
-        // Inventory Management
-        "drop": DropActionHandler(),
-        "inventory": InventoryActionHandler(),
-        "remove": RemoveActionHandler(),
-        "take": TakeActionHandler(),
-        "wear": WearActionHandler(),
-
-        // Other Actions
-        "listen": ListenActionHandler(),
-        "read": ReadActionHandler(),
-        "smell": SmellActionHandler(),
-        "taste": TasteActionHandler(),
-        "think": ThinkAboutActionHandler(),
-        "touch": TouchActionHandler(),
-        "turn off": TurnOffActionHandler(),
-        "turn on": TurnOnActionHandler(),
-        "wait": WaitActionHandler(),
-
-        // Meta Actions
-        "quit": QuitActionHandler(),
-        "score": ScoreActionHandler(),
-
-        // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
-    ]
-
     // MARK: - Initialization
 
     /// Creates a new `GameEngine` instance from a game definition.
@@ -119,8 +75,7 @@ public class GameEngine: Sendable {
         self.parser = parser
         self.ioHandler = ioHandler
         self.definitionRegistry = game.definitionRegistry
-        self.dynamicPropertyRegistry = game.dynamicPropertyRegistry
-        self.descriptionHandlerRegistry = DescriptionHandlerRegistry()
+        self.dynamicAttributeRegistry = game.dynamicAttributeRegistry
         self.actionHandlers = game.definitionRegistry.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
@@ -638,7 +593,7 @@ public class GameEngine: Sendable {
         await ioHandler.print("--- \(location.name) ---", style: .strong)
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
-        let description = await descriptionHandlerRegistry.generateDescription(
+        let description = await generateDescription(
             for: location.id,
             key: .longDescription,
             engine: self
@@ -744,7 +699,7 @@ public class GameEngine: Sendable {
             "\(theThat(item).capitalizedFirst) is already unlocked."
         case .itemNotAccessible(let item):
             "You can't see \(anySuch(item))."
-        case .itemNotCloseable(let item):
+        case .itemNotClosable(let item):
             "\(theThat(item).capitalizedFirst) is not something you can close."
         case .itemNotDroppable(let item):
             "You can't drop \(theThat(item))."
@@ -1133,7 +1088,7 @@ extension GameEngine {
 extension GameEngine {
 
     /// Retrieves the current value of a potentially dynamic item property.
-    /// Checks the `DynamicPropertyRegistry` for a compute handler first.
+    /// Checks the `DynamicAttributeRegistry` for a compute handler first.
     /// If no handler exists, returns the value stored in the item's `attributes`.
     ///
     /// - Parameters:
@@ -1143,12 +1098,15 @@ extension GameEngine {
     @MainActor
     public func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
-            logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
+            logger.warning("""
+                Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
+                \(itemID.rawValue)
+                """)
             return nil
         }
 
         // Check registry for compute handler
-        if let computeHandler = dynamicPropertyRegistry.itemComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: key) {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
@@ -1176,7 +1134,7 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = dynamicPropertyRegistry.locationComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: key) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
@@ -1189,7 +1147,7 @@ extension GameEngine {
     }
 
 
-    /// Sets the value of an item property, performing validation via the `DynamicPropertyRegistry` if applicable.
+    /// Sets the value of an item property, performing validation via the `DynamicAttributeRegistry` if applicable.
     /// Creates and applies the appropriate `StateChange` if validation passes.
     ///
     /// - Parameters:
@@ -1204,7 +1162,7 @@ extension GameEngine {
         }
 
         // Check registry for validate handler
-        if let validateHandler = dynamicPropertyRegistry.itemValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(item, newValue)
                 if !isValid {
@@ -1246,18 +1204,18 @@ extension GameEngine {
     /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
     @MainActor
     public func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
-         guard let location = gameState.locations[locationID] else {
+        guard let location = gameState.locations[locationID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }
 
-        if let validateHandler = dynamicPropertyRegistry.locationValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(location, newValue)
-                 if !isValid {
+                if !isValid {
                     throw ActionError.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
                 }
             } catch {
-                 logger.error("Error validating dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
+                logger.error("Error validating dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
                 throw error
             }
         }
@@ -1273,6 +1231,34 @@ extension GameEngine {
             )
             // Directly apply to gameState (we are already @MainActor async)
             try gameState.apply(change)
+        }
+    }
+
+    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Bool {
+        let value = await getDynamicItemValue(itemID: itemID, key: key)
+        switch value {
+        case .bool(let boolValue):
+            return boolValue
+        case nil:
+            return false
+        default:
+            throw ActionError.invalidValue("""
+                Cannot fetch boolean value for \(itemID.rawValue).\(key.rawValue): \
+                \(value ?? .undefined)
+                """)
+        }
+    }
+
+    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Int {
+        let value = await getDynamicItemValue(itemID: itemID, key: key)
+        switch value {
+        case .int(let intValue):
+            return intValue
+        default:
+            throw ActionError.invalidValue("""
+                Cannot fetch integer value for \(itemID.rawValue).\(key.rawValue): \
+                \(value ?? .undefined)
+                """)
         }
     }
 }

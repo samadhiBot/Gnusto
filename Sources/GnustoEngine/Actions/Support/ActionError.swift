@@ -56,7 +56,7 @@ public enum ActionError: Error, Equatable, Sendable {
 
     /// Action failed because the target item cannot be closed (lacks `.closeable` property,
     /// or equivalent logic).
-    case itemNotCloseable(ItemID)
+    case itemNotClosable(ItemID)
 
     /// Action failed because the target item cannot be dropped (e.g., has `.fixed` property).
     case itemNotDroppable(ItemID)

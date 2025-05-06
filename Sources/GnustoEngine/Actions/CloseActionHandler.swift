@@ -25,16 +25,13 @@ public struct CloseActionHandler: EnhancedActionHandler {
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check if item is closeable (using .openable for symmetry)
+        // 4. Check if item is closable (using .openable for symmetry)
         guard targetItem.hasFlag(.isOpenable) else {
-            throw ActionError.itemNotCloseable(targetItemID)
+            throw ActionError.itemNotClosable(targetItemID)
         }
 
         // 5. Check if already closed (using dynamic property)
-        let isOpen = await context.engine.getDynamicItemValue(
-            itemID: targetItemID,
-            key: .isOpen
-        )?.toBool ?? false
+        let isOpen: Bool = try await context.engine.fetch(targetItemID, .isOpen)
         guard isOpen else {
             // Don't throw, let process handle the specific message "That's already closed."
             return
@@ -103,4 +100,4 @@ public struct CloseActionHandler: EnhancedActionHandler {
     // Rely on default postProcess to print the message.
 }
 
-// TODO: Add/verify ActionError cases: .itemNotCloseable, .itemAlreadyClosed
+// TODO: Add/verify ActionError cases: .itemNotClosable, .itemAlreadyClosed

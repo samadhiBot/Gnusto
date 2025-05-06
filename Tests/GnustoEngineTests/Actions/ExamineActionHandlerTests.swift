@@ -290,7 +290,7 @@ struct ExamineActionHandlerTests {
         )
         let game = MinimalGame(
             items: [item],
-            dynamicPropertyRegistry: DynamicPropertyRegistry()
+            dynamicAttributeRegistry: DynamicAttributeRegistry()
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

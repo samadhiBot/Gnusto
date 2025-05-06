@@ -1,22 +1,9 @@
 import Foundation
 import Markdown
 
-/// A registry primarily responsible for formatting description strings retrieved
-/// from the dynamic property system.
-@MainActor
-public class DescriptionHandlerRegistry {
+// MARK: - Item Descriptions
 
-    /// The maximum line length before soft-wrapping a description.
-    private let maximumDescriptionLength: Int
-
-    /// Creates a new registry.
-    /// - Parameter maximumDescriptionLength: The preferred line length for formatting.
-    public init(maximumDescriptionLength: Int = 100) {
-        self.maximumDescriptionLength = maximumDescriptionLength
-    }
-
-    // --- Item Descriptions ---
-
+extension GameEngine {
     /// Generates a formatted description string for a specific item property.
     /// Retrieves the raw string using `engine.getDynamicItemValue` and applies formatting.
     ///
@@ -57,9 +44,11 @@ public class DescriptionHandlerRegistry {
             return "\(item?.withDefiniteArticle.capitalizedFirst ?? "It") seems indescribable."
         }
     }
+}
 
-    // --- Location Descriptions ---
+// MARK: - Location Descriptions
 
+extension GameEngine {
     /// Generates a formatted description string for a specific location property.
     /// Retrieves the raw string using `engine.getDynamicLocationValue` and applies formatting.
     ///
@@ -95,17 +84,15 @@ public class DescriptionHandlerRegistry {
             return "It seems indescribable."
         }
     }
+}
 
-    // --- Formatting ---
+// MARK: - Formatting
 
+extension GameEngine {
     /// Formats a raw description string using Markdown.
-    private func formatDescription(_ rawDescription: String) -> String {
-        let document = Document(parsing: rawDescription)
-        return document.format(
-            options: .init(
-                preferredLineLimit: .init(maxLength: maximumDescriptionLength, breakWith: .hardBreak)
-            )
-        )
-        .trimmingCharacters(in: .whitespacesAndNewlines)
+    private func formatDescription(_ rawMarkdown: String) -> String {
+        Document(parsing: rawMarkdown)
+            .format()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

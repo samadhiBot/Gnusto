@@ -68,7 +68,7 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // 1. Get base description using the registry
         var descriptionLines: [String] = []
-        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+        let baseDescription = await engine.generateDescription(
             for: targetItem.id, // Use item ID
             key: .longDescription, // Specify the key
             engine: engine
@@ -168,7 +168,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         await engine.ioHandler.print("--- \(location.name) ---", style: .strong)
 
         // Print long description (potentially dynamic)
-        let longDesc = await engine.descriptionHandlerRegistry.generateDescription(
+        let longDesc = await engine.generateDescription(
             for: location.id,
             key: .longDescription,
             engine: engine

@@ -289,7 +289,7 @@ struct LookActionHandlerTests {
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         // Register dynamic compute handler for the location's long description
-        engine.dynamicPropertyRegistry.registerLocationCompute(key: .longDescription) { _, gameEngine in
+        engine.dynamicAttributeRegistry.registerLocationCompute(key: .longDescription) { _, gameEngine in
             // Use the passed engine to check the flag
             let isFlagOn = engine.isFlagSet(flagId)
             let text = isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."

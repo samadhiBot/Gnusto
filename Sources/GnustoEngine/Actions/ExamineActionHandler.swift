@@ -63,7 +63,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         // Priority 4: Dynamic Long Description
         else {
             // Use the registry to generate the description using the item ID and key
-            message = await context.engine.descriptionHandlerRegistry.generateDescription(
+            message = await context.engine.generateDescription(
                 for: targetItem.id,
                 key: .longDescription,
                 engine: context.engine
@@ -85,7 +85,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+        let baseDescription = await engine.generateDescription(
             for: targetItem.id,
             key: .longDescription,
             engine: engine
@@ -115,7 +115,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
+        let baseDescription = await engine.generateDescription(
             for: targetItem.id,
             key: .longDescription,
             engine: engine

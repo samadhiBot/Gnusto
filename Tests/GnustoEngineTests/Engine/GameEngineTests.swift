@@ -1073,7 +1073,7 @@ struct GameEngineTests {
         expectNoDifference(output, "The chest is already unlocked.")
     }
 
-    @Test("ReportActionError: .itemNotCloseable")
+    @Test("ReportActionError: .itemNotClosable")
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
         let item = Item(

@@ -10,6 +10,7 @@ public enum StateValue: Codable, Sendable, Equatable {
     case parentEntity(ParentEntity)
     case string(String)
     case stringSet(Set<String>)
+    case undefined
 }
 
 // MARK: - Public casting helpers
@@ -83,6 +84,7 @@ extension StateValue {
         case .parentEntity(let value): value
         case .string(let value): value
         case .stringSet(let value): value
+        case .undefined: "⚠️ undefined ⚠️"
         }
     }
 }

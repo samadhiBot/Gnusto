@@ -4,7 +4,7 @@ import Foundation
 ///
 /// This registry separates the behavioral aspects of properties (computation, validation)
 /// from their state storage (which resides in `Item.attributes` or `Location.attributes`).
-public struct DynamicPropertyRegistry: Sendable {
+public struct DynamicAttributeRegistry: Sendable {
 
     // MARK: - Handler Type Aliases
 

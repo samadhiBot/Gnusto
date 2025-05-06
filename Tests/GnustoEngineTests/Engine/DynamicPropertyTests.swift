@@ -20,7 +20,7 @@ struct DynamicPropertyTests {
     private func createTestEngine(
         initialItemValues: [AttributeID: StateValue] = [:],
         initialLocationValues: [AttributeID: StateValue] = [:],
-        dynamicRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry(),
+        dynamicRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry(),
         ioHandler: IOHandler
     ) -> GameEngine {
         var testItem = Item(
@@ -41,7 +41,7 @@ struct DynamicPropertyTests {
         let blueprint = MinimalGame(
             locations: [testLocation],
             items: [testItem],
-            dynamicPropertyRegistry: dynamicRegistry
+            dynamicAttributeRegistry: dynamicRegistry
         )
 
         return GameEngine(
@@ -83,7 +83,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Item Value - Success")
     @MainActor
     func testSetValidatedItemValueSuccess() async throws {
-        var registry = DynamicPropertyRegistry()
+        var registry = DynamicAttributeRegistry()
         registry.registerItemValidate(key: TestIDs.validatedProp) { item, newValue in
             // Example: Only allow positive integers
             guard case .int(let intValue) = newValue else { return false }
@@ -104,7 +104,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Item Value - Failure")
     @MainActor
     func testSetValidatedItemValueFailure() async throws {
-        var registry = DynamicPropertyRegistry()
+        var registry = DynamicAttributeRegistry()
         registry.registerItemValidate(key: TestIDs.validatedProp) { item, newValue in
              guard case .int(let intValue) = newValue else { return false }
              return intValue > 0

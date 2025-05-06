@@ -3,7 +3,7 @@
 struct MinimalGame: GameBlueprint {
     var state: GameState
     var definitionRegistry: DefinitionRegistry
-    var dynamicPropertyRegistry: DynamicPropertyRegistry
+    var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     init(
         player: Player = Player(in: "startRoom"),
@@ -11,10 +11,10 @@ struct MinimalGame: GameBlueprint {
         items: [Item]? = nil,
         flags: [FlagID]? = nil,
         definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
-        dynamicPropertyRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry()
+        dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
         self.definitionRegistry = definitionRegistry
-        self.dynamicPropertyRegistry = dynamicPropertyRegistry
+        self.dynamicAttributeRegistry = dynamicAttributeRegistry
 
         let gameLocations = locations ?? [
             Location(

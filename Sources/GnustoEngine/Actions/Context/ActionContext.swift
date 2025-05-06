@@ -29,7 +29,7 @@ public struct ActionContext: Sendable {
         command: Command,
         engine: GameEngine,
         stateSnapshot: GameState,
-        contextData: [ContextID: StateValue] = [:] // Use ContextID
+        contextData: [ContextID: StateValue] = [:]
     ) {
         self.command = command
         self.engine = engine

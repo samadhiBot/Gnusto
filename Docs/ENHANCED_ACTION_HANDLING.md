@@ -109,7 +109,7 @@ public struct Location: Sendable, Codable {
 }
 
 /// Registry for dynamic behavior (part of GameBlueprint or DefinitionRegistry).
-public struct DynamicPropertyRegistry: Sendable {
+public struct DynamicAttributeRegistry: Sendable {
     /// Closure type for computing an item property's value.
     public typealias ItemComputeHandler =
         (@MainActor @Sendable (Item, GameState) -> StateValue)
@@ -190,7 +190,7 @@ public protocol ActionContextProvider {
 ### Phase 2: Dynamic Logic & State System
 
 - [x] Define `AttributeID` type.
-- [x] Create `DynamicPropertyRegistry` for compute/validate handlers.
+- [x] Create `DynamicAttributeRegistry` for compute/validate handlers.
 - [x] Add `attributes: [AttributeID: StateValue]` to `Item` and `Location`.
 - [x] Update `StatePropertyKey` and `GameState.apply` to handle changes to `attributes`.
 - [x] Implement `GameEngine` helpers (`get/setDynamic...Value`) to orchestrate registry/state access.

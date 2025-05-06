@@ -9,7 +9,7 @@ public protocol GameBlueprint {
     var definitionRegistry: DefinitionRegistry { get }
 
     /// The registry containing dynamic property handlers (compute/validate).
-    var dynamicPropertyRegistry: DynamicPropertyRegistry { get }
+    var dynamicAttributeRegistry: DynamicAttributeRegistry { get }
 
     /// Called when entering a new room.
     ///
