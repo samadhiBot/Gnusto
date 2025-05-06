@@ -43,8 +43,12 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true),
+                .isTakable: .bool(true)
+            ],
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
@@ -69,8 +73,11 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isTakable: .bool(true)
+            ],
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -94,8 +101,11 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .on,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true)
+            ],
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
@@ -120,8 +130,8 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource,
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [.isLightSource: .bool(true)],
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -145,8 +155,12 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true),
+                .isTakable: .bool(true)
+            ],
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
@@ -183,13 +197,13 @@ struct ScopeResolverTests {
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isInvisible: .bool(true)],
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
@@ -218,7 +232,8 @@ struct ScopeResolverTests {
         let item = Item(
             id: "key",
             name: "key",
-            parent: .location(darkRoom.id) // Place item in the dark room
+            parent: .location(darkRoom.id), // Place item in the dark room
+            attributes: [.isInvisible: .bool(true)],
         )
         let player = Player(in: darkRoom.id)
 
@@ -249,19 +264,24 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true),
+                .isTakable: .bool(true)
+            ],
         )
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isInvisible: .bool(true)],
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isInvisible: .bool(true)],
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
@@ -283,19 +303,23 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource, .on,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true)
+            ],
         )
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isInvisible: .bool(true)],
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isInvisible: .bool(true)],
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
@@ -333,27 +357,32 @@ struct ScopeResolverTests {
     let baseBox = Item(
         id: "box",
         name: "box",
-        properties: .container,
-        parent: .player
+        parent: .player,
+        attributes: [.isContainer: .bool(true)],
     )
     let baseOpenBox = Item(
         id: "openBox",
         name: "open box",
-        properties: .container,
-        attributes: [.isOpen: true],
-        parent: .player
+        parent: .player,
+        attributes: [
+            .isContainer: .bool(true),
+            .isOpen: .bool(true)
+        ],
     )
     let baseClosedBox = Item(
         id: "closedBox",
         name: "closed box",
-        properties: .container,
-        parent: .player
+        parent: .player,
+        attributes: [.isContainer: .bool(true)],
     )
     let baseTransparentBox = Item(
         id: "transBox",
         name: "transparent box",
-        properties: .container, .transparent,
-        parent: .player
+        parent: .player,
+        attributes: [
+            .isContainer: .bool(true),
+            .isTransparent: .bool(true),
+        ],
     )
     let baseItemInBox = Item(
         id: "itemInBox",
@@ -365,8 +394,8 @@ struct ScopeResolverTests {
         let inventoryItem = Item(
             id: "invItem",
             name: "Inventory Item",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: .bool(true)],
         )
         let game = MinimalGame(items: [inventoryItem])
         let mockIO = await MockIOHandler()
@@ -387,7 +416,7 @@ struct ScopeResolverTests {
         let locationItem = Item(
             id: "locItem",
             name: "Location Item",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
         )
         let game = MinimalGame(items: [locationItem])
         let mockIO = await MockIOHandler()
@@ -413,7 +442,8 @@ struct ScopeResolverTests {
         let locationItem = Item(
             id: "locItem",
             name: "Location Item",
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [.isInvisible: .bool(true)],
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -438,14 +468,16 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isContainer: .bool(true),
+                .isOpen: .bool(true)
+            ],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(openBox.id)
+            parent: .item(openBox.id),
         )
         let game = MinimalGame(items: [openBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -466,13 +498,13 @@ struct ScopeResolverTests {
         let closedBox = Item(
             id: "closedBox",
             name: "closed box",
-            properties: .container,
-            parent: .player
+            parent: .player,
+            attributes: [.isContainer: .bool(true)],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(closedBox.id)
+            parent: .item(closedBox.id),
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -495,13 +527,16 @@ struct ScopeResolverTests {
         let transparentBox = Item(
             id: "transBox",
             name: "transparent box",
-            properties: .container, .transparent,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isContainer: .bool(true),
+                .isTransparent: .bool(true),
+            ],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(transparentBox.id)
+            parent: .item(transparentBox.id),
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -522,14 +557,16 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: .bool(true),
+                .isOpen: .bool(true)
+            ],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(openBox.id)
+            parent: .item(openBox.id),
         )
         let game = MinimalGame(items: [openBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -550,13 +587,13 @@ struct ScopeResolverTests {
         let closedBox = Item(
             id: "closedBox",
             name: "closed box",
-            properties: .container,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isContainer: .bool(true)],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(closedBox.id)
+            parent: .item(closedBox.id),
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -579,13 +616,16 @@ struct ScopeResolverTests {
         let transparentBox = Item(
             id: "transBox",
             name: "transparent box",
-            properties: .container, .transparent,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: .bool(true),
+                .isTransparent: .bool(true),
+            ],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(transparentBox.id)
+            parent: .item(transparentBox.id),
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
         let mockIO = await MockIOHandler()
@@ -611,14 +651,16 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [
+                .isContainer: .bool(true),
+                .isOpen: .bool(true)
+            ],
         )
         let itemInBox = Item(
             id: "itemInBox",
             name: "item in box",
-            parent: .item(openBox.id)
+            parent: .item(openBox.id),
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -648,13 +690,14 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            properties: .lightSource,
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [.isLightSource: .bool(true)],
         )
         let item = Item(
             id: "key",
             name: "key",
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [.isInvisible: .bool(true)],
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
