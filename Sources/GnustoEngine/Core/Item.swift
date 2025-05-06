@@ -42,7 +42,7 @@ public struct Item: Codable, Identifiable, Sendable {
 
     /// The item's capacity to store other objects.
     public var capacity: Int {
-        attributes[.capacity]?.toInt ?? .max
+        attributes[.capacity]?.toInt ?? 1000
     }
 
     /// Checks if a boolean flag is set in the item's `attributes`.

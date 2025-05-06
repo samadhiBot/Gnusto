@@ -22,25 +22,25 @@ struct GameStateTests {
             Item(
                 id: Self.itemLantern,
                 name: "lantern",
-                properties: .takable, .lightSource
+                attributes: [.isTakable: .bool(true), .isLightSource: .bool(true)]
             ),
             Item(
                 id: Self.itemMailbox,
                 name: "mailbox",
-                properties: .container, .openable,
-                parent: .location(Self.locWOH)
+                parent: .location(Self.locWOH),
+                attributes: [.isContainer: .bool(true), .isOpenable: .bool(true)]
             ),
             Item(
                 id: Self.itemLeaflet,
                 name: "leaflet",
-                properties: .takable, .read,
-                parent: .item(Self.itemMailbox)
+                parent: .item(Self.itemMailbox),
+                attributes: [.isTakable: .bool(true), .isReadable: .bool(true)]
             ),
             Item(
                 id: Self.itemSword,
                 name: "sword",
-                properties: .takable,
-                parent: .player
+                parent: .player,
+                attributes: [.isTakable: .bool(true)]
             )
         ]
     }
@@ -98,7 +98,8 @@ struct GameStateTests {
         let testItem = Item(
             id: "testItem",
             name: "Test Item",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [:] // Assuming default is empty
         )
         let player = Player(in: "startRoom")
         let vocab = Vocabulary.build(items: [testItem]) // Build basic vocab
@@ -153,7 +154,8 @@ struct GameStateTests {
             let items: [Item] = [Item(
                 id: "item1",
                 name: "Area 1 Item",
-                parent: .location("loc1")
+                parent: .location("loc1"),
+                attributes: [:]
             )]
         }
         struct Area2: AreaContents {
@@ -164,7 +166,8 @@ struct GameStateTests {
             let items: [Item] = [Item(
                 id: "item2",
                 name: "Area 2 Item",
-                parent: .location("loc2")
+                parent: .location("loc2"),
+                attributes: [:]
             )]
         }
 
@@ -189,17 +192,20 @@ struct GameStateTests {
         let item1 = Item(
             id: "item1",
             name: "Item 1",
-            parent: .player
+            parent: .player,
+            attributes: [:]
         )
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [:]
         )
         let item3 = Item(
             id: "item3",
             name: "Item 3",
-            parent: .player
+            parent: .player,
+            attributes: [:]
         )
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
 
@@ -217,17 +223,20 @@ struct GameStateTests {
         let item1 = Item(
             id: "item1",
             name: "Item 1",
-            parent: .location(locID)
+            parent: .location(locID),
+            attributes: [:]
         )
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .player
+            parent: .player,
+            attributes: [:]
         )
         let item3 = Item(
             id: "item3",
             name: "Item 3",
-            parent: .location(locID)
+            parent: .location(locID),
+            attributes: [:]
         )
         let originalTestItem = state.items["testItem"]! // Keep original item in startRoom
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": originalTestItem] // Add/replace items
@@ -244,12 +253,14 @@ struct GameStateTests {
         let item1 = Item(
             id: "item1",
             name: "Item 1",
-            parent: .player
+            parent: .player,
+            attributes: [:]
         )
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [:]
         )
         state.items["item1"] = item1 // Add items
         state.items["item2"] = item2
@@ -403,7 +414,7 @@ struct GameStateTests {
 
         // Modify an item *before* encoding
         var lantern = originalState.items[Self.itemLantern]!
-        lantern.addProperty(.on)
+        lantern.attributes[.isOn] = .bool(true)
         lantern.parent = .player // Put lantern in inventory
         originalState.items[Self.itemLantern] = lantern
 
@@ -440,7 +451,7 @@ struct GameStateTests {
     }
 
     @Test("GameState Value Semantics (Struct Behavior)") // Updated name
-    func testGameStateValueSemantics() async throws {
+    func testGameSemantics() async throws {
         let state1 = await createSampleGameState()
         var state2 = state1 // Creates a copy of the struct
 
@@ -558,24 +569,23 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesSet() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc")
+        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.longDescription: .string("Original Desc")])
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet([]),
-            newValue: .locationPropertySet([.inherentlyLit])
+            propertyKey: .locationAttribute(.isLit),
+            oldValue: state.locations["testLoc"]?.attributes[.isLit],
+            newValue: .bool(true)
         )
         try? state.apply(change)
 
-        #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationProperties)
-        if case .locationPropertySet(let oldAttributes) = change.oldValue { #expect(oldAttributes.isEmpty) }
-        else { Issue.record("OldValue wrong type") }
-        if case .locationPropertySet(let newAttributes) = change.newValue { #expect(newAttributes == [.inherentlyLit]) }
-        else { Issue.record("NewValue wrong type") }
+        #expect(change.entityId == EntityID.location("testLoc"))
+        #expect(change.propertyKey == StatePropertyKey.locationAttribute(AttributeID.isLit))
+        #expect(change.oldValue == nil || change.oldValue == .bool(false))
+        #expect(change.newValue == .bool(true))
         // Verify description remains untouched initially
+        #expect(state.locations["testLoc"]?.attributes[.isLit] == .bool(true))
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
     }
 
@@ -583,24 +593,23 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesRemove() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc", isLit: true)
+        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.longDescription: .string("Original Desc"), .isLit: .bool(true)])
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet([.inherentlyLit]),
-            newValue: .locationPropertySet([])
+            propertyKey: .locationAttribute(.isLit),
+            oldValue: .bool(true),
+            newValue: .bool(false)
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationProperties)
-        if case .locationPropertySet(let oldAttributes) = change.oldValue { #expect(oldAttributes == [.inherentlyLit]) }
-        else { Issue.record("OldValue wrong type") }
-        if case .locationPropertySet(let newAttributes) = change.newValue { #expect(newAttributes.isEmpty) }
-        else { Issue.record("NewValue wrong type") }
+        #expect(change.propertyKey == .locationAttribute(.isLit))
+        #expect(change.oldValue == .bool(true))
+        #expect(change.newValue == .bool(false))
         // Verify description remains untouched
+        #expect(state.locations["testLoc"]?.attributes[.isLit] == .bool(false))
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
     }
 
@@ -608,39 +617,46 @@ struct GameStateTests {
     func testApplyModifyLocationAttribute() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", description: "Original Desc")
+        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.longDescription: .string("Original Desc")])
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationAttribute(.description),
+            propertyKey: .locationAttribute(.longDescription),
             oldValue: .string("Original Desc"),
             newValue: .string("Updated Desc")
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationAttribute(.description))
+        #expect(change.propertyKey == .locationAttribute(.longDescription))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
-        #expect(state.locations["testLoc"]?.attributes.isEmpty == true)
+        #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Updated Desc"))
+        #expect(state.locations["testLoc"]?.attributes[.isLit] == nil)
     }
 
     @Test("apply - Validation Failure - OldValue Mismatch")
     func testApplyValidationFailureOldValueMismatch() {
         var state = createInitialState()
+        // Ensure startRoom has a description attribute for the test
+        if var startRoom = state.locations["startRoom"] {
+            startRoom.attributes[.longDescription] = .string("Initial Room Desc")
+            state.locations["startRoom"] = startRoom
+        }
+
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationAttribute(.description),
+            propertyKey: .locationAttribute(.longDescription),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationAttribute(.description),
-            oldValue: state.locations["startRoom"]?.attributes[.longDescription], // Correct old value
+            propertyKey: .locationAttribute(.longDescription),
+            oldValue: state.locations["startRoom"]?.attributes[.longDescription],
             newValue: .string("New Description")
         )
 

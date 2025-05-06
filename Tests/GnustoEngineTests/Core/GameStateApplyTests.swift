@@ -16,26 +16,28 @@ struct GameStateApplyTests {
     func testApplyValidItemPropertyChange() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialItem = gameState.items[GameStateTests.itemLantern]
-        #expect(initialItem != nil)
-        let oldProperties = initialItem!.attributes
-        var newProperties = oldProperties
-        newProperties.insert(.on) // Add .on property
+        let itemID = GameStateTests.itemLantern
+        guard let initialItem = gameState.items[itemID] else {
+            Issue.record("Test setup failure: Lantern item not found.")
+            return
+        }
+        let attributeID: AttributeID = .isOn // Assume AttributeID.isOn exists
+        let oldAttributeValue = initialItem.attributes[attributeID]
+        let newAttributeValue: StateValue = .bool(true)
 
         let change = StateChange(
-            entityId: .item(GameStateTests.itemLantern),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(oldProperties),
-            newValue: .itemPropertySet(newProperties)
+            entityId: .item(itemID),
+            propertyKey: .itemAttribute(attributeID), // Use new key
+            oldValue: oldAttributeValue, // Use actual or .absent
+            newValue: newAttributeValue // Use direct StateValue
         )
 
         // When
         try gameState.apply(change)
 
         // Then
-        let finalItem = gameState.items[GameStateTests.itemLantern]
-        #expect(finalItem?.attributes == newProperties, "Item properties should be updated")
-        #expect(finalItem?.hasProperty(.on) == true)
+        let finalItem = gameState.items[itemID]
+        #expect(finalItem?.attributes[attributeID] == newAttributeValue, "Item attribute should be updated")
 
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
@@ -45,18 +47,22 @@ struct GameStateApplyTests {
     func testApplyInvalidItemPropertyChangeOldValue() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialItem = gameState.items[GameStateTests.itemLantern]
-        #expect(initialItem != nil)
-        let actualOldProperties = initialItem!.attributes
-        let incorrectOldProperties: Set<ItemProperty> = [.fixed] // Incorrect old value
-        var newProperties = actualOldProperties
-        newProperties.insert(.on)
+        let itemID = GameStateTests.itemLantern
+        guard let initialItem = gameState.items[itemID] else {
+            Issue.record("Test setup failure: Lantern item not found.")
+            return
+        }
+        let attributeID: AttributeID = .isOn
+        let actualOldValue = initialItem.attributes[attributeID]
+        // Ensure incorrectOldValue is different from actualOldValue
+        let incorrectOldValue: StateValue = (actualOldValue == .bool(true)) ? .bool(false) : .bool(true)
+        let newValue: StateValue = .bool(true)
 
         let change = StateChange(
-            entityId: .item(GameStateTests.itemLantern),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(incorrectOldProperties), // Use incorrect old value
-            newValue: .itemPropertySet(newProperties)
+            entityId: .item(itemID),
+            propertyKey: .itemAttribute(attributeID), // Use new key
+            oldValue: incorrectOldValue, // Use incorrect old value
+            newValue: newValue // Use direct StateValue
         )
 
         // When & Then
@@ -79,12 +85,11 @@ struct GameStateApplyTests {
         }
 
         // Verify state was not changed
-        let finalItem = gameState.items[GameStateTests.itemLantern]
+        let finalItem = gameState.items[itemID]
         #expect(
-            finalItem?.attributes == actualOldProperties,
-            "Item properties should not be updated on error"
+            finalItem?.attributes[attributeID] == actualOldValue,
+            "Item attribute should not be updated on error"
         )
-        #expect(finalItem?.hasProperty(.on) == false)
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
     }
 
@@ -535,21 +540,27 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let initialProperties = gameState.locations[locationID]?.attributes ?? []
-        let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
+        guard let initialLocation = gameState.locations[locationID] else {
+            Issue.record("Test setup failure: WOH location not found.")
+            return
+        }
+        // Let's change the .isLit attribute (assuming it exists)
+        let attributeID: AttributeID = .isLit
+        let oldAttributeValue = initialLocation.attributes[attributeID]
+        let newAttributeValue: StateValue = .bool(true)
 
         let change = StateChange(
             entityId: .location(locationID),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet(initialProperties),
-            newValue: .locationPropertySet(newProperties)
+            propertyKey: .locationAttribute(attributeID), // Use new key
+            oldValue: oldAttributeValue,
+            newValue: newAttributeValue
         )
 
         // When
         try gameState.apply(change)
 
         // Then
-        #expect(gameState.locations[locationID]?.attributes == newProperties)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == newAttributeValue)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -558,15 +569,22 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let actualOldProperties = gameState.locations[locationID]?.attributes ?? []
-        let incorrectOldProperties: Set<LocationProperty> = [.sacred] // Incorrect
-        let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
+        guard let initialLocation = gameState.locations[locationID] else {
+            Issue.record("Test setup failure: WOH location not found.")
+            return
+        }
+        // Let's try to change the .isLit attribute
+        let attributeID: AttributeID = .isLit
+        let actualOldValue = initialLocation.attributes[attributeID]
+        // Ensure incorrectOldValue is different
+        let incorrectOldValue: StateValue = (actualOldValue == .bool(true)) ? .bool(false) : .bool(true)
+        let newValue: StateValue = .bool(true)
 
         let change = StateChange(
             entityId: .location(locationID),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet(incorrectOldProperties),
-            newValue: .locationPropertySet(newProperties)
+            propertyKey: .locationAttribute(attributeID), // Use new key
+            oldValue: incorrectOldValue, // Incorrect old value
+            newValue: newValue
         )
 
         // When & Then
@@ -588,7 +606,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(gameState.locations[locationID]?.attributes == actualOldProperties)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
     }
 
