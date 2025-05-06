@@ -1226,7 +1226,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            attributeKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             // No oldValue for add
             newValue: .int(initialTurns)
         )
@@ -1248,7 +1248,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityId: .global,
-            attributeKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
@@ -1257,7 +1257,7 @@ struct GameStateApplyTests {
         let newInitialTurns = 20 // New turns value for the 'add'
         let change = StateChange(
             entityId: .global,
-            attributeKey: .addActiveFuse(fuseId: fuseID, initialTurns: newInitialTurns),
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: newInitialTurns),
             // No oldValue for add (even when overwriting)
             newValue: .int(newInitialTurns)
         )
@@ -1279,7 +1279,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityId: .global,
-            attributeKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
@@ -1287,7 +1287,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            attributeKey: .removeActiveFuse(fuseId: fuseID),
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(initialTurns), // Expecting the current value
             newValue: .int(0) // Per convention for remove
         )
@@ -1309,7 +1309,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityId: .global,
-            attributeKey: .addActiveFuse(fuseId: fuseID, initialTurns: actualTurns),
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: actualTurns),
             newValue: .int(actualTurns)
         )
         try gameState.apply(setupChange)
@@ -1317,7 +1317,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            attributeKey: .removeActiveFuse(fuseId: fuseID),
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(incorrectOldTurns),
             newValue: .int(0)
         )
@@ -1354,7 +1354,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityId: .global,
-            attributeKey: .removeActiveFuse(fuseId: fuseID),
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Correctly expecting nil
             newValue: .int(0)
         )

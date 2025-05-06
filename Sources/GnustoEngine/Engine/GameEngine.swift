@@ -29,9 +29,6 @@ public class GameEngine: Sendable {
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: EnhancedActionHandler]()
 
-    /// Active timed events (Fuses) - Runtime storage with closures.
-    private var activeFuses = [FuseID: Fuse]()
-
     /// A logger used for unhandled error warnings.
     private let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
 
@@ -80,44 +77,9 @@ public class GameEngine: Sendable {
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
-
-        var fuses: [Fuse.ID: Fuse] = [:]
-        for (fuseID, turnsRemaining) in game.state.activeFuses {
-            guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
-                print("Warning: No FuseDefinition found for saved fuse ID '\(fuseID)'. Skipping.")
-                continue
-            }
-            let runtimeFuse = Fuse(id: fuseID, turns: turnsRemaining, action: definition.action)
-            fuses[fuseID] = runtimeFuse
-        }
-        self.activeFuses = fuses
     }
 
     // MARK: - Fuse & Daemon Management (Runtime Only)
-
-    /// Adds or updates a fuse in the ENGINE'S RUNTIME state based on its definition.
-    /// Does NOT modify persistent GameState.
-    /// If a fuse with the same ID already exists, its timer is reset.
-    private func updateRuntimeFuse(
-        id: FuseID,
-        overrideTurns: Int? = nil
-    ) throws {
-        // Find definition
-        guard let definition = definitionRegistry.fuseDefinition(for: id) else {
-            throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(id)'. Cannot update runtime fuse.")
-        }
-        // Determine turns
-        let turns = overrideTurns ?? definition.initialTurns
-        // Create/update runtime instance
-        let runtimeFuse = Fuse(id: id, turns: turns, action: definition.action)
-        self.activeFuses[id] = runtimeFuse
-    }
-
-    /// Removes a fuse from the ENGINE'S RUNTIME state by its ID.
-    /// Does NOT modify persistent GameState.
-    private func removeRuntimeFuse(id: FuseID) {
-        self.activeFuses.removeValue(forKey: id)
-    }
 
     // Note: Daemons do not currently have separate runtime state managed by the engine,
     // they operate directly based on the gameState.activeDaemons set each tick.
@@ -220,67 +182,67 @@ public class GameEngine: Sendable {
         let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
-        var expiredFuseIDs: [FuseID] = []
-        var fusesToExecute: [Fuse] = []
+        // Explicitly define the action type to match FuseDefinition.action
+        typealias FuseActionType = @MainActor @Sendable (GameEngine) async -> Void
+        var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType)] = []
 
-        // Create a copy of keys to iterate over, allowing safe modification
-        // Need to iterate over the runtime activeFuses managed by the engine
-        let runtimeFuseIDs = Array(self.activeFuses.keys)
+        // Iterate over a copy of keys from gameState.activeFuses for safe modification
+        let activeFuseIDsInState = Array(gameState.activeFuses.keys)
 
-        for id in runtimeFuseIDs {
-            guard var fuse = self.activeFuses[id] else { continue } // Check runtime fuse
-            let oldTurns = fuse.turnsRemaining
+        for fuseID in activeFuseIDsInState {
+            guard let currentTurns = gameState.activeFuses[fuseID] else {
+                continue
+            }
 
-            fuse.turnsRemaining -= 1
-            let newTurns = fuse.turnsRemaining
+            let newTurns = currentTurns - 1
 
-            // Update runtime fuse state immediately
-            self.activeFuses[id] = fuse
-
-            // Create StateChange to update persistent state
             let updateChange = StateChange(
                 entityId: .global,
-                attributeKey: AttributeKey.updateFuseTurns(fuseId: id),
-                oldValue: StateValue.int(oldTurns),
+                attributeKey: AttributeKey.updateFuseTurns(fuseID: fuseID),
+                oldValue: StateValue.int(currentTurns),
                 newValue: StateValue.int(newTurns)
             )
             do {
                 try gameState.apply(updateChange)
             } catch {
-                print("TickClock Error: Failed to apply fuse turn update for \(id): \(error)")
-                // Consider how to handle this failure - continue or halt?
+                print("TickClock Error: Failed to apply fuse turn update for \(fuseID): \(error)")
             }
 
             if newTurns <= 0 {
-                expiredFuseIDs.append(id)
-                fusesToExecute.append(fuse)
+                guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
+                    print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
+                    let removeChangeOnError = StateChange(
+                        entityId: .global,
+                        attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
+                        oldValue: StateValue.int(newTurns),
+                        newValue: StateValue.int(0)
+                    )
+                    do {
+                        try gameState.apply(removeChangeOnError)
+                    } catch {
+                        print("TickClock Error: Failed to apply fuse removal (on definition error) for \(fuseID): \(error)")
+                    }
+                    continue
+                }
+                expiredFuseIDsToExecute.append((id: fuseID, action: definition.action))
 
-                // Create StateChange to remove from persistent state
                 let removeChange = StateChange(
                     entityId: .global,
-                    attributeKey: AttributeKey.removeActiveFuse(fuseId: id),
-                    oldValue: StateValue.int(oldTurns),
+                    attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
+                    oldValue: StateValue.int(newTurns),
                     newValue: StateValue.int(0)
                 )
                 do {
                     try gameState.apply(removeChange)
                 } catch {
-                    print("TickClock Error: Failed to apply fuse removal for \(id): \(error)")
-                    // Consider how to handle this failure
+                    print("TickClock Error: Failed to apply fuse removal for \(fuseID): \(error)")
                 }
             }
-            // Removed direct modification of gameState.activeFuses
         }
 
-        // Remove expired fuses from ENGINE'S runtime dictionary *before* executing actions
-        // Persistent state removal is handled by the StateChange above
-        for id in expiredFuseIDs {
-            self.activeFuses.removeValue(forKey: id)
-        }
-
-        // Execute actions of expired fuses
-        for fuse in fusesToExecute {
-            await fuse.action(self)
+        // Execute actions of expired fuses AFTER all state changes for this tick's expirations are processed
+        for fuseToExecute in expiredFuseIDsToExecute {
+            await fuseToExecute.action(self)
             if shouldQuit { return }
         }
 
@@ -491,61 +453,53 @@ public class GameEngine: Sendable {
     /// - Parameter effect: The `SideEffect` to process.
     /// - Throws: An error if processing the side effect fails (e.g., definition not found, apply fails).
     private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
-        let fuseId = effect.targetId.rawValue // Assuming targetId is FuseID for fuse effects
-        let daemonId = effect.targetId.rawValue // Assuming targetId is DaemonID for daemon effects
+        let fuseIDString = effect.targetId.rawValue
+        let daemonIDString = effect.targetId.rawValue
 
         switch effect.type {
         case .startFuse:
-            // 1. Get definition to find initial turns
-            guard let definition = definitionRegistry.fuseDefinition(for: fuseId) else {
-                throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(fuseId)' in startFuse side effect.")
+            let fuseID = FuseID(fuseIDString)
+            guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
+                throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(fuseID)' in startFuse side effect.")
             }
-            // 2. Determine turns (use parameter if provided, else definition)
             let initialTurns: Int
             if case .int(let t)? = effect.parameters["turns"] {
                 initialTurns = t
             } else {
                 initialTurns = definition.initialTurns
             }
-            // 3. Create StateChange to add to persistent state
             let addChange = StateChange(
                 entityId: .global,
-                attributeKey: AttributeKey.addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
-                // No oldValue for add
+                attributeKey: AttributeKey.addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
+                oldValue: gameState.activeFuses[fuseID].map { .int($0) },
                 newValue: StateValue.int(initialTurns)
             )
-            // 4. Apply the StateChange
             try gameState.apply(addChange)
-            // 5. Update the engine's runtime fuse state
-            try updateRuntimeFuse(id: fuseId, overrideTurns: initialTurns)
 
         case .stopFuse:
-            // 1. Get current turns from persistent state for oldValue validation
-            let oldTurns = gameState.activeFuses[fuseId]
-            // 2. Create StateChange to remove from persistent state
+            let fuseID = FuseID(fuseIDString)
+            let oldTurns = gameState.activeFuses[fuseID]
             let removeChange = StateChange(
                 entityId: .global,
-                attributeKey: AttributeKey.removeActiveFuse(fuseId: fuseId),
+                attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
                 oldValue: oldTurns.map { .int($0) },
                 newValue: StateValue.int(0)
             )
-            // 3. Apply the StateChange
             try gameState.apply(removeChange)
-            // 4. Remove from engine's runtime fuse state
-            removeRuntimeFuse(id: fuseId)
 
         case .runDaemon:
+            let daemonID = DaemonID(daemonIDString)
             // 1. Check definition exists (required for daemon execution later)
-            guard definitionRegistry.daemonDefinition(for: daemonId) != nil else {
-                throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(daemonId)' in runDaemon side effect.")
+            guard definitionRegistry.daemonDefinition(for: daemonID) != nil else {
+                throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(daemonID)' in runDaemon side effect.")
             }
             // 2. Check if already active in persistent state
-            let isAlreadyActive = gameState.activeDaemons.contains(daemonId)
+            let isAlreadyActive = gameState.activeDaemons.contains(daemonID)
             // 3. Create StateChange only if not already active
             if !isAlreadyActive {
                 let addDaemonChange = StateChange(
                     entityId: .global,
-                    attributeKey: AttributeKey.addActiveDaemon(daemonId: daemonId),
+                    attributeKey: AttributeKey.addActiveDaemon(daemonID: daemonID),
                     oldValue: false,
                     newValue: true
                 )
@@ -554,13 +508,14 @@ public class GameEngine: Sendable {
             }
 
         case .stopDaemon:
+            let daemonID = DaemonID(daemonIDString)
             // 1. Check if active in persistent state for oldValue validation
-            let wasActive = gameState.activeDaemons.contains(daemonId)
+            let wasActive = gameState.activeDaemons.contains(daemonID)
             // 2. Create StateChange only if it was active
             if wasActive {
                 let removeDaemonChange = StateChange(
                     entityId: .global,
-                    attributeKey: AttributeKey.removeActiveDaemon(daemonId: daemonId),
+                    attributeKey: AttributeKey.removeActiveDaemon(daemonID: daemonID),
                     oldValue: true,
                     newValue: false
                 )
@@ -747,7 +702,7 @@ public class GameEngine: Sendable {
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            "The \(item(keyID)?.name ?? keyID.rawValue) doesn\'t fit \(theThat(lockID))."
+            "The \(item(keyID)?.name ?? keyID.rawValue) doesn't fit \(theThat(lockID))."
         }
         await ioHandler.print(message)
 
@@ -1220,7 +1175,6 @@ extension GameEngine {
             try gameState.apply(change)
         }
     }
-
 
     /// Sets the value of a location property, performing validation.
     /// (Implementation mirrors setDynamicItemValue)

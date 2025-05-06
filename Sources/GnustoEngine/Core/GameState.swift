@@ -24,7 +24,7 @@ public struct GameState: Codable, Equatable, Sendable {
     /// Active fuses (timed events), indexed by their `FuseID`.
     ///
     /// Value is remaining turns.
-    public internal(set) var activeFuses: [Fuse.ID: Int]
+    public internal(set) var activeFuses: [FuseID: Int]
 
     /// Active daemons (background processes), indexed by their `DaemonID`.
     ///
@@ -52,7 +52,7 @@ public struct GameState: Codable, Equatable, Sendable {
         vocabulary: Vocabulary? = nil,
         flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
-        activeFuses: [Fuse.ID: Int] = [:],
+        activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         gameSpecificState: [GameStateKey: StateValue] = [:], // Keep AnyCodable
         changeHistory: [StateChange] = []
@@ -76,7 +76,7 @@ public struct GameState: Codable, Equatable, Sendable {
         vocabulary: Vocabulary? = nil,
         flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
-        activeFuses: [Fuse.ID: Int] = [:],
+        activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         gameSpecificState: [GameStateKey: StateValue] = [:],
         changeHistory: [StateChange] = []
@@ -380,7 +380,7 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             pronouns[pronoun] = newItemIDSet
 
-        case .addActiveDaemon(let daemonId):
+        case .addActiveDaemon(let daemonID):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityId)")
             }
@@ -388,40 +388,40 @@ public struct GameState: Codable, Equatable, Sendable {
                  print("WARN: addActiveDaemon StateChange newValue was not true, was \(change.newValue). Proceeding anyway.")
                  return
              }
-            activeDaemons.insert(daemonId)
+            activeDaemons.insert(daemonID)
 
-        case .addActiveFuse(let fuseId, let initialTurns):
+        case .addActiveFuse(let fuseID, let initialTurns):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for addActiveFuse: expected .global, got \(change.entityId)")
             }
             guard case .int(let turnsValue) = change.newValue, turnsValue == initialTurns else {
                 throw ActionError.internalEngineError("StateChange newValue (\(change.newValue)) does not match initialTurns (\(initialTurns)) in addActiveFuse key.")
             }
-            activeFuses[fuseId] = initialTurns
+            activeFuses[fuseID] = initialTurns
 
-        case .removeActiveDaemon(let daemonId):
+        case .removeActiveDaemon(let daemonID):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for removeActiveDaemon: expected .global, got \(change.entityId)")
             }
-            activeDaemons.remove(daemonId)
+            activeDaemons.remove(daemonID)
 
-        case .removeActiveFuse(let fuseId):
+        case .removeActiveFuse(let fuseID):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for removeActiveFuse: expected .global, got \(change.entityId)")
             }
-            activeFuses.removeValue(forKey: fuseId)
+            activeFuses.removeValue(forKey: fuseID)
 
-        case .updateFuseTurns(let fuseId):
+        case .updateFuseTurns(let fuseID):
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for updateFuseTurns: expected .global, got \(change.entityId)")
             }
             guard case .int(let newTurns) = change.newValue else {
                 throw ActionError.internalEngineError("Type mismatch for updateFuseTurns: expected .int, got \(change.newValue)")
             }
-            guard activeFuses[fuseId] != nil else {
-                throw ActionError.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseId)")
+            guard activeFuses[fuseID] != nil else {
+                throw ActionError.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseID)")
             }
-            activeFuses[fuseId] = newTurns
+            activeFuses[fuseID] = newTurns
         }
 
         changeHistory.append(change)
@@ -545,16 +545,16 @@ public struct GameState: Codable, Equatable, Sendable {
             print("INFO: Old value validation skipped for addActiveDaemon/addActiveFuse.")
             return // Skip the final comparison
 
-        case .removeActiveDaemon(let daemonId):
-            let currentlyActive = activeDaemons.contains(daemonId)
+        case .removeActiveDaemon(let daemonID):
+            let currentlyActive = activeDaemons.contains(daemonID)
             actualCurrentValue = StateValue.bool(currentlyActive)
 
-        case .removeActiveFuse(let fuseId):
-            actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
+        case .removeActiveFuse(let fuseID):
+            actualCurrentValue = activeFuses[fuseID].map { StateValue.int($0) }
 
-        case .updateFuseTurns(let fuseId):
+        case .updateFuseTurns(let fuseID):
             // If fuse doesn't exist, current value is nil
-            actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
+            actualCurrentValue = activeFuses[fuseID].map { StateValue.int($0) }
 
         case .itemAttribute(let key):
              guard case .item(let itemID) = change.entityId else {
@@ -591,7 +591,7 @@ public struct GameState: Codable, Equatable, Sendable {
         locations = try container.decode([LocationID: Location].self, forKey: .locations)
         flags = try container.decodeIfPresent(Set<FlagID>.self, forKey: .flags) ?? []
         player = try container.decode(Player.self, forKey: .player)
-        activeFuses = try container.decodeIfPresent([Fuse.ID: Int].self, forKey: .activeFuses) ?? [:]
+        activeFuses = try container.decodeIfPresent([FuseID: Int].self, forKey: .activeFuses) ?? [:]
         activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []
         pronouns = try container.decodeIfPresent([String: Set<ItemID>].self, forKey: .pronouns) ?? [:]
         gameSpecificState = try container.decodeIfPresent([GameStateKey: StateValue].self, forKey: .gameSpecificState) ?? [:] // Keep AnyCodable

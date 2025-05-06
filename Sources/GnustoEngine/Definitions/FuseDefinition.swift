@@ -6,10 +6,7 @@ import Foundation
 /// This definition provides the blueprint for creating runtime `Fuse` instances.
 public struct FuseDefinition: Identifiable, Equatable, Hashable {
     /// The unique identifier for this fuse definition.
-    public typealias ID = Fuse.ID
-
-    /// The unique identifier for this fuse definition.
-    public let id: ID // Changed from String to Fuse.ID
+    public let id: FuseID
 
     /// The initial number of turns before the fuse triggers.
     public let initialTurns: Int
@@ -23,12 +20,12 @@ public struct FuseDefinition: Identifiable, Equatable, Hashable {
     /// Initializes a new fuse definition.
     ///
     /// - Parameters:
-    ///   - id: The unique identifier for the fuse. Must match a corresponding `Fuse.ID`.
+    ///   - id: The unique identifier for the fuse. Must match a corresponding `FuseID`.
     ///   - initialTurns: The number of turns the fuse lasts. Must be positive.
     ///   - action: The closure to execute when the fuse triggers. Must run on MainActor.
     @MainActor // Ensure init is on MainActor due to action
     public init(
-        id: ID, // Changed from String to Fuse.ID
+        id: ID, // Changed from String to FuseID
         initialTurns: Int,
         action: @escaping @Sendable @MainActor (GameEngine) async -> Void // Added @MainActor
     ) {

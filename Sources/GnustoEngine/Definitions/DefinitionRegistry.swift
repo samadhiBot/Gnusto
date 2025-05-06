@@ -33,7 +33,6 @@ public struct DefinitionRegistry {
         objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
         roomActionHandlers: [LocationID: RoomActionHandler] = [:]
     ) {
-        // Build dictionaries from arrays for efficient lookup
         self.fuseDefinitions = Dictionary(
             uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
         )

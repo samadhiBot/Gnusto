@@ -35,11 +35,11 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     case pronounReference(pronoun: String)
 
     // Fuse & Daemon State (Managed via GameEngine helpers typically)
-    case addActiveDaemon(daemonId: DaemonID)
-    case addActiveFuse(fuseId: Fuse.ID, initialTurns: Int)
-    case removeActiveDaemon(daemonId: DaemonID)
-    case removeActiveFuse(fuseId: Fuse.ID)
-    case updateFuseTurns(fuseId: Fuse.ID)
+    case addActiveDaemon(daemonID: DaemonID)
+    case addActiveFuse(fuseID: FuseID, initialTurns: Int)
+    case removeActiveDaemon(daemonID: DaemonID)
+    case removeActiveFuse(fuseID: FuseID)
+    case updateFuseTurns(fuseID: FuseID)
 }
 
 // MARK: - CustomStringConvertible

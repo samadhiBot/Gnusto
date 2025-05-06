@@ -71,7 +71,7 @@ struct GameStateTests {
 
     // 4. Helper to create the GameState with defined placements
     func createSampleGameState(
-        activeFuses: [Fuse.ID: Int] = [:] // Add optional parameter
+        activeFuses: [FuseID: Int] = [:] // Add optional parameter
     ) async -> GameState {
         let items = createSampleItems()
         let locations = createSampleLocations()
@@ -509,13 +509,13 @@ struct GameStateTests {
     func testApplyRemoveNonExistentFuseNilOldValue() async throws {
         // Given: Initial state without the fuse
         var gameState = await createSampleGameState()
-        let fuseId: FuseID = "nonExistentFuse"
-        #expect(gameState.activeFuses[fuseId] == nil)
+        let fuseID: FuseID = "nonExistentFuse"
+        #expect(gameState.activeFuses[fuseID] == nil)
 
         // When: Applying a change to remove the non-existent fuse with oldValue: nil
         let change = StateChange(
             entityId: .global,
-            attributeKey: .removeActiveFuse(fuseId: fuseId),
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Explicitly stating we expect it to be nil (non-existent)
             newValue: .int(0) // newValue is often ignored for removals
         )
@@ -524,7 +524,7 @@ struct GameStateTests {
         try gameState.apply(change)
 
         // Assert final state: Fuse should still be absent
-        #expect(gameState.activeFuses[fuseId] == nil)
+        #expect(gameState.activeFuses[fuseID] == nil)
 
         // Assert history: The change *should* be recorded
         #expect(gameState.changeHistory.count == 1)
@@ -539,14 +539,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .global,
-            attributeKey: .removeActiveFuse(fuseId: "existingFuse"),
+            attributeKey: .removeActiveFuse(fuseID: "existingFuse"),
             oldValue: .int(1), // Providing the wrong oldValue
             newValue: .int(0) // newValue is ignored for remove
         )
 
         // Expect an error because the oldValue is wrong
         // Expect stateValidationFailed because the validation should catch the mismatch
-        // let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseId: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
+        // let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseID: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw ActionError.stateValidationFailed, but it did not throw.")
