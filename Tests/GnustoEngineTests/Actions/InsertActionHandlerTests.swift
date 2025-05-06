@@ -53,21 +53,21 @@ struct InsertActionHandlerTests {
         ))
 
         // Change 2: Item touched (if needed)
-        if initialItemAttributes[.isTouched] != .bool(true) {
+        if initialItemAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
 
         // Change 3: Container touched (if needed)
-        if initialContainerAttributes[.isTouched] != .bool(true) {
+        if initialContainerAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(containerID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
@@ -129,10 +129,10 @@ struct InsertActionHandlerTests {
         // Assert Final State
         let finalCoinState = try #require(await engine.item("coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
-        #expect(finalCoinState.attributes[.isTouched] == .bool(true), "Coin should be touched")
+        #expect(finalCoinState.attributes[.isTouched] == true, "Coin should be touched")
 
         let finalBoxState = try #require(await engine.item("openBox"))
-        #expect(finalBoxState.attributes[.isTouched] == .bool(true), "Box should be touched")
+        #expect(finalBoxState.attributes[.isTouched] == true, "Box should be touched")
 
         // Assert Pronoun
         #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
@@ -309,7 +309,7 @@ struct InsertActionHandlerTests {
             name: "stone statue",
             parent: .location("startRoom"),
             attributes: [
-                .isOpenable: .bool(false)
+                .isOpenable: false
             ]
         )
         let game = MinimalGame(items: [coin, statue])

@@ -18,18 +18,18 @@ struct OpenActionHandlerTests {
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOpen),
-                oldValue: initialAttributes?[.isOpen] ?? .bool(false), // Check initial state
+                oldValue: initialAttributes?[.isOpen] ?? false, // Check initial state
                 newValue: true,
             )
         )
 
         // Change 2: Item touched (if needed)
-        if initialAttributes?[.isTouched] != .bool(true) {
+        if initialAttributes?[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityId: .item(itemID),
                     propertyKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched] ?? .bool(false),
+                    oldValue: initialAttributes?[.isTouched] ?? false,
                     newValue: true,
                 )
             )

@@ -35,11 +35,11 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if targetItem.attributes[.isTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
         }

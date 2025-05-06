@@ -151,7 +151,7 @@ struct GameEngineTests {
         // Make pebble non-takable in this test's state
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
         // Ensure room is lit for this test - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = .bool(true) // Removed direct state modification
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -206,7 +206,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = .bool(true) // Removed direct state modification
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -267,7 +267,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = .bool(true) // Removed direct state modification
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -479,7 +479,7 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == .bool(true))
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
         let engine = GameEngine(
@@ -561,7 +561,7 @@ struct GameEngineTests {
                 let flagID = FlagID(flagToSet)
                 // Use the engine context to check the flag state before the change
                 let actualOldFlagValue = await context.engine.isFlagSet(flagID)
-                let flagOldValueState: StateValue? = actualOldFlagValue ? .bool(true) : nil // Simpler conversion
+                let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
 
                 let change3 = StateChange(
                     entityId: .global,
@@ -632,8 +632,8 @@ struct GameEngineTests {
         // Then
         // Check final state
         #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
-        #expect(engine.item(testItemID)?.attributes[.isOn] == .bool(true), "Item .on property should be set")
-        #expect(engine.item(testItemID)?.attributes[.isTouched] == .bool(true), "Item .touched property should be set")
+        #expect(engine.item(testItemID)?.attributes[.isOn] == true, "Item .on property should be set")
+        #expect(engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = engine.getChangeHistory()
@@ -652,7 +652,7 @@ struct GameEngineTests {
             history.contains { change in
                 guard change.entityId == .item(testItemID),
                       case .itemAttribute(let prop) = change.propertyKey,
-                      change.newValue == .bool(true) else { return false }
+                      change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
             },
             "History should contain item property change adding .on and .touched"
@@ -663,7 +663,7 @@ struct GameEngineTests {
             history.contains { change in
                 change.entityId == .global &&
                     change.propertyKey == StatePropertyKey.setFlag(testFlagKey) &&
-                    change.newValue == StateValue.bool(true)
+                    change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
         )
@@ -1241,7 +1241,7 @@ struct GameEngineTests {
             id: itemID,
             name: "Lamp",
             attributes: [
-                .isOn: .bool(false) // Start with lamp off
+                .isOn: false // Start with lamp off
             ]
         )
 
@@ -1250,7 +1250,7 @@ struct GameEngineTests {
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOn),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ),
             StateChange(
@@ -1300,8 +1300,8 @@ struct GameEngineTests {
         // Assert:
         // Verify the state changes were applied
         let finalLamp = engine.item(itemID)
-        #expect(finalLamp?.attributes[.isOn] == .bool(true), "Lamp should be ON")
-        #expect(finalLamp?.attributes[.isTouched] == .bool(true), "Lamp should be TOUCHED")
+        #expect(finalLamp?.attributes[.isOn] == true, "Lamp should be ON")
+        #expect(finalLamp?.attributes[.isTouched] == true, "Lamp should be TOUCHED")
         
         // Verify the message was printed
         let output = await mockIO.flush()

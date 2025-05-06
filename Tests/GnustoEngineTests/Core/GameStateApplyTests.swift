@@ -23,7 +23,7 @@ struct GameStateApplyTests {
         }
         let attributeID: AttributeID = .isOn // Assume AttributeID.isOn exists
         let oldAttributeValue = initialItem.attributes[attributeID]
-        let newAttributeValue: StateValue = .bool(true)
+        let newAttributeValue: StateValue = true
 
         let change = StateChange(
             entityId: .item(itemID),
@@ -55,8 +55,8 @@ struct GameStateApplyTests {
         let attributeID: AttributeID = .isOn
         let actualOldValue = initialItem.attributes[attributeID]
         // Ensure incorrectOldValue is different from actualOldValue
-        let incorrectOldValue: StateValue = (actualOldValue == .bool(true)) ? .bool(false) : .bool(true)
-        let newValue: StateValue = .bool(true)
+        let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true
+        let newValue: StateValue = true
 
         let change = StateChange(
             entityId: .item(itemID),
@@ -547,7 +547,7 @@ struct GameStateApplyTests {
         // Let's change the .isLit attribute (assuming it exists)
         let attributeID: AttributeID = .isLit
         let oldAttributeValue = initialLocation.attributes[attributeID]
-        let newAttributeValue: StateValue = .bool(true)
+        let newAttributeValue: StateValue = true
 
         let change = StateChange(
             entityId: .location(locationID),
@@ -577,8 +577,8 @@ struct GameStateApplyTests {
         let attributeID: AttributeID = .isLit
         let actualOldValue = initialLocation.attributes[attributeID]
         // Ensure incorrectOldValue is different
-        let incorrectOldValue: StateValue = (actualOldValue == .bool(true)) ? .bool(false) : .bool(true)
-        let newValue: StateValue = .bool(true)
+        let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true
+        let newValue: StateValue = true
 
         let change = StateChange(
             entityId: .location(locationID),
@@ -1039,7 +1039,7 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityId: .global,
             propertyKey: .setFlag(flagID),
-            oldValue: nil, // Or .bool(false)
+            oldValue: nil, // Or false
             newValue: true,
         )
 
@@ -1064,7 +1064,7 @@ struct GameStateApplyTests {
             entityId: .global,
             propertyKey: .clearFlag(flagID),
             oldValue: true, // Expecting it was true
-            newValue: .bool(false)
+            newValue: false
         )
 
         try gameState.apply(change)
@@ -1095,7 +1095,7 @@ struct GameStateApplyTests {
         } catch ActionError.stateValidationFailed(let failedChange, let reportedActualValue) {
             validationErrorThrown = true
             expectNoDifference(failedChange, change)
-            #expect(reportedActualValue == .bool(false)) // actual value was false
+            #expect(reportedActualValue == false) // actual value was false
         } catch {
             Issue.record("Threw unexpected error type: \(error)")
         }

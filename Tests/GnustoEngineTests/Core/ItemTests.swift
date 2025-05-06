@@ -28,10 +28,10 @@ struct ItemTests {
                 .firstDescription: .string("A shiny brass lantern rests here."),
                 .readText: .string("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
                 .readWhileHeldText: .string("It feels warm."),
-                .isTakable: .bool(true),
-                .isLightSource: .bool(true),
-                .isOn: .bool(true),
-                .isOpenable: .bool(true),
+                .isTakable: true,
+                .isLightSource: true,
+                .isOn: true,
+                .isOpenable: true,
                 .size: .int(10),
                 .capacity: .int(5)
             ]
@@ -89,14 +89,14 @@ struct ItemTests {
         #expect(!item.hasFlag(.isTakable))
         #expect(item.attributes.isEmpty) // Default item has no attributes initially
 
-        item.attributes[.isTakable] = .bool(true)
+        item.attributes[.isTakable] = true
         #expect(item.hasFlag(.isTakable))
         #expect(item.attributes.count == 1)
 
-        item.attributes[.isTakable] = .bool(true) // Setting again should have no effect
+        item.attributes[.isTakable] = true // Setting again should have no effect
         #expect(item.attributes.count == 1)
 
-        item.attributes[.isLightSource] = .bool(true)
+        item.attributes[.isLightSource] = true
         #expect(item.hasFlag(.isLightSource))
         #expect(item.attributes.count == 2)
 
@@ -148,7 +148,7 @@ struct ItemTests {
 
         // Modify the copy (item2)
         item2.name = "modified thing"
-        item2.attributes[.isInvisible] = .bool(true)
+        item2.attributes[.isInvisible] = true
         item2.parent = .location("limbo")
 
         // Assert that the original (item1) is unchanged

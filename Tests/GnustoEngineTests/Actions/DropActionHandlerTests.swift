@@ -31,7 +31,7 @@ struct DropActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
@@ -42,7 +42,7 @@ struct DropActionHandlerTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isWorn),
                 oldValue: true,
-                newValue: .bool(false)
+                newValue: false
             ))
         }
 

@@ -25,7 +25,7 @@ struct LockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
@@ -35,7 +35,7 @@ struct LockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
@@ -45,7 +45,7 @@ struct LockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }

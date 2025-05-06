@@ -42,21 +42,21 @@ struct PutOnActionHandlerTests {
         ))
 
         // Change 2: Item touched (if needed)
-        if oldItemAttributes[.isTouched] != .bool(true) {
+        if oldItemAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(itemToPutID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
 
         // Change 3: Surface touched (if needed)
-        if oldSurfaceAttributes[.isTouched] != .bool(true) {
+        if oldSurfaceAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(surfaceID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }

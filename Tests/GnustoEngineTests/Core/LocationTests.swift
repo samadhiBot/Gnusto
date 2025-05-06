@@ -15,7 +15,7 @@ struct LocationTests {
             name: defaultLocationName,
             description: "A nondescript room.",
             attributes: [
-                .inherentlyLit: .bool(false),
+                .inherentlyLit: false,
                 .localGlobals: .itemIDSet([])
             ]
         )
@@ -30,8 +30,8 @@ struct LocationTests {
             description: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
             attributes: [
-                .inherentlyLit: .bool(true),
-                .isSacred: .bool(true),
+                .inherentlyLit: true,
+                .isSacred: true,
                 .localGlobals: .itemIDSet(["rug", "fireplace"])
             ]
         )
@@ -50,7 +50,7 @@ struct LocationTests {
         #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
         #expect(location.attributes.count == 1) // Only inherentlyLit=false by default
-        #expect(location.attributes[.inherentlyLit] == .bool(false))
+        #expect(location.attributes[.inherentlyLit] == false)
         #expect(location.localGlobals.isEmpty)
     }
 
@@ -74,8 +74,8 @@ struct LocationTests {
         // Check the full attributes dictionary for completeness
         #expect(location.attributes == [
             .longDescription: .string("A comfortably furnished living room. There are exits west and east."),
-            .inherentlyLit: .bool(true),
-            .isSacred: .bool(true),
+            .inherentlyLit: true,
+            .isSacred: true,
             .localGlobals: .itemIDSet(["rug", "fireplace"])
         ])
     }
@@ -87,18 +87,18 @@ struct LocationTests {
         #expect(!location.hasFlag(.inherentlyLit)) // isInherentlyLit is false by default
         #expect(location.attributes.count == 1) // Only inherentlyLit
 
-        location.attributes[.inherentlyLit] = .bool(true)
+        location.attributes[.inherentlyLit] = true
         #expect(location.hasFlag(.inherentlyLit))
         #expect(location.attributes.count == 1)
 
-        location.attributes[.inherentlyLit] = .bool(true) // Setting again should have no effect on count
+        location.attributes[.inherentlyLit] = true // Setting again should have no effect on count
         #expect(location.attributes.count == 1)
 
-        location.attributes[.isOutside] = .bool(true)
+        location.attributes[.isOutside] = true
         #expect(location.hasFlag(.isOutside))
         #expect(location.attributes.count == 2)
 
-        location.attributes[.inherentlyLit] = .bool(false) // Set back to false, don't remove the key
+        location.attributes[.inherentlyLit] = false // Set back to false, don't remove the key
         #expect(!location.hasFlag(.inherentlyLit))
         #expect(location.hasFlag(.isOutside))
         #expect(location.attributes.count == 2)
@@ -148,7 +148,7 @@ struct LocationTests {
 
         // Modify the copy (location2)
         location2.name = "Renamed Room"
-        location2.attributes[.isVisited] = .bool(true)
+        location2.attributes[.isVisited] = true
         // Set dynamic value for description
         location2.attributes[.longDescription] = .string("An updated room.")
 

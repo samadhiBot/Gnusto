@@ -75,15 +75,15 @@ public struct CloseActionHandler: EnhancedActionHandler {
         try await context.engine.setDynamicItemValue(
             itemID: targetItemID,
             key: .isOpen,
-            newValue: .bool(false)
+            newValue: false
         )
 
         // Change 2: Set `.isTouched` flag if not already set
-        if targetItem.attributes[.isTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != true {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? .bool(false), // Current value (or default false)
+                oldValue: targetItem.attributes[.isTouched] ?? false, // Current value (or default false)
                 newValue: true,
             )
             stateChanges.append(touchedChange)

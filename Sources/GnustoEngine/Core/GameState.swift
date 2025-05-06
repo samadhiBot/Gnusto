@@ -339,9 +339,9 @@ public struct GameState: Codable, Equatable, Sendable {
         // MARK: Global/Misc Properties
 
         case .setFlag(let flagID):
-            // The convention is that setting a flag corresponds to a newValue of .bool(true)
-            guard change.newValue == .bool(true) else {
-                 print("Warning: setFlag StateChange newValue was not .bool(true), was \(String(describing: change.newValue)). Proceeding anyway.")
+            // The convention is that setting a flag corresponds to a newValue of true
+            guard change.newValue == true else {
+                 print("Warning: setFlag StateChange newValue was not true, was \(String(describing: change.newValue)). Proceeding anyway.")
                  return // Exit scope if newValue is not as expected
              }
              guard change.entityId == .global else {
@@ -350,9 +350,9 @@ public struct GameState: Codable, Equatable, Sendable {
              flags.insert(flagID)
 
         case .clearFlag(let flagID):
-            // The convention is that clearing a flag corresponds to a newValue of .bool(false)
-            guard change.newValue == .bool(false) else {
-                 print("Warning: clearFlag StateChange newValue was not .bool(false), was \(String(describing: change.newValue)). Proceeding anyway.")
+            // The convention is that clearing a flag corresponds to a newValue of false
+            guard change.newValue == false else {
+                 print("Warning: clearFlag StateChange newValue was not false, was \(String(describing: change.newValue)). Proceeding anyway.")
                  return // Exit scope if newValue is not as expected
              }
              guard change.entityId == .global else {
@@ -380,8 +380,8 @@ public struct GameState: Codable, Equatable, Sendable {
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityId)")
             }
-            guard case .bool(true) = change.newValue else {
-                 print("WARN: addActiveDaemon StateChange newValue was not .bool(true), was \(change.newValue). Proceeding anyway.")
+            guard case true = change.newValue else {
+                 print("WARN: addActiveDaemon StateChange newValue was not true, was \(change.newValue). Proceeding anyway.")
                  return
              }
             activeDaemons.insert(daemonId)
@@ -518,13 +518,13 @@ public struct GameState: Codable, Equatable, Sendable {
         // Global/Misc Properties
         case .setFlag(let flagID):
             // Before setting, the flag should *not* have been present.
-            // The expected old value should be .bool(false) or nil.
+            // The expected old value should be false or nil.
             let flagWasSet = flags.contains(flagID)
             actualCurrentValue = .bool(flagWasSet)
 
         case .clearFlag(let flagID):
             // Before clearing, the flag *should* have been present.
-            // The expected old value should be .bool(true).
+            // The expected old value should be true.
             let flagWasSet = flags.contains(flagID)
             actualCurrentValue = .bool(flagWasSet)
 

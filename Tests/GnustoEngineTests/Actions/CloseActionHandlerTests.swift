@@ -21,17 +21,17 @@ struct CloseActionHandlerTests {
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isOpen),
                 oldValue: true, // Assume it was open before closing
-                newValue: .bool(false)
+                newValue: false
             )
         )
 
         // Change 2: Item touched (if needed)
-        if initialAttributes[.isTouched] != .bool(true) {
+        if initialAttributes[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityId: .item(itemID),
                     propertyKey: .itemAttribute(.isTouched),
-                    oldValue: .bool(false),
+                    oldValue: false,
                     newValue: true,
                 )
             )
@@ -56,7 +56,7 @@ struct CloseActionHandlerTests {
             entityId: .item(itemID),
             propertyKey: .itemAttribute(.isOpen),
             oldValue: true, // Assumes it was true before closing
-            newValue: .bool(false)
+            newValue: false
         )
     }
 
@@ -85,7 +85,7 @@ struct CloseActionHandlerTests {
 
         // Initial state check
         let initialBox = engine.item("box")
-        #expect(initialBox?.attributes[.isOpen] == .bool(true)) // Qualified key
+        #expect(initialBox?.attributes[.isOpen] == true) // Qualified key
         #expect(engine.gameState.changeHistory.isEmpty)
 
         // Act
@@ -93,7 +93,7 @@ struct CloseActionHandlerTests {
 
         // Assert State Change
         let finalBox = engine.item("box")
-        #expect(finalBox?.attributes[.isOpen] == .bool(false)) // Qualified key
+        #expect(finalBox?.attributes[.isOpen] == false) // Qualified key
         #expect(finalBox?.hasFlag(.isTouched) == true)
 
         // Assert Output

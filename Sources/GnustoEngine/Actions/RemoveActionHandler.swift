@@ -42,21 +42,21 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if itemSnapshot.attributes[.isWorn] == .bool(true) { // Only change if currently worn
+        if itemSnapshot.attributes[.isWorn] == true { // Only change if currently worn
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isWorn),
                 oldValue: true,
-                newValue: .bool(false)
+                newValue: false
             ))
         }
 
         // Change 2: Set `.isTouched` to true (if not already)
-        if itemSnapshot.attributes[.isTouched] != .bool(true) {
+        if itemSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
+                oldValue: itemSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
         }

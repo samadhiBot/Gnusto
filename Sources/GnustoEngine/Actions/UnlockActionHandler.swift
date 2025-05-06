@@ -74,33 +74,33 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Remove .locked from target (if currently locked)
-        if targetItem.attributes[.isLocked] == .bool(true) {
+        if targetItem.attributes[.isLocked] == true {
             let lockedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
                 oldValue: true,
-                newValue: .bool(false)
+                newValue: false
             )
             stateChanges.append(lockedChange)
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if targetItem.attributes[.isTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != true {
             let targetTouchedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )
             stateChanges.append(targetTouchedChange)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if keyItem.attributes[.isTouched] != .bool(true) {
+        if keyItem.attributes[.isTouched] != true {
             let keyTouchedChange = StateChange(
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: keyItem.attributes[.isTouched] ?? .bool(false),
+                oldValue: keyItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )
             stateChanges.append(keyTouchedChange)

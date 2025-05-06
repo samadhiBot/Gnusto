@@ -22,25 +22,25 @@ struct GameStateTests {
             Item(
                 id: Self.itemLantern,
                 name: "lantern",
-                attributes: [.isTakable: .bool(true), .isLightSource: .bool(true)]
+                attributes: [.isTakable: true, .isLightSource: true]
             ),
             Item(
                 id: Self.itemMailbox,
                 name: "mailbox",
                 parent: .location(Self.locWOH),
-                attributes: [.isContainer: .bool(true), .isOpenable: .bool(true)]
+                attributes: [.isContainer: true, .isOpenable: true]
             ),
             Item(
                 id: Self.itemLeaflet,
                 name: "leaflet",
                 parent: .item(Self.itemMailbox),
-                attributes: [.isTakable: .bool(true), .isReadable: .bool(true)]
+                attributes: [.isTakable: true, .isReadable: true]
             ),
             Item(
                 id: Self.itemSword,
                 name: "sword",
                 parent: .player,
-                attributes: [.isTakable: .bool(true)]
+                attributes: [.isTakable: true]
             )
         ]
     }
@@ -414,7 +414,7 @@ struct GameStateTests {
 
         // Modify an item *before* encoding
         var lantern = originalState.items[Self.itemLantern]!
-        lantern.attributes[.isOn] = .bool(true)
+        lantern.attributes[.isOn] = true
         lantern.parent = .player // Put lantern in inventory
         originalState.items[Self.itemLantern] = lantern
 
@@ -576,16 +576,16 @@ struct GameStateTests {
             entityId: .location("testLoc"),
             propertyKey: .locationAttribute(.isLit),
             oldValue: state.locations["testLoc"]?.attributes[.isLit],
-            newValue: .bool(true)
+            newValue: true
         )
         try? state.apply(change)
 
         #expect(change.entityId == EntityID.location("testLoc"))
         #expect(change.propertyKey == StatePropertyKey.locationAttribute(AttributeID.isLit))
-        #expect(change.oldValue == nil || change.oldValue == .bool(false))
-        #expect(change.newValue == .bool(true))
+        #expect(change.oldValue == nil || change.oldValue == false)
+        #expect(change.newValue == true)
         // Verify description remains untouched initially
-        #expect(state.locations["testLoc"]?.attributes[.isLit] == .bool(true))
+        #expect(state.locations["testLoc"]?.attributes[.isLit] == true)
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
     }
 
@@ -593,23 +593,23 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesRemove() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.longDescription: .string("Original Desc"), .isLit: .bool(true)])
+        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.longDescription: .string("Original Desc"), .isLit: true])
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
             entityId: .location("testLoc"),
             propertyKey: .locationAttribute(.isLit),
-            oldValue: .bool(true),
-            newValue: .bool(false)
+            oldValue: true,
+            newValue: false
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
         #expect(change.propertyKey == .locationAttribute(.isLit))
-        #expect(change.oldValue == .bool(true))
-        #expect(change.newValue == .bool(false))
+        #expect(change.oldValue == true)
+        #expect(change.newValue == false)
         // Verify description remains untouched
-        #expect(state.locations["testLoc"]?.attributes[.isLit] == .bool(false))
+        #expect(state.locations["testLoc"]?.attributes[.isLit] == false)
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
     }
 

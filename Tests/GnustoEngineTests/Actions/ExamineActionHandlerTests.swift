@@ -13,12 +13,12 @@ struct ExamineActionHandlerTests {
         var changes: [StateChange] = []
 
         let isTouchedKey = StatePropertyKey.itemAttribute(.isTouched)
-        if initialAttributes?[.isTouched] != .bool(true) {
+        if initialAttributes?[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityId: .item(itemID),
                     propertyKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched] ?? .bool(false),
+                    oldValue: initialAttributes?[.isTouched] ?? false,
                     newValue: true,
                 )
             )
@@ -52,7 +52,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.attributes[.isTouched] != .bool(true))
+        #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine pebble")
@@ -62,7 +62,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "A smooth, grey pebble.")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.attributes[.isTouched] == .bool(true))
+        #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -88,7 +88,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.attributes[.isTouched] != .bool(true))
+        #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
@@ -98,7 +98,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "A small, tarnished silver locket.")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.attributes[.isTouched] == .bool(true))
+        #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -130,7 +130,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.attributes[.isTouched] != .bool(true))
+        #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
@@ -140,7 +140,7 @@ struct ExamineActionHandlerTests {
         expectNoDifference(output, "A weathered statue of a grue.")
 
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.attributes[.isTouched] == .bool(true))
+        #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
@@ -180,7 +180,7 @@ struct ExamineActionHandlerTests {
 
         #expect(engine.gameState.changeHistory.isEmpty)
         let itemState = engine.item(itemID)
-        #expect(itemState?.attributes[.isTouched] != .bool(true))
+        #expect(itemState?.attributes[.isTouched] != true)
     }
 
     @Test func testExamineNonExistentItem() async throws {
@@ -252,8 +252,8 @@ struct ExamineActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty)
         let item1State = engine.item(itemID1)
         let item2State = engine.item(itemID2)
-        #expect(item1State?.attributes[.isTouched] != .bool(true))
-        #expect(item2State?.attributes[.isTouched] != .bool(true))
+        #expect(item1State?.attributes[.isTouched] != true)
+        #expect(item2State?.attributes[.isTouched] != true)
     }
 
     @Test func testExamineSelf() async throws {
@@ -300,7 +300,7 @@ struct ExamineActionHandlerTests {
             ioHandler: mockIO
         )
         let initialItemState = engine.item(itemID)
-        #expect(initialItemState?.attributes[.isTouched] != .bool(true))
+        #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
@@ -311,6 +311,6 @@ struct ExamineActionHandlerTests {
 
         #expect(engine.gameState.changeHistory.isEmpty)
         let finalItemState = engine.item(itemID)
-        #expect(finalItemState?.attributes[.isTouched] != .bool(true))
+        #expect(finalItemState?.attributes[.isTouched] != true)
     }
 }

@@ -288,7 +288,7 @@ struct GoActionHandlerTests {
             entityId: .global, // Use .global for game-specific flags
             // Use .setFlag property key
             propertyKey: .setFlag(conditionFlagID), 
-            oldValue: .bool(false), // Expect flag was not set
+            oldValue: false, // Expect flag was not set
             newValue: true, // Set flag to true
         )
         try engine.gameState.apply(change)

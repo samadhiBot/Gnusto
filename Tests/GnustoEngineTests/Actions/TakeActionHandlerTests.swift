@@ -60,18 +60,18 @@ struct TakeActionHandlerTests {
 
         // Ensure touched is set if not already true
         let initialIsTouched = initialAttributes[.isTouched] // is Optional(StateValue)
-        if initialIsTouched != .bool(true) { // Correctly compares Optional != Non-optional
+        if initialIsTouched != true { // Correctly compares Optional != Non-optional
             let touchedChange = StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: initialIsTouched, // Keep original old value (nil or .bool(false))
+                oldValue: initialIsTouched, // Keep original old value (nil or false)
                 newValue: true,
             )
 
             // Avoid adding duplicate change if already handled by the general attribute comparison
             if let existingIndex = changes.firstIndex(where: { $0.propertyKey == .itemAttribute(.isTouched) }) {
                 // If a change exists, make sure its newValue is true
-                if changes[existingIndex].newValue != .bool(true) {
+                if changes[existingIndex].newValue != true {
                     changes[existingIndex] = touchedChange
                 }
             } else {

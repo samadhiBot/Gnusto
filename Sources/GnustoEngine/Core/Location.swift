@@ -44,7 +44,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     /// - Parameter id: The `AttributeID` of the flag to check.
     /// - Returns: `true` if the flag is set to `true`, or `false` otherwise.
     public func hasFlag(_ id: AttributeID) -> Bool {
-        attributes[id] == .bool(true)
+        attributes[id] == true
     }
     
     /// Checks whether the location is inherently lit, such as a location lit by sunlight.

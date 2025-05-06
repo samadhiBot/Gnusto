@@ -13,8 +13,8 @@ struct ActionResultTests {
     let simpleChange = StateChange(
         entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isOn),
-        oldValue: .bool(false),
-        newValue: .bool(true)
+        oldValue: false,
+        newValue: true
     )
     let simpleEffect = SideEffect(
         type: .startFuse, // Example type
@@ -28,20 +28,20 @@ struct ActionResultTests {
     private let change1 = StateChange(
         entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isOn),
-        oldValue: .bool(false),
-        newValue: .bool(true)
+        oldValue: false,
+        newValue: true
     )
     private let change2 = StateChange(
         entityId: .item("lamp"),
         propertyKey: .itemAttribute(.isTouched),
-        oldValue: .bool(false),
-        newValue: .bool(true)
+        oldValue: false,
+        newValue: true
     )
     private let change3 = StateChange(
         entityId: .location("cave"),
         propertyKey: .locationAttribute(.isVisited), // Corrected: .isVisited
-        oldValue: .bool(false),
-        newValue: .bool(true)
+        oldValue: false,
+        newValue: true
     )
 
     // Computed property to create the ActionResult using other instance properties
@@ -59,14 +59,14 @@ struct ActionResultTests {
         StateChange(
             entityId: .item("lamp"),
             propertyKey: .itemAttribute(.isOn),
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            oldValue: false,
+            newValue: true
         ),
         StateChange( // Mark cave visited when lamp is turned on (example)
             entityId: .location("cave"),
             propertyKey: .locationAttribute(.isVisited),
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            oldValue: false,
+            newValue: true
         )
     ]
 
@@ -107,14 +107,14 @@ struct ActionResultTests {
         let change = StateChange(
             entityId: .item("door"),
             propertyKey: .itemAttribute(.isOpen),
-            oldValue: .bool(false),
-            newValue: .bool(true)
+            oldValue: false,
+            newValue: true
         )
 
         #expect(change.entityId == .item("door"))
         #expect(change.propertyKey == .itemAttribute(.isOpen))
-        #expect(change.oldValue == .bool(false))
-        #expect(change.newValue == .bool(true))
+        #expect(change.oldValue == false)
+        #expect(change.newValue == true)
     }
 
     @Test("StateChange Initialization - No Old Value")
@@ -136,13 +136,13 @@ struct ActionResultTests {
         let change = StateChange(
             entityId: .global,
             propertyKey: .setFlag("lightsOut"),
-            oldValue: StateValue.bool(false),
-            newValue: StateValue.bool(true)
+            oldValue: false,
+            newValue: true
         )
 
         #expect(change.propertyKey == StatePropertyKey.setFlag("lightsOut"))
-        #expect(change.newValue == StateValue.bool(true))
-        #expect(change.oldValue == StateValue.bool(false))
+        #expect(change.newValue == true)
+        #expect(change.oldValue == false)
     }
 
     @Test("StateChange Initialization - Game Specific")
@@ -196,7 +196,7 @@ struct ActionResultTests {
         let decoder = JSONDecoder()
 
         let values: [StateValue] = [
-            .bool(true),
+            true,
             .int(123),
             .string("hello"),
             .itemID("key"),
@@ -287,14 +287,14 @@ struct ActionResultTests {
             success: true,
             message: "First action.",
             stateChanges: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true))
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: false, newValue: true)
             ]
         )
         let result2 = ActionResult(
             success: true,
             message: "Second action.",
             stateChanges: [
-                createTestLocationChange(id: "room", key: .isVisited, oldValue: .bool(false), newValue: .bool(true))
+                createTestLocationChange(id: "room", key: .isVisited, oldValue: false, newValue: true)
             ]
         )
 
@@ -312,14 +312,14 @@ struct ActionResultTests {
             success: true,
             message: "Action 1.",
             stateChanges: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(false), newValue: .bool(true)) // Lamp Off -> On
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: false, newValue: true) // Lamp Off -> On
             ]
         )
         let result2 = ActionResult(
             success: true,
             message: "Action 2.",
             stateChanges: [
-                createTestItemChange(id: "lamp", key: .isOn, oldValue: .bool(true), newValue: .bool(false)) // Lamp On -> Off
+                createTestItemChange(id: "lamp", key: .isOn, oldValue: true, newValue: false) // Lamp On -> Off
             ]
         )
 
@@ -329,8 +329,8 @@ struct ActionResultTests {
         // let finalChange = try #require(mergedResult.changes.first)
         // #expect(finalChange.entityId == .item("lamp"))
         // #expect(finalChange.propertyKey == .itemAttribute(.isOn))
-        // #expect(finalChange.oldValue == .bool(false)) // Original old value from result1
-        // #expect(finalChange.newValue == .bool(false)) // Final new value from result2
+        // #expect(finalChange.oldValue == false) // Original old value from result1
+        // #expect(finalChange.newValue == false) // Final new value from result2
     }
 
     // MARK: - Apply/Validation Tests (Require Mock Engine/State)
@@ -342,8 +342,8 @@ struct ActionResultTests {
     /* // Uncomment and adapt when mock infrastructure is ready
     @Test func testValidationSuccess() async throws {
         let mockState = MockGameState()
-        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: .bool(false)])
-        mockState.locations["cave"] = Location(id: "cave", name: "Cave", attributes: [.isVisited: .bool(false)])
+        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: false])
+        mockState.locations["cave"] = Location(id: "cave", name: "Cave", attributes: [.isVisited: false])
 
         let result = ActionResult(
             success: true,
@@ -356,7 +356,7 @@ struct ActionResultTests {
 
     @Test func testValidationFailureWrongOldValue() async throws {
         let mockState = MockGameState()
-        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: .bool(true)]) // Lamp starts ON
+        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: true]) // Lamp starts ON
 
         let result = ActionResult(
             success: true,
@@ -365,8 +365,8 @@ struct ActionResultTests {
                  StateChange(
                     entityId: .item("lamp"),
                     propertyKey: .itemAttribute(.isOn),
-                    oldValue: .bool(false), // Expects OFF
-                    newValue: .bool(true)
+                    oldValue: false, // Expects OFF
+                    newValue: true
                 )
             ]
         )
@@ -378,8 +378,8 @@ struct ActionResultTests {
 
     @Test func testApplyChangesSuccess() async throws {
         let mockState = MockGameState()
-        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: .bool(false)])
-        mockState.locations["cave"] = Location(id: "cave", name: "Cave", attributes: [.isVisited: .bool(false)])
+        mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: false])
+        mockState.locations["cave"] = Location(id: "cave", name: "Cave", attributes: [.isVisited: false])
         mockState.globals[.playerLocation] = .locationID("start")
 
         let result = ActionResult(
@@ -397,8 +397,8 @@ struct ActionResultTests {
 
         try await result.apply(to: mockState)
 
-        #expect(mockState.items["lamp"]?.attributes[.isOn] == .bool(true))
-        #expect(mockState.locations["cave"]?.attributes[.isVisited] == .bool(true))
+        #expect(mockState.items["lamp"]?.attributes[.isOn] == true)
+        #expect(mockState.locations["cave"]?.attributes[.isVisited] == true)
         #expect(mockState.globals[.playerLocation] == .locationID("cave"))
     }
     */

@@ -91,11 +91,11 @@ public struct TakeActionHandler: EnhancedActionHandler {
         stateChanges.append(parentChange)
 
         // Change 2: Set `.isTouched` flag if not already set
-        if targetItem.attributes[.isTouched] != .bool(true) {
+        if targetItem.attributes[.isTouched] != true {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? .bool(false),
+                oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )
             stateChanges.append(touchedChange)

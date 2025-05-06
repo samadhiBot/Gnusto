@@ -42,21 +42,21 @@ public struct WearActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .worn (if not already worn)
-        if itemSnapshot.attributes[.isWorn] != .bool(true) {
+        if itemSnapshot.attributes[.isWorn] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isWorn),
-                oldValue: itemSnapshot.attributes[.isWorn] ?? .bool(false),
+                oldValue: itemSnapshot.attributes[.isWorn] ?? false,
                 newValue: true,
             ))
         }
 
         // Change 2: Add .touched (if not already touched)
-        if itemSnapshot.attributes[.isTouched] != .bool(true) {
+        if itemSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: itemSnapshot.attributes[.isTouched] ?? .bool(false),
+                oldValue: itemSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
         }

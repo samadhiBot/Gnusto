@@ -14,13 +14,13 @@ struct LookActionHandlerTests {
         initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
         // Only expect a change if .isTouched wasn't already true
-        guard initialAttributes[.isTouched] != .bool(true) else { return [] }
+        guard initialAttributes[.isTouched] != true else { return [] }
 
         return [
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ),
             StateChange(

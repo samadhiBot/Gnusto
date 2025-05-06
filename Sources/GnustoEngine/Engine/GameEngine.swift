@@ -588,8 +588,8 @@ public class GameEngine: Sendable {
                 let addDaemonChange = StateChange(
                     entityId: .global,
                     propertyKey: StatePropertyKey.addActiveDaemon(daemonId: daemonId),
-                    oldValue: StateValue.bool(false),
-                    newValue: StateValue.bool(true)
+                    oldValue: false,
+                    newValue: true
                 )
                 // 4. Apply the StateChange
                 try gameState.apply(addDaemonChange)
@@ -603,8 +603,8 @@ public class GameEngine: Sendable {
                 let removeDaemonChange = StateChange(
                     entityId: .global,
                     propertyKey: StatePropertyKey.removeActiveDaemon(daemonId: daemonId),
-                    oldValue: StateValue.bool(true),
-                    newValue: StateValue.bool(false)
+                    oldValue: true,
+                    newValue: false
                 )
                 // 3. Apply the StateChange
                 try gameState.apply(removeDaemonChange)
@@ -892,7 +892,7 @@ public class GameEngine: Sendable {
             let change = StateChange(
                 entityId: .global,
                 propertyKey: .setFlag(id),
-                oldValue: .bool(false), // Expecting it was false
+                oldValue: false, // Expecting it was false
                 newValue: true,
             )
             do {
@@ -915,7 +915,7 @@ public class GameEngine: Sendable {
                 entityId: .global,
                 propertyKey: .clearFlag(id),
                 oldValue: true, // Expecting it was true
-                newValue: .bool(false)
+                newValue: false
             )
             do {
                 try gameState.apply(change)

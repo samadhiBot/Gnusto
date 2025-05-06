@@ -49,7 +49,7 @@ public struct Item: Codable, Identifiable, Sendable {
     /// - Parameter id: The `AttributeID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
     public func hasFlag(_ id: AttributeID) -> Bool {
-        attributes[id] == .bool(true)
+        attributes[id] == true
     }
     
     /// The item's size.

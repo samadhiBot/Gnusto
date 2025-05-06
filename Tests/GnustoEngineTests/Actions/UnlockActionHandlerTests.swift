@@ -26,7 +26,7 @@ struct UnlockActionHandlerTests {
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isLocked),
                 oldValue: true,
-                newValue: .bool(false)
+                newValue: false
             ))
         }
 
@@ -35,7 +35,7 @@ struct UnlockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
@@ -45,7 +45,7 @@ struct UnlockActionHandlerTests {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false),
+                oldValue: false,
                 newValue: true,
             ))
         }
