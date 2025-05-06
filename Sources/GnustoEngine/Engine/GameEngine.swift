@@ -523,7 +523,7 @@ public class GameEngine: Sendable {
             let removeChange = StateChange(
                 entityId: .global,
                 attributeKey: AttributeKey.removeActiveFuse(fuseId: fuseId),
-                oldValue: oldTurns != nil ? StateValue.int(oldTurns!) : nil,
+                oldValue: oldTurns.map { .int($0) },
                 newValue: StateValue.int(0)
             )
             // 3. Apply the StateChange
@@ -893,7 +893,7 @@ public class GameEngine: Sendable {
             let change = StateChange(
                 entityId: .global,
                 attributeKey: .pronounReference(pronoun: pronoun),
-                oldValue: oldSet != nil ? .itemIDSet(oldSet!) : nil,
+                oldValue: oldSet.map { .itemIDSet($0) },
                 newValue: .itemIDSet(newSet)
             )
             do {

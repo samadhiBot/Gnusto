@@ -8,58 +8,6 @@ import Testing
 struct CloseActionHandlerTests {
     let handler = CloseActionHandler()
 
-    // Helper to create the expected StateChange array for successful close
-    private func expectedCloseChanges(
-        itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Change 1: isOpen becomes false
-        changes.append(
-            StateChange(
-                entityId: .item(itemID),
-                attributeKey: .itemAttribute(.isOpen),
-                oldValue: true, // Assume it was open before closing
-                newValue: false
-            )
-        )
-
-        // Change 2: Item touched (if needed)
-        if initialAttributes[.isTouched] != true {
-            changes.append(
-                StateChange(
-                    entityId: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: false,
-                    newValue: true,
-                )
-            )
-        }
-
-        // Change 3: Pronoun "it"
-        changes.append(
-             StateChange(
-                 entityId: .global,
-                 attributeKey: .pronounReference(pronoun: "it"),
-                 oldValue: nil,
-                 newValue: .itemIDSet([itemID])
-             )
-        )
-
-        return changes
-    }
-
-    // Helper to create the expected StateChange for setting isOpen to false
-    private func expectedIsOpenFalseChange(itemID: ItemID) -> StateChange {
-        StateChange(
-            entityId: .item(itemID),
-            attributeKey: .itemAttribute(.isOpen),
-            oldValue: true, // Assumes it was true before closing
-            newValue: false
-        )
-    }
-
     @Test("Close open container successfully")
     func testCloseOpenContainerSuccessfully() async throws {
         let box = Item(
@@ -98,11 +46,29 @@ struct CloseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You close the wooden box.")
+        expectNoDifference(output, "Closed.")
 
         // Assert Change History
-        let expectedChanges = expectedCloseChanges(itemID: "box", initialAttributes: initialBox?.attributes ?? [:])
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        expectNoDifference(engine.gameState.changeHistory, [
+            StateChange(
+                entityId: .item(box.id),
+                attributeKey: .itemAttribute(.isOpen),
+                oldValue: true, // Assume it was open before closing
+                newValue: false
+            ),
+            StateChange(
+                entityId: .item(box.id),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
+            ),
+            StateChange(
+                entityId: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([box.id])
+            ),
+        ])
     }
 
     @Test("Close fails if already closed")
@@ -118,24 +84,24 @@ struct CloseActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [box])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            parser: mockParser,
+            ioHandler: mockIO
         )
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
-        // Act & Assert Error
-        await #expect(throws: ActionError.customResponse("It's already closed.")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
-                )
-            )
-        }
+        // Act: Use engine.execute for full pipeline
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The wooden box is already closed.")
+
+        // Assert Change History
         #expect(engine.gameState.changeHistory.isEmpty)
     }
 
@@ -157,7 +123,7 @@ struct CloseActionHandlerTests {
         let command = Command(verbID: "close", directObject: "rock", rawInput: "close rock")
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemNotOpenable("rock")) {
+        await #expect(throws: ActionError.itemNotClosable("rock")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -214,7 +180,7 @@ struct CloseActionHandlerTests {
         let command = Command(verbID: "close", rawInput: "close")
 
         // Act & Assert Error
-        await #expect(throws: ActionError.customResponse("Close what?")) {
+        await #expect(throws: ActionError.prerequisiteNotMet("Close what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

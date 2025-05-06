@@ -86,7 +86,15 @@ public struct CloseActionHandler: EnhancedActionHandler {
             stateChanges.append(touchedChange)
         }
 
-        // Closing doesn't usually affect pronouns like taking does.
+        // Change 3: Pronoun ("it")
+        let oldPronounValue = await context.engine.getPronounReference(pronoun: "it")
+        let pronounChange = StateChange(
+            entityId: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: oldPronounValue.map { .itemIDSet($0) },
+            newValue: .itemIDSet([targetItemID])
+        )
+        stateChanges.append(pronounChange)
 
         // --- Prepare Result ---
         return ActionResult(
