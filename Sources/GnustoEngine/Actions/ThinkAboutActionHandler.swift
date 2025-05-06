@@ -51,7 +51,7 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
             if targetItem.attributes[.isTouched] != true {
                 let change = StateChange(
                     entityId: .item(targetItemID),
-                    propertyKey: .itemAttribute(.isTouched),
+                    attributeKey: .itemAttribute(.isTouched),
                     oldValue: targetItem.attributes[.isTouched] ?? false,
                     newValue: true,
                 )

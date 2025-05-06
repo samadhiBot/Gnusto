@@ -21,7 +21,7 @@ struct DropActionHandlerTests {
         // Parent change
         changes.append(StateChange(
             entityId: .item(itemID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(initialParent),
             newValue: .parentEntity(.location(newLocation))
         ))
@@ -30,7 +30,7 @@ struct DropActionHandlerTests {
         if !initialTouched {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -40,7 +40,7 @@ struct DropActionHandlerTests {
         if initialWorn {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isWorn),
+                attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false
             ))

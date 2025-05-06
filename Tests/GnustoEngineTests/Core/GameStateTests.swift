@@ -277,7 +277,7 @@ struct GameStateTests {
     func testGameStateBasicCodable() throws {
         var originalState = createInitialState() // Make mutable for change history
         // Add some history for encoding
-        let change1 = StateChange(entityId: .player, propertyKey: .playerScore, newValue: .int(10))
+        let change1 = StateChange(entityId: .player, attributeKey: .playerScore, newValue: .int(10))
         try originalState.apply(change1)
 
         let encoder = JSONEncoder()
@@ -300,7 +300,7 @@ struct GameStateTests {
         #expect(state1 == state2)
 
         // Modify state3 slightly
-        let change = StateChange(entityId: .player, propertyKey: .playerScore, newValue: .int(5))
+        let change = StateChange(entityId: .player, attributeKey: .playerScore, newValue: .int(5))
         try state3.apply(change)
 
         #expect(state1 != state3)
@@ -314,7 +314,7 @@ struct GameStateTests {
         let state2 = state1 // Create a copy (structs are value types)
 
         // Modify state1
-        let change = StateChange(entityId: .player, propertyKey: .playerScore, newValue: .int(10))
+        let change = StateChange(entityId: .player, attributeKey: .playerScore, newValue: .int(10))
         try state1.apply(change)
 
         // Verify state2 remains unchanged
@@ -515,7 +515,7 @@ struct GameStateTests {
         // When: Applying a change to remove the non-existent fuse with oldValue: nil
         let change = StateChange(
             entityId: .global,
-            propertyKey: .removeActiveFuse(fuseId: fuseId),
+            attributeKey: .removeActiveFuse(fuseId: fuseId),
             oldValue: nil, // Explicitly stating we expect it to be nil (non-existent)
             newValue: .int(0) // newValue is often ignored for removals
         )
@@ -539,7 +539,7 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .global,
-            propertyKey: .removeActiveFuse(fuseId: "existingFuse"),
+            attributeKey: .removeActiveFuse(fuseId: "existingFuse"),
             oldValue: .int(1), // Providing the wrong oldValue
             newValue: .int(0) // newValue is ignored for remove
         )
@@ -574,14 +574,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationAttribute(.isLit),
+            attributeKey: .locationAttribute(.isLit),
             oldValue: state.locations["testLoc"]?.attributes[.isLit],
             newValue: true
         )
         try? state.apply(change)
 
         #expect(change.entityId == EntityID.location("testLoc"))
-        #expect(change.propertyKey == StatePropertyKey.locationAttribute(AttributeID.isLit))
+        #expect(change.attributeKey == AttributeKey.locationAttribute(AttributeID.isLit))
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
@@ -598,14 +598,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationAttribute(.isLit),
+            attributeKey: .locationAttribute(.isLit),
             oldValue: true,
             newValue: false
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationAttribute(.isLit))
+        #expect(change.attributeKey == .locationAttribute(.isLit))
         #expect(change.oldValue == true)
         #expect(change.newValue == false)
         // Verify description remains untouched
@@ -622,14 +622,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityId: .location("testLoc"),
-            propertyKey: .locationAttribute(.longDescription),
+            attributeKey: .locationAttribute(.longDescription),
             oldValue: .string("Original Desc"),
             newValue: .string("Updated Desc")
         )
         try? state.apply(change)
 
         #expect(change.entityId == .location("testLoc"))
-        #expect(change.propertyKey == .locationAttribute(.longDescription))
+        #expect(change.attributeKey == .locationAttribute(.longDescription))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
@@ -649,13 +649,13 @@ struct GameStateTests {
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationAttribute(.longDescription),
+            attributeKey: .locationAttribute(.longDescription),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
             entityId: .location("startRoom"),
-            propertyKey: .locationAttribute(.longDescription),
+            attributeKey: .locationAttribute(.longDescription),
             oldValue: state.locations["startRoom"]?.attributes[.longDescription],
             newValue: .string("New Description")
         )

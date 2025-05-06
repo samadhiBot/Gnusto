@@ -1,7 +1,7 @@
 import Foundation
 
 /// Defines the specific state property being modified.
-public enum StatePropertyKey: Codable, Sendable, Hashable {
+public enum AttributeKey: Codable, Sendable, Hashable {
     // Item Properties
     case itemAdjectives
     case itemCapacity
@@ -43,7 +43,7 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
 }
 
 // MARK: - CustomStringConvertible
-extension StatePropertyKey: CustomStringConvertible {
+extension AttributeKey: CustomStringConvertible {
     public var description: String {
         switch self {
         case .addActiveDaemon(let id): "addActiveDaemon(\(id))"

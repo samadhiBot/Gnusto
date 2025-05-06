@@ -47,7 +47,7 @@ struct InsertActionHandlerTests {
         // Change 1: Item parent
         changes.append(StateChange(
             entityId: .item(itemToInsertID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(initialParent),
             newValue: .parentEntity(.item(containerID))
         ))
@@ -56,7 +56,7 @@ struct InsertActionHandlerTests {
         if initialItemAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -66,7 +66,7 @@ struct InsertActionHandlerTests {
         if initialContainerAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -75,7 +75,7 @@ struct InsertActionHandlerTests {
         // Change 4: Pronoun "it"
         changes.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))
@@ -1044,7 +1044,7 @@ struct InsertActionHandlerTests {
         // Assert No State Change (other than taking the box)
         let history = engine.gameState.changeHistory // Use engine instance
         #expect(history.count > 0) // Take action happened
-        #expect(history.last?.propertyKey != .itemParent) // Insert action did not happen
+        #expect(history.last?.attributeKey != .itemParent) // Insert action did not happen
     }
 
     @Test("Insert into deeply nested container that contains itself indirectly")
@@ -1104,7 +1104,7 @@ struct InsertActionHandlerTests {
         // Assert No State Change (other than taking the box)
         let history = engine.gameState.changeHistory // Use engine instance
         #expect(history.count > 0) // Take action happened
-        #expect(history.last?.propertyKey != .itemParent || history.last?.entityId != .item("boxC")) // Insert action did not happen for boxC
+        #expect(history.last?.attributeKey != .itemParent || history.last?.entityId != .item("boxC")) // Insert action did not happen for boxC
     }
 
     // --- Validation Tests (using handler.validate for focused error checks) ---
@@ -1311,7 +1311,7 @@ struct InsertActionHandlerTests {
         // Check history, but don't expect it to be empty due to 'take'
         let history = engine.gameState.changeHistory
         #expect(history.count > 0)
-        #expect(history.last?.propertyKey != .itemParent || history.last?.entityId != .item("boxB")) // Insert didn't happen for boxB
+        #expect(history.last?.attributeKey != .itemParent || history.last?.entityId != .item("boxB")) // Insert didn't happen for boxB
     }
 
     @Test("Insert fails when item is fixed (scenery)")

@@ -38,7 +38,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             ))

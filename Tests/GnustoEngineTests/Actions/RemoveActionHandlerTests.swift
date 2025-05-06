@@ -54,19 +54,19 @@ struct RemoveActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemParent,
+                attributeKey: .itemParent,
                 oldValue: .parentEntity(.player),
                 newValue: .parentEntity(.location("startRoom"))
             ),
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemAttribute(.isWorn),
+                attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false
             ),
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true
             ),

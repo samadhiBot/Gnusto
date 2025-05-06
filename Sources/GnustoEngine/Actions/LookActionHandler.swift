@@ -87,7 +87,7 @@ public struct LookActionHandler: EnhancedActionHandler {
         {
             let propertiesChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched), // Use dynamic value key
+                attributeKey: .itemAttribute(.isTouched), // Use dynamic value key
                 oldValue: snapshotItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )

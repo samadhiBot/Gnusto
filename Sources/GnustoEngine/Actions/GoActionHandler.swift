@@ -67,7 +67,7 @@ public struct GoActionHandler: EnhancedActionHandler {
 
         let change = StateChange(
             entityId: .player,
-            propertyKey: .playerLocation,
+            attributeKey: .playerLocation,
             oldValue: .locationID(oldLocationID),
             newValue: .locationID(newLocationID)
         )

@@ -109,7 +109,7 @@ struct GameEngineTests {
         // Check change history only contains the move increment
         let history = engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on parse error")
-        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
     }
 
@@ -187,7 +187,7 @@ struct GameEngineTests {
         // Check change history only contains the move increment
         let history = engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on action error")
-        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
     }
 
@@ -545,14 +545,14 @@ struct GameEngineTests {
                 // Define multiple changes
                 let change1 = StateChange(
                     entityId: .item(itemIDToModify),
-                    propertyKey: .itemAttribute(.isTouched),
+                    attributeKey: .itemAttribute(.isTouched),
                     oldValue: item.attributes[.isTouched],
                     newValue: true,
                 )
 
                 let change2 = StateChange(
                     entityId: .item(itemIDToModify),
-                    propertyKey: .itemAttribute(.isOn),
+                    attributeKey: .itemAttribute(.isOn),
                     oldValue: item.attributes[.isOn],
                     newValue: true,
                 )
@@ -565,7 +565,7 @@ struct GameEngineTests {
 
                 let change3 = StateChange(
                     entityId: .global,
-                    propertyKey: .setFlag(flagID),
+                    attributeKey: .setFlag(flagID),
                     oldValue: flagOldValueState,
                     newValue: true,
                 )
@@ -642,7 +642,7 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.propertyKey == StatePropertyKey.playerMoves && change.newValue == StateValue.int(1)
+                change.attributeKey == AttributeKey.playerMoves && change.newValue == StateValue.int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -651,7 +651,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityId == .item(testItemID),
-                      case .itemAttribute(let prop) = change.propertyKey,
+                      case .itemAttribute(let prop) = change.attributeKey,
                       change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
             },
@@ -662,7 +662,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityId == .global &&
-                    change.propertyKey == StatePropertyKey.setFlag(testFlagKey) &&
+                    change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
                     change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
@@ -1249,13 +1249,13 @@ struct GameEngineTests {
         let turnOnChanges = [
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isOn),
+                attributeKey: .itemAttribute(.isOn),
                 oldValue: false,
                 newValue: true,
             ),
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: nil, // Assuming not touched initially
                 newValue: true,
             )

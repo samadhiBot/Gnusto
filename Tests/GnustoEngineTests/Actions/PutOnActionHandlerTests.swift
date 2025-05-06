@@ -36,7 +36,7 @@ struct PutOnActionHandlerTests {
         // Change 1: Item parent
         changes.append(StateChange(
             entityId: .item(itemToPutID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.item(surfaceID))
         ))
@@ -45,7 +45,7 @@ struct PutOnActionHandlerTests {
         if oldItemAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(itemToPutID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -55,7 +55,7 @@ struct PutOnActionHandlerTests {
         if oldSurfaceAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(surfaceID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -64,7 +64,7 @@ struct PutOnActionHandlerTests {
         // Change 4: Pronoun "it"
         changes.append(StateChange(
             entityId: .global, // Pronoun is global
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToPutID])
         ))

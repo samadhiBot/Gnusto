@@ -65,7 +65,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
@@ -75,7 +75,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isOn] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isOn),
+                attributeKey: .itemAttribute(.isOn),
                 oldValue: targetItem.attributes[.isOn] ?? false,
                 newValue: true,
             ))

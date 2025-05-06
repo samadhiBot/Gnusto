@@ -88,7 +88,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
             entityId: .item(itemToInsertID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(oldParent),
             newValue: .parentEntity(newParent)
         ))
@@ -97,7 +97,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         if itemToInsertSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: itemToInsertSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
@@ -107,7 +107,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         if containerSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: containerSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
@@ -116,7 +116,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Change 4: Update pronoun "it"
         stateChanges.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))

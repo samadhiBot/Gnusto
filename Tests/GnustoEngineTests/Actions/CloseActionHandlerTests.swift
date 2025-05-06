@@ -19,7 +19,7 @@ struct CloseActionHandlerTests {
         changes.append(
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isOpen),
+                attributeKey: .itemAttribute(.isOpen),
                 oldValue: true, // Assume it was open before closing
                 newValue: false
             )
@@ -30,7 +30,7 @@ struct CloseActionHandlerTests {
             changes.append(
                 StateChange(
                     entityId: .item(itemID),
-                    propertyKey: .itemAttribute(.isTouched),
+                    attributeKey: .itemAttribute(.isTouched),
                     oldValue: false,
                     newValue: true,
                 )
@@ -41,7 +41,7 @@ struct CloseActionHandlerTests {
         changes.append(
              StateChange(
                  entityId: .global,
-                 propertyKey: .pronounReference(pronoun: "it"),
+                 attributeKey: .pronounReference(pronoun: "it"),
                  oldValue: nil,
                  newValue: .itemIDSet([itemID])
              )
@@ -54,7 +54,7 @@ struct CloseActionHandlerTests {
     private func expectedIsOpenFalseChange(itemID: ItemID) -> StateChange {
         StateChange(
             entityId: .item(itemID),
-            propertyKey: .itemAttribute(.isOpen),
+            attributeKey: .itemAttribute(.isOpen),
             oldValue: true, // Assumes it was true before closing
             newValue: false
         )

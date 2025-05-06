@@ -77,7 +77,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isLocked] == true {
             let lockedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isLocked),
+                attributeKey: .itemAttribute(.isLocked),
                 oldValue: true,
                 newValue: false
             )
@@ -88,7 +88,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isTouched] != true {
             let targetTouchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )
@@ -99,7 +99,7 @@ public struct UnlockActionHandler: EnhancedActionHandler {
         if keyItem.attributes[.isTouched] != true {
             let keyTouchedChange = StateChange(
                 entityId: .item(keyItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: keyItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )

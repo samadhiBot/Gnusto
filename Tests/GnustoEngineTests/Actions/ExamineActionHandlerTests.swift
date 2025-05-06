@@ -12,12 +12,12 @@ struct ExamineActionHandlerTests {
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
-        let isTouchedKey = StatePropertyKey.itemAttribute(.isTouched)
+        let isTouchedKey = AttributeKey.itemAttribute(.isTouched)
         if initialAttributes?[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityId: .item(itemID),
-                    propertyKey: .itemAttribute(.isTouched),
+                    attributeKey: .itemAttribute(.isTouched),
                     oldValue: initialAttributes?[.isTouched] ?? false,
                     newValue: true,
                 )
@@ -27,7 +27,7 @@ struct ExamineActionHandlerTests {
         changes.append(
              StateChange(
                  entityId: .global,
-                 propertyKey: .pronounReference(pronoun: "it"),
+                 attributeKey: .pronounReference(pronoun: "it"),
                  oldValue: nil,
                  newValue: .itemIDSet([itemID])
              )

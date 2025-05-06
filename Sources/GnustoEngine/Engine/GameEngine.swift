@@ -218,7 +218,7 @@ public class GameEngine: Sendable {
             let oldMoves = gameState.player.moves
             let change = StateChange(
                 entityId: .player,
-                propertyKey: StatePropertyKey.playerMoves,
+                attributeKey: AttributeKey.playerMoves,
                 oldValue: StateValue.int(oldMoves),
                 newValue: StateValue.int(oldMoves + 1)
             )
@@ -285,7 +285,7 @@ public class GameEngine: Sendable {
             // Create StateChange to update persistent state
             let updateChange = StateChange(
                 entityId: .global,
-                propertyKey: StatePropertyKey.updateFuseTurns(fuseId: id),
+                attributeKey: AttributeKey.updateFuseTurns(fuseId: id),
                 oldValue: StateValue.int(oldTurns),
                 newValue: StateValue.int(newTurns)
             )
@@ -303,7 +303,7 @@ public class GameEngine: Sendable {
                 // Create StateChange to remove from persistent state
                 let removeChange = StateChange(
                     entityId: .global,
-                    propertyKey: StatePropertyKey.removeActiveFuse(fuseId: id),
+                    attributeKey: AttributeKey.removeActiveFuse(fuseId: id),
                     oldValue: StateValue.int(oldTurns),
                     newValue: StateValue.int(0)
                 )
@@ -552,7 +552,7 @@ public class GameEngine: Sendable {
             // 3. Create StateChange to add to persistent state
             let addChange = StateChange(
                 entityId: .global,
-                propertyKey: StatePropertyKey.addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
+                attributeKey: AttributeKey.addActiveFuse(fuseId: fuseId, initialTurns: initialTurns),
                 // No oldValue for add
                 newValue: StateValue.int(initialTurns)
             )
@@ -567,7 +567,7 @@ public class GameEngine: Sendable {
             // 2. Create StateChange to remove from persistent state
             let removeChange = StateChange(
                 entityId: .global,
-                propertyKey: StatePropertyKey.removeActiveFuse(fuseId: fuseId),
+                attributeKey: AttributeKey.removeActiveFuse(fuseId: fuseId),
                 oldValue: oldTurns != nil ? StateValue.int(oldTurns!) : nil,
                 newValue: StateValue.int(0)
             )
@@ -587,7 +587,7 @@ public class GameEngine: Sendable {
             if !isAlreadyActive {
                 let addDaemonChange = StateChange(
                     entityId: .global,
-                    propertyKey: StatePropertyKey.addActiveDaemon(daemonId: daemonId),
+                    attributeKey: AttributeKey.addActiveDaemon(daemonId: daemonId),
                     oldValue: false,
                     newValue: true
                 )
@@ -602,7 +602,7 @@ public class GameEngine: Sendable {
             if wasActive {
                 let removeDaemonChange = StateChange(
                     entityId: .global,
-                    propertyKey: StatePropertyKey.removeActiveDaemon(daemonId: daemonId),
+                    attributeKey: AttributeKey.removeActiveDaemon(daemonId: daemonId),
                     oldValue: true,
                     newValue: false
                 )
@@ -891,7 +891,7 @@ public class GameEngine: Sendable {
         if !gameState.flags.contains(id) {
             let change = StateChange(
                 entityId: .global,
-                propertyKey: .setFlag(id),
+                attributeKey: .setFlag(id),
                 oldValue: false, // Expecting it was false
                 newValue: true,
             )
@@ -913,7 +913,7 @@ public class GameEngine: Sendable {
         if gameState.flags.contains(id) {
             let change = StateChange(
                 entityId: .global,
-                propertyKey: .clearFlag(id),
+                attributeKey: .clearFlag(id),
                 oldValue: true, // Expecting it was true
                 newValue: false
             )
@@ -937,7 +937,7 @@ public class GameEngine: Sendable {
         if oldSet != newSet {
             let change = StateChange(
                 entityId: .global,
-                propertyKey: .pronounReference(pronoun: pronoun),
+                attributeKey: .pronounReference(pronoun: pronoun),
                 oldValue: oldSet != nil ? .itemIDSet(oldSet!) : nil,
                 newValue: .itemIDSet(newSet)
             )
@@ -990,7 +990,7 @@ public class GameEngine: Sendable {
         if oldParent != newParent {
             let change = StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemParent,
+                attributeKey: .itemParent,
                 oldValue: .parentEntity(oldParent),
                 newValue: .parentEntity(newParent)
             )
@@ -1020,7 +1020,7 @@ public class GameEngine: Sendable {
         if oldLocationID != newLocationID {
             let change = StateChange(
                 entityId: .player,
-                propertyKey: .playerLocation,
+                attributeKey: .playerLocation,
                 oldValue: .locationID(oldLocationID),
                 newValue: .locationID(newLocationID)
             )
@@ -1083,7 +1083,7 @@ public class GameEngine: Sendable {
         if value != oldValue {
             let change = StateChange( // Add explicit type
                 entityId: .global,
-                propertyKey: StatePropertyKey.gameSpecificState(key: key), // Use GameStateKey
+                attributeKey: AttributeKey.gameSpecificState(key: key), // Use GameStateKey
                 oldValue: oldValue, // Pass the existing StateValue? as oldValue
                 newValue: value
             )
@@ -1226,7 +1226,7 @@ extension GameEngine {
         if oldValue != newValue {
             let change = StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(key), // Use the new key
+                attributeKey: .itemAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
             )
@@ -1267,7 +1267,7 @@ extension GameEngine {
         if oldValue != newValue {
             let change = StateChange(
                 entityId: .location(locationID),
-                propertyKey: .locationAttribute(key), // Use the new key
+                attributeKey: .locationAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
             )

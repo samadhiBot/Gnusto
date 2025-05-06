@@ -12,7 +12,7 @@ struct ActionResultTests {
     // --- Simple Examples for Initialization Tests ---
     let simpleChange = StateChange(
         entityId: .item("lamp"),
-        propertyKey: .itemAttribute(.isOn),
+        attributeKey: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
@@ -27,19 +27,19 @@ struct ActionResultTests {
     // so it needs to be accessed within a test method or be computed.
     private let change1 = StateChange(
         entityId: .item("lamp"),
-        propertyKey: .itemAttribute(.isOn),
+        attributeKey: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
     private let change2 = StateChange(
         entityId: .item("lamp"),
-        propertyKey: .itemAttribute(.isTouched),
+        attributeKey: .itemAttribute(.isTouched),
         oldValue: false,
         newValue: true
     )
     private let change3 = StateChange(
         entityId: .location("cave"),
-        propertyKey: .locationAttribute(.isVisited), // Corrected: .isVisited
+        attributeKey: .locationAttribute(.isVisited), // Corrected: .isVisited
         oldValue: false,
         newValue: true
     )
@@ -58,13 +58,13 @@ struct ActionResultTests {
     let turnOnLampChanges = [
         StateChange(
             entityId: .item("lamp"),
-            propertyKey: .itemAttribute(.isOn),
+            attributeKey: .itemAttribute(.isOn),
             oldValue: false,
             newValue: true
         ),
         StateChange( // Mark cave visited when lamp is turned on (example)
             entityId: .location("cave"),
-            propertyKey: .locationAttribute(.isVisited),
+            attributeKey: .locationAttribute(.isVisited),
             oldValue: false,
             newValue: true
         )
@@ -106,13 +106,13 @@ struct ActionResultTests {
     func testStateChangeInitializationFull() {
         let change = StateChange(
             entityId: .item("door"),
-            propertyKey: .itemAttribute(.isOpen),
+            attributeKey: .itemAttribute(.isOpen),
             oldValue: false,
             newValue: true
         )
 
         #expect(change.entityId == .item("door"))
-        #expect(change.propertyKey == .itemAttribute(.isOpen))
+        #expect(change.attributeKey == .itemAttribute(.isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
     }
@@ -121,12 +121,12 @@ struct ActionResultTests {
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
             entityId: .player,
-            propertyKey: .playerScore,
+            attributeKey: .playerScore,
             newValue: StateValue.int(10)
         )
 
         #expect(change.entityId == .player)
-        #expect(change.propertyKey == .playerScore)
+        #expect(change.attributeKey == .playerScore)
         #expect(change.oldValue == nil)
         #expect(change.newValue == StateValue.int(10))
     }
@@ -135,12 +135,12 @@ struct ActionResultTests {
     func testStateChangeInitializationSetFlag() {
         let change = StateChange(
             entityId: .global,
-            propertyKey: .setFlag("lightsOut"),
+            attributeKey: .setFlag("lightsOut"),
             oldValue: false,
             newValue: true
         )
 
-        #expect(change.propertyKey == StatePropertyKey.setFlag("lightsOut"))
+        #expect(change.attributeKey == AttributeKey.setFlag("lightsOut"))
         #expect(change.newValue == true)
         #expect(change.oldValue == false)
     }
@@ -149,12 +149,12 @@ struct ActionResultTests {
     func testStateChangeInitializationGameSpecific() {
         let change = StateChange(
             entityId: .global,
-            propertyKey: .gameSpecificState(key: "puzzleCounter"),
+            attributeKey: .gameSpecificState(key: "puzzleCounter"),
             oldValue: StateValue.int(5),
             newValue: StateValue.int(6)
         )
 
-        #expect(change.propertyKey == StatePropertyKey.gameSpecificState(key: "puzzleCounter"))
+        #expect(change.attributeKey == AttributeKey.gameSpecificState(key: "puzzleCounter"))
         #expect(change.newValue == StateValue.int(6))
     }
 
@@ -213,12 +213,12 @@ struct ActionResultTests {
         }
     }
 
-    @Test("StatePropertyKey Codable Conformance")
-    func testStatePropertyKeyCodable() throws {
+    @Test("StateattributeKey Codable Conformance")
+    func testStateattributeKeyCodable() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
-        let keys: [StatePropertyKey] = [
+        let keys: [AttributeKey] = [
             .itemAttribute(.adjectives),
             .itemAttribute(.capacity),
             .itemAttribute(.isContainer),
@@ -233,7 +233,7 @@ struct ActionResultTests {
 
         for key in keys {
             let encodedData = try encoder.encode(key)
-            let decodedKey = try decoder.decode(StatePropertyKey.self, from: encodedData)
+            let decodedKey = try decoder.decode(AttributeKey.self, from: encodedData)
             #expect(decodedKey == key, "Failed for \(key)")
         }
     }
@@ -249,7 +249,7 @@ struct ActionResultTests {
     ) -> StateChange {
         StateChange(
             entityId: .item(id),
-            propertyKey: .itemAttribute(key),
+            attributeKey: .itemAttribute(key),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -264,7 +264,7 @@ struct ActionResultTests {
     ) -> StateChange {
         StateChange(
             entityId: .location(id),
-            propertyKey: .locationAttribute(key),
+            attributeKey: .locationAttribute(key),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -272,11 +272,11 @@ struct ActionResultTests {
 
     // Helper to create a simple global change
     private func createGlobalChange(
-        key: StatePropertyKey,
+        key: AttributeKey,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
-        StateChange(entityId: .global, propertyKey: key, oldValue: oldValue, newValue: newValue)
+        StateChange(entityId: .global, attributeKey: key, oldValue: oldValue, newValue: newValue)
     }
 
     // Example tests assuming an `ActionResult.merged(with:)` method exists
@@ -302,8 +302,8 @@ struct ActionResultTests {
         // let mergedResult = try result1.merged(with: result2)
         // #expect(mergedResult.message == "First action.\nSecond action.") // Example merge logic
         // #expect(mergedResult.changes.count == 2)
-        // #expect(mergedResult.changes.contains { $0.propertyKey == .itemAttribute(.isOn) })
-        // #expect(mergedResult.changes.contains { $0.propertyKey == .locationAttribute(.isVisited) })
+        // #expect(mergedResult.changes.contains { $0.attributeKey == .itemAttribute(.isOn) })
+        // #expect(mergedResult.changes.contains { $0.attributeKey == .locationAttribute(.isVisited) })
         // #expect(mergedResult.success == true) // Both successful
     }
 
@@ -328,7 +328,7 @@ struct ActionResultTests {
         // #expect(mergedResult.changes.count == 1) // Should coalesce
         // let finalChange = try #require(mergedResult.changes.first)
         // #expect(finalChange.entityId == .item("lamp"))
-        // #expect(finalChange.propertyKey == .itemAttribute(.isOn))
+        // #expect(finalChange.attributeKey == .itemAttribute(.isOn))
         // #expect(finalChange.oldValue == false) // Original old value from result1
         // #expect(finalChange.newValue == false) // Final new value from result2
     }
@@ -364,7 +364,7 @@ struct ActionResultTests {
             stateChanges: [
                  StateChange(
                     entityId: .item("lamp"),
-                    propertyKey: .itemAttribute(.isOn),
+                    attributeKey: .itemAttribute(.isOn),
                     oldValue: false, // Expects OFF
                     newValue: true
                 )
@@ -388,7 +388,7 @@ struct ActionResultTests {
             stateChanges: turnOnLampChanges + [
                  StateChange(
                     entityId: .global,
-                    propertyKey: .playerLocation,
+                    attributeKey: .playerLocation,
                     oldValue: .locationID("start"),
                     newValue: .locationID("cave")
                  )

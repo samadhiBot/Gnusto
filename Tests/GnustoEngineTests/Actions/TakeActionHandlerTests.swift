@@ -20,7 +20,7 @@ struct TakeActionHandlerTests {
             // Parent change
             StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemParent,
+                attributeKey: .itemParent,
                 oldValue: .parentEntity(initialParent),
                 newValue: .parentEntity(finalParent)
             ),
@@ -43,7 +43,7 @@ struct TakeActionHandlerTests {
             if oldValue != newValue {
                 changes.append(StateChange(
                     entityId: .item(itemID),
-                    propertyKey: .itemAttribute(key),
+                    attributeKey: .itemAttribute(key),
                     oldValue: oldValue,
                     newValue: newValue
                 ))
@@ -53,7 +53,7 @@ struct TakeActionHandlerTests {
         // Add pronoun change (assuming 'it' always refers to the taken item now)
         changes.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
             newValue: .itemIDSet([itemID])
         ))
@@ -63,13 +63,13 @@ struct TakeActionHandlerTests {
         if initialIsTouched != true { // Correctly compares Optional != Non-optional
             let touchedChange = StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: initialIsTouched, // Keep original old value (nil or false)
                 newValue: true,
             )
 
             // Avoid adding duplicate change if already handled by the general attribute comparison
-            if let existingIndex = changes.firstIndex(where: { $0.propertyKey == .itemAttribute(.isTouched) }) {
+            if let existingIndex = changes.firstIndex(where: { $0.attributeKey == .itemAttribute(.isTouched) }) {
                 // If a change exists, make sure its newValue is true
                 if changes[existingIndex].newValue != true {
                     changes[existingIndex] = touchedChange
@@ -676,7 +676,7 @@ struct TakeActionHandlerTests {
         // Since isTouched was already true, no change for it should be generated.
         // Only parent and pronoun changes are expected.
         #expect(expectedChanges.count == 2, "Expected only parent and pronoun changes")
-        #expect(!expectedChanges.contains { $0.propertyKey == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
+        #expect(!expectedChanges.contains { $0.attributeKey == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
         expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
     }
 

@@ -287,7 +287,7 @@ struct GoActionHandlerTests {
         let change = StateChange(
             entityId: .global, // Use .global for game-specific flags
             // Use .setFlag property key
-            propertyKey: .setFlag(conditionFlagID), 
+            attributeKey: .setFlag(conditionFlagID), 
             oldValue: false, // Expect flag was not set
             newValue: true, // Set flag to true
         )

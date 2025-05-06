@@ -84,7 +84,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         // Change 1: Parent
         let parentChange = StateChange(
             entityId: .item(targetItemID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(targetItem.parent),
             newValue: .parentEntity(.player)
         )
@@ -94,7 +94,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         if targetItem.attributes[.isTouched] != true {
             let touchedChange = StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             )
@@ -105,7 +105,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
         let oldPronounValue = await context.engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounValue != nil ? .itemIDSet(oldPronounValue!) : nil,
             newValue: .itemIDSet([targetItemID])
         )

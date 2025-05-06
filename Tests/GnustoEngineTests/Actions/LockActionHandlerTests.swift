@@ -24,7 +24,7 @@ struct LockActionHandlerTests {
         if !initialTargetLocked {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isLocked),
+                attributeKey: .itemAttribute(.isLocked),
                 oldValue: false,
                 newValue: true,
             ))
@@ -34,7 +34,7 @@ struct LockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -44,7 +44,7 @@ struct LockActionHandlerTests {
         if !initialKeyTouched {
             changes.append(StateChange(
                 entityId: .item(keyItemID),
-                propertyKey: .itemAttribute(.isTouched),
+                attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ))
@@ -53,7 +53,7 @@ struct LockActionHandlerTests {
         // Add pronoun change
         changes.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil, // Assuming previous 'it' is irrelevant
             newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target relevant
         ))
