@@ -10,7 +10,7 @@ enum Hooks {
     /// Custom logic that runs when the player enters a room.
     /// - Parameters:
     ///   - engine: The game engine.
-    ///   - locationID: The ID of the location being entered.
+    ///   - locationID: The unique identifier of the location being entered.
     static func onEnterRoom(engine: GameEngine, locationID: LocationID) async -> Bool {
         // Use safe accessors
         let visitedTreasureFlag: FlagID = "visited_treasure_room"

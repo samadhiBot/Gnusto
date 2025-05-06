@@ -78,7 +78,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         // Change 2: Set `.isTouched` flag if not already set
         if targetItem.attributes[.isTouched] != true {
             let touchedChange = StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false, // Current value (or default false)
                 newValue: true,
@@ -89,7 +89,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         // Change 3: Pronoun ("it")
         let oldPronounValue = await context.engine.getPronounReference(pronoun: "it")
         let pronounChange = StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .pronounReference(pronoun: "it"),
             oldValue: oldPronounValue.map { .itemIDSet($0) },
             newValue: .itemIDSet([targetItemID])

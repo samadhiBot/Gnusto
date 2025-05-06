@@ -11,14 +11,14 @@ struct ActionResultTests {
 
     // --- Simple Examples for Initialization Tests ---
     let simpleChange = StateChange(
-        entityId: .item("lamp"),
+        entityID: .item("lamp"),
         attributeKey: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
     let simpleEffect = SideEffect(
-        type: .startFuse, // Example type
-        targetId: "bomb",
+        type: .startFuse,
+        targetID: .fuse("bomb"),
         parameters: ["duration": .int(10)]
     )
 
@@ -26,19 +26,19 @@ struct ActionResultTests {
     // Note: These are now instance properties. `testResult` uses them,
     // so it needs to be accessed within a test method or be computed.
     private let change1 = StateChange(
-        entityId: .item("lamp"),
+        entityID: .item("lamp"),
         attributeKey: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
     private let change2 = StateChange(
-        entityId: .item("lamp"),
+        entityID: .item("lamp"),
         attributeKey: .itemAttribute(.isTouched),
         oldValue: false,
         newValue: true
     )
     private let change3 = StateChange(
-        entityId: .location("cave"),
+        entityID: .location("cave"),
         attributeKey: .locationAttribute(.isVisited), // Corrected: .isVisited
         oldValue: false,
         newValue: true
@@ -57,13 +57,13 @@ struct ActionResultTests {
     // --- More Complex Examples for Apply/Validation ---
     let turnOnLampChanges = [
         StateChange(
-            entityId: .item("lamp"),
+            entityID: .item("lamp"),
             attributeKey: .itemAttribute(.isOn),
             oldValue: false,
             newValue: true
         ),
         StateChange( // Mark cave visited when lamp is turned on (example)
-            entityId: .location("cave"),
+            entityID: .location("cave"),
             attributeKey: .locationAttribute(.isVisited),
             oldValue: false,
             newValue: true
@@ -105,13 +105,13 @@ struct ActionResultTests {
     @Test("StateChange Initialization - Full")
     func testStateChangeInitializationFull() {
         let change = StateChange(
-            entityId: .item("door"),
+            entityID: .item("door"),
             attributeKey: .itemAttribute(.isOpen),
             oldValue: false,
             newValue: true
         )
 
-        #expect(change.entityId == .item("door"))
+        #expect(change.entityID == .item("door"))
         #expect(change.attributeKey == .itemAttribute(.isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
@@ -120,12 +120,12 @@ struct ActionResultTests {
     @Test("StateChange Initialization - No Old Value")
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
-            entityId: .player,
+            entityID: .player,
             attributeKey: .playerScore,
             newValue: StateValue.int(10)
         )
 
-        #expect(change.entityId == .player)
+        #expect(change.entityID == .player)
         #expect(change.attributeKey == .playerScore)
         #expect(change.oldValue == nil)
         #expect(change.newValue == StateValue.int(10))
@@ -134,7 +134,7 @@ struct ActionResultTests {
     @Test("StateChange Initialization - Set Flag")
     func testStateChangeInitializationSetFlag() {
         let change = StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .setFlag("lightsOut"),
             oldValue: false,
             newValue: true
@@ -148,7 +148,7 @@ struct ActionResultTests {
     @Test("StateChange Initialization - Game Specific")
     func testStateChangeInitializationGameSpecific() {
         let change = StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .gameSpecificState(key: "puzzleCounter"),
             oldValue: StateValue.int(5),
             newValue: StateValue.int(6)
@@ -162,7 +162,7 @@ struct ActionResultTests {
     func testSideEffectInitializationFull() {
         let effect = SideEffect(
             type: .runDaemon,
-            targetId: "clock", // Assuming ItemID
+            targetID: .daemon("clock"),
             parameters: [
                 "interval": .int(60),
                 "message": .string("Tick tock")
@@ -170,7 +170,7 @@ struct ActionResultTests {
         )
 
         #expect(effect.type == .runDaemon)
-        #expect(effect.targetId == "clock")
+        #expect(effect.targetID == .daemon("clock"))
         #expect(effect.parameters.count == 2)
         #expect(effect.parameters["interval"] == .int(60))
         #expect(effect.parameters["message"] == .string("Tick tock"))
@@ -180,11 +180,11 @@ struct ActionResultTests {
     func testSideEffectInitializationWithDefaultParameters() {
         let effect = SideEffect(
             type: .stopDaemon,
-            targetId: "clock" // Assuming ItemID
+            targetID: .daemon("clock")
         )
 
         #expect(effect.type == .stopDaemon)
-        #expect(effect.targetId == "clock")
+        #expect(effect.targetID == .daemon("clock"))
         #expect(effect.parameters.isEmpty == true)
     }
 
@@ -248,7 +248,7 @@ struct ActionResultTests {
         newValue: StateValue
     ) -> StateChange {
         StateChange(
-            entityId: .item(id),
+            entityID: .item(id),
             attributeKey: .itemAttribute(key),
             oldValue: oldValue,
             newValue: newValue
@@ -263,7 +263,7 @@ struct ActionResultTests {
         newValue: StateValue
     ) -> StateChange {
         StateChange(
-            entityId: .location(id),
+            entityID: .location(id),
             attributeKey: .locationAttribute(key),
             oldValue: oldValue,
             newValue: newValue
@@ -276,7 +276,7 @@ struct ActionResultTests {
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
-        StateChange(entityId: .global, attributeKey: key, oldValue: oldValue, newValue: newValue)
+        StateChange(entityID: .global, attributeKey: key, oldValue: oldValue, newValue: newValue)
     }
 
     // Example tests assuming an `ActionResult.merged(with:)` method exists
@@ -327,7 +327,7 @@ struct ActionResultTests {
         // let mergedResult = try result1.merged(with: result2)
         // #expect(mergedResult.changes.count == 1) // Should coalesce
         // let finalChange = try #require(mergedResult.changes.first)
-        // #expect(finalChange.entityId == .item("lamp"))
+        // #expect(finalChange.entityID == .item("lamp"))
         // #expect(finalChange.attributeKey == .itemAttribute(.isOn))
         // #expect(finalChange.oldValue == false) // Original old value from result1
         // #expect(finalChange.newValue == false) // Final new value from result2
@@ -363,7 +363,7 @@ struct ActionResultTests {
             message: "Turn on lamp.",
             stateChanges: [
                  StateChange(
-                    entityId: .item("lamp"),
+                    entityID: .item("lamp"),
                     attributeKey: .itemAttribute(.isOn),
                     oldValue: false, // Expects OFF
                     newValue: true
@@ -387,7 +387,7 @@ struct ActionResultTests {
             message: "Applied changes.",
             stateChanges: turnOnLampChanges + [
                  StateChange(
-                    entityId: .global,
+                    entityID: .global,
                     attributeKey: .playerLocation,
                     oldValue: .locationID("start"),
                     newValue: .locationID("cave")
@@ -413,12 +413,11 @@ struct ActionResultTests {
 
     // Corrected SideEffect initialization:
     let sideEffect1 = SideEffect(
-        type: .scheduleEvent, // Use generic schedule type
-        targetId: "fuse",     // Target can be an ID related to the event
+        type: .scheduleEvent,
+        targetID: .fuse("fuse"),
         parameters: [
-            "turns": .int(5), // Specify details in parameters
-            // Action might need encoding/representation if needed here
-            "eventName": .string("FuseBurnDown") // Example parameter
+            "turns": .int(5),
+            "eventName": .string("FuseBurnDown")
         ]
     )
 
@@ -444,7 +443,7 @@ struct ActionResultTests {
         // Check if the side effect is the correct type and has params
         let effect = resultWithChangesAndEffects.sideEffects.first
         #expect(effect?.type == .scheduleEvent)
-        #expect(effect?.targetId == "fuse")
+        #expect(effect?.targetID == .fuse("fuse"))
         #expect(effect?.parameters["turns"] == .int(5))
         #expect(effect?.parameters["eventName"] == .string("FuseBurnDown"))
     }

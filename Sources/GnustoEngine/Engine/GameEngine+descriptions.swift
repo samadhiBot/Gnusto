@@ -8,7 +8,7 @@ extension GameEngine {
     /// Retrieves the raw string using `engine.getDynamicItemValue` and applies formatting.
     ///
     /// - Parameters:
-    ///   - itemID: The ID of the item.
+    ///   - itemID: The unique identifier of the item.
     ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.
@@ -53,7 +53,7 @@ extension GameEngine {
     /// Retrieves the raw string using `engine.getDynamicLocationValue` and applies formatting.
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location.
+    ///   - locationID: The unique identifier of the location.
     ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.

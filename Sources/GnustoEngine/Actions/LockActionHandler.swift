@@ -78,7 +78,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         // Change 1: Add .locked to target (if not already set)
         if targetItem.attributes[.isLocked] != true {
             let lockedChange = StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isLocked),
                 oldValue: targetItem.attributes[.isLocked] ?? false,
                 newValue: true,
@@ -89,7 +89,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         // Change 2: Add .touched to target (if not already set)
         if targetItem.attributes[.isTouched] != true {
             let targetTouchedChange = StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -100,7 +100,7 @@ public struct LockActionHandler: EnhancedActionHandler {
         // Change 3: Add .touched to key (if not already set)
         if keyItem.attributes[.isTouched] != true {
             let keyTouchedChange = StateChange(
-                entityId: .item(keyItemID),
+                entityID: .item(keyItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: keyItem.attributes[.isTouched] ?? false,
                 newValue: true,

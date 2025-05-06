@@ -10,7 +10,7 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
 
 - [x] **Generalize `StateChange` Identifier:**
   - [x] Define `EntityID` enum (`.item(ItemID)`, `.location(LocationID)`, `.player`, `.global`) in `ActionResult.swift`.
-  - [x] Update `StateChange` struct to use `entityId: EntityID` instead of `objectId: ItemID`.
+  - [x] Update `StateChange` struct to use `entityID: EntityID` instead of `objectId: ItemID`.
   - [x] Review and update `StatePropertyKey` enum cases to align with `EntityID` (e.g., ensure keys clearly map to item, location, player, or global state). Add missing keys like `.locationExits` if needed, along with corresponding `StateValue` cases.
 - [x] **Implement `GameState.apply(_:)`:**
   - [x] Add `public private(set)` access control to core state properties in `GameState` (`items`, `locations`, `flags`, `player`, `activeFuses`, `activeDaemons`, `pronouns`, `gameSpecificState`, `changeHistory`).

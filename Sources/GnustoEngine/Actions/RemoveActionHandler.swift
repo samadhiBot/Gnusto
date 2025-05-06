@@ -44,7 +44,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         // Change 1: Set `.isWorn` to false
         if itemSnapshot.attributes[.isWorn] == true { // Only change if currently worn
             stateChanges.append(StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false
@@ -54,7 +54,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
         // Change 2: Set `.isTouched` to true (if not already)
         if itemSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: itemSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -63,7 +63,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
 
         // Update pronoun "it"
         stateChanges.append(StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([targetItemID])

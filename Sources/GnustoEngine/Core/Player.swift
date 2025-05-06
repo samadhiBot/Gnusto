@@ -3,7 +3,7 @@ public struct Player: Codable, Equatable, Sendable {
     /// The maximum weight/size the player can carry.
     public var carryingCapacity: Int = 100 // Example, could be based on SIZE props
 
-    /// The ID of the location the player is currently in.
+    /// The unique identifier of the location the player is currently in.
     public var currentLocationID: LocationID
 
     /// The player's current health or state (e.g., normal, stunned, dead). We can refine this.

@@ -66,7 +66,7 @@ public struct GoActionHandler: EnhancedActionHandler {
         let newLocationID = exit.destination
 
         let change = StateChange(
-            entityId: .player,
+            entityID: .player,
             attributeKey: .playerLocation,
             oldValue: .locationID(oldLocationID),
             newValue: .locationID(newLocationID)

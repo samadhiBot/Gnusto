@@ -87,7 +87,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         let oldParent = itemToInsertSnapshot.parent // Should be .player
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
-            entityId: .item(itemToInsertID),
+            entityID: .item(itemToInsertID),
             attributeKey: .itemParent,
             oldValue: .parentEntity(oldParent),
             newValue: .parentEntity(newParent)
@@ -96,7 +96,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Change 2: Mark item touched
         if itemToInsertSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityId: .item(itemToInsertID),
+                entityID: .item(itemToInsertID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: itemToInsertSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -106,7 +106,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Change 3: Mark container touched
         if containerSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityId: .item(containerID),
+                entityID: .item(containerID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: containerSnapshot.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -115,7 +115,7 @@ struct InsertActionHandler: EnhancedActionHandler {
 
         // Change 4: Update pronoun "it"
         stateChanges.append(StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])

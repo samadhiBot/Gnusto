@@ -3,7 +3,7 @@ import Foundation
 /// Represents a change in game state.
 public struct StateChange: Codable, Sendable {
     /// The entity being changed (can be Item, Location, Player, or Global context).
-    public let entityId: EntityID
+    public let entityID: EntityID
 
     /// The specific attribute being modified.
     public let attributeKey: AttributeKey
@@ -19,17 +19,17 @@ public struct StateChange: Codable, Sendable {
 
     /// Creates a new state change record.
     /// - Parameters:
-    ///   - entityId: The ID of the entity being changed.
+    ///   - entityID: The unique identifier of the entity being changed.
     ///   - attributeKey: The name of the attribute being modified.
     ///   - oldValue: The value of the attribute before the change (optional).
     ///   - newValue: The value of the attribute after the change.
     public init(
-        entityId: EntityID,
+        entityID: EntityID,
         attributeKey: AttributeKey,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) {
-        self.entityId = entityId
+        self.entityID = entityID
         self.attributeKey = attributeKey
         self.oldValue = oldValue
         self.newValue = newValue
@@ -47,7 +47,7 @@ extension StateChange: Comparable {
 
 extension StateChange: Equatable {
     public static func == (lhs: StateChange, rhs: StateChange) -> Bool {
-        lhs.entityId == rhs.entityId
+        lhs.entityID == rhs.entityID
         && lhs.attributeKey == rhs.attributeKey
         && lhs.oldValue == rhs.oldValue
         && lhs.newValue == rhs.newValue

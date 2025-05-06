@@ -16,7 +16,7 @@ struct ExamineActionHandlerTests {
         if initialAttributes?[.isTouched] != true {
             changes.append(
                 StateChange(
-                    entityId: .item(itemID),
+                    entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: initialAttributes?[.isTouched] ?? false,
                     newValue: true,
@@ -26,7 +26,7 @@ struct ExamineActionHandlerTests {
 
         changes.append(
              StateChange(
-                 entityId: .global,
+                 entityID: .global,
                  attributeKey: .pronounReference(pronoun: "it"),
                  oldValue: nil,
                  newValue: .itemIDSet([itemID])

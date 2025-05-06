@@ -52,7 +52,7 @@ public struct DropActionHandler: EnhancedActionHandler {
 
         // Change 1: Parent
         let parentChange = StateChange(
-            entityId: .item(targetItemID),
+            entityID: .item(targetItemID),
             attributeKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.location(currentLocationID))
@@ -62,7 +62,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         // Change 2: Ensure `.isTouched` is true
         if targetItem.attributes[.isTouched] != true {
             let touchedChange = StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -73,7 +73,7 @@ public struct DropActionHandler: EnhancedActionHandler {
         // Change 3: Ensure `.isWorn` is false
         if targetItem.attributes[.isWorn] == true { // Only add change if it was worn
             let wornChange = StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false

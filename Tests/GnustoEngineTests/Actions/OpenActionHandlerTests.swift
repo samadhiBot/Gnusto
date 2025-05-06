@@ -16,7 +16,7 @@ struct OpenActionHandlerTests {
         // Change 1: isOpen becomes true
         changes.append(
             StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isOpen),
                 oldValue: initialAttributes?[.isOpen] ?? false, // Check initial state
                 newValue: true,
@@ -27,7 +27,7 @@ struct OpenActionHandlerTests {
         if initialAttributes?[.isTouched] != true {
             changes.append(
                 StateChange(
-                    entityId: .item(itemID),
+                    entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: initialAttributes?[.isTouched] ?? false,
                     newValue: true,
@@ -38,7 +38,7 @@ struct OpenActionHandlerTests {
         // Change 3: Pronoun "it"
         changes.append(
             StateChange(
-                entityId: .global,
+                entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
                 oldValue: nil, // Assume no prior "it" for simplicity
                 newValue: .itemIDSet([itemID])

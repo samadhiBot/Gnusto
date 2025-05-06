@@ -19,7 +19,7 @@ public struct ScopeResolver: Sendable {
     /// (`.lightSource` and `.on` properties).
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location to check.
+    ///   - locationID: The unique identifier of the location to check.
     /// - Returns: `true` if the location is lit, `false` otherwise.
     public func isLocationLit(locationID: LocationID) -> Bool {
         let gameState = engine.gameState
@@ -65,7 +65,7 @@ public struct ScopeResolver: Sendable {
     /// Does not include contents of containers unless they are transparent.
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location.
+    ///   - locationID: The unique identifier of the location.
     /// - Returns: An array of IDs for items visible in the location.
     public func visibleItemsIn(locationID: LocationID) -> [ItemID] {
         let gameState = engine.gameState

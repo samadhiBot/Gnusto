@@ -74,7 +74,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
         var stateChanges: [StateChange] = []
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,

@@ -51,19 +51,19 @@ struct CloseActionHandlerTests {
         // Assert Change History
         expectNoDifference(engine.gameState.changeHistory, [
             StateChange(
-                entityId: .item(box.id),
+                entityID: .item(box.id),
                 attributeKey: .itemAttribute(.isOpen),
                 oldValue: true, // Assume it was open before closing
                 newValue: false
             ),
             StateChange(
-                entityId: .item(box.id),
+                entityID: .item(box.id),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
             ),
             StateChange(
-                entityId: .global,
+                entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
                 oldValue: nil,
                 newValue: .itemIDSet([box.id])

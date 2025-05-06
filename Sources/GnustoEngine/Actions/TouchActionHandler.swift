@@ -65,7 +65,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
         if let targetItem = await context.engine.item(targetItemID) {
             if targetItem.attributes[.isTouched] != true {
                 stateChanges.append(StateChange(
-                    entityId: .item(targetItemID),
+                    entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: targetItem.attributes[.isTouched] ?? false,
                     newValue: true,

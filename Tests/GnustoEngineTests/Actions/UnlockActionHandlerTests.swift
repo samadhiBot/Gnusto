@@ -23,7 +23,7 @@ struct UnlockActionHandlerTests {
         // Target change: Unlock (if it was locked)
         if initialTargetLocked {
             changes.append(StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isLocked),
                 oldValue: true,
                 newValue: false
@@ -33,7 +33,7 @@ struct UnlockActionHandlerTests {
         // Target change: Touch (if not already touched)
         if !initialTargetTouched {
             changes.append(StateChange(
-                entityId: .item(targetItemID),
+                entityID: .item(targetItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
@@ -43,7 +43,7 @@ struct UnlockActionHandlerTests {
         // Key change: Touch (if not already touched)
         if !initialKeyTouched {
             changes.append(StateChange(
-                entityId: .item(keyItemID),
+                entityID: .item(keyItemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: false,
                 newValue: true,
@@ -52,7 +52,7 @@ struct UnlockActionHandlerTests {
 
         // Add pronoun change
         changes.append(StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil, // Assuming previous 'it' is irrelevant for this action
             newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target are relevant

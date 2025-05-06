@@ -544,14 +544,14 @@ struct GameEngineTests {
 
                 // Define multiple changes
                 let change1 = StateChange(
-                    entityId: .item(itemIDToModify),
+                    entityID: .item(itemIDToModify),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: item.attributes[.isTouched],
                     newValue: true,
                 )
 
                 let change2 = StateChange(
-                    entityId: .item(itemIDToModify),
+                    entityID: .item(itemIDToModify),
                     attributeKey: .itemAttribute(.isOn),
                     oldValue: item.attributes[.isOn],
                     newValue: true,
@@ -564,7 +564,7 @@ struct GameEngineTests {
                 let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
 
                 let change3 = StateChange(
-                    entityId: .global,
+                    entityID: .global,
                     attributeKey: .setFlag(flagID),
                     oldValue: flagOldValueState,
                     newValue: true,
@@ -650,7 +650,7 @@ struct GameEngineTests {
         // Check for Item property change (touched + on)
         #expect(
             history.contains { change in
-                guard change.entityId == .item(testItemID),
+                guard change.entityID == .item(testItemID),
                       case .itemAttribute(let prop) = change.attributeKey,
                       change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
@@ -661,7 +661,7 @@ struct GameEngineTests {
         // Check for Flag change
         #expect(
             history.contains { change in
-                change.entityId == .global &&
+                change.entityID == .global &&
                     change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
                     change.newValue == true
             },
@@ -1248,13 +1248,13 @@ struct GameEngineTests {
         // Define the desired state changes
         let turnOnChanges = [
             StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isOn),
                 oldValue: false,
                 newValue: true,
             ),
             StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: nil, // Assuming not touched initially
                 newValue: true,

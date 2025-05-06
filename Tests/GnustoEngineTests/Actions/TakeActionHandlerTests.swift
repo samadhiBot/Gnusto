@@ -19,7 +19,7 @@ struct TakeActionHandlerTests {
         var changes = [
             // Parent change
             StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemParent,
                 oldValue: .parentEntity(initialParent),
                 newValue: .parentEntity(finalParent)
@@ -42,7 +42,7 @@ struct TakeActionHandlerTests {
             // Use nil-coalescing or direct comparison where appropriate
             if oldValue != newValue {
                 changes.append(StateChange(
-                    entityId: .item(itemID),
+                    entityID: .item(itemID),
                     attributeKey: .itemAttribute(key),
                     oldValue: oldValue,
                     newValue: newValue
@@ -52,7 +52,7 @@ struct TakeActionHandlerTests {
 
         // Add pronoun change (assuming 'it' always refers to the taken item now)
         changes.append(StateChange(
-            entityId: .global,
+            entityID: .global,
             attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
             newValue: .itemIDSet([itemID])
@@ -62,7 +62,7 @@ struct TakeActionHandlerTests {
         let initialIsTouched = initialAttributes[.isTouched] // is Optional(StateValue)
         if initialIsTouched != true { // Correctly compares Optional != Non-optional
             let touchedChange = StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: initialIsTouched, // Keep original old value (nil or false)
                 newValue: true,

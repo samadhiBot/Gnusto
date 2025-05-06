@@ -134,8 +134,8 @@ public class GameEngine: Sendable {
         do {
             let oldMoves = gameState.player.moves
             let change = StateChange(
-                entityId: .player,
-                attributeKey: AttributeKey.playerMoves,
+                entityID: .player,
+                attributeKey: .playerMoves,
                 oldValue: StateValue.int(oldMoves),
                 newValue: StateValue.int(oldMoves + 1)
             )
@@ -197,8 +197,8 @@ public class GameEngine: Sendable {
             let newTurns = currentTurns - 1
 
             let updateChange = StateChange(
-                entityId: .global,
-                attributeKey: AttributeKey.updateFuseTurns(fuseID: fuseID),
+                entityID: .global,
+                attributeKey: .updateFuseTurns(fuseID: fuseID),
                 oldValue: StateValue.int(currentTurns),
                 newValue: StateValue.int(newTurns)
             )
@@ -212,8 +212,8 @@ public class GameEngine: Sendable {
                 guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
-                        entityId: .global,
-                        attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
+                        entityID: .global,
+                        attributeKey: .removeActiveFuse(fuseID: fuseID),
                         oldValue: StateValue.int(newTurns),
                         newValue: StateValue.int(0)
                     )
@@ -227,8 +227,8 @@ public class GameEngine: Sendable {
                 expiredFuseIDsToExecute.append((id: fuseID, action: definition.action))
 
                 let removeChange = StateChange(
-                    entityId: .global,
-                    attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
+                    entityID: .global,
+                    attributeKey: .removeActiveFuse(fuseID: fuseID),
                     oldValue: StateValue.int(newTurns),
                     newValue: StateValue.int(0)
                 )
@@ -453,78 +453,79 @@ public class GameEngine: Sendable {
     /// - Parameter effect: The `SideEffect` to process.
     /// - Throws: An error if processing the side effect fails (e.g., definition not found, apply fails).
     private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
-        let fuseIDString = effect.targetId.rawValue
-        let daemonIDString = effect.targetId.rawValue
-
         switch effect.type {
         case .startFuse:
-            let fuseID = FuseID(fuseIDString)
-            guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
-                throw ActionError.internalEngineError("No FuseDefinition found for fuse ID '\(fuseID)' in startFuse side effect.")
+            guard
+                let definition = definitionRegistry.fuseDefinition(
+                    for: try effect.targetID.fuseID()
+                )
+            else {
+                throw ActionError.internalEngineError("""
+                    No FuseDefinition found for fuse ID '\(effect.targetID)' \
+                    in startFuse side effect.
+                    """)
             }
-            let initialTurns: Int
-            if case .int(let t)? = effect.parameters["turns"] {
-                initialTurns = t
-            } else {
-                initialTurns = definition.initialTurns
-            }
+            let initialTurns = effect.parameters["turns"]?.toInt ?? definition.initialTurns
             let addChange = StateChange(
-                entityId: .global,
-                attributeKey: AttributeKey.addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
-                oldValue: gameState.activeFuses[fuseID].map { .int($0) },
+                entityID: .global,
+                attributeKey: 
+                    .addActiveFuse(
+                        fuseID: definition.id,
+                        initialTurns: initialTurns
+                    ),
+                oldValue: gameState.activeFuses[definition.id].map { .int($0) },
                 newValue: StateValue.int(initialTurns)
             )
             try gameState.apply(addChange)
 
         case .stopFuse:
-            let fuseID = FuseID(fuseIDString)
+            let fuseID = try effect.targetID.fuseID()
             let oldTurns = gameState.activeFuses[fuseID]
             let removeChange = StateChange(
-                entityId: .global,
-                attributeKey: AttributeKey.removeActiveFuse(fuseID: fuseID),
-                oldValue: oldTurns.map { .int($0) },
+                entityID: .global,
+                attributeKey: .removeActiveFuse(fuseID: fuseID),
+                oldValue: oldTurns.map { StateValue.int($0) },
                 newValue: StateValue.int(0)
             )
             try gameState.apply(removeChange)
 
         case .runDaemon:
-            let daemonID = DaemonID(daemonIDString)
-            // 1. Check definition exists (required for daemon execution later)
+            let daemonID = try effect.targetID.daemonID()
             guard definitionRegistry.daemonDefinition(for: daemonID) != nil else {
-                throw ActionError.internalEngineError("No DaemonDefinition found for daemon ID '\(daemonID)' in runDaemon side effect.")
+                throw ActionError.internalEngineError("""
+                    No DaemonDefinition found for daemon ID '\(daemonID)' \
+                    in runDaemon side effect.
+                    """)
             }
-            // 2. Check if already active in persistent state
-            let isAlreadyActive = gameState.activeDaemons.contains(daemonID)
-            // 3. Create StateChange only if not already active
-            if !isAlreadyActive {
-                let addDaemonChange = StateChange(
-                    entityId: .global,
-                    attributeKey: AttributeKey.addActiveDaemon(daemonID: daemonID),
-                    oldValue: false,
-                    newValue: true
+            if !gameState.activeDaemons.contains(daemonID) {
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .addActiveDaemon(daemonID: daemonID),
+                        oldValue: false,
+                        newValue: true
+                    )
                 )
-                // 4. Apply the StateChange
-                try gameState.apply(addDaemonChange)
             }
 
         case .stopDaemon:
-            let daemonID = DaemonID(daemonIDString)
-            // 1. Check if active in persistent state for oldValue validation
-            let wasActive = gameState.activeDaemons.contains(daemonID)
-            // 2. Create StateChange only if it was active
-            if wasActive {
-                let removeDaemonChange = StateChange(
-                    entityId: .global,
-                    attributeKey: AttributeKey.removeActiveDaemon(daemonID: daemonID),
-                    oldValue: true,
-                    newValue: false
+            let daemonID = try effect.targetID.daemonID()
+            if gameState.activeDaemons.contains(daemonID) {
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .removeActiveDaemon(daemonID: daemonID),
+                        oldValue: true,
+                        newValue: false
+                    )
                 )
-                // 3. Apply the StateChange
-                try gameState.apply(removeDaemonChange)
             }
 
         case .scheduleEvent:
-            print("Warning: SideEffectType.scheduleEvent not yet implemented.")
+            // For scheduleEvent, effect.targetID (EntityID) can be used directly
+            // without needing to convert it to a definition key.
+            // The actual scheduling logic would go here.
+            print("Warning: SideEffectType.scheduleEvent for target '\(effect.targetID)' not yet fully implemented.")
         }
     }
 
@@ -803,7 +804,7 @@ public class GameEngine: Sendable {
         // Only apply if the flag isn't already set
         if !gameState.flags.contains(id) {
             let change = StateChange(
-                entityId: .global,
+                entityID: .global,
                 attributeKey: .setFlag(id),
                 oldValue: false, // Expecting it was false
                 newValue: true,
@@ -828,7 +829,7 @@ public class GameEngine: Sendable {
         // Only apply if the flag is currently set
         if gameState.flags.contains(id) {
             let change = StateChange(
-                entityId: .global,
+                entityID: .global,
                 attributeKey: .clearFlag(id),
                 oldValue: true, // Expecting it was true
                 newValue: false
@@ -855,7 +856,7 @@ public class GameEngine: Sendable {
 
         if oldSet != newSet {
             let change = StateChange(
-                entityId: .global,
+                entityID: .global,
                 attributeKey: .pronounReference(pronoun: pronoun),
                 oldValue: oldSet.map { .itemIDSet($0) },
                 newValue: .itemIDSet(newSet)
@@ -874,7 +875,7 @@ public class GameEngine: Sendable {
     /// Moves an item to a new parent entity.
     ///
     /// - Parameters:
-    ///   - itemID: The ID of the item to move.
+    ///   - itemID: The unique identifier of the item to move.
     ///   - newParent: The target parent entity.
     public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
         guard let moveItem = item(itemID) else {
@@ -908,7 +909,7 @@ public class GameEngine: Sendable {
 
         if oldParent != newParent {
             let change = StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemParent,
                 oldValue: .parentEntity(oldParent),
                 newValue: .parentEntity(newParent)
@@ -926,7 +927,7 @@ public class GameEngine: Sendable {
 
     /// Moves the player to a new location.
     ///
-    /// - Parameter newLocationID: The ID of the destination location.
+    /// - Parameter newLocationID: The unique identifier of the destination location.
     public func applyPlayerMove(to newLocationID: LocationID) async {
         let oldLocationID = gameState.player.currentLocationID
 
@@ -942,7 +943,7 @@ public class GameEngine: Sendable {
 
         if oldLocationID != newLocationID {
             let change = StateChange(
-                entityId: .player,
+                entityID: .player,
                 attributeKey: .playerLocation,
                 oldValue: .locationID(oldLocationID),
                 newValue: .locationID(newLocationID)
@@ -1006,8 +1007,8 @@ public class GameEngine: Sendable {
         // Only apply if the value is changing
         if value != oldValue {
             let change = StateChange( // Add explicit type
-                entityId: .global,
-                attributeKey: AttributeKey.gameSpecificState(key: key), // Use GameStateKey
+                entityID: .global,
+                attributeKey: .gameSpecificState(key: key), // Use GameStateKey
                 oldValue: oldValue, // Pass the existing StateValue? as oldValue
                 newValue: value
             )
@@ -1064,7 +1065,7 @@ extension GameEngine {
     /// If no handler exists, returns the value stored in the item's `attributes`.
     ///
     /// - Parameters:
-    ///   - itemID: The ID of the item.
+    ///   - itemID: The unique identifier of the item.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
     @MainActor
@@ -1099,7 +1100,7 @@ extension GameEngine {
     /// (Implementation mirrors getDynamicItemValue)
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location.
+    ///   - locationID: The unique identifier of the location.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
     @MainActor
@@ -1131,7 +1132,7 @@ extension GameEngine {
     /// Creates and applies the appropriate `StateChange` if validation passes.
     ///
     /// - Parameters:
-    ///   - itemID: The ID of the item to modify.
+    ///   - itemID: The unique identifier of the item to modify.
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
@@ -1166,7 +1167,7 @@ extension GameEngine {
         // Only apply if value is actually changing
         if oldValue != newValue {
             let change = StateChange(
-                entityId: .item(itemID),
+                entityID: .item(itemID),
                 attributeKey: .itemAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
@@ -1180,7 +1181,7 @@ extension GameEngine {
     /// (Implementation mirrors setDynamicItemValue)
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location to modify.
+    ///   - locationID: The unique identifier of the location to modify.
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
@@ -1209,7 +1210,7 @@ extension GameEngine {
 
         if oldValue != newValue {
             let change = StateChange(
-                entityId: .location(locationID),
+                entityID: .location(locationID),
                 attributeKey: .locationAttribute(key), // Use the new key
                 oldValue: oldValue,
                 newValue: newValue
