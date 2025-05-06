@@ -21,11 +21,15 @@ public struct GameState: Codable, Equatable, Sendable {
     /// The current state of the player.
     public internal(set) var player: Player
 
-    /// Active fuses (timed events), indexed by their `FuseID`. Value is remaining turns.
+    /// Active fuses (timed events), indexed by their `FuseID`.
+    ///
+    /// Value is remaining turns.
     public internal(set) var activeFuses: [Fuse.ID: Int]
 
-    /// Active daemons (background processes), indexed by their `DaemonID`. Value is irrelevant (presence indicates active).
-    public internal(set) var activeDaemons: Set<DaemonID> // Use Set for simple presence check
+    /// Active daemons (background processes), indexed by their `DaemonID`.
+    ///
+    /// Value is irrelevant (presence indicates active).
+    public internal(set) var activeDaemons: Set<DaemonID>
 
     /// Pronoun references, mapping String pronouns ("it", "them") to specific item ID sets.
     public internal(set) var pronouns: [String: Set<ItemID>]

@@ -24,8 +24,5 @@ public struct ItemID: Hashable, Comparable, Codable, ExpressibleByStringLiteral,
 // MARK: - Standard Item IDs
 public extension ItemID {
     /// Represents the player character as an item.
-    static let player: ItemID = "player"
-
-    /// Represents the absence of an item or an invalid item reference.
-    // static let none: ItemID = "none" // Or consider using Optional<ItemID> instead
+    static let player = ItemID("player")
 }

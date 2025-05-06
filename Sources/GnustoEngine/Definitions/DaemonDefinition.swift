@@ -1,6 +1,3 @@
-/// Type alias for Daemon identifiers.
-public typealias DaemonID = String
-
 /// Defines a Daemon, a process that runs periodically.
 public struct DaemonDefinition {
     /// The unique identifier for this daemon.

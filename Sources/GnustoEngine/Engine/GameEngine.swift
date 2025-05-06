@@ -363,7 +363,10 @@ public class GameEngine: Sendable {
             if let specificError = error as? ActionError {
                 await report(actionError: specificError)
             } else {
-                logger.warning("💥 An unexpected error occurred in an object handler: \(error, privacy: .public)")
+                logger.warning("""
+                    💥 An unexpected error occurred in an object handler: \
+                    \(error, privacy: .public)
+                    """)
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {
@@ -853,7 +856,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                logger.warning("💥 Failed to apply .setFlag change for '\(id.rawValue, privacy: .public)': \(error, privacy: .public)")
+                logger.warning("""
+                    💥 Failed to apply .setFlag change for '\(id.rawValue, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -875,7 +881,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                logger.warning("💥 Failed to apply .clearFlag change for '\(id.rawValue, privacy: .public)': \(error, privacy: .public)")
+                logger.warning("""
+                    💥 Failed to apply .clearFlag change for \
+                    '\(id.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -952,7 +961,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                logger.warning("💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \(error, privacy: .public)")
+                logger.warning("""
+                    💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \
+                    \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -966,9 +978,10 @@ public class GameEngine: Sendable {
         // Check if destination is valid
         guard location(with: newLocationID) != nil else {
             logger
-                .warning(
-                    "💥 Cannot move player to non-existent location '\(newLocationID.rawValue, privacy: .public)'."
-                )
+                .warning("""
+                    💥 Cannot move player to non-existent location \
+                    '\(newLocationID.rawValue, privacy: .public)'.
+                    """)
             return
         }
 
@@ -991,9 +1004,10 @@ public class GameEngine: Sendable {
                 }
 
             } catch {
-                logger.warning(
-                    "💥 Failed to apply player move to '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)"
-                )
+                logger.warning("""
+                    💥 Failed to apply player move to \
+                    '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -1045,7 +1059,10 @@ public class GameEngine: Sendable {
             do {
                 try gameState.apply(change)
             } catch {
-                logger.warning("💥 Failed to apply game specific state change for key '\(key.rawValue, privacy: .public)': \(error, privacy: .public)")
+                logger.warning("""
+                    💥 Failed to apply game specific state change for key \
+                    '\(key.rawValue, privacy: .public)': \(error, privacy: .public)
+                    """)
             }
         }
     }
@@ -1099,7 +1116,7 @@ extension GameEngine {
     public func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
             logger.warning("""
-                Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
+                💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
                 """)
             return nil
@@ -1110,7 +1127,10 @@ extension GameEngine {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
-                logger.error("Error computing dynamic value '\(key.rawValue)' for item \(itemID.rawValue): \(error)")
+                logger.error("""
+                    💥 Error computing dynamic value '\(key.rawValue)' \
+                    for item \(itemID.rawValue): \(error)
+                    """)
                 // Fall through to return stored value or nil? Or return nil on error? Let's return nil.
                 return nil
             }
@@ -1130,7 +1150,10 @@ extension GameEngine {
     @MainActor
     public func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
-            logger.warning("Attempted to get dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
+            logger.warning("""
+                💥 Attempted to get dynamic value '\(key.rawValue)' \
+                for non-existent location: \(locationID.rawValue)
+                """)
             return nil
         }
 
@@ -1138,14 +1161,16 @@ extension GameEngine {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
-                logger.error("Error computing dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
+                logger.error("""
+                    💥 Error computing dynamic value '\(key.rawValue)' \
+                    for location \(locationID.rawValue): \(error)
+                    """)
                 return nil
             }
         } else {
             return location.attributes[key]
         }
     }
-
 
     /// Sets the value of an item property, performing validation via the `DynamicAttributeRegistry` if applicable.
     /// Creates and applies the appropriate `StateChange` if validation passes.
@@ -1172,7 +1197,10 @@ extension GameEngine {
                 }
             } catch {
                 // If validator throws, propagate the error
-                logger.error("Error validating dynamic value '\(key.rawValue)' for item \(itemID.rawValue): \(error)")
+                logger.error("""
+                    💥 Error validating dynamic value '\(key.rawValue)' \
+                    for item \(itemID.rawValue): \(error)
+                    """)
                 throw error
             }
         }
@@ -1215,7 +1243,10 @@ extension GameEngine {
                     throw ActionError.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
                 }
             } catch {
-                logger.error("Error validating dynamic value '\(key.rawValue)' for location \(locationID.rawValue): \(error)")
+                logger.error("""
+                    💥 Error validating dynamic value '\(key.rawValue)' \
+                    for location \(locationID.rawValue): \(error)
+                    """)
                 throw error
             }
         }

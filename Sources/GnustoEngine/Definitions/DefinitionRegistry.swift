@@ -1,8 +1,5 @@
 import Foundation
 
-/// Type alias for Fuse identifiers.
-public typealias FuseID = String
-
 /// Stores definitions for various game elements like Fuses, Daemons, and custom action handlers.
 /// This registry allows the engine to look up definitions by their IDs.
 public struct DefinitionRegistry {
