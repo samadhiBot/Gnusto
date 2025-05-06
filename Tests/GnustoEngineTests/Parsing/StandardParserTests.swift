@@ -211,7 +211,7 @@ struct StandardParserTests {
                 id: roomID,
                 name: "Room",
                 description: "A room.",
-                globals: "rug" // Globals remain associated with location
+                attributes: [.localGlobals: .itemIDSet(["rug"])] // Globals remain associated with location
             )
             // Add more locations later if needed
         ]
@@ -342,7 +342,7 @@ struct StandardParserTests {
         #expect(command.preposition == "in")
     }
 
-    @Test("Parse Verb + DirectMods + Prep + IndirectMods", .tags(.parser, .directObject, .indirectObject, .preposition, .modifiers, .resolution, .scope))
+    @Test("Parse Verb + DirectObject + Prep + IndirectMods", .tags(.parser, .directObject, .indirectObject, .preposition, .modifiers, .resolution, .scope))
     func testParseFullComplexity() throws {
         // "key" parent is .player, "box" parent is .location(roomID). Both should be found.
         let result = parser.parse(input: "place the small key into the wooden box", vocabulary: vocabulary, gameState: gameState)
@@ -854,7 +854,7 @@ struct StandardParserTests {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["lantern"]?.attributes.insert(ItemProperty.container)
+        itemsDict["lantern"]?.attributes[.isContainer] = .bool(true)
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),

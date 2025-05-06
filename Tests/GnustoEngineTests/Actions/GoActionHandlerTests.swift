@@ -227,7 +227,8 @@ struct GoActionHandlerTests {
     func testGoFailsWithConditionalExit() async throws {
         // Arrange
         let conditionFlagKey = "gateOpen"
-        let conditionAttributeID: AttributeID = .gameSpecificState(key: conditionFlagKey) // Define the flag ID
+        // Flags use FlagID, not AttributeID - requires explicit type annotation
+        let conditionFlagID = FlagID(conditionFlagKey)
 
         let foyer = Location(
             id: "foyer",
@@ -246,8 +247,8 @@ struct GoActionHandlerTests {
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
         let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
-        // Ensure condition flag is initially nil in GameState.flags
-        #expect(engine.gameState.flags.contains(conditionAttributeID) == false)
+        // Check flags set using contains
+        #expect(!engine.gameState.flags.contains(conditionFlagID))
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 
@@ -262,7 +263,8 @@ struct GoActionHandlerTests {
     func testGoSucceedsWithConditionalExit() async throws {
         // Arrange
         let conditionFlagKey = "gateOpen"
-        let conditionAttributeID: AttributeID = .gameSpecificState(key: conditionFlagKey) // Define the flag ID
+        // Flags use FlagID, not AttributeID - requires explicit type annotation
+        let conditionFlagID = FlagID(conditionFlagKey)
 
         var foyer = Location( // Make foyer mutable to add the exit later
             id: "foyer",
@@ -284,14 +286,15 @@ struct GoActionHandlerTests {
         // Set the condition flag to true by applying a state change
         let change = StateChange(
             entityId: .global, // Use .global for game-specific flags
-            propertyKey: .flag(conditionAttributeID), // Use .flag(AttributeID) for StateChange key
-            oldValue: nil, // Assuming it wasn't set before
-            newValue: true,
+            // Use .setFlag property key
+            propertyKey: .setFlag(conditionFlagID), 
+            oldValue: .bool(false), // Expect flag was not set
+            newValue: true, // Set flag to true
         )
         try engine.gameState.apply(change)
 
-        // Verify the flag is set in GameState.flags
-        #expect(engine.gameState.flags[conditionAttributeID] == .bool(true))
+        // Check flags set using contains
+        #expect(engine.gameState.flags.contains(conditionFlagID))
 
         // Manually add the exit now that the condition is met
         foyer.exits[.east] = Exit(destination: "garden")

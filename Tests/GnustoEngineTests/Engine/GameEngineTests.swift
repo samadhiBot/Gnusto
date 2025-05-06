@@ -1233,20 +1233,19 @@ struct GameEngineTests {
         // TODO: Implementation
     }
 
-    @Test("ReportActionError: .applyActionResult_Success")
+    @Test("Apply Action Result - Success")
     func testApplyActionResult_Success() async throws {
+        // Define ItemID and initial item state
         let itemID: ItemID = "lamp"
-        let items = [Item(
+        let lamp = Item(
             id: itemID,
             name: "Lamp",
             attributes: [
                 .isOn: .bool(false) // Start with lamp off
             ]
-        )]
-        let game = MinimalGame(items: items) // Use MinimalGame
-        let mockIO = await MockIOHandler() // Add MockIOHandler
-        let mockParser = MockParser() // Add MockParser
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Setup engine
+        )
+
+        // Define the desired state changes
         let turnOnChanges = [
             StateChange(
                 entityId: .item(itemID),
@@ -1257,21 +1256,56 @@ struct GameEngineTests {
             StateChange(
                 entityId: .item(itemID),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: nil,
+                oldValue: nil, // Assuming not touched initially
                 newValue: true,
             )
         ]
-        let result = ActionResult(
+        
+        // Define the ActionResult to be returned by the mock handler
+        let resultToTest = ActionResult(
             success: true,
             message: "Lamp turned on!",
             stateChanges: turnOnChanges
         )
-        await engine.applyActionResult(result)
+        
+        // Create a mock handler that returns the ActionResult
+        struct MockResultHandler: EnhancedActionHandler {
+            let result: ActionResult
+            func validate(context: ActionContext) async throws { /* No validation needed */ }
+            func process(context: ActionContext) async throws -> ActionResult { result }
+            func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
+        }
+        
+        let testVerb: VerbID = "testapply"
+        let mockHandler = MockResultHandler(result: resultToTest)
+        
+        // Setup game with the mock handler
+        let game = MinimalGame(
+            items: [lamp],
+            definitionRegistry: DefinitionRegistry(
+                customActionHandlers: [testVerb: mockHandler]
+            )
+        )
+        
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        
+        // Create the command to trigger the mock handler
+        let testCommand = Command(verbID: testVerb, rawInput: "testapply")
+        
+        // Act: Execute the command
+        await engine.execute(command: testCommand)
 
-        // Verify the state changes
+        // Assert:
+        // Verify the state changes were applied
         let finalLamp = engine.item(itemID)
-        #expect(finalLamp?.attributes[.isOn] == .bool(true))
-        #expect(finalLamp?.attributes[.isTouched] == .bool(true))
+        #expect(finalLamp?.attributes[.isOn] == .bool(true), "Lamp should be ON")
+        #expect(finalLamp?.attributes[.isTouched] == .bool(true), "Lamp should be TOUCHED")
+        
+        // Verify the message was printed
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Lamp turned on!")
     }
 }
 

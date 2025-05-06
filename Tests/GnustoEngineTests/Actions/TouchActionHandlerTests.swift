@@ -31,7 +31,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("rock")
+        let finalItemState = engine.item("rock")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -43,8 +43,8 @@ struct TouchActionHandlerTests {
         let key = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: true]
         )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
@@ -61,7 +61,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -130,9 +130,8 @@ struct TouchActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container,
-            attributes: [.isOpen: true],
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isContainer: true, .isOpen: true]
         )
         let gem = Item(
             id: "gem",
@@ -154,7 +153,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("gem")
+        let finalItemState = engine.item("gem")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -166,8 +165,8 @@ struct TouchActionHandlerTests {
         let table = Item(
             id: "table",
             name: "wooden table",
-            properties: .surface,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isSurface: true]
         )
         let book = Item(
             id: "book",
@@ -189,7 +188,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("book")
+        let finalItemState = engine.item("book")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -201,8 +200,8 @@ struct TouchActionHandlerTests {
         let chest = Item(
             id: "chest",
             name: "locked chest",
-            properties: .container, // Closed by default
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [.isContainer: true] // Closed by default
         )
         let coin = Item(
             id: "coin",
@@ -218,7 +217,7 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(chest.attributes["isOpen"] == nil) // Verify closed
+        #expect(chest.attributes[.isOpen] == nil) // Verify closed
 
         let command = Command(verbID: "touch", directObject: "coin", rawInput: "touch coin")
 

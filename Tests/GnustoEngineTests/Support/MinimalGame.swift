@@ -28,8 +28,10 @@ struct MinimalGame: GameBlueprint {
             Item(
                 id: "startItem",
                 name: "pebble",
-                properties: .takable,
-                parent: .location("startRoom")
+                parent: .location("startRoom"),
+                attributes: [
+                    .isTakable: true
+                ]
             )
         ]
 

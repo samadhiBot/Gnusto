@@ -13,7 +13,11 @@ struct LocationTests {
         Location(
             id: defaultLocationID,
             name: defaultLocationName,
-            description: "A nondescript room."
+            description: "A nondescript room.",
+            attributes: [
+                .inherentlyLit: .bool(false),
+                .localGlobals: .itemIDSet([])
+            ]
         )
     }
 
@@ -25,8 +29,11 @@ struct LocationTests {
             name: "Living Room",
             description: "A comfortably furnished living room. There are exits west and east.",
             exits: [.west: westExit, .east: eastExit],
-            isLit: true, .sacred,
-            globals: "rug", "fireplace"
+            attributes: [
+                .inherentlyLit: .bool(true),
+                .isSacred: .bool(true),
+                .localGlobals: .itemIDSet(["rug", "fireplace"])
+            ]
         )
     }
 
@@ -42,8 +49,9 @@ struct LocationTests {
         #expect(location.attributes[.longDescription] == .string("A nondescript room."))
         #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
-        #expect(location.attributes.isEmpty)
-        #expect(location.globals.isEmpty)
+        #expect(location.attributes.count == 1) // Only inherentlyLit=false by default
+        #expect(location.attributes[.inherentlyLit] == .bool(false))
+        #expect(location.localGlobals.isEmpty)
     }
 
     @Test("Location Custom Initialization")
@@ -59,38 +67,48 @@ struct LocationTests {
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
         #expect(location.exits[.east]?.blockedMessage == "A solid wall blocks your path.")
-        #expect(location.attributes == [.inherentlyLit, .sacred])
-        #expect(location.globals.count == 2)
-        #expect(location.globals.contains(rugID))
+        #expect(location.hasFlag(.inherentlyLit))
+        #expect(location.hasFlag(.isSacred))
+        #expect(location.localGlobals.count == 2)
+        #expect(location.localGlobals.contains(rugID))
+        // Check the full attributes dictionary for completeness
+        #expect(location.attributes == [
+            .longDescription: .string("A comfortably furnished living room. There are exits west and east."),
+            .inherentlyLit: .bool(true),
+            .isSacred: .bool(true),
+            .localGlobals: .itemIDSet(["rug", "fireplace"])
+        ])
     }
 
-    @Test("Location Property Management")
-    func testLocationPropertyManagement() throws {
+    @Test("Location Attribute Management")
+    func testLocationAttributeManagement() throws {
         var location = createDefaultLocation()
 
-        #expect(!location.hasProperty(.inherentlyLit))
+        #expect(!location.hasFlag(.inherentlyLit)) // isInherentlyLit is false by default
+        #expect(location.attributes.count == 1) // Only inherentlyLit
 
-        location.addProperty(.inherentlyLit)
-        #expect(location.hasProperty(.inherentlyLit))
+        location.attributes[.inherentlyLit] = .bool(true)
+        #expect(location.hasFlag(.inherentlyLit))
         #expect(location.attributes.count == 1)
 
-        location.addProperty(.inherentlyLit) // Adding again should have no effect
+        location.attributes[.inherentlyLit] = .bool(true) // Setting again should have no effect on count
         #expect(location.attributes.count == 1)
 
-        location.addProperty(.outside)
-        #expect(location.hasProperty(.outside))
+        location.attributes[.isOutside] = .bool(true)
+        #expect(location.hasFlag(.isOutside))
         #expect(location.attributes.count == 2)
 
-        location.removeProperty(.inherentlyLit)
-        #expect(!location.hasProperty(.inherentlyLit))
-        #expect(location.hasProperty(.outside))
-        #expect(location.attributes.count == 1)
+        location.attributes[.inherentlyLit] = .bool(false) // Set back to false, don't remove the key
+        #expect(!location.hasFlag(.inherentlyLit))
+        #expect(location.hasFlag(.isOutside))
+        #expect(location.attributes.count == 2)
 
-        location.removeProperty(.inherentlyLit) // Removing again should have no effect
-        #expect(location.attributes.count == 1)
+        location.attributes[.inherentlyLit] = nil // Remove the key entirely
+        #expect(!location.hasFlag(.inherentlyLit)) // Still false
+        #expect(location.attributes.count == 1) // Count decreases
 
-        location.removeProperty(.outside)
-        #expect(!location.hasProperty(.outside))
+        location.attributes[.isOutside] = nil // Remove the other key
+        #expect(!location.hasFlag(.isOutside))
         #expect(location.attributes.isEmpty)
     }
 
@@ -117,7 +135,7 @@ struct LocationTests {
         #expect(decodedLocation.exits[.west]?.destination == originalLocation.exits[.west]?.destination)
         #expect(decodedLocation.exits[.east]?.blockedMessage == originalLocation.exits[.east]?.blockedMessage)
         #expect(decodedLocation.attributes == originalLocation.attributes)
-        #expect(decodedLocation.globals == originalLocation.globals)
+        #expect(decodedLocation.localGlobals == originalLocation.localGlobals)
     }
 
     @Test("Location Value Semantics")
@@ -130,19 +148,19 @@ struct LocationTests {
 
         // Modify the copy (location2)
         location2.name = "Renamed Room"
-        location2.addProperty(.visited)
+        location2.attributes[.isVisited] = .bool(true)
         // Set dynamic value for description
         location2.attributes[.longDescription] = .string("An updated room.")
 
         // Assert that the original (location1) is unchanged
         #expect(location1.name == originalName) // Check against captured default
-        #expect(!location1.hasProperty(.visited))
+        #expect(!location1.hasFlag(.isVisited))
         // Check original dynamic value
         #expect(location1.attributes[.longDescription] == originalDescValue)
 
         // Assert that location2 has the changes
         #expect(location2.name == "Renamed Room")
-        #expect(location2.hasProperty(.visited))
+        #expect(location2.hasFlag(.isVisited))
         // Check new dynamic value
         #expect(location2.attributes[.longDescription] == .string("An updated room."))
 

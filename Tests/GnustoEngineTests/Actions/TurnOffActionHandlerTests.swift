@@ -17,10 +17,8 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "lamp",
-            shortDescription: "A brass lamp",
-            description: "A brass lamp is here.",
-            properties: .lightSource, .device, .on,
-            parent: .player
+            parent: .player,
+            attributes: [.isLightSource: true, .isDevice: true, .isOn: true]
         )
 
         let game = MinimalGame(
@@ -61,8 +59,6 @@ struct TurnOffActionHandlerTests {
         let book = Item(
             id: "book",
             name: "book",
-            shortDescription: "A dusty book",
-            description: "A dusty book lies here.",
             parent: .location(room.id)
         )
 
@@ -132,9 +128,14 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isDevice: true,
+                .isLightSource: true,
+                .isTakable: true,
+                .isOn: true,
+                .size: 10
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -167,9 +168,8 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -212,9 +212,8 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            size: 10,
-            parent: .player
+            parent: .player,
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -250,9 +249,8 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .takable, .on,
-            size: 10,
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -286,9 +284,8 @@ struct TurnOffActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .nowhere
+            parent: .nowhere,
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -315,8 +312,8 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            properties: .device, .lightSource, .takable, .on,
-            parent: .location("darkRoom")
+            parent: .location("darkRoom"),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true]
         )
         let darkRoom = Location(
             id: "darkRoom",
@@ -364,8 +361,8 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            properties: .device, .lightSource, .takable, .on,
-            parent: .location("darkRoom")
+            parent: .location("darkRoom"),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true]
         )
         let darkRoom = Location(
             id: "darkRoom",

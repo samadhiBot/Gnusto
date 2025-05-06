@@ -33,15 +33,19 @@ struct TakeActionHandlerTests {
         let allKeys = Set(initialAttributes.keys).union(effectiveFinalAttributes.keys)
         for key in allKeys {
             let oldValue = initialAttributes[key]
-            let newValue = effectiveFinalAttributes[key]
+
+            guard let newValue = effectiveFinalAttributes[key] else {
+                Issue.record("Expected attribute \(key) to exist in final attributes")
+                continue
+            }
 
             // Use nil-coalescing or direct comparison where appropriate
             if oldValue != newValue {
                 changes.append(StateChange(
                     entityId: .item(itemID),
                     propertyKey: .itemAttribute(key),
-                    oldValue: oldValue, // Can be nil
-                    newValue: newValue  // Can be nil
+                    oldValue: oldValue,
+                    newValue: newValue
                 ))
             }
         }

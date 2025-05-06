@@ -15,9 +15,9 @@ struct RemoveActionHandlerTests {
             name: "cloak",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true),
-                .isWearable: .bool(true),
-                .isWorn: .bool(true)
+                .isTakable: true,
+                .isWearable: true,
+                .isWorn: true
             ]
         )
         let game = MinimalGame(items: [cloak])
@@ -61,14 +61,14 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isWorn),
-                oldValue: .bool(true),
+                oldValue: true,
                 newValue: .bool(false)
             ),
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isTouched),
                 oldValue: .bool(false),
-                newValue: .bool(true)
+                newValue: true
             ),
         ]
         let finalHistory = engine.gameState.changeHistory
@@ -82,8 +82,8 @@ struct RemoveActionHandlerTests {
             name: "cloak",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true),
-                .isWearable: .bool(true)
+                .isTakable: true,
+                .isWearable: true
             ]
         )
         let game = MinimalGame(items: [cloak])
@@ -164,9 +164,9 @@ struct RemoveActionHandlerTests {
             name: "cursed amulet",
             parent: .player,
             attributes: [
-                .isWearable: .bool(true),
-                .isWorn: .bool(true),
-                .isFixed: .bool(true)
+                .isWearable: true,
+                .isWorn: true,
+                .isFixed: true
             ]
         )
         let game = MinimalGame(items: [amulet])

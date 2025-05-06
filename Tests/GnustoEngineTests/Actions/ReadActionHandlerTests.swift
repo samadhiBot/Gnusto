@@ -15,8 +15,8 @@ struct ReadActionHandlerTests {
             parent: .player,
             attributes: [
                 .readText: .string("It reads: \"Beware the Grue!\""),
-                .isTakable: .bool(true),
-                .isReadable: .bool(true)
+                .isTakable: true,
+                .isReadable: true
             ]
         )
 
@@ -50,7 +50,7 @@ struct ReadActionHandlerTests {
             parent: .location("litRoom"),
             attributes: [
                 .readText: .string("DANGER AHEAD"),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
         let litRoom = Location(
@@ -58,7 +58,7 @@ struct ReadActionHandlerTests {
             name: "Bright Room",
             attributes: [
                 .longDescription: .string("It's bright here."),
-                .inherentlyLit: .bool(true)
+                .inherentlyLit: true
             ]
         )
 
@@ -125,7 +125,7 @@ struct ReadActionHandlerTests {
             parent: .nowhere,
             attributes: [
                 .readText: .string("Secrets within"),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -195,8 +195,8 @@ struct ReadActionHandlerTests {
             parent: .location("darkRoom"),
             attributes: [
                 .readText: .string("X marks the spot"),
-                .isTakable: .bool(true),
-                .isReadable: .bool(true)
+                .isTakable: true,
+                .isReadable: true
             ]
         )
         let darkRoom = Location(
@@ -242,8 +242,8 @@ struct ReadActionHandlerTests {
             parent: .player,
             attributes: [
                 .readText: .string(""),
-                .isTakable: .bool(true),
-                .isReadable: .bool(true)
+                .isTakable: true,
+                .isReadable: true
             ]
         )
 
@@ -277,9 +277,9 @@ struct ReadActionHandlerTests {
             parent: .location("darkRoom"),
             attributes: [
                 .readText: .string("Ancient Runes"),
-                .isLightSource: .bool(true),
-                .isOn: .bool(true),
-                .isReadable: .bool(true)
+                .isLightSource: true,
+                .isOn: true,
+                .isReadable: true
             ]
         )
         let darkRoom = Location(
@@ -322,7 +322,7 @@ struct ReadActionHandlerTests {
             parent: .location("startRoom"),
             attributes: [
                 .readText: .string("Beware the Grue!"),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -359,7 +359,7 @@ struct ReadActionHandlerTests {
             parent: .location("startRoom"),
             attributes: [
                 .readText: .string(""),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -395,7 +395,7 @@ struct ReadActionHandlerTests {
             name: "stone tablet",
             parent: .location("startRoom"),
             attributes: [
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -432,7 +432,7 @@ struct ReadActionHandlerTests {
             parent: .nowhere,
             attributes: [
                 .readText: .string("Secrets within."),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
         let game = MinimalGame(items: [book])
@@ -489,7 +489,7 @@ struct ReadActionHandlerTests {
             parent: .location(darkRoom.id),
             attributes: [
                 .readText: .string("Can't read this."),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
@@ -520,9 +520,9 @@ struct ReadActionHandlerTests {
             parent: .location(darkRoom.id),
             attributes: [
                 .readText: .string("Luminous secrets!"),
-                .isReadable: .bool(true),
-                .isLightSource: .bool(true),
-                .isOn: .bool(true)
+                .isReadable: true,
+                .isLightSource: true,
+                .isOn: true
             ]
         )
 
@@ -579,9 +579,9 @@ struct ReadActionHandlerTests {
             name: "wooden box",
             parent: .player,
             attributes: [
-                .isTakable: .bool(true),
-                .isContainer: .bool(true),
-                .isOpen: .bool(true)
+                .isTakable: true,
+                .isContainer: true,
+                .isOpen: true
             ]
         )
         let note = Item(
@@ -590,7 +590,7 @@ struct ReadActionHandlerTests {
             parent: .item("box"),
             attributes: [
                 .readText: .string("Meet at midnight."),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -624,8 +624,8 @@ struct ReadActionHandlerTests {
             name: "iron chest",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isOpen: .bool(true)
+                .isContainer: true,
+                .isOpen: true
             ]
         )
         let letter = Item(
@@ -634,7 +634,7 @@ struct ReadActionHandlerTests {
             parent: .item("chest"),
             attributes: [
                 .readText: .string("Important news."),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 
@@ -668,8 +668,8 @@ struct ReadActionHandlerTests {
             name: "locked box",
             parent: .location("startRoom"),
             attributes: [
-                .isContainer: .bool(true),
-                .isLockable: .bool(true)
+                .isContainer: true,
+                .isLockable: true
             ]
         )
         let secret = Item(
@@ -678,7 +678,7 @@ struct ReadActionHandlerTests {
             parent: .item("lockedBox"),
             attributes: [
                 .readText: .string("Top Secret!"),
-                .isReadable: .bool(true)
+                .isReadable: true
             ]
         )
 

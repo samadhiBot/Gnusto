@@ -24,16 +24,16 @@ struct ItemTests {
             attributes: [
                 .adjectives: .stringSet(["brass", "shiny"]),
                 .synonyms: .stringSet(["lamp", "light"]),
-                .shortDescription: "The brass lantern is here.",
-                .firstDescription: "A shiny brass lantern rests here.",
-                .readText: "Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\"",
-                .readWhileHeldText: "It feels warm.",
-                .isTakable: true,
-                .isLightSource: true,
-                .isOn: true,
-                .isOpenable: true,
-                .size: 10,
-                .capacity: 5
+                .shortDescription: .string("The brass lantern is here."),
+                .firstDescription: .string("A shiny brass lantern rests here."),
+                .readText: .string("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
+                .readWhileHeldText: .string("It feels warm."),
+                .isTakable: .bool(true),
+                .isLightSource: .bool(true),
+                .isOn: .bool(true),
+                .isOpenable: .bool(true),
+                .size: .int(10),
+                .capacity: .int(5)
             ]
         )
     }
@@ -53,8 +53,8 @@ struct ItemTests {
         #expect(item.attributes[.longDescription] == nil)
         #expect(item.attributes[.readText] == nil)
         #expect(item.attributes[.readWhileHeldText] == nil)
-        #expect(item.size == 5) // ZILF default
-        #expect(item.capacity == -1) // ZILF default
+        #expect(item.size == 1) // Default size
+        #expect(item.capacity == .max) // Default capacity
         #expect(item.parent == .nowhere) // Check default parent
         #expect(item.attributes[.lockKey] == nil)
     }
@@ -82,33 +82,34 @@ struct ItemTests {
         #expect(item.attributes[.lockKey] == nil)
     }
 
-    @Test("Item Property Management")
-    func testItemPropertyManagement() throws {
+    @Test("Item Attribute Management")
+    func testItemAttributeManagement() throws {
         var item = createDefaultItem()
 
-        #expect(!item.hasProperty(.takable))
+        #expect(!item.hasFlag(.isTakable))
+        #expect(item.attributes.isEmpty) // Default item has no attributes initially
 
-        item.addProperty(.takable)
-        #expect(item.hasProperty(.takable))
+        item.attributes[.isTakable] = .bool(true)
+        #expect(item.hasFlag(.isTakable))
         #expect(item.attributes.count == 1)
 
-        item.addProperty(.takable) // Adding again should have no effect
+        item.attributes[.isTakable] = .bool(true) // Setting again should have no effect
         #expect(item.attributes.count == 1)
 
-        item.addProperty(.lightSource)
-        #expect(item.hasProperty(.lightSource))
+        item.attributes[.isLightSource] = .bool(true)
+        #expect(item.hasFlag(.isLightSource))
         #expect(item.attributes.count == 2)
 
-        item.removeProperty(.takable)
-        #expect(!item.hasProperty(.takable))
-        #expect(item.hasProperty(.lightSource))
+        item.attributes[.isTakable] = nil // Remove the key
+        #expect(!item.hasFlag(.isTakable))
+        #expect(item.hasFlag(.isLightSource))
         #expect(item.attributes.count == 1)
 
-        item.removeProperty(.takable) // Removing again should have no effect
+        item.attributes[.isTakable] = nil // Removing again should have no effect
         #expect(item.attributes.count == 1)
 
-        item.removeProperty(.lightSource)
-        #expect(!item.hasProperty(.lightSource))
+        item.attributes[.isLightSource] = nil // Remove the other key
+        #expect(!item.hasFlag(.isLightSource))
         #expect(item.attributes.isEmpty)
     }
 
@@ -147,17 +148,17 @@ struct ItemTests {
 
         // Modify the copy (item2)
         item2.name = "modified thing"
-        item2.addProperty(.invisible)
+        item2.attributes[.isInvisible] = .bool(true)
         item2.parent = .location("limbo")
 
         // Assert that the original (item1) is unchanged
         #expect(item1.name == "thing")
-        #expect(!item1.hasProperty(.invisible))
+        #expect(!item1.hasFlag(.isInvisible))
         #expect(item1.parent == .nowhere)
 
         // Assert that item2 has the changes
         #expect(item2.name == "modified thing")
-        #expect(item2.hasProperty(.invisible))
+        #expect(item2.hasFlag(.isInvisible))
         #expect(item2.parent == .location("limbo"))
 
         // Assert that item1 and item2 are now different
