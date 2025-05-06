@@ -47,10 +47,7 @@ public struct OpenActionHandler: EnhancedActionHandler {
         }
 
         // Check if already open using dynamic property
-        let isOpen = await context.engine.getDynamicItemValue(
-            itemID: targetItemID,
-            key: .isOpen
-        )?.toBool ?? false
+        let isOpen: Bool = try await context.engine.fetch(targetItemID, .isOpen)
         guard !isOpen else {
             throw ActionError.itemAlreadyOpen(targetItemID)
         }

@@ -6,35 +6,6 @@ import Testing
 @MainActor
 @Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
-    private func expectedExamineChanges(
-        itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]?
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        let isTouchedKey = AttributeKey.itemAttribute(.isTouched)
-        if initialAttributes?[.isTouched] != true {
-            changes.append(
-                StateChange(
-                    entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched] ?? false,
-                    newValue: true,
-                )
-            )
-        }
-
-        changes.append(
-             StateChange(
-                 entityID: .global,
-                 attributeKey: .pronounReference(pronoun: "it"),
-                 oldValue: nil,
-                 newValue: .itemIDSet([itemID])
-             )
-        )
-        return changes
-    }
-
     @Test func testExamineSimpleItem() async throws {
         let itemID: ItemID = "pebble"
         let item = Item(
@@ -55,7 +26,11 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine pebble")
+        let command = Command(
+            verbID: VerbID("examine"),
+            directObject: itemID,
+            rawInput: "examine pebble"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -312,5 +287,32 @@ struct ExamineActionHandlerTests {
         #expect(engine.gameState.changeHistory.isEmpty)
         let finalItemState = engine.item(itemID)
         #expect(finalItemState?.attributes[.isTouched] != true)
+    }
+}
+
+extension ExamineActionHandlerTests {
+    private func expectedExamineChanges(
+        itemID: ItemID,
+        initialAttributes: [AttributeID: StateValue]?
+    ) -> [StateChange] {
+        var changes = [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([itemID])
+            )
+        ]
+        if initialAttributes?[.isTouched] != true {
+            changes.insert(
+                StateChange(
+                    entityID: .item(itemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: initialAttributes?[.isTouched],
+                    newValue: true,
+                ), at: 0
+            )
+        }
+        return changes
     }
 }

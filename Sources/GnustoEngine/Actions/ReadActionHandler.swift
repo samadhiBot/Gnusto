@@ -35,7 +35,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
             if isParentItemInReach {
                 // Check if parent allows access (surface or open container)
                 let isParentContainer = parentItem.hasFlag(.isContainer)
-                let isParentOpen = isParentContainer ? (await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false) : false
+                let isParentOpen: Bool = try await context.engine.fetch(parentItemID, .isOpen)
                 if parentItem.hasFlag(.isSurface) || (isParentContainer && isParentOpen) {
                     isReachable = true
                 }
@@ -84,11 +84,11 @@ public struct ReadActionHandler: EnhancedActionHandler {
         // --- Determine Message ---
         let message: String
         // Fetch text from dynamic values
-        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .readText)
-        if let textToRead = readTextValue?.toString, !textToRead.isEmpty {
-            message = textToRead
-        } else {
+        let textToRead: String = try await context.engine.fetch(targetItemID, .readText)
+        if textToRead.isEmpty {
             message = "There's nothing written on the \(targetItem.name)."
+        } else {
+            message = textToRead
         }
 
         // --- Create Result ---

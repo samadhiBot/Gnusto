@@ -19,46 +19,62 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         }
 
         // 3. Check reachability
-        let isReachable = await context.engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
-        guard isReachable else {
+        guard
+            await context.engine.scopeResolver
+                .itemsReachableByPlayer()
+                .contains(targetItemID)
+        else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError("Examine context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+        guard
+            let targetItemID = context.command.directObject,
+            let targetItem = await context.engine.item(targetItemID)
+        else {
+            throw ActionError.internalEngineError(
+                "Examine context.command reached process without direct object."
+            )
         }
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
+
         if targetItem.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+            stateChanges.append(
+                StateChange(
+                    entityID: .item(targetItemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: targetItem.attributes[.isTouched],
+                    newValue: true,
+                )
+            )
         }
 
         // --- Determine Message ---
         let message: String
 
         // Priority 1: Readable Text (Check dynamic value)
-        let readTextValue = await context.engine.getDynamicItemValue(itemID: targetItemID, key: .readText)
-        if targetItem.hasFlag(.isReadable), let text = readTextValue?.toString, !text.isEmpty {
-            message = text
+        if targetItem.hasFlag(.isReadable),
+           let readText: String = try? await context.engine.fetch(targetItemID, .readText),
+           !readText.isEmpty
+        {
+            message = readText
         }
         // Priority 2: Container/Door Description
         else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
-            message = await describeContainerOrDoor(targetItem: targetItem, engine: context.engine)
+            message = try await describeContainerOrDoor(
+                targetItem: targetItem,
+                engine: context.engine
+            )
         }
         // Priority 3: Surface Description
         else if targetItem.hasFlag(.isSurface) {
-            message = await describeSurface(targetItem: targetItem, engine: context.engine)
+            message = await describeSurface(
+                targetItem: targetItem,
+                engine: context.engine
+            )
         }
         // Priority 4: Dynamic Long Description
         else {
@@ -81,7 +97,10 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     // MARK: - Private Helpers (Adapted to return String)
 
     /// Helper function to generate description for containers or doors.
-    private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
+    private func describeContainerOrDoor(
+        targetItem: Item,
+        engine: GameEngine
+    ) async throws -> String {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
@@ -93,7 +112,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
         descriptionParts.append(baseDescription)
 
         // Check dynamic property for open state
-        let isOpen = await engine.getDynamicItemValue(itemID: targetItem.id, key: .isOpen)?.toBool ?? false
+        let isOpen: Bool = try await engine.fetch(targetItem.id, .isOpen)
         let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {

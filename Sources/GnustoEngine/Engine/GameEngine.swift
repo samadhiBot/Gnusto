@@ -1069,7 +1069,7 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
     @MainActor
-    public func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
+    private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
@@ -1104,7 +1104,7 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
     @MainActor
-    public func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
+    private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' \
@@ -1243,6 +1243,32 @@ extension GameEngine {
         default:
             throw ActionError.invalidValue("""
                 Cannot fetch integer value for \(itemID.rawValue).\(key.rawValue): \
+                \(value ?? .undefined)
+                """)
+        }
+    }
+
+    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> String {
+        let value = await getDynamicItemValue(itemID: itemID, key: key)
+        switch value {
+        case .string(let stringValue):
+            return stringValue
+        default:
+            throw ActionError.invalidValue("""
+                Cannot fetch string value for \(itemID.rawValue).\(key.rawValue): \
+                \(value ?? .undefined)
+                """)
+        }
+    }
+
+    public func fetch(_ locationID: LocationID, _ key: AttributeID) async throws -> String {
+        let value = await getDynamicLocationValue(locationID: locationID, key: key)
+        switch value {
+        case .string(let stringValue):
+            return stringValue
+        default:
+            throw ActionError.invalidValue("""
+                Cannot fetch string value for \(locationID.rawValue).\(key.rawValue): \
                 \(value ?? .undefined)
                 """)
         }

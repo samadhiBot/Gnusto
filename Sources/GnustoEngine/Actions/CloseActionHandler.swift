@@ -51,10 +51,7 @@ public struct CloseActionHandler: EnhancedActionHandler {
         }
 
         // Handle "already closed" case detected (but not thrown) in validate
-        let isOpen = await context.engine.getDynamicItemValue(
-            itemID: targetItemID,
-            key: .isOpen
-        )?.toBool ?? false
+        let isOpen: Bool = try await context.engine.fetch(targetItemID, .isOpen)
         if !isOpen {
             return ActionResult(
                 success: false,

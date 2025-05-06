@@ -7,14 +7,14 @@ public struct AttributeID: Hashable, Comparable, Codable, ExpressibleByStringLit
     /// Initializes a `AttributeID` using a string literal.
     /// - Parameter value: The string literal representing the property ID.
     public init(stringLiteral value: String) {
-        // Consider adding validation or normalization if needed (e.g., lowercase)
+        assert(!value.isEmpty, "Attribute ID cannot be empty")
         self.rawValue = value
     }
 
     /// Initializes a `AttributeID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
     public init(_ rawValue: String) {
-        // Consider adding validation or normalization if needed (e.g., lowercase)
+        assert(!rawValue.isEmpty, "Attribute ID cannot be empty")
         self.rawValue = rawValue
     }
 

@@ -63,8 +63,8 @@ struct DynamicPropertyTests {
         )
 
         // Get initial value
-        let initialValue = await engine.getDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.simpleProp)
-        #expect(initialValue == StateValue.int(10))
+        let initialValue: Int = try await engine.fetch(TestIDs.testItem, TestIDs.simpleProp)
+        #expect(initialValue == 10)
 
         // Set new value
         try await engine.setDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.simpleProp, newValue: StateValue.int(20))
@@ -74,8 +74,8 @@ struct DynamicPropertyTests {
         #expect(updatedItem?.attributes[TestIDs.simpleProp] == StateValue.int(20))
 
         // Verify getting the value again works
-        let finalValue = await engine.getDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.simpleProp)
-        #expect(finalValue == StateValue.int(20))
+        let finalValue: Int = try await engine.fetch(TestIDs.testItem, TestIDs.simpleProp)
+        #expect(finalValue == 20)
     }
 
     // MARK: - Validation Tests

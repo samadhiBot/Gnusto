@@ -44,8 +44,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
             if case .item(let parentID) = targetItem.parent,
                let container = await context.engine.item(parentID),
                container.hasFlag(.isContainer),
-               // Check dynamic property for open state
-               await context.engine.getDynamicItemValue(itemID: parentID, key: .isOpen)?.toBool == false
+               try await context.engine.fetch(parentID, .isOpen) == false
             {
                 throw ActionError.containerIsClosed(parentID)
             }

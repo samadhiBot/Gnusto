@@ -17,31 +17,38 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        let stateValue = await engine.getDynamicItemValue(itemID: itemID, key: key)
-        let raw = stateValue?.toString ?? defaultItemDescription(for: key, itemID: itemID, engine: engine)
-        return formatDescription(raw)
+        formatDescription(
+            (try? await engine.fetch(itemID, key)) ??
+            defaultItemDescription(for: itemID, key: key, engine: engine)
+        )
     }
 
     /// Provides a default description string when a dynamic or static one isn't found.
+    ///
+    /// - Parameters:
+    ///   - itemID: The unique identifier of the item.
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
+    ///   - engine: The game engine providing access to state and dynamic values.
+    /// - Returns: The formatted default description string.
     private func defaultItemDescription(
-        for key: AttributeID,
-        itemID: ItemID,
+        for itemID: ItemID,
+        key: AttributeID,
         engine: GameEngine
     ) -> String {
         let item = engine.item(itemID)
-        switch key {
+        return switch key {
         case .longDescription:
-            return "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
+            "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
         case .shortDescription:
-            return "\(item?.withIndefiniteArticle.capitalizedFirst ?? "An item")."
+            "\(item?.withIndefiniteArticle.capitalizedFirst ?? "An item")."
         case .firstDescription:
-            return "There is \(item?.withIndefiniteArticle ?? "something") here."
+            "There is \(item?.withIndefiniteArticle ?? "something") here."
         case .readText:
-            return "There is nothing written on \(item?.withDefiniteArticle ?? "it")."
+            "There is nothing written on \(item?.withDefiniteArticle ?? "it")."
         case .readWhileHeldText:
-            return "Holding \(item?.withDefiniteArticle ?? "it") reveals nothing special."
+            "Holding \(item?.withDefiniteArticle ?? "it") reveals nothing special."
         default:
-            return "\(item?.withDefiniteArticle.capitalizedFirst ?? "It") seems indescribable."
+            "\(item?.withDefiniteArticle.capitalizedFirst ?? "It") seems indescribable."
         }
     }
 }
@@ -62,15 +69,16 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        let stateValue = await engine.getDynamicLocationValue(locationID: locationID, key: key)
-        let raw = stateValue?.toString ?? defaultLocationDescription(for: key, locationID: locationID, engine: engine)
-        return formatDescription(raw)
+        formatDescription(
+            (try? await engine.fetch(locationID, key)) ??
+            defaultLocationDescription(for: locationID, key: key, engine: engine)
+        )
     }
 
     /// Provides a default description string when a dynamic or static one isn't found.
     private func defaultLocationDescription(
-        for key: AttributeID,
-        locationID: LocationID,
+        for locationID: LocationID,
+        key: AttributeID,
         engine: GameEngine
     ) -> String {
         // Consider fetching location name

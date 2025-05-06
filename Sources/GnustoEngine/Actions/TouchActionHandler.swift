@@ -37,8 +37,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
                     isReachable = true
                 } else if parentItem.hasFlag(.isContainer) {
                     // Check dynamic property for open state
-                    let isParentOpen = await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false
-                    guard isParentOpen else {
+                    guard try await context.engine.fetch(parentItemID, .isOpen) else {
                         throw ActionError.prerequisiteNotMet("The \(parentItem.name) is closed.")
                     }
                     isReachable = true
