@@ -854,7 +854,7 @@ struct StandardParserTests {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["lantern"]?.properties.insert(ItemProperty.container)
+        itemsDict["lantern"]?.attributes.insert(ItemProperty.container)
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),

@@ -42,7 +42,7 @@ struct LocationTests {
         #expect(location.attributes[.longDescription] == .string("A nondescript room."))
         #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
-        #expect(location.properties.isEmpty)
+        #expect(location.attributes.isEmpty)
         #expect(location.globals.isEmpty)
     }
 
@@ -59,7 +59,7 @@ struct LocationTests {
         #expect(location.exits.count == 2)
         #expect(location.exits[.west]?.destination == "westOfHouse")
         #expect(location.exits[.east]?.blockedMessage == "A solid wall blocks your path.")
-        #expect(location.properties == [.inherentlyLit, .sacred])
+        #expect(location.attributes == [.inherentlyLit, .sacred])
         #expect(location.globals.count == 2)
         #expect(location.globals.contains(rugID))
     }
@@ -72,26 +72,26 @@ struct LocationTests {
 
         location.addProperty(.inherentlyLit)
         #expect(location.hasProperty(.inherentlyLit))
-        #expect(location.properties.count == 1)
+        #expect(location.attributes.count == 1)
 
         location.addProperty(.inherentlyLit) // Adding again should have no effect
-        #expect(location.properties.count == 1)
+        #expect(location.attributes.count == 1)
 
         location.addProperty(.outside)
         #expect(location.hasProperty(.outside))
-        #expect(location.properties.count == 2)
+        #expect(location.attributes.count == 2)
 
         location.removeProperty(.inherentlyLit)
         #expect(!location.hasProperty(.inherentlyLit))
         #expect(location.hasProperty(.outside))
-        #expect(location.properties.count == 1)
+        #expect(location.attributes.count == 1)
 
         location.removeProperty(.inherentlyLit) // Removing again should have no effect
-        #expect(location.properties.count == 1)
+        #expect(location.attributes.count == 1)
 
         location.removeProperty(.outside)
         #expect(!location.hasProperty(.outside))
-        #expect(location.properties.isEmpty)
+        #expect(location.attributes.isEmpty)
     }
 
     @Test("Location Codable Conformance")
@@ -116,7 +116,7 @@ struct LocationTests {
         #expect(decodedLocation.exits.count == originalLocation.exits.count)
         #expect(decodedLocation.exits[.west]?.destination == originalLocation.exits[.west]?.destination)
         #expect(decodedLocation.exits[.east]?.blockedMessage == originalLocation.exits[.east]?.blockedMessage)
-        #expect(decodedLocation.properties == originalLocation.properties)
+        #expect(decodedLocation.attributes == originalLocation.attributes)
         #expect(decodedLocation.globals == originalLocation.globals)
     }
 

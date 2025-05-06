@@ -95,6 +95,9 @@ public enum ActionError: Error, Equatable, Sendable {
     /// Action failed because the item cannot be worn (lacks `.wearable` property).
     case itemNotWearable(ItemID)
 
+    /// Action failed because the specified item cannot fit inside the specified container.
+    case itemTooLargeForContainer(item: ItemID, container: ItemID)
+
     /// Action failed because the player cannot carry any more items (inventory capacity reached).
     case playerCannotCarryMore
 

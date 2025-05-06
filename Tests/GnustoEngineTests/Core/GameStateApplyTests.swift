@@ -18,7 +18,7 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let initialItem = gameState.items[GameStateTests.itemLantern]
         #expect(initialItem != nil)
-        let oldProperties = initialItem!.properties
+        let oldProperties = initialItem!.attributes
         var newProperties = oldProperties
         newProperties.insert(.on) // Add .on property
 
@@ -34,7 +34,7 @@ struct GameStateApplyTests {
 
         // Then
         let finalItem = gameState.items[GameStateTests.itemLantern]
-        #expect(finalItem?.properties == newProperties, "Item properties should be updated")
+        #expect(finalItem?.attributes == newProperties, "Item properties should be updated")
         #expect(finalItem?.hasProperty(.on) == true)
 
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
@@ -47,7 +47,7 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let initialItem = gameState.items[GameStateTests.itemLantern]
         #expect(initialItem != nil)
-        let actualOldProperties = initialItem!.properties
+        let actualOldProperties = initialItem!.attributes
         let incorrectOldProperties: Set<ItemProperty> = [.fixed] // Incorrect old value
         var newProperties = actualOldProperties
         newProperties.insert(.on)
@@ -81,7 +81,7 @@ struct GameStateApplyTests {
         // Verify state was not changed
         let finalItem = gameState.items[GameStateTests.itemLantern]
         #expect(
-            finalItem?.properties == actualOldProperties,
+            finalItem?.attributes == actualOldProperties,
             "Item properties should not be updated on error"
         )
         #expect(finalItem?.hasProperty(.on) == false)
@@ -535,7 +535,7 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let initialProperties = gameState.locations[locationID]?.properties ?? []
+        let initialProperties = gameState.locations[locationID]?.attributes ?? []
         let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
 
         let change = StateChange(
@@ -549,7 +549,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Then
-        #expect(gameState.locations[locationID]?.properties == newProperties)
+        #expect(gameState.locations[locationID]?.attributes == newProperties)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -558,7 +558,7 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let actualOldProperties = gameState.locations[locationID]?.properties ?? []
+        let actualOldProperties = gameState.locations[locationID]?.attributes ?? []
         let incorrectOldProperties: Set<LocationProperty> = [.sacred] // Incorrect
         let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
 
@@ -588,7 +588,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(gameState.locations[locationID]?.properties == actualOldProperties)
+        #expect(gameState.locations[locationID]?.attributes == actualOldProperties)
         #expect(gameState.changeHistory.isEmpty)
     }
 

@@ -43,7 +43,7 @@ The `Item` class represents interactable objects within the game world. Key feat
 
 ### Custom State Management
 
-- **Current State:** Limited to boolean properties via `Item.properties`.
+- **Current State:** Limited to boolean properties via `Item.attributes`.
 - **Future Goals:** Extend support for custom, mutable state on items and locations.
 
 ### Parser

@@ -429,7 +429,7 @@ struct GameStateTests {
 
         // Check content of items (comparing key properties, including parent)
         #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)
-        #expect(decodedState.items[Self.itemLantern]?.properties == originalState.items[Self.itemLantern]?.properties)
+        #expect(decodedState.items[Self.itemLantern]?.attributes == originalState.items[Self.itemLantern]?.attributes)
         #expect(decodedState.items[Self.itemLantern]?.parent == originalState.items[Self.itemLantern]?.parent)
         #expect(decodedState.items[Self.itemMailbox]?.parent == originalState.items[Self.itemMailbox]?.parent)
         #expect(decodedState.items[Self.itemLeaflet]?.parent == originalState.items[Self.itemLeaflet]?.parent)
@@ -571,9 +571,9 @@ struct GameStateTests {
 
         #expect(change.entityId == .location("testLoc"))
         #expect(change.propertyKey == .locationProperties)
-        if case .locationPropertySet(let oldProps) = change.oldValue { #expect(oldProps.isEmpty) }
+        if case .locationPropertySet(let oldAttributes) = change.oldValue { #expect(oldAttributes.isEmpty) }
         else { Issue.record("OldValue wrong type") }
-        if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps == [.inherentlyLit]) }
+        if case .locationPropertySet(let newAttributes) = change.newValue { #expect(newAttributes == [.inherentlyLit]) }
         else { Issue.record("NewValue wrong type") }
         // Verify description remains untouched initially
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
@@ -596,9 +596,9 @@ struct GameStateTests {
 
         #expect(change.entityId == .location("testLoc"))
         #expect(change.propertyKey == .locationProperties)
-        if case .locationPropertySet(let oldProps) = change.oldValue { #expect(oldProps == [.inherentlyLit]) }
+        if case .locationPropertySet(let oldAttributes) = change.oldValue { #expect(oldAttributes == [.inherentlyLit]) }
         else { Issue.record("OldValue wrong type") }
-        if case .locationPropertySet(let newProps) = change.newValue { #expect(newProps.isEmpty) }
+        if case .locationPropertySet(let newAttributes) = change.newValue { #expect(newAttributes.isEmpty) }
         else { Issue.record("NewValue wrong type") }
         // Verify description remains untouched
         #expect(state.locations["testLoc"]?.attributes[.longDescription] == .string("Original Desc"))
@@ -624,7 +624,7 @@ struct GameStateTests {
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
-        #expect(state.locations["testLoc"]?.properties.isEmpty == true)
+        #expect(state.locations["testLoc"]?.attributes.isEmpty == true)
     }
 
     @Test("apply - Validation Failure - OldValue Mismatch")

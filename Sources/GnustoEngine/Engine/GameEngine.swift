@@ -770,6 +770,8 @@ public class GameEngine: Sendable {
             "You can't unlock \(theThat(item))."
         case .itemNotWearable(let item):
             "You can't wear \(theThat(item))."
+        case .itemTooLargeForContainer(item: let item, container: let container):
+            "\(theThat(item).capitalizedFirst) won't fit in \(theThat(container))."
         case .playerCannotCarryMore:
             "Your hands are full."
         case .prerequisiteNotMet(let customMessage):

@@ -267,7 +267,7 @@ public struct EnhancedActionHandler: EnhancedActionHandler {
 
 ```swift
 // Before
-item.properties["isOpen"] = true
+item.attributes["isOpen"] = true
 
 // After (Conceptual Example)
 // 1. Define AttributeID

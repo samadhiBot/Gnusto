@@ -33,7 +33,7 @@ struct ScopeResolverTests {
         )
         let resolver = engine.scopeResolver
 
-        engine.gameState.locations["startRoom"]?.properties.remove(.inherentlyLit)
+        engine.gameState.locations["startRoom"]?.attributes.removeValue(forKey: .inherentlyLit)
 
         #expect(resolver.isLocationLit(locationID: "startRoom") == false)
     }
@@ -238,7 +238,7 @@ struct ScopeResolverTests {
         let resolver = engine.scopeResolver
 
         // No need to modify state after initialization
-        // game.state.locations["startRoom"]?.properties.remove(.inherentlyLit)
+        // game.state.locations["startRoom"]?.attributes.remove(.inherentlyLit)
 
         let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)

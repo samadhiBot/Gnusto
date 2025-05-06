@@ -41,7 +41,7 @@ extension Components {
                 engine.updateGameSpecificState(key: Constants.weatherStateKey, value: AnyCodable(newWeather))
 
                 // Show weather change message if player is outside
-                if location?.properties.contains(.outside) == true {
+                if location?.attributes.contains(.outside) == true {
                     var message = ""
                     switch newWeather {
                     case "sunny":

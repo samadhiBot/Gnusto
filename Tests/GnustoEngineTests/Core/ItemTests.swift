@@ -90,26 +90,26 @@ struct ItemTests {
 
         item.addProperty(.takable)
         #expect(item.hasProperty(.takable))
-        #expect(item.properties.count == 1)
+        #expect(item.attributes.count == 1)
 
         item.addProperty(.takable) // Adding again should have no effect
-        #expect(item.properties.count == 1)
+        #expect(item.attributes.count == 1)
 
         item.addProperty(.lightSource)
         #expect(item.hasProperty(.lightSource))
-        #expect(item.properties.count == 2)
+        #expect(item.attributes.count == 2)
 
         item.removeProperty(.takable)
         #expect(!item.hasProperty(.takable))
         #expect(item.hasProperty(.lightSource))
-        #expect(item.properties.count == 1)
+        #expect(item.attributes.count == 1)
 
         item.removeProperty(.takable) // Removing again should have no effect
-        #expect(item.properties.count == 1)
+        #expect(item.attributes.count == 1)
 
         item.removeProperty(.lightSource)
         #expect(!item.hasProperty(.lightSource))
-        #expect(item.properties.isEmpty)
+        #expect(item.attributes.isEmpty)
     }
 
     @Test("Item Codable Conformance")

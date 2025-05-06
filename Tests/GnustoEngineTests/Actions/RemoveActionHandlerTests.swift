@@ -29,7 +29,7 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        let initialProperties = engine.item("cloak")?.properties ?? []
+        let initialProperties = engine.item("cloak")?.attributes ?? []
         #expect(initialProperties.contains(.worn) == true)
         let initialHistory = engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
