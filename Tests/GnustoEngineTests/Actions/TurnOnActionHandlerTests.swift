@@ -14,8 +14,11 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isTakable: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -53,8 +56,11 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            parent: .location(darkRoom.id)
+            parent: .location(darkRoom.id),
+            attributes: [
+                .isLightSource: .bool(true),
+                .isTakable: .bool(true)
+            ]
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -100,8 +106,12 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isOn: .bool(true),
+                .isTakable: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -139,8 +149,8 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: .bool(true)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -177,8 +187,11 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            parent: .nowhere // Not accessible
+            parent: .nowhere, // Not accessible
+            attributes: [
+                .isLightSource: .bool(true),
+                .isTakable: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -208,8 +221,8 @@ struct TurnOnActionHandlerTests {
             id: "radio",
             name: "portable radio",
             description: "A portable radio.",
-            properties: .device, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [.isTakable: .bool(true)]
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -251,8 +264,11 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isLightSource: .bool(true),
+                .isTakable: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()

@@ -13,8 +13,12 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, .worn, // Held, wearable, worn
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: .bool(true),
+                .isWearable: .bool(true),
+                .isWorn: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -29,8 +33,7 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        let initialProperties = engine.item("cloak")?.attributes ?? []
-        #expect(initialProperties.contains(.worn) == true)
+        #expect(engine.item("cloak")?.hasFlag(.isWorn) == true)
         let initialHistory = engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 
@@ -40,8 +43,8 @@ struct RemoveActionHandlerTests {
         // Assert State Change
         let finalCloakState = await engine.item("cloak")
         #expect(finalCloakState?.parent == .location("startRoom"))
-        #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .worn property")
-        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property") // Ensure touched is added
+        #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
+        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
@@ -58,14 +61,14 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isWorn),
-                oldValue: true,
+                oldValue: .bool(true),
                 newValue: .bool(false)
             ),
             StateChange(
                 entityId: .item("cloak"),
                 propertyKey: .itemAttribute(.isTouched),
-                oldValue: .bool(false), // Assuming not touched before removal
-                newValue: true,
+                oldValue: .bool(false),
+                newValue: .bool(true)
             ),
         ]
         let finalHistory = engine.gameState.changeHistory
@@ -77,8 +80,11 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, // Held, wearable, NOT worn
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: .bool(true),
+                .isWearable: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let engine = GameEngine(
@@ -156,8 +162,12 @@ struct RemoveActionHandlerTests {
         let amulet = Item(
             id: "amulet",
             name: "cursed amulet",
-            properties: .wearable, .worn, .fixed, // Worn and fixed
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isWearable: .bool(true),
+                .isWorn: .bool(true),
+                .isFixed: .bool(true)
+            ]
         )
         let game = MinimalGame(items: [amulet])
         let engine = GameEngine(

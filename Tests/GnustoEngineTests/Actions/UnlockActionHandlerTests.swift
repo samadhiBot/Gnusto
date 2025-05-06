@@ -113,11 +113,11 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        let finalBoxState = try #require(await engine.item("box"))
+        let finalBoxState = try #require(engine.item("box"))
         #expect(finalBoxState.hasFlag(.isLocked) == false, "Box should be unlocked") // Qualified AttributeID
         #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched") // Qualified AttributeID
 
-        let finalKeyState = try #require(await engine.item("key"))
+        let finalKeyState = try #require(engine.item("key"))
         #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched") // Qualified AttributeID
 
         // Assert Change History
@@ -415,7 +415,7 @@ let box = Item(
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(await engine.item("box"))
+        let initialBoxSnapshot = try #require(engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified AttributeID
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
