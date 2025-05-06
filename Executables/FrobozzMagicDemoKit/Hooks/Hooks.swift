@@ -13,8 +13,8 @@ enum Hooks {
     ///   - locationID: The ID of the location being entered.
     static func onEnterRoom(engine: GameEngine, locationID: LocationID) async -> Bool {
         // Use safe accessors
-        let flagKey = "visited_treasure_room"
-        let hasVisitedTreasure = engine.getFlagValue(key: flagKey) ?? false
+        let visitedTreasureFlag: FlagID = "visited_treasure_room"
+        let hasVisitedTreasure = engine.isFlagSet(visitedTreasureFlag)
 
         // Check for special room behaviors
         switch locationID {
@@ -22,7 +22,7 @@ enum Hooks {
             if !hasVisitedTreasure {
                 await engine.output("You've discovered the legendary treasure room!", style: .strong)
                 // Use safe mutators
-                engine.setFlagValue(key: flagKey, value: true)
+                await engine.setFlag(visitedTreasureFlag)
                 engine.updatePlayerScore(delta: 10) // Award points for discovery
             }
 
@@ -38,8 +38,8 @@ enum Hooks {
 
         case "hiddenVault":
             // Use safe accessors
-            let vaultFlag = "visited_vault"
-            let hasVisitedVault = engine.getFlagValue(key: vaultFlag) ?? false
+            let visitedVaultFlag: FlagID = "visited_vault"
+            let hasVisitedVault = engine.isFlagSet(visitedVaultFlag)
 
             if !hasVisitedVault {
                 await engine.output(
@@ -50,7 +50,7 @@ enum Hooks {
                     style: .strong
                 )
                 // Use safe mutators
-                engine.setFlagValue(key: vaultFlag, value: true)
+                await engine.setFlag(visitedVaultFlag)
                 engine.updatePlayerScore(delta: 15) // Award points for discovery
             }
 
@@ -121,11 +121,11 @@ enum Hooks {
     /// - Returns: `true` if the player has an active light source.
     private static func hasActiveLight(engine: GameEngine) async -> Bool {
         // Get player's directly held items
-        let playerItemIDs = engine.items(withParent: .player).map { $0.id }
+        let playerItemIDs = engine.items(in: .player).map { $0.id }
 
         // Check for the lantern specifically
         if playerItemIDs.contains(Components.Lantern.Constants.itemID) {
-            let lantern = engine.item(with: Components.Lantern.Constants.itemID)
+            let lantern = engine.item(Components.Lantern.Constants.itemID)
             if lantern?.hasProperty(.on) == true {
                 return true // Lit lantern found
             }
@@ -133,7 +133,7 @@ enum Hooks {
 
         // Check for other light sources (like the glowing gem)
         for itemID in playerItemIDs {
-            let item = engine.item(with: itemID)
+            let item = engine.item(itemID)
             // Check if it's a light source BUT NOT the lantern (already checked)
             if itemID != Components.Lantern.Constants.itemID,
                item?.hasProperty(.lightSource) == true

@@ -15,8 +15,8 @@ public struct GameState: Codable, Equatable, Sendable {
     /// All locations defined in the game, indexed by their `LocationID`.
     public internal(set) var locations: [LocationID: Location]
 
-    /// Global boolean flags, indexed by String key.
-    public internal(set) var flags: [String: Bool]
+    /// The set of currently active global flags.
+    public internal(set) var flags: Set<FlagID>
 
     /// The current state of the player.
     public internal(set) var player: Player
@@ -30,7 +30,7 @@ public struct GameState: Codable, Equatable, Sendable {
     /// Pronoun references, mapping String pronouns ("it", "them") to specific item ID sets.
     public internal(set) var pronouns: [String: Set<ItemID>]
 
-    /// Game-specific key-value storage for miscellaneous state. Uses String keys.
+    /// Game-specific key-value storage for miscellaneous state.
     public internal(set) var gameSpecificState: [GameStateKey: StateValue]
 
     /// A history of all state changes applied to this game state instance.
@@ -46,7 +46,7 @@ public struct GameState: Codable, Equatable, Sendable {
         items: [Item],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: [String: Bool] = [:],
+        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
@@ -70,7 +70,7 @@ public struct GameState: Codable, Equatable, Sendable {
         areas: [AreaContents.Type],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: [String: Bool] = [:],
+        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [Fuse.ID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
@@ -116,6 +116,21 @@ public struct GameState: Codable, Equatable, Sendable {
         )
     }
 
+    @MainActor
+    var snapshot: GameState {
+        GameState(
+            locations: Array(locations.values),
+            items: Array(items.values),
+            player: player,
+            vocabulary: vocabulary,
+            flags: flags,
+            pronouns: pronouns,
+            activeFuses: activeFuses,
+            activeDaemons: activeDaemons,
+            gameSpecificState: gameSpecificState
+        )
+    }
+
     // MARK: - State Mutation
 
     /// Applies a `StateChange` to the game state, modifying the relevant property and recording the change.
@@ -124,7 +139,7 @@ public struct GameState: Codable, Equatable, Sendable {
         try validateOldValue(for: change)
 
         // --- Mutation Phase ---
-        switch change.propertyKey {
+        switch change.attributeKey {
 
         // MARK: Item Properties
 
@@ -139,7 +154,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAdjectives change")
             }
-            items[itemID]?.adjectives = newAdjectives
+            items[itemID]?.attributes[.adjectives] = .stringSet(newAdjectives)
 
         case .itemCapacity:
             // Expecting an .int for itemCapacity
@@ -152,7 +167,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemCapacity change")
             }
-            items[itemID]?.capacity = newCapacity // Assuming Item has capacity
+            items[itemID]?.attributes[.capacity] = .int(newCapacity)
 
         case .itemName:
             // Expecting a .string for itemName
@@ -180,19 +195,6 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             items[itemID]?.parent = newParent
 
-        case .itemProperties:
-            // Expecting an .itemPropertySet for itemProperties
-            guard case .itemPropertySet(let newProperties) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemProperties: expected .itemPropertySet, got \(change.newValue)")
-            }
-            guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemProperties: expected .item, got \(change.entityId)")
-            }
-            guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemProperties change")
-            }
-            items[itemID]?.properties = newProperties
-
         case .itemSize:
             // Expecting an .int for itemSize
             guard case .int(let newSize) = change.newValue else {
@@ -204,7 +206,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSize change")
             }
-            items[itemID]?.size = newSize
+            items[itemID]?.attributes[.size] = .int(newSize)
 
         case .itemSynonyms:
             // Expecting a .stringSet for itemSynonyms
@@ -217,7 +219,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSynonyms change")
             }
-            items[itemID]?.synonyms = newSynonyms
+            items[itemID]?.attributes[.synonyms] = .stringSet(newSynonyms)
 
         case .itemValue:
             // Expecting an .int for itemValue
@@ -250,19 +252,6 @@ public struct GameState: Codable, Equatable, Sendable {
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
 
-        case .locationProperties:
-            // Expecting a .locationPropertySet for locationProperties
-            guard case .locationPropertySet(let newProperties) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for locationProperties: expected .locationPropertySet, got \(change.newValue)")
-            }
-            guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationProperties: expected .location, got \(change.entityId)")
-            }
-            guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationProperties change")
-            }
-            locations[locationID]?.properties = newProperties
-
         case .locationExits:
             // Expecting .locationExits
             guard case .locationExits(let newExits) = change.newValue else {
@@ -275,6 +264,28 @@ public struct GameState: Codable, Equatable, Sendable {
                 throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change")
             }
             locations[locationID]?.exits = newExits
+
+        // MARK: Attributes (Item or Location)
+
+        case .itemAttribute(let key):
+            guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("EntityID mismatch for itemAttribute: expected .item, got \(change.entityId)")
+            }
+            guard items[itemID] != nil else {
+                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAttribute change ('\(key.rawValue)')")
+            }
+            // Directly update the StateValue in the dictionary.
+            // Assumes validation happened *before* StateChange creation.
+            items[itemID]?.attributes[key] = change.newValue
+
+        case .locationAttribute(let key):
+             guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("EntityID mismatch for locationAttribute: expected .location, got \(change.entityId)")
+            }
+            guard locations[locationID] != nil else {
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationAttribute change ('\(key.rawValue)')")
+            }
+            locations[locationID]?.attributes[key] = change.newValue
 
         // MARK: Player Properties
 
@@ -327,15 +338,27 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // MARK: Global/Misc Properties
 
-        case .flag(let key):
-            // Expecting .bool
-            guard case .bool(let newValue) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for flag \(key): expected .bool, got \(change.newValue)")
-            }
-            guard change.entityId == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for flag: expected .global, got \(change.entityId)")
-            }
-            flags[key] = newValue // Use String key
+        case .setFlag(let flagID):
+            // The convention is that setting a flag corresponds to a newValue of true
+            guard change.newValue == true else {
+                 print("Warning: setFlag StateChange newValue was not true, was \(String(describing: change.newValue)). Proceeding anyway.")
+                 return // Exit scope if newValue is not as expected
+             }
+             guard change.entityId == .global else {
+                 throw ActionError.internalEngineError("EntityID mismatch for setFlag: expected .global, got \(change.entityId)")
+             }
+             flags.insert(flagID)
+
+        case .clearFlag(let flagID):
+            // The convention is that clearing a flag corresponds to a newValue of false
+            guard change.newValue == false else {
+                 print("Warning: clearFlag StateChange newValue was not false, was \(String(describing: change.newValue)). Proceeding anyway.")
+                 return // Exit scope if newValue is not as expected
+             }
+             guard change.entityId == .global else {
+                 throw ActionError.internalEngineError("EntityID mismatch for clearFlag: expected .global, got \(change.entityId)")
+             }
+             flags.remove(flagID)
 
         case .gameSpecificState(let key):
             guard change.entityId == .global else {
@@ -357,8 +380,8 @@ public struct GameState: Codable, Equatable, Sendable {
             guard change.entityId == .global else {
                 throw ActionError.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityId)")
             }
-            guard case .bool(true) = change.newValue else {
-                 print("WARN: addActiveDaemon StateChange newValue was not .bool(true), was \(change.newValue). Proceeding anyway.")
+            guard case true = change.newValue else {
+                 print("WARN: addActiveDaemon StateChange newValue was not true, was \(change.newValue). Proceeding anyway.")
                  return
              }
             activeDaemons.insert(daemonId)
@@ -407,7 +430,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // Determine the actual current value based on the property key.
         let actualCurrentValue: StateValue?
-        switch change.propertyKey {
+        switch change.attributeKey {
         // Item Properties
         case .itemAdjectives:
             guard case .item(let itemID) = change.entityId else {
@@ -444,13 +467,6 @@ public struct GameState: Codable, Equatable, Sendable {
             // Map item's parent ParentEntity to .parentEntity
             actualCurrentValue = items[itemID].map { .parentEntity($0.parent) }
 
-        case .itemProperties:
-            guard case .item(let itemID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemProperties")
-            }
-            // Map item's properties Set<ItemProperty> to .itemPropertySet
-            actualCurrentValue = items[itemID].map { .itemPropertySet($0.properties) }
-
         case .itemSize:
             guard case .item(let id) = change.entityId else {
                 throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize")
@@ -474,17 +490,6 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .locationDescription:
              throw ActionError.internalEngineError("Old value validation cannot be performed on locationDescription.")
-
-        case .locationProperties:
-            guard case .location(let locationID) = change.entityId else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationProperties")
-            }
-            // Map location's properties Set<LocationProperty> to .locationPropertySet
-            actualCurrentValue = if let properties = locations[locationID]?.properties {
-                .locationPropertySet(properties)
-            } else {
-                nil
-            }
 
         case .locationExits:
             guard case .location(let locationID) = change.entityId else {
@@ -511,8 +516,17 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue = nil // Skip validation
 
         // Global/Misc Properties
-        case .flag(let key):
-            actualCurrentValue = flags[key].map { .bool($0) }
+        case .setFlag(let flagID):
+            // Before setting, the flag should *not* have been present.
+            // The expected old value should be false or nil.
+            let flagWasSet = flags.contains(flagID)
+            actualCurrentValue = .bool(flagWasSet)
+
+        case .clearFlag(let flagID):
+            // Before clearing, the flag *should* have been present.
+            // The expected old value should be true.
+            let flagWasSet = flags.contains(flagID)
+            actualCurrentValue = .bool(flagWasSet)
 
         case .gameSpecificState(let key):
              actualCurrentValue = gameSpecificState[key]
@@ -537,10 +551,25 @@ public struct GameState: Codable, Equatable, Sendable {
         case .updateFuseTurns(let fuseId):
             // If fuse doesn't exist, current value is nil
             actualCurrentValue = activeFuses[fuseId].map { StateValue.int($0) }
+
+        case .itemAttribute(let key):
+             guard case .item(let itemID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemAttribute")
+             }
+             actualCurrentValue = items[itemID]?.attributes[key]
+
+        case .locationAttribute(let key):
+             guard case .location(let locationID) = change.entityId else {
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationAttribute")
+             }
+             actualCurrentValue = locations[locationID]?.attributes[key]
         }
 
-        // Perform the comparison: expectedOldValue is guaranteed non-nil here.
-        if actualCurrentValue != expectedOldValue {
+        // Perform the validation
+        guard
+            actualCurrentValue == expectedOldValue ||
+            (actualCurrentValue == nil && expectedOldValue == false)
+        else {
             throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
         }
     }
@@ -556,7 +585,7 @@ public struct GameState: Codable, Equatable, Sendable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         items = try container.decode([ItemID: Item].self, forKey: .items)
         locations = try container.decode([LocationID: Location].self, forKey: .locations)
-        flags = try container.decodeIfPresent([String: Bool].self, forKey: .flags) ?? [:]
+        flags = try container.decodeIfPresent(Set<FlagID>.self, forKey: .flags) ?? []
         player = try container.decode(Player.self, forKey: .player)
         activeFuses = try container.decodeIfPresent([Fuse.ID: Int].self, forKey: .activeFuses) ?? [:]
         activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []

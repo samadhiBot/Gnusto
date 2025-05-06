@@ -12,15 +12,13 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here."
+            description: "You are here."
         )
         let lamp = Item(
             id: "lamp",
             name: "lamp",
-            shortDescription: "A brass lamp",
-            longDescription: "A brass lamp is here.",
-            properties: .lightSource, .device, .on,
-            parent: .player
+            parent: .player,
+            attributes: [.isLightSource: true, .isDevice: true, .isOn: true]
         )
 
         let game = MinimalGame(
@@ -45,9 +43,9 @@ struct TurnOffActionHandlerTests {
             The lamp is now off.
             It is now pitch black. You are likely to be eaten by a grue.
             """)
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
     @Test("TURN OFF fails for non-light source")
@@ -55,14 +53,12 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here.",
-            properties: .inherentlyLit
+            description: "You are here.",
+            isLit: true
         )
         let book = Item(
             id: "book",
             name: "book",
-            shortDescription: "A dusty book",
-            longDescription: "A dusty book lies here.",
             parent: .location(room.id)
         )
 
@@ -82,7 +78,13 @@ struct TurnOffActionHandlerTests {
         let command = Command(verbID: "turn off", directObject: "book", rawInput: "turn off book")
 
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -91,7 +93,7 @@ struct TurnOffActionHandlerTests {
         let room = Location(
             id: "room",
             name: "Test Room",
-            longDescription: "You are here."
+            description: "You are here."
         )
 
         let game = MinimalGame(
@@ -110,7 +112,13 @@ struct TurnOffActionHandlerTests {
 
         // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -119,10 +127,15 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .player
+            description: "A brass lantern.",
+            parent: .player,
+            attributes: [
+                .isDevice: true,
+                .isLightSource: true,
+                .isTakable: true,
+                .isOn: true,
+                .size: 10
+            ]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -136,9 +149,9 @@ struct TurnOffActionHandlerTests {
 
         await engine.execute(command: command)
 
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now off.")
@@ -149,15 +162,14 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            longDescription: "This room will become dark."
+            description: "This room will become dark."
         )
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .location(darkRoom.id)
+            description: "A brass lantern.",
+            parent: .location(darkRoom.id),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -179,9 +191,9 @@ struct TurnOffActionHandlerTests {
 
         await engine.execute(command: command)
 
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -199,10 +211,9 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
-            properties: .device, .lightSource, .takable,
-            size: 10,
-            parent: .player
+            description: "A brass lantern.",
+            parent: .player,
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -217,13 +228,19 @@ struct TurnOffActionHandlerTests {
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already off.")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
 
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == false)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
 
     @Test("Try to turn off non-device item")
@@ -231,10 +248,9 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
-            properties: .takable, .on,
-            size: 10,
-            parent: .player
+            description: "A brass lantern.",
+            parent: .player,
+            attributes: [.isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -248,12 +264,18 @@ struct TurnOffActionHandlerTests {
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == true)
-        #expect(finalItemState?.hasProperty(.touched) == false)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == true)
+        #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
 
     @Test("Try to turn off item not accessible")
@@ -261,10 +283,9 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            longDescription: "A brass lantern.",
-            properties: .device, .lightSource, .takable, .on,
-            size: 10,
-            parent: .nowhere
+            description: "A brass lantern.",
+            parent: .nowhere,
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true, .size: .int(10)]
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -291,13 +312,13 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            properties: .device, .lightSource, .takable, .on,
-            parent: .location("darkRoom")
+            parent: .location("darkRoom"),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true]
         )
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -322,9 +343,9 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """
@@ -340,13 +361,13 @@ struct TurnOffActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            properties: .device, .lightSource, .takable, .on,
-            parent: .location("darkRoom")
+            parent: .location("darkRoom"),
+            attributes: [.isDevice: true, .isLightSource: true, .isTakable: true, .isOn: true]
         )
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -371,9 +392,9 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "lamp")
-        #expect(finalItemState?.hasProperty(.on) == false)
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = engine.item("lamp")
+        #expect(finalItemState?.hasFlag(.isOn) == false)
+        #expect(finalItemState?.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         let expectedOutput = """

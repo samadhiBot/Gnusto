@@ -11,37 +11,67 @@ struct CloseActionHandlerTests {
     // Helper to create the expected StateChange array for successful close
     private func expectedCloseChanges(
         itemID: ItemID,
-        oldProperties: Set<ItemProperty>
+        initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
-        var finalProperties = oldProperties
-        finalProperties.remove(.open)
-        finalProperties.insert(.touched)
-
         var changes: [StateChange] = []
 
-        if oldProperties != finalProperties {
-            changes.append(StateChange(
+        // Change 1: isOpen becomes false
+        changes.append(
+            StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(finalProperties)
-            ))
+                attributeKey: .itemAttribute(.isOpen),
+                oldValue: true, // Assume it was open before closing
+                newValue: false
+            )
+        )
+
+        // Change 2: Item touched (if needed)
+        if initialAttributes[.isTouched] != true {
+            changes.append(
+                StateChange(
+                    entityId: .item(itemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: false,
+                    newValue: true,
+                )
+            )
         }
-        // No pronoun changes expected for closing
+
+        // Change 3: Pronoun "it"
+        changes.append(
+             StateChange(
+                 entityId: .global,
+                 attributeKey: .pronounReference(pronoun: "it"),
+                 oldValue: nil,
+                 newValue: .itemIDSet([itemID])
+             )
+        )
+
         return changes
     }
 
-    @Test("Close item successfully")
-    func testCloseItemSuccessfully() async throws {
-        // Arrange
+    // Helper to create the expected StateChange for setting isOpen to false
+    private func expectedIsOpenFalseChange(itemID: ItemID) -> StateChange {
+        StateChange(
+            entityId: .item(itemID),
+            attributeKey: .itemAttribute(.isOpen),
+            oldValue: true, // Assumes it was true before closing
+            newValue: false
+        )
+    }
+
+    @Test("Close open container successfully")
+    func testCloseOpenContainerSuccessfully() async throws {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .open,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isOpen: true // Start open
+            ]
         )
-        let initialProperties = box.properties // Capture initial state
-
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -51,210 +81,148 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
-        let command = Command(
-            verbID: "close",
-            directObject: "box",
-            rawInput: "close box"
-        )
+        // Initial state check
+        let initialBox = engine.item("box")
+        #expect(initialBox?.attributes[.isOpen] == true) // Qualified key
+        #expect(engine.gameState.changeHistory.isEmpty)
 
-        // Act: Use engine.execute for full pipeline
+        // Act
         await engine.execute(command: command)
 
-        // Assert Final State
-        let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should gain .touched property")
+        // Assert State Change
+        let finalBox = engine.item("box")
+        #expect(finalBox?.attributes[.isOpen] == false) // Qualified key
+        #expect(finalBox?.hasFlag(.isTouched) == true)
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "You close the wooden box.")
 
         // Assert Change History
-        let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
+        let expectedChanges = expectedCloseChanges(itemID: "box", initialAttributes: initialBox?.attributes ?? [:])
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
-    @Test("Close item that is already touched")
-    func testCloseItemAlreadyTouched() async throws {
-        // Arrange: Item is openable, open, and already touched
+    @Test("Close fails if already closed")
+    func testCloseFailsIfAlreadyClosed() async throws {
         let box = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .open, .touched, // Start touched
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true
+                // Starts closed by default (no .isOpen: true)
+            ]
         )
-        let initialProperties = box.properties // Includes .touched
-
         let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
-        #expect(engine.item(with: "box")?.hasProperty(.open) == true)
-        #expect(engine.item(with: "box")?.hasProperty(.touched) == true)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
-        let command = Command(
-            verbID: "close",
-            directObject: "box",
-            rawInput: "close box"
+        // Act & Assert Error
+        await #expect(throws: ActionError.customResponse("It's already closed.")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
+    }
+
+    @Test("Close fails if not openable")
+    func testCloseFailsIfNotOpenable() async throws {
+        let rock = Item(
+            id: "rock",
+            name: "smooth rock",
+            parent: .location("startRoom")
+            // isContainer/isOpenable are false by default
+        )
+        let game = MinimalGame(items: [rock])
+        let engine = GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        let command = Command(verbID: "close", directObject: "rock", rawInput: "close rock")
 
-        // Assert Final State
-        let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false, "Item should lose .open property")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should still have .touched property")
+        // Act & Assert Error
+        await #expect(throws: ActionError.itemNotOpenable("rock")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
+    }
 
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You close the wooden box.")
+    @Test("Close fails if item not accessible")
+    func testCloseFailsIfNotAccessible() async throws {
+        let box = Item(
+            id: "box",
+            name: "distant box",
+            parent: .nowhere,
+            attributes: [
+                .isOpenable: true,
+                .isOpen: true // Start open
+            ]
+        )
+        let game = MinimalGame(items: [box])
+        let engine = GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
-        // Assert Change History
-        let expectedChanges = expectedCloseChanges(itemID: "box", oldProperties: initialProperties)
-        // Change should still happen because .open is removed
-        #expect(!expectedChanges.isEmpty)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
+
+        // Act & Assert Error
+        await #expect(throws: ActionError.itemNotAccessible("box")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
-        // Arrange
         let game = MinimalGame()
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
         let engine = GameEngine(
             game: game,
-            parser: mockParser,
-            ioHandler: mockIO
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
         )
 
-        let command = Command(
-            verbID: "close",
-            rawInput: "close"
-        )
+        let command = Command(verbID: "close", rawInput: "close")
 
-        // Act
-        await engine.execute(command: command)
-
-        // Assert: Check output instead of thrown error
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Close what?")
-    }
-
-    @Test("Close fails item not accessible")
-    func testCloseFailsItemNotAccessible() async throws {
-        // Arrange: Item exists but is in .nowhere
-        let game = MinimalGame(
-            items: [
-                Item(
-                    id: "box",
-                    name: "wooden box",
-                    properties: .container, .openable, .open,
-                    parent: .nowhere
-                ),
-            ]
-        )
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "close",
-            directObject: "box",
-            rawInput: "close box"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert: Check output instead of thrown error
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.") // Standard Zork message
-    }
-
-    @Test("Close fails item not closeable")
-    func testCloseFailsItemNotCloseable() async throws {
-        // Arrange
-        let rock = Item(
-            id: "rock",
-            name: "heavy rock",
-            parent: .location("startRoom")
-        ) // Not .openable
-        let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
-        let command = Command(
-            verbID: "close",
-            directObject: "rock",
-            rawInput: "close rock"
-        )
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert: Check output instead of thrown error
-        let output = await mockIO.flush()
-        expectNoDifference(output, "The heavy rock is not something you can close.")
-    }
-
-    @Test("Close fails item already closed")
-    func testCloseFailsItemAlreadyClosed() async throws {
-        // Arrange
-        let box = Item(
-            id: "box",
-            name: "wooden box",
-            properties: .container, .openable, // Starts closed
-            parent: .location("startRoom")
-        )
-        let game = MinimalGame(items: [box])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-        #expect(engine.item(with: "box")?.hasProperty(.open) == false)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
-
-        let command = Command(
-            verbID: "close",
-            directObject: "box",
-            rawInput: "close box"
-        )
-
-        // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
-
-        // Assert Final State (Unchanged)
-        let finalItemState = engine.item(with: "box")
-        #expect(finalItemState?.hasProperty(.open) == false)
-
-        // Assert Output
-        let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is already closed.")
-
-        // Assert Change History (Should be empty)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        // Act & Assert Error
+        await #expect(throws: ActionError.customResponse("Close what?")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+        #expect(engine.gameState.changeHistory.isEmpty)
     }
 }

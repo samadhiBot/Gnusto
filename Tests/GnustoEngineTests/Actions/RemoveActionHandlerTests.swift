@@ -13,8 +13,12 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, .worn, // Held, wearable, worn
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .isWearable: true,
+                .isWorn: true
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -29,8 +33,7 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        let initialProperties = engine.item(with: "cloak")?.properties ?? []
-        #expect(initialProperties.contains(.worn) == true)
+        #expect(engine.item("cloak")?.hasFlag(.isWorn) == true)
         let initialHistory = engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 
@@ -38,9 +41,10 @@ struct RemoveActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = engine.item(with: "cloak")
-        #expect(finalCloakState?.hasProperty(.worn) == false, "Cloak should NOT have .worn property")
-        #expect(finalCloakState?.hasProperty(.touched) == true, "Cloak should have .touched property") // Ensure touched is added
+        let finalCloakState = await engine.item("cloak")
+        #expect(finalCloakState?.parent == .location("startRoom"))
+        #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
+        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
@@ -50,16 +54,22 @@ struct RemoveActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityId: .item("cloak"),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet([.takable, .wearable, .touched]) // .worn removed, .touched added
+                attributeKey: .itemParent,
+                oldValue: .parentEntity(.player),
+                newValue: .parentEntity(.location("startRoom"))
             ),
             StateChange(
-                entityId: .global,
-                propertyKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
-                newValue: .itemIDSet(["cloak"])
-            )
+                entityId: .item("cloak"),
+                attributeKey: .itemAttribute(.isWorn),
+                oldValue: true,
+                newValue: false
+            ),
+            StateChange(
+                entityId: .item("cloak"),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true
+            ),
         ]
         let finalHistory = engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
@@ -70,8 +80,11 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            properties: .takable, .wearable, // Held, wearable, NOT worn
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .isWearable: true
+            ]
         )
         let game = MinimalGame(items: [cloak])
         let engine = GameEngine(
@@ -84,7 +97,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -102,7 +121,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -121,7 +146,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
-             try await handler.validate(command: command, engine: engine)
+             try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }
@@ -131,8 +162,12 @@ struct RemoveActionHandlerTests {
         let amulet = Item(
             id: "amulet",
             name: "cursed amulet",
-            properties: .wearable, .worn, .fixed, // Worn and fixed
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isWearable: true,
+                .isWorn: true,
+                .isFixed: true
+            ]
         )
         let game = MinimalGame(items: [amulet])
         let engine = GameEngine(
@@ -145,7 +180,13 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotRemovable("amulet")) {
-            try await handler.validate(command: command, engine: engine)
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         #expect(engine.gameState.changeHistory.isEmpty)
     }

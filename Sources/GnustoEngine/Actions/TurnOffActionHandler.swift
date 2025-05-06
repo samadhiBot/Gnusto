@@ -5,68 +5,63 @@ struct TurnOffActionHandler: EnhancedActionHandler {
 
     // MARK: - EnhancedActionHandler Methods
 
-    func validate(command: Command, engine: GameEngine) async throws {
+    func validate(context: ActionContext) async throws {
         // 1. Get direct object ID
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Turn off what?")
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID.rawValue)'.")
         }
 
         // 3. Verify the item is reachable.
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
         // 4. Check if the item has the `.device` property.
-        guard targetItem.hasProperty(.device) else {
+        guard targetItem.hasFlag(.isDevice) else {
             throw ActionError.prerequisiteNotMet("You can't turn that off.")
         }
 
         // 5. Check if the item is already off (lacks `.on`).
-        guard targetItem.hasProperty(.on) else {
-            throw ActionError.customResponse("It's already off.") // Use customResponse
+        guard targetItem.hasFlag(.isOn) else {
+            throw ActionError.customResponse("It's already off.")
         }
     }
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TURN OFF command reached process without direct object.")
+    func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("TURN OFF context.command reached process without direct object.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
              // Should be caught by validate
             throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN OFF.")
         }
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
-        let initialProperties = targetItem.properties // Use initial state
 
-        // Add touched property change if needed
-        if !initialProperties.contains(.touched) {
+        // Change 1: Add .touched property change if needed
+        if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet(initialProperties.union([.touched]))
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: targetItem.attributes[.isTouched] ?? false,
+                newValue: true,
             ))
         }
 
-        // Remove .on property change (always based on initial state + touched)
-        let propertiesAfterTouch = initialProperties.union(stateChanges.isEmpty ? [] : [.touched]) // Account for potential touch
-        let propertiesAfterOff = propertiesAfterTouch.subtracting([.on])
-        // Only add the change if .on was actually present initially
-        if initialProperties.contains(.on) { // Ensure we only remove if it was on
-             stateChanges.append(StateChange(
+        // Change 2: Remove .on property change (only if currently on)
+        if targetItem.attributes[.isOn] == true {
+            stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                 // Old value depends on whether touched was added *before* this change conceptually
-                oldValue: .itemPropertySet(propertiesAfterTouch),
-                newValue: .itemPropertySet(propertiesAfterOff)
+                attributeKey: .itemAttribute(.isOn),
+                oldValue: true,
+                newValue: false
             ))
         }
 
@@ -75,26 +70,29 @@ struct TurnOffActionHandler: EnhancedActionHandler {
         messageParts.append("The \(targetItem.name) is now off.")
 
         // Check if location became dark
-        let isLightSource = targetItem.hasProperty(.lightSource)
-        if isLightSource {
-            let currentLocationID = await engine.gameState.player.currentLocationID
+        let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
+        if isLightSourceBeingTurnedOff {
+            let currentLocationID = await context.engine.gameState.player.currentLocationID
+            let currentLocation = await context.engine.location(with: currentLocationID)
 
-            // Determine the hypothetical state of the target item *after* changes
-            var propsAfterOff = targetItem.properties // Start with current props
-            propsAfterOff.remove(.on)
-            if !targetItem.hasProperty(.touched) {
-                propsAfterOff.insert(.touched)
-            }
+            // 1. Is the room inherently lit?
+            let locationIsInherentlyLit = currentLocation?.hasFlag(.inherentlyLit) ?? false
 
-            // Check lit status using the hypothetical state of the single changed item
-            let locationIsNowLit = await engine.scopeResolver.isLocationLitAfterSimulatedChange(
-                locationID: currentLocationID,
-                changedItemID: targetItemID,
-                newItemProperties: propsAfterOff // Pass the hypothetical properties
-            )
+            if !locationIsInherentlyLit {
+                // 2. Check for other active light sources (inventory or location)
+                let allItems = await context.engine.gameState.items.values
+                let otherActiveLightSources = allItems.filter { item in
+                    guard item.id != targetItemID else { return false } // Exclude the item being turned off
+                    let isInPlayerInventory = item.parent == .player
+                    let isInCurrentLocation = item.parent == .location(currentLocationID)
+                    let providesLight = item.hasFlag(.isLightSource)
+                    let isOn = item.hasFlag(.isOn)
+                    return (isInPlayerInventory || isInCurrentLocation) && providesLight && isOn
+                }
 
-            if !locationIsNowLit {
-                messageParts.append("It is now pitch black. You are likely to be eaten by a grue.")
+                if otherActiveLightSources.isEmpty {
+                    messageParts.append("It is now pitch black. You are likely to be eaten by a grue.")
+                }
             }
         }
 

@@ -8,52 +8,55 @@ import Testing
 struct LockActionHandlerTests {
 
     // --- Test Setup ---
-    let box = Item(
-        id: "box",
-        name: "wooden box",
-        properties: .container, .openable, .lockable, // Lockable, initially unlocked
-        lockKey: "key"
-    )
-
-    let key = Item(
-        id: "key",
-        name: "small key",
-        properties: .takable
-    )
+    // Removed redundant setup
 
     // --- Helper ---
     private func expectedLockChanges(
         targetItemID: ItemID,
         keyItemID: ItemID,
-        oldTargetProps: Set<ItemProperty>,
-        oldKeyProps: Set<ItemProperty>
+        initialTargetLocked: Bool,
+        initialTargetTouched: Bool,
+        initialKeyTouched: Bool
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
-        // Target changes: Add .locked and .touched
-        var newTargetProps = oldTargetProps
-        newTargetProps.insert(.locked)
-        newTargetProps.insert(.touched)
-        if oldTargetProps != newTargetProps {
+        // Target change: Lock (if it wasn't locked)
+        if !initialTargetLocked {
             changes.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldTargetProps),
-                newValue: .itemPropertySet(newTargetProps)
+                attributeKey: .itemAttribute(.isLocked),
+                oldValue: false,
+                newValue: true,
             ))
         }
 
-        // Key changes: Add .touched (if needed)
-        if !oldKeyProps.contains(.touched) {
-            var newKeyProps = oldKeyProps
-            newKeyProps.insert(.touched)
+        // Target change: Touch (if not already touched)
+        if !initialTargetTouched {
             changes.append(StateChange(
-                entityId: .item(keyItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldKeyProps),
-                newValue: .itemPropertySet(newKeyProps)
+                entityId: .item(targetItemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
             ))
         }
+
+        // Key change: Touch (if not already touched)
+        if !initialKeyTouched {
+            changes.append(StateChange(
+                entityId: .item(keyItemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
+            ))
+        }
+
+        // Add pronoun change
+        changes.append(StateChange(
+            entityId: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: nil, // Assuming previous 'it' is irrelevant
+            newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target relevant
+        ))
 
         return changes
     }
@@ -63,21 +66,25 @@ struct LockActionHandlerTests {
     @Test("Lock item successfully")
     func testLockItemSuccessfully() async throws {
         // Arrange: Key held, box reachable and unlocked
-        let initialBox = Item( // Use copies to track initial state
+        let initialBox = Item(
             id: "box",
             name: "wooden box",
-            properties: .container, .openable, .lockable,
             parent: .location("startRoom"),
-            lockKey: "key"
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isOpenable: true
+            ]
         )
         let initialKey = Item(
             id: "key",
             name: "small key",
-            properties: .takable,
-            parent: .player // Key is held
+            parent: .player, // Key is held
+            attributes: [
+                .isTakable: true
+            ]
         )
-        let initialBoxProps = initialBox.properties
-        let initialKeyProps = initialKey.properties
 
         let game = MinimalGame(items: [initialBox, initialKey])
         let mockIO = await MockIOHandler()
@@ -89,17 +96,9 @@ struct LockActionHandlerTests {
         )
 
         // Check initial state
-        guard let initialBoxSnapshot = engine.item(with: "box") else {
-            Issue.record("Initial box snapshot was nil")
-            return // Exit test if setup failed
-        }
-        #expect(initialBoxSnapshot.hasProperty(.locked) == false)
-
-        guard let initialKeySnapshot = engine.item(with: "key") else {
-            Issue.record("Initial key snapshot was nil")
-            return // Exit test if setup failed
-        }
-        #expect(initialKeySnapshot.parent == .player)
+        let initialBoxSnapshot = try #require(await engine.item("box"))
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified
+        let initialKeySnapshot = try #require(await engine.item("key"))
 
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
@@ -113,25 +112,20 @@ struct LockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now locked.")
 
         // Assert Final State
-        guard let finalBoxState = engine.item(with: "box") else {
-            Issue.record("Final box snapshot was nil")
-            return // Exit test if check failed
-        }
-        #expect(finalBoxState.hasProperty(.locked) == true, "Box should be locked")
-        #expect(finalBoxState.hasProperty(.touched) == true, "Box should be touched")
+        let finalBoxState = try #require(await engine.item("box"))
+        #expect(finalBoxState.hasFlag(.isLocked) == true, "Box should be locked") // Qualified
+        #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched") // Qualified
 
-        guard let finalKeyState = engine.item(with: "key") else {
-            Issue.record("Final key snapshot was nil")
-            return // Exit test if check failed
-        }
-        #expect(finalKeyState.hasProperty(.touched) == true, "Key should be touched")
+        let finalKeyState = try #require(await engine.item("key"))
+        #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched") // Qualified
 
         // Assert Change History
         let expectedChanges = expectedLockChanges(
             targetItemID: "box",
             keyItemID: "key",
-            oldTargetProps: initialBoxProps,
-            oldKeyProps: initialKeyProps
+            initialTargetLocked: initialBoxSnapshot.hasFlag(.isLocked), // Qualified
+            initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched), // Qualified
+            initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched) // Qualified
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -139,7 +133,14 @@ struct LockActionHandlerTests {
     @Test("Lock fails with no direct object")
     func testLockFailsNoDirectObject() async throws {
         // Arrange: Player holds key
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -152,10 +153,10 @@ struct LockActionHandlerTests {
 
         let command = Command(verbID: "lock", indirectObject: "key", rawInput: "lock with key") // No direct object
 
-        // Act: Use engine.execute
+        // Act
         await engine.execute(command: command)
 
-        // Assert Output (Error message from validation reported by engine)
+        // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Lock what?")
 
@@ -165,8 +166,17 @@ struct LockActionHandlerTests {
 
     @Test("Lock fails with no indirect object")
     func testLockFailsNoIndirectObject() async throws {
-        // Arrange: Box is reachable
-        let box = Item(id: "box", name: "box", parent: .location("startRoom"))
+        // Arrange: Box is reachable and unlocked
+        let box = Item(
+            id: "box",
+            name: "box",
+            parent: .location("startRoom"),
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
+        )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -192,9 +202,24 @@ struct LockActionHandlerTests {
 
     @Test("Lock fails when key not held")
     func testLockFailsKeyNotHeld() async throws {
-        // Arrange: Key is in the room, not held
-        let box = Item(id: "box", name: "box", parent: .location("startRoom"))
-        let key = Item(id: "key", name: "key", parent: .location("startRoom")) // Key also in room
+        // Arrange: Key is in the room, not held; box is unlocked
+        let box = Item(
+            id: "box", name: "box",
+            parent: .location("startRoom"),
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
+        )
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true
+            ] // Key also in room
+        )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -220,11 +245,26 @@ struct LockActionHandlerTests {
 
     @Test("Lock fails when target not reachable")
     func testLockFailsTargetNotReachable() async throws {
-        // Arrange: Box is in another room, player holds key
-        let box = Item(id: "box", name: "box", parent: .location("otherRoom"))
-        let key = Item(id: "key", name: "key", parent: .player)
-        let room1 = Location(id: "startRoom", name: "Start", properties: .inherentlyLit)
-        let room2 = Location(id: "otherRoom", name: "Other")
+        // Arrange: Box is unlocked in another room, player holds key
+        let box = Item(
+            id: "box", name: "box",
+            parent: .location("otherRoom"),
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
+        )
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let room1 = Location(id: "startRoom", name: "Start", description: "", isLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other", description: "", isLit: true)
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -250,9 +290,16 @@ struct LockActionHandlerTests {
 
     @Test("Lock fails when target not lockable")
     func testLockFailsTargetNotLockable() async throws {
-        // Arrange: Target is not lockable, player holds key
+        // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(id: "pebble", name: "pebble", parent: .location("startRoom")) // Not lockable
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -270,7 +317,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't lock the pebble.")
+        expectNoDifference(output, "You can't lock the pebble.") // Uses ActionError.itemNotLockable message
 
         // Assert No State Change
         #expect(engine.gameState.changeHistory.isEmpty == true)
@@ -278,19 +325,24 @@ struct LockActionHandlerTests {
 
     @Test("Lock fails with wrong key")
     func testLockFailsWrongKey() async throws {
-        // Arrange: Player holds wrong key, box requires 'key'
+        // Arrange: Box unlocked, requires 'key', player holds 'wrongkey'
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container, .lockable,
             parent: .location("startRoom"),
-            lockKey: "key"
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true
+            ]
         )
         let wrongKey = Item(
             id: "wrongkey",
             name: "bent key",
-            properties: .takable,
-            parent: .player // Player holds this
+            parent: .player, // Player holds this
+            attributes: [
+                .isTakable: true
+            ]
         )
         let game = MinimalGame(items: [box, wrongKey])
         let mockIO = await MockIOHandler()
@@ -321,11 +373,22 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            properties: .container, .lockable, .locked, // Start locked
             parent: .location("startRoom"),
-            lockKey: "key"
+            attributes: [
+                .lockKey: "key",
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true // Start locked
+            ]
         )
-        let key = Item(id: "key", name: "key", parent: .player)
+        let key = Item(
+            id: "key",
+            name: "key",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -334,11 +397,8 @@ struct LockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        guard let initialBoxSnapshot = engine.item(with: "box") else {
-            Issue.record("Initial box snapshot was nil")
-            return
-        }
-        #expect(initialBoxSnapshot.hasProperty(.locked) == true)
+        let initialBoxSnapshot = try #require(await engine.item("box"))
+        #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "lock", directObject: "box", indirectObject: "key", rawInput: "lock box with key")

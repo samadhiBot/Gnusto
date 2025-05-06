@@ -1,42 +1,44 @@
 import Foundation
 
-/// Handles the "TOUCH" command and its synonyms (e.g., "FEEL", "RUB", "PAT").
+/// Handles the "TOUCH" context.command and its synonyms (e.g., "FEEL", "RUB", "PAT").
 public struct TouchActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, engine: GameEngine) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.customResponse("Touch what?")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = await context.engine.item(targetItemID) else {
             throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
         }
 
         // 3. Check reachability
         // Inline check as ScopeResolver doesn't have this specific logic yet.
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.gameState.player.currentLocationID
         let itemParent = targetItem.parent
         var isReachable = false
         switch itemParent {
         case .location(let locID):
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
-            guard let parentItem = await engine.item(with: parentItemID) else {
+            guard let parentItem = await context.engine.item(parentItemID) else {
                 throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
             }
             let parentParent = parentItem.parent
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
             if isParentItemInReach {
-                if parentItem.hasProperty(.surface) {
+                if parentItem.hasFlag(.isSurface) {
                     isReachable = true
-                } else if parentItem.hasProperty(.container) {
-                    guard parentItem.hasProperty(.open) else {
+                } else if parentItem.hasFlag(.isContainer) {
+                    // Check dynamic property for open state
+                    let isParentOpen = await context.engine.getDynamicItemValue(itemID: parentItemID, key: .isOpen)?.toBool ?? false
+                    guard isParentOpen else {
                         throw ActionError.prerequisiteNotMet("The \(parentItem.name) is closed.")
                     }
                     isReachable = true
@@ -52,22 +54,21 @@ public struct TouchActionHandler: EnhancedActionHandler {
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TOUCH command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetItemID = context.command.directObject else {
+            throw ActionError.internalEngineError("TOUCH context.command reached process without direct object.")
         }
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
         // Get snapshot again to ensure properties are current
-        if let targetItem = await engine.item(with: targetItemID) {
-            let initialProperties = targetItem.properties // Use initial state
-            if !initialProperties.contains(.touched) {
+        if let targetItem = await context.engine.item(targetItemID) {
+            if targetItem.attributes[.isTouched] != true {
                 stateChanges.append(StateChange(
                     entityId: .item(targetItemID),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(initialProperties),
-                    newValue: .itemPropertySet(initialProperties.union([.touched]))
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: targetItem.attributes[.isTouched] ?? false,
+                    newValue: true,
                 ))
             }
         } else {

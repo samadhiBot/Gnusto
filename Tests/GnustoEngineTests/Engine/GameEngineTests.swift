@@ -17,7 +17,7 @@ struct GameEngineTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            longDescription: "It's dark."
+            description: "It's dark."
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -109,7 +109,7 @@ struct GameEngineTests {
         // Check change history only contains the move increment
         let history = engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on parse error")
-        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
     }
 
@@ -119,12 +119,17 @@ struct GameEngineTests {
             errorToThrow: .itemNotTakable("startItem"),
             throwFrom: .process
         )
+        // Initialize pebble without .isTakable
+        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom")) // No .isTakable attribute
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true) // Ensure room is lit
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("take"): mockTakeHandler]
             )
         )
-        game.state.items["startItem"]?.properties.remove(.takable)
+//        game.state.items["startItem"]?.attributes[.isTakable] = nil // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -144,9 +149,9 @@ struct GameEngineTests {
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
-        // Ensure room is lit for this test
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        // Ensure room is lit for this test - Done via initializer now
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -182,7 +187,7 @@ struct GameEngineTests {
         // Check change history only contains the move increment
         let history = engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on action error")
-        #expect(history.first?.propertyKey == .playerMoves)
+        #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
     }
 
@@ -190,13 +195,18 @@ struct GameEngineTests {
     func testEngineProcessesSuccessfulCommand() async throws {
         let mockLookHandler = MockActionHandler()
 
+        // Initialize room with isLit: true
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
+        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("look"): mockLookHandler]
             )
         )
-        // Ensure room is lit
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        // Ensure room is lit - Done via initializer now
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -242,15 +252,22 @@ struct GameEngineTests {
     func testEngineProcessesMultipleCommands() async throws {
         let mockLookHandler = MockActionHandler()
         let mockTakeHandler = MockActionHandler()
+
+        // Initialize room with isLit: true
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
+        let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
         var game = MinimalGame(
-            registry: DefinitionRegistry(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     VerbID("look"): mockLookHandler,
                     VerbID("take"): mockTakeHandler
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        // Ensure room is lit - Done via initializer now
+//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -315,7 +332,7 @@ struct GameEngineTests {
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         let mockQuitHandler = MockActionHandler()
         let game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [VerbID("quit"): mockQuitHandler]
             )
         )
@@ -424,19 +441,21 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             name: "pebble",
-            properties: .takable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+            ]
         )
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            properties: LocationProperty.inherentlyLit
+            isLit: true
         )
 
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     // Only mock inventory
                     VerbID("inventory"): mockInventoryHandler,
@@ -460,7 +479,7 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
         let engine = GameEngine(
@@ -468,7 +487,7 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.items(withParent: .player).isEmpty == true)
+        #expect(engine.items(in: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -483,13 +502,13 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = engine.item(with: "startItem")
+        let finalPebbleSnapshot = engine.item("startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.items(withParent: .player)
+        let finalInventorySnapshots = engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.items(withParent: .location("startRoom"))
+        let finalRoomSnapshots = engine.items(in: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
@@ -515,54 +534,74 @@ struct GameEngineTests {
             let itemIDToModify: ItemID
             let flagToSet: String
 
-            func validate(command: Command, engine: GameEngine) async throws { }
+            func validate(context: ActionContext) async throws { }
 
-            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-                guard let item = await engine.item(with: itemIDToModify) else {
+            func process(context: ActionContext) async throws -> ActionResult {
+                // Use snapshot for checks
+                guard let item = context.stateSnapshot.items[itemIDToModify] else {
                     throw ActionError.internalEngineError("Test item missing")
                 }
 
                 // Define multiple changes
                 let change1 = StateChange(
                     entityId: .item(itemIDToModify),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(item.properties),
-                    newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: item.attributes[.isTouched],
+                    newValue: true,
                 )
 
-                // Correctly determine oldValue for the flag using the new helper
-                let actualOldFlagValue: Bool? = await engine.getOptionalFlagValue(key: flagToSet)
-                let flagOldValueState: StateValue? = actualOldFlagValue != nil ? .bool(actualOldFlagValue!) : nil
-
                 let change2 = StateChange(
+                    entityId: .item(itemIDToModify),
+                    attributeKey: .itemAttribute(.isOn),
+                    oldValue: item.attributes[.isOn],
+                    newValue: true,
+                )
+
+                // Get old flag value from snapshot using FlagID and engine helper
+                let flagID = FlagID(flagToSet)
+                // Use the engine context to check the flag state before the change
+                let actualOldFlagValue = await context.engine.isFlagSet(flagID)
+                let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
+
+                let change3 = StateChange(
                     entityId: .global,
-                    propertyKey: .flag(key: flagToSet),
-                    oldValue: flagOldValueState, // Use the correctly determined nil or .bool value
-                    newValue: .bool(true)
+                    attributeKey: .setFlag(flagID),
+                    oldValue: flagOldValueState,
+                    newValue: true,
                 )
 
                 return ActionResult(
                     success: true,
                     message: "Multiple changes applied.",
-                    stateChanges: [change1, change2]
+                    stateChanges: [change1, change2, change3]
                 )
             }
+
+            // Add empty postProcess for conformance
+            func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
-        let testItemID: ItemID = "testLamp"
-        let testFlagKey = "lampLit"
-        let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
-        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey)
-        var game = MinimalGame(
+        let testItemID: ItemID = "lamp"
+        let testFlagKey: FlagID = "lampLit" // Use FlagID type
+        let lamp = Item(
+            id: testItemID,
+            name: "lamp",
+            attributes: [
+                .isTakable: true,
+            ]
+        )
+        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
+        let game = MinimalGame(
+            locations: [startRoom],
             items: [lamp],
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 // Use customActionHandlers directly with the EnhancedActionHandler
                 customActionHandlers: [
                     VerbID("activate"): mockEnhancedHandler // No bridge needed
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -581,8 +620,9 @@ struct GameEngineTests {
         )
 
         // Ensure initial state
-        #expect(engine.gameState.flags[testFlagKey] == nil)
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == false)
+        #expect(!engine.isFlagSet(testFlagKey))
+        #expect(engine.item(testItemID)?.attributes[.isOn] == nil)
+        #expect(engine.item(testItemID)?.attributes[.isTouched] == nil)
         #expect(engine.getChangeHistory().isEmpty)
 
         // Act
@@ -591,9 +631,9 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(engine.gameState.flags[testFlagKey] == true, "Flag should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
+        #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
+        #expect(engine.item(testItemID)?.attributes[.isOn] == true, "Item .on property should be set")
+        #expect(engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = engine.getChangeHistory()
@@ -602,7 +642,7 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.propertyKey == StatePropertyKey.playerMoves && change.newValue == StateValue.int(1)
+                change.attributeKey == AttributeKey.playerMoves && change.newValue == StateValue.int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -610,12 +650,10 @@ struct GameEngineTests {
         // Check for Item property change (touched + on)
         #expect(
             history.contains { change in
-                guard change.entityId == .item(testItemID), change.propertyKey == StatePropertyKey.itemProperties else { return false }
-                if case .itemPropertySet(let props) = change.newValue {
-                    return props.contains(ItemProperty.on) && props.contains(ItemProperty.touched)
-                } else {
-                    return false
-                }
+                guard change.entityId == .item(testItemID),
+                      case .itemAttribute(let prop) = change.attributeKey,
+                      change.newValue == true else { return false }
+                return prop == .isTouched || prop == .isOn
             },
             "History should contain item property change adding .on and .touched"
         )
@@ -624,14 +662,14 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityId == .global &&
-                    change.propertyKey == StatePropertyKey.flag(key: testFlagKey) &&
-                    change.newValue == StateValue.bool(true)
+                    change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
+                    change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
         )
 
         // Optionally, still check count if exact number is important
-        #expect(history.count == 3, "Expected exactly 3 changes: moves + item props + flag")
+        #expect(history.count == 4, "Expected exactly 4 changes: moves + item props + flag")
 
         // Check output message
         let output = await mockIO.recordedOutput
@@ -655,7 +693,7 @@ struct GameEngineTests {
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(fuseDefinitions: [fuseDef])
+            definitionRegistry: DefinitionRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
 
@@ -685,7 +723,7 @@ struct GameEngineTests {
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
+            definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
         let _ = GameEngine( // Use _ for unused engine
@@ -713,7 +751,7 @@ struct GameEngineTests {
 
         // Initialize game with definitions
         let game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )
@@ -742,7 +780,7 @@ struct GameEngineTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            properties: LocationProperty.inherentlyLit // Qualify LocationProperty
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -763,10 +801,10 @@ struct GameEngineTests {
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
 
         let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
         let output = await runCommandAndCaptureOutput(
@@ -781,7 +819,7 @@ struct GameEngineTests {
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
@@ -802,10 +840,13 @@ struct GameEngineTests {
         let target = Item(
             id: "box",
             name: "box",
-            properties: .container, .openable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+            ],
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -827,7 +868,7 @@ struct GameEngineTests {
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
         let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
@@ -845,10 +886,12 @@ struct GameEngineTests {
         let item = Item(
             id: "rock",
             name: "rock",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ],
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
@@ -866,22 +909,26 @@ struct GameEngineTests {
         let itemHeld = Item(
             id: "sword",
             name: "sword",
-            properties: .takable,
-            size: 8,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .size: .int(8)
+            ],
         )
         let itemToTake = Item(
             id: "shield",
             name: "shield",
-            properties: .takable,
-            size: 7,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true,
+                .size: .int(7)
+            ],
         )
         let player = Player(
             in: "startRoom",
             carryingCapacity: 10 // Set low capacity
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
@@ -898,7 +945,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -921,7 +968,7 @@ struct GameEngineTests {
         // Initialize items directly
         let itemToPut = Item(id: "key", name: "key", parent: .player)
         let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
@@ -950,7 +997,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.north: blockedExit],
-            properties: LocationProperty.inherentlyLit
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -969,10 +1016,13 @@ struct GameEngineTests {
         let container = Item(
             id: "box",
             name: "box",
-            properties: .container, .openable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+            ],
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [container])
 
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
@@ -990,12 +1040,21 @@ struct GameEngineTests {
         let container = Item(
             id: "chest",
             name: "chest",
-            properties: .container, .openable, .lockable,
             parent: .location("startRoom"),
-            lockKey: "key1"
+            attributes: [
+                .isContainer: true,
+                .isOpenable: true,
+                .isLockable: true,
+                .lockKey: .string("key1")
+            ],
         )
-        let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let key = Item(
+            id: "key1",
+            name: "key",
+            parent: .player,
+            attributes: [.isTakable: true,],
+        )
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
@@ -1017,8 +1076,12 @@ struct GameEngineTests {
     @Test("ReportActionError: .itemNotCloseable")
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
-        let item = Item(id: "book", name: "book", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let item = Item(
+            id: "book",
+            name: "book",
+            parent: .location("startRoom")
+        )
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
@@ -1036,10 +1099,12 @@ struct GameEngineTests {
         let item = Item(
             id: "statue",
             name: "statue",
-            properties: .fixed,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isFixed: true,
+            ],
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
@@ -1057,10 +1122,14 @@ struct GameEngineTests {
         let item = Item(
             id: "amulet",
             name: "cursed amulet",
-            properties: .wearable, .worn, .fixed,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isWearable: true,
+                .isWorn: true,
+                .isFixed: true,
+            ],
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
@@ -1083,7 +1152,7 @@ struct GameEngineTests {
             id: "startRoom",
             name: "Start Room",
             exits: [.up: conditionalExit],
-            properties: LocationProperty.inherentlyLit
+            isLit: true
         )
         let game = MinimalGame(locations: [startRoom])
 
@@ -1099,11 +1168,15 @@ struct GameEngineTests {
     @Test("ReportActionError: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
         // Initialize dark room with an item
-        let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
+        let item = Item(
+            id: "shadow",
+            name: "shadow",
+            parent: .location("startRoom")
+        )
         let startRoom = Location(id: "startRoom", name: "Dark Room")
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        #expect(game.state.locations["startRoom"]?.hasProperty(LocationProperty.inherentlyLit) == false)
+        #expect(game.state.locations["startRoom"]?.attributes[.inherentlyLit] == nil)
 
         let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
         let output = await runCommandAndCaptureOutput(
@@ -1120,16 +1193,33 @@ struct GameEngineTests {
         let container = Item(
             id: "chest",
             name: "chest",
-            properties: .container, .lockable, .locked,
             parent: .location("startRoom"),
-            lockKey: "key1"
+            attributes: [
+                .isContainer: true,
+                .isLockable: true,
+                .isLocked: true,
+                .lockKey: .string("key1")
+            ],
         )
-        let wrongKey = Item(id: "key2", name: "wrong key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let wrongKey = Item(
+            id: "key2",
+            name: "wrong key",
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+            ],
+        )
+        let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let player = Player(in: "startRoom")
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
-        let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
+        let command = Command(
+            verbID: "unlock",
+            directObject: "chest",
+            indirectObject: "key2",
+            preposition: "with",
+            rawInput: "unlock chest with key2"
+        )
         let output = await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key2",
@@ -1143,7 +1233,81 @@ struct GameEngineTests {
         // TODO: Implementation
     }
 
-} // End of struct GameEngineTests
+    @Test("Apply Action Result - Success")
+    func testApplyActionResult_Success() async throws {
+        // Define ItemID and initial item state
+        let itemID: ItemID = "lamp"
+        let lamp = Item(
+            id: itemID,
+            name: "Lamp",
+            attributes: [
+                .isOn: false // Start with lamp off
+            ]
+        )
+
+        // Define the desired state changes
+        let turnOnChanges = [
+            StateChange(
+                entityId: .item(itemID),
+                attributeKey: .itemAttribute(.isOn),
+                oldValue: false,
+                newValue: true,
+            ),
+            StateChange(
+                entityId: .item(itemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil, // Assuming not touched initially
+                newValue: true,
+            )
+        ]
+        
+        // Define the ActionResult to be returned by the mock handler
+        let resultToTest = ActionResult(
+            success: true,
+            message: "Lamp turned on!",
+            stateChanges: turnOnChanges
+        )
+        
+        // Create a mock handler that returns the ActionResult
+        struct MockResultHandler: EnhancedActionHandler {
+            let result: ActionResult
+            func validate(context: ActionContext) async throws { /* No validation needed */ }
+            func process(context: ActionContext) async throws -> ActionResult { result }
+            func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
+        }
+        
+        let testVerb: VerbID = "testapply"
+        let mockHandler = MockResultHandler(result: resultToTest)
+        
+        // Setup game with the mock handler
+        let game = MinimalGame(
+            items: [lamp],
+            definitionRegistry: DefinitionRegistry(
+                customActionHandlers: [testVerb: mockHandler]
+            )
+        )
+        
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        
+        // Create the command to trigger the mock handler
+        let testCommand = Command(verbID: testVerb, rawInput: "testapply")
+        
+        // Act: Execute the command
+        await engine.execute(command: testCommand)
+
+        // Assert:
+        // Verify the state changes were applied
+        let finalLamp = engine.item(itemID)
+        #expect(finalLamp?.attributes[.isOn] == true, "Lamp should be ON")
+        #expect(finalLamp?.attributes[.isTouched] == true, "Lamp should be TOUCHED")
+        
+        // Verify the message was printed
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Lamp turned on!")
+    }
+}
 
 // Helper extension for OutputCall checks (optional)
 extension [MockIOHandler.OutputCall] {

@@ -2,6 +2,8 @@ import CustomDump
 import GnustoEngine
 import Testing
 
+/* TODO: re-enable the following tests after game state refactor
+
 @testable import CloakOfDarkness
 
 extension Tag {
@@ -9,7 +11,6 @@ extension Tag {
     @Tag static var walkthrough: Tag
 }
 
-/* TODO: re-enable the following tests after game state refactor
 
 @MainActor
 struct CloakOfDarknessWalkthroughTests {

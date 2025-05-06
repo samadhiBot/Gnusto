@@ -11,30 +11,41 @@ struct DropActionHandlerTests {
     // Helper to create the expected StateChange array for successful drop
     private func expectedDropChanges(
         itemID: ItemID,
-        oldProperties: Set<ItemProperty>,
-        newLocation: LocationID
+        initialParent: ParentEntity,
+        newLocation: LocationID,
+        initialTouched: Bool,
+        initialWorn: Bool
     ) -> [StateChange] {
-        var finalProperties = oldProperties
-        finalProperties.insert(.touched)
-        finalProperties.remove(.worn)
+        var changes: [StateChange] = []
 
-        var changes: [StateChange] = [
-            StateChange(
-                entityId: .item(itemID),
-                propertyKey: .itemParent,
-                oldValue: .parentEntity(.player),
-                newValue: .parentEntity(.location(newLocation))
-            )
-        ]
+        // Parent change
+        changes.append(StateChange(
+            entityId: .item(itemID),
+            attributeKey: .itemParent,
+            oldValue: .parentEntity(initialParent),
+            newValue: .parentEntity(.location(newLocation))
+        ))
 
-        if oldProperties != finalProperties {
+        // Touched change (if needed)
+        if !initialTouched {
             changes.append(StateChange(
                 entityId: .item(itemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(finalProperties)
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
             ))
         }
+
+        // Worn change (if needed)
+        if initialWorn {
+            changes.append(StateChange(
+                entityId: .item(itemID),
+                attributeKey: .itemAttribute(.isWorn),
+                oldValue: true,
+                newValue: false
+            ))
+        }
+
         // No pronoun changes expected for dropping (currently)
         return changes
     }
@@ -45,10 +56,14 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
         )
-        let initialProperties = testItem.properties
+        let initialParent = testItem.parent
+        let initialTouched = testItem.hasFlag(.isTouched)
+        let initialWorn = testItem.hasFlag(.isWorn)
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -60,7 +75,7 @@ struct DropActionHandlerTests {
         )
         let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.item(with: "key")?.parent == .player) // Verify setup
+        #expect(engine.item("key")?.parent == .player) // Verify setup
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -69,16 +84,22 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
+        #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Dropped.")
 
         // Assert Change History
-        let expectedChanges = expectedDropChanges(itemID: "key", oldProperties: initialProperties, newLocation: finalLocation)
+        let expectedChanges = expectedDropChanges(
+            itemID: "key",
+            initialParent: initialParent,
+            newLocation: finalLocation,
+            initialTouched: initialTouched,
+            initialWorn: initialWorn
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -110,8 +131,10 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            properties: .takable,
-            parent: .location("startRoom")
+            parent: .location("startRoom"),
+            attributes: [
+                .isTakable: true
+            ]
         )
 
         let game = MinimalGame(items: [testItem])
@@ -123,7 +146,7 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item(with: "key")?.parent == .location("startRoom"))
+        #expect(engine.item("key")?.parent == .location("startRoom"))
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -132,7 +155,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = engine.item(with: "key")
+        let finalItemState = engine.item("key")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
 
         // Assert Output
@@ -149,10 +172,16 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "cloak",
             name: "dark cloak",
-            properties: .takable, .wearable, .worn, // Start worn
-            parent: .player
+            parent: .player,
+            attributes: [
+                .isTakable: true,
+                .isWearable: true,
+                .isWorn: true
+            ]
         )
-        let initialProperties = testItem.properties
+        let initialParent = testItem.parent
+        let initialTouched = testItem.hasFlag(.isTouched)
+        let initialWorn = testItem.hasFlag(.isWorn)
 
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -164,8 +193,8 @@ struct DropActionHandlerTests {
         )
         let finalLocation = engine.gameState.player.currentLocationID
 
-        #expect(engine.item(with: "cloak")?.parent == .player)
-        #expect(engine.item(with: "cloak")?.hasProperty(.worn) == true)
+        #expect(engine.item("cloak")?.parent == .player)
+        #expect(engine.item("cloak")?.hasFlag(.isWorn) == true) // Qualified
         #expect(engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "cloak", rawInput: "drop cloak")
@@ -174,17 +203,23 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(with: "cloak")
+        let finalItemState = engine.item("cloak")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
-        #expect(finalItemState?.hasProperty(.worn) == false, "Item should NOT have .worn property")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should have .touched property")
+        #expect(finalItemState?.hasFlag(.isWorn) == false, "Item should NOT have .worn property") // Qualified
+        #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified
 
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Dropped.")
 
         // Assert Change History
-        let expectedChanges = expectedDropChanges(itemID: "cloak", oldProperties: initialProperties, newLocation: finalLocation)
+        let expectedChanges = expectedDropChanges(
+            itemID: "cloak",
+            initialParent: initialParent,
+            newLocation: finalLocation,
+            initialTouched: initialTouched,
+            initialWorn: initialWorn
+        )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
 
@@ -194,8 +229,10 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "sword-in-stone",
             name: "sword in stone",
-            properties: .fixed, // Item cannot be dropped
-            parent: .player // Hypothetically held
+            parent: .player, // Hypothetically held
+            attributes: [
+                .isFixed: true
+            ]
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()

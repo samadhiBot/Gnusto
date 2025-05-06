@@ -1,13 +1,12 @@
 import Foundation
 
 /// Defines the specific state property being modified.
-public enum StatePropertyKey: Codable, Sendable, Hashable {
+public enum AttributeKey: Codable, Sendable, Hashable {
     // Item Properties
     case itemAdjectives
     case itemCapacity
     case itemName
     case itemParent
-    case itemProperties
     case itemSize
     case itemSynonyms
     case itemValue
@@ -16,7 +15,10 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case locationDescription
     case locationExits
     case locationName
-    case locationProperties
+
+    // Dynamic Values (Stored in Item/Location, logic in Registry)
+    case itemAttribute(AttributeID)
+    case locationAttribute(AttributeID)
 
     // Player Properties
     case playerHealth
@@ -27,7 +29,8 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
     case playerStrength
 
     // Global/Misc Properties
-    case flag(key: String)
+    case setFlag(_ id: FlagID)
+    case clearFlag(_ id: FlagID)
     case gameSpecificState(key: GameStateKey)
     case pronounReference(pronoun: String)
 
@@ -40,25 +43,26 @@ public enum StatePropertyKey: Codable, Sendable, Hashable {
 }
 
 // MARK: - CustomStringConvertible
-extension StatePropertyKey: CustomStringConvertible {
+extension AttributeKey: CustomStringConvertible {
     public var description: String {
         switch self {
         case .addActiveDaemon(let id): "addActiveDaemon(\(id))"
         case .addActiveFuse(let id, _): "addActiveFuse(\(id))"
-        case .flag(let key): "flag(\(key))"
+        case .itemAttribute(let key): "itemAttribute(\(key.rawValue))"
+        case .setFlag(let id): "setFlag(\(id.rawValue))"
+        case .clearFlag(let id): "clearFlag(\(id.rawValue))"
         case .gameSpecificState(let key): "gameSpecificState(\(key.rawValue))"
         case .itemAdjectives: "itemAdjectives"
         case .itemCapacity: "itemCapacity"
         case .itemName: "itemName"
         case .itemParent: "itemParent"
-        case .itemProperties: "itemProperties"
         case .itemSize: "itemSize"
         case .itemSynonyms: "itemSynonyms"
         case .itemValue: "itemValue"
         case .locationDescription: "locationDescription"
         case .locationExits: "locationExits"
         case .locationName: "locationName"
-        case .locationProperties: "locationProperties"
+        case .locationAttribute(let key): "locationAttribute(\(key.rawValue))"
         case .playerHealth: "playerHealth"
         case .playerInventoryLimit: "playerInventoryLimit"
         case .playerLocation: "playerLocation"

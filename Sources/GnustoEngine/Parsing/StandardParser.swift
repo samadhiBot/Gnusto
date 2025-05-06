@@ -587,8 +587,8 @@ public struct StandardParser: Parser {
         let mustBeContainer = requiredConditions.contains(.container)
 
         func checkItemConditions(_ item: Item) -> Bool {
-            if mustBePerson && !item.hasProperty(.person) { return false }
-            if mustBeContainer && !item.hasProperty(.container) { return false }
+            if mustBePerson && !item.hasFlag(.isPerson) { return false }
+            if mustBeContainer && !item.hasFlag(.isContainer) { return false }
             return true
         }
 
@@ -601,18 +601,20 @@ public struct StandardParser: Parser {
                     if mustBeHeld { meetsScopeCondition = (item.parent == .player) }
                     else if mustBeOnGround { meetsScopeCondition = (item.parent == .location(currentLocationID)) }
                     else if mustBeInRoom {
-                        let isGlobal = gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false
+                        let isGlobal = gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false
                         meetsScopeCondition = (item.parent == .location(currentLocationID) || isGlobal)
                     }
                     else {
                          if item.parent == .player || item.parent == .location(currentLocationID) { meetsScopeCondition = true }
                          else if case .item(let containerID) = item.parent {
                              if let container = allItems[containerID],
-                                (container.parent == .player || container.parent == .location(currentLocationID)),
-                                (container.hasProperty(.container) && container.hasProperty(.open)) || container.hasProperty(.surface) {
-                                 meetsScopeCondition = true
+                                (container.parent == .player || container.parent == .location(currentLocationID)) {
+                                 let isContainerOpen = container.attributes[.isOpen]?.toBool ?? false
+                                 if (container.hasFlag(.isContainer) && isContainerOpen) || container.hasFlag(.isSurface) {
+                                     meetsScopeCondition = true
+                                 }
                              }
-                         } else if gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false {
+                         } else if gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false {
                               meetsScopeCondition = true
                          }
                     }
@@ -622,7 +624,8 @@ public struct StandardParser: Parser {
                     }
                 }
 
-                if (item.hasProperty(.container) && item.hasProperty(.open)) || item.hasProperty(.surface) {
+                let isContainerOpen = item.attributes[.isOpen]?.toBool ?? false
+                if (item.hasFlag(.isContainer) && isContainerOpen) || item.hasFlag(.isSurface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }
             }
@@ -630,17 +633,17 @@ public struct StandardParser: Parser {
 
         gatherRecursive(parentEntity: .player)
         gatherRecursive(parentEntity: .location(currentLocationID))
-
+        
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
-             if let location = gameState.locations[currentLocationID] {
-                for itemID in location.globals {
+            if let location = gameState.locations[currentLocationID] {
+                for itemID in location.localGlobals {
                     if let globalItem = allItems[itemID], checkItemConditions(globalItem) {
-                         candidates[itemID] = globalItem
+                        candidates[itemID] = globalItem
                     }
                 }
             }
         }
-
+        
         return candidates
     }
 

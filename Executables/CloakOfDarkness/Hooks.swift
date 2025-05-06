@@ -4,11 +4,11 @@ struct Hooks {
     @MainActor
     public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
         guard location == "bar" else { return false }
-        let cloakIsWorn = engine.item(with: "cloak")?.hasProperty(.worn) ?? false
+        let cloakIsWorn = engine.item("cloak")?.hasFlag(.isWorn) ?? false
         if cloakIsWorn {
-            await engine.applyLocationPropertyChange(locationID: "bar", removing: [LocationProperty.isLit])
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(false))
         } else {
-            await engine.applyLocationPropertyChange(locationID: "bar", adding: [LocationProperty.isLit])
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
         }
         return false
     }
@@ -18,15 +18,15 @@ struct Hooks {
         let locationID = engine.gameState.player.currentLocationID
         guard locationID == "bar" else { return false } // Only care about the bar
 
-        let cloakIsWorn = engine.item(with: "cloak")?.hasProperty(.worn) ?? false
+        let cloakIsWorn = engine.item("cloak")?.hasFlag(.isWorn) ?? false
 
         if cloakIsWorn {
             // Ensure bar is dark if cloak is worn
-            await engine.applyLocationPropertyChange(locationID: "bar", removing: [LocationProperty.isLit])
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(false))
 
             // Now check for unsafe actions IN THE DARK
             // Re-check lit status *after* potentially removing it
-            let isLitNow = engine.location(with: locationID)?.properties.contains(LocationProperty.isLit) ?? false
+            let isLitNow = engine.location(with: locationID)?.hasFlag(.locationIsLit) ?? false
 
             if !isLitNow { // Should definitely be false here if update worked
                 let verb = command.verbID
@@ -60,7 +60,7 @@ struct Hooks {
             return false
         } else {
             // Cloak is not worn, ensure bar is lit
-            await engine.applyLocationPropertyChange(locationID: "bar", adding: [LocationProperty.isLit])
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
             return false // Hook didn't handle the command itself
         }
     }

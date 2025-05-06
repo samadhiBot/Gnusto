@@ -401,8 +401,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in, // Note: 'in' is already a preposition, parser needs to handle ambiguity
-            "out": .out
+            "in": .inside,
+            "out": .outside
             // Add LAND? Might conflict with "land verb"
         ]
     }

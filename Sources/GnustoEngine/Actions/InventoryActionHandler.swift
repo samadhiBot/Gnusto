@@ -1,19 +1,19 @@
 import Foundation
 
-/// Handles the "INVENTORY" command and its synonyms (e.g., "I").
+/// Handles the "INVENTORY" context.command and its synonyms (e.g., "I").
 public struct InventoryActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler Methods
 
-    public func validate(command: Command, engine: GameEngine) async throws {
-        // No specific validation needed for basic inventory command.
+    public func validate(context: ActionContext) async throws {
+        // No specific validation needed for basic inventory context.command.
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // 1. Get inventory item snapshots
-        let inventoryItems = await engine.items(withParent: .player)
+        let inventoryItems = await context.engine.items(in: .player)
 
         // 2. Construct the message
         let message: String
@@ -30,7 +30,7 @@ public struct InventoryActionHandler: EnhancedActionHandler {
             message = messageParts.joined(separator: "\n")
         }
 
-        // Inventory command typically takes no game time.
+        // Inventory context.command typically takes no game time.
         // No state changes occur.
         return ActionResult(
             success: true,

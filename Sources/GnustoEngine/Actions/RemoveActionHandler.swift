@@ -1,71 +1,70 @@
 import Foundation
 
-/// Handles the "REMOVE" command and its synonyms (e.g., "DOFF", "TAKE OFF").
+/// Handles the "REMOVE" context.command and its synonyms (e.g., "DOFF", "TAKE OFF").
 public struct RemoveActionHandler: EnhancedActionHandler {
 
     public init() {}
 
     // MARK: - EnhancedActionHandler
 
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Remove what?")
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await engine.item(with: targetItemID),
+        guard let targetItem = await context.engine.item(targetItemID),
               targetItem.parent == .player else
         {
             throw ActionError.itemNotHeld(targetItemID)
         }
 
         // 3. Check if the (held) item is currently worn
-        guard targetItem.hasProperty(.worn) else {
+        guard targetItem.hasFlag(.isWorn) else {
             throw ActionError.itemIsNotWorn(targetItemID)
         }
 
         // 4. Check if the item is fixed (e.g., cursed amulet)
-        guard !targetItem.hasProperty(.fixed) else {
+        guard !targetItem.hasFlag(.isFixed) else {
             throw ActionError.itemNotRemovable(targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // IDs and validation guaranteed by validate()
-        let targetItemID = command.directObject!
-        guard let itemSnapshot = await engine.item(with: targetItemID) else {
+        let targetItemID = context.command.directObject!
+        guard let itemSnapshot = await context.engine.item(targetItemID) else {
             // Should not happen if validate passed
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for REMOVE.")
         }
 
         var stateChanges: [StateChange] = []
 
-        // Calculate property changes: Remove .worn, add .touched
-        let oldProps = itemSnapshot.properties
-        var newProps = oldProps
-        newProps.remove(.worn)
-        newProps.insert(.touched) // Taking off implies touching
-
-        if oldProps != newProps {
+        // Change 1: Set `.isWorn` to false
+        if itemSnapshot.attributes[.isWorn] == true { // Only change if currently worn
             stateChanges.append(StateChange(
                 entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProps),
-                newValue: .itemPropertySet(newProps)
+                attributeKey: .itemAttribute(.isWorn),
+                oldValue: true,
+                newValue: false
+            ))
+        }
+
+        // Change 2: Set `.isTouched` to true (if not already)
+        if itemSnapshot.attributes[.isTouched] != true {
+            stateChanges.append(StateChange(
+                entityId: .item(targetItemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: itemSnapshot.attributes[.isTouched] ?? false,
+                newValue: true,
             ))
         }
 
         // Update pronoun "it"
         stateChanges.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([targetItemID])
         ))
@@ -81,7 +80,7 @@ public struct RemoveActionHandler: EnhancedActionHandler {
 
     // Remove the old perform method
     /*
-    public func perform(command: Command, engine: GameEngine) async throws {
+    public func perform(context: ActionContext) async throws {
         // ... old implementation ...
     }
     */

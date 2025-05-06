@@ -3,25 +3,22 @@ import Foundation
 /// Handles the "INSERT [item] INTO/IN [container]" action.
 @MainActor
 struct InsertActionHandler: EnhancedActionHandler {
-    func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
+    func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
-        guard let itemToInsertID = command.directObject else {
+        guard let itemToInsertID = context.command.directObject else {
             throw ActionError.prerequisiteNotMet("Insert what?")
         }
-        guard let containerID = command.indirectObject else {
+        guard let containerID = context.command.indirectObject else {
             // Fetch name for better error message if possible
-            let itemName = engine.item(with: itemToInsertID)?.name ?? "item"
+            let itemName = context.engine.item(itemToInsertID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item Snapshots
-        guard let itemToInsert = engine.item(with: itemToInsertID) else {
+        guard let itemToInsert = context.engine.item(itemToInsertID) else {
             throw ActionError.itemNotAccessible(itemToInsertID)
         }
-        guard let containerItem = engine.item(with: containerID) else {
+        guard let containerItem = context.engine.item(containerID) else {
             throw ActionError.itemNotAccessible(containerID)
         }
 
@@ -29,7 +26,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         guard itemToInsert.parent == .player else {
             throw ActionError.itemNotHeld(itemToInsertID)
         }
-        let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(containerID) else {
              throw ActionError.itemNotAccessible(containerID)
         }
@@ -44,15 +41,17 @@ struct InsertActionHandler: EnhancedActionHandler {
             if parentItemID == itemToInsertID {
                 throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
             }
-            guard let parentItem = engine.item(with: parentItemID) else { break }
+            guard let parentItem = context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
         // 4. Target Checks (Specific to INSERT)
-        guard containerItem.hasProperty(.container) else {
+        guard containerItem.hasFlag(.isContainer) else {
             throw ActionError.targetIsNotAContainer(containerID)
         }
-        guard containerItem.hasProperty(.open) else {
+        // Check dynamic property for open state
+        let isOpen = await context.engine.getDynamicItemValue(itemID: containerID, key: .isOpen)?.toBool ?? false
+        guard isOpen else {
             throw ActionError.containerIsClosed(containerID)
         }
 
@@ -60,7 +59,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = engine.items(withParent: .item(containerID))
+            let itemsInside = context.engine.items(in: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
@@ -69,17 +68,14 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
     }
 
-    func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
+    func process(context: ActionContext) async throws -> ActionResult {
         // IDs guaranteed non-nil by validate
-        let itemToInsertID = command.directObject!
-        let containerID = command.indirectObject!
+        let itemToInsertID = context.command.directObject!
+        let containerID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToInsertSnapshot = engine.item(with: itemToInsertID),
-              let containerSnapshot = engine.item(with: containerID) else
+        guard let itemToInsertSnapshot = context.engine.item(itemToInsertID),
+              let containerSnapshot = context.engine.item(containerID) else
         {
             throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for INSERT.")
         }
@@ -92,41 +88,35 @@ struct InsertActionHandler: EnhancedActionHandler {
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
             entityId: .item(itemToInsertID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(oldParent),
             newValue: .parentEntity(newParent)
         ))
 
         // Change 2: Mark item touched
-        let oldItemProps = itemToInsertSnapshot.properties
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
+        if itemToInsertSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(itemToInsertID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: itemToInsertSnapshot.attributes[.isTouched] ?? false,
+                newValue: true,
             ))
         }
 
         // Change 3: Mark container touched
-        let oldContainerProps = containerSnapshot.properties
-        if !oldContainerProps.contains(.touched) {
-            var newContainerProps = oldContainerProps
-            newContainerProps.insert(.touched)
+        if containerSnapshot.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityId: .item(containerID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldContainerProps),
-                newValue: .itemPropertySet(newContainerProps)
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: containerSnapshot.attributes[.isTouched] ?? false,
+                newValue: true,
             ))
         }
 
         // Change 4: Update pronoun "it"
         stateChanges.append(StateChange(
             entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToInsertID])
         ))

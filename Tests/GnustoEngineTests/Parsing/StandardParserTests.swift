@@ -38,116 +38,160 @@ struct StandardParserTests {
             Item(
                 id: "apple",
                 name: "apple",
-                adjectives: "red",
-                properties: .takable, .edible,
-                parent: .item("tray")
+                parent: .item("tray"),
+                attributes: [
+                    .adjectives: .stringSet(["red"]),
+                    .isTakable: true,
+                    .isEdible: true
+                ]
             ),
             Item(
                 id: "backpack",
                 name: "backpack",
-                properties: .container, .open, .takable,
-                capacity: 20,
-                parent: .player
+                parent: .player,
+                attributes: [
+                    .isContainer: true,
+                    .isTakable: true,
+                    .isOpen: true,
+                    .capacity: 20
+                ]
             ),
             Item(
                 id: "book",
                 name: "book",
-                adjectives: "dusty",
-                properties: .takable, .read,
-                parent: .item("table")
+                parent: .item("table"),
+                attributes: [
+                    .adjectives: .stringSet(["dusty"]),
+                    .isTakable: true,
+                    .isReadable: true
+                ]
             ),
             Item(
                 id: "box",
                 name: "box",
-                adjectives: "wooden",
-                properties: .container, .openable,
-                parent: .location(roomID)
+                parent: .location(roomID),
+                attributes: [
+                    .adjectives: .stringSet(["wooden"]),
+                    .isContainer: true,
+                    .isOpenable: true
+                ]
             ),
             Item(
                 id: "chest",
                 name: "chest",
-                properties: .container, .takable, .openable, .locked,
-                capacity: 50,
-                parent: .player
-            ), // Starts closed & locked in inv
+                parent: .player,
+                attributes: [
+                    .isContainer: true,
+                    .isTakable: true,
+                    .isOpenable: true,
+                    .isLocked: true,
+                    .capacity: 50
+                ]
+            ),
             Item(
                 id: "coin",
                 name: "coin",
-                adjectives: "gold",
-                properties: .takable,
-                parent: .item("backpack")
+                parent: .item("backpack"),
+                attributes: [
+                    .adjectives: .stringSet(["gold"]),
+                    .isTakable: true
+                ]
             ),
             Item(
                 id: "key",
                 name: "key",
-                adjectives: "rusty",
-                "small",
-                properties: .takable,
-                parent: .player
+                parent: .player,
+                attributes: [
+                    .adjectives: .stringSet(["rusty", "small"]),
+                    .isTakable: true
+                ]
             ),
             Item(
                 id: "lantern",
                 name: "lantern",
-                adjectives: "brass",
-                synonyms: "lamp",
-                properties: .lightSource, .openable,
-                parent: .location(roomID)
+                parent: .location(roomID),
+                attributes: [
+                    .adjectives: .stringSet(["brass"]),
+                    .synonyms: .stringSet(["lamp"]),
+                    .isLightSource: true,
+                    .isOpenable: true
+                ]
             ),
             Item(
                 id: "lantern2",
                 name: "lantern",
-                adjectives: "rusty",
-                properties: .lightSource,
-                parent: .location(roomID)
+                parent: .location(roomID),
+                attributes: [
+                    .adjectives: .stringSet(["rusty"]),
+                    .isLightSource: true
+                ]
             ),
             Item(
                 id: "leaflet",
                 name: "leaflet",
-                properties: .takable, .read,
-                parent: .player
+                parent: .player,
+                attributes: [
+                    .isTakable: true,
+                    .isReadable: true
+                ]
             ),
             Item(
                 id: "note",
                 name: "note",
-                properties: .takable, .read,
-                parent: .item("chest")
+                parent: .item("chest"),
+                attributes: [
+                    .isTakable: true,
+                    .isReadable: true
+                ]
             ),
             Item(
                 id: "orb",
                 name: "orb",
-                adjectives: "glowing",
-                properties: .takable, .lightSource,
-                parent: .nowhere
+                parent: .nowhere,
+                attributes: [
+                    .adjectives: .stringSet(["glowing"]),
+                    .isTakable: true,
+                    .isLightSource: true
+                ]
             ),
             Item(
                 id: "rug",
                 name: "rug"
-            ), // Global
+            ),
             Item(
                 id: "sword",
                 name: "sword",
-                properties: .takable,
-                parent: .location(roomID)
+                parent: .location(roomID),
+                attributes: [
+                    .isTakable: true
+                ]
             ),
             Item(
                 id: "table",
                 name: "table",
-                adjectives: "sturdy",
-                properties: .surface,
-                parent: .location(roomID)
+                parent: .location(roomID),
+                attributes: [
+                    .adjectives: .stringSet(["sturdy"]),
+                    .isSurface: true
+                ]
             ),
             Item(
                 id: "tray",
                 name: "tray",
-                adjectives: "silver",
-                properties: .surface, .takable,
-                parent: .player
+                parent: .player,
+                attributes: [
+                    .adjectives: .stringSet(["silver"]),
+                    .isSurface: true,
+                    .isTakable: true
+                ]
             ),
             Item(
                 id: "widget",
                 name: "widget",
-                properties: .takable,
-                parent: .item("box")
+                parent: .item("box"),
+                attributes: [
+                    .isTakable: true
+                ]
             ),
         ]
 
@@ -166,8 +210,8 @@ struct StandardParserTests {
             Location(
                 id: roomID,
                 name: "Room",
-                longDescription: "A room.",
-                globals: "rug" // Globals remain associated with location
+                description: "A room.",
+                attributes: [.localGlobals: .itemIDSet(["rug"])] // Globals remain associated with location
             )
             // Add more locations later if needed
         ]
@@ -298,7 +342,7 @@ struct StandardParserTests {
         #expect(command.preposition == "in")
     }
 
-    @Test("Parse Verb + DirectMods + Prep + IndirectMods", .tags(.parser, .directObject, .indirectObject, .preposition, .modifiers, .resolution, .scope))
+    @Test("Parse Verb + DirectObject + Prep + IndirectMods", .tags(.parser, .directObject, .indirectObject, .preposition, .modifiers, .resolution, .scope))
     func testParseFullComplexity() throws {
         // "key" parent is .player, "box" parent is .location(roomID). Both should be found.
         let result = parser.parse(input: "place the small key into the wooden box", vocabulary: vocabulary, gameState: gameState)
@@ -583,7 +627,7 @@ struct StandardParserTests {
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["note"]?.parent == .item("chest"))
-        #expect(initState.items["chest"]?.hasProperty(.open) == false)
+        #expect(initState.items["chest"]?.attributes["isOpen"] == nil)
 
         // Only the key should be resolved from "them" because the note is out of scope
         let result = parser.parse(input: "drop them", vocabulary: vocabulary, gameState: initState)
@@ -645,8 +689,33 @@ struct StandardParserTests {
     func testDirectInventoryPreferredOverContainer() throws {
         // Create a temporary state where 'key' is held and a temp key is in backpack
         var itemsDict = self.gameState.items // Base items copy
-        let tempKeyInBackpack = Item(id: "tempKeyInBackpack", name: "key", adjectives: "temp", parent: .item("backpack"))
+        let tempKeyInBackpack = Item(
+            id: "tempKeyInBackpack",
+            name: "key",
+            parent: .item("backpack"),
+            attributes: [
+                .adjectives: .stringSet(["temp"])
+            ]
+        )
+        let tempKeyOnGround = Item(
+            id: "tempKeyOnGround",
+            name: "key",
+            parent: .location("startRoom"),
+            attributes: [
+                .adjectives: .stringSet(["temp"])
+            ]
+        )
+        let permKey = Item(
+            id: "permKey",
+            name: "key",
+            parent: .location("startRoom"),
+            attributes: [
+                .adjectives: .stringSet(["perm"])
+            ]
+        )
         itemsDict[tempKeyInBackpack.id] = tempKeyInBackpack
+        itemsDict[tempKeyOnGround.id] = tempKeyOnGround
+        itemsDict[permKey.id] = permKey
         let initState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values), // Pass the modified copy's values
@@ -658,10 +727,14 @@ struct StandardParserTests {
         // Verify setup
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["tempKeyInBackpack"]?.parent == .item("backpack"))
+        #expect(initState.items["tempKeyOnGround"]?.parent == .location("startRoom"))
+        #expect(initState.items["permKey"]?.parent == .location("startRoom"))
 
         // Update vocab temporarily ONLY for this test's state
         var tempVocabulary = vocabulary
         tempVocabulary.items["key", default: []].insert(tempKeyInBackpack.id)
+        tempVocabulary.items["key", default: []].insert(tempKeyOnGround.id)
+        tempVocabulary.items["key", default: []].insert(permKey.id)
 
         // Parsing "take key" might become ambiguous IF the parser finds both.
         // Let's test with the modifier to target the *real* key.
@@ -781,7 +854,7 @@ struct StandardParserTests {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["lantern"]?.properties.insert(ItemProperty.container)
+        itemsDict["lantern"]?.attributes[.isContainer] = true
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -872,8 +945,8 @@ struct StandardParserTests {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in,
-            "out": .out
+            "in": .inside,
+            "out": .outside
         ]
 
         for (input, expectedDirection) in directionMap {
@@ -901,8 +974,8 @@ struct StandardParserTests {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in,
-            "out": .out
+            "in": .inside,
+            "out": .outside
         ]
 
         for (directionWord, expectedDirection) in directionMap {

@@ -2,36 +2,42 @@
 
 struct MinimalGame: GameBlueprint {
     var state: GameState
-    var registry: DefinitionRegistry
+    var definitionRegistry: DefinitionRegistry
+    var dynamicPropertyRegistry: DynamicPropertyRegistry
 
     init(
         player: Player = Player(in: "startRoom"),
         locations: [Location]? = nil,
         items: [Item]? = nil,
-        registry: DefinitionRegistry = DefinitionRegistry()
+        flags: [FlagID]? = nil,
+        definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
+        dynamicPropertyRegistry: DynamicPropertyRegistry = DynamicPropertyRegistry()
     ) {
-        self.registry = registry
+        self.definitionRegistry = definitionRegistry
+        self.dynamicPropertyRegistry = dynamicPropertyRegistry
 
         let gameLocations = locations ?? [
             Location(
                 id: "startRoom",
                 name: "Void",
-                longDescription: "An empty void.",
-                properties: .inherentlyLit
+                description: "An empty void.",
+                isLit: true
             )
         ]
         let gameItems = items ?? [
             Item(
                 id: "startItem",
                 name: "pebble",
-                properties: .takable,
-                parent: .location("startRoom")
+                parent: .location("startRoom"),
+                attributes: [
+                    .isTakable: true
+                ]
             )
         ]
 
         // Build vocabulary including verbs from custom handlers
         var customVerbs: [Verb] = []
-        for verbID in registry.customActionHandlers.keys {
+        for verbID in definitionRegistry.customActionHandlers.keys {
             // Create a basic definition; requiresLight=false is a safe default for tests
             let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
             customVerbs.append(verbDef)
@@ -42,7 +48,8 @@ struct MinimalGame: GameBlueprint {
             locations: gameLocations,
             items: gameItems,
             player: player,
-            vocabulary: vocabulary // Provide the constructed vocabulary
+            vocabulary: vocabulary, // Provide the constructed vocabulary
+            flags: Set(flags ?? []) // Pass the initial flags here
         )
     }
 }

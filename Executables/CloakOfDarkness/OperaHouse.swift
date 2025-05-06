@@ -6,9 +6,9 @@ struct OperaHouse: AreaContents {
     let bar = Location(
         id: "bar",
         name: "Bar",
-        longDescription: """
+        description: """
             The bar, much rougher than you'd have guessed after the opulence
-            of the foyer to the north, is completely empty. There seems to be 
+            of the foyer to the north, is completely empty. There seems to be
             some sort of message scrawled in the sawdust on the floor.
             """,
         exits: [
@@ -19,10 +19,13 @@ struct OperaHouse: AreaContents {
 
     let message = Item(
         id: "message",
-        name: "message",
-        properties: .ndesc, .read,
+        name: "crumpled message",
+        description: "A message appears to be written on the note.",
         parent: .location("bar"),
-        readableText: "You have won!"
+        attributes: [
+            .hasNoDescription: true,
+            .isReadable: true,
+        ]
     )
 
     // MARK: - Cloakroom
@@ -30,23 +33,24 @@ struct OperaHouse: AreaContents {
     let cloakroom = Location(
         id: "cloakroom",
         name: "Cloakroom",
-        longDescription: """
+        description: """
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
             """,
         exits: [
             .east: Exit(destination: "foyer"),
         ],
-        properties: .inherentlyLit
+        isLit: true
     )
 
     let hook = Item(
         id: "hook",
         name: "small brass hook",
-        adjectives: "small", "brass",
-        synonyms: "peg",
-        properties: .surface,
-        parent: .location("cloakroom")
+        description: "It's just a small brass hook, firmly fixed to the wall.",
+        parent: .location("cloakroom"),
+        attributes: [
+            .isSurface: true,
+        ]
     )
 
     // MARK: - Foyer of the Opera House
@@ -54,7 +58,7 @@ struct OperaHouse: AreaContents {
     let foyer = Location(
         id: "foyer",
         name: "Foyer of the Opera House",
-        longDescription: """
+        description: """
                 You are standing in a spacious hall, splendidly decorated in red
                 and gold, with glittering chandeliers overhead. The entrance from
                 the street is to the north, and there are doorways south and west.
@@ -70,16 +74,20 @@ struct OperaHouse: AreaContents {
                     """
             )
         ],
-        properties: .inherentlyLit
+        isLit: true
     )
 
     // MARK: - Items
 
     let cloak = Item(
         id: "cloak",
-        name: "cloak",
-        adjectives: "handsome", "velvet",
-        properties: .takable, .wearable, .worn,
-        parent: .player
+        name: "velvet cloak",
+        description: "A handsome velvet cloak, of exquisite quality.",
+        parent: .location("cloakroom"),
+        attributes: [
+            .isTakable: true,
+            .isWearable: true,
+            .isWorn: true,
+        ]
     )
 }

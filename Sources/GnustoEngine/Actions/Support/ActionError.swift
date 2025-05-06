@@ -30,6 +30,9 @@ public enum ActionError: Error, Equatable, Sendable {
     /// The indirect object specified in the command is invalid or missing.
     case invalidIndirectObject(String?)
 
+    /// A value provided for a state change or property update was invalid (e.g., failed validation).
+    case invalidValue(String)
+
     /// Action failed because the target item is already closed.
     case itemAlreadyClosed(ItemID)
 
@@ -91,6 +94,9 @@ public enum ActionError: Error, Equatable, Sendable {
 
     /// Action failed because the item cannot be worn (lacks `.wearable` property).
     case itemNotWearable(ItemID)
+
+    /// Action failed because the specified item cannot fit inside the specified container.
+    case itemTooLargeForContainer(item: ItemID, container: ItemID)
 
     /// Action failed because the player cannot carry any more items (inventory capacity reached).
     case playerCannotCarryMore

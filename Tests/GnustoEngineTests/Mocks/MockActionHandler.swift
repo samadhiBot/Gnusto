@@ -5,7 +5,7 @@ import Foundation
 actor MockActionHandler: EnhancedActionHandler {
 
     /// A closure to execute when `process` is called. Allows custom logic or error throwing.
-    let processHandler: (@Sendable (Command, GameEngine) async throws -> ActionResult)?
+    let processHandler: (@Sendable (ActionContext) async throws -> ActionResult)?
 
     /// A predefined error to throw immediately when `process` (or `validate`) is called.
     let errorToThrow: ActionError?
@@ -26,7 +26,7 @@ actor MockActionHandler: EnhancedActionHandler {
 
     // Initializer for the actor
     init(
-        processHandler: (@Sendable (Command, GameEngine) async throws -> ActionResult)? = nil,
+        processHandler: (@Sendable (ActionContext) async throws -> ActionResult)? = nil,
         errorToThrow: ActionError? = nil,
         throwFrom: ThrowPhase = .process // Default to throwing from process
     ) {
@@ -35,21 +35,21 @@ actor MockActionHandler: EnhancedActionHandler {
         self.throwFrom = throwFrom
     }
 
-    func validate(command: Command, engine: GameEngine) async throws {
+    func validate(context: ActionContext) async throws {
         validateCalled = true
-        lastCommandReceived = command // Record command even on validate
+        lastCommandReceived = context.command
         if throwFrom == .validate, let error = errorToThrow {
             throw error
         }
         // Otherwise, default validation passes
     }
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    func process(context: ActionContext) async throws -> ActionResult {
         processCalled = true
-        lastCommandReceived = command
+        lastCommandReceived = context.command
 
         if let handler = processHandler {
-            return try await handler(command, engine)
+            return try await handler(context)
         } else if throwFrom == .process, let error = errorToThrow {
             throw error
         }
@@ -58,8 +58,9 @@ actor MockActionHandler: EnhancedActionHandler {
         return ActionResult(success: true, message: "Mock action succeeded.")
     }
 
-    // Default empty postProcess is sufficient for most mock scenarios
-    // func postProcess(command: Command, engine: GameEngine, result: ActionResult) async throws {}
+    func postProcess(context: ActionContext, result: ActionResult) async throws {
+        // Implementation needed
+    }
 
     /// Resets the recorded call state.
     func reset() {

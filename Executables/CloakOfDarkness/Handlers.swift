@@ -30,7 +30,7 @@ struct Handlers {
             // Should not happen if game setup is correct
             throw ActionError.internalEngineError("Location 'bar' not found.")
         }
-        guard bar.properties.contains(.isLit) else {
+        guard bar.attributes.contains(.isLit) else {
             throw ActionError.prerequisiteNotMet("It's too dark to do that.")
         }
 

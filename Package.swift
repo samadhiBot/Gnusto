@@ -13,10 +13,10 @@ let package = Package(
             name: "GnustoEngine",
             targets: ["GnustoEngine"]
         ),
-        .executable(
-            name: "CloakOfDarkness",
-            targets: ["CloakOfDarkness"]
-        ),
+//        .executable(
+//            name: "CloakOfDarkness",
+//            targets: ["CloakOfDarkness"]
+//        ),
 //        .executable(
 //            name: "FrobozzMagicDemoKit",
 //            targets: ["FrobozzMagicDemoKit"]
@@ -33,11 +33,11 @@ let package = Package(
                 .product(name: "Markdown", package: "swift-markdown"),
             ]
         ),
-        .executableTarget(
-            name: "CloakOfDarkness",
-            dependencies: ["GnustoEngine"],
-            path: "Executables/CloakOfDarkness"
-        ),
+//        .executableTarget(
+//            name: "CloakOfDarkness",
+//            dependencies: ["GnustoEngine"],
+//            path: "Executables/CloakOfDarkness"
+//        ),
 //        .executableTarget(
 //            name: "FrobozzMagicDemoKit",
 //            dependencies: ["GnustoEngine"],
@@ -47,7 +47,7 @@ let package = Package(
             name: "GnustoEngineTests",
             dependencies: [
                 "GnustoEngine",
-                "CloakOfDarkness",
+//                "CloakOfDarkness",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),

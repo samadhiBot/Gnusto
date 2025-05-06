@@ -11,60 +11,60 @@ struct PutOnActionHandlerTests {
     let book = Item(
         id: "book",
         name: "heavy book",
-        properties: .takable
+        attributes: [
+            .isTakable: true,
+        ]
     )
 
     let table = Item(
         id: "table",
         name: "sturdy table",
-        properties: .surface // It's a surface
+        attributes: [
+            .isSurface: true,
+        ]
     )
 
     // --- Helper ---
     private func expectedPutOnChanges(
         itemToPutID: ItemID,
         surfaceID: ItemID,
-        oldItemProps: Set<ItemProperty>,
-        oldSurfaceProps: Set<ItemProperty>
+        oldItemAttributes: [AttributeID: StateValue],
+        oldSurfaceAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
         // Change 1: Item parent
         changes.append(StateChange(
             entityId: .item(itemToPutID),
-            propertyKey: .itemParent,
+            attributeKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.item(surfaceID))
         ))
 
-        // Change 2: Item touched
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
+        // Change 2: Item touched (if needed)
+        if oldItemAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(itemToPutID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
             ))
         }
 
-        // Change 3: Surface touched
-        if !oldSurfaceProps.contains(.touched) {
-            var newSurfaceProps = oldSurfaceProps
-            newSurfaceProps.insert(.touched)
+        // Change 3: Surface touched (if needed)
+        if oldSurfaceAttributes[.isTouched] != true {
             changes.append(StateChange(
                 entityId: .item(surfaceID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldSurfaceProps),
-                newValue: .itemPropertySet(newSurfaceProps)
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: false,
+                newValue: true,
             ))
         }
 
         // Change 4: Pronoun "it"
         changes.append(StateChange(
             entityId: .global, // Pronoun is global
-            propertyKey: .pronounReference(pronoun: "it"),
+            attributeKey: .pronounReference(pronoun: "it"),
             oldValue: nil,
             newValue: .itemIDSet([itemToPutID])
         ))
@@ -77,10 +77,24 @@ struct PutOnActionHandlerTests {
     @Test("Put item on surface successfully")
     func testPutOnItemSuccessfully() async throws {
         // Arrange: Player holds book, table is reachable
-        let initialBook = Item(id: "book", name: "heavy book", properties: .takable, parent: .player)
-        let initialTable = Item(id: "table", name: "sturdy table", properties: .surface, parent: .location("startRoom"))
-        let initialBookProps = initialBook.properties
-        let initialTableProps = initialTable.properties
+        let initialBook = Item(
+            id: "book",
+            name: "heavy book",
+            parent: .player,
+            attributes: [
+                .isTakable: true
+            ]
+        )
+        let initialTable = Item(
+            id: "table",
+            name: "sturdy table",
+            parent: .location("startRoom"),
+            attributes: [
+                .isSurface: true
+            ]
+        )
+        let initialBookAttributes = initialBook.attributes
+        let initialTableAttributes = initialTable.attributes
 
         let game = MinimalGame(items: [initialBook, initialTable])
         let mockIO = await MockIOHandler()
@@ -102,18 +116,18 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You put the heavy book on the sturdy table.")
 
         // Assert Final State
-        guard let finalBookState = engine.item(with: "book") else {
+        guard let finalBookState = engine.item("book") else {
             Issue.record("Final book snapshot was nil")
             return
         }
         #expect(finalBookState.parent == .item("table"), "Book should be on the table")
-        #expect(finalBookState.hasProperty(.touched) == true, "Book should be touched")
+        #expect(finalBookState.hasFlag(.isTouched), "Book should be touched")
 
-        guard let finalTableState = engine.item(with: "table") else {
+        guard let finalTableState = engine.item("table") else {
             Issue.record("Final table snapshot was nil")
             return
         }
-        #expect(finalTableState.hasProperty(.touched) == true, "Table should be touched")
+        #expect(finalTableState.hasFlag(.isTouched), "Table should be touched")
 
         // Assert Pronoun
         #expect(engine.getPronounReference(pronoun: "it") == ["book"])
@@ -122,8 +136,8 @@ struct PutOnActionHandlerTests {
         let expectedChanges = expectedPutOnChanges(
             itemToPutID: "book",
             surfaceID: "table",
-            oldItemProps: initialBookProps,
-            oldSurfaceProps: initialTableProps
+            oldItemAttributes: initialBookAttributes,
+            oldSurfaceAttributes: initialTableAttributes
         )
         expectNoDifference(engine.gameState.changeHistory, expectedChanges)
     }
@@ -131,7 +145,14 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails with no direct object")
     func testPutOnFailsNoDirectObject() async throws {
         // Arrange: Table is reachable
-        let table = Item(id: "table", name: "table", properties: .surface, parent: .location("startRoom"))
+        let table = Item(
+            id: "table",
+            name: "table",
+            parent: .location("startRoom"),
+            attributes: [
+                .isSurface: true
+            ]
+        )
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -186,7 +207,14 @@ struct PutOnActionHandlerTests {
     func testPutOnFailsItemNotHeld() async throws {
         // Arrange: Book is on the floor, table is reachable
         let book = Item(id: "book", name: "heavy book", parent: .location("startRoom"))
-        let table = Item(id: "table", name: "sturdy table", properties: .surface, parent: .location("startRoom"))
+        let table = Item(
+            id: "table",
+            name: "sturdy table",
+            parent: .location("startRoom"),
+            attributes: [
+                .isSurface: true
+            ]
+        )
         let game = MinimalGame(items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -214,9 +242,16 @@ struct PutOnActionHandlerTests {
     func testPutOnFailsTargetNotReachable() async throws {
         // Arrange: Table is in another room, player holds book
         let book = Item(id: "book", name: "heavy book", parent: .player)
-        let table = Item(id: "table", name: "sturdy table", properties: .surface, parent: .location("otherRoom"))
-        let room1 = Location(id: "startRoom", name: "Start", properties: .inherentlyLit)
-        let room2 = Location(id: "otherRoom", name: "Other", properties: .inherentlyLit)
+        let table = Item(
+            id: "table",
+            name: "sturdy table",
+            parent: .location("otherRoom"),
+            attributes: [
+                .isSurface: true
+            ]
+        )
+        let room1 = Location(id: "startRoom", name: "Start", isLit: true)
+        let room2 = Location(id: "otherRoom", name: "Other", isLit: true)
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -244,7 +279,14 @@ struct PutOnActionHandlerTests {
     func testPutOnFailsTargetNotSurface() async throws {
         // Arrange: Target is a box (not surface), player holds book
         let book = Item(id: "book", name: "heavy book", parent: .player)
-        let box = Item(id: "box", name: "box", properties: .container, parent: .location("startRoom")) // Not a surface
+        let box = Item(
+            id: "box",
+            name: "box",
+            parent: .location("startRoom"),
+            attributes: [
+                .isContainer: true // Not a surface
+            ]
+        )
         let game = MinimalGame(items: [book, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -271,7 +313,14 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails self-insertion")
     func testPutOnFailsSelfInsertion() async throws {
         // Arrange: Player holds table
-        let table = Item(id: "table", name: "table", properties: .surface, .takable, parent: .player)
+        let table = Item(
+            id: "table",
+            name: "table",
+            parent: .player,
+            attributes: [
+                .isSurface: true,
+            ]
+        )
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -298,8 +347,23 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails recursive insertion")
     func testPutOnFailsRecursiveInsertion() async throws {
         // Arrange: Player holds tray, tray is on table
-        let tray = Item(id: "tray", name: "silver tray", properties: .surface, .takable, parent: .player)
-        let table = Item(id: "table", name: "table", properties: .surface, parent: .item("tray")) // Table is *on* tray (setup for recursive fail)
+        let tray = Item(
+            id: "tray",
+            name: "silver tray",
+            parent: .player,
+            attributes: [
+                .isSurface: true,
+                .isTakable: true
+            ]
+        )
+        let table = Item(
+            id: "table",
+            name: "table",
+            parent: .item("tray"),
+            attributes: [
+                .isSurface: true // Table is also a surface
+            ]
+        )
         let game = MinimalGame(items: [tray, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()

@@ -29,7 +29,7 @@ Based on the analysis of the Inform 6 "Cloak of Darkness" source, the next major
 
 4. **Custom State on Objects**
 
-   - **Current State:** Limited to boolean properties via `Item.properties`.
+   - **Current State:** Limited to boolean properties via `Item.attributes`.
    - **Desired State:** Support for custom, mutable state (e.g., counters, strings) on items and locations.
    - **Example:** The `message` object tracks disturbance via an integer `number` property.
 

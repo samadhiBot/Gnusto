@@ -65,7 +65,7 @@ struct ExitTests {
 
     // Test non-door ignores door properties
     @Test("Exit Initialization - NonDoor Ignores Door Properties")
-    func testExitInitializationNonDoorIgnoresDoorProps() throws {
+    func testExitInitializationNonDoorIgnoresDoorAttributes() throws {
         let destination: LocationID = "otherSide"
         // Provide door properties, but set isDoor to false
         let exit = Exit(destination: destination, isDoor: false, isOpen: false, isLocked: true)
