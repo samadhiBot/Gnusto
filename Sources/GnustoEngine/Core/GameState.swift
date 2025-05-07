@@ -41,7 +41,6 @@ public struct GameState: Codable, Equatable, Sendable {
     public let vocabulary: Vocabulary
 
     // --- Initializers (Using structure from read_file output) ---
-    @MainActor
     public init(
         locations: [Location],
         items: [Item],
@@ -66,7 +65,6 @@ public struct GameState: Codable, Equatable, Sendable {
         self.vocabulary = vocabulary ?? .build(items: items)
     }
 
-    @MainActor
     public init(
         areas: [AreaContents.Type],
         player: Player,
@@ -117,7 +115,6 @@ public struct GameState: Codable, Equatable, Sendable {
         )
     }
 
-    @MainActor
     var snapshot: GameState {
         GameState(
             locations: Array(locations.values),
