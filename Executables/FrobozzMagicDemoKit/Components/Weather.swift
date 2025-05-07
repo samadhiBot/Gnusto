@@ -25,11 +25,11 @@ extension Components {
             ) { engine in
                 // Only affects outdoor locations
                 let locationID = await engine.gameState.player.currentLocationID
-                let location = engine.location(with: locationID)
+                let location = await engine.location(with: locationID)
 
                 // Randomly change the weather
                 let weatherStates = ["sunny", "cloudy", "rainy"]
-                let currentWeather = engine.getStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
+                let currentWeather = await engine.getStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
 
                 // Choose a different weather state
                 var newWeather = currentWeather
@@ -82,7 +82,7 @@ extension Components {
 
             // Register the weather daemon
             // Needs await for MainActor isolated call
-            let _ = engine.registerDaemon(id: Constants.weatherDaemonID)
+            let _ = await engine.registerDaemon(id: Constants.weatherDaemonID)
         }
     }
 }

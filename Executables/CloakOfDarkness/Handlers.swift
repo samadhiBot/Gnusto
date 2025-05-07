@@ -26,7 +26,7 @@ struct Handlers {
     func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
         guard command.verbID == "examine", engine.gameState.player.currentLocationID == "bar" else { return false }
         // Fix: Check location exists before accessing properties
-        guard let bar = engine.location(with: "bar") else {
+        guard let bar = await engine.location(with: "bar") else {
             // Should not happen if game setup is correct
             throw ActionError.internalEngineError("Location 'bar' not found.")
         }
@@ -34,7 +34,7 @@ struct Handlers {
             throw ActionError.prerequisiteNotMet("It's too dark to do that.")
         }
 
-        let disturbedCount = engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
+        let disturbedCount = await engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
         let finalMessage: String
         if disturbedCount > 1 {
             finalMessage = "The message simply reads: \"You lose.\""

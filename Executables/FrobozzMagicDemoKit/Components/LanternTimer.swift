@@ -55,7 +55,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
         // Get current battery life from game state
         // Default to defaultBatteryLife if not set
-        let batteryLifeValue = engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
+        let batteryLifeValue = await engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
             ?? LanternConstants.defaultBatteryLife
 
         // Decrement battery life by 1
@@ -68,7 +68,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
         switch newBatteryLife {
         case LanternConstants.lowBatteryThreshold:
             // When we hit the threshold, add a fuse for the final warning
-            let _ = engine.addFuse(id: LanternConstants.lowBatteryWarningFuseID)
+            let _ = await engine.addFuse(id: LanternConstants.lowBatteryWarningFuseID)
             await engine.output("Your lantern is getting dim.", style: .strong)
 
         case 0:

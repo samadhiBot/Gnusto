@@ -26,7 +26,7 @@ struct Hooks {
 
             // Now check for unsafe actions IN THE DARK
             // Re-check lit status *after* potentially removing it
-            let isLitNow = engine.location(with: locationID)?.hasFlag(.locationIsLit) ?? false
+            let isLitNow = await engine.location(with: locationID)?.hasFlag(.locationIsLit) ?? false
 
             if !isLitNow { // Should definitely be false here if update worked
                 let verb = command.verbID
@@ -45,7 +45,7 @@ struct Hooks {
                 // If the action is NOT specifically allowed, THEN it's an unsafe disturbance.
                 if !isActionAllowedInDark {
                     // Increment counter
-                    let currentCount = engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
+                    let currentCount = await engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
                     await engine.applyGameSpecificStateChange(
                         key: "disturbedCounter",
                         value: .int(currentCount + 1)

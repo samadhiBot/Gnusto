@@ -14,7 +14,7 @@ enum Hooks {
     static func onEnterRoom(engine: GameEngine, locationID: LocationID) async -> Bool {
         // Use safe accessors
         let visitedTreasureFlag: FlagID = "visited_treasure_room"
-        let hasVisitedTreasure = engine.isFlagSet(visitedTreasureFlag)
+        let hasVisitedTreasure = await engine.isFlagSet(visitedTreasureFlag)
 
         // Check for special room behaviors
         switch locationID {
@@ -39,7 +39,7 @@ enum Hooks {
         case "hiddenVault":
             // Use safe accessors
             let visitedVaultFlag: FlagID = "visited_vault"
-            let hasVisitedVault = engine.isFlagSet(visitedVaultFlag)
+            let hasVisitedVault = await engine.isFlagSet(visitedVaultFlag)
 
             if !hasVisitedVault {
                 await engine.output(
@@ -66,7 +66,7 @@ enum Hooks {
     /// - Parameter command: The command about to be executed.
     static func beforeEachTurn(engine: GameEngine, command: Command) async -> Bool {
         // Use safe accessors
-        let messageValue = engine.getStateValue(key: Components.Lantern.Constants.pendingMessageKey)
+        let messageValue = await engine.getStateValue(key: Components.Lantern.Constants.pendingMessageKey)
 
         // Check for pending messages from daemons or fuses
         if let pendingMessage = messageValue?.value as? String {
@@ -78,7 +78,7 @@ enum Hooks {
 
         // Add atmospheric messages based on location
         let locationID = await engine.gameState.player.currentLocationID // Safe accessor
-        let turnCount = engine.playerMoves      // Safe accessor
+        let turnCount = await engine.playerMoves      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
         guard turnCount % 5 == 0 else { return false }
@@ -90,7 +90,7 @@ enum Hooks {
             await engine.output("The gems in the walls glitter mysteriously.", style: .emphasis)
         case "outside", "streamBank":
             // Weather effects for outside areas
-            if let weatherState = engine.getGameSpecificStateString(key: Components.Weather.Constants.weatherStateKey) {
+            if let weatherState = await engine.getGameSpecificStateString(key: Components.Weather.Constants.weatherStateKey) {
                 switch weatherState {
                 case "sunny":
                     await engine.output("Sunlight filters through the trees above you.", style: .emphasis)
@@ -121,7 +121,7 @@ enum Hooks {
     /// - Returns: `true` if the player has an active light source.
     private static func hasActiveLight(engine: GameEngine) async -> Bool {
         // Get player's directly held items
-        let playerItemIDs = engine.items(in: .player).map { $0.id }
+        let playerItemIDs = await engine.items(in: .player).map { $0.id }
 
         // Check for the lantern specifically
         if playerItemIDs.contains(Components.Lantern.Constants.itemID) {

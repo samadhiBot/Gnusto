@@ -67,7 +67,7 @@ enum Components {
             /*
             // TODO: Move Weather daemon registration to Weather component
             // Register the weather daemon (Remove isDaemonRegistered check)
-            let _ = engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
+            let _ = await engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
             */
         }
 
@@ -81,7 +81,7 @@ enum Components {
                 frequency: 1 // Run every turn
             ) { engine in
                 // Closure runs every turn to update lantern battery
-                let batteryLifeValue = engine.getStateValue(key: Constants.batteryLifeKey)?.value as? Int
+                let batteryLifeValue = await engine.getStateValue(key: Constants.batteryLifeKey)?.value as? Int
                     ?? Constants.defaultBatteryLife
 
                 // Check lantern state directly via snapshot to avoid direct gameState access
@@ -103,7 +103,7 @@ enum Components {
                 switch newBatteryLife {
                 case Constants.lowBatteryThreshold:
                     // When we hit the threshold, add a fuse for the final warning
-                    let _ = engine.addFuse(id: Constants.lowBatteryWarningFuseID)
+                    let _ = await engine.addFuse(id: Constants.lowBatteryWarningFuseID)
 
                     // Store message to be displayed on next turn
                     engine.updateGameSpecificState(

@@ -74,7 +74,7 @@ enum GameDataSetup {
                     // Access game specific state directly via engine helper
                     let item = await engine.item(itemID)
                     // Use getStateValue to get the value safely
-                    if let batteryLife = engine.getStateValue(key: Components.Lantern.Constants.batteryLifeKey)?.value as? Int {
+                    if let batteryLife = await engine.getStateValue(key: Components.Lantern.Constants.batteryLifeKey)?.value as? Int {
                         let status = item?.hasProperty(.on) == true ? "lit" : "unlit"
                         await engine.output(
                             """
