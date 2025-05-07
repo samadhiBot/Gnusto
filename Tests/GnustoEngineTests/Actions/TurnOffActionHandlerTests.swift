@@ -110,7 +110,7 @@ struct TurnOffActionHandlerTests {
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         // Expect internalEngineError when item ID doesn't exist in gameState
-        await #expect(throws: ActionError.internalEngineError("Parser resolved non-existent item ID 'lamp'.")) {
+        await #expect(throws: ActionError.unknownItem("lamp")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -388,7 +388,7 @@ struct TurnOffActionHandlerTests {
 
         // Act
         // Parse the raw input first
-        let parseResult = await parser.parse(input: "blow out lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
+        let parseResult = parser.parse(input: "blow out lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get() // Get the parsed command
 
         // Execute the parsed command

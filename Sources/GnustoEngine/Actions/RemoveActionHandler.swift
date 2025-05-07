@@ -27,42 +27,48 @@ public struct RemoveActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        // IDs and validation guaranteed by validate()
-        let targetItemID = context.command.directObject!
-        guard let itemSnapshot = await context.engine.item(targetItemID) else {
-            // Should not happen if validate passed
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for REMOVE.")
+        guard
+            let targetItemID = context.command.directObject,
+            let itemSnapshot = await context.engine.item(targetItemID)
+        else {
+            throw ActionError.internalEngineError("Item snapshot disappeared!")
         }
 
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if itemSnapshot.attributes[.isWorn] == true { // Only change if currently worn
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isWorn),
-                oldValue: true,
-                newValue: false
-            ))
+        if itemSnapshot.attributes[.isWorn] == true {
+            stateChanges.append(
+                StateChange(
+                    entityID: .item(targetItemID),
+                    attributeKey: .itemAttribute(.isWorn),
+                    oldValue: true,
+                    newValue: false
+                )
+            )
         }
 
-        // Change 2: Set `.isTouched` to true (if not already)
-        if itemSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: itemSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        // Change 2: Set `.isTouched` to true
+        if try await context.engine.fetch(targetItemID, .isTouched) {
+            stateChanges.append(
+                StateChange(
+                    entityID: .item(targetItemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: itemSnapshot.attributes[.isTouched] ?? false,
+                    newValue: true,
+                )
+            )
         }
 
         // Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([targetItemID])
-        ))
+        stateChanges.append(
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([targetItemID])
+            )
+        )
 
         // --- Prepare Result ---
         let message = "You take off the \(itemSnapshot.name)."

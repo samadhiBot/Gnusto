@@ -33,55 +33,6 @@ struct InsertActionHandlerTests {
         ]
     )
 
-    // --- Helper ---
-    private func expectedInsertChanges(
-        itemToInsertID: ItemID,
-        containerID: ItemID,
-        initialParent: ParentEntity,
-        initialItemAttributes: [AttributeID: StateValue],
-        initialContainerAttributes: [AttributeID: StateValue]
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Change 1: Item parent
-        changes.append(StateChange(
-            entityID: .item(itemToInsertID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(initialParent),
-            newValue: .parentEntity(.item(containerID))
-        ))
-
-        // Change 2: Item touched (if needed)
-        if initialItemAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(itemToInsertID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Change 3: Container touched (if needed)
-        if initialContainerAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(containerID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Change 4: Pronoun "it"
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToInsertID])
-        ))
-
-        return changes
-    }
-
     // --- Tests ---
 
     @Test("Insert item successfully")
@@ -91,10 +42,13 @@ struct InsertActionHandlerTests {
             id: "coin",
             name: "gold coin",
             parent: .player,
-            attributes: [.isTakable: true,]
+            attributes: [
+                .isTakable: true,
+            ]
         )
         let initialBox = Item(
-            id: "openBox", name: "open box",
+            id: "openBox",
+            name: "open box",
             parent: .location("startRoom"),
             attributes: [
                 .isOpen: true,
@@ -329,7 +283,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things in the rock.")
+        expectNoDifference(output, "You can't put things in the stone statue.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -414,13 +368,19 @@ struct InsertActionHandlerTests {
             id: "bag",
             name: "bag",
             parent: .player,
-            attributes: [.isOpen: true,],
+            attributes: [
+                .isContainer: true,
+                .isOpen: true,
+            ],
         )
         let box = Item(
             id: "box",
             name: "box",
             parent: .item("bag"),
-            attributes: [.isOpen: true,],
+            attributes: [
+                .isContainer: true,
+                .isOpen: true,
+            ],
         )
         let game = MinimalGame(items: [bag, box])
         let mockIO = await MockIOHandler()
@@ -1357,5 +1317,55 @@ struct InsertActionHandlerTests {
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
+    }
+}
+
+extension InsertActionHandlerTests {
+    private func expectedInsertChanges(
+        itemToInsertID: ItemID,
+        containerID: ItemID,
+        initialParent: ParentEntity,
+        initialItemAttributes: [AttributeID: StateValue],
+        initialContainerAttributes: [AttributeID: StateValue]
+    ) -> [StateChange] {
+        var changes: [StateChange] = []
+
+        // Change 1: Item parent
+        changes.append(StateChange(
+            entityID: .item(itemToInsertID),
+            attributeKey: .itemParent,
+            oldValue: .parentEntity(initialParent),
+            newValue: .parentEntity(.item(containerID))
+        ))
+
+        // Change 2: Item touched (if needed)
+        if initialItemAttributes[.isTouched] != true {
+            changes.append(StateChange(
+                entityID: .item(itemToInsertID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil,
+                newValue: true,
+            ))
+        }
+
+        // Change 3: Container touched (if needed)
+        if initialContainerAttributes[.isTouched] != true {
+            changes.append(StateChange(
+                entityID: .item(containerID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil,
+                newValue: true,
+            ))
+        }
+
+        // Change 4: Pronoun "it"
+        changes.append(StateChange(
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: nil,
+            newValue: .itemIDSet([itemToInsertID])
+        ))
+
+        return changes
     }
 }

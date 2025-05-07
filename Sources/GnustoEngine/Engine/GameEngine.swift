@@ -289,7 +289,8 @@ public actor GameEngine: Sendable {
 
         // 1. Check Direct Object Handler
         if let doID = command.directObject,
-           let objectHandler = definitionRegistry.objectActionHandlers[doID] {
+           let objectHandler = definitionRegistry.objectActionHandlers[doID]
+        {
             do {
                 // Pass the engine and the full command to the handler
                 actionHandled = try await objectHandler(self, command)
@@ -301,8 +302,10 @@ public actor GameEngine: Sendable {
 
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
-        if !actionHandled, actionError == nil, let ioID = command.indirectObject,
-           let objectHandler = definitionRegistry.objectActionHandlers[ioID] {
+        if !actionHandled, actionError == nil,
+           let ioID = command.indirectObject,
+           let objectHandler = definitionRegistry.objectActionHandlers[ioID]
+        {
             do {
                 actionHandled = try await objectHandler(self, command)
             } catch {
