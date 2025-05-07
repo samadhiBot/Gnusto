@@ -12,8 +12,7 @@ public struct TakeActionHandler: EnhancedActionHandler {
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
-            // Use standard not accessible error for non-existent items
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionError.unknownItem(targetItemID)
         }
 
         // 3. Check if player already has the item

@@ -3,7 +3,7 @@ import Foundation
 /// Handles the "EXAMINE" context.command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
 public struct ExamineActionHandler: EnhancedActionHandler {
 
-    public init() {}
+//    public init() {}
 
     // MARK: - EnhancedActionHandler Methods
 
@@ -15,7 +15,7 @@ public struct ExamineActionHandler: EnhancedActionHandler {
 
         // 2. Check if item exists
         guard await context.engine.item(targetItemID) != nil else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            throw ActionError.unknownItem(targetItemID)
         }
 
         // 3. Check reachability

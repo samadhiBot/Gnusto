@@ -18,7 +18,7 @@ public struct ThinkAboutActionHandler: EnhancedActionHandler {
 
         // 3. Check if item exists
         guard await context.engine.item(targetItemID) != nil else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            throw ActionError.unknownItem(targetItemID)
         }
 
         // 4. Check reachability

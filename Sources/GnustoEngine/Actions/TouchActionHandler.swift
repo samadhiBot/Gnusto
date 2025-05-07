@@ -15,8 +15,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
-        }
+            throw ActionError.unknownItem(targetItemID)        }
 
         // 3. Check reachability
         // Inline check as ScopeResolver doesn't have this specific logic yet.
@@ -28,7 +27,7 @@ public struct TouchActionHandler: EnhancedActionHandler {
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
             guard let parentItem = await context.engine.item(parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
+                throw ActionError.unknownItem(parentItemID)
             }
             let parentParent = parentItem.parent
             let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)

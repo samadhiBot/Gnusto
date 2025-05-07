@@ -15,7 +15,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            throw ActionError.unknownItem(targetItemID)
         }
 
         // 3. Check reachability
@@ -27,7 +27,7 @@ public struct ReadActionHandler: EnhancedActionHandler {
             isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
             guard let parentItem = await context.engine.item(parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
+                throw ActionError.unknownItem(parentItemID)
             }
             let parentParent = parentItem.parent
             // Check if parent is in current location or held by player

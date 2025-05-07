@@ -5,50 +5,6 @@ import Testing
 
 @Suite("DropActionHandler Tests")
 struct DropActionHandlerTests {
-    let handler = DropActionHandler()
-
-    // Helper to create the expected StateChange array for successful drop
-    private func expectedDropChanges(
-        itemID: ItemID,
-        initialParent: ParentEntity,
-        newLocation: LocationID,
-        initialTouched: Bool,
-        initialWorn: Bool
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Parent change
-        changes.append(StateChange(
-            entityID: .item(itemID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(initialParent),
-            newValue: .parentEntity(.location(newLocation))
-        ))
-
-        // Touched change (if needed)
-        if !initialTouched {
-            changes.append(StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Worn change (if needed)
-        if initialWorn {
-            changes.append(StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isWorn),
-                oldValue: true,
-                newValue: false
-            ))
-        }
-
-        // No pronoun changes expected for dropping (currently)
-        return changes
-    }
-
     @Test("Drop item successfully")
     func testDropItemSuccessfully() async throws {
         // Arrange: Create item
@@ -252,5 +208,56 @@ struct DropActionHandlerTests {
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
         expectNoDifference(output, "You can't drop the sword in stone.")
+    }
+}
+
+extension DropActionHandlerTests {
+    /// Helper to create the expected StateChange array for successful drop.
+    private func expectedDropChanges(
+        itemID: ItemID,
+        initialParent: ParentEntity,
+        newLocation: LocationID,
+        initialTouched: Bool,
+        initialWorn: Bool
+    ) -> [StateChange] {
+        var changes: [StateChange] = []
+
+        // Parent change
+        changes.append(StateChange(
+            entityID: .item(itemID),
+            attributeKey: .itemParent,
+            oldValue: .parentEntity(initialParent),
+            newValue: .parentEntity(.location(newLocation))
+        ))
+
+        // Touched change (if needed)
+        if !initialTouched {
+            changes.append(StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil,
+                newValue: true,
+            ))
+        }
+
+        // Update pronoun
+        changes.append(StateChange(
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: nil,
+            newValue: .itemIDSet([itemID])
+        ))
+
+        // Worn change (if needed)
+        if initialWorn {
+            changes.append(StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemAttribute(.isWorn),
+                oldValue: true,
+                newValue: false
+            ))
+        }
+
+        return changes
     }
 }

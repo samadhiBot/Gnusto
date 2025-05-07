@@ -13,7 +13,7 @@ struct TurnOnActionHandler: EnhancedActionHandler {
 
         // 2. Fetch the item snapshot.
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
+            throw ActionError.unknownItem(targetItemID)
         }
 
         // 3. Verify the item is reachable (with light source exception in dark).

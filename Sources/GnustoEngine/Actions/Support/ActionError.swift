@@ -121,6 +121,9 @@ public enum ActionError: Error, Equatable, Sendable {
     /// A required tool for the action is missing.
     case toolMissing(String)
 
+    /// Action failed because the specified item is unknown in the game.
+    case unknownItem(ItemID)
+
     /// The verb used in the command is not recognized or applicable in the current context.
     case unknownVerb(String)
 

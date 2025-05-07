@@ -693,6 +693,8 @@ public actor GameEngine: Sendable {
             "You can't put things on \(theThat(item))."
         case .toolMissing(let tool):
             "You need \(tool) for that."
+        case .unknownItem(let item):
+            "You can't see any \(item.rawValue) here."
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
         case .wrongKey(keyID: let keyID, lockID: let lockID):

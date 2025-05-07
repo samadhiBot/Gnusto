@@ -92,7 +92,11 @@ struct ExamineActionHandlerTests {
             description: "A weathered statue of a grue.",
             parent: .location(roomID)
         )
-        let room = Location(id: roomID, name: "Garden")
+        let room = Location(
+            id: roomID,
+            name: "Garden",
+            isLit: true
+        )
         let game = MinimalGame(
             player: Player(in: roomID),
             locations: [room],
@@ -134,8 +138,16 @@ struct ExamineActionHandlerTests {
             description: "Should not see this.",
             parent: .location("farAwayRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room")
-        let farRoom = Location(id: "farAwayRoom", name: "Far Room")
+        let startRoom = Location(
+            id: "startRoom",
+            name: "Start Room",
+            isLit: true
+        )
+        let farRoom = Location(
+            id: "farAwayRoom",
+            name: "Far Room",
+            isLit: true
+        )
         let game = MinimalGame(
             locations: [startRoom, farRoom],
             items: [item],
@@ -153,11 +165,54 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You see no hidden gem here.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let itemState = await engine.item(itemID)
         #expect(itemState?.attributes[.isTouched] != true)
+    }
+
+    @Test func testExamineTouchedItemNotInScope() async throws {
+        let itemID: ItemID = "hiddenGem"
+        let item = Item(
+            id: itemID,
+            name: "hidden gem",
+            description: "Should not see this.",
+            parent: .location("farAwayRoom"),
+            attributes: [.isTouched: true]
+        )
+        let startRoom = Location(
+            id: "startRoom",
+            name: "Start Room",
+            isLit: true
+        )
+        let farRoom = Location(
+            id: "farAwayRoom",
+            name: "Far Room",
+            isLit: true
+        )
+        let game = MinimalGame(
+            locations: [startRoom, farRoom],
+            items: [item],
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        #expect(await engine.gameState.changeHistory.isEmpty)
+
+        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine hidden gem")
+        await engine.execute(command: command)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see the hidden gem.")
+
+        #expect(await engine.gameState.changeHistory.isEmpty)
+        let itemState = await engine.item(itemID)
+        #expect(itemState?.attributes[.isTouched] == true)
     }
 
     @Test func testExamineNonExistentItem() async throws {
@@ -176,7 +231,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You see no ghost here.")
+        expectNoDifference(output, "You can't see any ghost here.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -190,8 +245,8 @@ struct ExamineActionHandlerTests {
             description: "A red ball.",
             parent: .player,
             attributes: [
-                .adjectives: "red",
-                .synonyms: "ball",
+                .adjectives: ["red"],
+                .synonyms: ["ball"],
             ],
         )
         let item2 = Item(
@@ -200,8 +255,8 @@ struct ExamineActionHandlerTests {
             description: "A blue ball.",
             parent: .player,
             attributes: [
-                .adjectives: .stringSet(["blue"]),
-                .synonyms: .stringSet(["ball"])
+                .adjectives: ["blue"],
+                .synonyms: ["ball"],
             ],
         )
         let game = MinimalGame(
@@ -297,24 +352,28 @@ extension ExamineActionHandlerTests {
         itemID: ItemID,
         initialAttributes: [AttributeID: StateValue]?
     ) -> [StateChange] {
-        var changes = [
+        var changes = [StateChange]()
+
+        if initialAttributes?[.isTouched] != true {
+            changes.append(
+                StateChange(
+                    entityID: .item(itemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: initialAttributes?[.isTouched],
+                    newValue: true,
+                )
+            )
+        }
+
+        changes.append(
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
                 oldValue: nil,
                 newValue: .itemIDSet([itemID])
             )
-        ]
-        if initialAttributes?[.isTouched] != true {
-            changes.insert(
-                StateChange(
-                    entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched],
-                    newValue: true,
-                ), at: 0
-            )
-        }
+        )
+
         return changes
     }
 }

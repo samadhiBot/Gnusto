@@ -59,7 +59,7 @@ struct CloseActionHandlerTests {
             StateChange(
                 entityID: .item(box.id),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
