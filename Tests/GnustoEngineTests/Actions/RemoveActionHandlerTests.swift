@@ -33,7 +33,7 @@ struct RemoveActionHandlerTests {
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         // Initial state check
-        #expect(engine.item("cloak")?.hasFlag(.isWorn) == true)
+        #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true)
         let initialHistory = await engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 

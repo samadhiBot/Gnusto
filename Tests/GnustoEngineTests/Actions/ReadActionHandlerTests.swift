@@ -334,7 +334,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("scroll")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("scroll")?.hasFlag(.isTouched) == false)
 
         let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
 
@@ -371,7 +371,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("note")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("note")?.hasFlag(.isTouched) == false)
 
         let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
 
@@ -407,7 +407,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("tablet")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -534,7 +534,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-         #expect(engine.item("tablet")?.hasFlag(.isTouched) == false)
+         #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 

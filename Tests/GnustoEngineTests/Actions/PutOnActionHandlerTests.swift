@@ -130,7 +130,7 @@ struct PutOnActionHandlerTests {
         #expect(finalTableState.hasFlag(.isTouched), "Table should be touched")
 
         // Assert Pronoun
-        #expect(engine.getPronounReference(pronoun: "it") == ["book"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["book"])
 
         // Assert Change History
         let expectedChanges = expectedPutOnChanges(

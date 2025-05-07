@@ -108,7 +108,7 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = engine.getPronounReference(pronoun: "it") // Capture initial state
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it") // Capture initial state
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -122,7 +122,7 @@ struct TakeActionHandlerTests {
         let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true) // Use convenience accessor
-        #expect(engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -204,7 +204,7 @@ struct TakeActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check that the player is still holding nothing
-        #expect(engine.items(in: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty == true)
     }
 
     @Test("Take item fails when not takable")
@@ -288,7 +288,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -305,7 +305,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = await engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
         #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
-        #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["gem"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -347,7 +347,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
 
@@ -364,7 +364,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = await engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
         #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
-        #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -405,7 +405,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item("box")?.hasFlag(.isOpen) == false) // Verify closed
+        #expect(await engine.item("box")?.hasFlag(.isOpen) == false) // Verify closed
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -450,7 +450,7 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item("statue")?.hasFlag(.isContainer) == false) // Verify statue is not container
+        #expect(await engine.item("statue")?.hasFlag(.isContainer) == false) // Verify statue is not container
 
         // Command targets the chip, but context is "from statue"
         let command = Command(
@@ -510,7 +510,7 @@ struct TakeActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert item is still in the room
-        #expect(engine.item("heavy")?.parent == .location("startRoom"))
+        #expect(await engine.item("heavy")?.parent == .location("startRoom"))
     }
 
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
@@ -536,7 +536,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
 
@@ -551,7 +551,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         #expect(finalItemState?.hasFlag(.isWorn) == false) // Not worn
-        #expect(engine.getPronounReference(pronoun: "it") == ["cloak"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["cloak"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -594,7 +594,7 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
 
@@ -610,7 +610,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalSurfaceState = await engine.item(surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
-        #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
+        #expect(await engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -652,7 +652,7 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -665,7 +665,7 @@ struct TakeActionHandlerTests {
         let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true) // Still touched
-        #expect(engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -721,7 +721,7 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -734,7 +734,7 @@ struct TakeActionHandlerTests {
         let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player) // Should succeed
         #expect(finalItemState?.hasFlag(.isTouched) == true)
-        #expect(engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -781,13 +781,13 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = engine.getPronounReference(pronoun: "it")
+        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "fly", rawInput: "take fly")
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
-        #expect(engine.item("jar")?.hasFlag(.isOpen) == false) // Verify closed
-        #expect(engine.item("jar")?.hasFlag(.isTransparent) == true) // Verify transparent
+        #expect(await engine.item("jar")?.hasFlag(.isOpen) == false) // Verify closed
+        #expect(await engine.item("jar")?.hasFlag(.isTransparent) == true) // Verify transparent
 
         // Act: ScopeResolver sees through transparent containers, but TakeActionHandler should still check if container is open
         await engine.execute(command: command)

@@ -75,7 +75,7 @@ struct DropActionHandlerTests {
         )
         let finalLocation = await engine.gameState.player.currentLocationID
 
-        #expect(engine.item("key")?.parent == .player) // Verify setup
+        #expect(await engine.item("key")?.parent == .player) // Verify setup
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -147,7 +147,7 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(engine.item("key")?.parent == .location("startRoom"))
+        #expect(await engine.item("key")?.parent == .location("startRoom"))
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
@@ -194,8 +194,8 @@ struct DropActionHandlerTests {
         )
         let finalLocation = await engine.gameState.player.currentLocationID
 
-        #expect(engine.item("cloak")?.parent == .player)
-        #expect(engine.item("cloak")?.hasFlag(.isWorn) == true) // Qualified
+        #expect(await engine.item("cloak")?.parent == .player)
+        #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true) // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "drop", directObject: "cloak", rawInput: "drop cloak")

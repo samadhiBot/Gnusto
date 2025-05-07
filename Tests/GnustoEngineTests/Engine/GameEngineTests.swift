@@ -487,7 +487,7 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.items(in: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -620,10 +620,10 @@ struct GameEngineTests {
         )
 
         // Ensure initial state
-        #expect(!engine.isFlagSet(testFlagKey))
-        #expect(engine.item(testItemID)?.attributes[.isOn] == nil)
-        #expect(engine.item(testItemID)?.attributes[.isTouched] == nil)
-        #expect(engine.getChangeHistory().isEmpty)
+        #expect(await engine.isFlagSet(testFlagKey) == false)
+        #expect(await engine.item(testItemID)?.attributes[.isOn] == nil)
+        #expect(await engine.item(testItemID)?.attributes[.isTouched] == nil)
+        #expect(await engine.getChangeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
@@ -631,9 +631,9 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(engine.isFlagSet(testFlagKey), "Flag should be set")
-        #expect(engine.item(testItemID)?.attributes[.isOn] == true, "Item .on property should be set")
-        #expect(engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
+        #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
+        #expect(await engine.item(testItemID)?.attributes[.isOn] == true, "Item .on property should be set")
+        #expect(await engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
 
         // Check history recorded correctly
         let history = await engine.getChangeHistory()
@@ -697,7 +697,7 @@ struct GameEngineTests {
             // TODO: Need initial state setup for activeFuses
         )
 
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -726,7 +726,7 @@ struct GameEngineTests {
             definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -758,7 +758,7 @@ struct GameEngineTests {
             // TODO: Need initial state setup for active timers
         )
 
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO

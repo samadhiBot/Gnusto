@@ -483,7 +483,7 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInside = engine.items(in: .item("fullBox"))
+        let itemsInside = await engine.items(in: .item("fullBox"))
         let initialLoad = itemsInside.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 6)
 
@@ -497,7 +497,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The nearly full box is full.") // ActionError.containerIsFull
 
         // Assert No State Change
-        #expect(engine.item("coin")?.parent == .player) // Coin still held
+        #expect(await engine.item("coin")?.parent == .player) // Coin still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -540,7 +540,7 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
-        let itemsInsideInitial = engine.items(in: .item("exactBox"))
+        let itemsInsideInitial = await engine.items(in: .item("exactBox"))
         let initialLoad = itemsInsideInitial.reduce(0) { $0 + $1.size }
         #expect(initialLoad == 5)
 
@@ -554,9 +554,9 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the half-full box.") // Success message
 
         // Assert Final State
-        #expect(engine.item("coin")?.parent == .item("exactBox")) // Coin is in box
+        #expect(await engine.item("coin")?.parent == .item("exactBox")) // Coin is in box
                                                                   // Final state check - Calculate manually
-        let itemsInsideFinal = engine.items(in: .item("exactBox"))
+        let itemsInsideFinal = await engine.items(in: .item("exactBox"))
         let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
         #expect(finalLoad == 10) // Box is now full
 
@@ -820,7 +820,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The wooden box is full.") // ActionError.containerIsFull
 
         // Assert No State Change
-        #expect(engine.item("key")?.parent == .player) // Key still held
+        #expect(await engine.item("key")?.parent == .player) // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -865,7 +865,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The small box is too small for the large key.") // ActionError.itemTooLargeForContainer
 
         // Assert No State Change
-        #expect(engine.item("key")?.parent == .player) // Key still held
+        #expect(await engine.item("key")?.parent == .player) // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 

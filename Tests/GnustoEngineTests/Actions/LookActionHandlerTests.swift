@@ -346,7 +346,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("rock")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("rock")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "x rock")
@@ -389,7 +389,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("pebble")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("pebble")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", directObject: "pebble", rawInput: "l pebble")
@@ -434,7 +434,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("stone")?.hasFlag(.isTouched) == true)
+        #expect(await engine.item("stone")?.hasFlag(.isTouched) == true)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "stone", rawInput: "x stone")
@@ -489,7 +489,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("box")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("box")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -541,8 +541,8 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("box")?.hasFlag(.isTouched) == false)
-        #expect(engine.item("box")?.attributes["isOpen"] == nil)
+        #expect(await engine.item("box")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("box")?.attributes["isOpen"] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
@@ -588,9 +588,9 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("jar")?.hasFlag(.isTouched) == false)
-        #expect(engine.item("jar")?.attributes["isOpen"] == nil)
-        #expect(engine.item("jar")?.attributes["isTransparent"] == true)
+        #expect(await engine.item("jar")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("jar")?.attributes["isOpen"] == nil)
+        #expect(await engine.item("jar")?.attributes["isTransparent"] == true)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "jar", rawInput: "x jar")
@@ -643,7 +643,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("table")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("table")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "table", rawInput: "x table")
@@ -688,7 +688,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.item("artifact") != nil) // Item exists
+        #expect(await engine.item("artifact") != nil) // Item exists
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(await engine.gameState.changeHistory.isEmpty == true)

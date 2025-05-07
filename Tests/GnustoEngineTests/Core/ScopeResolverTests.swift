@@ -16,7 +16,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: "startRoom") == true)
     }
@@ -31,7 +31,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         engine.gameState.locations["startRoom"]?.attributes.removeValue(forKey: .inherentlyLit)
 
@@ -58,7 +58,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: "startRoom") == true)
     }
@@ -91,7 +91,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
@@ -115,7 +115,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: "startRoom") == true)
     }
@@ -145,7 +145,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
@@ -170,7 +170,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: "startRoom") == true)
     }
@@ -185,7 +185,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         #expect(resolver.isLocationLit(locationID: "badRoom") == false)
     }
@@ -213,7 +213,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
@@ -250,7 +250,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         // No need to modify state after initialization
         // game.state.locations["startRoom"]?.attributes.remove(.inherentlyLit)
@@ -291,7 +291,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
@@ -329,7 +329,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
         #expect(Set(visibleIDs) == Set([activeLamp.id, visibleItem.id]))
@@ -346,7 +346,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: "badRoom")
         #expect(visibleIDs.isEmpty)
@@ -405,7 +405,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(inventoryItem.id))
@@ -426,7 +426,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(locationItem.id))
@@ -457,7 +457,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(!reachable.contains(locationItem.id))
@@ -487,7 +487,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
@@ -514,7 +514,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
@@ -546,7 +546,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
@@ -576,7 +576,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
@@ -603,7 +603,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
@@ -635,7 +635,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
@@ -674,7 +674,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let reachable = resolver.itemsReachableByPlayer()
         #expect(reachable.isEmpty) // Neither box nor item inside should be reachable in dark
@@ -711,7 +711,7 @@ struct ScopeResolverTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
