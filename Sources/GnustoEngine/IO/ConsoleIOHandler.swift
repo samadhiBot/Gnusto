@@ -3,9 +3,6 @@ import Foundation
 /// A basic implementation of `IOHandler` that interacts with the standard console.
 @MainActor
 public struct ConsoleIOHandler: IOHandler {
-
-    public init() {}
-
     // --- Output Methods ---
 
     public func print(_ text: String, style: TextStyle, newline: Bool) {

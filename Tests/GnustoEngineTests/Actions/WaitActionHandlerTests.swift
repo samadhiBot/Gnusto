@@ -33,7 +33,7 @@ struct WaitActionHandlerTests {
     }
 
     // Removed testWaitProcessReturnsCorrectResult due to Sendable complexities
-    // with returning ActionResult from the non-Sendable EnhancedActionHandler protocol.
+    // with returning ActionResult from the non-Sendable ActionHandler protocol.
     // The perform test adequately covers the behavior for this simple handler.
 
     // @Test("Wait process returns correct ActionResult")

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Handles the "PUT [item] ON [surface]" action.
-struct PutOnActionHandler: EnhancedActionHandler {
+struct PutOnActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects

@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles movement context.commands (e.g., "GO NORTH", "NORTH", "N").
-public struct GoActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct GoActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Identify Direction
         guard let direction = context.command.direction else {

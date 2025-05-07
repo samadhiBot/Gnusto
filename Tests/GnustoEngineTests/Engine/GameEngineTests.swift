@@ -533,7 +533,7 @@ struct GameEngineTests {
     @Test("Engine Records State Changes from Enhanced Handler")
     func testEngineRecordsStateChangesFromEnhancedHandler() async throws {
         // Given: An enhanced handler that changes multiple things
-        struct MockMultiChangeHandler: EnhancedActionHandler {
+        struct MockMultiChangeHandler: ActionHandler {
             let itemIDToModify: ItemID
             let flagToSet: String
 
@@ -599,7 +599,7 @@ struct GameEngineTests {
             locations: [startRoom],
             items: [lamp],
             definitionRegistry: DefinitionRegistry(
-                // Use customActionHandlers directly with the EnhancedActionHandler
+                // Use customActionHandlers directly with the ActionHandler
                 customActionHandlers: [
                     VerbID("activate"): mockEnhancedHandler // No bridge needed
                 ]
@@ -1285,7 +1285,7 @@ struct GameEngineTests {
         )
 
         // Create a mock handler that returns the ActionResult
-        struct MockResultHandler: EnhancedActionHandler {
+        struct MockResultHandler: ActionHandler {
             let result: ActionResult
             func validate(context: ActionContext) async throws { /* No validation needed */ }
             func process(context: ActionContext) async throws -> ActionResult { result }

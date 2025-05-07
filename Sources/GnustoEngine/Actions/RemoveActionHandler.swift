@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "REMOVE" context.command and its synonyms (e.g., "DOFF", "TAKE OFF").
-public struct RemoveActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
+public struct RemoveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

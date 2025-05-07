@@ -3,7 +3,7 @@
 extension GameEngine {
     /// Default action handlers provided by the engine.
     /// Games can override these via the `DefinitionRegistry`.
-    static let defaultActionHandlers: [VerbID: EnhancedActionHandler] = [
+    static let defaultActionHandlers: [VerbID: ActionHandler] = [
         // Movement & World Interaction
         "close": CloseActionHandler(),
         "examine": ExamineActionHandler(),

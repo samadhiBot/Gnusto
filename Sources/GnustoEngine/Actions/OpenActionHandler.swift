@@ -1,10 +1,7 @@
 import Foundation
 
 /// Handles the "OPEN" context.command.
-public struct OpenActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
+public struct OpenActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

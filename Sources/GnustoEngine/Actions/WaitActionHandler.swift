@@ -1,7 +1,7 @@
 import Foundation
 
 /// Action handler for the WAIT verb.
-struct WaitActionHandler: EnhancedActionHandler {
+struct WaitActionHandler: ActionHandler {
 
     // Removed original perform method
     // func perform(context: ActionContext) async throws {

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Action handler for the SCORE verb.
-struct ScoreActionHandler: EnhancedActionHandler {
+struct ScoreActionHandler: ActionHandler {
 
     func process(context: ActionContext) async throws -> ActionResult {
         // Fetch current score and turn count

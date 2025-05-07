@@ -18,7 +18,7 @@ The project is organized into two main directories:
   - Have dynamic state stored in a `[AttributeID: StateValue]` dictionary (`attributes`). This includes boolean flags (like `isContainer`, `isLit`), numeric values, string data, or entity references.
   - Can have optional `description` strings and `descriptionHandlerId`s for dynamic text generation.
   - Can have optional `objectActionHandlerId`s (Items) or `roomActionHandlerId`s (Locations) to override default action logic.
-- **Actions:** Player input is parsed into `Command` objects. `ActionHandler`s (or `EnhancedActionHandler`s) process these commands, interacting with `GameState` via `GameEngine` helpers and returning `ActionResult`s.
+- **Actions:** Player input is parsed into `Command` objects. `ActionHandler`s (or `ActionHandler`s) process these commands, interacting with `GameState` via `GameEngine` helpers and returning `ActionResult`s.
 
 ## Core Engine Features
 

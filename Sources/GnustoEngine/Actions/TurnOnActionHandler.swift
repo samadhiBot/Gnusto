@@ -1,9 +1,9 @@
 import Foundation
 
 /// Handles the "TURN ON" action for items, primarily light sources.
-struct TurnOnActionHandler: EnhancedActionHandler {
+struct TurnOnActionHandler: ActionHandler {
 
-    // MARK: - EnhancedActionHandler Methods
+    // MARK: - ActionHandler Methods
 
     func validate(context: ActionContext) async throws {
         // 1. Get direct object ID

@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "WEAR" context.command and its synonyms (e.g., "DON").
-public struct WearActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
+public struct WearActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

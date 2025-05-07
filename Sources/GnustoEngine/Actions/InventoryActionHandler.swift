@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "INVENTORY" context.command and its synonyms (e.g., "I").
-public struct InventoryActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct InventoryActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // No specific validation needed for basic inventory context.command.
     }

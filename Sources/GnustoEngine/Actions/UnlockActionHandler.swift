@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "UNLOCK <DO> WITH <IO>" context.command.
-public struct UnlockActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
+public struct UnlockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate context.command structure: Need DO and IO
         guard context.command.directObject != nil else {

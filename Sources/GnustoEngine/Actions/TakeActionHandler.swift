@@ -1,9 +1,7 @@
 import Foundation
 
 /// Handles the "TAKE" context.command and its synonyms (e.g., "GET").
-public struct TakeActionHandler: EnhancedActionHandler {
-    public init() {}
-
+public struct TakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Action handler for the SMELL verb (default behavior).
-struct SmellActionHandler: EnhancedActionHandler {
+struct SmellActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         // No validation needed for default SMELL.

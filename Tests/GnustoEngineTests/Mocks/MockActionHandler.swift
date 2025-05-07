@@ -1,8 +1,8 @@
 import Foundation
 @testable import GnustoEngine
 
-/// A mock implementation of the `EnhancedActionHandler` protocol for testing purposes.
-actor MockActionHandler: EnhancedActionHandler {
+/// A mock implementation of the `ActionHandler` protocol for testing purposes.
+actor MockActionHandler: ActionHandler {
 
     /// A closure to execute when `process` is called. Allows custom logic or error throwing.
     let processHandler: (@Sendable (ActionContext) async throws -> ActionResult)?

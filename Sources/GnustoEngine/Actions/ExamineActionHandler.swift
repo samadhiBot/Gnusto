@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "EXAMINE" context.command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
-public struct ExamineActionHandler: EnhancedActionHandler {
-
-//    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct ExamineActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

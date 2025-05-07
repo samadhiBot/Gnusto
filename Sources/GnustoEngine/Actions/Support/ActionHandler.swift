@@ -5,7 +5,7 @@ import Foundation
 /// This protocol provides a more structured way to handle complex actions that involve
 /// multiple stages or potential side effects.
 /// Note: This protocol is Sendable as its methods now use Sendable types.
-public protocol EnhancedActionHandler: Sendable {
+public protocol ActionHandler: Sendable {
     /// Validates if the action can be performed given the current game state.
     /// This step should check prerequisites but not modify the game state.
     /// - Parameters:
@@ -40,7 +40,7 @@ public protocol EnhancedActionHandler: Sendable {
 
 // MARK: - Default Implementation
 
-extension EnhancedActionHandler {
+extension ActionHandler {
     public func validate(
         context: ActionContext
     ) async throws {

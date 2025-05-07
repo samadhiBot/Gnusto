@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "CLOSE" context.command.
-public struct CloseActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
+public struct CloseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

@@ -1,7 +1,7 @@
 import Foundation
 
 /// Action handler for the TASTE verb (default behavior).
-struct TasteActionHandler: EnhancedActionHandler {
+struct TasteActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {

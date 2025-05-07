@@ -1,12 +1,7 @@
 import Foundation
 
 /// Action handler for the THINK ABOUT verb (based on Cloak of Darkness).
-public struct ThinkAboutActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

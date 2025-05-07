@@ -1,7 +1,7 @@
 import Foundation
 
 /// Action handler for the LISTEN verb (default behavior).
-struct ListenActionHandler: EnhancedActionHandler {
+struct ListenActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         // No validation needed for LISTEN.

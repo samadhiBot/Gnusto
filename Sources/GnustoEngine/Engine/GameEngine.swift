@@ -26,7 +26,7 @@ public actor GameEngine: Sendable {
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered handlers for specific verb commands.
-    private var actionHandlers = [VerbID: EnhancedActionHandler]()
+    private var actionHandlers = [VerbID: ActionHandler]()
 
     /// A logger used for unhandled error warnings.
     private let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
@@ -409,7 +409,7 @@ public actor GameEngine: Sendable {
 
     /// Processes the result of an action, applying state changes and printing the message.
     ///
-    /// - Parameter result: The `ActionResult` returned by an `EnhancedActionHandler`.
+    /// - Parameter result: The `ActionResult` returned by an `ActionHandler`.
     /// - Throws: Re-throws errors encountered during state application.
     private func processActionResult(_ result: ActionResult) async throws {
         // 1. Apply State Changes

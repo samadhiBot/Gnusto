@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "TOUCH" context.command and its synonyms (e.g., "FEEL", "RUB", "PAT").
-public struct TouchActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct TouchActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

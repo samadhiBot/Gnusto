@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "LOOK" context.command and its synonyms (e.g., "L", "EXAMINE").
-public struct LookActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
+public struct LookActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // LOOK (no object) always validates
         guard let targetItemID = context.command.directObject else {

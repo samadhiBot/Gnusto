@@ -26,7 +26,7 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
     - Construct the appropriate `StateChange` object (using `EntityID`, `StatePropertyKey`, `oldValue`, `newValue`).
     - Call `try gameState.apply(change)` instead of performing direct mutation.
   - [x] Create ergonomic helper methods in `GameEngine` (e.g., `applyFlagChange`, `applyScoreUpdate`, `applyItemMove`) that encapsulate `StateChange` creation and the call to `gameState.apply` for common mutations needed by game logic (daemons, fuses, handlers).
-  - [x] Ensure `GameEngine.execute` correctly calls `gameState.apply(change)` for changes originating from `EnhancedActionHandler` `ActionResult`s (confirming the current implementation which looks correct).
+  - [x] Ensure `GameEngine.execute` correctly calls `gameState.apply(change)` for changes originating from `ActionHandler` `ActionResult`s (confirming the current implementation which looks correct).
 - [x] **Testing:**
   - [x] Add comprehensive unit tests for `GameState.apply` covering all `StatePropertyKey` cases, including `oldValue` validation.
   - [x] Update/add integration tests to ensure actions and engine operations correctly modify state and update `changeHistory` via the new mechanism.

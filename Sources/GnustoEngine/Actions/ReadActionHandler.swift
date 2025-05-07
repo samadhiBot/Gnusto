@@ -1,12 +1,7 @@
 import Foundation
 
 /// Handles the "READ" context.command.
-public struct ReadActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
+public struct ReadActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {

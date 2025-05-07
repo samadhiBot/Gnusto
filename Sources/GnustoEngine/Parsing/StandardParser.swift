@@ -665,9 +665,6 @@ public struct StandardParser: Parser {
         }
     }
 
-    // Add public initializer if needed (structs get internal one by default)
-    public init() {}
-
     // MARK: - Private Helpers (New/Modified for Syntax Matching)
 
     /// Finds the range of tokens corresponding to a noun phrase within the token list,

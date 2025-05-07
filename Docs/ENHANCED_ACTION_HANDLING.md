@@ -30,7 +30,7 @@ This document outlines the design for enhancing the existing Gnusto engine's act
 
 ```swift
 /// Enhanced ActionHandler protocol with pipeline support
-public protocol EnhancedActionHandler: ActionHandler {
+public protocol ActionHandler: ActionHandler {
     /// Validate if the action can be performed
     func validate(command: Command, engine: GameEngine) async throws
 
@@ -239,7 +239,7 @@ public struct SimpleActionHandler: ActionHandler {
 }
 
 // After
-public struct EnhancedActionHandler: EnhancedActionHandler {
+public struct ActionHandler: ActionHandler {
     func perform(command: Command, engine: GameEngine) async throws {
         try await validate(command: command, engine: engine)
         let result = try await process(command: command, engine: engine)

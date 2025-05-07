@@ -1,9 +1,9 @@
 import Foundation
 
 /// Handles the "TURN OFF" action for items, primarily light sources.
-struct TurnOffActionHandler: EnhancedActionHandler {
+struct TurnOffActionHandler: ActionHandler {
 
-    // MARK: - EnhancedActionHandler Methods
+    // MARK: - ActionHandler Methods
 
     func validate(context: ActionContext) async throws {
         // 1. Get direct object ID

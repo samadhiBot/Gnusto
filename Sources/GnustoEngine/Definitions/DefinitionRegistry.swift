@@ -11,7 +11,7 @@ public struct DefinitionRegistry: Sendable {
 
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
-    public let customActionHandlers: [VerbID: EnhancedActionHandler]
+    public let customActionHandlers: [VerbID: ActionHandler]
 
     /// Handlers triggered when an action targets a specific item ID.
     public let objectActionHandlers: [ItemID: ObjectActionHandler]
@@ -29,7 +29,7 @@ public struct DefinitionRegistry: Sendable {
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
-        customActionHandlers: [VerbID: EnhancedActionHandler] = [:],
+        customActionHandlers: [VerbID: ActionHandler] = [:],
         objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
         roomActionHandlers: [LocationID: RoomActionHandler] = [:]
     ) {

@@ -1,9 +1,9 @@
 import Foundation
 
 /// Action handler for the QUIT verb.
-struct QuitActionHandler: EnhancedActionHandler {
+struct QuitActionHandler: ActionHandler {
 
-    // MARK: - EnhancedActionHandler Methods
+    // MARK: - ActionHandler Methods
 
     func validate(context: ActionContext) async throws {
         // No validation needed for QUIT.

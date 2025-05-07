@@ -1,7 +1,7 @@
 import Foundation
 
 /// Handles the "INSERT [item] INTO/IN [container]" action.
-struct InsertActionHandler: EnhancedActionHandler {
+struct InsertActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
         guard let itemToInsertID = context.command.directObject else {
