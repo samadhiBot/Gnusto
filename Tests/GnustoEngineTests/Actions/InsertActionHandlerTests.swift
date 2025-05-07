@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("InsertActionHandler Tests")
 struct InsertActionHandlerTests {
     let handler = InsertActionHandler()

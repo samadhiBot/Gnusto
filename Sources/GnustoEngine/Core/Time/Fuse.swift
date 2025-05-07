@@ -16,18 +16,17 @@ public struct Fuse: Identifiable {
     /// This closure runs on the GameEngine's actor context.
     /// **Note:** This closure itself is not directly Codable. Persistence requires
     /// associating this fuse's ID with a specific game action during serialization.
-    @MainActor public var action: (GameEngine) async -> Void
+    public var action: (GameEngine) async -> Void
 
     /// Initializes a new fuse.
     /// - Parameters:
     ///   - id: A unique identifier for the fuse.
     ///   - turns: The number of turns before the fuse triggers.
     ///   - action: The closure to execute when the fuse triggers.
-    @MainActor
-    public init(
+        public init(
         id: ID,
         turns: Int,
-        action: @escaping @MainActor (GameEngine) async -> Void
+        action: @escaping (GameEngine) async -> Void
     ) {
         precondition(turns > 0, "Fuse must have a positive duration.")
         self.id = id

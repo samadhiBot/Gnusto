@@ -14,15 +14,15 @@ public struct Daemon: Identifiable {
 
     /// The action to execute when the daemon runs.
     /// This closure runs on the GameEngine's actor context.
-    @MainActor public var action: (GameEngine) async -> Void
+    public var action: (GameEngine) async -> Void
 
     /// Initializes a new daemon.
     /// - Parameters:
     ///   - id: A unique identifier for the daemon.
     ///   - frequency: The number of turns between executions (must be >= 1). Defaults to 1.
     ///   - action: The closure to execute periodically.
-    @MainActor // Mark init as MainActor to match action property isolation
-    public init(id: ID, frequency: Int = 1, action: @escaping @MainActor (GameEngine) async -> Void) {
+    // Mark init as MainActor to match action property isolation
+    public init(id: ID, frequency: Int = 1, action: @escaping (GameEngine) async -> Void) {
         precondition(frequency >= 1, "Daemon frequency must be 1 or greater.")
         self.id = id
         self.frequency = frequency

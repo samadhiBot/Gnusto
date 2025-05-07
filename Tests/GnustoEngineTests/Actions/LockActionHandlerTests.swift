@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("LockActionHandler Tests")
 struct LockActionHandlerTests {
 

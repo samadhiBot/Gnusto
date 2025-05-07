@@ -3,7 +3,7 @@ import Foundation // For print
 
 /// Defines the verbs used *specifically* by the Frobozz Magic Demo Kit game.
 /// Common verbs (look, go, inventory, quit, wait, etc.) are provided by the engine's default vocabulary.
-@MainActor enum VocabularySetup {
+enum VocabularySetup {
     /// Game-specific verbs.
     static let verbs: [Verb] = [
         // Removed light, extinguish (handled by engine defaults + particles)

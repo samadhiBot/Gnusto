@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("ReadActionHandler Tests")
 struct ReadActionHandlerTests {
     @Test("Read item successfully (held)")

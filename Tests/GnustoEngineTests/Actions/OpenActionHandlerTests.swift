@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("OpenActionHandler Tests")
 struct OpenActionHandlerTests {
     // Helper function for expected state changes during a successful open

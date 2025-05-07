@@ -34,7 +34,6 @@ public enum LanternConstants {
 
 /// Creates a daemon definition for the lantern timer.
 /// - Returns: A `DaemonDefinition` that tracks the lantern's battery consumption
-@MainActor
 public func createLanternTimerDaemon() -> DaemonDefinition {
     return DaemonDefinition(
         id: LanternConstants.timerDaemonID,
@@ -91,7 +90,6 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
 /// Creates a fuse definition for the lantern's low battery warning.
 /// - Returns: A `FuseDefinition` that will trigger a final warning before the lantern dies
-@MainActor
 public func createLanternWarningFuse() -> FuseDefinition {
     return FuseDefinition(
         id: LanternConstants.lowBatteryWarningFuseID,
@@ -109,7 +107,6 @@ public func createLanternWarningFuse() -> FuseDefinition {
 ///   - engine: The game engine instance
 ///   - initialBatteryLife: Optional custom initial battery life (defaults to LanternConstants.defaultBatteryLife)
 /// - Returns: True if setup was successful
-@MainActor
 @discardableResult
 public func setupLanternTimer(
     engine: GameEngine,
@@ -133,7 +130,6 @@ public func setupLanternTimer(
 /// Gets the current battery life of the lantern.
 /// - Parameter engine: The game engine instance
 /// - Returns: The remaining battery life in turns, or nil if not set
-@MainActor
 public func getLanternBatteryLife(engine: GameEngine) -> Int? {
     return engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
 }
@@ -142,7 +138,6 @@ public func getLanternBatteryLife(engine: GameEngine) -> Int? {
 /// - Parameters:
 ///   - engine: The game engine instance
 ///   - amount: The amount to set the battery life to (defaults to full charge)
-@MainActor
 public func rechargeLantern(
     engine: GameEngine,
     amount: Int = LanternConstants.defaultBatteryLife

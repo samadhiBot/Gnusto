@@ -6,8 +6,7 @@ struct CloakOfDarkness: GameBlueprint {
 
     let definitionRegistry: DefinitionRegistry
 
-    @MainActor
-    init() {
+        init() {
         state = GameState(
             locations: OperaHouse.locations,
             items: OperaHouse.items,

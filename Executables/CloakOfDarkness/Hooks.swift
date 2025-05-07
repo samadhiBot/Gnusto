@@ -1,8 +1,7 @@
 import GnustoEngine
 
 struct Hooks {
-    @MainActor
-    public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
+        public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
         guard location == "bar" else { return false }
         let cloakIsWorn = await engine.item("cloak")?.hasFlag(.isWorn) ?? false
         if cloakIsWorn {
@@ -13,8 +12,7 @@ struct Hooks {
         return false
     }
 
-    @MainActor
-    public func beforeTurn(engine: GameEngine, command: Command) async throws -> Bool {
+        public func beforeTurn(engine: GameEngine, command: Command) async throws -> Bool {
         let locationID = await engine.gameState.player.currentLocationID
         guard locationID == "bar" else { return false } // Only care about the bar
 

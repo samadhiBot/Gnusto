@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("WaitActionHandler Tests")
 struct WaitActionHandlerTests {
     let handler = WaitActionHandler()

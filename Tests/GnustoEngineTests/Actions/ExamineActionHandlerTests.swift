@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("ExamineActionHandler Tests")
 struct ExamineActionHandlerTests {
     @Test func testExamineSimpleItem() async throws {

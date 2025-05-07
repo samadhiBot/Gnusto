@@ -11,21 +11,21 @@ public struct DynamicAttributeRegistry: Sendable {
     /// Closure type for computing an item property's value.
     /// Takes the specific Item instance and the current GameState.
     public typealias ItemComputeHandler =
-        (@MainActor @Sendable (Item, GameState) async throws -> StateValue)
+        (@Sendable (Item, GameState) async throws -> StateValue)
 
     /// Closure type for validating a new value for an item property.
     /// Takes the specific Item instance and the proposed new StateValue.
     /// Returns `true` if the value is valid, `false` otherwise.
     public typealias ItemValidateHandler =
-        (@MainActor @Sendable (Item, StateValue) async throws -> Bool)
+        (@Sendable (Item, StateValue) async throws -> Bool)
 
     /// Closure type for computing a location property's value.
     public typealias LocationComputeHandler =
-        (@MainActor @Sendable (Location, GameState) async throws -> StateValue)
+        (@Sendable (Location, GameState) async throws -> StateValue)
 
     /// Closure type for validating a new value for a location property.
     public typealias LocationValidateHandler =
-        (@MainActor @Sendable (Location, StateValue) async throws -> Bool)
+        (@Sendable (Location, StateValue) async throws -> Bool)
 
     // MARK: - Private Storage
 

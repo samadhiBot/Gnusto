@@ -4,7 +4,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("GameState.apply Tests")
 struct GameStateApplyTests {
     // Use the helper from the main struct

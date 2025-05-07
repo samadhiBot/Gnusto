@@ -26,7 +26,7 @@ public struct FuseDefinition: Identifiable, Equatable, Hashable, Sendable {
     public init(
         id: FuseID,
         initialTurns: Int,
-        action: @escaping @Sendable (GameEngine) async -> Void // Added @MainActor
+        action: @escaping @Sendable (GameEngine) async -> Void
     ) {
         precondition(initialTurns > 0, "FuseDefinition must have a positive initial duration.")
         self.id = id

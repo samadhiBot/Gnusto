@@ -12,7 +12,6 @@ extension Tag {
 }
 
 
-@MainActor
 struct CloakOfDarknessWalkthroughTests {
     /// Performs a basic walkthrough: look, go west, take cloak, wear cloak, go east, look.
     @Test("Basic Cloak Walkthrough", .tags(.integration, .walkthrough))

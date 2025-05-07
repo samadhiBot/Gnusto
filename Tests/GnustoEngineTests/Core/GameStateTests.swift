@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("GameState Struct Tests")
 struct GameStateTests {
     // Define IDs for clarity

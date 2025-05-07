@@ -2,7 +2,6 @@ import Testing
 import CustomDump
 @testable import GnustoEngine
 
-@MainActor
 @Suite("TurnOffActionHandler Tests")
 struct TurnOffActionHandlerTests {
     let handler = TurnOffActionHandler()

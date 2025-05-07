@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("InventoryActionHandler Tests")
 struct InventoryActionHandlerTests {
     @Test("Inventory shows items held")

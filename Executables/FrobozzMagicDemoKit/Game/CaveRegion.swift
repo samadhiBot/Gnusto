@@ -1,7 +1,7 @@
 import GnustoEngine
 
 /// Defines locations and items found within the cave system.
-@MainActor enum CaveRegion {
+enum CaveRegion {
     /// Locations within the cave system.
     static let locations: [Location] = [
         crystalGrotto,

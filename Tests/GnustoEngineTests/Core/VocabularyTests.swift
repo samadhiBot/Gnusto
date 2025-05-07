@@ -5,8 +5,7 @@ import Testing
 struct VocabularyTests {
 
     @Test("Default verbSynonyms mapping is correct")
-    @MainActor
-    func testDefaultVerbSynonyms() throws {
+        func testDefaultVerbSynonyms() throws {
         // Arrange: Get the default vocabulary used by MinimalGame
         // Note: We access defaultVerbs directly as MinimalGame isn't customizable here.
         let defaultGameVocabulary = Vocabulary.build(items: [], useDefaultVerbs: true)

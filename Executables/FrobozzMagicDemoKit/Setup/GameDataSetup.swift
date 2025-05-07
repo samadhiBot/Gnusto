@@ -1,7 +1,6 @@
 import GnustoEngine
 
 /// Handles the creation of initial game state and registry.
-@MainActor
 enum GameDataSetup {
     /// Creates the initial game state and registry with all necessary game data.
     /// - Returns: A tuple containing the initial `GameState` and `GameDefinitionRegistry`.

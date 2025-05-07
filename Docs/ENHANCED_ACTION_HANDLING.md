@@ -111,10 +111,10 @@ public struct Location: Sendable, Codable {
 public struct DynamicAttributeRegistry: Sendable {
     /// Closure type for computing an item property's value.
     public typealias ItemComputeHandler =
-        (@MainActor @Sendable (Item, GameState) -> StateValue)
+        (@Sendable (Item, GameState) -> StateValue)
     /// Closure type for validating a new value for an item property.
     public typealias ItemValidateHandler =
-        (@MainActor @Sendable (Item, StateValue) -> Bool)
+        (@Sendable (Item, StateValue) -> Bool)
 
     // ... Similar types for Location handlers ...
 
@@ -134,7 +134,6 @@ public struct DynamicAttributeRegistry: Sendable {
 }
 
 /// Engine provides helpers to access values (handles registry lookup + state access).
-@MainActor
 public class GameEngine: Sendable {
     /// Gets the current value, checking compute handlers first.
     public func getDynamicItemValue(

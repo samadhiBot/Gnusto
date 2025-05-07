@@ -45,14 +45,14 @@ public actor GameEngine: Sendable {
     /// The closure receives the engine and the ID of the location entered. It can modify the
     /// game state (e.g., change location properties based on player state). The closure returns
     /// `true` if the hook handled the situation, and no further action is required.
-    public var onEnterRoom: (@MainActor @Sendable (GameEngine, LocationID) async -> Bool)?
+    public var onEnterRoom: (@Sendable (GameEngine, LocationID) async -> Bool)?
 
     /// Custom logic called at the very start of each turn, before command processing.
     ///
     /// The closure receives the engine and the command. It can modify game state or print messages
     /// based on the current state. The closure returns `true` if the hook handled the command,
     /// and no further action is required.
-    public var beforeTurn: (@MainActor @Sendable (GameEngine, Command) async -> Bool)?
+    public var beforeTurn: (@Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
@@ -176,7 +176,7 @@ public actor GameEngine: Sendable {
 
         // --- Process Fuses ---
         // Explicitly define the action type to match FuseDefinition.action
-        typealias FuseActionType = @MainActor @Sendable (GameEngine) async -> Void
+        typealias FuseActionType = @Sendable (GameEngine) async -> Void
         var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType)] = []
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
@@ -1061,8 +1061,7 @@ extension GameEngine {
     ///   - itemID: The unique identifier of the item.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
-    @MainActor
-    private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
+        private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
         guard let item = await gameState.items[itemID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
@@ -1096,8 +1095,7 @@ extension GameEngine {
     ///   - locationID: The unique identifier of the location.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
-    @MainActor
-    private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
+        private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
         guard let location = await gameState.locations[locationID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' \
@@ -1164,7 +1162,7 @@ extension GameEngine {
                 oldValue: oldValue,
                 newValue: newValue
             )
-            // Directly apply to gameState (we are already @MainActor async)
+            // Directly apply to gameState (we are already async)
             try gameState.apply(change)
         }
     }
@@ -1206,7 +1204,7 @@ extension GameEngine {
                 oldValue: oldValue,
                 newValue: newValue
             )
-            // Directly apply to gameState (we are already @MainActor async)
+            // Directly apply to gameState (we are already async)
             try gameState.apply(change)
         }
     }

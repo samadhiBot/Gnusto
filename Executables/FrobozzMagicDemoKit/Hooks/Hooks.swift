@@ -2,7 +2,6 @@ import GnustoEngine
 import Foundation // For print
 
 /// Container for game-specific engine hook implementations.
-@MainActor
 enum Hooks {
 
     // MARK: - Engine Hooks

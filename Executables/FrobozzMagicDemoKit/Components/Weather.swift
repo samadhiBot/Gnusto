@@ -1,6 +1,5 @@
 import GnustoEngine
 
-@MainActor
 extension Components {
     /// Functionality related to weather simulation.
     enum Weather {
@@ -71,8 +70,7 @@ extension Components {
 
         /// Initializes the weather system: sets initial state and registers the daemon.
         /// - Parameter engine: The game engine instance.
-        @MainActor
-        static func setupWeather(engine: GameEngine) async {
+                static func setupWeather(engine: GameEngine) async {
             // Set initial weather state using updateGameSpecificState
             // It safely handles nil dictionary and existing keys
             // Needs await for MainActor isolated call

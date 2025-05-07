@@ -2,7 +2,6 @@ import Testing
 import CustomDump // For diffing complex types
 @testable import GnustoEngine
 
-@MainActor
 @Suite("TurnOnActionHandler Tests")
 struct TurnOnActionHandlerTests {
     let handler = TurnOnActionHandler()

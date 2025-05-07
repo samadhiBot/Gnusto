@@ -6,7 +6,7 @@ import Foundation
 ///   - message: The `RoomActionMessage` indicating the event type.
 /// - Returns: `true` if the handler fully handled the action (potentially blocking default behavior), `false` otherwise.
 /// - Throws: Allows handlers to throw errors if needed.
-public typealias RoomActionHandler = @MainActor @Sendable (GameEngine, RoomActionMessage) async throws -> Bool
+public typealias RoomActionHandler = @Sendable (GameEngine, RoomActionMessage) async throws -> Bool
 
 /// Represents the different events that can trigger a RoomActionHandler.
 public enum RoomActionMessage: Sendable {

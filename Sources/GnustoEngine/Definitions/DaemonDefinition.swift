@@ -9,7 +9,7 @@ public struct DaemonDefinition: Sendable {
 
     /// The action to perform when the daemon runs.
     /// The closure receives the `GameEngine` instance.
-    public let action: @MainActor @Sendable (GameEngine) async -> Void
+    public let action: @Sendable (GameEngine) async -> Void
 
     /// Initializes a new Daemon definition.
     /// - Parameters:
@@ -19,7 +19,7 @@ public struct DaemonDefinition: Sendable {
     public init(
         id: DaemonID,
         frequency: Int,
-        action: @escaping @MainActor @Sendable (GameEngine) async -> Void
+        action: @escaping @Sendable (GameEngine) async -> Void
     ) {
         precondition(frequency >= 1, "Daemon frequency must be 1 or greater.")
         self.id = id

@@ -3,7 +3,6 @@ import CustomDump
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("WearActionHandler Tests")
 struct WearActionHandlerTests {
     // Keep handler instance for direct validation testing

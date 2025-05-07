@@ -3,7 +3,6 @@ import CustomDump
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("RemoveActionHandler Tests")
 struct RemoveActionHandlerTests {
     let handler = RemoveActionHandler()

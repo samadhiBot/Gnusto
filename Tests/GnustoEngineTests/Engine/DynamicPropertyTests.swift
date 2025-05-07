@@ -5,8 +5,7 @@ import Testing
 struct DynamicPropertyTests {
     /*
     // Helper to create a basic engine setup for testing
-    @MainActor
-    private func createTestEngine(
+        private func createTestEngine(
         initialItemValues: [AttributeID: StateValue] = [:],
         initialLocationValues: [AttributeID: StateValue] = [:],
         dynamicRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry(),
@@ -43,8 +42,7 @@ struct DynamicPropertyTests {
     // MARK: - Basic Get/Set Tests
 
     @Test("Get/Set Simple Dynamic Item Value")
-    @MainActor
-    func testGetSetSimpleItemValue() async throws {
+        func testGetSetSimpleItemValue() async throws {
         let testItem = Item(
             id: "testItem",
             name: "widget",
@@ -86,8 +84,7 @@ struct DynamicPropertyTests {
     // MARK: - Validation Tests
 
 //    @Test("Set Validated Item Value - Success")
-//    @MainActor
-//    func testSetValidatedItemValueSuccess() async throws {
+//    //    func testSetValidatedItemValueSuccess() async throws {
 //        var registry = DynamicAttributeRegistry()
 //        registry.registerItemValidate(key: "validatedProp") { item, newValue in
 //            // Example: Only allow positive integers
@@ -107,8 +104,7 @@ struct DynamicPropertyTests {
 //    }
 //
 //    @Test("Set Validated Item Value - Failure")
-//    @MainActor
-//    func testSetValidatedItemValueFailure() async throws {
+//    //    func testSetValidatedItemValueFailure() async throws {
 //        var registry = DynamicAttributeRegistry()
 //        registry.registerItemValidate(key: "validatedProp") { item, newValue in
 //             guard case .int(let intValue) = newValue else { return false }

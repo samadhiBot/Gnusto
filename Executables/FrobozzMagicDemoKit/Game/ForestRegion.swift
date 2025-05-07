@@ -1,7 +1,7 @@
 import GnustoEngine
 
 /// Defines locations and items found within the forest region.
-@MainActor enum ForestRegion {
+enum ForestRegion {
     /// Locations within the forest.
     static let locations: [Location] = [
         outside,

@@ -3,7 +3,6 @@ import Foundation // For print in init
 
 /// A simple example game that demonstrates various Gnusto engine features.
 /// This serves as both documentation and a reference implementation.
-@MainActor
 final class FrobozzMagicDemoKit {
     // MARK: - Properties
 

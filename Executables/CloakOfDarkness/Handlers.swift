@@ -1,6 +1,5 @@
 import GnustoEngine
 
-@MainActor
 struct Handlers {
     func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
         switch command.verbID {

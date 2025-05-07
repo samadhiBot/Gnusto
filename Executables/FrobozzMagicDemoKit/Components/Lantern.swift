@@ -1,7 +1,6 @@
 import Foundation // For print
 import GnustoEngine
 
-@MainActor
 enum Components {
     /// Functionality related to the Brass Lantern item.
     enum Lantern {
@@ -132,7 +131,7 @@ enum Components {
 
         /// Creates a fuse definition for the lantern's low battery warning.
         /// - Returns: A `FuseDefinition` that will trigger a final warning before the lantern dies
-        @MainActor static func createLanternWarningFuse() -> FuseDefinition {
+        static func createLanternWarningFuse() -> FuseDefinition {
             FuseDefinition(
                 id: Constants.lowBatteryWarningFuseID,
                 initialTurns: Constants.lowBatteryThreshold / 2
