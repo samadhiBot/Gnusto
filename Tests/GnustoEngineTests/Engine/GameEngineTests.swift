@@ -125,7 +125,7 @@ struct GameEngineTests {
         // Initialize pebble without .isTakable
         let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom")) // No .isTakable attribute
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true) // Ensure room is lit
-        var game = MinimalGame(
+        let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
@@ -201,7 +201,7 @@ struct GameEngineTests {
         // Initialize room with isLit: true
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
-        var game = MinimalGame(
+        let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
@@ -259,7 +259,7 @@ struct GameEngineTests {
         // Initialize room with isLit: true
         let startRoom = Location(id: "startRoom", name: "Start Room", isLit: true)
         let pebble = Item(id: "startItem", name: "pebble", attributes: [.isTakable: true,])
-        var game = MinimalGame(
+        let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
@@ -756,7 +756,7 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testFuse = await FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
+        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
             await mockIO.print("Fuse! [\(stateHolder.getFlag())]")
             await stateHolder.markFlag()
         }

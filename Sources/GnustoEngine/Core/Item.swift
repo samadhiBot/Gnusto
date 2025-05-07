@@ -63,10 +63,6 @@ public struct Item: Codable, Identifiable, Sendable {
     }
 }
 
-// MARK: - Equatable Conformance
-
-// Equatable conformance will be synthesized
-
 // MARK: - Comparable conformance
 
 extension Item: Comparable {

@@ -107,7 +107,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it") // Capture initial state
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -287,7 +286,6 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
@@ -346,7 +344,6 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
 
@@ -535,7 +532,6 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
 
@@ -593,7 +589,6 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
 
@@ -651,7 +646,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -720,7 +714,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
@@ -767,8 +760,7 @@ struct TakeActionHandlerTests {
             parent: .item("jar"),
             attributes: [.isTakable: true]
         )
-        let initialParent = itemInContainer.parent
-        let initialAttributes = itemInContainer.attributes // Capture initial
+
         // Define player with capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)
 
@@ -780,7 +772,6 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialPronounIt = await engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "fly", rawInput: "take fly")
 

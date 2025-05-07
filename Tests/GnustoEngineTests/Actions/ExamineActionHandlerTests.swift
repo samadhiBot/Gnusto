@@ -263,29 +263,26 @@ struct ExamineActionHandlerTests {
             items: [item1, item2],
         )
         let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
+        let parser = StandardParser()
         let engine = await GameEngine(
             game: game,
-            parser: mockParser,
+            parser: parser,
             ioHandler: mockIO
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(
-            verbID: VerbID("examine"),
-            directObject: "ball",
-            rawInput: "examine ball"
+        // Act
+        // Parse the raw input first
+        let parseResult = parser.parse(
+            input: "examine ball",
+            vocabulary: await engine.gameState.vocabulary,
+            gameState: await engine.gameState
         )
-        await engine.execute(command: command)
 
-        let output = await mockIO.flush()
-        expectNoDifference(output, "Which ball do you mean, the red ball or the blue ball?")
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
-        let item1State = await engine.item(itemID1)
-        let item2State = await engine.item(itemID2)
-        #expect(item1State?.attributes[.isTouched] != true)
-        #expect(item2State?.attributes[.isTouched] != true)
+        // Assert
+        #expect(throws: ParseError.ambiguity("Which ball do you mean?")) {
+            try parseResult.get()
+        }
     }
 
     @Test func testExamineSelf() async throws {

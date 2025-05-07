@@ -121,7 +121,7 @@ public actor GameEngine: Sendable {
 
         // 2. Parse Input
         let vocabulary = gameState.vocabulary
-        let parseResult = await parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
+        let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
         do {
@@ -365,7 +365,7 @@ public actor GameEngine: Sendable {
                     let context = ActionContext(
                         command: command,
                         engine: self,
-                        stateSnapshot: await gameState.snapshot
+                        stateSnapshot: gameState.snapshot
                         // contextData is empty by default
                     )
 
@@ -1064,7 +1064,7 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
         private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
-        guard let item = await gameState.items[itemID] else {
+        guard let item = gameState.items[itemID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
@@ -1073,7 +1073,7 @@ extension GameEngine {
         }
 
         // Check registry for compute handler
-        if let computeHandler = await dynamicAttributeRegistry.itemComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: key) {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
@@ -1098,7 +1098,7 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
         private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
-        guard let location = await gameState.locations[locationID] else {
+        guard let location = gameState.locations[locationID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
@@ -1106,7 +1106,7 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = await dynamicAttributeRegistry.locationComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: key) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
@@ -1130,12 +1130,12 @@ extension GameEngine {
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
     public func setDynamicItemValue(itemID: ItemID, key: AttributeID, newValue: StateValue) async throws {
-        guard let item = await gameState.items[itemID] else {
+        guard let item = gameState.items[itemID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
         }
 
         // Check registry for validate handler
-        if let validateHandler = await dynamicAttributeRegistry.itemValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(item, newValue)
                 if !isValid {
@@ -1178,11 +1178,11 @@ extension GameEngine {
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
     public func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
-        guard let location = await gameState.locations[locationID] else {
+        guard let location = gameState.locations[locationID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }
 
-        if let validateHandler = await dynamicAttributeRegistry.locationValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(location, newValue)
                 if !isValid {

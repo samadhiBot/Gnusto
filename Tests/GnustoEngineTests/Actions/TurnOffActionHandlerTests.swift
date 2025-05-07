@@ -329,13 +329,17 @@ struct TurnOffActionHandlerTests {
         let parser = StandardParser()
         let engine = await GameEngine(
             game: game,
-            parser: parser, // Use StandardParser
+            parser: parser,
             ioHandler: mockIO
         )
 
         // Act
         // Parse the raw input first
-        let parseResult = await parser.parse(input: "extinguish lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
+        let parseResult = parser.parse(
+            input: "extinguish lamp",
+            vocabulary: await engine.gameState.vocabulary,
+            gameState: await engine.gameState
+        )
         let command = try parseResult.get() // Get the parsed command
 
         // Execute the parsed command

@@ -49,7 +49,7 @@ struct DynamicPropertyTests {
             parent: .location("testLocation"),
             attributes: ["simpleProp": StateValue.int(10)]
         )
-        var testLocation = Location(
+        let testLocation = Location(
             id: "testLocation",
             name: "Test Chamber",
         )
