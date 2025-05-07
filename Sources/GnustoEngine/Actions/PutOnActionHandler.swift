@@ -14,7 +14,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
             throw ActionError.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
         }
 
-        // 2. Get Item Snapshots
+        // 2. Get Item s
         guard let itemToPut = context.engine.item(itemToPutID) else {
             throw ActionError.itemNotAccessible(itemToPutID)
         }
@@ -59,17 +59,20 @@ struct PutOnActionHandler: EnhancedActionHandler {
         let surfaceID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToPutSnapshot = context.engine.item(itemToPutID),
-              let surfaceSnapshot = context.engine.item(surfaceID) else
-        {
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for PUT ON.")
+        guard
+            let itemToPut = context.engine.item(itemToPutID),
+            let surface = context.engine.item(surfaceID)
+        else {
+            throw ActionError.internalEngineError(
+                "Item snapshot disappeared between validate and process for PUT ON."
+            )
         }
 
         // --- Put Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Update item parent
-        let oldParent = itemToPutSnapshot.parent // Should be .player
+        let oldParent = itemToPut.parent // Should be .player
         let newParent: ParentEntity = .item(surfaceID)
         stateChanges.append(StateChange(
             entityID: .item(itemToPutID),
@@ -79,35 +82,22 @@ struct PutOnActionHandler: EnhancedActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if itemToPutSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(itemToPutID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: itemToPutSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        if let touchedStateChange = await context.engine.flag(itemToPut, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
         // Change 3: Mark surface touched
-        if surfaceSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(surfaceID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: surfaceSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        if let touchedStateChange = await context.engine.flag(surface, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
         // Change 4: Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToPutID])
-        ))
+        if let pronounStateChange = context.engine.pronounStateChange(for: itemToPut) {
+            stateChanges.append(pronounStateChange)
+        }
 
         // --- Prepare Result ---
-        let message = "You put the \(itemToPutSnapshot.name) on the \(surfaceSnapshot.name)."
+        let message = "You put the \(itemToPut.name) on the \(surface.name)."
         return ActionResult(
             success: true,
             message: message,

@@ -4,7 +4,7 @@ import Foundation
 ///
 /// Using a dedicated type instead of raw strings helps prevent typos and improves code clarity
 /// when dealing with global or miscellaneous state information not directly tied to items or locations.
-public struct GameStateKey: RawRepresentable, Hashable, Codable, Sendable {
+public struct GameStateID: RawRepresentable, Hashable, Codable, Sendable {
     public let rawValue: String
 
     /// Creates a new game state key with the specified string value.
@@ -32,7 +32,7 @@ public struct GameStateKey: RawRepresentable, Hashable, Codable, Sendable {
 
 // MARK: - ExpressibleByStringLiteral
 
-extension GameStateKey: ExpressibleByStringLiteral {
+extension GameStateID: ExpressibleByStringLiteral {
     /// Allows creating a `GameStateKey` directly from a string literal.
     /// - Parameter value: The string literal value.
     public init(stringLiteral value: String) {

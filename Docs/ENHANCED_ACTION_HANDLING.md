@@ -23,7 +23,6 @@ This document outlines the design for enhancing the existing Gnusto engine's act
 3. **Command Processing**
    - `Command` type for representing player actions
    - `ScopeResolver` for object resolution
-   - `SearchScope` for defining search boundaries
 
 ## Enhancement Strategy
 

@@ -6,9 +6,6 @@ import Foundation
 /// to the game state *must* go through the `apply(_:)` method to ensure changes are
 /// tracked and validated.
 public struct GameState: Codable, Equatable, Sendable {
-    /// Unique identifier for the game instance.
-    // public let gameID: String // Removed - See previous implementation in read_file
-
     /// All items currently existing in the game world, indexed by their `ItemID`.
     public internal(set) var items: [ItemID: Item]
 
@@ -35,7 +32,7 @@ public struct GameState: Codable, Equatable, Sendable {
     public internal(set) var pronouns: [String: Set<ItemID>]
 
     /// Game-specific key-value storage for miscellaneous state.
-    public internal(set) var gameSpecificState: [GameStateKey: StateValue]
+    public internal(set) var gameSpecificState: [GameStateID: StateValue]
 
     /// A history of all state changes applied to this game state instance.
     public internal(set) var changeHistory: [StateChange]
@@ -54,7 +51,7 @@ public struct GameState: Codable, Equatable, Sendable {
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [GameStateKey: StateValue] = [:], // Keep AnyCodable
+        gameSpecificState: [GameStateID: StateValue] = [:], // Keep AnyCodable
         changeHistory: [StateChange] = []
     ) {
         self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
@@ -78,7 +75,7 @@ public struct GameState: Codable, Equatable, Sendable {
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [GameStateKey: StateValue] = [:],
+        gameSpecificState: [GameStateID: StateValue] = [:],
         changeHistory: [StateChange] = []
     ) {
         var allItems: [Item] = []
@@ -594,7 +591,7 @@ public struct GameState: Codable, Equatable, Sendable {
         activeFuses = try container.decodeIfPresent([FuseID: Int].self, forKey: .activeFuses) ?? [:]
         activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []
         pronouns = try container.decodeIfPresent([String: Set<ItemID>].self, forKey: .pronouns) ?? [:]
-        gameSpecificState = try container.decodeIfPresent([GameStateKey: StateValue].self, forKey: .gameSpecificState) ?? [:] // Keep AnyCodable
+        gameSpecificState = try container.decodeIfPresent([GameStateID: StateValue].self, forKey: .gameSpecificState) ?? [:] // Keep AnyCodable
         changeHistory = try container.decodeIfPresent([StateChange].self, forKey: .changeHistory) ?? []
         vocabulary = try container.decode(Vocabulary.self, forKey: .vocabulary)
         // Removed gameID decoding

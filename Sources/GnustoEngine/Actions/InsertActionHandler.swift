@@ -14,7 +14,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
-        // 2. Get Item Snapshots
+        // 2. Get Item s
         guard let itemToInsert = context.engine.item(itemToInsertID) else {
             throw ActionError.itemNotAccessible(itemToInsertID)
         }
@@ -50,8 +50,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             throw ActionError.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
-        let isOpen: Bool = try await context.engine.fetch(containerID, .isOpen)
-        guard isOpen else {
+        guard try await context.engine.fetch(containerID, .isOpen) else {
             throw ActionError.containerIsClosed(containerID)
         }
 
@@ -74,17 +73,20 @@ struct InsertActionHandler: EnhancedActionHandler {
         let containerID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToInsertSnapshot = context.engine.item(itemToInsertID),
-              let containerSnapshot = context.engine.item(containerID) else
-        {
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for INSERT.")
+        guard
+            let itemToInsert = context.engine.item(itemToInsertID),
+            let container = context.engine.item(containerID)
+        else {
+            throw ActionError.internalEngineError(
+                "Item snapshot disappeared between validate and process for INSERT."
+            )
         }
 
         // --- Insert Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Update item parent
-        let oldParent = itemToInsertSnapshot.parent // Should be .player
+        let oldParent = itemToInsert.parent // Should be .player
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
             entityID: .item(itemToInsertID),
@@ -94,35 +96,22 @@ struct InsertActionHandler: EnhancedActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if itemToInsertSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(itemToInsertID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: itemToInsertSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        if let touchedStateChange = context.engine.flag(itemToInsert, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
-        // Change 3: Mark container touched
-        if containerSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(containerID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: containerSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        // Change 2: Mark container touched
+        if let touchedStateChange = context.engine.flag(container, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
-        // Change 4: Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToInsertID])
-        ))
+        // Change 4: Update pronoun
+        if let pronounStateChange = context.engine.pronounStateChange(for: itemToInsert) {
+            stateChanges.append(pronounStateChange)
+        }
 
         // --- Prepare Result ---
-        let message = "You put the \(itemToInsertSnapshot.name) in the \(containerSnapshot.name)."
+        let message = "You put the \(itemToInsert.name) in the \(container.name)."
         return ActionResult(
             success: true,
             message: message,

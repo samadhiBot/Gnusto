@@ -48,7 +48,9 @@ public struct LookActionHandler: EnhancedActionHandler {
             // 2. Location is lit, proceed with description
             guard let currentLocation = await engine.location(with: currentLocationID) else {
                 // Should not happen if player location is valid and not dark
-                throw ActionError.internalEngineError("Player is in an invalid location: \(currentLocationID)")
+                throw ActionError.internalEngineError(
+                    "Player is in an invalid location: \(currentLocationID)"
+                )
             }
 
             // Call helper to print description, passing the snapshot
@@ -63,7 +65,9 @@ public struct LookActionHandler: EnhancedActionHandler {
         // Validation ensures item exists and is reachable
         guard let targetItem = await engine.item(targetItemID) else {
             // This should not happen due to validation, but guard defensively.
-            throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
+            throw ActionError.internalEngineError(
+                "Item \(targetItemID) disappeared between validate and process."
+            )
         }
 
         // 1. Get base description using the registry
@@ -81,20 +85,16 @@ public struct LookActionHandler: EnhancedActionHandler {
 
         // 3. Prepare state change (mark as touched)
         var stateChanges: [StateChange] = []
-        // Use the item from the snapshot for checking state
-        if let snapshotItem = stateSnapshot.items[targetItemID],
-           snapshotItem.attributes[.isTouched] != true // Check dynamicValue
-        {
-            let propertiesChange = StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched), // Use dynamic value key
-                oldValue: snapshotItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(propertiesChange)
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
-        // 4. Combine description lines and return result
+        // 4: Update pronoun
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
+        }
+
+        // 5. Combine description lines and return result
         let finalMessage = descriptionLines.joined(separator: "\n")
         return ActionResult(
             success: true,

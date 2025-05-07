@@ -2,9 +2,8 @@ import Foundation
 
 /// Determines visibility and reachability of items and locations based on game state,
 /// primarily considering light conditions.
-@MainActor // Isolate to MainActor
+@MainActor 
 public struct ScopeResolver: Sendable {
-
     /// Reference to the GameEngine to access state safely.
     private unowned let engine: GameEngine
 
@@ -118,7 +117,7 @@ public struct ScopeResolver: Sendable {
             if currentItem.hasFlag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
                 // Check dynamic property for open state
-                let isOpen = engine.gameState.items[currentItem.id]?.attributes[.isOpen]?.toBool ?? false
+                let isOpen = gameState.items[currentItem.id]?.attributes[.isOpen]?.toBool ?? false
                 let isTransparent = currentItem.hasFlag(.isTransparent)
                 if isOpen || isTransparent {
                     // Find items directly inside this container

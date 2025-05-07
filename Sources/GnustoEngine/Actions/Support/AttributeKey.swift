@@ -31,7 +31,7 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     // Global/Misc Properties
     case setFlag(_ id: FlagID)
     case clearFlag(_ id: FlagID)
-    case gameSpecificState(key: GameStateKey)
+    case gameSpecificState(key: GameStateID)
     case pronounReference(pronoun: String)
 
     // Fuse & Daemon State (Managed via GameEngine helpers typically)

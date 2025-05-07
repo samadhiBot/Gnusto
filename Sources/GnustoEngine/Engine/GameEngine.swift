@@ -992,7 +992,7 @@ public class GameEngine: Sendable {
     ///
     /// - Parameter key: The key (`GameStateKey`) for the game-specific state variable.
     /// - Returns: The `StateValue` if found, otherwise `nil`.
-    public func getStateValue(key: GameStateKey) -> StateValue? {
+    public func getStateValue(key: GameStateID) -> StateValue? {
         gameState.gameSpecificState[key]
     }
 
@@ -1001,7 +1001,7 @@ public class GameEngine: Sendable {
     /// - Parameters:
     ///   - key: The key (`GameStateKey`) for the game-specific state.
     ///   - value: The new `StateValue`.
-    public func applyGameSpecificStateChange(key: GameStateKey, value: StateValue) async {
+    public func applyGameSpecificStateChange(key: GameStateID, value: StateValue) async {
         let oldValue = gameState.gameSpecificState[key] // Read using GameStateKey
 
         // Only apply if the value is changing
@@ -1056,7 +1056,7 @@ extension GameEngine {
     }
 }
 
-// MARK: - Dynamic Property Accessors
+// MARK: - Dynamic Attribute Accessors
 
 extension GameEngine {
 

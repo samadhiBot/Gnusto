@@ -38,18 +38,16 @@ public struct ExamineActionHandler: EnhancedActionHandler {
             )
         }
 
-        // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
 
-        if targetItem.attributes[.isTouched] != true {
-            stateChanges.append(
-                StateChange(
-                    entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: targetItem.attributes[.isTouched],
-                    newValue: true,
-                )
-            )
+        // --- State Change: Mark as Touched ---
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
+        }
+
+        // --- State Change: Update pronoun ---
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
         }
 
         // --- Determine Message ---

@@ -62,14 +62,13 @@ public struct OpenActionHandler: EnhancedActionHandler {
 
         // Update the 'touched' flag - Create a state change if not already touched
         var stateChanges: [StateChange] = []
-        if targetItem.attributes[.isTouched] != true {
-            let touchedChange = StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(touchedChange)
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
+        }
+
+        // Update pronoun
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
         }
 
         // Prepare the result

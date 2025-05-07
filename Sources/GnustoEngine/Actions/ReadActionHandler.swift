@@ -72,13 +72,14 @@ public struct ReadActionHandler: EnhancedActionHandler {
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        if targetItem.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
+        }
+
+        // --- State Change: Update pronoun "it" ---
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
         }
 
         // --- Determine Message ---

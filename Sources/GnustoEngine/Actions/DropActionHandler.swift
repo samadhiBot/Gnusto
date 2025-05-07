@@ -60,17 +60,16 @@ public struct DropActionHandler: EnhancedActionHandler {
         stateChanges.append(parentChange)
 
         // Change 2: Ensure `.isTouched` is true
-        if targetItem.attributes[.isTouched] != true {
-            let touchedChange = StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(touchedChange)
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
-        // Change 3: Ensure `.isWorn` is false
+        // Change 3: Update pronoun
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
+        }
+
+        // Change 4: Ensure `.isWorn` is false
         if targetItem.attributes[.isWorn] == true { // Only add change if it was worn
             let wornChange = StateChange(
                 entityID: .item(targetItemID),
