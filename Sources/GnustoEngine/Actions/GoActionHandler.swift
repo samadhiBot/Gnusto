@@ -5,13 +5,17 @@ public struct GoActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Identify Direction
         guard let direction = context.command.direction else {
-            throw ActionError.internalEngineError("Go context.command processed without a direction.")
+            throw ActionError.internalEngineError(
+                "Go context.command processed without a direction."
+            )
         }
 
         // 2. Get Current Location data
         let currentLocationID = await context.engine.gameState.player.currentLocationID
         guard let currentLoc = await context.engine.location(with: currentLocationID) else {
-            throw ActionError.internalEngineError("Player's current location ID '\(currentLocationID)' is invalid.")
+            throw ActionError.internalEngineError(
+                "Player's current location ID '\(currentLocationID)' is invalid."
+            )
         }
 
         // 3. Find Exit
