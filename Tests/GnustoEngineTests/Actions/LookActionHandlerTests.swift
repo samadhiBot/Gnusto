@@ -3,7 +3,6 @@ import CustomDump
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("LookActionHandler Tests")
 struct LookActionHandlerTests {
     // No handler instance needed for engine.execute tests
@@ -289,11 +288,11 @@ struct LookActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         // Register dynamic compute handler for the location's long description
-        engine.dynamicAttributeRegistry.registerLocationCompute(key: .longDescription) { _, gameEngine in
-            // Use the passed engine to check the flag
-            let isFlagOn = engine.isFlagSet(flagId)
+        await engine.registerLocationComputeHandler(key: .longDescription) { [flagId]
+            (location: Location, gameState: GameState) -> StateValue in
+
+            let isFlagOn = gameState.flags.contains(flagId)
             let text = isFlagOn ? "The room *sparkles* brightly via registry." : "The room seems normal via registry."
-            // Return StateValue.string
             return .string(text)
         }
 

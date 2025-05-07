@@ -248,7 +248,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Check flags set using contains
-        #expect(!engine.gameState.flags.contains(conditionFlagID))
+        #expect(await engine.gameState.flags.contains(conditionFlagID) == false)
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 
