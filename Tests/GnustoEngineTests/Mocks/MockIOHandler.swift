@@ -4,7 +4,7 @@ import Testing
 
 /// A mock implementation of the `IOHandler` protocol for testing purposes.
 /// This actor runs on the dedicated IOActor.
-@IOActor
+@MainActor
 final class MockIOHandler: IOHandler {
     // --- Recorded Output ---
     struct OutputCall: Equatable, Sendable {

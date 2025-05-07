@@ -1,7 +1,7 @@
 import Foundation
 
 /// A basic implementation of `IOHandler` that interacts with the standard console.
-@IOActor
+@MainActor
 public struct ConsoleIOHandler: IOHandler {
 
     public init() {}

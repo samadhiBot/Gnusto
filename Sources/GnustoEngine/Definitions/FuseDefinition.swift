@@ -37,10 +37,7 @@ public struct FuseDefinition: Identifiable, Equatable, Hashable, Sendable {
     // MARK: - Equatable Conformance
 
     public static func == (lhs: FuseDefinition, rhs: FuseDefinition) -> Bool {
-        lhs.id == rhs.id &&
-            lhs.initialTurns == rhs.initialTurns
-        // Note: Closures are not directly comparable for equality.
-        // Equality is based on id and initialTurns only.
+        lhs.id == rhs.id && lhs.initialTurns == rhs.initialTurns
     }
 
     // MARK: - Hashable Conformance

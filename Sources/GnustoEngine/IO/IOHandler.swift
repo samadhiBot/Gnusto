@@ -1,12 +1,6 @@
 import Foundation
 
-/// Defines the interface for handling input and output operations for the game engine.
-/// Implementations could include console I/O, GUI interfaces, network protocols, etc.
-@globalActor public actor IOActor {
-    public static let shared = IOActor()
-}
-
-@IOActor
+@MainActor
 public protocol IOHandler: Sendable {
 
     // --- Output Methods ---
