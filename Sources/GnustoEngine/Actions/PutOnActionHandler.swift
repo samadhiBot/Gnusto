@@ -10,15 +10,15 @@ struct PutOnActionHandler: EnhancedActionHandler {
             throw ActionError.prerequisiteNotMet("Put what?") // Changed from Insert
         }
         guard let surfaceID = context.command.indirectObject else {
-            let itemName = context.engine.item(itemToPutID)?.name ?? "item"
+            let itemName = await context.engine.item(itemToPutID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
         }
 
         // 2. Get Item s
-        guard let itemToPut = context.engine.item(itemToPutID) else {
+        guard let itemToPut = await context.engine.item(itemToPutID) else {
             throw ActionError.itemNotAccessible(itemToPutID)
         }
-        guard let surfaceItem = context.engine.item(surfaceID) else {
+        guard let surfaceItem = await context.engine.item(surfaceID) else {
             throw ActionError.itemNotAccessible(surfaceID)
         }
 
@@ -26,7 +26,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         guard itemToPut.parent == .player else {
             throw ActionError.itemNotHeld(itemToPutID)
         }
-        let reachableItems = context.engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(surfaceID) else {
              throw ActionError.itemNotAccessible(surfaceID)
         }
@@ -42,7 +42,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
                 // Slightly awkward message, but covers the case
                 throw ActionError.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
             }
-            guard let parentItem = context.engine.item(parentItemID) else { break }
+            guard let parentItem = await context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
@@ -60,8 +60,8 @@ struct PutOnActionHandler: EnhancedActionHandler {
 
         // Get snapshots (existence guaranteed by validate)
         guard
-            let itemToPut = context.engine.item(itemToPutID),
-            let surface = context.engine.item(surfaceID)
+            let itemToPut = await context.engine.item(itemToPutID),
+            let surface = await context.engine.item(surfaceID)
         else {
             throw ActionError.internalEngineError(
                 "Item snapshot disappeared between validate and process for PUT ON."
@@ -92,7 +92,7 @@ struct PutOnActionHandler: EnhancedActionHandler {
         }
 
         // Change 4: Update pronoun "it"
-        if let pronounStateChange = context.engine.pronounStateChange(for: itemToPut) {
+        if let pronounStateChange = await context.engine.pronounStateChange(for: itemToPut) {
             stateChanges.append(pronounStateChange)
         }
 

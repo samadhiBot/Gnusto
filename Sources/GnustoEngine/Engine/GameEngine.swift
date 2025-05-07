@@ -5,8 +5,7 @@ import Markdown
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
 /// and IO handler, and executes player commands using registered ActionHandlers.
-@MainActor
-public class GameEngine: Sendable {
+public actor GameEngine: Sendable {
     /// The current state of the game world.
     public internal(set) var gameState: GameState
 
@@ -67,7 +66,7 @@ public class GameEngine: Sendable {
         game: GameBlueprint,
         parser: Parser,
         ioHandler: IOHandler
-    ) {
+    ) async {
         self.gameState = game.state
         self.parser = parser
         self.ioHandler = ioHandler
@@ -78,12 +77,6 @@ public class GameEngine: Sendable {
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
     }
-
-    // MARK: - Fuse & Daemon Management (Runtime Only)
-
-    // Note: Daemons do not currently have separate runtime state managed by the engine,
-    // they operate directly based on the gameState.activeDaemons set each tick.
-    // Therefore, registerDaemon and unregisterDaemon helpers are no longer needed.
 
     // MARK: - Game Loop
 
@@ -334,7 +327,7 @@ public class GameEngine: Sendable {
         } else if !actionHandled {
             // No object handler took charge, check for darkness before running default verb handler
 
-            let isLit = scopeResolver.isLocationLit(locationID: currentLocationID)
+            let isLit = await scopeResolver.isLocationLit(locationID: currentLocationID)
 
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
@@ -372,7 +365,7 @@ public class GameEngine: Sendable {
                     let context = ActionContext(
                         command: command,
                         engine: self,
-                        stateSnapshot: gameState.snapshot
+                        stateSnapshot: await gameState.snapshot
                         // contextData is empty by default
                     )
 
@@ -468,7 +461,7 @@ public class GameEngine: Sendable {
             let initialTurns = effect.parameters["turns"]?.toInt ?? definition.initialTurns
             let addChange = StateChange(
                 entityID: .global,
-                attributeKey: 
+                attributeKey:
                     .addActiveFuse(
                         fuseID: definition.id,
                         initialTurns: initialTurns
@@ -536,7 +529,7 @@ public class GameEngine: Sendable {
         let locationID = gameState.player.currentLocationID
 
         // 1. Check for light
-        let isLitResult = scopeResolver.isLocationLit(locationID: locationID)
+        let isLitResult = await scopeResolver.isLocationLit(locationID: locationID)
         guard isLitResult else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
@@ -566,7 +559,7 @@ public class GameEngine: Sendable {
     /// Helper to list items visible in a location (only called if lit).
     private func listItemsInLocation(locationID: LocationID) async {
         // 1. Get visible item IDs using ScopeResolver
-        let visibleItemIDs = scopeResolver.visibleItemsIn(locationID: locationID)
+        let visibleItemIDs = await scopeResolver.visibleItemsIn(locationID: locationID)
 
         // 2. Asynchronously fetch Item objects/snapshots for the visible IDs
         let visibleItems = visibleItemIDs.compactMap(item(_:))
@@ -1070,7 +1063,7 @@ extension GameEngine {
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
     @MainActor
     private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
-        guard let item = gameState.items[itemID] else {
+        guard let item = await gameState.items[itemID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
@@ -1079,7 +1072,7 @@ extension GameEngine {
         }
 
         // Check registry for compute handler
-        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: key) {
+        if let computeHandler = await dynamicAttributeRegistry.itemComputeHandler(for: key) {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
@@ -1105,7 +1098,7 @@ extension GameEngine {
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
     @MainActor
     private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
-        guard let location = gameState.locations[locationID] else {
+        guard let location = await gameState.locations[locationID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
@@ -1113,7 +1106,7 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: key) {
+        if let computeHandler = await dynamicAttributeRegistry.locationComputeHandler(for: key) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
@@ -1136,14 +1129,13 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
-    @MainActor
     public func setDynamicItemValue(itemID: ItemID, key: AttributeID, newValue: StateValue) async throws {
-        guard let item = gameState.items[itemID] else {
+        guard let item = await gameState.items[itemID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
         }
 
         // Check registry for validate handler
-        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: key) {
+        if let validateHandler = await dynamicAttributeRegistry.itemValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(item, newValue)
                 if !isValid {
@@ -1185,13 +1177,12 @@ extension GameEngine {
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
     /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
-    @MainActor
     public func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
-        guard let location = gameState.locations[locationID] else {
+        guard let location = await gameState.locations[locationID] else {
             throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }
 
-        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: key) {
+        if let validateHandler = await dynamicAttributeRegistry.locationValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(location, newValue)
                 if !isValid {

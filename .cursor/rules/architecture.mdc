@@ -19,11 +19,11 @@ Responsible for generating dynamic descriptions for items and locations, potenti
 
 ## GameEngine
 
-The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers, processes timed events (tickClock), and provides helper methods for common state access and mutation. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
+The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers, processes timed events (tickClock), and provides helper methods for common state access and mutation. GameEngine is `Sendable`. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
 
 ## GameState
 
-The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via GameEngine helpers). [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
+The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via GameEngine helpers). GameState is `Codable` and `Sendable`. [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
 
 ## IOHandler
 
@@ -31,7 +31,7 @@ Defines the interface for all input/output operations: reading player commands, 
 
 ## Item / Location
 
-The core model classes representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like properties, parent). [Item.swift](mdc:Sources/GnustoEngine/Core/Item.swift) [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
+The core model structs representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like attributes, parent). Each is `Codable` and `Sendable`. [Item.swift](mdc:Sources/GnustoEngine/Core/Item.swift) [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
 
 ## Parser
 

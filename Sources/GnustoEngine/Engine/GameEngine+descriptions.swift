@@ -17,10 +17,13 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        formatDescription(
-            (try? await engine.fetch(itemID, key)) ??
-            defaultItemDescription(for: itemID, key: key, engine: engine)
-        )
+        let fetchedOrNil: String? = try? await engine.fetch(itemID, key)
+        if let actualDescription = fetchedOrNil {
+            return formatDescription(actualDescription)
+        } else {
+            let defaultDesc = await defaultItemDescription(for: itemID, key: key, engine: engine)
+            return formatDescription(defaultDesc)
+        }
     }
 
     /// Provides a default description string when a dynamic or static one isn't found.
@@ -34,8 +37,8 @@ extension GameEngine {
         for itemID: ItemID,
         key: AttributeID,
         engine: GameEngine
-    ) -> String {
-        let item = engine.item(itemID)
+    ) async -> String {
+        let item = await engine.item(itemID)
         return switch key {
         case .longDescription:
             "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
@@ -69,10 +72,13 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        formatDescription(
-            (try? await engine.fetch(locationID, key)) ??
-            defaultLocationDescription(for: locationID, key: key, engine: engine)
-        )
+        let fetchedOrNil: String? = try? await engine.fetch(locationID, key)
+        if let actualDescription = fetchedOrNil {
+            return formatDescription(actualDescription)
+        } else {
+            let defaultDesc = await defaultLocationDescription(for: locationID, key: key, engine: engine)
+            return formatDescription(defaultDesc)
+        }
     }
 
     /// Provides a default description string when a dynamic or static one isn't found.
@@ -80,7 +86,7 @@ extension GameEngine {
         for locationID: LocationID,
         key: AttributeID,
         engine: GameEngine
-    ) -> String {
+    ) async -> String {
         // Consider fetching location name
         // let locationName = await engine.locationSnapshot(locationID)?.name ?? "place"
         switch key {

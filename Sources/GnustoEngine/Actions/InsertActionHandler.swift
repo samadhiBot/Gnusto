@@ -10,15 +10,15 @@ struct InsertActionHandler: EnhancedActionHandler {
         }
         guard let containerID = context.command.indirectObject else {
             // Fetch name for better error message if possible
-            let itemName = context.engine.item(itemToInsertID)?.name ?? "item"
+            let itemName = await context.engine.item(itemToInsertID)?.name ?? "item"
             throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item s
-        guard let itemToInsert = context.engine.item(itemToInsertID) else {
+        guard let itemToInsert = await context.engine.item(itemToInsertID) else {
             throw ActionError.itemNotAccessible(itemToInsertID)
         }
-        guard let containerItem = context.engine.item(containerID) else {
+        guard let containerItem = await context.engine.item(containerID) else {
             throw ActionError.itemNotAccessible(containerID)
         }
 
@@ -26,7 +26,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         guard itemToInsert.parent == .player else {
             throw ActionError.itemNotHeld(itemToInsertID)
         }
-        let reachableItems = context.engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(containerID) else {
              throw ActionError.itemNotAccessible(containerID)
         }
@@ -41,7 +41,7 @@ struct InsertActionHandler: EnhancedActionHandler {
             if parentItemID == itemToInsertID {
                 throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
             }
-            guard let parentItem = context.engine.item(parentItemID) else { break }
+            guard let parentItem = await context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
         }
 
@@ -58,7 +58,7 @@ struct InsertActionHandler: EnhancedActionHandler {
         // Check if container has limited capacity (capacity >= 0)
         if containerItem.capacity >= 0 {
             // Fix: Calculate load manually
-            let itemsInside = context.engine.items(in: .item(containerID))
+            let itemsInside = await context.engine.items(in: .item(containerID))
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
@@ -74,8 +74,8 @@ struct InsertActionHandler: EnhancedActionHandler {
 
         // Get snapshots (existence guaranteed by validate)
         guard
-            let itemToInsert = context.engine.item(itemToInsertID),
-            let container = context.engine.item(containerID)
+            let itemToInsert = await context.engine.item(itemToInsertID),
+            let container = await context.engine.item(containerID)
         else {
             throw ActionError.internalEngineError(
                 "Item snapshot disappeared between validate and process for INSERT."
@@ -96,17 +96,17 @@ struct InsertActionHandler: EnhancedActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if let touchedStateChange = context.engine.flag(itemToInsert, with: .isTouched) {
+        if let touchedStateChange = await context.engine.flag(itemToInsert, with: .isTouched) {
             stateChanges.append(touchedStateChange)
         }
 
         // Change 2: Mark container touched
-        if let touchedStateChange = context.engine.flag(container, with: .isTouched) {
+        if let touchedStateChange = await context.engine.flag(container, with: .isTouched) {
             stateChanges.append(touchedStateChange)
         }
 
         // Change 4: Update pronoun
-        if let pronounStateChange = context.engine.pronounStateChange(for: itemToInsert) {
+        if let pronounStateChange = await context.engine.pronounStateChange(for: itemToInsert) {
             stateChanges.append(pronounStateChange)
         }
 

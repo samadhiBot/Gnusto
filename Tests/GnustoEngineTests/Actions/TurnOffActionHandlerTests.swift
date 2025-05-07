@@ -28,7 +28,7 @@ struct TurnOffActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -43,7 +43,7 @@ struct TurnOffActionHandlerTests {
             The lamp is now off.
             It is now pitch black. You are likely to be eaten by a grue.
             """)
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
