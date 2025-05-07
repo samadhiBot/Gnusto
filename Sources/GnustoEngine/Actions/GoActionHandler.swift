@@ -48,9 +48,12 @@ public struct GoActionHandler: ActionHandler {
 
     public func process(context: ActionContext) async throws -> ActionResult {
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
-        guard let direction = context.command.direction,
-              let currentLoc = await context.engine.location(with: await context.engine.gameState.player.currentLocationID),
-              let exit = currentLoc.exits[direction]
+        guard
+            let direction = context.command.direction,
+            let currentLoc = await context.engine.location(
+                with: await context.engine.gameState.player.currentLocationID
+            ),
+            let exit = currentLoc.exits[direction]
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionError.internalEngineError("Exit disappeared between validate and process for GO context.command.")
