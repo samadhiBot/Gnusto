@@ -23,7 +23,7 @@ struct RemoveActionHandlerTests {
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -34,7 +34,7 @@ struct RemoveActionHandlerTests {
 
         // Initial state check
         #expect(engine.item("cloak")?.hasFlag(.isWorn) == true)
-        let initialHistory = engine.gameState.changeHistory
+        let initialHistory = await engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 
         // Act
@@ -71,7 +71,7 @@ struct RemoveActionHandlerTests {
                 newValue: true
             ),
         ]
-        let finalHistory = engine.gameState.changeHistory
+        let finalHistory = await engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
     }
 
@@ -87,7 +87,7 @@ struct RemoveActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [cloak])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -105,13 +105,13 @@ struct RemoveActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
         let game = MinimalGame() // Cloak doesn't exist here
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -129,13 +129,13 @@ struct RemoveActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
         let game = MinimalGame()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -154,7 +154,7 @@ struct RemoveActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Remove fails if item is fixed (cursed)")
@@ -170,7 +170,7 @@ struct RemoveActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [amulet])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -188,6 +188,6 @@ struct RemoveActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

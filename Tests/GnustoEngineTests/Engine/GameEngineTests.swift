@@ -25,7 +25,7 @@ struct GameEngineTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -72,7 +72,7 @@ struct GameEngineTests {
         let parseError = ParseError.unknownVerb("xyzzy")
         mockParser.defaultParseResult = .failure(parseError)
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
@@ -103,11 +103,11 @@ struct GameEngineTests {
             """)
 
         // Check turn counter was incremented despite error
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
         // Check change history only contains the move increment
-        let history = engine.getChangeHistory()
+        let history = await engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on parse error")
         #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
@@ -142,7 +142,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -181,11 +181,11 @@ struct GameEngineTests {
         #expect(commandReceived?.directObject == "startItem")
 
         // Check turn counter incremented
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
         // Check change history only contains the move increment
-        let history = engine.getChangeHistory()
+        let history = await engine.getChangeHistory()
         #expect(history.count == 1, "Only move increment should be in history on action error")
         #expect(history.first?.attributeKey == .playerMoves)
         #expect(history.first?.newValue == .int(1))
@@ -219,7 +219,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -244,7 +244,7 @@ struct GameEngineTests {
         #expect(commandReceived?.verbID == "look", "Handler received incorrect verb")
 
         // Check turn counter incremented
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment for successful command")
     }
 
@@ -285,7 +285,7 @@ struct GameEngineTests {
             }
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -317,7 +317,7 @@ struct GameEngineTests {
         #expect(takeCommandReceived?.directObject == "startItem")
 
         // Check turn counter reflects two successful commands
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
 
         // Check status line was updated for each turn (initial + 2 turns)
@@ -338,7 +338,7 @@ struct GameEngineTests {
         )
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -371,7 +371,7 @@ struct GameEngineTests {
         // #expect(quitCommandReceived?.verbID == "quit") <-- Removed
 
         // Check turn counter - should NOT increment if quit happens before increment.
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 0, "Turn counter should not increment for the quit command if exit happens first")
 
         // Verify output - only initial description, status, and prompt, then nothing after quit
@@ -395,7 +395,7 @@ struct GameEngineTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -428,7 +428,7 @@ struct GameEngineTests {
         #expect(statuses.first?.turns == 0)
 
         // Verify no commands were processed (turn counter remains 0)
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 0, "Turn counter should not increment if no input is read")
     }
 
@@ -482,7 +482,7 @@ struct GameEngineTests {
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
         #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -502,17 +502,17 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = engine.item("startItem")
+        let finalPebbleSnapshot = await engine.item("startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.items(in: .player)
+        let finalInventorySnapshots = await engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.items(in: .location("startRoom"))
+        let finalRoomSnapshots = await engine.items(in: .location("startRoom"))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 2, "Turn counter should be 2 after take and inventory commands")
 
         // Check status lines were updated
@@ -613,7 +613,7 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -636,7 +636,7 @@ struct GameEngineTests {
         #expect(engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
 
         // Check history recorded correctly
-        let history = engine.getChangeHistory()
+        let history = await engine.getChangeHistory()
         #expect(!history.isEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
@@ -1289,7 +1289,7 @@ struct GameEngineTests {
         
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         
         // Create the command to trigger the mock handler
         let testCommand = Command(verbID: testVerb, rawInput: "testapply")
@@ -1299,7 +1299,7 @@ struct GameEngineTests {
 
         // Assert:
         // Verify the state changes were applied
-        let finalLamp = engine.item(itemID)
+        let finalLamp = await engine.item(itemID)
         #expect(finalLamp?.attributes[.isOn] == true, "Lamp should be ON")
         #expect(finalLamp?.attributes[.isTouched] == true, "Lamp should be TOUCHED")
         
@@ -1339,7 +1339,7 @@ extension GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO

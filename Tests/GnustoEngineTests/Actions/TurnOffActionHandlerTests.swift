@@ -69,7 +69,7 @@ struct TurnOffActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -102,7 +102,7 @@ struct TurnOffActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -140,7 +140,7 @@ struct TurnOffActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -149,7 +149,7 @@ struct TurnOffActionHandlerTests {
 
         await engine.execute(command: command)
 
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -178,20 +178,20 @@ struct TurnOffActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let initiallyLit = engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
+        let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(initiallyLit == true)
 
         let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
 
         await engine.execute(command: command)
 
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -202,7 +202,7 @@ struct TurnOffActionHandlerTests {
             """
         expectNoDifference(output, expectedOutput)
 
-        let finallyLit = engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
+        let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(finallyLit == false)
     }
 
@@ -218,7 +218,7 @@ struct TurnOffActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -238,7 +238,7 @@ struct TurnOffActionHandlerTests {
         }
 
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
@@ -255,7 +255,7 @@ struct TurnOffActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -273,7 +273,7 @@ struct TurnOffActionHandlerTests {
             )
         }
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
@@ -290,7 +290,7 @@ struct TurnOffActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -328,7 +328,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         // Use the real parser to test alias resolution
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser, // Use StandardParser
             ioHandler: mockIO
@@ -336,14 +336,14 @@ struct TurnOffActionHandlerTests {
 
         // Act
         // Parse the raw input first
-        let parseResult = parser.parse(input: "extinguish lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "extinguish lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get() // Get the parsed command
 
         // Execute the parsed command
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -377,7 +377,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         // Use the real parser to test alias resolution
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser, // Use StandardParser
             ioHandler: mockIO
@@ -385,14 +385,14 @@ struct TurnOffActionHandlerTests {
 
         // Act
         // Parse the raw input first
-        let parseResult = parser.parse(input: "blow out lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "blow out lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get() // Get the parsed command
 
         // Execute the parsed command
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("lamp")
+        let finalItemState = await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 

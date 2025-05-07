@@ -23,13 +23,17 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
-        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(
+            input: "turn on lamp",
+            vocabulary: await engine.gameState.vocabulary,
+            gameState: await engine.gameState
+        )
         let command = try parseResult.get()
 
         // Act
@@ -69,17 +73,17 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
         // Verify room is dark initially
-        let initiallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
+        let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(initiallyLit == false)
 
-        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get()
 
         // Act
@@ -95,7 +99,7 @@ struct TurnOnActionHandlerTests {
         expectNoDifference(output, "The brass lantern is now on.")
 
         // Assert: Verify the room is now lit
-        let finallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
+        let finallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(finallyLit == true, "Room should be lit after turning on the lamp.")
     }
 
@@ -116,13 +120,13 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
-        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get()
 
         // Act & Assert: Expect error during validation
@@ -155,13 +159,13 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
-        let parseResult = parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get()
 
         // Act & Assert
@@ -196,7 +200,7 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
@@ -204,8 +208,8 @@ struct TurnOnActionHandlerTests {
 
         // Act & Assert: Expect parser error because item is out of scope
         let expectedError = ParseError.itemNotInScope(noun: "lamp")
-        #expect(throws: expectedError) {
-            _ = try parser.parse(input: "turn on lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState).get()
+        await #expect(throws: expectedError) {
+            _ = try parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState).get()
         }
     }
 
@@ -231,13 +235,13 @@ struct TurnOnActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
-        let parseResult = parser.parse(input: "turn on radio", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "turn on radio", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get()
 
         // Act
@@ -253,7 +257,7 @@ struct TurnOnActionHandlerTests {
         expectNoDifference(output, "The portable radio is now on.")
 
         // Verify room is still dark
-        let finallyLit = engine.scopeResolver.isLocationLit(locationID: "darkRoom")
+        let finallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(finallyLit == false)
     }
 
@@ -273,13 +277,13 @@ struct TurnOnActionHandlerTests {
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: parser,
             ioHandler: mockIO
         )
 
-        let parseResult = parser.parse(input: "light lamp", vocabulary: engine.gameState.vocabulary, gameState: engine.gameState)
+        let parseResult = await parser.parse(input: "light lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
         let command = try parseResult.get()
 
         // Act

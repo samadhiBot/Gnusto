@@ -23,7 +23,7 @@ struct CloseActionHandlerTests {
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -32,15 +32,15 @@ struct CloseActionHandlerTests {
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
 
         // Initial state check
-        let initialBox = engine.item("box")
+        let initialBox = await engine.item("box")
         #expect(initialBox?.attributes[.isOpen] == true)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalBox = engine.item("box")
+        let finalBox = await engine.item("box")
         #expect(finalBox?.attributes[.isOpen] == false)
         #expect(finalBox?.attributes[.isTouched] == true)
 
@@ -49,7 +49,8 @@ struct CloseActionHandlerTests {
         expectNoDifference(output, "Closed.")
 
         // Assert Change History
-        expectNoDifference(engine.gameState.changeHistory, [
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, [
             StateChange(
                 entityID: .item(box.id),
                 attributeKey: .itemAttribute(.isOpen),
@@ -86,7 +87,7 @@ struct CloseActionHandlerTests {
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -102,7 +103,7 @@ struct CloseActionHandlerTests {
         expectNoDifference(output, "The wooden box is already closed.")
 
         // Assert Change History
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Close fails if not openable")
@@ -114,7 +115,7 @@ struct CloseActionHandlerTests {
             // isContainer/isOpenable are false by default
         )
         let game = MinimalGame(items: [rock])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -132,7 +133,7 @@ struct CloseActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Close fails if item not accessible")
@@ -147,7 +148,7 @@ struct CloseActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [box])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -165,13 +166,13 @@ struct CloseActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
         let game = MinimalGame()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -189,6 +190,6 @@ struct CloseActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

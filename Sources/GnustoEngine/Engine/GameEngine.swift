@@ -121,7 +121,7 @@ public actor GameEngine: Sendable {
 
         // 2. Parse Input
         let vocabulary = gameState.vocabulary
-        let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
+        let parseResult = await parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
         do {

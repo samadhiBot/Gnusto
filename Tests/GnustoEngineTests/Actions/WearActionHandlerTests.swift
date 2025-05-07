@@ -23,7 +23,7 @@ struct WearActionHandlerTests {
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -32,13 +32,13 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialItem = engine.item("cloak")
+        let initialItem = await engine.item("cloak")
         #expect(initialItem?.hasFlag(.isWorn) == false)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         await engine.execute(command: command)
 
-        let finalCloakState = engine.item("cloak")
+        let finalCloakState = await engine.item("cloak")
         #expect(finalCloakState?.parent == .player)
         #expect(finalCloakState?.hasFlag(.isWorn) == true, "Cloak should have .worn property")
         #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property")
@@ -66,14 +66,14 @@ struct WearActionHandlerTests {
                 newValue: .itemIDSet(["cloak"])
             )
         ]
-        let finalHistory = engine.gameState.changeHistory
+        let finalHistory = await engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
     }
 
     @Test("Wear fails if item not held")
     func testWearItemNotHeld() async throws {
         let game = MinimalGame()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -90,7 +90,7 @@ struct WearActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails if item not wearable")
@@ -104,7 +104,7 @@ struct WearActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [rock])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -121,7 +121,7 @@ struct WearActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails if item already worn")
@@ -137,7 +137,7 @@ struct WearActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [cloak])
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -154,13 +154,13 @@ struct WearActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Wear fails with no direct object")
     func testWearNoObject() async throws {
         let game = MinimalGame()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -177,6 +177,6 @@ struct WearActionHandlerTests {
                 )
             )
         }
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

@@ -90,18 +90,18 @@ struct UnlockActionHandlerTests {
         let game = MinimalGame(items: [initialBox, initialKey])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Check initial state
-        let initialBoxSnapshot = try #require(engine.item("box"))
+        let initialBoxSnapshot = try #require(await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified AttributeID
-        let initialKeySnapshot = try #require(engine.item("key"))
+        let initialKeySnapshot = try #require(await engine.item("key"))
 
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
 
@@ -113,11 +113,11 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        let finalBoxState = try #require(engine.item("box"))
+        let finalBoxState = try #require(await engine.item("box"))
         #expect(finalBoxState.hasFlag(.isLocked) == false, "Box should be unlocked") // Qualified AttributeID
         #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched") // Qualified AttributeID
 
-        let finalKeyState = try #require(engine.item("key"))
+        let finalKeyState = try #require(await engine.item("key"))
         #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched") // Qualified AttributeID
 
         // Assert Change History
@@ -128,7 +128,8 @@ struct UnlockActionHandlerTests {
             initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched), // Qualified AttributeID
             initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched) // Qualified AttributeID
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("Unlock fails with no direct object")
@@ -145,12 +146,12 @@ struct UnlockActionHandlerTests {
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", indirectObject: "key", rawInput: "unlock with key") // No direct object
 
@@ -162,7 +163,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "Unlock what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails with no indirect object")
@@ -182,12 +183,12 @@ struct UnlockActionHandlerTests {
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", rawInput: "unlock box") // No indirect object
 
@@ -199,7 +200,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "Unlock it with what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails when key not held")
@@ -227,12 +228,12 @@ struct UnlockActionHandlerTests {
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
 
@@ -244,7 +245,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "You aren't holding the key.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails when target not reachable")
@@ -282,12 +283,12 @@ let box = Item(
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
 
@@ -299,7 +300,7 @@ let box = Item(
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails when target not lockable/unlockable")
@@ -321,12 +322,12 @@ let box = Item(
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "pebble", indirectObject: "key", rawInput: "unlock pebble with key")
 
@@ -338,7 +339,7 @@ let box = Item(
         expectNoDifference(output, "You can't unlock the pebble.") // Uses ActionError.itemNotUnlockable message
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails with wrong key")
@@ -366,12 +367,12 @@ let box = Item(
         let game = MinimalGame(items: [box, wrongKey])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "wrongkey", rawInput: "unlock box with bent key")
 
@@ -383,7 +384,7 @@ let box = Item(
         expectNoDifference(output, "The bent key doesn't fit the box.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Unlock fails when already unlocked")
@@ -410,14 +411,14 @@ let box = Item(
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(engine.item("box"))
+        let initialBoxSnapshot = try #require(await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified AttributeID
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
 
@@ -429,6 +430,6 @@ let box = Item(
         expectNoDifference(output, "The box is already unlocked.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 }

@@ -16,7 +16,7 @@ struct ScoreActionHandlerTests {
         let game = MinimalGame(player: initialPlayer)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -36,6 +36,6 @@ struct ScoreActionHandlerTests {
         expectNoDifference(output, expectedMessage)
 
         // Verify no state changes were recorded
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 }

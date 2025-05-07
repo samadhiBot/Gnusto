@@ -35,7 +35,7 @@ final class FrobozzMagicDemoKit {
         self.ioHandler = resolvedIOHandler
 
         // Create the engine with the initial components
-        engine = GameEngine(
+        engine = await GameEngine(
             initialState: initialState,
             parser: parser,
             ioHandler: resolvedIOHandler,

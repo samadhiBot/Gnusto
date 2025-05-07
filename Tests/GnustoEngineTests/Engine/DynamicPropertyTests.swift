@@ -70,7 +70,7 @@ struct DynamicPropertyTests {
         try await engine.setDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.simpleProp, newValue: StateValue.int(20))
 
         // Verify new value in GameState
-        let updatedItem = engine.gameState.items[TestIDs.testItem]
+        let updatedItem = await engine.gameState.items[TestIDs.testItem]
         #expect(updatedItem?.attributes[TestIDs.simpleProp] == StateValue.int(20))
 
         // Verify getting the value again works
@@ -97,7 +97,7 @@ struct DynamicPropertyTests {
         try await engine.setDynamicItemValue(itemID: TestIDs.testItem, key: TestIDs.validatedProp, newValue: StateValue.int(5))
 
         // Verify value in GameState
-        let updatedItem = engine.gameState.items[TestIDs.testItem]
+        let updatedItem = await engine.gameState.items[TestIDs.testItem]
         #expect(updatedItem?.attributes[TestIDs.validatedProp] == StateValue.int(5))
     }
 
@@ -123,7 +123,7 @@ struct DynamicPropertyTests {
         }
 
         // Verify value in GameState hasn't changed
-        let item = engine.gameState.items[TestIDs.testItem]
+        let item = await engine.gameState.items[TestIDs.testItem]
         #expect(item?.attributes[TestIDs.validatedProp] == StateValue.int(1))
 
         // Attempt to set wrong type

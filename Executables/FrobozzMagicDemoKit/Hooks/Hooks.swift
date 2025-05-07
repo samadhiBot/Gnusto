@@ -77,7 +77,7 @@ enum Hooks {
         }
 
         // Add atmospheric messages based on location
-        let locationID = engine.gameState.player.currentLocationID // Safe accessor
+        let locationID = await engine.gameState.player.currentLocationID // Safe accessor
         let turnCount = engine.playerMoves      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)
@@ -125,7 +125,7 @@ enum Hooks {
 
         // Check for the lantern specifically
         if playerItemIDs.contains(Components.Lantern.Constants.itemID) {
-            let lantern = engine.item(Components.Lantern.Constants.itemID)
+            let lantern = await engine.item(Components.Lantern.Constants.itemID)
             if lantern?.hasProperty(.on) == true {
                 return true // Lit lantern found
             }
@@ -133,7 +133,7 @@ enum Hooks {
 
         // Check for other light sources (like the glowing gem)
         for itemID in playerItemIDs {
-            let item = engine.item(itemID)
+            let item = await engine.item(itemID)
             // Check if it's a light source BUT NOT the lantern (already checked)
             if itemID != Components.Lantern.Constants.itemID,
                item?.hasProperty(.lightSource) == true

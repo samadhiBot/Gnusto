@@ -54,12 +54,12 @@ struct LookActionHandlerTests {
         let game = MinimalGame(player: Player(in: "litRoom"), locations: [litRoom], items: [item1, item2])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", rawInput: "look")
 
@@ -76,7 +76,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("LOOK in lit room with multiple items lists them correctly")
@@ -116,12 +116,12 @@ struct LookActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", rawInput: "look")
 
@@ -139,7 +139,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("LOOK in dark room prints darkness message")
@@ -159,12 +159,12 @@ struct LookActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", rawInput: "look")
 
@@ -177,7 +177,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "It is pitch black. You are likely to be eaten by a grue.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
@@ -206,12 +206,12 @@ struct LookActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", rawInput: "look")
 
@@ -228,7 +228,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("LOOK with nil location description uses default")
@@ -246,7 +246,7 @@ struct LookActionHandlerTests {
             locations: [litRoom]
         )
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(verbID: "look", rawInput: "look")
 
@@ -262,7 +262,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("LOOK with dynamic location description closure")
@@ -286,7 +286,7 @@ struct LookActionHandlerTests {
         )
 
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         // Register dynamic compute handler for the location's long description
         engine.dynamicAttributeRegistry.registerLocationCompute(key: .longDescription) { _, gameEngine in
@@ -341,13 +341,13 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("rock")?.hasFlag(.isTouched) == false)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "rock", rawInput: "x rock")
 
@@ -359,12 +359,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "Just a plain rock.")
 
         // Assert Final State
-        let finalItemState = engine.item("rock")
+        let finalItemState = await engine.item("rock")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "rock", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT item with no description shows default message and marks touched")
@@ -383,13 +384,13 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("pebble")?.hasFlag(.isTouched) == false)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "look", directObject: "pebble", rawInput: "l pebble")
 
@@ -401,12 +402,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You notice a small pebble.")
 
         // Assert Final State
-        let finalItemState = engine.item("pebble")
+        let finalItemState = await engine.item("pebble")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "pebble", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT already touched item shows description, no state change")
@@ -427,13 +429,13 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("stone")?.hasFlag(.isTouched) == true)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "stone", rawInput: "x stone")
 
@@ -445,13 +447,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A worn stone.")
 
         // Assert Final State (remains touched)
-        let finalItemState = engine.item("stone")
+        let finalItemState = await engine.item("stone")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should still be marked touched")
 
         // Assert Change History (Should be empty)
         let expectedChanges = expectedLookChanges(itemID: "stone", initialAttributes: initialAttributes)
         #expect(expectedChanges.isEmpty == true)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     // TODO: Add tests for LOOK AT container (open/closed/transparent) and surface
@@ -482,13 +484,13 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [box, coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("box")?.hasFlag(.isTouched) == false)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
 
@@ -500,12 +502,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A wooden box. The wooden box contains a gold coin.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item("box")
+        let finalItemState = await engine.item("box")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "box", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT closed container shows description, closed message, and marks touched")
@@ -533,14 +536,14 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [box, coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("box")?.hasFlag(.isTouched) == false)
         #expect(engine.item("box")?.attributes["isOpen"] == nil)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
 
@@ -552,12 +555,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A wooden box. The wooden box is closed.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item("box")
+        let finalItemState = await engine.item("box")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "box", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT closed transparent container shows description, contents, and marks touched")
@@ -579,7 +583,7 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [jar, fly])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -587,7 +591,7 @@ struct LookActionHandlerTests {
         #expect(engine.item("jar")?.hasFlag(.isTouched) == false)
         #expect(engine.item("jar")?.attributes["isOpen"] == nil)
         #expect(engine.item("jar")?.attributes["isTransparent"] == true)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "jar", rawInput: "x jar")
 
@@ -599,12 +603,13 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "A glass jar. The glass jar contains a dead fly.")
 
         // Assert Final State (Container marked touched)
-        let finalItemState = engine.item("jar")
+        let finalItemState = await engine.item("jar")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "jar", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT surface shows description, contents, and marks touched")
@@ -633,13 +638,13 @@ struct LookActionHandlerTests {
         let game = MinimalGame(items: [table, book, candle])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("table")?.hasFlag(.isTouched) == false)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "table", rawInput: "x table")
 
@@ -655,12 +660,13 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Surface marked touched)
-        let finalItemState = engine.item("table")
+        let finalItemState = await engine.item("table")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
         let expectedChanges = expectedLookChanges(itemID: "table", initialAttributes: initialAttributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("LOOK AT item not reachable fails")
@@ -677,15 +683,15 @@ struct LookActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         #expect(engine.item("artifact") != nil) // Item exists
-        let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
+        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "examine", directObject: "artifact", rawInput: "x artifact")
 
@@ -697,11 +703,11 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
-        let finalItemState = engine.item("artifact")
+        let finalItemState = await engine.item("artifact")
         #expect(finalItemState?.hasFlag(.isTouched) == false)
         #expect(finalItemState?.parent == .location("otherRoom"))
 
         // Assert Change History (Should be empty)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 }

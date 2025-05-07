@@ -103,7 +103,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -113,13 +113,13 @@ struct TakeActionHandlerTests {
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("key")
+        let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true) // Use convenience accessor
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -135,7 +135,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item fails when already held")
@@ -150,17 +151,17 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = engine.item("key")
+        let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player)
 
         // Assert Output
@@ -168,7 +169,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You already have that.")
 
         // Assert Change History (Should be empty)
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Take item fails when not present in location")
@@ -184,7 +185,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [nonexistentItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -200,7 +201,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check that the player is still holding nothing
         #expect(engine.items(in: .player).isEmpty == true)
@@ -219,7 +220,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -235,10 +236,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can't take the heavy rock.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item("rock")
+        let finalItemState = await engine.item("rock")
         #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
     }
 
@@ -248,7 +249,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "take", rawInput: "take")
 
         // Act
@@ -259,7 +260,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Take what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Take item successfully from open container in room")
@@ -286,22 +287,22 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("gem")
+        let finalItemState = await engine.item("gem")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
-        let finalContainerState = engine.item("box")
+        let finalContainerState = await engine.item("box")
         #expect(finalContainerState?.parent == .location("startRoom"))
         #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
         #expect(engine.getPronounReference(pronoun: "it") == ["gem"])
@@ -316,7 +317,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item successfully from open container held by player")
@@ -344,22 +346,22 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("coin")
+        let finalItemState = await engine.item("coin")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
-        let finalContainerState = engine.item("pouch")
+        let finalContainerState = await engine.item("pouch")
         #expect(finalContainerState?.parent == .player)
         #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
         #expect(engine.getPronounReference(pronoun: "it") == ["coin"])
@@ -374,7 +376,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item fails from closed container")
@@ -396,7 +399,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -415,10 +418,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item("gem")
+        let finalItemState = await engine.item("gem")
         #expect(finalItemState?.parent == .item("box"), "Item should still be in the box")
     }
 
@@ -441,7 +444,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(items: [nonContainer, itemInside])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -465,10 +468,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can't take things out of the stone statue.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item("chip")
+        let finalItemState = await engine.item("chip")
         #expect(finalItemState?.parent == .item("statue"), "Chip should still be parented to statue")
     }
 
@@ -489,7 +492,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [heavyItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -504,7 +507,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Your hands are full.") // Check standard message
 
         // Assert no state changes occurred
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert item is still in the room
         #expect(engine.item("heavy")?.parent == .location("startRoom"))
@@ -532,19 +535,19 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("cloak")
+        let finalItemState = await engine.item("cloak")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         #expect(finalItemState?.hasFlag(.isWorn) == false) // Not worn
@@ -560,7 +563,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item successfully from surface in room")
@@ -589,22 +593,22 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [surfaceItem, itemOnSurface])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let initialPronounIt = engine.getPronounReference(pronoun: "it")
 
         let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
 
         // Initial state check
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item(itemOnSurface.id)
+        let finalItemState = await engine.item(itemOnSurface.id)
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
-        let finalSurfaceState = engine.item(surfaceItem.id)
+        let finalSurfaceState = await engine.item(surfaceItem.id)
         #expect(finalSurfaceState?.parent == .location("startRoom"))
         #expect(engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
 
@@ -618,7 +622,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item that is already touched")
@@ -642,7 +647,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -651,13 +656,13 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("key")
+        let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true) // Still touched
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -677,7 +682,8 @@ struct TakeActionHandlerTests {
         // Only parent and pronoun changes are expected.
         #expect(expectedChanges.count == 2, "Expected only parent and pronoun changes")
         #expect(!expectedChanges.contains { $0.attributeKey == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
 
@@ -710,7 +716,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [heldItem, itemToTake])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -719,13 +725,13 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
 
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Act
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = engine.item("key")
+        let finalItemState = await engine.item("key")
         #expect(finalItemState?.parent == .player) // Should succeed
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         #expect(engine.getPronounReference(pronoun: "it") == ["key"])
@@ -740,7 +746,8 @@ struct TakeActionHandlerTests {
             initialParent: initialParent,
             initialAttributes: initialAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory.sorted(), expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
     @Test("Take item from transparent container")
@@ -769,7 +776,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -778,7 +785,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(verbID: "take", directObject: "fly", rawInput: "take fly")
 
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
         #expect(engine.item("jar")?.hasFlag(.isOpen) == false) // Verify closed
         #expect(engine.item("jar")?.hasFlag(.isTransparent) == true) // Verify transparent
 
@@ -790,10 +797,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You have to open the glass jar first.") // Updated expected message
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item("fly")
+        let finalItemState = await engine.item("fly")
         #expect(finalItemState?.parent == .item("jar"), "Fly should still be in the jar")
     }
 
@@ -824,7 +831,7 @@ struct TakeActionHandlerTests {
         let game = MinimalGame(player: player, items: [itemHeld, itemToTake])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
 
@@ -836,10 +843,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Your hands are full.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert: Check item parent DID NOT change
-        let finalItemState = engine.item("shield")
+        let finalItemState = await engine.item("shield")
         #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
     }
 }

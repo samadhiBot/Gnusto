@@ -23,7 +23,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -35,7 +35,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("book")
+        let finalItemState = await engine.item("book")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "It reads: \"Beware the Grue!\"")
@@ -69,7 +69,7 @@ struct ReadActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -81,7 +81,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("sign")
+        let finalItemState = await engine.item("sign")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "DANGER AHEAD")
@@ -93,7 +93,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -132,7 +132,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [scroll])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -165,7 +165,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -212,7 +212,7 @@ struct ReadActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -250,7 +250,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [blankPaper])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -262,7 +262,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("paper")
+        let finalItemState = await engine.item("paper")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "There's nothing written on the blank paper.")
@@ -295,7 +295,7 @@ struct ReadActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -307,7 +307,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item("tablet")
+        let finalItemState = await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "Ancient Runes")
@@ -329,7 +329,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [scroll])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -346,7 +346,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Beware the Grue!")
 
         // Assert Final State
-        let finalItemState = engine.item("scroll")
+        let finalItemState = await engine.item("scroll")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -366,7 +366,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [note])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -383,7 +383,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the blank note.")
 
         // Assert Final State
-        let finalItemState = engine.item("note")
+        let finalItemState = await engine.item("note")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -402,7 +402,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [tablet])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -419,7 +419,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the stone tablet.")
 
         // Assert Final State
-        let finalItemState = engine.item("tablet")
+        let finalItemState = await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -438,7 +438,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -464,7 +464,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -495,7 +495,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -529,7 +529,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -546,7 +546,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Luminous secrets!")
 
         // Assert Final State
-        let finalItemState = engine.item("tablet")
+        let finalItemState = await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -556,7 +556,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -597,7 +597,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [box, note])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -612,7 +612,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Meet at midnight.")
 
         // Assert Final State
-        let finalItemState = engine.item("note")
+        let finalItemState = await engine.item("note")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -641,7 +641,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [chest, letter])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -656,7 +656,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Important news.")
 
         // Assert Final State
-        let finalItemState = engine.item("letter")
+        let finalItemState = await engine.item("letter")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -685,7 +685,7 @@ struct ReadActionHandlerTests {
         let game = MinimalGame(items: [lockedBox, secret])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -698,7 +698,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Also assert the item wasn't touched
-        let finalSecretState = engine.item("secret")
+        let finalSecretState = await engine.item("secret")
         #expect(finalSecretState?.hasFlag(.isTouched) == false)
     }
 }

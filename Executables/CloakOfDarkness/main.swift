@@ -13,7 +13,7 @@ await ioHandler.print("""
     people about but, hey, what do you expect in a cheap demo game...?
     """)
 
-let engine = GameEngine(
+let engine = await GameEngine(
     game: CloakOfDarkness(),
     parser: StandardParser(),
     ioHandler: ioHandler

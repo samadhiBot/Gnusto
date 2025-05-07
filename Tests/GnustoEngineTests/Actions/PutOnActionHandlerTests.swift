@@ -99,12 +99,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [initialBook, initialTable])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
@@ -116,14 +116,14 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You put the heavy book on the sturdy table.")
 
         // Assert Final State
-        guard let finalBookState = engine.item("book") else {
+        guard let finalBookState = await engine.item("book") else {
             Issue.record("Final book snapshot was nil")
             return
         }
         #expect(finalBookState.parent == .item("table"), "Book should be on the table")
         #expect(finalBookState.hasFlag(.isTouched), "Book should be touched")
 
-        guard let finalTableState = engine.item("table") else {
+        guard let finalTableState = await engine.item("table") else {
             Issue.record("Final table snapshot was nil")
             return
         }
@@ -139,7 +139,8 @@ struct PutOnActionHandlerTests {
             oldItemAttributes: initialBookAttributes,
             oldSurfaceAttributes: initialTableAttributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test("PutOn fails with no direct object")
@@ -156,12 +157,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", indirectObject: "table", preposition: "on", rawInput: "put on table") // No DO
 
@@ -173,7 +174,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "Put what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails with no indirect object")
@@ -183,12 +184,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "book", preposition: "on", rawInput: "put book on") // No IO
 
@@ -200,7 +201,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "Put the book on what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails when item not held")
@@ -218,12 +219,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
@@ -235,7 +236,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You aren't holding the heavy book.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails when target not reachable")
@@ -255,12 +256,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "book", indirectObject: "table", preposition: "on", rawInput: "put book on table")
 
@@ -272,7 +273,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails when target not a surface")
@@ -290,12 +291,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [book, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "book", indirectObject: "box", preposition: "on", rawInput: "put book on box")
 
@@ -307,7 +308,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can't put things on the box.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails self-insertion")
@@ -324,12 +325,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "put-on", directObject: "table", indirectObject: "table", preposition: "on", rawInput: "put table on table")
 
@@ -341,7 +342,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can't put something on itself.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("PutOn fails recursive insertion")
@@ -367,12 +368,12 @@ struct PutOnActionHandlerTests {
         let game = MinimalGame(items: [tray, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Try to put the tray onto the table (which is on the tray)
         let command = Command(verbID: "put-on", directObject: "tray", indirectObject: "table", preposition: "on", rawInput: "put tray on table")
@@ -386,7 +387,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can't put the table inside the silver tray like that.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     // TODO: Add capacity check test when implemented

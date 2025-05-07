@@ -65,17 +65,17 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [closedBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Initial state check
-        let initialBoxState = engine.item("box")
+        let initialBoxState = await engine.item("box")
         #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
         #expect(!initialBoxState!.hasFlag(.isTouched), "Box should start untouched")
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
 
@@ -88,11 +88,12 @@ struct OpenActionHandlerTests {
 
         // Assert Change History
         let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
 
         // Optional: Verify final state via snapshot if needed for complex scenarios,
         // but primarily rely on change history for handler correctness.
-        let finalBoxState = engine.item("box")
+        let finalBoxState = await engine.item("box")
         #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
         #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should be touched")
     }
@@ -114,17 +115,17 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [closedBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Initial state check
-        let initialBoxState = engine.item("box")
+        let initialBoxState = await engine.item("box")
         #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
         #expect(initialBoxState!.hasFlag(.isTouched), "Box should start touched")
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
 
@@ -139,10 +140,11 @@ struct OpenActionHandlerTests {
         let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
         // Should not include .isTouched change as it was already true
         #expect(expectedChanges.count == 2) // isOpen + pronoun
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
 
         // Optional: Verify final state
-        let finalBoxState = engine.item("box")
+        let finalBoxState = await engine.item("box")
         #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
         #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should still be touched")
     }
@@ -153,7 +155,7 @@ struct OpenActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -168,7 +170,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "Open what?")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Open fails item not accessible")
@@ -186,7 +188,7 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
 
         // Act
@@ -198,7 +200,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You see no box here.")
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Open fails item not openable")
@@ -213,7 +215,7 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -229,7 +231,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "That's not something you can open.") // More standard message
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Open fails item already open")
@@ -249,7 +251,7 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [openBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -265,7 +267,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "It's already open.") // More standard message
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Open fails item is locked")
@@ -285,7 +287,7 @@ struct OpenActionHandlerTests {
         let game = MinimalGame(items: [lockedChest])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -301,6 +303,6 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "The iron chest appears to be locked.") // More standard message
 
         // Assert No State Change
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 }

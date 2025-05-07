@@ -17,14 +17,14 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialItemState = engine.item(itemID)
+        let initialItemState = await engine.item(itemID)
         #expect(initialItemState?.attributes[.isTouched] != true)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verbID: VerbID("examine"),
@@ -36,14 +36,15 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "A smooth, grey pebble.")
 
-        let finalItemState = engine.item(itemID)
+        let finalItemState = await engine.item(itemID)
         #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
             initialAttributes: initialItemState?.attributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test func testExamineItemWithDetailedDescriptionHandler() async throws {
@@ -57,14 +58,14 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialItemState = engine.item(itemID)
+        let initialItemState = await engine.item(itemID)
         #expect(initialItemState?.attributes[.isTouched] != true)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
         await engine.execute(command: command)
@@ -72,14 +73,15 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "A small, tarnished silver locket.")
 
-        let finalItemState = engine.item(itemID)
+        let finalItemState = await engine.item(itemID)
         #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
             initialAttributes: initialItemState?.attributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test func testExamineItemInRoom() async throws {
@@ -99,14 +101,14 @@ struct ExamineActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialItemState = engine.item(itemID)
+        let initialItemState = await engine.item(itemID)
         #expect(initialItemState?.attributes[.isTouched] != true)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
         await engine.execute(command: command)
@@ -114,14 +116,15 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "A weathered statue of a grue.")
 
-        let finalItemState = engine.item(itemID)
+        let finalItemState = await engine.item(itemID)
         #expect(finalItemState?.attributes[.isTouched] == true)
 
         let expectedChanges = expectedExamineChanges(
             itemID: itemID,
             initialAttributes: initialItemState?.attributes
         )
-        expectNoDifference(engine.gameState.changeHistory, expectedChanges)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
     }
 
     @Test func testExamineItemNotInScope() async throws {
@@ -140,12 +143,12 @@ struct ExamineActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine hidden gem")
         await engine.execute(command: command)
@@ -153,8 +156,8 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "You see no hidden gem here.")
 
-        #expect(engine.gameState.changeHistory.isEmpty)
-        let itemState = engine.item(itemID)
+        #expect(await engine.gameState.changeHistory.isEmpty)
+        let itemState = await engine.item(itemID)
         #expect(itemState?.attributes[.isTouched] != true)
     }
 
@@ -162,13 +165,13 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
         let itemID: ItemID = "ghost"
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine ghost")
         await engine.execute(command: command)
@@ -176,7 +179,7 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "You see no ghost here.")
 
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test func testExamineAmbiguousItem() async throws {
@@ -207,12 +210,12 @@ struct ExamineActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verbID: VerbID("examine"),
@@ -224,9 +227,9 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Which ball do you mean, the red ball or the blue ball?")
 
-        #expect(engine.gameState.changeHistory.isEmpty)
-        let item1State = engine.item(itemID1)
-        let item2State = engine.item(itemID2)
+        #expect(await engine.gameState.changeHistory.isEmpty)
+        let item1State = await engine.item(itemID1)
+        let item2State = await engine.item(itemID2)
         #expect(item1State?.attributes[.isTouched] != true)
         #expect(item2State?.attributes[.isTouched] != true)
     }
@@ -235,12 +238,12 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verbID: VerbID("examine"),
@@ -252,7 +255,7 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "You are your usual self.")
 
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test func testExamineItemWithObjectActionOverride() async throws {
@@ -269,14 +272,14 @@ struct ExamineActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialItemState = engine.item(itemID)
+        let initialItemState = await engine.item(itemID)
         #expect(initialItemState?.attributes[.isTouched] != true)
-        #expect(engine.gameState.changeHistory.isEmpty)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
         await engine.execute(command: command)
@@ -284,8 +287,8 @@ struct ExamineActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "A dusty old mirror.")
 
-        #expect(engine.gameState.changeHistory.isEmpty)
-        let finalItemState = engine.item(itemID)
+        #expect(await engine.gameState.changeHistory.isEmpty)
+        let finalItemState = await engine.item(itemID)
         #expect(finalItemState?.attributes[.isTouched] != true)
     }
 }

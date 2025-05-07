@@ -29,7 +29,7 @@ struct GoActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -67,7 +67,7 @@ struct GoActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -112,7 +112,7 @@ struct GoActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -155,7 +155,7 @@ struct GoActionHandlerTests {
             isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(verbID: "go", direction: .north, rawInput: "go north")
 
@@ -163,7 +163,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "hall")
+        #expect(await engine.gameState.player.currentLocationID == "hall")
         // Output handled by GameEngine's look after move, not tested here directly
     }
 
@@ -179,7 +179,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(verbID: "go", direction: .north, rawInput: "go north")
 
@@ -187,7 +187,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "You can't go that way.")
     }
@@ -210,7 +210,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, vault])
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(verbID: "go", direction: .north, rawInput: "go north")
 
@@ -218,7 +218,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "The way is locked.") // Assuming a generic locked message
     }
@@ -245,7 +245,7 @@ struct GoActionHandlerTests {
             isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Check flags set using contains
         #expect(!engine.gameState.flags.contains(conditionFlagID))
@@ -256,7 +256,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
     }
 
     @Test("Go succeeds with conditional exit (condition met)")
@@ -281,7 +281,7 @@ struct GoActionHandlerTests {
             isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden]) // Pass initial foyer
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Set the condition flag to true by applying a state change
         let change = StateChange(
@@ -294,7 +294,7 @@ struct GoActionHandlerTests {
         try engine.gameState.apply(change)
 
         // Check flags set using contains
-        #expect(engine.gameState.flags.contains(conditionFlagID))
+        #expect(await engine.gameState.flags.contains(conditionFlagID))
 
         // Manually add the exit now that the condition is met
         foyer.exits[.east] = Exit(destination: "garden")
@@ -307,7 +307,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "garden") // Player moved
+        #expect(await engine.gameState.player.currentLocationID == "garden") // Player moved
     }
 
     @Test("Go fails with no direction")
@@ -321,7 +321,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(verbID: "go", rawInput: "go") // No direction
 
@@ -329,7 +329,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "Go where?")
     }

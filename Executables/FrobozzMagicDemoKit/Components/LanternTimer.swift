@@ -43,7 +43,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
         // Closure runs every turn to update lantern battery
 
         // Precondition: Lantern exists in the game
-        guard let lantern = engine.item(LanternConstants.lanternID) else {
+        guard let lantern = await engine.item(LanternConstants.lanternID) else {
             print("Warning: Lantern item \(LanternConstants.lanternID) not found in game state")
             return
         }

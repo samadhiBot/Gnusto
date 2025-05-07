@@ -30,7 +30,7 @@ struct CloakOfDarknessWalkthroughTests {
             "look",
             nil             // Signal end of input
         )
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -103,7 +103,7 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",    // Examine message (should trigger win)
             nil
         )
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -143,7 +143,7 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",
             nil
         )
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -186,7 +186,7 @@ struct CloakOfDarknessWalkthroughTests {
             "x message",   // Examine message (triggers lose condition)
             nil
         )
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
@@ -225,7 +225,7 @@ struct CloakOfDarknessWalkthroughTests {
             "look",
             nil
         )
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
