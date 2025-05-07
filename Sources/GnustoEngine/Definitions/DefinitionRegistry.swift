@@ -2,7 +2,7 @@ import Foundation
 
 /// Stores definitions for various game elements like Fuses, Daemons, and custom action handlers.
 /// This registry allows the engine to look up definitions by their IDs.
-public struct DefinitionRegistry {
+public struct DefinitionRegistry: Sendable {
     /// Dictionary mapping Fuse IDs to their definitions.
     private let fuseDefinitions: [FuseID: FuseDefinition]
 

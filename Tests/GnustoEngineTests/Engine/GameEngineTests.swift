@@ -4,13 +4,16 @@ import Testing
 @testable import GnustoEngine
 
 // Helper class for sharing state with closures in tests
-@MainActor
-private class TestStateHolder {
+private actor TestStateHolder {
     var flag = false
     var count = 0
+
+    func markFlag() { flag = true }
+    func increment() { count += 1 }
+    func getFlag() -> Bool { flag }
+    func getCount() -> Int { count }
 }
 
-@MainActor
 struct GameEngineTests {
     @Test("Engine Run Initialization and First Prompt in Dark Room")
     func testEngineRunInitializationInDarkRoom() async throws {
@@ -686,9 +689,15 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
-        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { _ in
+        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { gameEngineParameter in
+            // This closure is @Sendable and runs on the GameEngine actor context.
+            // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
+
+            // To call mockIO.print (MainActor) from GameEngine actor context:
             await mockIO.print("Fuse triggered!")
-            stateHolder.flag = true
+
+            // To call stateHolder.markFlag (TestStateHolder actor)
+            await stateHolder.markFlag()
         }
 
         // Initialize game with fuse definition
@@ -717,9 +726,10 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in
+        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { gameEngineParameter in
+            // This closure is @Sendable and runs on the GameEngine actor context.
             await mockIO.print("Daemon ran!")
-            stateHolder.count += 1
+            await stateHolder.increment()
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
@@ -744,10 +754,16 @@ struct GameEngineTests {
     func testFuseAndDaemonInteraction() async throws {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let _ = TestStateHolder() // Use _ for unused stateHolder
+        let stateHolder = TestStateHolder()
 
-        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in /* ... */ }
-        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in /* ... */ }
+        let testFuse = await FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
+            await mockIO.print("Fuse! [\(stateHolder.getFlag())]")
+            await stateHolder.markFlag()
+        }
+        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
+            await mockIO.print("Daemon! [\(stateHolder.getCount())]")
+            await stateHolder.increment()
+        }
 
         // Initialize game with definitions
         let game = MinimalGame(
@@ -1260,14 +1276,14 @@ struct GameEngineTests {
                 newValue: true,
             )
         ]
-        
+
         // Define the ActionResult to be returned by the mock handler
         let resultToTest = ActionResult(
             success: true,
             message: "Lamp turned on!",
             stateChanges: turnOnChanges
         )
-        
+
         // Create a mock handler that returns the ActionResult
         struct MockResultHandler: EnhancedActionHandler {
             let result: ActionResult
@@ -1275,10 +1291,10 @@ struct GameEngineTests {
             func process(context: ActionContext) async throws -> ActionResult { result }
             func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
         }
-        
+
         let testVerb: VerbID = "testapply"
         let mockHandler = MockResultHandler(result: resultToTest)
-        
+
         // Setup game with the mock handler
         let game = MinimalGame(
             items: [lamp],
@@ -1286,14 +1302,14 @@ struct GameEngineTests {
                 customActionHandlers: [testVerb: mockHandler]
             )
         )
-        
+
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Create the command to trigger the mock handler
         let testCommand = Command(verbID: testVerb, rawInput: "testapply")
-        
+
         // Act: Execute the command
         await engine.execute(command: testCommand)
 
@@ -1302,7 +1318,7 @@ struct GameEngineTests {
         let finalLamp = await engine.item(itemID)
         #expect(finalLamp?.attributes[.isOn] == true, "Lamp should be ON")
         #expect(finalLamp?.attributes[.isTouched] == true, "Lamp should be TOUCHED")
-        
+
         // Verify the message was printed
         let output = await mockIO.flush()
         expectNoDifference(output, "Lamp turned on!")

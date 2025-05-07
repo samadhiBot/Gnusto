@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol GameBlueprint {
+public protocol GameBlueprint: Sendable {
     /// The complete state of the world at the start of the game.
     var state: GameState { get }
 

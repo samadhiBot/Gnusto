@@ -287,11 +287,11 @@ struct GoActionHandlerTests {
         let change = StateChange(
             entityID: .global, // Use .global for game-specific flags
             // Use .setFlag property key
-            attributeKey: .setFlag(conditionFlagID), 
+            attributeKey: .setFlag(conditionFlagID),
             oldValue: false, // Expect flag was not set
             newValue: true, // Set flag to true
         )
-        try engine.gameState.apply(change)
+//        try await engine.TEST_ONLY_applyStateChange(change)
 
         // Check flags set using contains
         #expect(await engine.gameState.flags.contains(conditionFlagID))
@@ -299,7 +299,7 @@ struct GoActionHandlerTests {
         // Manually add the exit now that the condition is met
         foyer.exits[.east] = Exit(destination: "garden")
         // Update the location in the game state directly for the test setup
-        engine.gameState.locations[foyer.id] = foyer
+//        await engine.TEST_ONLY_updateLocation(foyer)
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 

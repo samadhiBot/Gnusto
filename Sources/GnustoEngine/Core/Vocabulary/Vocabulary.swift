@@ -99,7 +99,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     ]
 
     /// Default verbs common to most IF games.
-    @MainActor public static let defaultVerbs: [Verb] = [
+    public static let defaultVerbs: [Verb] = [
         // Core Actions
         Verb(
             id: "look",
@@ -357,7 +357,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     ///   - verbs: An array of `Verb` objects specific to the game (can override defaults).
     ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
-    @MainActor public static func build(
+    public static func build(
         items: [Item],
         verbs: [Verb] = [],
         useDefaultVerbs: Bool = true

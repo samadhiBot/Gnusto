@@ -1,5 +1,5 @@
 /// Defines a Daemon, a process that runs periodically.
-public struct DaemonDefinition {
+public struct DaemonDefinition: Sendable {
     /// The unique identifier for this daemon.
     public let id: DaemonID
 
