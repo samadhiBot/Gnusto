@@ -19,15 +19,20 @@ extension GameEngine {
     /// <#Description#>
     /// - Parameter item: <#item description#>
     /// - Returns: <#description#>
-    public func pronounStateChange(for item: Item) -> StateChange? {
-        let pronoun = item.hasFlag(.isPlural) ? "them" : "it"
-        let oldValue = gameState.pronouns[pronoun]
-        if oldValue == Set([item.id]) { return nil }
+    public func pronounStateChange(for items: Item...) -> StateChange? {
+        let pronoun = switch items.count {
+        case 0: "it"
+        case 1: items[0].hasFlag(.isPlural) ? "them" : "it"
+        default: "them"
+        }
+        let newItemIDs = Set(items.map(\.id))
+        let oldItemIDs = gameState.pronouns[pronoun]
+        if newItemIDs == oldItemIDs { return nil }
         return StateChange(
             entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: oldValue.map { .itemIDSet($0) },
-            newValue: .itemIDSet([item.id])
+            attributeKey: .pronounReference(pronoun: pronoun),
+            oldValue: oldItemIDs.map { .itemIDSet($0) },
+            newValue: .itemIDSet(newItemIDs)
         )
     }
 }

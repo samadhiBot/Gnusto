@@ -5,9 +5,7 @@ public struct GoActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Identify Direction
         guard let direction = context.command.direction else {
-            throw ActionError.internalEngineError(
-                "Go context.command processed without a direction."
-            )
+            throw ActionError.prerequisiteNotMet("Go where?")
         }
 
         // 2. Get Current Location data

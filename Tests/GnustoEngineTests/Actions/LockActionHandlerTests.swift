@@ -5,63 +5,6 @@ import Testing
 
 @Suite("LockActionHandler Tests")
 struct LockActionHandlerTests {
-
-    // --- Test Setup ---
-    // Removed redundant setup
-
-    // --- Helper ---
-    private func expectedLockChanges(
-        targetItemID: ItemID,
-        keyItemID: ItemID,
-        initialTargetLocked: Bool,
-        initialTargetTouched: Bool,
-        initialKeyTouched: Bool
-    ) -> [StateChange] {
-        var changes: [StateChange] = []
-
-        // Target change: Lock (if it wasn't locked)
-        if !initialTargetLocked {
-            changes.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isLocked),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Target change: Touch (if not already touched)
-        if !initialTargetTouched {
-            changes.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Key change: Touch (if not already touched)
-        if !initialKeyTouched {
-            changes.append(StateChange(
-                entityID: .item(keyItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
-                newValue: true,
-            ))
-        }
-
-        // Add pronoun change
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil, // Assuming previous 'it' is irrelevant
-            newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target relevant
-        ))
-
-        return changes
-    }
-
-    // --- Tests ---
-
     @Test("Lock item successfully")
     func testLockItemSuccessfully() async throws {
         // Arrange: Key held, box reachable and unlocked
@@ -70,7 +13,7 @@ struct LockActionHandlerTests {
             name: "wooden box",
             parent: .location("startRoom"),
             attributes: [
-                .lockKey: "key",
+                .lockKey: .itemID("key"),
                 .isContainer: true,
                 .isLockable: true,
                 .isOpenable: true
@@ -101,7 +44,12 @@ struct LockActionHandlerTests {
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "lock", directObject: "box", indirectObject: "key", rawInput: "lock box with key")
+        let command = Command(
+            verbID: "lock",
+            directObject: "box",
+            indirectObject: "key",
+            rawInput: "lock box with key"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -412,5 +360,57 @@ struct LockActionHandlerTests {
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
+    }
+}
+
+extension LockActionHandlerTests {
+    private func expectedLockChanges(
+        targetItemID: ItemID,
+        keyItemID: ItemID,
+        initialTargetLocked: Bool,
+        initialTargetTouched: Bool,
+        initialKeyTouched: Bool
+    ) -> [StateChange] {
+        var changes: [StateChange] = []
+
+        // Target change: Lock (if it wasn't locked)
+        if !initialTargetLocked {
+            changes.append(StateChange(
+                entityID: .item(targetItemID),
+                attributeKey: .itemAttribute(.isLocked),
+                oldValue: false,
+                newValue: true,
+            ))
+        }
+
+        // Target change: Touch (if not already touched)
+        if !initialTargetTouched {
+            changes.append(StateChange(
+                entityID: .item(targetItemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil,
+                newValue: true,
+            ))
+        }
+
+        // Key change: Touch (if not already touched)
+        if !initialKeyTouched {
+            changes.append(StateChange(
+                entityID: .item(keyItemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil,
+                newValue: true,
+            ))
+        }
+
+        // Add pronoun change
+        changes.append(StateChange(
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: nil,
+            newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target relevant
+        ))
+
+        return changes
     }
 }
