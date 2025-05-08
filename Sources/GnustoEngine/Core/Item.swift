@@ -46,6 +46,7 @@ public struct Item: Codable, Identifiable, Sendable {
     }
 
     /// Checks if a boolean flag is set in the item's `attributes`.
+    ///
     /// - Parameter id: The `AttributeID` of the flag to check.
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
     public func hasFlag(_ id: AttributeID) -> Bool {

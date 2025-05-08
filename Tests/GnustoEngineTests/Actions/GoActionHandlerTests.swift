@@ -52,7 +52,12 @@ struct GoActionHandlerTests {
             id: "startRoom",
             name: "Start Room",
             description: "You are here.",
-            exits: [.north: Exit(destination: "end", blockedMessage: "A wall blocks your path.")]
+            exits: [
+                .north: Exit(
+                    destination: "end",
+                    blockedMessage: "A wall blocks your path."
+                )
+            ]
         )
         let endRoom = Location(
             id: "end",
@@ -199,15 +204,20 @@ struct GoActionHandlerTests {
             name: "Foyer",
             description: "A grand foyer.",
             exits: [
-                .north: Exit(destination: "vault", doorID: "vaultDoor")
+                .north: Exit(
+                    destination: "vault",
+                    doorID: "vaultDoor"
+                )
             ],
             isLit: true
         )
         let vaultDoor = Item(
             id: "vaultDoor",
             name: "door to the vault",
-            description: "",
-            parent: .exit,
+            description: """
+                A massive, reinforced steel door dominates one wall of the grand foyer.
+                """,
+            parent: .location(foyer.id),
             attributes: [
                 .isLocked: true,
             ]

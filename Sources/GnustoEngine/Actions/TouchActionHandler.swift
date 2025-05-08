@@ -18,8 +18,6 @@ public struct TouchActionHandler: ActionHandler {
         let itemParent = targetItem.parent
         var isReachable = false
         switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
         case .item(let parentItemID):
             guard let parentItem = await context.engine.item(parentItemID) else {
                 throw ActionError.unknownItem(parentItemID)
@@ -37,10 +35,12 @@ public struct TouchActionHandler: ActionHandler {
                     isReachable = true
                 }
             }
-        case .player:
-            isReachable = true
+        case .location(let locID):
+            isReachable = (locID == currentLocationID)
         case .nowhere:
             isReachable = false
+        case .player:
+            isReachable = true
         }
         guard isReachable else {
             throw ActionError.itemNotAccessible(targetItemID)

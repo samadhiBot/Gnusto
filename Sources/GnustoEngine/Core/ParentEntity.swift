@@ -1,9 +1,6 @@
 /// Represents the possible parents of an Item in the game hierarchy, determining its location
 /// or containment state.
 public enum ParentEntity: Hashable, Codable, Equatable, Sendable {
-    /// The item is a door that belongs to an exit.
-    case exit
-
     /// The item is contained within or supported by another item.
     case item(ItemID)
     
