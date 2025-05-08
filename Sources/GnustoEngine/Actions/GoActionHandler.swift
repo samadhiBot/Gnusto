@@ -23,6 +23,7 @@ public struct GoActionHandler: ActionHandler {
             throw ActionError.invalidDirection // Standard message: "You can't go that way."
         }
 
+        print("🎾", exit)
         // 4. Check Exit Conditions
 
         // Check for static blocked message first
@@ -30,8 +31,17 @@ public struct GoActionHandler: ActionHandler {
             throw ActionError.directionIsBlocked(staticBlockedMessage)
         }
 
+        guard let door = exit.door else { return }
+
+        // Check if the way is locked (regardless of whether it's a door)
+        if door.isLocked == true {
+            // TODO: Zork message for "The way is locked." or "The door is locked."
+            // For now, using the message expected by the test.
+            throw ActionError.directionIsBlocked("The way is locked.")
+        }
+
         // Check required key
-        if let keyID = exit.requiredKey {
+        if let keyID = door.requiredKey {
             let inventory = await context.engine.items(in: .player)
             let playerHasKey = inventory.contains { $0.id == keyID }
             if !playerHasKey {
@@ -41,12 +51,8 @@ public struct GoActionHandler: ActionHandler {
         }
 
         // Check door status if applicable
-        if exit.isDoor {
-            if !exit.isOpen {
-                throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
-            }
-            // Note: Lock check removed - UnlockAction should handle setting isLocked = false when isOpen is set true.
-            // If a door can be open *and* locked, this needs reconsideration. Zork doors usually auto-unlock when opened.
+        if !exit.isOpen {
+            throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
         }
     }
 

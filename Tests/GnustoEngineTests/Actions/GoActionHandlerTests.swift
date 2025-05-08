@@ -198,8 +198,19 @@ struct GoActionHandlerTests {
             id: "foyer",
             name: "Foyer",
             description: "A grand foyer.",
-            exits: [.north: Exit(destination: "vault", isLocked: true)], // Locked exit
+            exits: [
+                .north: Exit(destination: "vault", doorID: "vaultDoor")
+            ],
             isLit: true
+        )
+        let vaultDoor = Item(
+            id: "vaultDoor",
+            name: "door to the vault",
+            description: "",
+            parent: .exit,
+            attributes: [
+                .isLocked: true,
+            ]
         )
         let vault = Location(
             id: "vault",
