@@ -120,7 +120,7 @@ enum Hooks {
     /// - Returns: `true` if the player has an active light source.
     private static func hasActiveLight(engine: GameEngine) async -> Bool {
         // Get player's directly held items
-        let playerItemIDs = await engine.items(in: .player).map { $0.id }
+        let playerItemIDs = await engine.items(in: .player).map(\.id)
 
         // Check for the lantern specifically
         if playerItemIDs.contains(Components.Lantern.Constants.itemID) {

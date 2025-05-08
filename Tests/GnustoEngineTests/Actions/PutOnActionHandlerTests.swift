@@ -45,7 +45,7 @@ struct PutOnActionHandlerTests {
             changes.append(StateChange(
                 entityID: .item(itemToPutID),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ))
         }
@@ -55,7 +55,7 @@ struct PutOnActionHandlerTests {
             changes.append(StateChange(
                 entityID: .item(surfaceID),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ))
         }

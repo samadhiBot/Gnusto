@@ -84,12 +84,13 @@ public struct ScopeResolver: Sendable {
         }
 
         // 4. Return the IDs of the visible items.
-        return visibleItems.map { $0.id }.sorted()
+        return visibleItems.map(\.id).sorted()
     }
 
     /// Determines all items currently reachable by the player.
-    /// This includes items in their inventory, items visible in the current location,
-    /// and the contents of open or transparent containers that are themselves reachable.
+    ///
+    /// This includes items in their inventory, items visible in the current location, and the
+    /// contents of open or transparent containers that are themselves reachable.
     ///
     /// - Returns: A Set of IDs for items reachable by the player.
     public func itemsReachableByPlayer() async -> Set<ItemID> {
@@ -99,10 +100,12 @@ public struct ScopeResolver: Sendable {
 
         // Add initially reachable items (inventory)
         let inventoryItems = gameState.items.values.filter { $0.parent == .player }
-        reachableItems.formUnion(inventoryItems.map { $0.id })
+        reachableItems.formUnion(inventoryItems.map(\.id))
 
         // Add initially reachable items (visible in location)
-        let visibleLocationItems = await self.visibleItemsIn(locationID: gameState.player.currentLocationID)
+        let visibleLocationItems = await self.visibleItemsIn(
+            locationID: gameState.player.currentLocationID
+        )
         reachableItems.formUnion(visibleLocationItems)
 
         // Now, process containers and surfaces among the currently reachable items
@@ -121,7 +124,7 @@ public struct ScopeResolver: Sendable {
                 if isOpen || isTransparent {
                     // Find items directly inside this container
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
-                    let insideIDs = itemsInside.map { $0.id }
+                    let insideIDs = itemsInside.map(\.id)
 
                     // Add newly found items to reachable set
                     let newlyReachable = Set(insideIDs).subtracting(reachableItems)
@@ -136,7 +139,7 @@ public struct ScopeResolver: Sendable {
             if currentItem.hasFlag(.isSurface) {
                 // Find items directly on this surface
                 let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
-                let onSurfaceIDs = itemsOnSurface.map { $0.id }
+                let onSurfaceIDs = itemsOnSurface.map(\.id)
 
                 // Add newly found items to reachable set
                 let newlyReachable = Set(onSurfaceIDs).subtracting(reachableItems)

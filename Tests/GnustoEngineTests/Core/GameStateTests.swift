@@ -209,7 +209,7 @@ struct GameStateTests {
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
 
         // Replace itemsInInventory() call
-        let inventoryItems = state.items.values.filter { $0.parent == .player }.map { $0.id }
+        let inventoryItems = state.items.values.filter { $0.parent == .player }.map(\.id)
         let inventoryItemSet = Set(inventoryItems)
         #expect(inventoryItemSet == ["item1", "item3"])
         #expect(inventoryItems.count == 2)
@@ -240,7 +240,7 @@ struct GameStateTests {
         let originalTestItem = state.items["testItem"]! // Keep original item in startRoom
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": originalTestItem] // Add/replace items
 
-        let locationItems = state.items.values.filter { $0.parent == .location(locID) }.map { $0.id }
+        let locationItems = state.items.values.filter { $0.parent == .location(locID) }.map(\.id)
         let locationItemSet = Set(locationItems)
         #expect(locationItemSet == ["item1", "item3", "testItem"])
         #expect(locationItems.count == 3)
@@ -363,7 +363,7 @@ struct GameStateTests {
         #expect(state.pronouns == ["it": [Self.itemMailbox]])
 
         // Check derived inventory
-        let inventoryIDs = state.items.values.filter { $0.parent == .player }.map { $0.id }
+        let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
         #expect(Set(inventoryIDs) == [Self.itemSword])
     }
 
@@ -400,7 +400,7 @@ struct GameStateTests {
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
         // Check derived inventory reflects parent changes
-        let inventoryIDs = state.items.values.filter { $0.parent == .player }.map { $0.id }
+        let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
         #expect(Set(inventoryIDs) == [Self.itemLantern]) // Sword dropped, Lantern taken
 
         // Check sword is now in the location
@@ -490,9 +490,9 @@ struct GameStateTests {
         #expect(state2.items[Self.itemLantern]?.parent == .player)
 
         // Check derived inventories reflect the *separate* changes
-        let inventory1 = state1.items.values.filter { $0.parent == .player }.map { $0.id }
+        let inventory1 = state1.items.values.filter { $0.parent == .player }.map(\.id)
         #expect(Set(inventory1) == [Self.itemSword]) // Only sword originally
-        let inventory2 = state2.items.values.filter { $0.parent == .player }.map { $0.id }
+        let inventory2 = state2.items.values.filter { $0.parent == .player }.map(\.id)
         #expect(Set(inventory2) == [Self.itemSword, Self.itemLantern]) // Sword and moved lantern
 
         // Check equality of the states and dictionaries

@@ -9,47 +9,21 @@ public struct TouchActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(targetItemID) else {
+        guard await context.engine.item(targetItemID) != nil else {
             throw ActionError.unknownItem(targetItemID)        }
 
         // 3. Check reachability
-        // Inline check as ScopeResolver doesn't have this specific logic yet.
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .item(let parentItemID):
-            guard let parentItem = await context.engine.item(parentItemID) else {
-                throw ActionError.unknownItem(parentItemID)
-            }
-            let parentParent = parentItem.parent
-            let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
-            if isParentItemInReach {
-                if parentItem.hasFlag(.isSurface) {
-                    isReachable = true
-                } else if parentItem.hasFlag(.isContainer) {
-                    // Check dynamic property for open state
-                    guard try await context.engine.fetch(parentItemID, .isOpen) else {
-                        throw ActionError.prerequisiteNotMet("The \(parentItem.name) is closed.")
-                    }
-                    isReachable = true
-                }
-            }
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .nowhere:
-            isReachable = false
-        case .player:
-            isReachable = true
-        }
-        guard isReachable else {
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
+        guard reachableItems.contains(targetItemID) else {
             throw ActionError.itemNotAccessible(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError("TOUCH context.command reached process without direct object.")
+            throw ActionError.internalEngineError(
+                "TOUCH context.command reached process without direct object."
+            )
         }
 
         // --- State Change: Mark as Touched ---
@@ -66,7 +40,9 @@ public struct TouchActionHandler: ActionHandler {
             }
         } else {
             // Should not happen if validate passed
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TOUCH.")
+            throw ActionError.internalEngineError(
+                "Target item '\(targetItemID)' disappeared between validate and process for TOUCH."
+            )
         }
 
         // TODO: Allow item-specific touch actions via ObjectActionHandler?

@@ -118,7 +118,7 @@ struct GameStateApplyTests {
         #expect(finalItem?.parent == newParent, "Item parent should be updated")
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
-        let inventoryItemsAfterMove = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItemsAfterMove = gameState.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItemsAfterMove.contains(itemToMove), "Item should now be in inventory")
     }
 
@@ -162,7 +162,7 @@ struct GameStateApplyTests {
         let finalItem = gameState.items[itemToMove]
         #expect(finalItem?.parent == actualOldParent, "Item parent should not be updated on error")
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
-        let inventoryItemsAfterError = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItemsAfterError = gameState.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItemsAfterError.contains(itemToMove) == false, "Item should not be in inventory")
     }
 
@@ -180,7 +180,7 @@ struct GameStateApplyTests {
         try state.apply(change)
 
         #expect(state.items[itemID]?.parent == .player)
-        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItems.contains(itemID))
         #expect(state.changeHistory.last == change)
     }
@@ -207,7 +207,7 @@ struct GameStateApplyTests {
         try state.apply(change)
 
         #expect(state.items[itemID]?.parent == .location(newLocationID))
-        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(!inventoryItems.contains(itemID))
         #expect(state.changeHistory.last == change)
     }

@@ -13,42 +13,17 @@ public struct ReadActionHandler: ActionHandler {
             throw ActionError.unknownItem(targetItemID)
         }
 
-        // 3. Check reachability
+        // 3. Check if room is lit (unless item provides light)
         let currentLocationID = await context.engine.gameState.player.currentLocationID
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .item(let parentItemID):
-            guard let parentItem = await context.engine.item(parentItemID) else {
-                throw ActionError.unknownItem(parentItemID)
-            }
-            let parentParent = parentItem.parent
-            // Check if parent is in current location or held by player
-            let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
-            if isParentItemInReach {
-                // Check if parent allows access (surface or open container)
-                let isParentContainer = parentItem.hasFlag(.isContainer)
-                let isParentOpen: Bool = try await context.engine.fetch(parentItemID, .isOpen)
-                if parentItem.hasFlag(.isSurface) || (isParentContainer && isParentOpen) {
-                    isReachable = true
-                }
-            }
-        case .player:
-            isReachable = true
-        case .nowhere:
-            isReachable = false
-        }
-        guard isReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
+        guard isLit else {
+            throw ActionError.roomIsDark
         }
 
-        // 4. Check if room is lit (unless item provides light)
-        let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-        let providesLight = targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isOn)
-        guard isLit || providesLight else {
-            throw ActionError.roomIsDark
+        // 4. Check reachability
+        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
+        guard reachableItems.contains(targetItemID) else {
+            throw ActionError.itemNotAccessible(targetItemID)
         }
 
         // 5. Check if item is readable
@@ -59,10 +34,14 @@ public struct ReadActionHandler: ActionHandler {
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError("READ context.command reached process without direct object.")
+            throw ActionError.internalEngineError(
+                "READ context.command reached process without direct object."
+            )
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+            throw ActionError.internalEngineError(
+                "Target item '\(targetItemID)' disappeared between validate and process."
+            )
         }
 
         // --- State Change: Mark as Touched ---
@@ -79,12 +58,17 @@ public struct ReadActionHandler: ActionHandler {
 
         // --- Determine Message ---
         let message: String
+
         // Fetch text from dynamic values
-        let textToRead: String = try await context.engine.fetch(targetItemID, .readText)
-        if textToRead.isEmpty {
+        do {
+            let textToRead: String = try await context.engine.fetch(targetItemID, .readText)
+            if textToRead.isEmpty {
+                message = "There's nothing written on the \(targetItem.name)."
+            } else {
+                message = textToRead
+            }
+        } catch {
             message = "There's nothing written on the \(targetItem.name)."
-        } else {
-            message = textToRead
         }
 
         // --- Create Result ---

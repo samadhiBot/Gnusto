@@ -74,7 +74,11 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "read", directObject: "sign", rawInput: "read sign")
+        let command = Command(
+            verbID: "read",
+            directObject: "sign",
+            rawInput: "read sign"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -138,10 +142,14 @@ struct ReadActionHandlerTests {
         )
 
         let handler = ReadActionHandler()
-        let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
+        let command = Command(
+            verbID: "read",
+            directObject: "scroll",
+            rawInput: "read scroll"
+        )
 
         // Act & Assert
-        await #expect(throws: ActionError.customResponse("You can't see any such thing.")) {
+        await #expect(throws: ActionError.itemNotAccessible("scroll")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -201,7 +209,7 @@ struct ReadActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            attributes: [.longDescription: .string("It's dark.")]
+            description: "It's dark."
         )
 
         let game = MinimalGame(
@@ -221,7 +229,9 @@ struct ReadActionHandlerTests {
         let command = Command(verbID: "read", directObject: "map", rawInput: "read map")
 
         // Act & Assert
-        await #expect(throws: ActionError.roomIsDark) {
+        await #expect(
+            throws: ActionError.roomIsDark
+        ) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -408,7 +418,11 @@ struct ReadActionHandlerTests {
         )
         #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
-        let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
+        let command = Command(
+            verbID: "read",
+            directObject: "tablet",
+            rawInput: "read tablet"
+        )
 
         // Act
         await engine.execute(command: command)

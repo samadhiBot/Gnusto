@@ -29,12 +29,14 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.id = id
         self.name = name
         self.exits = exits
-        var initial = attributes
+        self.attributes = attributes
         if let description {
-            initial[.longDescription] = .string(description)
+            assert(attributes[.longDescription] == nil, "Long description defined twice.")
+            self.attributes[.longDescription] = .string(description)
         }
-        initial[.inherentlyLit] = .bool(isLit)
-        self.attributes = initial
+        self.attributes[.inherentlyLit] = .bool(
+            isLit || (attributes[.inherentlyLit]?.toBool ?? false)
+        )
     }
 
     // MARK: - Convenience Accessors
