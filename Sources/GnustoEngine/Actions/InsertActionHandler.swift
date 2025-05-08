@@ -61,7 +61,10 @@ struct InsertActionHandler: ActionHandler {
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
-                throw ActionError.containerIsFull(containerID)
+                throw ActionError.itemTooLargeForContainer(
+                    item: itemToInsertID,
+                    container: containerID
+                )
             }
         }
     }

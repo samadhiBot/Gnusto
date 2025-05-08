@@ -94,11 +94,9 @@ extension GameEngine {
 
         await ioHandler.teardown()
     }
-}
 
-// MARK: - Game Loop helpers
+    // MARK: Private helpers
 
-extension GameEngine {
     private func anySuch(_ itemID: ItemID) -> String {
         if let item = item(itemID), item.hasFlag(.isTouched) {
             "the \(item.name)"
@@ -188,8 +186,6 @@ extension GameEngine {
         let message = switch actionError {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
-        case .containerIsFull(let item):
-            "\(theThat(item).capitalizedFirst) is full."
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
         case .customResponse(let message):

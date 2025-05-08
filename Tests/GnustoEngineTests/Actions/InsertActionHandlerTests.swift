@@ -453,7 +453,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The nearly full box is full.") // ActionError.containerIsFull
+        expectNoDifference(output, "The gold coin won't fit in the nearly full box.")
 
         // Assert No State Change
         #expect(await engine.item("coin")?.parent == .player) // Coin still held
@@ -683,7 +683,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things in the rock.")
+        expectNoDifference(output, "You can't put things in the smooth rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -776,7 +776,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The wooden box is full.") // ActionError.containerIsFull
+        expectNoDifference(output, "The small key won't fit in the wooden box.")
 
         // Assert No State Change
         #expect(await engine.item("key")?.parent == .player) // Key still held
@@ -821,7 +821,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The small box is too small for the large key.") // ActionError.itemTooLargeForContainer
+        expectNoDifference(output, "The large key won't fit in the small box.")
 
         // Assert No State Change
         #expect(await engine.item("key")?.parent == .player) // Key still held

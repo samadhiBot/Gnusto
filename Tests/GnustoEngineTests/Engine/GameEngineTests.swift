@@ -1244,11 +1244,6 @@ struct GameEngineTests {
         expectNoDifference(output, "The wrong key doesn't fit the chest.")
     }
 
-    @Test("ReportActionError: .containerIsFull")
-    func testReportErrorContainerIsFull() async throws {
-        // TODO: Implementation
-    }
-
     @Test("Apply Action Result - Success")
     func testApplyActionResult_Success() async throws {
         // Define ItemID and initial item state

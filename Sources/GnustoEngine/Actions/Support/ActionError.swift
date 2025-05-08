@@ -3,9 +3,6 @@ public enum ActionError: Error, Equatable, Sendable {
     /// Action failed because the target container is closed.
     case containerIsClosed(ItemID)
 
-    /// Action failed because the target container cannot hold any more items.
-    case containerIsFull(ItemID)
-
     /// Action failed because the target container is already open (e.g., trying to close
     /// non-closeable open item).
     case containerIsOpen(ItemID)
