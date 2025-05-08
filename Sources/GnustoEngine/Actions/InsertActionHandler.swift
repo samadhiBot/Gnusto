@@ -32,13 +32,16 @@ struct InsertActionHandler: ActionHandler {
 
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
-             throw ActionError.prerequisiteNotMet("You can't put something in itself.")
+             throw ActionError.prerequisiteNotMet("You can't put something inside itself.")
         }
+
         // Recursive check: is the target container inside the item we are inserting?
         var currentParent = containerItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToInsertID {
-                throw ActionError.prerequisiteNotMet("You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that.")
+                throw ActionError.prerequisiteNotMet(
+                    "You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that."
+                )
             }
             guard let parentItem = await context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent

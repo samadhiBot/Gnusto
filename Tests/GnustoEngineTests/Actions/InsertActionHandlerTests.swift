@@ -355,7 +355,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something in itself.")
+        expectNoDifference(output, "You can't put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -611,7 +611,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something in itself.")
+        expectNoDifference(output, "You can't put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -931,7 +931,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Insert into self fails")
+    @Test("Insert into itself fails")
     func testInsertIntoSelfFails() async throws {
         // Arrange: Player holds a bag (which is a container)
         let bag = Item(
@@ -956,8 +956,8 @@ struct InsertActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        let output = await mockIO.flush() // Initialize mockIO
-        expectNoDifference(output, "Putting the cloth bag into itself would be বোকা.") // Zorkian message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true) // Use engine instance
@@ -967,7 +967,8 @@ struct InsertActionHandlerTests {
     func testInsertIntoIndirectSelfContainer() async throws {
         // Arrange: Box A contains Box B. Player holds Box B. Try putting B into A.
         let boxA = Item(
-            id: "boxA", name: "box A",
+            id: "boxA",
+            name: "box A",
             parent: .location("startRoom"),
             attributes: [
                 .isContainer: true,
@@ -976,7 +977,8 @@ struct InsertActionHandlerTests {
             ],
         )
         let boxB = Item(
-            id: "boxB", name: "box B",
+            id: "boxB",
+            name: "box B",
             parent: .item("boxA"),
             attributes: [
                 .isContainer: true,
