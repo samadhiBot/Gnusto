@@ -25,6 +25,13 @@ struct InsertActionHandler: ActionHandler {
         guard itemToInsert.parent == .player else {
             throw ActionError.itemNotHeld(itemToInsertID)
         }
+
+        // If the item being inserted is fixed (scenery),
+        // Zork replies as if the fixed item itself is not a container.
+        if itemToInsert.hasFlag(.isFixed) {
+            throw ActionError.targetIsNotAContainer(itemToInsertID)
+        }
+
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(containerID) else {
              throw ActionError.itemNotAccessible(containerID)
@@ -40,7 +47,7 @@ struct InsertActionHandler: ActionHandler {
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToInsertID {
                 throw ActionError.prerequisiteNotMet(
-                    "You can't put the \(containerItem.name) inside the \(itemToInsert.name) like that."
+                    "You can't put the \(itemToInsert.name) in the \(containerItem.name), because the \(containerItem.name) is inside the \(itemToInsert.name)!"
                 )
             }
             guard let parentItem = await context.engine.item(parentItemID) else { break }

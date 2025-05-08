@@ -393,14 +393,23 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Try to put the bag into the box (which is inside the bag)
-        let command = Command(verbID: "insert", directObject: "bag", indirectObject: "box", preposition: "in", rawInput: "put bag in box")
+        let command = Command(
+            verbID: "insert",
+            directObject: "bag",
+            indirectObject: "box",
+            preposition: "in",
+            rawInput: "put bag in box"
+        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put the box inside the bag like that.")
+        expectNoDifference(
+            output,
+            "You can't put the bag in the box, because the box is inside the bag!"
+        )
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -965,38 +974,36 @@ struct InsertActionHandlerTests {
 
     @Test("Insert into nested container that contains itself indirectly (A in B, put B in A)")
     func testInsertIntoIndirectSelfContainer() async throws {
-        // Arrange: Box A contains Box B. Player holds Box B. Try putting B into A.
-        let boxA = Item(
+        // Arrange: Player holds Box B (open container). Box A is inside Box B.
+        // Command: Put Box B (itemToInsert) into Box A (containerItem).
+        // Expected Error: "You can't put Box B in Box A, because Box A is in Box B!"
+
+        let boxA = Item( // This is containerItem (Y)
             id: "boxA",
             name: "box A",
-            parent: .location("startRoom"),
+            parent: .item("boxB"), // Box A is INSIDE Box B
             attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isOpen: true,
-            ],
+                .isTakable: true, // So it can be a parent, but also a target for insertion
+                .isContainer: true, // Technically, for it to be a target container, it needs this
+                .isOpen: true
+            ]
         )
-        let boxB = Item(
+        let boxB = Item( // This is itemToInsert (X)
             id: "boxB",
             name: "box B",
-            parent: .item("boxA"),
+            parent: .player, // Held by player
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
-                .isTakable: true,
-            ],
+                .isTakable: true, // Player is holding it
+            ]
         )
 
         let game = MinimalGame(items: [boxA, boxB])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
-
-        // Player needs to take Box B first
-        await engine.execute(command: Command(verbID: "take", directObject: "boxB", rawInput: "take box B"))
-        _ = await mockIO.flush() // Discard take output
-        #expect(await engine.item("boxB")?.parent == .player)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verbID: "insert", directObject: "boxB", indirectObject: "boxA", preposition: "in", rawInput: "put box B in box A")
 
@@ -1004,59 +1011,60 @@ struct InsertActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        let output = await mockIO.flush() // Initialize mockIO
-        expectNoDifference(output, "You can't put the box B inside the box A, because the box A is inside the box B!") // Zorkian message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put the box B in the box A, because the box A is inside the box B!")
 
-        // Assert No State Change (other than taking the box)
-        let history = await engine.gameState.changeHistory // Use engine instance
-        #expect(history.count > 0) // Take action happened
-        #expect(history.last?.attributeKey != .itemParent) // Insert action did not happen
+        // Assert No State Change (Box A still in Box B, Box B still held)
+        let finalBoxA = try #require(await engine.item("boxA"))
+        #expect(finalBoxA.parent == .item("boxB"))
+        let finalBoxB = try #require(await engine.item("boxB"))
+        #expect(finalBoxB.parent == .player)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     @Test("Insert into deeply nested container that contains itself indirectly")
     func testInsertIntoDeepIndirectSelfContainer() async throws {
-        // Arrange: A contains B, B contains C. Player holds C. Try putting C into A.
-        let boxA = Item(
+        // Arrange: Player holds Box C (open container).
+        // Box B is inside Box C. Box A is inside Box B.
+        // Command: Put Box C (itemToInsert) into Box A (containerItem).
+        // Expected: "You can't put Box C in Box A, because Box A is in Box C!"
+
+        let boxA = Item( // This is containerItem (Y)
             id: "boxA",
             name: "box A",
-            parent: .location("startRoom"),
+            parent: .item("boxB"), // A is in B
             attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isOpen: true,
-            ],
+                .isTakable: true,
+                .isContainer: true, // Target for insertion
+                .isOpen: true
+            ]
         )
         let boxB = Item(
             id: "boxB",
             name: "box B",
-            parent: .item("boxA"),
+            parent: .item("boxC"), // B is in C
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
-            ],
+            ]
         )
-        let boxC = Item(
+        let boxC = Item( // This is itemToInsert (X)
             id: "boxC",
             name: "box C",
-            parent: .item("boxB"),
+            parent: .player, // Held by player
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
                 .isTakable: true,
-            ],
+            ]
         )
 
         let game = MinimalGame(items: [boxA, boxB, boxC])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
-
-        // Player needs to take Box C first (requires opening A and B)
-        await engine.execute(command: Command(verbID: "take", directObject: "boxC", rawInput: "take box C"))
-        _ = await mockIO.flush() // Discard take output
-        #expect(await engine.item("boxC")?.parent == .player)
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(verbID: "insert", directObject: "boxC", indirectObject: "boxA", preposition: "in", rawInput: "put box C in box A")
 
@@ -1064,13 +1072,17 @@ struct InsertActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        let output = await mockIO.flush() // Initialize mockIO
-        expectNoDifference(output, "You can't put the box C inside the box A, because the box A is inside the box C!") // Zorkian message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't put the box C in the box A, because the box A is inside the box C!")
 
-        // Assert No State Change (other than taking the box)
-        let history = await engine.gameState.changeHistory // Use engine instance
-        #expect(history.count > 0) // Take action happened
-        #expect(history.last?.attributeKey != .itemParent || history.last?.entityID != .item("boxC")) // Insert action did not happen for boxC
+        // Assert No State Change
+        let finalBoxA = try #require(await engine.item("boxA"))
+        #expect(finalBoxA.parent == .item("boxB"))
+        let finalBoxB = try #require(await engine.item("boxB"))
+        #expect(finalBoxB.parent == .item("boxC"))
+        let finalBoxC = try #require(await engine.item("boxC"))
+        #expect(finalBoxC.parent == .player)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
     // --- Validation Tests (using handler.validate for focused error checks) ---
@@ -1221,63 +1233,75 @@ struct InsertActionHandlerTests {
             ]
         )
         let game = MinimalGame(items: [bag])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
-        let command = Command(verbID: "insert", directObject: "bag", indirectObject: "bag", preposition: "in", rawInput: "put bag in bag")
+        let engine = await GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+        let command = Command(
+            verbID: "insert",
+            directObject: "bag",
+            indirectObject: "bag",
+            preposition: "in",
+            rawInput: "put bag in bag"
+        )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.customResponse("Putting the cloth bag into itself would be বোকা.")) { // Correct error type
+        await #expect(
+            throws: ActionError.prerequisiteNotMet("You can't put something inside itself.")
+        ) { // Correct error type
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
             )
         }
-        #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Validation fails when inserting into indirect self container")
     func testValidationInsertIntoIndirectSelf() async throws {
-        // Arrange: A contains B. Player holds B. Try putting B into A.
-        let boxA = Item(
+        // Arrange: Player holds Box B (open container). Box A is inside Box B.
+        // Command: Put Box B (itemToInsert) into Box A (containerItem).
+        // Expected Error: "You can't put Box B in Box A, because Box A is in Box B!"
+
+        let boxA = Item( // This is containerItem (Y)
             id: "boxA",
             name: "box A",
-            parent: .location("startRoom"),
+            parent: .item("boxB"), // Box A is INSIDE Box B
             attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isOpen: true,
-            ],
+                .isTakable: true,
+                .isContainer: true, // Target for insertion
+                .isOpen: true
+            ]
         )
-        let boxB = Item(
+        let boxB = Item( // This is itemToInsert (X)
             id: "boxB",
             name: "box B",
-            parent: .item("boxA"),
+            parent: .player, // Held by player
             attributes: [
                 .isContainer: true,
                 .isOpenable: true,
                 .isOpen: true,
                 .isTakable: true,
-            ],
+            ]
         )
 
         let game = MinimalGame(items: [boxA, boxB])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
-
-        // Player needs to take Box B first
-        await engine.execute(command: Command(verbID: "take", directObject: "boxB", rawInput: "take box B"))
-        _ = await MockIOHandler().flush() // Discard take output (needs own mockIO instance for flush)
-        #expect(await engine.item("boxB")?.parent == .player)
+        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(verbID: "insert", directObject: "boxB", indirectObject: "boxA", preposition: "in", rawInput: "put box B in box A")
 
         // Act & Assert Error
-        await #expect(throws: ActionError.customResponse("You can't put the box B inside the box A, because the box A is inside the box B!")) { // Correct error type
+        let expectedMessage = "You can't put the box B in the box A, because the box A is inside the box B!"
+        await #expect(throws: ActionError.prerequisiteNotMet(expectedMessage)) {
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(command: command, engine: engine, stateSnapshot: await engine.gameState)
             )
         }
-        // Check history, but don't expect it to be empty due to 'take'
-        let history = await engine.gameState.changeHistory
-        #expect(history.count > 0)
-        #expect(history.last?.attributeKey != .itemParent || history.last?.entityID != .item("boxB")) // Insert didn't happen for boxB
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when item is fixed (scenery)")
@@ -1308,7 +1332,13 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "insert", directObject: "trophy", indirectObject: "box", preposition: "in", rawInput: "put trophy in box")
+        let command = Command(
+            verbID: "insert",
+            directObject: "trophy",
+            indirectObject: "openBox",
+            preposition: "in",
+            rawInput: "put trophy in the open box"
+        )
 
         // Act
         await engine.execute(command: command)
