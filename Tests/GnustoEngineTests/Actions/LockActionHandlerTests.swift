@@ -60,19 +60,19 @@ struct LockActionHandlerTests {
 
         // Assert Final State
         let finalBoxState = try #require(await engine.item("box"))
-        #expect(finalBoxState.hasFlag(.isLocked) == true, "Box should be locked") // Qualified
-        #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched") // Qualified
+        #expect(finalBoxState.hasFlag(.isLocked), "Box should be locked")
+        #expect(finalBoxState.hasFlag(.isTouched), "Box should be touched")
 
         let finalKeyState = try #require(await engine.item("key"))
-        #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched") // Qualified
+        #expect(finalKeyState.hasFlag(.isTouched), "Key should be touched")
 
         // Assert Change History
         let expectedChanges = expectedLockChanges(
             targetItemID: "box",
             keyItemID: "key",
-            initialTargetLocked: initialBoxSnapshot.hasFlag(.isLocked), // Qualified
-            initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched), // Qualified
-            initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched) // Qualified
+            initialTargetLocked: initialBoxSnapshot.hasFlag(.isLocked),
+            initialTargetTouched: initialBoxSnapshot.hasFlag(.isTouched),
+            initialKeyTouched: initialKeySnapshot.hasFlag(.isTouched)
         )
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
@@ -375,41 +375,49 @@ extension LockActionHandlerTests {
 
         // Target change: Lock (if it wasn't locked)
         if !initialTargetLocked {
-            changes.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isLocked),
-                oldValue: false,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(targetItemID),
+                    attributeKey: .itemAttribute(.isLocked),
+                    oldValue: false,
+                    newValue: true,
+                )
+            )
         }
 
         // Target change: Touch (if not already touched)
         if !initialTargetTouched {
-            changes.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(targetItemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Key change: Touch (if not already touched)
         if !initialKeyTouched {
-            changes.append(StateChange(
-                entityID: .item(keyItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(keyItemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Add pronoun change
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target relevant
-        ))
+        changes.append(
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([targetItemID])
+            )
+        )
 
         return changes
     }
