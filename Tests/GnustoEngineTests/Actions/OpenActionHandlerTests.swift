@@ -17,7 +17,7 @@ struct OpenActionHandlerTests {
             StateChange(
                 entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isOpen),
-                oldValue: initialAttributes?[.isOpen] ?? false, // Check initial state
+                oldValue: initialAttributes?[.isOpen], // Check initial state
                 newValue: true,
             )
         )
@@ -28,7 +28,7 @@ struct OpenActionHandlerTests {
                 StateChange(
                     entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched] ?? false,
+                    oldValue: initialAttributes?[.isTouched],
                     newValue: true,
                 )
             )
@@ -86,7 +86,10 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
+        let expectedChanges = expectedOpenChanges(
+            itemID: "box",
+            initialAttributes: initialBoxState?.attributes
+        )
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
 
@@ -196,7 +199,7 @@ struct OpenActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         // Updated expected message for inaccessible items
-        expectNoDifference(output, "You see no box here.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -227,7 +230,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "That's not something you can open.") // More standard message
+        expectNoDifference(output, "You can't open the heavy rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -263,7 +266,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "It's already open.") // More standard message
+        expectNoDifference(output, "The wooden box is already open.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -299,7 +302,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The iron chest appears to be locked.") // More standard message
+        expectNoDifference(output, "The iron chest is locked.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
