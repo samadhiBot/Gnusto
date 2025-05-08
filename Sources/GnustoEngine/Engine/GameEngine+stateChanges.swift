@@ -16,6 +16,16 @@ extension GameEngine {
         )
     }
 
+    public func flag(_ item: Item, remove flag: AttributeID) -> StateChange? {
+        if item.attributes[flag] != true { return nil }
+        return StateChange(
+            entityID: .item(item.id),
+            attributeKey: .itemAttribute(flag),
+            oldValue: item.attributes[flag],
+            newValue: false,
+        )
+    }
+
     /// <#Description#>
     /// - Parameter item: <#item description#>
     /// - Returns: <#description#>

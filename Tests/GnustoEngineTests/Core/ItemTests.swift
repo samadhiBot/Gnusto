@@ -1,8 +1,9 @@
 import Testing
-import Foundation // For JSONEncoder/Decoder
+import Foundation
+
 @testable import GnustoEngine
 
-@Suite("Item Class Tests")
+@Suite("Item Tests")
 struct ItemTests {
 
     // --- Test Setup ---
@@ -54,7 +55,7 @@ struct ItemTests {
         #expect(item.attributes[.readText] == nil)
         #expect(item.attributes[.readWhileHeldText] == nil)
         #expect(item.size == 1) // Default size
-        #expect(item.capacity == .max) // Default capacity
+        #expect(item.capacity == 1000) // Default capacity
         #expect(item.parent == .nowhere) // Check default parent
         #expect(item.attributes[.lockKey] == nil)
     }

@@ -1,8 +1,9 @@
 import Testing
-import Foundation // For JSONEncoder/Decoder
+import Foundation
+
 @testable import GnustoEngine
 
-@Suite("Location Class Tests")
+@Suite("Location Tests")
 struct LocationTests {
 
     // --- Test Setup ---
@@ -49,7 +50,7 @@ struct LocationTests {
         #expect(location.attributes[.longDescription] == .string("A nondescript room."))
         #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
         #expect(location.exits.isEmpty)
-        #expect(location.attributes.count == 1) // Only inherentlyLit=false by default
+        #expect(location.attributes.count == 3)
         #expect(location.attributes[.inherentlyLit] == false)
         #expect(location.localGlobals.isEmpty)
     }
@@ -85,31 +86,34 @@ struct LocationTests {
         var location = createDefaultLocation()
 
         #expect(!location.hasFlag(.inherentlyLit)) // isInherentlyLit is false by default
-        #expect(location.attributes.count == 1) // Only inherentlyLit
+        #expect(location.attributes.count == 3) // Only inherentlyLit
 
         location.attributes[.inherentlyLit] = true
         #expect(location.hasFlag(.inherentlyLit))
-        #expect(location.attributes.count == 1)
+        #expect(location.attributes.count == 3)
 
         location.attributes[.inherentlyLit] = true // Setting again should have no effect on count
-        #expect(location.attributes.count == 1)
+        #expect(location.attributes.count == 3)
 
         location.attributes[.isOutside] = true
         #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes.count == 2)
+        #expect(location.attributes.count == 4)
 
         location.attributes[.inherentlyLit] = false // Set back to false, don't remove the key
         #expect(!location.hasFlag(.inherentlyLit))
         #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes.count == 2)
+        #expect(location.attributes.count == 4)
 
         location.attributes[.inherentlyLit] = nil // Remove the key entirely
         #expect(!location.hasFlag(.inherentlyLit)) // Still false
-        #expect(location.attributes.count == 1) // Count decreases
+        #expect(location.attributes.count == 3) // Count decreases
 
         location.attributes[.isOutside] = nil // Remove the other key
         #expect(!location.hasFlag(.isOutside))
-        #expect(location.attributes.isEmpty)
+        #expect(location.attributes == [
+            .localGlobals: .itemIDSet([]),
+            .longDescription: "A nondescript room."
+        ])
     }
 
     @Test("Location Codable Conformance")

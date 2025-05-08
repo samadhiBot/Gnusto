@@ -29,7 +29,7 @@ public struct RemoveActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         guard
             let targetItemID = context.command.directObject,
-            let itemSnapshot = await context.engine.item(targetItemID)
+            let targetItem = await context.engine.item(targetItemID)
         else {
             throw ActionError.internalEngineError("Item snapshot disappeared!")
         }
@@ -37,41 +37,22 @@ public struct RemoveActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if itemSnapshot.attributes[.isWorn] == true {
-            stateChanges.append(
-                StateChange(
-                    entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isWorn),
-                    oldValue: true,
-                    newValue: false
-                )
-            )
+        if let touchedStateChange = await context.engine.flag(targetItem, remove: .isWorn) {
+            stateChanges.append(touchedStateChange)
         }
 
         // Change 2: Set `.isTouched` to true
-        if try await context.engine.fetch(targetItemID, .isTouched) {
-            stateChanges.append(
-                StateChange(
-                    entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: itemSnapshot.attributes[.isTouched] ?? false,
-                    newValue: true,
-                )
-            )
+        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(touchedStateChange)
         }
 
-        // Update pronoun "it"
-        stateChanges.append(
-            StateChange(
-                entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
-                newValue: .itemIDSet([targetItemID])
-            )
-        )
+        // Change 3: Update pronoun "it"
+        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
+            stateChanges.append(pronounStateChange)
+        }
 
         // --- Prepare Result ---
-        let message = "You take off the \(itemSnapshot.name)."
+        let message = "You take off the \(targetItem.name)."
         return ActionResult(
             success: true,
             message: message,

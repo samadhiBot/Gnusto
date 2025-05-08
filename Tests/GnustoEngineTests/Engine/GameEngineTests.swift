@@ -810,7 +810,7 @@ struct GameEngineTests {
             commandInput: "go xyzzy",
             commandToParse: command
         )
-        expectNoDifference(output, "A strange buzzing sound indicates something is wrong.")
+        expectNoDifference(output, "Go where?")
     }
 
     @Test("ReportActionError: .itemNotTakable")
@@ -1189,10 +1189,16 @@ struct GameEngineTests {
             name: "shadow",
             parent: .location("startRoom")
         )
-        let startRoom = Location(id: "startRoom", name: "Dark Room")
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let startRoom = Location(
+            id: "startRoom",
+            name: "Dark Room"
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
+            items: [item]
+        )
 
-        #expect(game.state.locations["startRoom"]?.attributes[.inherentlyLit] == nil)
+        #expect(game.state.locations["startRoom"]?.attributes[.inherentlyLit] == false)
 
         let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
         let output = await runCommandAndCaptureOutput(

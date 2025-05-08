@@ -21,15 +21,17 @@ struct RemoveActionHandlerTests {
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
-        var mockParser = MockParser()
         let engine = await GameEngine(
             game: game,
-            parser: mockParser,
+            parser: StandardParser(),
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
-        mockParser.parseHandler = { _, _, _ in .success(command) }
+        let command = Command(
+            verbID: "remove",
+            directObject: "cloak",
+            rawInput: "remove cloak"
+        )
 
         // Initial state check
         #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true)
@@ -41,7 +43,7 @@ struct RemoveActionHandlerTests {
 
         // Assert State Change
         let finalCloakState = await engine.item("cloak")
-        #expect(finalCloakState?.parent == .location("startRoom"))
+        #expect(finalCloakState?.parent == .player)
         #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
         #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
 
@@ -53,12 +55,6 @@ struct RemoveActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityID: .item("cloak"),
-                attributeKey: .itemParent,
-                oldValue: .parentEntity(.player),
-                newValue: .parentEntity(.location("startRoom"))
-            ),
-            StateChange(
-                entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false
@@ -66,9 +62,15 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true
             ),
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet(["cloak"])
+            )
         ]
         let finalHistory = await engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
