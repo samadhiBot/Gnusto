@@ -27,7 +27,7 @@ extension GameEngine {
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await generateDescription(
             for: location.id,
-            key: .longDescription,
+            key: .description,
             engine: self
         )
         await ioHandler.print(description)

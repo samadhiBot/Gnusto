@@ -17,14 +17,25 @@ public struct LocationAttribute: Attribute {
 // MARK: - Value attributes
 
 extension LocationAttribute {
-    /// The item's primary, detailed description (ZIL `LDESC`).
+    /// The location's primary, detailed description (ZIL `LDESC`).
     ///
-    /// - Parameter description: The item's primary detailed description.
-    /// - Returns: A .longDescription attribute.
-    static func longDescription(_ description: String) -> LocationAttribute {
+    /// - Parameter description: The location's primary detailed description.
+    /// - Returns: A .description attribute.
+    static func description(_ description: String) -> LocationAttribute {
         LocationAttribute(
-            id: .longDescription,
+            id: .description,
             rawValue: .string(description)
+        )
+    }
+
+    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
+    ///
+    /// - Parameter localGlobals: Items that are considered local to a location.
+    /// - Returns: A .localGlobals attribute.
+    static func localGlobals(_ localGlobals: ItemID...) -> LocationAttribute {
+        LocationAttribute(
+            id: .localGlobals,
+            rawValue: .itemIDSet(Set(localGlobals))
         )
     }
 }

@@ -39,6 +39,17 @@ extension ItemAttribute {
         )
     }
 
+    /// The item's primary, detailed description (ZIL `LDESC`).
+    ///
+    /// - Parameter description: The item's primary detailed description.
+    /// - Returns: A .description attribute.
+    static func description(_ description: String) -> ItemAttribute {
+        ItemAttribute(
+            id: .description,
+            rawValue: .string(description)
+        )
+    }
+
     /// The description shown the first time an item is seen (ZIL `FDESC`).
     ///
     /// - Parameter description: The description shown the first time an item is seen.
@@ -50,33 +61,11 @@ extension ItemAttribute {
         )
     }
 
-    /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
-    ///
-    /// - Parameter localGlobals: Items that are considered local to a location.
-    /// - Returns: A .localGlobals attribute.
-    static func localGlobals(_ localGlobals: ItemID...) -> ItemAttribute {
-        ItemAttribute(
-            id: .localGlobals,
-            rawValue: .itemIDSet(Set(localGlobals))
-        )
-    }
-
     /// The key needed to lock/unlock an item (if `.isLockable`).
     static func lockKey(_ lockKey: ItemID) -> ItemAttribute {
         ItemAttribute(
             id: .lockKey,
             rawValue: .itemID(lockKey)
-        )
-    }
-
-    /// The item's primary, detailed description (ZIL `LDESC`).
-    ///
-    /// - Parameter description: The item's primary detailed description.
-    /// - Returns: A .longDescription attribute.
-    static func longDescription(_ description: String) -> ItemAttribute {
-        ItemAttribute(
-            id: .longDescription,
-            rawValue: .string(description)
         )
     }
 

@@ -52,7 +52,7 @@ public extension AttributeID {
     static let firstDescription = AttributeID("firstDescription")
 
     /// The primary, detailed description (ZIL `LDESC`).
-    static let longDescription = AttributeID("longDescription")
+    static let description = AttributeID("description")
 
     /// The shorter description used in lists or brief mentions (ZIL `SDESC`).
     static let shortDescription = AttributeID("shortDescription")

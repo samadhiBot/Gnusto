@@ -9,7 +9,7 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The unique identifier of the item.
-    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.description`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.
     public func generateDescription(
@@ -30,7 +30,7 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The unique identifier of the item.
-    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.description`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted default description string.
     private func defaultItemDescription(
@@ -40,7 +40,7 @@ extension GameEngine {
     ) async -> String {
         let item = await engine.item(itemID)
         return switch key {
-        case .longDescription:
+        case .description:
             "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
         case .shortDescription:
             "\(item?.withIndefiniteArticle.capitalizedFirst ?? "An item")."
@@ -64,7 +64,7 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The unique identifier of the location.
-    ///   - key: The `AttributeID` representing the desired description (e.g., `.longDescription`).
+    ///   - key: The `AttributeID` representing the desired description (e.g., `.description`).
     ///   - engine: The game engine providing access to state and dynamic values.
     /// - Returns: The formatted description string, or a default message if unavailable.
     public func generateDescription(
@@ -90,7 +90,7 @@ extension GameEngine {
         // Consider fetching location name
         // let locationName = await engine.locationSnapshot(locationID)?.name ?? "place"
         switch key {
-        case .longDescription:
+        case .description:
             return "You are in a nondescript location."
         case .shortDescription:
             return "A location."

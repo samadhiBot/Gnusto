@@ -28,7 +28,7 @@ public struct Item: Codable, Identifiable, Sendable {
         self.parent = parent
         var initial = attributes
         if let description {
-            initial[.longDescription] = .string(description)
+            initial[.description] = .string(description)
         }
         self.attributes = initial
     }
@@ -46,8 +46,8 @@ public struct Item: Codable, Identifiable, Sendable {
         self.attributes = Dictionary(
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
-        if let description, self.attributes[.longDescription] == nil {
-            self.attributes[.longDescription] = .string(description)
+        if let description, self.attributes[.description] == nil {
+            self.attributes[.description] = .string(description)
         }
     }
 

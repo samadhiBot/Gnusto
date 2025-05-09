@@ -236,7 +236,7 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Plain Room",
-            // No longDescription provided - should be nil by default
+            // No description provided - should be nil by default
             isLit: true
         )
 
@@ -288,7 +288,7 @@ struct LookActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         // Register dynamic compute handler for the location's long description
-        await engine.registerLocationCompute(key: .longDescription) { location, gameState in
+        await engine.registerLocationCompute(key: .description) { location, gameState in
             let isFlagOn = gameState.flags.contains(flagId)
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
                                   "The room seems normal via registry."

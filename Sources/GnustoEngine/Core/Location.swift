@@ -31,8 +31,8 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.exits = exits
         self.attributes = attributes
         if let description {
-            assert(attributes[.longDescription] == nil, "Long description defined twice.")
-            self.attributes[.longDescription] = .string(description)
+            assert(attributes[.description] == nil, "Long description defined twice.")
+            self.attributes[.description] = .string(description)
         }
         self.attributes[.inherentlyLit] = .bool(
             isLit || (attributes[.inherentlyLit]?.toBool ?? false)
@@ -52,8 +52,8 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.attributes = Dictionary(
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
-        if let description, self.attributes[.longDescription] == nil {
-            self.attributes[.longDescription] = .string(description)
+        if let description, self.attributes[.description] == nil {
+            self.attributes[.description] = .string(description)
         }
     }
 
