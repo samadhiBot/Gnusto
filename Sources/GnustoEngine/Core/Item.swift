@@ -20,24 +20,7 @@ public struct Item: Codable, Identifiable, Sendable {
         id: ItemID,
         name: String,
         description: String? = nil,
-        parent: ParentEntity = .nowhere,
-        attributes: [AttributeID: StateValue] = [:]
-    ) {
-        self.id = id
-        self.name = name
-        self.parent = parent
-        var initial = attributes
-        if let description {
-            initial[.description] = .string(description)
-        }
-        self.attributes = initial
-    }
-
-    public init(
-        id: ItemID,
-        name: String,
-        description: String? = nil,
-        parent: ParentEntity = .nowhere,
+        in parent: ParentEntity = .nowhere,
         _ attributes: ItemAttribute...
     ) {
         self.id = id
@@ -49,6 +32,27 @@ public struct Item: Codable, Identifiable, Sendable {
         if let description, self.attributes[.description] == nil {
             self.attributes[.description] = .string(description)
         }
+    }
+
+    @available(*, deprecated,
+         renamed: "init(id:name:description:parent:_:)",
+         message: "Please switch to the new syntax."
+    )
+    public init(
+        id: ItemID,
+        name: String,
+        description: String? = nil,
+        parent: ParentEntity = .nowhere,
+        attributes: [AttributeID: StateValue] = [:]
+    ) {
+        self.id = id
+        self.name = name
+        self.parent = parent
+        var initial = attributes
+        if let description {
+            initial[.description] = .string(description)
+        }
+        self.attributes = initial
     }
 
     // MARK: - Convenience Accessors

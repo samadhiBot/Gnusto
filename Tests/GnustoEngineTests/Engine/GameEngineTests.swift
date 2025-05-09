@@ -1191,7 +1191,8 @@ struct GameEngineTests {
         )
         let startRoom = Location(
             id: "startRoom",
-            name: "Dark Room"
+            name: "Dark Room",
+            description: "A dark, dark room."
         )
         let game = MinimalGame(
             locations: [startRoom],

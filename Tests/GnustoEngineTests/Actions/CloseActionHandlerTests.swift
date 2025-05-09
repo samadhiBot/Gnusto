@@ -12,12 +12,10 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isOpen: true // Start open
-            ]
+            in: .location("startRoom"),
+            .isContainer,
+            .isOpenable,
+            .isOpen // Start open
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()

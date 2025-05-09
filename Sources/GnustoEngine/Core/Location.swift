@@ -23,6 +23,28 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         name: String,
         description: String? = nil,
         exits: [Direction: Exit] = [:],
+        _ attributes: LocationAttribute...
+    ) {
+        self.id = id
+        self.name = name
+        self.exits = exits
+        self.attributes = Dictionary(
+            uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
+        )
+        if let description, self.attributes[.description] == nil {
+            self.attributes[.description] = .string(description)
+        }
+    }
+
+    @available(*, deprecated,
+        renamed: "init(id:name:description:exits:_:)",
+        message: "Please switch to the new syntax."
+    )
+    public init(
+        id: LocationID,
+        name: String,
+        description: String? = nil,
+        exits: [Direction: Exit] = [:],
         isLit: Bool = false,
         attributes: [AttributeID: StateValue] = [:]
     ) {
@@ -37,24 +59,6 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.attributes[.inherentlyLit] = .bool(
             isLit || (attributes[.inherentlyLit]?.toBool ?? false)
         )
-    }
-
-    public init(
-        id: LocationID,
-        name: String,
-        description: String? = nil,
-        exits: [Direction: Exit] = [:],
-        _ attributes: LocationAttribute...
-    ) {
-        self.id = id
-        self.name = name
-        self.exits = exits
-        self.attributes = Dictionary(
-            uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
-        )
-        if let description, self.attributes[.description] == nil {
-            self.attributes[.description] = .string(description)
-        }
     }
 
     // MARK: - Convenience Accessors

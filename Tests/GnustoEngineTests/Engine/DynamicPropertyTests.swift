@@ -52,6 +52,7 @@ struct DynamicPropertyTests {
         let testLocation = Location(
             id: "testLocation",
             name: "Test Chamber",
+            description: "A dark, dark room."
         )
         let game = MinimalGame(
             locations: [testLocation],

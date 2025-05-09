@@ -105,8 +105,7 @@ struct LocationTests {
         location.attributes[.isOutside] = nil // Remove the other key
         #expect(!location.hasFlag(.isOutside))
         #expect(location.attributes == [
-            .localGlobals: .itemIDSet([]),
-            .description: "A nondescript room."
+            .localGlobals: .itemIDSet([])
         ])
     }
 

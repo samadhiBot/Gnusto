@@ -670,9 +670,21 @@ struct LookActionHandlerTests {
     @Test("LOOK AT item not reachable fails")
     func testLookAtItemNotReachable() async throws {
         // Arrange: Item exists but is in another room
-        let item = Item(id: "artifact", name: "glowing artifact", parent: .location("otherRoom"))
-        let room1 = Location(id: "startRoom", name: "Start Room", isLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other Room") // inherentlyLit defaults false
+        let item = Item(
+            id: "artifact",
+            name: "glowing artifact",
+            parent: .location("otherRoom")
+        )
+        let room1 = Location(
+            id: "startRoom",
+            name: "Start Room",
+            .inherentlyLit
+        )
+        let room2 = Location(
+            id: "otherRoom",
+            name: "Other Room",
+            description: "A very dark room."
+        ) // inherentlyLit defaults false
 
         let game = MinimalGame(
             player: Player(in: "startRoom"),

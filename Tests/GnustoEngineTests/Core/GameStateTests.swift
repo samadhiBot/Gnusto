@@ -92,7 +92,8 @@ struct GameStateTests {
     func createInitialState() -> GameState {
         let startRoom = Location(
             id: "startRoom",
-            name: "Starting Room"
+            name: "Starting Room",
+            description: "A dark, dark room."
         )
         let testItem = Item(
             id: "testItem",
@@ -148,7 +149,8 @@ struct GameStateTests {
         struct Area1: AreaContents {
             let locations: [Location] = [Location(
                 id: "loc1",
-                name: "Area 1 Room"
+                name: "Area 1 Room",
+                description: "A dark, dark room."
             )]
             let items: [Item] = [Item(
                 id: "item1",
@@ -160,7 +162,8 @@ struct GameStateTests {
         struct Area2: AreaContents {
             let locations: [Location] = [Location(
                 id: "loc2",
-                name: "Area 2 Room"
+                name: "Area 2 Room",
+                description: "A dark, dark room."
             )]
             let items: [Item] = [Item(
                 id: "item2",

@@ -495,7 +495,11 @@ struct ReadActionHandlerTests {
     @Test("Read item in dark room")
     func testReadInDarkRoom() async throws {
         // Arrange
-        let darkRoom = Location(id: "darkRoom", name: "Dark Room")
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Dark Room",
+            description: "A dark, dark room."
+        )
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
@@ -526,7 +530,11 @@ struct ReadActionHandlerTests {
     @Test("Read item providing light in dark room")
     func testReadSelfLitItemInDark() async throws {
         // Arrange
-        let darkRoom = Location(id: "darkRoom", name: "Dark Room")
+        let darkRoom = Location(
+            id: "darkRoom",
+            name: "Dark Room",
+            description: "A dark, dark room."
+        )
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",

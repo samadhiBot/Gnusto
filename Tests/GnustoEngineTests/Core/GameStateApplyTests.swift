@@ -195,7 +195,11 @@ struct GameStateApplyTests {
         state.changeHistory = [] // Clear history
 
         let newLocationID: LocationID = "anotherRoom"
-        state.locations[newLocationID] = Location(id: newLocationID, name: "Another Room") // Ensure location exists
+        state.locations[newLocationID] = Location(
+            id: newLocationID,
+            name: "Another Room",
+            description: "A dark, dark room."
+        ) // Ensure location exists
 
         let change = StateChange(
             entityID: .item(itemID),

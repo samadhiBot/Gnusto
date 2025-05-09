@@ -13,11 +13,9 @@ struct TurnOnActionHandlerTests {
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            parent: .player,
-            attributes: [
-                .isLightSource: true,
-                .isTakable: true
-            ]
+            in: .player,
+            .isLightSource,
+            .isTakable
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -28,7 +26,7 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let parseResult = await parser.parse(
+        let parseResult = parser.parse(
             input: "turn on lamp",
             vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
@@ -53,17 +51,16 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            description: "This is a dark room that should now be lit."
+            description: "This is a dark room that should now be lit.",
+            .isVisited
         )
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
             description: "A brass lantern.",
-            parent: .location(darkRoom.id),
-            attributes: [
-                .isLightSource: true,
-                .isTakable: true
-            ]
+            in: .location(darkRoom.id),
+            .isLightSource,
+            .isTakable
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

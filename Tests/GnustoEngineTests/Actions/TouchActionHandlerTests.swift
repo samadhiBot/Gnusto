@@ -164,8 +164,8 @@ struct TouchActionHandlerTests {
         let table = Item(
             id: "table",
             name: "wooden table",
-            parent: .location("startRoom"),
-            attributes: [.isSurface: true]
+            in: .location("startRoom"),
+            .isSurface
         )
         let book = Item(
             id: "book",
@@ -181,7 +181,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "book", rawInput: "touch book")
+        let command = Command(
+            verbID: "touch",
+            directObject: "book",
+            rawInput: "touch book"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -199,13 +203,13 @@ struct TouchActionHandlerTests {
         let chest = Item(
             id: "chest",
             name: "locked chest",
-            parent: .location("startRoom"),
-            attributes: [.isContainer: true] // Closed by default
+            in: .location("startRoom"),
+            .isContainer // Closed by default
         )
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .item(chest.id)
+            in: .item(chest.id)
         )
         let game = MinimalGame(items: [chest, coin])
         let mockIO = await MockIOHandler()
@@ -218,10 +222,14 @@ struct TouchActionHandlerTests {
 
         #expect(chest.attributes[.isOpen] == nil) // Verify closed
 
-        let command = Command(verbID: "touch", directObject: "coin", rawInput: "touch coin")
+        let command = Command(
+            verbID: "touch",
+            directObject: "coin",
+            rawInput: "touch coin"
+        )
 
         // Act & Assert
-        await #expect(throws: ActionError.prerequisiteNotMet("The locked chest is closed.")) {
+        await #expect(throws: ActionError.itemNotAccessible("coin")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
