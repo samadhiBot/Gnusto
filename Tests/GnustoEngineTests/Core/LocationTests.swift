@@ -14,11 +14,13 @@ struct LocationTests {
         Location(
             id: defaultLocationID,
             name: defaultLocationName,
-            description: "A nondescript room.",
-            attributes: [
-                .inherentlyLit: false,
-                .localGlobals: .itemIDSet([])
-            ]
+            .longDescription("A nondescript room."),
+            .inherentlyLit
+
+//            description: "A nondescript room.",
+//            with: .
+
+
         )
     }
 

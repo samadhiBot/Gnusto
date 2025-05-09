@@ -33,6 +33,24 @@ public struct Item: Codable, Identifiable, Sendable {
         self.attributes = initial
     }
 
+    public init(
+        id: ItemID,
+        name: String,
+        description: String? = nil,
+        parent: ParentEntity = .nowhere,
+        _ attributes: ItemAttribute...
+    ) {
+        self.id = id
+        self.name = name
+        self.parent = parent
+        self.attributes = Dictionary(
+            uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
+        )
+        if let description, self.attributes[.longDescription] == nil {
+            self.attributes[.longDescription] = .string(description)
+        }
+    }
+
     // MARK: - Convenience Accessors
 
     /// Adjectives associated with the item (e.g., "brass", "small" for lantern).

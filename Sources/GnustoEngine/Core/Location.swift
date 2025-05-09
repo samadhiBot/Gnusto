@@ -39,6 +39,24 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         )
     }
 
+    public init(
+        id: LocationID,
+        name: String,
+        description: String? = nil,
+        exits: [Direction: Exit] = [:],
+        _ attributes: LocationAttribute...
+    ) {
+        self.id = id
+        self.name = name
+        self.exits = exits
+        self.attributes = Dictionary(
+            uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
+        )
+        if let description, self.attributes[.longDescription] == nil {
+            self.attributes[.longDescription] = .string(description)
+        }
+    }
+
     // MARK: - Convenience Accessors
 
     /// Checks if a flag is set in the location's `attributes`.
