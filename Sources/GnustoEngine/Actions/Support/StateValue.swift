@@ -1,6 +1,6 @@
 /// Represents the possible types of values that can be tracked in state changes.
 /// Ensures values are both Codable and Sendable.
-public enum StateValue: Codable, Sendable, Equatable {
+public enum StateValue: Codable, Sendable, Hashable {
     case bool(Bool)
     case int(Int)
     case itemID(ItemID)

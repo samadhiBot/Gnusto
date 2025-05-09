@@ -1,7 +1,7 @@
 import Foundation
 
 /// Represents a connection from one location to another in a specific direction.
-public struct Exit: Codable, Equatable, Sendable {
+public struct Exit: Codable, Hashable, Sendable {
     /// The unique identifier of the location this exit leads to.
     public var destination: LocationID
 
