@@ -49,14 +49,6 @@ struct TakeActionHandlerTests {
             }
         }
 
-        // Add pronoun change (assuming 'it' always refers to the taken item now)
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
-            newValue: .itemIDSet([itemID])
-        ))
-
         // Ensure touched is set if not already true
         let initialIsTouched = initialAttributes[.isTouched] // is Optional(StateValue)
         if initialIsTouched != true { // Correctly compares Optional != Non-optional
@@ -78,6 +70,14 @@ struct TakeActionHandlerTests {
                 changes.append(touchedChange)
             }
         }
+
+        // Add pronoun change (assuming 'it' always refers to the taken item now)
+        changes.append(StateChange(
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
+            newValue: .itemIDSet([itemID])
+        ))
 
         return changes.sorted() // Sort for consistent comparison
     }
@@ -773,7 +773,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "fly", rawInput: "take fly")
+        let command = Command(
+            verbID: "take",
+            directObject: "fly",
+            rawInput: "take fly"
+        )
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
         #expect(await engine.item("jar")?.hasFlag(.isOpen) == false) // Verify closed
@@ -784,7 +788,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output - Should fail because container is closed
         let output = await mockIO.flush()
-        expectNoDifference(output, "You have to open the glass jar first.") // Updated expected message
+        expectNoDifference(output, "The glass jar is closed.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)

@@ -34,39 +34,43 @@ public struct TakeActionHandler: ActionHandler {
             }
         }
 
-        // 5. Check reachability using ScopeResolver (general check)
+        // 5. Handle specific container closed errors before general unreachability
+        if case .item(let parentID) = targetItem.parent,
+           let container = await context.engine.item(parentID),
+           container.hasFlag(.isContainer),
+           !container.hasFlag(.isOpen)
+        {
+            if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
+                throw ActionError.containerIsClosed(parentID)
+            } else {
+                throw ActionError.itemNotAccessible(targetItemID)
+            }
+        }
+
+        // 6. Check reachability using ScopeResolver (general check)
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            // Handle specific container closed errors before general unreachability
-            if case .item(let parentID) = targetItem.parent,
-               let container = await context.engine.item(parentID),
-               container.hasFlag(.isContainer),
-               try await context.engine.fetch(parentID, .isOpen) == false
-            {
-                throw ActionError.containerIsClosed(parentID)
-            }
             // If not reachable for other reasons (e.g., too far, darkness affecting scope)
             throw ActionError.itemNotAccessible(targetItemID)
         }
 
-        // 6. Check if the item is takable
+        // 7. Check if the item is takable
         guard targetItem.hasFlag(.isTakable) else {
             throw ActionError.itemNotTakable(targetItemID)
         }
 
-        // 7. Check capacity <-- Check added here
+        // 8. Check capacity <-- Check added here
         guard await context.engine.playerCanCarry(targetItem) else {
             throw ActionError.playerCannotCarryMore
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
+        guard
+            let targetItemID = context.command.directObject,
+            let targetItem = await context.engine.item(targetItemID)
+        else {
             throw ActionError.internalEngineError("Take context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // Should be caught by validate.
-            throw ActionError.internalEngineError("Take context.command target item disappeared between validate and process.")
         }
 
         // Handle "already have" case detected (but not thrown) in validate
