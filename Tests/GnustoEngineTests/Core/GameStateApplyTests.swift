@@ -197,8 +197,8 @@ struct GameStateApplyTests {
         let newLocationID: LocationID = "anotherRoom"
         state.locations[newLocationID] = Location(
             id: newLocationID,
-            name: "Another Room",
-            description: "A dark, dark room."
+            .name("Another Room"),
+            .description("A dark, dark room.")
         ) // Ensure location exists
 
         let change = StateChange(

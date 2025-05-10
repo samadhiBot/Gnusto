@@ -20,26 +20,25 @@ struct GameStateTests {
         [
             Item(
                 id: Self.itemLantern,
-                name: "lantern",
-                attributes: [.isTakable: true, .isLightSource: true]
+                .isTakable,
+                .isLightSource
             ),
             Item(
                 id: Self.itemMailbox,
-                name: "mailbox",
-                parent: .location(Self.locWOH),
-                attributes: [.isContainer: true, .isOpenable: true]
+                .in(.location(Self.locWOH)),
+                .isContainer,
+                .isOpenable
             ),
             Item(
                 id: Self.itemLeaflet,
-                name: "leaflet",
-                parent: .item(Self.itemMailbox),
-                attributes: [.isTakable: true, .isReadable: true]
+                .in(.item(Self.itemMailbox)),
+                .isTakable,
+                .isReadable
             ),
             Item(
                 id: Self.itemSword,
-                name: "sword",
                 .in(.player),
-                attributes: [.isTakable: true]
+                .isTakable
             )
         ]
     }
@@ -49,16 +48,15 @@ struct GameStateTests {
         return [
             Location(
                 id: Self.locWOH,
-                name: "West of House",
-                description: "You are standing west of a white house.",
-                exits: [.north: Exit(destination: Self.locNorth)]
-                // items: // Removed
+                .name("West of House"),
+                .description("You are standing west of a white house."),
+                .exits([.north: Exit(destination: Self.locNorth)])
             ),
             Location(
                 id: Self.locNorth,
-                name: "North of House",
-                description: "You are north of the house.",
-                exits: [.south: Exit(destination: Self.locWOH)]
+                .name("North of House"),
+                .description("You are north of the house."),
+                .exits([.south: Exit(destination: Self.locWOH)])
             )
         ]
     }
@@ -92,14 +90,13 @@ struct GameStateTests {
     func createInitialState() -> GameState {
         let startRoom = Location(
             id: "startRoom",
-            name: "Starting Room",
-            description: "A dark, dark room."
+            .name("Starting Room"),
+            .description("A dark, dark room.")
         )
         let testItem = Item(
             id: "testItem",
-            name: "Test Item",
-            .in(.location("startRoom")),
-            attributes: [:] // Assuming default is empty
+            .name("Test Item"),
+            .in(.location("startRoom"))
         )
         let player = Player(in: "startRoom")
         let vocab = Vocabulary.build(items: [testItem]) // Build basic vocab
@@ -149,27 +146,25 @@ struct GameStateTests {
         struct Area1: AreaContents {
             let locations: [Location] = [Location(
                 id: "loc1",
-                name: "Area 1 Room",
-                description: "A dark, dark room."
+                .name("Area 1 Room"),
+                .description("A dark, dark room.")
             )]
             let items: [Item] = [Item(
                 id: "item1",
-                name: "Area 1 Item",
-                parent: .location("loc1"),
-                attributes: [:]
+                .name("Area 1 Item"),
+                .in(.location("loc1"))
             )]
         }
         struct Area2: AreaContents {
             let locations: [Location] = [Location(
                 id: "loc2",
-                name: "Area 2 Room",
-                description: "A dark, dark room."
+                .name("Area 2 Room"),
+                .description("A dark, dark room.")
             )]
             let items: [Item] = [Item(
                 id: "item2",
-                name: "Area 2 Item",
-                parent: .location("loc2"),
-                attributes: [:]
+                .name("Area 2 Item"),
+                .in(.location("loc2"))
             )]
         }
 
@@ -193,21 +188,18 @@ struct GameStateTests {
         var state = createInitialState() // Make mutable to modify items
         let item1 = Item(
             id: "item1",
-            name: "Item 1",
-            .in(.player),
-            attributes: [:]
+            .name("Item 1"),
+            .in(.player)
         )
         let item2 = Item(
             id: "item2",
-            name: "Item 2",
-            .in(.location("startRoom")),
-            attributes: [:]
+            .name("Item 2"),
+            .in(.location("startRoom"))
         )
         let item3 = Item(
             id: "item3",
-            name: "Item 3",
-            .in(.player),
-            attributes: [:]
+            .name("Item 3"),
+            .in(.player)
         )
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
 
@@ -224,21 +216,18 @@ struct GameStateTests {
         let locID: LocationID = "startRoom"
         let item1 = Item(
             id: "item1",
-            name: "Item 1",
-            parent: .location(locID),
-            attributes: [:]
+            .name("Item 1"),
+            .in(.location(locID))
         )
         let item2 = Item(
             id: "item2",
-            name: "Item 2",
-            .in(.player),
-            attributes: [:]
+            .name("Item 2"),
+            .in(.player)
         )
         let item3 = Item(
             id: "item3",
-            name: "Item 3",
-            parent: .location(locID),
-            attributes: [:]
+            .name("Item 3"),
+            .in(.location(locID))
         )
         let originalTestItem = state.items["testItem"]! // Keep original item in startRoom
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": originalTestItem] // Add/replace items
@@ -254,15 +243,13 @@ struct GameStateTests {
         var state = createInitialState() // Make mutable
         let item1 = Item(
             id: "item1",
-            name: "Item 1",
-            .in(.player),
-            attributes: [:]
+            .name("Item 1"),
+            .in(.player)
         )
         let item2 = Item(
             id: "item2",
-            name: "Item 2",
-            .in(.location("startRoom")),
-            attributes: [:]
+            .name("Item 2"),
+            .in(.location("startRoom"))
         )
         state.items["item1"] = item1 // Add items
         state.items["item2"] = item2
@@ -382,19 +369,31 @@ struct GameStateTests {
         woh.attributes[.description] = .string("A new description.")
         state.locations[Self.locWOH] = woh
 
-        var lantern = state.items[Self.itemLantern]!
-        lantern.name = "Magic Lantern"
-        state.items[Self.itemLantern] = lantern
+        // Create new lantern with updated name
+        let updatedLantern = Item(
+            id: Self.itemLantern,
+            .name("Magic Lantern"),
+            .isTakable,
+            .isLightSource
+        )
+        state.items[Self.itemLantern] = updatedLantern
 
-        // Valid: Simulate state changes by modifying Item parents
-        // Again, modify copy and reassign
-        var lanternForParent = state.items[Self.itemLantern]!
-        lanternForParent.attributes[.parentEntity] = .parentEntity(.player)
-        state.items[Self.itemLantern] = lanternForParent
+        // Create new lantern with updated parent
+        let lanternWithNewParent = Item(
+            id: Self.itemLantern,
+            .in(.player),
+            .isTakable,
+            .isLightSource
+        )
+        state.items[Self.itemLantern] = lanternWithNewParent
 
-        var swordForParent = state.items[Self.itemSword]!
-        swordForParent.attributes[.parentEntity] = .parentEntity(.location(state.player.currentLocationID))
-        state.items[Self.itemSword] = swordForParent
+        // Create new sword with updated parent
+        let swordWithNewParent = Item(
+            id: Self.itemSword,
+            .in(.location(state.player.currentLocationID)),
+            .isTakable
+        )
+        state.items[Self.itemSword] = swordWithNewParent
 
         // Assertions for the valid modifications:
         #expect(
@@ -414,11 +413,14 @@ struct GameStateTests {
     func testGameStateCodable() async throws {
         var originalState = await createSampleGameState()
 
-        // Modify an item *before* encoding
-        var lantern = originalState.items[Self.itemLantern]!
-        lantern.attributes[.isOn] = true
-        lantern.attributes[.parentEntity] = .parentEntity(.player) // Put lantern in inventory
-        originalState.items[Self.itemLantern] = lantern
+        // Create new lantern with updated attributes
+        let updatedLantern = Item(
+            id: Self.itemLantern,
+            .in(.player),
+            .isLightSource,
+            .isOn
+        )
+        originalState.items[Self.itemLantern] = updatedLantern
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -467,11 +469,15 @@ struct GameStateTests {
         // Modify value type (Player) *in* state2
         state2.player.moves = 5
 
-        // Modify reference type contained within struct (Item dict value) *in* state2
-        var lantern2 = state2.items[Self.itemLantern]!
-        lantern2.name = "Shiny Lantern"
-        lantern2.attributes[.parentEntity] = .parentEntity(.player) // Also move it for state2
-        state2.items[Self.itemLantern] = lantern2 // Reassign modified copy back
+        // Create new lantern with updated properties
+        let updatedLantern = Item(
+            id: Self.itemLantern,
+            .name("Shiny Lantern"),
+            .in(.player),
+            .isTakable,
+            .isLightSource
+        )
+        state2.items[Self.itemLantern] = updatedLantern
 
         // Verify state1's value types remain unchanged
         let initialPlayer = state1.player // Capture initial player state from state1
@@ -571,7 +577,11 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesSet() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.description: .string("Original Desc")])
+        let testLoc = Location(
+            id: "testLoc",
+            .name("Test Location"),
+            .description("Original Desc")
+        )
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
@@ -595,7 +605,12 @@ struct GameStateTests {
     func testApplyModifyLocationPropertiesRemove() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.description: .string("Original Desc"), .isLit: true])
+        let testLoc = Location(
+            id: "testLoc",
+            .name("Test Location"),
+            .description("Original Desc"),
+            .inherentlyLit
+        )
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
@@ -619,7 +634,11 @@ struct GameStateTests {
     func testApplyModifyLocationAttribute() {
         var state = createInitialState()
         // Add the location explicitly before applying the change
-        let testLoc = Location(id: "testLoc", name: "Test Location", attributes: [.description: .string("Original Desc")])
+        let testLoc = Location(
+            id: "testLoc",
+            .name("Test Location"),
+            .description("Original Desc")
+        )
         state.locations["testLoc"] = testLoc
 
         let change = StateChange(
@@ -643,10 +662,12 @@ struct GameStateTests {
     func testApplyValidationFailureOldValueMismatch() {
         var state = createInitialState()
         // Ensure startRoom has a description attribute for the test
-        if var startRoom = state.locations["startRoom"] {
-            startRoom.attributes[.description] = .string("Initial Room Desc")
-            state.locations["startRoom"] = startRoom
-        }
+        let updatedStartRoom = Location(
+            id: "startRoom",
+            .name("Starting Room"),
+            .description("Initial Room Desc")
+        )
+        state.locations["startRoom"] = updatedStartRoom
 
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(

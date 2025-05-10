@@ -36,162 +36,130 @@ struct StandardParserTests {
         let allItems = [
             Item(
                 id: "apple",
-                name: "apple",
-                parent: .item("tray"),
-                attributes: [
-                    .adjectives: .stringSet(["red"]),
-                    .isTakable: true,
-                    .isEdible: true
-                ]
+                .name("apple"),
+                .in(.item("tray")),
+                .adjectives("red"),
+                .isTakable,
+                .isEdible
             ),
             Item(
                 id: "backpack",
-                name: "backpack",
+                .name("backpack"),
                 .in(.player),
-                attributes: [
-                    .isContainer: true,
-                    .isTakable: true,
-                    .isOpen: true,
-                    .capacity: 20
-                ]
+                .isContainer,
+                .isTakable,
+                .isOpen,
+                .capacity(20)
             ),
             Item(
                 id: "book",
-                name: "book",
-                parent: .item("table"),
-                attributes: [
-                    .adjectives: .stringSet(["dusty"]),
-                    .isTakable: true,
-                    .isReadable: true
-                ]
+                .name("book"),
+                .in(.item("table")),
+                .adjectives("dusty"),
+                .isTakable,
+                .isReadable
             ),
             Item(
                 id: "box",
-                name: "box",
-                parent: .location(roomID),
-                attributes: [
-                    .adjectives: .stringSet(["wooden"]),
-                    .isContainer: true,
-                    .isOpenable: true
-                ]
+                .name("box"),
+                .in(.location(roomID)),
+                .adjectives("wooden"),
+                .isContainer,
+                .isOpenable
             ),
             Item(
                 id: "chest",
-                name: "chest",
+                .name("chest"),
                 .in(.player),
-                attributes: [
-                    .isContainer: true,
-                    .isTakable: true,
-                    .isOpenable: true,
-                    .isLocked: true,
-                    .capacity: 50
-                ]
+                .isContainer,
+                .isTakable,
+                .isOpenable,
+                .isLocked,
+                .capacity(50)
             ),
             Item(
                 id: "coin",
-                name: "coin",
-                parent: .item("backpack"),
-                attributes: [
-                    .adjectives: .stringSet(["gold"]),
-                    .isTakable: true
-                ]
+                .name("coin"),
+                .in(.item("backpack")),
+                .adjectives("gold"),
+                .isTakable
             ),
             Item(
                 id: "key",
-                name: "key",
+                .name("key"),
                 .in(.player),
-                attributes: [
-                    .adjectives: .stringSet(["rusty", "small"]),
-                    .isTakable: true
-                ]
+                .adjectives("rusty", "small"),
+                .isTakable
             ),
             Item(
                 id: "lantern",
-                name: "lantern",
-                parent: .location(roomID),
-                attributes: [
-                    .adjectives: .stringSet(["brass"]),
-                    .synonyms: .stringSet(["lamp"]),
-                    .isLightSource: true,
-                    .isOpenable: true
-                ]
+                .name("lantern"),
+                .in(.location(roomID)),
+                .adjectives("brass"),
+                .synonyms("lamp"),
+                .isLightSource,
+                .isOpenable
             ),
             Item(
                 id: "lantern2",
-                name: "lantern",
-                parent: .location(roomID),
-                attributes: [
-                    .adjectives: .stringSet(["rusty"]),
-                    .isLightSource: true
-                ]
+                .name("lantern"),
+                .in(.location(roomID)),
+                .adjectives("rusty"),
+                .isLightSource
             ),
             Item(
                 id: "leaflet",
-                name: "leaflet",
+                .name("leaflet"),
                 .in(.player),
-                attributes: [
-                    .isTakable: true,
-                    .isReadable: true
-                ]
+                .isTakable,
+                .isReadable
             ),
             Item(
                 id: "note",
-                name: "note",
-                parent: .item("chest"),
-                attributes: [
-                    .isTakable: true,
-                    .isReadable: true
-                ]
+                .name("note"),
+                .in(.item("chest")),
+                .isTakable,
+                .isReadable
             ),
             Item(
                 id: "orb",
-                name: "orb",
-                parent: .nowhere,
-                attributes: [
-                    .adjectives: .stringSet(["glowing"]),
-                    .isTakable: true,
-                    .isLightSource: true
-                ]
+                .name("orb"),
+                .in(.nowhere),
+                .adjectives("glowing"),
+                .isTakable,
+                .isLightSource
             ),
             Item(
                 id: "rug",
-                name: "rug",
+                .name("rug"),
                 .in(.nowhere)
             ),
             Item(
                 id: "sword",
-                name: "sword",
-                parent: .location(roomID),
-                attributes: [
-                    .isTakable: true
-                ]
+                .name("sword"),
+                .in(.location(roomID)),
+                .isTakable
             ),
             Item(
                 id: "table",
-                name: "table",
-                parent: .location(roomID),
-                attributes: [
-                    .adjectives: .stringSet(["sturdy"]),
-                    .isSurface: true
-                ]
+                .name("table"),
+                .in(.location(roomID)),
+                .adjectives("sturdy"),
+                .isSurface
             ),
             Item(
                 id: "tray",
-                name: "tray",
+                .name("tray"),
                 .in(.player),
-                attributes: [
-                    .adjectives: .stringSet(["silver"]),
-                    .isSurface: true,
-                    .isTakable: true
-                ]
+                .adjectives("silver"),
+                .isSurface,
+                .isTakable
             ),
             Item(
                 id: "widget",
-                name: "widget",
-                parent: .item("box"),
-                attributes: [
-                    .isTakable: true
-                ]
+                .name("widget"),
+                .in(.item("box")),
+                .isTakable
             ),
         ]
 
@@ -209,9 +177,9 @@ struct StandardParserTests {
         let locations = [
             Location(
                 id: roomID,
-                name: "Room",
-                description: "A room.",
-                attributes: [.localGlobals: .itemIDSet(["rug"])] // Globals remain associated with location
+                .name("Room"),
+                .description("A room."),
+                .localGlobals("rug")
             )
             // Add more locations later if needed
         ]
@@ -691,27 +659,21 @@ struct StandardParserTests {
         var itemsDict = self.gameState.items // Base items copy
         let tempKeyInBackpack = Item(
             id: "tempKeyInBackpack",
-            name: "key",
-            parent: .item("backpack"),
-            attributes: [
-                .adjectives: .stringSet(["temp"])
-            ]
+            .name("key"),
+            .in(.item("backpack")),
+            .adjectives("temp")
         )
         let tempKeyOnGround = Item(
             id: "tempKeyOnGround",
-            name: "key",
+            .name("key"),
             .in(.location("startRoom")),
-            attributes: [
-                .adjectives: .stringSet(["temp"])
-            ]
+            .adjectives("temp")
         )
         let permKey = Item(
             id: "permKey",
-            name: "key",
+            .name("key"),
             .in(.location("startRoom")),
-            attributes: [
-                .adjectives: .stringSet(["perm"])
-            ]
+            .adjectives("perm")
         )
         itemsDict[tempKeyInBackpack.id] = tempKeyInBackpack
         itemsDict[tempKeyOnGround.id] = tempKeyOnGround
@@ -743,7 +705,7 @@ struct StandardParserTests {
 
         // Should resolve to the original 'key' which is rusty and held by player.
         #expect(commandSpecific.directObject == "key")
-        #expect(Set(commandSpecific.directObjectModifiers) == Set(["rusty"]))
+        #expect(commandSpecific.directObjectModifiers == ["rusty"])
         // No need to clean up temp state as it was local to the test
     }
 

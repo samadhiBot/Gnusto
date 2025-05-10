@@ -42,7 +42,7 @@ struct ExitTests {
         let exit = Exit(destination: destination, doorID: "jailCellDoor")
         let door = Item(
             id: "jailCellDoor",
-            name: "Jail cell door",
+            .name("Jail cell door"),
             .lockKey(keyID)
         )
         #expect(exit.destination == destination)

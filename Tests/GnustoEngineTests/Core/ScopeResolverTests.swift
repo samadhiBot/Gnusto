@@ -63,7 +63,7 @@ struct ScopeResolverTests {
     func testIsLitPlayerInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let inactiveLamp = Item(
@@ -114,7 +114,7 @@ struct ScopeResolverTests {
     func testIsLitRoomInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let inactiveLamp = Item(
@@ -209,7 +209,7 @@ struct ScopeResolverTests {
         // Explicitly create a dark room
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
             // No .inherentlyLit property
         )
@@ -404,7 +404,7 @@ struct ScopeResolverTests {
     func testReachableDarkRoom() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let locationItem = Item(
@@ -605,7 +605,7 @@ struct ScopeResolverTests {
     func testReachableContainerDarkRoom() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let openBox = Item(
@@ -642,7 +642,7 @@ struct ScopeResolverTests {
     func testVisibleItemsRoomInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let inactiveLamp = Item(

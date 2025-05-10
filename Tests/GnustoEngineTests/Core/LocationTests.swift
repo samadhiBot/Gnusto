@@ -13,7 +13,7 @@ struct LocationTests {
     func createDefaultLocation() -> Location {
         Location(
             id: defaultLocationID,
-            name: defaultLocationName,
+            .name(defaultLocationName),
             .description("A nondescript room.")
         )
     }
@@ -23,7 +23,7 @@ struct LocationTests {
         let eastExit = Exit(destination: "nowhere", blockedMessage: "A solid wall blocks your path.")
         return Location(
             id: "livingRoom",
-            name: "Living Room",
+            .name("Living Room"),
             .description("A comfortably furnished living room. There are exits west and east."),
             .exits([.west: westExit, .east: eastExit]),
             .inherentlyLit,
@@ -144,7 +144,7 @@ struct LocationTests {
         let originalDescValue = location1.attributes[.description] // Capture original dynamic value
 
         // Modify the copy (location2)
-        location2.name = "Renamed Room"
+        location2.attributes[.name] = "Renamed Room"
         location2.attributes[.isVisited] = true
         // Set dynamic value for description
         location2.attributes[.description] = .string("An updated room.")

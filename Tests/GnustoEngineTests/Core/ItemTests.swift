@@ -13,7 +13,7 @@ struct ItemTests {
     func createDefaultItem() -> Item {
         Item(
             id: defaultItemID,
-            name: defaultItemName
+            .name(defaultItemName)
         )
     }
 
@@ -21,7 +21,6 @@ struct ItemTests {
         // Let's assume this custom item starts directly held by the player
         Item(
             id: "customItem",
-            name: "lantern",
             .adjectives("brass", "shiny"),
             .capacity(5),
             .description("A sturdy brass lantern."),
@@ -31,6 +30,7 @@ struct ItemTests {
             .isOn,
             .isOpenable,
             .isTakable,
+            .name("lantern"),
             .readText("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
             .readWhileHeldText("It feels warm."),
             .shortDescription("The brass lantern is here."),
@@ -148,7 +148,7 @@ struct ItemTests {
         var item2 = item1 // Assign creates a copy for structs
 
         // Modify the copy (item2)
-        item2.name = "modified thing"
+        item2.attributes[.name] = "modified thing"
         item2.attributes[.isInvisible] = true
         item2.attributes[.parentEntity] = .parentEntity(.location("limbo"))
 

@@ -19,19 +19,17 @@ struct MinimalGame: GameBlueprint {
         let gameLocations = locations ?? [
             Location(
                 id: "startRoom",
-                name: "Void",
-                description: "An empty void.",
-                isLit: true
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
             )
         ]
         let gameItems = items ?? [
             Item(
                 id: "startItem",
-                name: "pebble",
+                .name("pebble"),
                 .in(.location("startRoom")),
-                attributes: [
-                    .isTakable: true
-                ]
+                .isTakable
             )
         ]
 
