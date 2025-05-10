@@ -12,12 +12,10 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            parent: .player,
-            attributes: [
-                .isTakable: true,
-                .isWearable: true,
-                .isWorn: true
-            ]
+            .in(.player),
+            .isTakable,
+            .isWearable,
+            .isWorn,
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -81,11 +79,9 @@ struct RemoveActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "cloak",
-            parent: .player,
-            attributes: [
-                .isTakable: true,
-                .isWearable: true
-            ]
+            .in(.player),
+            .isTakable,
+            .isWearable,
         )
         let game = MinimalGame(items: [cloak])
         let engine = await GameEngine(
@@ -122,7 +118,7 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
-             try await handler.validate(
+            try await handler.validate(
                 context: ActionContext(
                     command: command,
                     engine: engine,
@@ -147,7 +143,7 @@ struct RemoveActionHandlerTests {
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
-             try await handler.validate(
+            try await handler.validate(
                 context: ActionContext(
                     command: command,
                     engine: engine,
@@ -163,12 +159,10 @@ struct RemoveActionHandlerTests {
         let amulet = Item(
             id: "amulet",
             name: "cursed amulet",
-            parent: .player,
-            attributes: [
-                .isWearable: true,
-                .isWorn: true,
-                .isFixed: true
-            ]
+            .in(.player),
+            .isFixed,
+            .isWearable,
+            .isWorn,
         )
         let game = MinimalGame(items: [amulet])
         let engine = await GameEngine(

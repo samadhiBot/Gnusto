@@ -10,17 +10,13 @@ struct PutOnActionHandlerTests {
     let book = Item(
         id: "book",
         name: "heavy book",
-        attributes: [
-            .isTakable: true,
-        ]
+        .isTakable
     )
 
     let table = Item(
         id: "table",
         name: "sturdy table",
-        attributes: [
-            .isSurface: true,
-        ]
+        .isSurface
     )
 
     // --- Helper ---

@@ -37,18 +37,20 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Bright Room",
-            description: "A brightly lit room.",
-            isLit: true
+            .description("A brightly lit room."),
+            .inherentlyLit
         )
         let item1 = Item(
             id: "table",
             name: "wooden table",
-            parent: .location("litRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("litRoom")),
+            .isSurface
         )
-        let item2 = Item(id: "rug", name: "woven rug", parent: .location("litRoom"))
+        let item2 = Item(
+            id: "rug",
+            name: "woven rug",
+            .in(.location("litRoom"))
+        )
 
         let game = MinimalGame(player: Player(in: "litRoom"), locations: [litRoom], items: [item1, item2])
         let mockIO = await MockIOHandler()
@@ -84,28 +86,28 @@ struct LookActionHandlerTests {
         let litRoom = Location(
             id: "litRoom",
             name: "Test Room",
-            description: "A basic room.",
-            isLit: true
+            .description("A basic room."),
+            .inherentlyLit
         )
         let item1 = Item(
             id: "apple",
             name: "apple",
-            parent: .location("litRoom")
+            .in(.location("litRoom"))
         )
         let item2 = Item(
             id: "banana",
             name: "banana",
-            parent: .location("litRoom")
+            .in(.location("litRoom"))
         )
         let item3 = Item(
             id: "pear",
             name: "pear",
-            parent: .location("litRoom")
+            .in(.location("litRoom"))
         )
         let item4 = Item(
             id: "orange",
             name: "orange",
-            parent: .location("litRoom")
+            .in(.location("litRoom"))
         )
 
         let game = MinimalGame(
@@ -147,9 +149,13 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            description: "You see nothing." // inherentlyLit defaults false
+            .description("You see nothing.") // inherentlyLit defaults false
         )
-        let item1 = Item(id: "shadow", name: "shadow", parent: .location("darkRoom"))
+        let item1 = Item(
+            id: "shadow",
+            name: "shadow",
+            .in(.location("darkRoom"))
+        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -185,18 +191,20 @@ struct LookActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            description: "A dark, damp room."
+            .description("A dark, damp room.")
         )
         let activeLamp = Item(
             id: "lamp",
             name: "brass lamp",
-            parent: .player,
-            attributes: [
-                .isLightSource: true,
-                .isOn: true
-            ]
+            .in(.player),
+            .isLightSource,
+            .isOn
         )
-        let item1 = Item(id: "table", name: "wooden table", parent: .location(darkRoom.id))
+        let item1 = Item(
+            id: "table",
+            name: "wooden table",
+            .in(.location(darkRoom.id))
+        )
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -237,7 +245,7 @@ struct LookActionHandlerTests {
             id: "litRoom",
             name: "Plain Room",
             // No description provided - should be nil by default
-            isLit: true
+            .inherentlyLit
         )
 
         let game = MinimalGame(
@@ -273,8 +281,8 @@ struct LookActionHandlerTests {
             id: "dynamicRoom",
             name: "Magic Room",
             // Provide a default description; dynamic logic will override
-            description: "The room seems normal.",
-            isLit: true
+            .description("The room seems normal."),
+            .inherentlyLit
         )
 
         // MinimalGame takes flags as variadic arguments
@@ -291,7 +299,7 @@ struct LookActionHandlerTests {
         await engine.registerLocationCompute(key: .description) { location, gameState in
             let isFlagOn = gameState.flags.contains(flagId)
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
-                                  "The room seems normal via registry."
+            "The room seems normal via registry."
             return .string(text)
         }
 
@@ -331,8 +339,8 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "rock",
             name: "grey rock",
-            description: "Just a plain rock.",
-            parent: .location("startRoom")
+            .description("Just a plain rock."),
+            .in(.location("startRoom"))
         )
         let initialAttributes = item.attributes
 
@@ -372,10 +380,8 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "pebble",
             name: "smooth pebble",
-            parent: .location("startRoom"),
-            attributes: [
-                .firstDescription: "You notice a small pebble."
-            ]
+            .in(.location("startRoom")),
+            .firstDescription("You notice a small pebble.")
         )
         let initialAttributes = item.attributes
 
@@ -415,12 +421,10 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "stone",
             name: "chipped stone",
-            description: "A worn stone.",
-            parent: .location("startRoom"),
-            attributes: [
-                .firstDescription: "This shouldn't appear.",
-                .isTouched: true
-            ]
+            .description("A worn stone."),
+            .in(.location("startRoom")),
+            .firstDescription("This shouldn't appear."),
+            .isTouched
         )
         let initialAttributes = item.attributes
 
@@ -462,20 +466,16 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isOpen: true
-            ]
+            .in(.location("startRoom")),
+            .isContainer,
+            .isOpenable,
+            .isOpen
         )
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .item("box"),
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.item("box")),
+            .isTakable
         )
         let initialAttributes = box.attributes
 
@@ -515,19 +515,15 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isOpenable: true
-            ]
+            .in(.location("startRoom")),
+            .isContainer,
+            .isOpenable
         )
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            parent: .item("box"),
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.item("box")),
+            .isTakable
         )
         let initialAttributes = box.attributes
 
@@ -568,14 +564,16 @@ struct LookActionHandlerTests {
         let jar = Item(
             id: "jar",
             name: "glass jar",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isOpenable: true,
-                .isTransparent: true
-            ]
+            .in(.location("startRoom")),
+            .isContainer,
+            .isOpenable,
+            .isTransparent
         )
-        let fly = Item(id: "fly", name: "dead fly", parent: .item("jar"))
+        let fly = Item(
+            id: "fly",
+            name: "dead fly",
+            .in(.item("jar"))
+        )
         let initialAttributes = jar.attributes
 
         let game = MinimalGame(items: [jar, fly])
@@ -616,20 +614,20 @@ struct LookActionHandlerTests {
         let table = Item(
             id: "table",
             name: "kitchen table",
-            parent: .location("startRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("startRoom")),
+            .isSurface
         )
-        let book = Item(id: "book", name: "dusty book", parent: .item("table"))
+        let book = Item(
+            id: "book",
+            name: "dusty book",
+            .in(.item("table"))
+        )
         let candle = Item(
             id: "candle",
             name: "lit candle",
-            parent: .item("table"),
-            attributes: [
-                .isLightSource: true,
-                .isOn: true
-            ]
+            .in(.item("table")),
+            .isLightSource,
+            .isOn
         )
         let initialAttributes = table.attributes
 
@@ -673,7 +671,7 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "artifact",
             name: "glowing artifact",
-            parent: .location("otherRoom")
+            .in(.location("otherRoom"))
         )
         let room1 = Location(
             id: "startRoom",
@@ -683,7 +681,7 @@ struct LookActionHandlerTests {
         let room2 = Location(
             id: "otherRoom",
             name: "Other Room",
-            description: "A very dark room."
+            .description("A very dark room.")
         ) // inherentlyLit defaults false
 
         let game = MinimalGame(

@@ -11,12 +11,10 @@ struct ReadActionHandlerTests {
         let book = Item(
             id: "book",
             name: "dusty book",
-            parent: .player,
-            attributes: [
-                .readText: .string("It reads: \"Beware the Grue!\""),
-                .isTakable: true,
-                .isReadable: true
-            ]
+            .in(.player),
+            .readText("It reads: \"Beware the Grue!\""),
+            .isTakable,
+            .isReadable
         )
 
         let game = MinimalGame(items: [book])
@@ -46,19 +44,15 @@ struct ReadActionHandlerTests {
         let sign = Item(
             id: "sign",
             name: "warning sign",
-            parent: .location("litRoom"),
-            attributes: [
-                .readText: .string("DANGER AHEAD"),
-                .isReadable: true
-            ]
+            .in(.location("litRoom")),
+            .readText("DANGER AHEAD"),
+            .isReadable
         )
         let litRoom = Location(
             id: "litRoom",
             name: "Bright Room",
-            attributes: [
-                .description: .string("It's bright here."),
-                .inherentlyLit: true
-            ]
+            .description("It's bright here."),
+            .inherentlyLit
         )
 
         let game = MinimalGame(
@@ -125,11 +119,9 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            parent: .nowhere,
-            attributes: [
-                .readText: .string("Secrets within"),
-                .isReadable: true
-            ]
+            .in(.nowhere),
+            .readText("Secrets within"),
+            .isReadable
         )
 
         let game = MinimalGame(items: [scroll])
@@ -166,7 +158,7 @@ struct ReadActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            parent: .location("startRoom")
+            .in(.location("startRoom"))
         )
 
         let game = MinimalGame(items: [rock])
@@ -199,12 +191,10 @@ struct ReadActionHandlerTests {
         let map = Item(
             id: "map",
             name: "folded map",
-            parent: .location("darkRoom"),
-            attributes: [
-                .readText: .string("X marks the spot"),
-                .isTakable: true,
-                .isReadable: true
-            ]
+            .in(.location("darkRoom")),
+            .readText("X marks the spot"),
+            .isTakable,
+            .isReadable
         )
         let darkRoom = Location(
             id: "darkRoom",
@@ -248,12 +238,10 @@ struct ReadActionHandlerTests {
         let blankPaper = Item(
             id: "paper",
             name: "blank paper",
-            parent: .player,
-            attributes: [
-                .readText: .string(""),
-                .isTakable: true,
-                .isReadable: true
-            ]
+            .in(.player),
+            .readText(""),
+            .isTakable,
+            .isReadable
         )
 
         let game = MinimalGame(items: [blankPaper])
@@ -283,18 +271,16 @@ struct ReadActionHandlerTests {
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",
-            parent: .location("darkRoom"),
-            attributes: [
-                .readText: .string("Ancient Runes"),
-                .isLightSource: true,
-                .isOn: true,
-                .isReadable: true
-            ]
+            .in(.location("darkRoom")),
+            .isLightSource,
+            .isOn,
+            .isReadable,
+            .readText("Ancient Runes"),
         )
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            attributes: [.description: .string("It's dark.")]
+            .description("It's dark.")
         )
 
         let game = MinimalGame(
@@ -328,11 +314,9 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            parent: .location("startRoom"),
-            attributes: [
-                .readText: .string("Beware the Grue!"),
-                .isReadable: true
-            ]
+            .in(.location("startRoom")),
+            .readText("Beware the Grue!"),
+            .isReadable
         )
 
         let game = MinimalGame(items: [scroll])
@@ -365,11 +349,9 @@ struct ReadActionHandlerTests {
         let note = Item(
             id: "note",
             name: "blank note",
-            parent: .location("startRoom"),
-            attributes: [
-                .readText: .string(""),
-                .isReadable: true
-            ]
+            .in(.location("startRoom")),
+            .readText(""),
+            .isReadable
         )
 
         let game = MinimalGame(items: [note])
@@ -402,10 +384,8 @@ struct ReadActionHandlerTests {
         let tablet = Item(
             id: "tablet",
             name: "stone tablet",
-            parent: .location("startRoom"),
-            attributes: [
-                .isReadable: true
-            ]
+            .in(.location("startRoom")),
+            .isReadable
         )
 
         let game = MinimalGame(items: [tablet])
@@ -442,11 +422,9 @@ struct ReadActionHandlerTests {
         let book = Item(
             id: "book",
             name: "ancient book",
-            parent: .nowhere,
-            attributes: [
-                .readText: .string("Secrets within."),
-                .isReadable: true
-            ]
+            .in(.nowhere),
+            .readText("Secrets within."),
+            .isReadable
         )
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
@@ -472,7 +450,7 @@ struct ReadActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "plain rock",
-            parent: .location("startRoom")
+            .in(.location("startRoom"))
         )
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
@@ -503,11 +481,9 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             name: "ancient scroll",
-            parent: .location(darkRoom.id),
-            attributes: [
-                .readText: .string("Can't read this."),
-                .isReadable: true
-            ]
+            .in(.location(darkRoom.id)),
+            .readText("Can't read this."),
+            .isReadable
         )
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
         let mockIO = await MockIOHandler()
@@ -538,13 +514,11 @@ struct ReadActionHandlerTests {
         let glowingTablet = Item(
             id: "tablet",
             name: "glowing tablet",
-            parent: .location(darkRoom.id),
-            attributes: [
-                .readText: .string("Luminous secrets!"),
-                .isReadable: true,
-                .isLightSource: true,
-                .isOn: true
-            ]
+            .in(.location(darkRoom.id)),
+            .readText("Luminous secrets!"),
+            .isReadable,
+            .isLightSource,
+            .isOn
         )
 
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
@@ -555,7 +529,7 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-         #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
+        #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
         let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
 
@@ -598,21 +572,17 @@ struct ReadActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            parent: .player,
-            attributes: [
-                .isTakable: true,
-                .isContainer: true,
-                .isOpen: true
-            ]
+            .in(.player),
+            .isTakable,
+            .isContainer,
+            .isOpen
         )
         let note = Item(
             id: "note",
             name: "folded note",
-            parent: .item("box"),
-            attributes: [
-                .readText: .string("Meet at midnight."),
-                .isReadable: true
-            ]
+            .in(.item("box")),
+            .readText("Meet at midnight."),
+            .isReadable
         )
 
         let game = MinimalGame(items: [box, note])
@@ -643,20 +613,16 @@ struct ReadActionHandlerTests {
         let chest = Item(
             id: "chest",
             name: "iron chest",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isOpen: true
-            ]
+            .in(.location("startRoom")),
+            .isContainer,
+            .isOpen
         )
         let letter = Item(
             id: "letter",
             name: "sealed letter",
-            parent: .item("chest"),
-            attributes: [
-                .readText: .string("Important news."),
-                .isReadable: true
-            ]
+            .in(.item("chest")),
+            .readText("Important news."),
+            .isReadable
         )
 
         let game = MinimalGame(items: [chest, letter])
@@ -687,20 +653,16 @@ struct ReadActionHandlerTests {
         let lockedBox = Item(
             id: "lockedBox",
             name: "locked box",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true,
-                .isLockable: true
-            ]
+            .in(.location("startRoom")),
+            .isContainer,
+            .isLockable
         )
         let secret = Item(
             id: "secret",
             name: "secret paper",
-            parent: .item("lockedBox"),
-            attributes: [
-                .readText: .string("Top Secret!"),
-                .isReadable: true
-            ]
+            .in(.item("lockedBox")),
+            .readText("Top Secret!"),
+            .isReadable
         )
 
         let game = MinimalGame(items: [lockedBox, secret])

@@ -95,7 +95,7 @@ struct ExamineActionHandlerTests {
         let room = Location(
             id: roomID,
             name: "Garden",
-            isLit: true
+            .inherentlyLit
         )
         let game = MinimalGame(
             player: Player(in: roomID),
@@ -141,12 +141,12 @@ struct ExamineActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            isLit: true
+            .inherentlyLit
         )
         let farRoom = Location(
             id: "farAwayRoom",
             name: "Far Room",
-            isLit: true
+            .inherentlyLit
         )
         let game = MinimalGame(
             locations: [startRoom, farRoom],
@@ -184,12 +184,12 @@ struct ExamineActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            isLit: true
+            .inherentlyLit
         )
         let farRoom = Location(
             id: "farAwayRoom",
             name: "Far Room",
-            isLit: true
+            .inherentlyLit
         )
         let game = MinimalGame(
             locations: [startRoom, farRoom],

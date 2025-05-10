@@ -11,10 +11,8 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let initialParent = testItem.parent
         let initialTouched = testItem.hasFlag(.isTouched)
@@ -87,10 +85,8 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "key",
             name: "brass key",
-            parent: .location("startRoom"),
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.location("startRoom")),
+            .isTakable
         )
 
         let game = MinimalGame(items: [testItem])
@@ -128,12 +124,10 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "cloak",
             name: "dark cloak",
-            parent: .player,
-            attributes: [
-                .isTakable: true,
-                .isWearable: true,
-                .isWorn: true
-            ]
+            .in(.player),
+            .isTakable,
+            .isWearable,
+            .isWorn
         )
         let initialParent = testItem.parent
         let initialTouched = testItem.hasFlag(.isTouched)
@@ -186,10 +180,8 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "sword-in-stone",
             name: "sword in stone",
-            parent: .player, // Hypothetically held
-            attributes: [
-                .isFixed: true
-            ]
+            .in(.player), // Hypothetically held
+            .isFixed
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
