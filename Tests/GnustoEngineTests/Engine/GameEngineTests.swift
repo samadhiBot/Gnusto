@@ -616,7 +616,10 @@ struct GameEngineTests {
             .isOn,
             .in(.location("startRoom"))
         )
-        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey.rawValue) // Pass rawValue if handler needs string
+        let mockEnhancedHandler = MockMultiChangeHandler(
+            itemIDToModify: testItemID,
+            flagToSet: testFlagKey.rawValue
+        ) // Pass rawValue if handler needs string
         let startRoom = Location(
             id: "startRoom",
             .name("Start Room"),

@@ -99,32 +99,58 @@ struct LocationTests {
         var location = createDefaultLocation()
 
         #expect(!location.hasFlag(.inherentlyLit)) // isInherentlyLit is false by default
-        #expect(location.attributes.count == 3) // Only inherentlyLit
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room."
+        ])
 
         location.attributes[.inherentlyLit] = true
         #expect(location.hasFlag(.inherentlyLit))
-        #expect(location.attributes.count == 3)
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+            .inherentlyLit: true,
+        ])
 
         location.attributes[.inherentlyLit] = true // Setting again should have no effect on count
-        #expect(location.attributes.count == 3)
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+            .inherentlyLit: true,
+        ])
 
         location.attributes[.isOutside] = true
         #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes.count == 4)
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+            .inherentlyLit: true,
+            .isOutside: true,
+        ])
 
         location.attributes[.inherentlyLit] = false // Set back to false, don't remove the key
         #expect(!location.hasFlag(.inherentlyLit))
         #expect(location.hasFlag(.isOutside))
-        #expect(location.attributes.count == 4)
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+            .inherentlyLit: false,
+            .isOutside: true,
+        ])
 
         location.attributes[.inherentlyLit] = nil // Remove the key entirely
         #expect(!location.hasFlag(.inherentlyLit)) // Still false
-        #expect(location.attributes.count == 3) // Count decreases
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+            .isOutside: true,
+        ])
 
         location.attributes[.isOutside] = nil // Remove the other key
         #expect(!location.hasFlag(.isOutside))
         #expect(location.attributes == [
-            .localGlobals: .itemIDSet([])
+            .name: "Room",
+            .description: "A nondescript room.",
         ])
     }
 

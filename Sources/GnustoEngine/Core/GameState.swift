@@ -571,41 +571,4 @@ public struct GameState: Codable, Equatable, Sendable {
             throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
         }
     }
-
-//    // MARK: - Codable Conformance (Ensure it matches actual property types)
-//
-//    enum CodingKeys: String, CodingKey {
-//        case items, locations, flags, player, activeFuses, activeDaemons, pronouns, gameSpecificState, changeHistory, vocabulary
-//        // Removed gameID as it wasn't in the read_file output's property list
-//    }
-//
-//    public init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        items = try container.decode([ItemID: Item].self, forKey: .items)
-//        locations = try container.decode([LocationID: Location].self, forKey: .locations)
-//        flags = try container.decodeIfPresent(Set<FlagID>.self, forKey: .flags) ?? []
-//        player = try container.decode(Player.self, forKey: .player)
-//        activeFuses = try container.decodeIfPresent([FuseID: Int].self, forKey: .activeFuses) ?? [:]
-//        activeDaemons = try container.decodeIfPresent(Set<DaemonID>.self, forKey: .activeDaemons) ?? []
-//        pronouns = try container.decodeIfPresent([String: Set<ItemID>].self, forKey: .pronouns) ?? [:]
-//        gameSpecificState = try container.decodeIfPresent([GameStateID: StateValue].self, forKey: .gameSpecificState) ?? [:] // Keep AnyCodable
-//        changeHistory = try container.decodeIfPresent([StateChange].self, forKey: .changeHistory) ?? []
-//        vocabulary = try container.decode(Vocabulary.self, forKey: .vocabulary)
-//        // Removed gameID decoding
-//    }
-//
-//    public func encode(to encoder: Encoder) throws {
-//        var container = encoder.container(keyedBy: CodingKeys.self)
-//        try container.encode(items, forKey: .items)
-//        try container.encode(locations, forKey: .locations)
-//        try container.encodeIfPresent(flags.isEmpty ? nil : flags, forKey: .flags)
-//        try container.encode(player, forKey: .player)
-//        try container.encodeIfPresent(activeFuses.isEmpty ? nil : activeFuses, forKey: .activeFuses)
-//        try container.encodeIfPresent(activeDaemons.isEmpty ? nil : activeDaemons, forKey: .activeDaemons)
-//        try container.encodeIfPresent(pronouns.isEmpty ? nil : pronouns, forKey: .pronouns)
-//        try container.encodeIfPresent(gameSpecificState.isEmpty ? nil : gameSpecificState, forKey: .gameSpecificState) // Keep AnyCodable
-//        try container.encodeIfPresent(changeHistory.isEmpty ? nil : changeHistory, forKey: .changeHistory)
-//        try container.encode(vocabulary, forKey: .vocabulary)
-//        // Removed gameID encoding
-//    }
 }
