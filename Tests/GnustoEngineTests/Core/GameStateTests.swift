@@ -124,7 +124,7 @@ struct GameStateTests {
         #expect(state.locations["startRoom"]?.name == "Starting Room")
         #expect(state.player.currentLocationID == "startRoom")
         #expect(state.globalState["gameStarted"] == true)
-        #expect(state.globalState["testFlag"] == false)
+        #expect(state.globalState["testFlag"] == nil)
         #expect(state.pronouns["it"] == ["testItem"])
         #expect(state.activeFuses.count == 1)
         #expect(state.activeDaemons.count == 1)

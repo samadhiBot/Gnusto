@@ -19,7 +19,7 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
@@ -38,7 +38,8 @@ struct LookActionHandlerTests {
             id: "litRoom",
             .name("Bright Room"),
             .description("A brightly lit room."),
-            .inherentlyLit
+            .inherentlyLit,
+            .localGlobals("ceiling")
         )
         let item1 = Item(
             id: "table",
@@ -51,8 +52,22 @@ struct LookActionHandlerTests {
             .name("woven rug"),
             .in(.location("litRoom"))
         )
+        let item3 = Item(
+            id: "chair",
+            .name("modern looking chair"),
+            .in(.location("litRoom"))
+        )
+        let item4 = Item(
+            id: "ceiling",
+            .name("vaulted ceiling"),
+            .isScenery
+        )
 
-        let game = MinimalGame(player: Player(in: "litRoom"), locations: [litRoom], items: [item1, item2])
+        let game = MinimalGame(
+            player: Player(in: "litRoom"),
+            locations: [litRoom],
+            items: [item1, item2, item3, item4]
+        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
@@ -73,7 +88,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             --- Bright Room ---
             A brightly lit room.
-            You can see a woven rug here.
+            You can see a modern looking chair, a woven rug, and a wooden table here.
             """
         )
         // Assert No State Change
@@ -398,7 +413,7 @@ struct LookActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You notice a small pebble.")
+        expectNoDifference(output, "You see nothing special about the smooth pebble.")
 
         // Assert Final State
         let finalItemState = await engine.item("pebble")
@@ -443,6 +458,17 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "A worn stone.")
 
+        // Only change is pronoun change
+        #expect(await engine.gameState.changeHistory == [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet(["stone"])
+            )
+        ])
+        #expect(await engine.gameState.changeHistory.count == 1)
+
         // Assert Final State (remains touched)
         let finalItemState = await engine.item("stone")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should still be marked touched")
@@ -450,7 +476,7 @@ struct LookActionHandlerTests {
         // Assert Change History (Should be empty)
         let expectedChanges = expectedLookChanges(itemID: "stone", initialAttributes: initialAttributes)
         #expect(expectedChanges.isEmpty == true)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.count == 1)
     }
 
     // TODO: Add tests for LOOK AT container (open/closed/transparent) and surface
@@ -462,6 +488,7 @@ struct LookActionHandlerTests {
             id: "box",
             .name("wooden box"),
             .in(.location("startRoom")),
+            .description("On its lid is a rough carving of a skull."),
             .isContainer,
             .isOpenable,
             .isOpen
@@ -492,7 +519,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A wooden box. The wooden box contains a gold coin.")
+        expectNoDifference(
+            output,
+            "On its lid is a rough carving of a skull. The wooden box contains a gold coin."
+        )
 
         // Assert Final State (Container marked touched)
         let finalItemState = await engine.item("box")
@@ -509,10 +539,11 @@ struct LookActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            .name("wooden box"),
+            .description("On its lid is a rough carving of a skull."),
             .in(.location("startRoom")),
             .isContainer,
-            .isOpenable
+            .isOpenable,
+            .name("wooden box"),
         )
         let coin = Item(
             id: "coin",
@@ -541,7 +572,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A wooden box. The wooden box is closed.")
+        expectNoDifference(
+            output,
+            "On its lid is a rough carving of a skull. The wooden box is closed."
+        )
 
         // Assert Final State (Container marked touched)
         let finalItemState = await engine.item("box")
@@ -560,6 +594,7 @@ struct LookActionHandlerTests {
             id: "jar",
             .name("glass jar"),
             .in(.location("startRoom")),
+            .description("An old canning jar, probably from the 1940s."),
             .isContainer,
             .isOpenable,
             .isTransparent
@@ -591,7 +626,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
-        expectNoDifference(output, "A glass jar. The glass jar contains a dead fly.")
+        expectNoDifference(
+            output,
+            "An old canning jar, probably from the 1940s. The glass jar contains a dead fly."
+        )
 
         // Assert Final State (Container marked touched)
         let finalItemState = await engine.item("jar")
@@ -609,6 +647,7 @@ struct LookActionHandlerTests {
         let table = Item(
             id: "table",
             .name("kitchen table"),
+            .description("A shabby wooden table, worn from years of use."),
             .in(.location("startRoom")),
             .isSurface
         )
@@ -645,7 +684,7 @@ struct LookActionHandlerTests {
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            A kitchen table. \
+            A shabby wooden table, worn from years of use. \
             On the kitchen table is a dusty book and a lit candle.
             """
         )
