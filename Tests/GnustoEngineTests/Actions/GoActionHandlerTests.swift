@@ -11,14 +11,12 @@ struct GoActionHandlerTests {
     func testGoNorth() async throws {
         let startRoom = Location(
             id: "startRoom",
-            .name("Start Room"),
             .description("You are here."),
             .exits([.north: Exit(destination: "end")]),
             .inherentlyLit
         )
         let endRoom = Location(
             id: "end",
-            .name("End Room"),
             .description("You went there."),
             .inherentlyLit
         )
@@ -50,7 +48,6 @@ struct GoActionHandlerTests {
     func testGoNorthBlocked() async throws {
         let startRoom = Location(
             id: "startRoom",
-            .name("Start Room"),
             .description("You are here."),
             .exits([
                 .north: Exit(
@@ -61,7 +58,6 @@ struct GoActionHandlerTests {
         )
         let endRoom = Location(
             id: "end",
-            .name("End Room"),
             .description("You went there.")
         )
 
@@ -101,12 +97,10 @@ struct GoActionHandlerTests {
     func testGoNorthNoExit() async throws {
         let startRoom = Location(
             id: "startRoom",
-            .name("Start Room"),
             .description("You are here.")
         )
         let endRoom = Location(
             id: "end",
-            .name("End Room"),
             .description("You went there.")
         )
 
@@ -147,14 +141,12 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            .name("Foyer"),
             .description("A grand foyer."),
             .exits([.north: Exit(destination: "hall")]),
             .inherentlyLit
         )
         let hall = Location(
             id: "hall",
-            .name("Hall"),
             .description("A long hall."),
             .inherentlyLit
         )
@@ -176,7 +168,6 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            .name("Foyer"),
             .description("A grand foyer."),
             .inherentlyLit
             // No exit north
@@ -201,7 +192,6 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            .name("Foyer"),
             .description("A grand foyer."),
             .exits([
                 .north: Exit(
@@ -213,7 +203,6 @@ struct GoActionHandlerTests {
         )
         let vaultDoor = Item(
             id: "vaultDoor",
-            .name("door to the vault"),
             .description("""
                 A massive, reinforced steel door dominates one wall of the grand foyer.
                 """),
@@ -222,7 +211,6 @@ struct GoActionHandlerTests {
         )
         let vault = Location(
             id: "vault",
-            .name("Vault"),
             .description("A secure vault."),
             .inherentlyLit
         )
@@ -254,7 +242,6 @@ struct GoActionHandlerTests {
 
         let foyer = Location(
             id: "foyer",
-            .name("Foyer"),
             .description("A grand foyer."),
             // Initially, the exit does not exist if the condition is not met
             .exits([:]),
@@ -262,7 +249,6 @@ struct GoActionHandlerTests {
         )
         let garden = Location(
             id: "garden",
-            .name("Garden"),
             .description("A beautiful garden."),
             .inherentlyLit
         )
@@ -339,7 +325,6 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            .name("Foyer"),
             .description("A grand foyer."),
             .inherentlyLit
         )

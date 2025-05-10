@@ -5,11 +5,14 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The item's unique identifier.
     public let id: ItemID
 
-    /// A dictionary that holds the item's current attributes.
-    ///
-    /// Some attributes are static under normal circumstances, but any can change when necessary.
+    /// A dictionary that holds all of the item's mutable attributes.
     public var attributes: [AttributeID: StateValue]
-
+    
+    /// Creates a new `Item` instance.
+    ///
+    /// - Parameters:
+    ///   - id: The item's unique identifier.
+    ///   - attributes: All of the item's attributes.
     public init(
         id: ItemID,
         _ attributes: ItemAttribute...
@@ -19,24 +22,6 @@ public struct Item: Codable, Identifiable, Sendable {
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
     }
-
-//    @available(*, deprecated,
-//         renamed: "init(id:name:description:parent:_:)",
-//         message: "Please switch to the new syntax."
-//    )
-//    public init(
-//        id: ItemID,
-//        name: String,
-//        description: String,
-//        parent: ParentEntity = .nowhere,
-//        attributes: [AttributeID: StateValue] = [:]
-//    ) {
-//        self.id = id
-//        self.name = name
-//        self.attributes = attributes
-//        self.attributes[.description] = .string(description)
-//        self.attributes[.parentEntity] = .parentEntity(parent)
-//    }
 
     // MARK: - Convenience Accessors
 

@@ -239,14 +239,12 @@ struct UnlockActionHandlerTests {
         // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(
             id: "pebble",
-            .name("pebble"),
             .in(.location("startRoom"))
         ) // Not lockable
         let key = Item(
             id: "key",
-            .name("key"),
             .in(.player),
-            .isTakable,
+            .isTakable
         )
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
@@ -323,9 +321,8 @@ struct UnlockActionHandlerTests {
         )
         let key = Item(
             id: "key",
-            .name("key"),
             .in(.player),
-            .isTakable,
+            .isTakable
         )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()

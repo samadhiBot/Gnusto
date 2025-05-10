@@ -5,13 +5,16 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     /// The unique identifier for this location.
     public let id: LocationID
 
-    /// A dictionary that holds the location's current attributes.
-    ///
-    /// Some attributes are static under normal circumstances, but any can change when necessary.
+    /// A dictionary that holds all of the location's mutable attributes.
     public var attributes: [AttributeID: StateValue]
 
     // MARK: - Initializer
 
+    /// Creates a new `Location` instance.
+    ///
+    /// - Parameters:
+    ///   - id: The location's unique identifier.
+    ///   - attributes: All of the location's attributes.
     public init(
         id: LocationID,
         _ attributes: LocationAttribute...
@@ -21,30 +24,6 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
     }
-
-    //    @available(*, deprecated,
-    //        renamed: "init(id:name:description:exits:_:)",
-    //        message: "Please switch to the new syntax."
-    //    )
-    //    public init(
-    //        id: LocationID,
-    //        name: String,
-    //        description: String,
-    //        exits: [Direction: Exit] = [:],
-    //        isLit: Bool = false,
-    //        attributes: [AttributeID: StateValue] = [:]
-    //    ) {
-    //        self.id = id
-    //        self.name = name
-    //        self.attributes = attributes
-    //        self.attributes[.description] = .string(description)
-    //        if !exits.isEmpty {
-    //            self.attributes[.locationExits] = .locationExits(exits)
-    //        }
-    //        self.attributes[.inherentlyLit] = .bool(
-    //            isLit || (attributes[.inherentlyLit]?.toBool ?? false)
-    //        )
-    //    }
 
     // MARK: - Convenience Accessors
 
