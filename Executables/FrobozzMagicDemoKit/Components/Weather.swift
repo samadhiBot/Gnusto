@@ -10,7 +10,7 @@ extension Components {
             /// ID for the weather daemon
             static let weatherDaemonID: DaemonID = "weatherDaemon"
 
-            /// Key for weather state in gameSpecificState
+            /// Key for weather state in globalState
             static let weatherStateKey = "weatherState"
         }
 

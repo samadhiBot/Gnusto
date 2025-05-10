@@ -582,8 +582,8 @@ struct GameEngineTests {
                     newValue: true,
                 )
 
-                // Get old flag value from snapshot using FlagID and engine helper
-                let flagID = FlagID(flagToSet)
+                // Get old flag value from snapshot using GlobalID and engine helper
+                let flagID = GlobalID(rawValue: flagToSet)
                 // Use the engine context to check the flag state before the change
                 let actualOldFlagValue = await context.engine.isFlagSet(flagID)
                 let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
@@ -607,7 +607,7 @@ struct GameEngineTests {
         }
 
         let testItemID: ItemID = "lamp"
-        let testFlagKey: FlagID = "lampLit" // Use FlagID type
+        let testFlagKey: GlobalID = "lampLit" // Use GlobalID type
         let lamp = Item(
             id: testItemID,
             .name("brass lamp"),

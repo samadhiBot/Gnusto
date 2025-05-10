@@ -149,12 +149,12 @@ struct ActionResultTests {
     func testStateChangeInitializationGameSpecific() {
         let change = StateChange(
             entityID: .global,
-            attributeKey: .gameSpecificState(key: "puzzleCounter"),
+            attributeKey: .globalState(key: "puzzleCounter"),
             oldValue: StateValue.int(5),
             newValue: StateValue.int(6)
         )
 
-        #expect(change.attributeKey == AttributeKey.gameSpecificState(key: "puzzleCounter"))
+        #expect(change.attributeKey == AttributeKey.globalState(key: "puzzleCounter"))
         #expect(change.newValue == StateValue.int(6))
     }
 
@@ -228,7 +228,7 @@ struct ActionResultTests {
             .playerScore,
             .playerLocation,
             .setFlag("testFlag"),
-            .gameSpecificState(key: "testCounter")
+            .globalState(key: "testCounter")
         ]
 
         for key in keys {

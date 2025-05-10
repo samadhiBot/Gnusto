@@ -238,8 +238,8 @@ struct GoActionHandlerTests {
     func testGoFailsWithConditionalExit() async throws {
         // Arrange
         let conditionFlagKey = "gateOpen"
-        // Flags use FlagID, not AttributeID - requires explicit type annotation
-        let conditionFlagID = FlagID(conditionFlagKey)
+        // Flags use GlobalID, not AttributeID - requires explicit type annotation
+        let conditionGlobalID = GlobalID(rawValue: conditionFlagKey)
 
         let foyer = Location(
             id: "foyer",
@@ -257,7 +257,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Check flags set using contains
-        #expect(await engine.gameState.flags.contains(conditionFlagID) == false)
+        #expect(await engine.gameState.globalState[conditionGlobalID] == false)
 
         let command = Command(verbID: "go", direction: .east, rawInput: "go east")
 
@@ -273,8 +273,8 @@ struct GoActionHandlerTests {
     func testGoSucceedsWithConditionalExit() async throws {
         // Arrange
         let conditionFlagKey = "gateOpen"
-        // Flags use FlagID, not AttributeID - requires explicit type annotation
-        let conditionFlagID = FlagID(conditionFlagKey)
+        // Flags use GlobalID, not AttributeID - requires explicit type annotation
+        let conditionGlobalID = GlobalID(conditionFlagKey)
 
         var foyer = Location( // Make foyer mutable to add the exit later
             id: "foyer",
@@ -297,14 +297,14 @@ struct GoActionHandlerTests {
         let change = StateChange(
             entityID: .global, // Use .global for game-specific flags
             // Use .setFlag property key
-            attributeKey: .setFlag(conditionFlagID),
+            attributeKey: .setFlag(conditionGlobalID),
             oldValue: false, // Expect flag was not set
             newValue: true, // Set flag to true
         )
 //        try await engine.TEST_ONLY_applyStateChange(change)
 
         // Check flags set using contains
-        #expect(await engine.gameState.flags.contains(conditionFlagID))
+        #expect(await engine.gameState.flags.contains(conditionGlobalID))
 
         // Manually add the exit now that the condition is met
         foyer.exits[.east] = Exit(destination: "garden")

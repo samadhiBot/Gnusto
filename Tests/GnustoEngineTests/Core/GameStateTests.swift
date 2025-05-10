@@ -73,14 +73,13 @@ struct GameStateTests {
         let items = createSampleItems()
         let locations = createSampleLocations()
         let player = createSamplePlayer()
-        let flags: Set<FlagID> = ["gameStarted"]
+        let globalState: Set<GlobalID> = ["gameStarted"]
         let pronouns: [String: Set<ItemID>] = ["it": [Self.itemMailbox]]
 
         return GameState(
             locations: locations,
             items: items,
             player: player,
-            flags: flags,
             pronouns: pronouns,
             activeFuses: activeFuses // Pass parameter to initializer
         )
@@ -108,9 +107,9 @@ struct GameStateTests {
             vocabulary: vocab
         )
         // Add some initial values if needed by tests
-        state.flags.insert("gameStarted") // Example: Add a starting flag
         state.pronouns["it"] = ["testItem"]
-        state.gameSpecificState["counter"] = .int(0)
+        state.globalState["counter"] = .int(0)
+        state.globalState["gameStarted"] = true
         state.activeFuses = ["testFuse": 10]
         state.activeDaemons = ["testDaemon"]
         state.changeHistory = [] // Start with empty history for most tests
@@ -129,13 +128,13 @@ struct GameStateTests {
         #expect(state.locations.count == 1)
         #expect(state.locations["startRoom"]?.name == "Starting Room")
         #expect(state.player.currentLocationID == "startRoom")
-        #expect(state.flags.contains(FlagID("gameStarted")))
-        #expect(!state.flags.contains(FlagID("testFlag")))
+        #expect(state.globalState["gameStarted"] == true)
+        #expect(state.globalState["testFlag"] == false)
         #expect(state.pronouns["it"] == ["testItem"])
         #expect(state.activeFuses.count == 1)
         #expect(state.activeDaemons.count == 1)
         #expect(state.changeHistory.isEmpty)
-        #expect(state.gameSpecificState["counter"] == .int(0))
+        #expect(state.globalState["counter"] == .int(0))
 
         #expect(!state.vocabulary.verbDefinitions.isEmpty || !state.vocabulary.items.isEmpty)
     }
@@ -349,7 +348,7 @@ struct GameStateTests {
         #expect(state.player.currentLocationID == Self.locWOH)
 
         // Check other state properties
-        #expect(state.flags == Set([FlagID("gameStarted")]))
+        #expect(state.globalState == ["gameStarted": true])
         #expect(state.pronouns == ["it": [Self.itemMailbox]])
 
         // Check derived inventory
@@ -429,7 +428,7 @@ struct GameStateTests {
         let decodedState = try decoder.decode(GameState.self, from: jsonData)
 
         // Basic properties
-        #expect(decodedState.flags == originalState.flags)
+        #expect(decodedState.globalState == originalState.globalState)
         #expect(decodedState.pronouns == originalState.pronouns)
         #expect(decodedState.player == originalState.player)
 
@@ -460,7 +459,7 @@ struct GameStateTests {
 
         // Check initial equality of value types
         #expect(state1.player == state2.player)
-        #expect(state1.flags == state2.flags)
+        #expect(state1.globalState == state2.globalState)
         #expect(state1.pronouns == state2.pronouns)
         #expect(state1.items == state2.items) // Items dict should be equal initially
         #expect(state1.locations == state2.locations) // Locations dict should be equal
@@ -482,9 +481,9 @@ struct GameStateTests {
         let initialPlayer = state1.player // Capture initial player state from state1
         #expect(state1.player == initialPlayer) // state1 player unchanged
         #expect(state2.player != initialPlayer) // state2 player changed
-        let initialFlags = state1.flags
-        #expect(state1.flags == initialFlags)
-        #expect(state2.flags == initialFlags)
+        let initialFlags = state1.globalState
+        #expect(state1.globalState == initialFlags)
+        #expect(state2.globalState == initialFlags)
         let initialPronouns = state1.pronouns
         #expect(state1.pronouns == initialPronouns)
         #expect(state2.pronouns == initialPronouns)

@@ -270,7 +270,7 @@ struct LookActionHandlerTests {
     @Test("LOOK with dynamic location description closure")
     func testLookWithDynamicLocationDescription() async throws {
         // Arrange
-        let flagId: FlagID = "special_flag"
+        let globalID: GlobalID = "special_flag"
 
         let dynamicRoom = Location(
             id: "dynamicRoom",
@@ -284,7 +284,7 @@ struct LookActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: "dynamicRoom"),
             locations: [dynamicRoom],
-            flags: [flagId] // Keep flag initialization
+            globalState: [globalID: true]
         )
 
         let mockIO = await MockIOHandler()
@@ -292,7 +292,7 @@ struct LookActionHandlerTests {
 
         // Register dynamic compute handler for the location's long description
         await engine.registerLocationCompute(key: .description) { location, gameState in
-            let isFlagOn = gameState.flags.contains(flagId)
+            let isFlagOn = gameState.globalState[globalID] == true
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
             "The room seems normal via registry."
             return .string(text)
@@ -313,7 +313,7 @@ struct LookActionHandlerTests {
         )
 
         // Act 2: Turn flag OFF and LOOK again
-        await engine.clearFlag(flagId) // Use new helper and FlagID
+        await engine.clearFlag(globalID) // Use new helper and GlobalID
         await engine.execute(command: command)
 
         // Assert Output 2 (Should show normal description)

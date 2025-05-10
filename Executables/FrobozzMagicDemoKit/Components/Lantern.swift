@@ -23,7 +23,7 @@ enum Components {
             /// ID for the low battery warning fuse
             static let lowBatteryWarningFuseID: FuseID = "lanternLowBatteryWarning"
 
-            /// Key for the battery life in gameSpecificState
+            /// Key for the battery life in globalState
             static let batteryLifeKey = "lanternBatteryLife"
 
             /// Flag for pending messages
@@ -54,8 +54,8 @@ enum Components {
             /*
             // TODO: Move Weather initialization to Weather component
             // Set initial weather
-            if state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] == nil {
-                 state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
+            if state.globalState?[Components.Weather.Constants.weatherStateKey] == nil {
+                 state.globalState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
             }
             */
 

@@ -1034,10 +1034,10 @@ struct GameStateApplyTests {
     @Test("Apply valid flag change (set true)")
     func testApplyValidFlagSet() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagID: FlagID = "testFlag"
+        let flagID: GlobalID = "testFlag"
 
         // Initial state check
-        #expect(!gameState.flags.contains(flagID))
+        #expect(gameState.globalState[flagID] == false)
 
         let change = StateChange(
             entityID: .global,
@@ -1049,7 +1049,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Assert final state
-        #expect(gameState.flags.contains(flagID))
+        #expect(gameState.globalState[flagID] == true)
         #expect(gameState.changeHistory.count == 1)
         #expect(gameState.changeHistory.first == change)
     }
@@ -1057,11 +1057,11 @@ struct GameStateApplyTests {
     @Test("Apply valid flag change (set false)")
     func testApplyValidFlagClear() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagID: FlagID = "testFlagInitiallyTrue"
-        gameState.flags.insert(flagID) // Pre-set the flag
+        let flagID: GlobalID = "testFlagInitiallyTrue"
+        gameState.globalState[flagID] = true // Pre-set the flag
 
         // Initial state check
-        #expect(gameState.flags.contains(flagID))
+        #expect(gameState.globalState[flagID] == true)
 
         let change = StateChange(
             entityID: .global,
@@ -1073,7 +1073,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Assert final state
-        #expect(!gameState.flags.contains(flagID))
+        #expect(gameState.globalState[flagID] == false)
         #expect(gameState.changeHistory.count == 1)
         #expect(gameState.changeHistory.first == change)
     }
@@ -1081,8 +1081,8 @@ struct GameStateApplyTests {
     @Test("Apply flag change with invalid old value fails")
     func testApplyFlagChangeInvalidOldValue() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagID: FlagID = "testFlag"
-        let actualOldValue = gameState.flags.contains(flagID) // false
+        let flagID: GlobalID = "testFlag"
+        let actualOldValue = gameState.globalState[flagID]
         #expect(actualOldValue == false)
 
         let change = StateChange(
@@ -1104,15 +1104,15 @@ struct GameStateApplyTests {
         }
         #expect(validationErrorThrown)
         // Assert state unchanged
-        #expect(gameState.flags.contains(flagID) == actualOldValue)
+        #expect(gameState.globalState[flagID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
     }
 
     @Test("Apply flag change with nil old value succeeds")
     func testApplyFlagChangeNilOldValue() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagID: FlagID = "testFlag"
-        #expect(!gameState.flags.contains(flagID))
+        let flagID: GlobalID = "testFlag"
+        #expect(gameState.globalState[flagID] == false)
 
         let change = StateChange(
             entityID: .global,
@@ -1124,7 +1124,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Assert final state
-        #expect(gameState.flags.contains(flagID))
+        #expect(gameState.globalState[flagID] == true)
         #expect(gameState.changeHistory.count == 1)
     }
 

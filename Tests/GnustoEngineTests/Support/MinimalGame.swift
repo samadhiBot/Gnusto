@@ -9,7 +9,7 @@ struct MinimalGame: GameBlueprint {
         player: Player = Player(in: "startRoom"),
         locations: [Location]? = nil,
         items: [Item]? = nil,
-        flags: [FlagID]? = nil,
+        globalState: [GlobalID: StateValue]? = nil,
         definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
@@ -53,8 +53,8 @@ struct MinimalGame: GameBlueprint {
             locations: gameLocations,
             items: gameItems,
             player: player,
-            vocabulary: vocabulary, // Provide the constructed vocabulary
-            flags: Set(flags ?? []) // Pass the initial flags here
+            vocabulary: vocabulary,
+            globalState: globalState ?? [:]
         )
     }
 }

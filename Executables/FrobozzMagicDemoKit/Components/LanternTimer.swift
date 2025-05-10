@@ -26,7 +26,7 @@ public enum LanternConstants {
     /// ID for the low battery warning fuse
     public static let lowBatteryWarningFuseID: FuseID = "lanternLowBatteryWarning"
 
-    /// Key for the battery life in gameSpecificState
+    /// Key for the battery life in globalState
     public static let batteryLifeKey = "lanternBatteryLife"
 }
 

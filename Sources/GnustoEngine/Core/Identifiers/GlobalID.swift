@@ -1,10 +1,10 @@
 import Foundation
 
-/// A type-safe key for accessing game-specific state values stored in `GameState.gameSpecificState`.
+/// A type-safe key for accessing game-specific state values stored in `GameState.globalState`.
 ///
 /// Using a dedicated type instead of raw strings helps prevent typos and improves code clarity
 /// when dealing with global or miscellaneous state information not directly tied to items or locations.
-public struct GameStateID: RawRepresentable, Hashable, Codable, Sendable {
+public struct GlobalID: RawRepresentable, Hashable, Codable, Sendable {
     public let rawValue: String
 
     /// Creates a new game state key with the specified string value.
@@ -32,7 +32,7 @@ public struct GameStateID: RawRepresentable, Hashable, Codable, Sendable {
 
 // MARK: - ExpressibleByStringLiteral
 
-extension GameStateID: ExpressibleByStringLiteral {
+extension GlobalID: ExpressibleByStringLiteral {
     /// Allows creating a `GameStateKey` directly from a string literal.
     /// - Parameter value: The string literal value.
     public init(stringLiteral value: String) {

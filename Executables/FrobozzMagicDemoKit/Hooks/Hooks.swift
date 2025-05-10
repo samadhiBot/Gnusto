@@ -12,7 +12,7 @@ enum Hooks {
     ///   - locationID: The unique identifier of the location being entered.
     static func onEnterRoom(engine: GameEngine, locationID: LocationID) async -> Bool {
         // Use safe accessors
-        let visitedTreasureFlag: FlagID = "visited_treasure_room"
+        let visitedTreasureFlag: GlobalID = "visited_treasure_room"
         let hasVisitedTreasure = await engine.isFlagSet(visitedTreasureFlag)
 
         // Check for special room behaviors
@@ -37,7 +37,7 @@ enum Hooks {
 
         case "hiddenVault":
             // Use safe accessors
-            let visitedVaultFlag: FlagID = "visited_vault"
+            let visitedVaultFlag: GlobalID = "visited_vault"
             let hasVisitedVault = await engine.isFlagSet(visitedVaultFlag)
 
             if !hasVisitedVault {

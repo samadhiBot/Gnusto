@@ -12,9 +12,6 @@ public struct GameState: Codable, Equatable, Sendable {
     /// All locations defined in the game, indexed by their `LocationID`.
     public internal(set) var locations: [LocationID: Location]
 
-    /// The set of currently active global flags.
-    public internal(set) var flags: Set<FlagID>
-
     /// The current state of the player.
     public internal(set) var player: Player
 
@@ -32,7 +29,7 @@ public struct GameState: Codable, Equatable, Sendable {
     public internal(set) var pronouns: [String: Set<ItemID>]
 
     /// Game-specific key-value storage for miscellaneous state.
-    public internal(set) var gameSpecificState: [GameStateID: StateValue]
+    public internal(set) var globalState: [GlobalID: StateValue]
 
     /// A history of all state changes applied to this game state instance.
     public internal(set) var changeHistory: [StateChange]
@@ -46,21 +43,19 @@ public struct GameState: Codable, Equatable, Sendable {
         items: [Item],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [GameStateID: StateValue] = [:], // Keep AnyCodable
+        globalState: [GlobalID: StateValue] = [:], // Keep AnyCodable
         changeHistory: [StateChange] = []
     ) {
         self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
         self.locations = Dictionary(uniqueKeysWithValues: locations.map { ($0.id, $0) })
-        self.flags = flags
         self.player = player
         self.activeFuses = activeFuses
         self.activeDaemons = activeDaemons
         self.pronouns = pronouns
-        self.gameSpecificState = gameSpecificState
+        self.globalState = globalState
         self.changeHistory = changeHistory
         self.vocabulary = vocabulary ?? .build(items: items)
     }
@@ -69,11 +64,10 @@ public struct GameState: Codable, Equatable, Sendable {
         areas: [AreaContents.Type],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        flags: Set<FlagID> = [],
         pronouns: [String: Set<ItemID>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        gameSpecificState: [GameStateID: StateValue] = [:],
+        globalState: [GlobalID: StateValue] = [:],
         changeHistory: [StateChange] = []
     ) {
         var allItems: [Item] = []
@@ -106,11 +100,10 @@ public struct GameState: Codable, Equatable, Sendable {
             items: allItems,
             player: player,
             vocabulary: vocabulary,
-            flags: flags,
             pronouns: pronouns,
             activeFuses: activeFuses,
             activeDaemons: activeDaemons,
-            gameSpecificState: gameSpecificState,
+            globalState: globalState,
             changeHistory: changeHistory
         )
     }
@@ -121,11 +114,10 @@ public struct GameState: Codable, Equatable, Sendable {
             items: Array(items.values),
             player: player,
             vocabulary: vocabulary,
-            flags: flags,
             pronouns: pronouns,
             activeFuses: activeFuses,
             activeDaemons: activeDaemons,
-            gameSpecificState: gameSpecificState
+            globalState: globalState
         )
     }
 
@@ -336,7 +328,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // MARK: Global/Misc Properties
 
-        case .setFlag(let flagID):
+        case .setFlag(let key):
             // The convention is that setting a flag corresponds to a newValue of true
             guard change.newValue == true else {
                  print("Warning: setFlag StateChange newValue was not true, was \(String(describing: change.newValue)). Proceeding anyway.")
@@ -345,9 +337,9 @@ public struct GameState: Codable, Equatable, Sendable {
              guard change.entityID == .global else {
                  throw ActionError.internalEngineError("EntityID mismatch for setFlag: expected .global, got \(change.entityID)")
              }
-             flags.insert(flagID)
+            globalState[key] = change.newValue
 
-        case .clearFlag(let flagID):
+        case .clearFlag(let key):
             // The convention is that clearing a flag corresponds to a newValue of false
             guard change.newValue == false else {
                  print("Warning: clearFlag StateChange newValue was not false, was \(String(describing: change.newValue)). Proceeding anyway.")
@@ -356,13 +348,13 @@ public struct GameState: Codable, Equatable, Sendable {
              guard change.entityID == .global else {
                  throw ActionError.internalEngineError("EntityID mismatch for clearFlag: expected .global, got \(change.entityID)")
              }
-             flags.remove(flagID)
+            globalState[key] = change.newValue
 
-        case .gameSpecificState(let key):
+        case .globalState(let key):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for gameSpecificState: expected .global, got \(change.entityID)")
+                throw ActionError.internalEngineError("EntityID mismatch for globalState: expected .global, got \(change.entityID)")
             }
-             gameSpecificState[key] = change.newValue
+             globalState[key] = change.newValue
 
         case .pronounReference(let pronoun):
             // Expecting .itemIDSet
@@ -514,20 +506,20 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue = nil // Skip validation
 
         // Global/Misc Properties
-        case .setFlag(let flagID):
+        case .setFlag(let key):
             // Before setting, the flag should *not* have been present.
             // The expected old value should be false or nil.
-            let flagWasSet = flags.contains(flagID)
+            let flagWasSet = globalState[key] != true
             actualCurrentValue = .bool(flagWasSet)
 
-        case .clearFlag(let flagID):
+        case .clearFlag(let key):
             // Before clearing, the flag *should* have been present.
             // The expected old value should be true.
-            let flagWasSet = flags.contains(flagID)
+            let flagWasSet = globalState[key] != false
             actualCurrentValue = .bool(flagWasSet)
 
-        case .gameSpecificState(let key):
-             actualCurrentValue = gameSpecificState[key]
+        case .globalState(let key):
+             actualCurrentValue = globalState[key]
 
         case .pronounReference(let pronoun):
             actualCurrentValue = pronouns[pronoun].map { StateValue.itemIDSet($0) }

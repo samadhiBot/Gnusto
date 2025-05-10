@@ -29,9 +29,9 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     case playerStrength
 
     // Global/Misc Properties
-    case setFlag(_ id: FlagID)
-    case clearFlag(_ id: FlagID)
-    case gameSpecificState(key: GameStateID)
+    case setFlag(_ id: GlobalID)
+    case clearFlag(_ id: GlobalID)
+    case globalState(key: GlobalID)
     case pronounReference(pronoun: String)
 
     // Fuse & Daemon State (Managed via GameEngine helpers typically)
@@ -51,7 +51,7 @@ extension AttributeKey: CustomStringConvertible {
         case .itemAttribute(let key): "itemAttribute(\(key.rawValue))"
         case .setFlag(let id): "setFlag(\(id.rawValue))"
         case .clearFlag(let id): "clearFlag(\(id.rawValue))"
-        case .gameSpecificState(let key): "gameSpecificState(\(key.rawValue))"
+        case .globalState(let key): "globalState(\(key.rawValue))"
         case .itemAdjectives: "itemAdjectives"
         case .itemCapacity: "itemCapacity"
         case .itemName: "itemName"

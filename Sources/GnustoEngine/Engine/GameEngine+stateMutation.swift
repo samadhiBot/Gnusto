@@ -5,14 +5,14 @@ extension GameEngine {
     /// Logs a warning and returns if the state change application fails.
     /// Does nothing if the flag is already set.
     ///
-    /// - Parameter id: The `FlagID` of the flag to set.
-    public func setFlag(_ id: FlagID) async {
+    /// - Parameter id: The `GlobalID` of the flag to set.
+    public func setFlag(_ id: GlobalID) async {
         // Only apply if the flag isn't already set
-        if !gameState.flags.contains(id) {
+        if gameState.globalState[id] != true {
             let change = StateChange(
                 entityID: .global,
                 attributeKey: .setFlag(id),
-                oldValue: false, // Expecting it was false
+                oldValue: gameState.globalState[id],
                 newValue: true,
             )
             do {
@@ -30,14 +30,14 @@ extension GameEngine {
     /// Logs a warning and returns if the state change application fails.
     /// Does nothing if the flag is already clear.
     ///
-    /// - Parameter id: The `FlagID` of the flag to clear.
-    public func clearFlag(_ id: FlagID) async {
+    /// - Parameter id: The `GameStateID` of the flag to clear.
+    public func clearFlag(_ id: GlobalID) async {
         // Only apply if the flag is currently set
-        if gameState.flags.contains(id) {
+        if gameState.globalState[id] != false {
             let change = StateChange(
                 entityID: .global,
                 attributeKey: .clearFlag(id),
-                oldValue: true, // Expecting it was true
+                oldValue: gameState.globalState[id],
                 newValue: false
             )
             do {
@@ -198,8 +198,8 @@ extension GameEngine {
     ///
     /// - Parameter key: The key (`GameStateKey`) for the game-specific state variable.
     /// - Returns: The `StateValue` if found, otherwise `nil`.
-    public func getStateValue(key: GameStateID) -> StateValue? {
-        gameState.gameSpecificState[key]
+    public func getStateValue(key: GlobalID) -> StateValue? {
+        gameState.globalState[key]
     }
 
     /// Applies a change to a game-specific state variable.
@@ -207,14 +207,14 @@ extension GameEngine {
     /// - Parameters:
     ///   - key: The key (`GameStateKey`) for the game-specific state.
     ///   - value: The new `StateValue`.
-    public func applyGameSpecificStateChange(key: GameStateID, value: StateValue) async {
-        let oldValue = gameState.gameSpecificState[key] // Read using GameStateKey
+    public func applyGameSpecificStateChange(key: GlobalID, value: StateValue) async {
+        let oldValue = gameState.globalState[key] // Read using GameStateKey
 
         // Only apply if the value is changing
         if value != oldValue {
             let change = StateChange( // Add explicit type
                 entityID: .global,
-                attributeKey: .gameSpecificState(key: key), // Use GameStateKey
+                attributeKey: .globalState(key: key), // Use GameStateKey
                 oldValue: oldValue, // Pass the existing StateValue? as oldValue
                 newValue: value
             )
@@ -231,9 +231,9 @@ extension GameEngine {
 
     /// Checks if a specific global flag is currently set.
     ///
-    /// - Parameter id: The `FlagID` to check.
+    /// - Parameter id: The `GlobalID` to check.
     /// - Returns: `true` if the flag is present in the `GameState.flags` set, `false` otherwise.
-    public func isFlagSet(_ id: FlagID) -> Bool {
-        gameState.flags.contains(id)
+    public func isFlagSet(_ id: GlobalID) -> Bool {
+        gameState.globalState[id] == true
     }
 }
