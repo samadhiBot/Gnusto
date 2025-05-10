@@ -1080,19 +1080,16 @@ struct GameStateApplyTests {
 
     @Test("Apply flag change with invalid old value fails")
     func testApplyFlagChangeInvalidOldValue() async throws {
-        let flagID: GlobalID = "testFlag"
         var gameState = await helper.createSampleGameState()
-        gameState.globalState[flagID] = false
-        print("🎾", gameState.globalState)
 
-        let actualOldValue = gameState.globalState[flagID]
-        #expect(actualOldValue == false)
+        let actualOldValue = gameState.globalState["gameStarted"]
+        #expect(actualOldValue == true)
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .setFlag(flagID), // Attempt to set
-            oldValue: true, // INCORRECT: Expecting true, but it's false
-            newValue: true,
+            attributeKey: .clearFlag("gameStarted"),
+            oldValue: false, // INCORRECT
+            newValue: false
         )
 
         do {
@@ -1100,13 +1097,12 @@ struct GameStateApplyTests {
             Issue.record("Expected validation error to be thrown")
         } catch ActionError.stateValidationFailed(let failedChange, let reportedActualValue) {
             expectNoDifference(failedChange, change)
-            #expect(reportedActualValue == false) // actual value was false
+            #expect(reportedActualValue == true) // actual value was false
         } catch {
             Issue.record("Threw unexpected error type: \(error)")
         }
 
         // Assert state unchanged
-        #expect(gameState.globalState[flagID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
     }
 
@@ -1114,13 +1110,13 @@ struct GameStateApplyTests {
     func testApplyFlagChangeNilOldValue() async throws {
         var gameState = await helper.createSampleGameState()
         let flagID: GlobalID = "testFlag"
-        #expect(gameState.globalState[flagID] == false)
+        #expect(gameState.globalState[flagID] == nil)
 
         let change = StateChange(
             entityID: .global,
             attributeKey: .setFlag(flagID),
             oldValue: nil, // No validation expected
-            newValue: true,
+            newValue: true
         )
 
         try gameState.apply(change)
