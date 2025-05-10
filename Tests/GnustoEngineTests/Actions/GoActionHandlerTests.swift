@@ -203,6 +203,7 @@ struct GoActionHandlerTests {
         )
         let vaultDoor = Item(
             id: "vaultDoor",
+            .name("door to the vault"),
             .description("""
                 A massive, reinforced steel door dominates one wall of the grand foyer.
                 """),

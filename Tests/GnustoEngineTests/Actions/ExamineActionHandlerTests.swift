@@ -306,16 +306,23 @@ struct ExamineActionHandlerTests {
     }
 
     @Test func testExamineItemWithObjectActionOverride() async throws {
-        let itemID: ItemID = "magicMirror"
         let item = Item(
-            id: itemID,
+            id: "magicMirror",
             .name("magic mirror"),
             .description("A dusty old mirror."),
             .in(.player)
         )
+        let definitionRegistry = DefinitionRegistry(
+            objectActionHandlers: [
+                "magicMirror": { engine, command in
+                    await engine.ioHandler.print("You see your reflection in the magic mirror.")
+                    return true
+                }
+            ]
+        )
         let game = MinimalGame(
             items: [item],
-            dynamicAttributeRegistry: DynamicAttributeRegistry()
+            definitionRegistry: definitionRegistry
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -324,18 +331,23 @@ struct ExamineActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialItemState = await engine.item(itemID)
+
+        let initialItemState = await engine.item("magicMirror")
         #expect(initialItemState?.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine mirror")
+        let command = Command(
+            verbID: VerbID("examine"),
+            directObject: "magicMirror",
+            rawInput: "examine mirror"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "A dusty old mirror.")
+        expectNoDifference(output, "You see your reflection in the magic mirror.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
-        let finalItemState = await engine.item(itemID)
+        let finalItemState = await engine.item("magicMirror")
         #expect(finalItemState?.attributes[.isTouched] != true)
     }
 }

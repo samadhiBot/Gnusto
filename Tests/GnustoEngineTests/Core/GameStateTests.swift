@@ -364,7 +364,6 @@ struct GameStateTests {
         // Valid: Modify properties of reference types (Location, Item)
         // Note: Since Item/Location are structs, direct modification like this
         // modifies a *copy*. To persist, reassign to the dictionary.
-        // This test might need rethinking if direct mutation isn't the goal.
         var woh = state.locations[Self.locWOH]!
         woh.attributes[.description] = .string("A new description.")
         state.locations[Self.locWOH] = woh
@@ -380,12 +379,12 @@ struct GameStateTests {
 
         // Create new lantern with updated parent
         let lanternWithNewParent = Item(
-            id: Self.itemLantern,
+            id: "heldLantern",
             .in(.player),
             .isTakable,
             .isLightSource
         )
-        state.items[Self.itemLantern] = lanternWithNewParent
+        state.items["heldLantern"] = lanternWithNewParent
 
         // Create new sword with updated parent
         let swordWithNewParent = Item(
@@ -403,7 +402,7 @@ struct GameStateTests {
 
         // Check derived inventory reflects parent changes
         let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
-        #expect(Set(inventoryIDs) == [Self.itemLantern]) // Sword dropped, Lantern taken
+        #expect(Set(inventoryIDs) == ["heldLantern"]) // Sword dropped, Lantern taken
 
         // Check sword is now in the location
         #expect(state.items[Self.itemSword]?.parent == .location(Self.locWOH))
@@ -615,18 +614,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.isLit),
+            attributeKey: .locationAttribute(.inherentlyLit),
             oldValue: true,
             newValue: false
         )
         try? state.apply(change)
 
-        #expect(change.entityID == .location("testLoc"))
-        #expect(change.attributeKey == .locationAttribute(.isLit))
-        #expect(change.oldValue == true)
-        #expect(change.newValue == false)
         // Verify description remains untouched
-        #expect(state.locations["testLoc"]?.attributes[.isLit] == false)
+        #expect(state.locations["testLoc"]?.attributes[.inherentlyLit] == false)
         #expect(state.locations["testLoc"]?.attributes[.description] == .string("Original Desc"))
     }
 
