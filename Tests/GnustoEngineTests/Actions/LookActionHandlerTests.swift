@@ -91,22 +91,18 @@ struct LookActionHandlerTests {
         )
         let item1 = Item(
             id: "apple",
-            .name("apple"),
             .in(.location("litRoom"))
         )
         let item2 = Item(
             id: "banana",
-            .name("banana"),
             .in(.location("litRoom"))
         )
         let item3 = Item(
             id: "pear",
-            .name("pear"),
             .in(.location("litRoom"))
         )
         let item4 = Item(
             id: "orange",
-            .name("orange"),
             .in(.location("litRoom"))
         )
 
@@ -153,7 +149,6 @@ struct LookActionHandlerTests {
         )
         let item1 = Item(
             id: "shadow",
-            .name("shadow"),
             .in(.location("darkRoom"))
         )
 

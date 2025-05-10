@@ -176,7 +176,6 @@ struct OpenActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            .name("box"),
             .in(.nowhere),
             .isOpenable
             // Don't need .isOpen here, it's not reachable anyway

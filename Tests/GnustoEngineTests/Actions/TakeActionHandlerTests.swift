@@ -264,15 +264,15 @@ struct TakeActionHandlerTests {
         // Arrange
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpen
         )
         let itemInContainer = Item(
             id: "gem",
-            name: "ruby gem",
-            parent: .item("box"),
+            .name("ruby gem"),
+            .in(.item("box")),
             .isTakable
         )
         let initialParent = itemInContainer.parent
@@ -319,7 +319,7 @@ struct TakeActionHandlerTests {
         // Arrange
         let container = Item(
             id: "pouch",
-            name: "leather pouch",
+            .name("leather pouch"),
             .in(.player),
             .isContainer,
             .isOpen, // Explicitly open
@@ -327,8 +327,8 @@ struct TakeActionHandlerTests {
         )
         let itemInContainer = Item(
             id: "coin",
-            name: "gold coin",
-            parent: .item("pouch"),
+            .name("gold coin"),
+            .in(.item("pouch")),
             .isTakable
         )
         let initialParent = itemInContainer.parent
@@ -375,14 +375,14 @@ struct TakeActionHandlerTests {
         // Arrange: Create a CLOSED container and item inside it
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer
         )
         let itemInContainer = Item(
             id: "gem",
-            name: "ruby gem",
-            parent: .item("box"),
+            .name("ruby gem"),
+            .in(.item("box")),
             .isTakable
         )
 
@@ -420,14 +420,14 @@ struct TakeActionHandlerTests {
         // Arrange: Create a non-container and an item 'inside' it
         let nonContainer = Item(
             id: "statue",
-            name: "stone statue",
+            .name("stone statue"),
             .in(.location("startRoom"))
             // Not a container by default
         )
         let itemInside = Item(
             id: "chip",
-            name: "stone chip",
-            parent: .item("statue"),
+            .name("stone chip"),
+            .in(.item("statue")),
             .isTakable
         )
 
@@ -446,7 +446,7 @@ struct TakeActionHandlerTests {
         let command = Command(
             verbID: "take",
             directObject: "chip",
-            indirectObject: .item("statue"), // Specify source
+            indirectObject: "statue", // Specify source
             rawInput: "take chip from statue"
         )
 
@@ -470,7 +470,7 @@ struct TakeActionHandlerTests {
         // Arrange
         let heavyItem = Item(
             id: "heavy",
-            name: "heavy thing",
+            .name("heavy thing"),
             .in(.location("startRoom")),
             .isTakable,
             .size(101) // Exceeds default capacity (100) if player has 0
@@ -507,7 +507,7 @@ struct TakeActionHandlerTests {
         // Arrange
         let testItem = Item(
             id: "cloak",
-            name: "dark cloak",
+            .name("dark cloak"),
             .in(.location("startRoom")),
             .isTakable,
             .isWearable,
@@ -557,14 +557,14 @@ struct TakeActionHandlerTests {
         // Arrange
         let surfaceItem = Item(
             id: "table",
-            name: "wooden table",
+            .name("wooden table"),
             .in(.location("startRoom")),
             .isSurface
         )
         let itemOnSurface = Item(
             id: "book",
-            name: "old book",
-            parent: .item(surfaceItem.id),
+            .name("old book"),
+            .in(.item("table")),
             .isTakable,
             .isReadable
         )
@@ -671,14 +671,13 @@ struct TakeActionHandlerTests {
         // Arrange: Player has capacity 10, holds item size 7, tries to take item size 3
         let heldItem = Item(
             id: "sword",
-            name: "sword",
             .in(.player),
             .isTakable,
             .size(7)
         )
         let itemToTake = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.location("startRoom")),
             .isTakable,
             .size(3)
@@ -729,15 +728,15 @@ struct TakeActionHandlerTests {
         // Arrange: Item is inside a *closed* but *transparent* container
         let container = Item(
             id: "jar",
-            name: "glass jar",
+            .name("glass jar"),
             .in(.location("startRoom")),
             .isContainer,
             .isTransparent // Closed by default, but transparent
         )
         let itemInContainer = Item(
             id: "fly",
-            name: "dead fly",
-            parent: .item("jar"),
+            .name("dead fly"),
+            .in(.item("jar")),
             .isTakable
         )
 
@@ -783,14 +782,13 @@ struct TakeActionHandlerTests {
         // Arrange: Player holds item, capacity is low, try to take another
         let itemHeld = Item(
             id: "sword",
-            name: "sword",
             .in(.player),
             .isTakable,
             .size(8)
         )
         let itemToTake = Item(
             id: "shield",
-            name: "shield",
+            .name("shield"),
             .in(.location("startRoom")),
             .isTakable,
             .size(7)

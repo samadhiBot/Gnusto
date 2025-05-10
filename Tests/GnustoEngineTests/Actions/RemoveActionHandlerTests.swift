@@ -11,7 +11,6 @@ struct RemoveActionHandlerTests {
     func testRemoveItemSuccess() async throws {
         let cloak = Item(
             id: "cloak",
-            .name("cloak"),
             .in(.player),
             .isTakable,
             .isWearable,
@@ -78,7 +77,6 @@ struct RemoveActionHandlerTests {
     func testRemoveItemNotWorn() async throws {
         let cloak = Item(
             id: "cloak",
-            .name("cloak"),
             .in(.player),
             .isTakable,
             .isWearable
