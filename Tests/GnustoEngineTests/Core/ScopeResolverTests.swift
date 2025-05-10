@@ -42,7 +42,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isLightSource: true,
                 .isOn: true,
@@ -72,7 +72,7 @@ struct ScopeResolverTests {
         let inactiveLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isLightSource: true,
                 .isTakable: true
@@ -100,7 +100,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .isLightSource: true,
                 .isOn: true
@@ -154,7 +154,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isLightSource: true,
                 .isOn: true,
@@ -196,12 +196,12 @@ struct ScopeResolverTests {
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isInvisible: true],
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
@@ -263,7 +263,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isLightSource: true,
                 .isOn: true,
@@ -273,13 +273,13 @@ struct ScopeResolverTests {
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isInvisible: true],
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isInvisible: true],
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
@@ -302,7 +302,7 @@ struct ScopeResolverTests {
         let activeLamp = Item(
             id: "lamp",
             name: "lamp",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .isLightSource: true,
                 .isOn: true
@@ -311,13 +311,13 @@ struct ScopeResolverTests {
         let visibleItem = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isInvisible: true],
         )
         let invisibleItem = Item(
             id: "dust",
             name: "dust",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isInvisible: true],
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
@@ -356,13 +356,13 @@ struct ScopeResolverTests {
     let baseBox = Item(
         id: "box",
         name: "box",
-        parent: .player,
+        .in(.player),
         attributes: [.isContainer: true],
     )
     let baseOpenBox = Item(
         id: "openBox",
         name: "open box",
-        parent: .player,
+        .in(.player),
         attributes: [
             .isContainer: true,
             .isOpen: true
@@ -371,13 +371,13 @@ struct ScopeResolverTests {
     let baseClosedBox = Item(
         id: "closedBox",
         name: "closed box",
-        parent: .player,
+        .in(.player),
         attributes: [.isContainer: true],
     )
     let baseTransparentBox = Item(
         id: "transBox",
         name: "transparent box",
-        parent: .player,
+        .in(.player),
         attributes: [
             .isContainer: true,
             .isTransparent: true,
@@ -394,7 +394,7 @@ struct ScopeResolverTests {
         let inventoryItem = Item(
             id: "invItem",
             name: "Inventory Item",
-            parent: .player,
+            .in(.player),
             attributes: [.isTakable: true],
         )
         let game = MinimalGame(items: [inventoryItem])
@@ -416,7 +416,7 @@ struct ScopeResolverTests {
         let locationItem = Item(
             id: "locItem",
             name: "Location Item",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
         )
         let game = MinimalGame(items: [locationItem])
         let mockIO = await MockIOHandler()
@@ -468,7 +468,7 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isContainer: true,
                 .isOpen: true
@@ -498,7 +498,7 @@ struct ScopeResolverTests {
         let closedBox = Item(
             id: "closedBox",
             name: "closed box",
-            parent: .player,
+            .in(.player),
             attributes: [.isContainer: true],
         )
         let itemInBox = Item(
@@ -527,7 +527,7 @@ struct ScopeResolverTests {
         let transparentBox = Item(
             id: "transBox",
             name: "transparent box",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .isContainer: true,
                 .isTransparent: true,
@@ -557,7 +557,7 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             name: "open box",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .isContainer: true,
                 .isOpen: true
@@ -587,7 +587,7 @@ struct ScopeResolverTests {
         let closedBox = Item(
             id: "closedBox",
             name: "closed box",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isContainer: true],
         )
         let itemInBox = Item(
@@ -616,7 +616,7 @@ struct ScopeResolverTests {
         let transparentBox = Item(
             id: "transBox",
             name: "transparent box",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .isContainer: true,
                 .isTransparent: true,

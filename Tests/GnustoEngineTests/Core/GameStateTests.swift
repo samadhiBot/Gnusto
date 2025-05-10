@@ -38,7 +38,7 @@ struct GameStateTests {
             Item(
                 id: Self.itemSword,
                 name: "sword",
-                parent: .player,
+                .in(.player),
                 attributes: [.isTakable: true]
             )
         ]
@@ -98,7 +98,7 @@ struct GameStateTests {
         let testItem = Item(
             id: "testItem",
             name: "Test Item",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [:] // Assuming default is empty
         )
         let player = Player(in: "startRoom")
@@ -194,19 +194,19 @@ struct GameStateTests {
         let item1 = Item(
             id: "item1",
             name: "Item 1",
-            parent: .player,
+            .in(.player),
             attributes: [:]
         )
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [:]
         )
         let item3 = Item(
             id: "item3",
             name: "Item 3",
-            parent: .player,
+            .in(.player),
             attributes: [:]
         )
         state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
@@ -231,7 +231,7 @@ struct GameStateTests {
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .player,
+            .in(.player),
             attributes: [:]
         )
         let item3 = Item(
@@ -255,13 +255,13 @@ struct GameStateTests {
         let item1 = Item(
             id: "item1",
             name: "Item 1",
-            parent: .player,
+            .in(.player),
             attributes: [:]
         )
         let item2 = Item(
             id: "item2",
             name: "Item 2",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [:]
         )
         state.items["item1"] = item1 // Add items

@@ -10,8 +10,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "small pebble",
-            description: "A smooth, grey pebble.",
-            parent: .player
+            .description("A smooth, grey pebble."),
+            .in(.player)
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
@@ -51,8 +51,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "engraved locket",
-            description: "A small, tarnished silver locket.",
-            parent: .player
+            .description("A small, tarnished silver locket."),
+            .in(.player)
         )
         let game = MinimalGame(items: [item])
         let mockIO = await MockIOHandler()
@@ -89,8 +89,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "stone statue",
-            description: "A weathered statue of a grue.",
-            parent: .location(roomID)
+            .description("A weathered statue of a grue."),
+            .in(.location(roomID))
         )
         let room = Location(
             id: roomID,
@@ -135,8 +135,8 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "hidden gem",
-            description: "Should not see this.",
-            parent: .location("farAwayRoom")
+            .description("Should not see this."),
+            .in(.location("farAwayRoom"))
         )
         let startRoom = Location(
             id: "startRoom",
@@ -177,9 +177,9 @@ struct ExamineActionHandlerTests {
         let item = Item(
             id: itemID,
             name: "hidden gem",
-            description: "Should not see this.",
-            parent: .location("farAwayRoom"),
-            attributes: [.isTouched: true]
+            .description("Should not see this."),
+            .in(.location("farAwayRoom")),
+            .isTouched
         )
         let startRoom = Location(
             id: "startRoom",
@@ -243,7 +243,7 @@ struct ExamineActionHandlerTests {
             id: itemID1,
             name: "red ball",
             description: "A red ball.",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .adjectives: ["red"],
                 .synonyms: ["ball"],
@@ -253,7 +253,7 @@ struct ExamineActionHandlerTests {
             id: itemID2,
             name: "blue ball",
             description: "A blue ball.",
-            parent: .player,
+            .in(.player),
             attributes: [
                 .adjectives: ["blue"],
                 .synonyms: ["ball"],
@@ -315,7 +315,7 @@ struct ExamineActionHandlerTests {
             id: itemID,
             name: "magic mirror",
             description: "A dusty old mirror.",
-            parent: .player
+            .in(.player)
         )
         let game = MinimalGame(
             items: [item],

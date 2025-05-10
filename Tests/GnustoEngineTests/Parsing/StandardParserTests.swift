@@ -47,7 +47,7 @@ struct StandardParserTests {
             Item(
                 id: "backpack",
                 name: "backpack",
-                parent: .player,
+                .in(.player),
                 attributes: [
                     .isContainer: true,
                     .isTakable: true,
@@ -78,7 +78,7 @@ struct StandardParserTests {
             Item(
                 id: "chest",
                 name: "chest",
-                parent: .player,
+                .in(.player),
                 attributes: [
                     .isContainer: true,
                     .isTakable: true,
@@ -99,7 +99,7 @@ struct StandardParserTests {
             Item(
                 id: "key",
                 name: "key",
-                parent: .player,
+                .in(.player),
                 attributes: [
                     .adjectives: .stringSet(["rusty", "small"]),
                     .isTakable: true
@@ -128,7 +128,7 @@ struct StandardParserTests {
             Item(
                 id: "leaflet",
                 name: "leaflet",
-                parent: .player,
+                .in(.player),
                 attributes: [
                     .isTakable: true,
                     .isReadable: true
@@ -178,7 +178,7 @@ struct StandardParserTests {
             Item(
                 id: "tray",
                 name: "tray",
-                parent: .player,
+                .in(.player),
                 attributes: [
                     .adjectives: .stringSet(["silver"]),
                     .isSurface: true,
@@ -700,7 +700,7 @@ struct StandardParserTests {
         let tempKeyOnGround = Item(
             id: "tempKeyOnGround",
             name: "key",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .adjectives: .stringSet(["temp"])
             ]
@@ -708,7 +708,7 @@ struct StandardParserTests {
         let permKey = Item(
             id: "permKey",
             name: "key",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [
                 .adjectives: .stringSet(["perm"])
             ]

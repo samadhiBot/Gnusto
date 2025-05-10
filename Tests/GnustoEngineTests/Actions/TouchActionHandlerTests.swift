@@ -13,7 +13,7 @@ struct TouchActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "smooth rock",
-            parent: .player
+            .in(.player)
         ) // Not necessarily takable
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
@@ -42,7 +42,7 @@ struct TouchActionHandlerTests {
         let key = Item(
             id: "key",
             name: "brass key",
-            parent: .player,
+            .in(.player),
             attributes: [.isTakable: true]
         )
         let game = MinimalGame(items: [key])
@@ -129,7 +129,7 @@ struct TouchActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
+            .in(.location("startRoom")),
             attributes: [.isContainer: true, .isOpen: true]
         )
         let gem = Item(

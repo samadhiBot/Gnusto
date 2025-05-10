@@ -12,15 +12,15 @@ struct GoActionHandlerTests {
         let startRoom = Location(
             id: "startRoom",
             name: "Start Room",
-            description: "You are here.",
-            exits: [.north: Exit(destination: "end")],
-            isLit: true
+            .description("You are here."),
+            .exits([.north: Exit(destination: "end")]),
+            .inherentlyLit
         )
         let endRoom = Location(
             id: "end",
             name: "End Room",
-            description: "You went there.",
-            isLit: true
+            .description("You went there."),
+            .inherentlyLit
         )
 
         let game = MinimalGame(

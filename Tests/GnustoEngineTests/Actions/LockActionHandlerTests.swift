@@ -11,21 +11,17 @@ struct LockActionHandlerTests {
         let initialBox = Item(
             id: "box",
             name: "wooden box",
-            parent: .location("startRoom"),
-            attributes: [
-                .lockKey: .itemID("key"),
-                .isContainer: true,
-                .isLockable: true,
-                .isOpenable: true
-            ]
+            .in(.location("startRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable,
+            .isOpenable
         )
         let initialKey = Item(
             id: "key",
             name: "small key",
-            parent: .player, // Key is held
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player), // Key is held
+            .isTakable
         )
 
         let game = MinimalGame(items: [initialBox, initialKey])
@@ -84,10 +80,8 @@ struct LockActionHandlerTests {
         let key = Item(
             id: "key",
             name: "key",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
@@ -118,12 +112,10 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            parent: .location("startRoom"),
-            attributes: [
-                .lockKey: "key",
-                .isContainer: true,
-                .isLockable: true
-            ]
+            .in(.location("startRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -152,21 +144,18 @@ struct LockActionHandlerTests {
     func testLockFailsKeyNotHeld() async throws {
         // Arrange: Key is in the room, not held; box is unlocked
         let box = Item(
-            id: "box", name: "box",
-            parent: .location("startRoom"),
-            attributes: [
-                .lockKey: "key",
-                .isContainer: true,
-                .isLockable: true
-            ]
+            id: "box",
+            name: "box",
+            .in(.location("startRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable
         )
         let key = Item(
             id: "key",
             name: "key",
-            parent: .location("startRoom"),
-            attributes: [
-                .isTakable: true
-            ] // Key also in room
+            .in(.location("startRoom")), // Key also in room
+            .isTakable
         )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()
@@ -195,24 +184,29 @@ struct LockActionHandlerTests {
     func testLockFailsTargetNotReachable() async throws {
         // Arrange: Box is unlocked in another room, player holds key
         let box = Item(
-            id: "box", name: "box",
-            parent: .location("otherRoom"),
-            attributes: [
-                .lockKey: "key",
-                .isContainer: true,
-                .isLockable: true
-            ]
+            id: "box",
+            name: "box",
+            .in(.location("otherRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable
         )
         let key = Item(
             id: "key",
             name: "key",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
-        let room1 = Location(id: "startRoom", name: "Start", description: "", isLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other", description: "", isLit: true)
+        let room1 = Location(
+            id: "startRoom",
+            name: "Start",
+            .inherentlyLit
+        )
+        let room2 = Location(
+            id: "otherRoom",
+            name: "Other",
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -239,14 +233,16 @@ struct LockActionHandlerTests {
     @Test("Lock fails when target not lockable")
     func testLockFailsTargetNotLockable() async throws {
         // Arrange: Target lacks .lockable, player holds key
-        let pebble = Item(id: "pebble", name: "pebble", parent: .location("startRoom")) // Not lockable
+        let pebble = Item(
+            id: "pebble",
+            name: "pebble",
+            .in(.location("startRoom"))
+        ) // Not lockable
         let key = Item(
             id: "key",
             name: "key",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [pebble, key])
         let mockIO = await MockIOHandler()
@@ -258,7 +254,12 @@ struct LockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "lock", directObject: "pebble", indirectObject: "key", rawInput: "lock pebble with key")
+        let command = Command(
+            verbID: "lock",
+            directObject: "pebble",
+            indirectObject: "key",
+            rawInput: "lock pebble with key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -277,20 +278,16 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            parent: .location("startRoom"),
-            attributes: [
-                .lockKey: "key",
-                .isContainer: true,
-                .isLockable: true
-            ]
+            .in(.location("startRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable
         )
         let wrongKey = Item(
             id: "wrongkey",
             name: "bent key",
-            parent: .player, // Player holds this
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player), // Player holds this
+            .isTakable
         )
         let game = MinimalGame(items: [box, wrongKey])
         let mockIO = await MockIOHandler()
@@ -321,21 +318,17 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             name: "box",
-            parent: .location("startRoom"),
-            attributes: [
-                .lockKey: "key",
-                .isContainer: true,
-                .isLockable: true,
-                .isLocked: true // Start locked
-            ]
+            .in(.location("startRoom")),
+            .lockKey("key"),
+            .isContainer,
+            .isLockable,
+            .isLocked // Start locked
         )
         let key = Item(
             id: "key",
             name: "key",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [box, key])
         let mockIO = await MockIOHandler()

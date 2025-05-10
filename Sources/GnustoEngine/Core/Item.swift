@@ -25,23 +25,23 @@ public struct Item: Codable, Identifiable, Sendable {
         )
     }
 
-    @available(*, deprecated,
-         renamed: "init(id:name:description:parent:_:)",
-         message: "Please switch to the new syntax."
-    )
-    public init(
-        id: ItemID,
-        name: String,
-        description: String,
-        parent: ParentEntity = .nowhere,
-        attributes: [AttributeID: StateValue] = [:]
-    ) {
-        self.id = id
-        self.name = name
-        self.attributes = attributes
-        self.attributes[.description] = .string(description)
-        self.attributes[.parentEntity] = .parentEntity(parent)
-    }
+//    @available(*, deprecated,
+//         renamed: "init(id:name:description:parent:_:)",
+//         message: "Please switch to the new syntax."
+//    )
+//    public init(
+//        id: ItemID,
+//        name: String,
+//        description: String,
+//        parent: ParentEntity = .nowhere,
+//        attributes: [AttributeID: StateValue] = [:]
+//    ) {
+//        self.id = id
+//        self.name = name
+//        self.attributes = attributes
+//        self.attributes[.description] = .string(description)
+//        self.attributes[.parentEntity] = .parentEntity(parent)
+//    }
 
     // MARK: - Convenience Accessors
 

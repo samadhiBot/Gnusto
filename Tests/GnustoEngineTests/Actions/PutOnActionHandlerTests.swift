@@ -75,18 +75,14 @@ struct PutOnActionHandlerTests {
         let initialBook = Item(
             id: "book",
             name: "heavy book",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let initialTable = Item(
             id: "table",
             name: "sturdy table",
-            parent: .location("startRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("startRoom")),
+            .isSurface
         )
         let initialBookAttributes = initialBook.attributes
         let initialTableAttributes = initialTable.attributes
@@ -144,10 +140,8 @@ struct PutOnActionHandlerTests {
         let table = Item(
             id: "table",
             name: "table",
-            parent: .location("startRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("startRoom")),
+            .isSurface
         )
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
@@ -175,7 +169,11 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails with no indirect object")
     func testPutOnFailsNoIndirectObject() async throws {
         // Arrange: Player holds book
-        let book = Item(id: "book", name: "book", parent: .player)
+        let book = Item(
+            id: "book",
+            name: "book",
+            .in(.player)
+        )
         let game = MinimalGame(items: [book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -202,14 +200,16 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails when item not held")
     func testPutOnFailsItemNotHeld() async throws {
         // Arrange: Book is on the floor, table is reachable
-        let book = Item(id: "book", name: "heavy book", parent: .location("startRoom"))
+        let book = Item(
+            id: "book",
+            name: "heavy book",
+            .in(.location("startRoom"))
+        )
         let table = Item(
             id: "table",
             name: "sturdy table",
-            parent: .location("startRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("startRoom")),
+            .isSurface
         )
         let game = MinimalGame(items: [book, table])
         let mockIO = await MockIOHandler()
@@ -237,17 +237,27 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails when target not reachable")
     func testPutOnFailsTargetNotReachable() async throws {
         // Arrange: Table is in another room, player holds book
-        let book = Item(id: "book", name: "heavy book", parent: .player)
+        let book = Item(
+            id: "book",
+            name: "heavy book",
+            .in(.player)
+        )
         let table = Item(
             id: "table",
             name: "sturdy table",
-            parent: .location("otherRoom"),
-            attributes: [
-                .isSurface: true
-            ]
+            .in(.location("otherRoom")),
+            .isSurface
         )
-        let room1 = Location(id: "startRoom", name: "Start", isLit: true)
-        let room2 = Location(id: "otherRoom", name: "Other", isLit: true)
+        let room1 = Location(
+            id: "startRoom",
+            name: "Start",
+            .inherentlyLit
+        )
+        let room2 = Location(
+            id: "otherRoom",
+            name: "Other",
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -274,14 +284,16 @@ struct PutOnActionHandlerTests {
     @Test("PutOn fails when target not a surface")
     func testPutOnFailsTargetNotSurface() async throws {
         // Arrange: Target is a box (not surface), player holds book
-        let book = Item(id: "book", name: "heavy book", parent: .player)
+        let book = Item(
+            id: "book",
+            name: "heavy book",
+            .in(.player)
+        )
         let box = Item(
             id: "box",
             name: "box",
-            parent: .location("startRoom"),
-            attributes: [
-                .isContainer: true // Not a surface
-            ]
+            .in(.location("startRoom")),
+            .isContainer // Not a surface
         )
         let game = MinimalGame(items: [book, box])
         let mockIO = await MockIOHandler()
@@ -312,10 +324,8 @@ struct PutOnActionHandlerTests {
         let table = Item(
             id: "table",
             name: "table",
-            parent: .player,
-            attributes: [
-                .isSurface: true,
-            ]
+            .in(.player),
+            .isSurface,
         )
         let game = MinimalGame(items: [table])
         let mockIO = await MockIOHandler()
@@ -346,19 +356,15 @@ struct PutOnActionHandlerTests {
         let tray = Item(
             id: "tray",
             name: "silver tray",
-            parent: .player,
-            attributes: [
-                .isSurface: true,
-                .isTakable: true
-            ]
+            .in(.player),
+            .isSurface,
+            .isTakable
         )
         let table = Item(
             id: "table",
             name: "table",
-            parent: .item("tray"),
-            attributes: [
-                .isSurface: true // Table is also a surface
-            ]
+            .in(.item("tray")),
+            .isSurface // Table is also a surface
         )
         let game = MinimalGame(items: [tray, table])
         let mockIO = await MockIOHandler()

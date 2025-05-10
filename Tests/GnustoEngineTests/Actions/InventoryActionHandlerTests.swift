@@ -9,8 +9,16 @@ struct InventoryActionHandlerTests {
     func testInventoryShowsItemsHeld() async throws {
         let game = MinimalGame(
             items: [
-                Item(id: "key", name: "brass key", parent: .player),
-                Item(id: "lamp", name: "brass lamp", parent: .player),
+                Item(
+                    id: "key",
+                    name: "brass key",
+                    .in(.player)
+                ),
+                Item(
+                    id: "lamp",
+                    name: "brass lamp",
+                    .in(.player)
+                ),
             ]
         )
         let mockIO = await MockIOHandler()
@@ -40,8 +48,16 @@ struct InventoryActionHandlerTests {
     func testInventoryShowsEmptyMessage() async throws {
         let game = MinimalGame(
             items: [
-                Item(id: "key", name: "brass key", parent: .location("startRoom")),
-                Item(id: "lamp", name: "brass lamp", parent: .location("startRoom")),
+                Item(
+                    id: "key",
+                    name: "brass key",
+                    .in(.location("startRoom"))
+                ),
+                Item(
+                    id: "lamp",
+                    name: "brass lamp",
+                    .in(.location("startRoom"))
+                ),
             ]
         )
         let mockIO = await MockIOHandler()

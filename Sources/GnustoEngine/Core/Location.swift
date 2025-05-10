@@ -27,29 +27,29 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         )
     }
 
-    @available(*, deprecated,
-        renamed: "init(id:name:description:exits:_:)",
-        message: "Please switch to the new syntax."
-    )
-    public init(
-        id: LocationID,
-        name: String,
-        description: String,
-        exits: [Direction: Exit] = [:],
-        isLit: Bool = false,
-        attributes: [AttributeID: StateValue] = [:]
-    ) {
-        self.id = id
-        self.name = name
-        self.attributes = attributes
-        self.attributes[.description] = .string(description)
-        if !exits.isEmpty {
-            self.attributes[.locationExits] = .locationExits(exits)
-        }
-        self.attributes[.inherentlyLit] = .bool(
-            isLit || (attributes[.inherentlyLit]?.toBool ?? false)
-        )
-    }
+//    @available(*, deprecated,
+//        renamed: "init(id:name:description:exits:_:)",
+//        message: "Please switch to the new syntax."
+//    )
+//    public init(
+//        id: LocationID,
+//        name: String,
+//        description: String,
+//        exits: [Direction: Exit] = [:],
+//        isLit: Bool = false,
+//        attributes: [AttributeID: StateValue] = [:]
+//    ) {
+//        self.id = id
+//        self.name = name
+//        self.attributes = attributes
+//        self.attributes[.description] = .string(description)
+//        if !exits.isEmpty {
+//            self.attributes[.locationExits] = .locationExits(exits)
+//        }
+//        self.attributes[.inherentlyLit] = .bool(
+//            isLit || (attributes[.inherentlyLit]?.toBool ?? false)
+//        )
+//    }
 
     // MARK: - Convenience Accessors
 
