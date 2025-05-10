@@ -22,7 +22,8 @@ struct ScopeResolverTests {
 
     @Test("Location is dark if not inherentlyLit and no light source")
     func testIsLitDarkNoSource() async throws {
-        let game = MinimalGame()
+        let darkRoom = Location(id: "startRoom")
+        let game = MinimalGame(locations: [darkRoom])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
@@ -31,8 +32,6 @@ struct ScopeResolverTests {
             ioHandler: mockIO
         )
         let resolver = await engine.scopeResolver
-
-//        engine.gameState.locations["startRoom"]?.attributes.removeValue(forKey: .inherentlyLit)
 
         await #expect(resolver.isLocationLit(locationID: "startRoom") == false)
     }
@@ -253,8 +252,7 @@ struct ScopeResolverTests {
         )
         let visibleItem = Item(
             id: "key",
-            .in(.location("startRoom")),
-            .isInvisible
+            .in(.location("startRoom"))
         )
         let invisibleItem = Item(
             id: "dust",
@@ -286,9 +284,8 @@ struct ScopeResolverTests {
         )
         let visibleItem = Item(
             id: "key",
-            .in(.location("startRoom")),
-            .isInvisible
-        )
+            .in(.location("startRoom"))
+)
         let invisibleItem = Item(
             id: "dust",
             .in(.location("startRoom")),
