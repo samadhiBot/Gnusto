@@ -613,7 +613,6 @@ struct GameEngineTests {
             .name("brass lamp"),
             .description("A small brass lamp."),
             .isLightSource,
-            .isOn,
             .in(.location("startRoom"))
         )
         let mockEnhancedHandler = MockMultiChangeHandler(
@@ -638,7 +637,11 @@ struct GameEngineTests {
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let activateCommand = Command(verbID: "activate", directObject: testItemID, rawInput: "activate lamp")
+        let activateCommand = Command(
+            verbID: "activate",
+            directObject: testItemID,
+            rawInput: "activate lamp"
+        )
 
         mockParser.parseHandler = { input, _, _ in
             if input == "activate lamp" { return .success(activateCommand) }
@@ -665,8 +668,14 @@ struct GameEngineTests {
         // Then
         // Check final state
         #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
-        #expect(await engine.item(testItemID)?.attributes[.isOn] == true, "Item .on property should be set")
-        #expect(await engine.item(testItemID)?.attributes[.isTouched] == true, "Item .touched property should be set")
+        #expect(
+            await engine.item(testItemID)?.attributes[.isOn] == true,
+            "Item .on property should be set"
+        )
+        #expect(
+            await engine.item(testItemID)?.attributes[.isTouched] == true,
+            "Item .touched property should be set"
+        )
 
         // Check history recorded correctly
         let history = await engine.getChangeHistory()
@@ -675,7 +684,8 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attributeKey == AttributeKey.playerMoves && change.newValue == StateValue.int(1)
+                change.attributeKey == AttributeKey.playerMoves &&
+                change.newValue == StateValue.int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -1297,7 +1307,9 @@ struct GameEngineTests {
             items: [item]
         )
 
-        #expect(game.state.locations["startRoom"]?.attributes[.inherentlyLit] == false)
+        #expect(
+            game.state.locations["startRoom"]?.hasFlag(.inherentlyLit) == false
+        )
 
         let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
         let output = await runCommandAndCaptureOutput(
@@ -1358,7 +1370,6 @@ struct GameEngineTests {
             .name("brass lamp"),
             .description("A small brass lamp."),
             .isLightSource,
-            .isOn,
             .in(.location("startRoom"))
         )
 
