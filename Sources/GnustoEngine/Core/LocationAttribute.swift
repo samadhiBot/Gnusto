@@ -31,11 +31,11 @@ extension LocationAttribute {
     /// The available exits from a location.
     ///
     /// - Parameter exits: The available exits from a location.
-    /// - Returns: A .locationExits attribute.
+    /// - Returns: A .exits attribute.
     static func exits(_ exits: [Direction: Exit]) -> LocationAttribute {
         LocationAttribute(
-            id: .locationExits,
-            rawValue: .locationExits(exits)
+            id: .exits,
+            rawValue: .exits(exits)
         )
     }
 

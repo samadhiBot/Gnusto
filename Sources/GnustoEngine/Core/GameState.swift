@@ -250,18 +250,18 @@ public struct GameState: Codable, Equatable, Sendable {
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
 
-        case .locationExits:
-            // Expecting .locationExits
-            guard case .locationExits(let newExits) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for locationExits: expected .locationExits, got \(change.newValue)")
+        case .exits:
+            // Expecting .exits
+            guard case .exits(let newExits) = change.newValue else {
+                throw ActionError.internalEngineError("Type mismatch for exits: expected .exits, got \(change.newValue)")
             }
             guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationExits: expected .location, got \(change.entityID)")
+                throw ActionError.internalEngineError("EntityID mismatch for exits: expected .location, got \(change.entityID)")
             }
             guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change")
+                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for exits change")
             }
-            locations[locationID]?.attributes[.locationExits] = .locationExits(newExits)
+            locations[locationID]?.attributes[.exits] = .exits(newExits)
 
         // MARK: Attributes (Item or Location)
 
@@ -489,13 +489,13 @@ public struct GameState: Codable, Equatable, Sendable {
         case .locationDescription:
              throw ActionError.internalEngineError("Old value validation cannot be performed on locationDescription.")
 
-        case .locationExits:
+        case .exits:
             guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationExits")
+                throw ActionError.internalEngineError("Validation: Invalid entity ID for exits")
             }
-            // Map location's exits [Direction: Exit] to .locationExits
+            // Map location's exits [Direction: Exit] to .exits
             actualCurrentValue = if let exits = locations[locationID]?.exits {
-                .locationExits(exits)
+                .exits(exits)
             } else {
                 nil
             }

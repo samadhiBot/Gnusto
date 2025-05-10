@@ -5,7 +5,7 @@ public enum StateValue: Codable, Sendable, Hashable {
     case int(Int)
     case itemID(ItemID)
     case itemIDSet(Set<ItemID>)
-    case locationExits([Direction: Exit])
+    case exits([Direction: Exit])
     case locationID(LocationID)
     case parentEntity(ParentEntity)
     case string(String)
@@ -79,7 +79,7 @@ extension StateValue {
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .locationExits(let value): value
+        case .exits(let value): value
         case .locationID(let value): value
         case .parentEntity(let value): value
         case .string(let value): value

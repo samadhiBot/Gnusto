@@ -13,7 +13,7 @@ public enum AttributeKey: Codable, Sendable, Hashable {
 
     // Location Properties
     case locationDescription
-    case locationExits
+    case exits
     case locationName
 
     // Dynamic Values (Stored in Item/Location, logic in Registry)
@@ -60,7 +60,7 @@ extension AttributeKey: CustomStringConvertible {
         case .itemSynonyms: "itemSynonyms"
         case .itemValue: "itemValue"
         case .locationDescription: "locationDescription"
-        case .locationExits: "locationExits"
+        case .exits: "exits"
         case .locationName: "locationName"
         case .locationAttribute(let key): "locationAttribute(\(key.rawValue))"
         case .playerHealth: "playerHealth"

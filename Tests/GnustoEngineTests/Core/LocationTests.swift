@@ -77,7 +77,7 @@ struct LocationTests {
             location.attributes == [
                 .name: "Living Room",
                 .description: "A comfortably furnished living room. There are exits west and east.",
-                .locationExits: .locationExits([
+                .exits: .exits([
                     .west: Exit(
                         destination: "westOfHouse",
                         blockedMessage: "You head west."

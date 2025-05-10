@@ -690,9 +690,9 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationExits,
-            oldValue: .locationExits(initialExits),
-            newValue: .locationExits(newExits)
+            attributeKey: .exits,
+            oldValue: .exits(initialExits),
+            newValue: .exits(newExits)
         )
 
         // When
@@ -715,9 +715,9 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationExits,
-            oldValue: .locationExits(incorrectOldExits),
-            newValue: .locationExits(newExits)
+            attributeKey: .exits,
+            oldValue: .exits(incorrectOldExits),
+            newValue: .exits(newExits)
         )
 
         // When & Then

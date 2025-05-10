@@ -29,7 +29,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
 
     /// Defines the connections (exits) from this location to others.
     public var exits: [Direction: Exit] {
-        attributes[.locationExits]?.toLocationExits ?? [:]
+        attributes[.exits]?.toLocationExits ?? [:]
     }
 
     /// Checks if a flag is set in the location's `attributes`.

@@ -36,7 +36,7 @@ public extension AttributeID {
     static let localGlobals = AttributeID("localGlobals")
     
     /// The available exits from a location.
-    static let locationExits = AttributeID("locationExits")
+    static let exits = AttributeID("exits")
 
     /// The key needed to lock/unlock an item (if `.isLockable`).
     static let lockKey = AttributeID("lockKey")

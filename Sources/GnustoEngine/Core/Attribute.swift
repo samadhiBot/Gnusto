@@ -32,7 +32,7 @@ extension Attribute {
     }
 
     /// Returns the raw value as a `[Direction: Exit]`, or `nil` if the type does not match.
-    public var locationExits: [Direction: Exit]? {
+    public var exits: [Direction: Exit]? {
         underlyingValue as? [Direction: Exit]
     }
 
@@ -77,7 +77,7 @@ extension Attribute {
     }
 
     public func get() -> [Direction: Exit]? {
-        locationExits
+        exits
     }
 
     public func get() -> LocationID? {
@@ -106,7 +106,7 @@ extension Attribute {
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .locationExits(let value): value
+        case .exits(let value): value
         case .locationID(let value): value
         case .parentEntity(let value): value
         case .string(let value): value
