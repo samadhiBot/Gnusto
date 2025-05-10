@@ -13,11 +13,9 @@ struct WearActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "velvet cloak",
-            parent: .player,
-            attributes: [
-                .isWearable: true,
-                .isTakable: true
-            ]
+            .in(.player),
+            .isWearable,
+            .isTakable
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -43,7 +41,7 @@ struct WearActionHandlerTests {
         #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property")
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You put on the cloak.")
+        expectNoDifference(output, "You put on the velvet cloak.")
 
         let expectedChanges = [
             StateChange(
@@ -97,10 +95,8 @@ struct WearActionHandlerTests {
         let rock = Item(
             id: "rock",
             name: "heavy rock",
-            parent: .player,
-            attributes: [
-                .isTakable: true
-            ]
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [rock])
         let engine = await GameEngine(
@@ -128,12 +124,10 @@ struct WearActionHandlerTests {
         let cloak = Item(
             id: "cloak",
             name: "velvet cloak",
-            parent: .player,
-            attributes: [
-                .isWearable: true,
-                .isTakable: true,
-                .isWorn: true
-            ]
+            .in(.player),
+            .isWearable,
+            .isTakable,
+            .isWorn
         )
         let game = MinimalGame(items: [cloak])
         let engine = await GameEngine(
@@ -145,7 +139,7 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
 
         await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
-             try await handler.validate(
+            try await handler.validate(
                 context: ActionContext(
                     command: command,
                     engine: engine,
@@ -168,7 +162,7 @@ struct WearActionHandlerTests {
         let command = Command(verbID: "wear", rawInput: "wear")
 
         await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
-             try await handler.validate(
+            try await handler.validate(
                 context: ActionContext(
                     command: command,
                     engine: engine,

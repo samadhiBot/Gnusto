@@ -32,20 +32,15 @@ public struct Item: Codable, Identifiable, Sendable {
     public init(
         id: ItemID,
         name: String,
-        description: String? = nil,
-        parent: ParentEntity? = nil,
+        description: String,
+        parent: ParentEntity = .nowhere,
         attributes: [AttributeID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
         self.attributes = attributes
-        if let description {
-            assert(attributes[.description] == nil, "Long description defined twice.")
-            self.attributes[.description] = .string(description)
-        }
-        if let parent {
-            self.attributes[.parentEntity] = .parentEntity(parent)
-        }
+        self.attributes[.description] = .string(description)
+        self.attributes[.parentEntity] = .parentEntity(parent)
     }
 
     // MARK: - Convenience Accessors

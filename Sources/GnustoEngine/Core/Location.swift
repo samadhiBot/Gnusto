@@ -34,7 +34,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     public init(
         id: LocationID,
         name: String,
-        description: String? = nil,
+        description: String,
         exits: [Direction: Exit] = [:],
         isLit: Bool = false,
         attributes: [AttributeID: StateValue] = [:]
@@ -42,10 +42,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
         self.id = id
         self.name = name
         self.attributes = attributes
-        if let description {
-            assert(attributes[.description] == nil, "Long description defined twice.")
-            self.attributes[.description] = .string(description)
-        }
+        self.attributes[.description] = .string(description)
         if !exits.isEmpty {
             self.attributes[.locationExits] = .locationExits(exits)
         }

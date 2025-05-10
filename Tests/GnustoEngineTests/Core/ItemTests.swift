@@ -13,8 +13,7 @@ struct ItemTests {
     func createDefaultItem() -> Item {
         Item(
             id: defaultItemID,
-            name: defaultItemName,
-            .in(.nowhere)
+            name: defaultItemName
         )
     }
 
