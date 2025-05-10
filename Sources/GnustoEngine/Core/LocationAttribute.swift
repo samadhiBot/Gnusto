@@ -49,6 +49,17 @@ extension LocationAttribute {
             rawValue: .itemIDSet(Set(localGlobals))
         )
     }
+
+    /// The primary name used to refer to the location (ZIL: `DESC`).
+    ///
+    /// - Parameter name: The primary name used to refer to the location.
+    /// - Returns: A .name attribute.
+    static func name(_ name: String) -> LocationAttribute {
+        LocationAttribute(
+            id: .name,
+            rawValue: .string(name)
+        )
+    }
 }
 
 // MARK: - Flag attributes

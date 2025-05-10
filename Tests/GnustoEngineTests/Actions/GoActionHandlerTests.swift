@@ -61,8 +61,8 @@ struct GoActionHandlerTests {
         )
         let endRoom = Location(
             id: "end",
-            name: "End Room",
-            description: "You went there."
+            .name("End Room"),
+            .description("You went there.")
         )
 
         let game = MinimalGame(

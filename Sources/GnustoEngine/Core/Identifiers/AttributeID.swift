@@ -40,7 +40,10 @@ public extension AttributeID {
 
     /// The key needed to lock/unlock an item (if `.isLockable`).
     static let lockKey = AttributeID("lockKey")
-    
+
+    /// The primary noun used to refer to the item (ZIL: `DESC`).
+    static let name = AttributeID("name")
+
     /// The identifier of the item's parent entity.
     static let parentEntity = AttributeID("parentEntity")
 

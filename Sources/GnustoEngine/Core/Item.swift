@@ -5,9 +5,6 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The item's unique identifier.
     public let id: ItemID
 
-    /// The primary noun used to refer to the item (ZIL: `DESC`).
-    public var name: String
-
     /// A dictionary that holds the item's current attributes.
     ///
     /// Some attributes are static under normal circumstances, but any can change when necessary.
@@ -15,11 +12,9 @@ public struct Item: Codable, Identifiable, Sendable {
 
     public init(
         id: ItemID,
-        name: String,
         _ attributes: ItemAttribute...
     ) {
         self.id = id
-        self.name = name
         self.attributes = Dictionary(
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
@@ -61,6 +56,11 @@ public struct Item: Codable, Identifiable, Sendable {
     /// - Returns: `true` if the flag exists and is set to `true`, `false` otherwise.
     public func hasFlag(_ id: AttributeID) -> Bool {
         attributes[id] == true
+    }
+
+    /// The primary noun used to refer to the item (ZIL: `DESC`).
+    public var name: String {
+        attributes[.name]?.toString ?? id.rawValue
     }
 
     /// The entity that currently contains or supports this item (ZIL: `IN`)

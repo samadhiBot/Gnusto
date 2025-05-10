@@ -83,6 +83,17 @@ extension ItemAttribute {
         )
     }
 
+    /// The primary name used to refer to the item (ZIL: `DESC`).
+    ///
+    /// - Parameter name: The primary name used to refer to the item.
+    /// - Returns: A .name attribute.
+    static func name(_ name: String) -> ItemAttribute {
+        ItemAttribute(
+            id: .name,
+            rawValue: .string(name)
+        )
+    }
+
     /// Text that can be read from an item (ZIL `RTEXT/TEXT`).
     ///
     /// - Parameter text: Text that can be read from an item.
