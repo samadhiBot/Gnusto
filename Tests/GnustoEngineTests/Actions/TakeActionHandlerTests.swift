@@ -87,12 +87,10 @@ struct TakeActionHandlerTests {
         // Arrange
         let testItem = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .size: 3
-            ]
+            .isTakable,
+            .size(3)
         )
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Capture initial attributes
@@ -142,9 +140,9 @@ struct TakeActionHandlerTests {
         // Arrange
         let testItem = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.player), // Already held
-            attributes: [.isTakable: true]
+            .isTakable
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
@@ -175,9 +173,9 @@ struct TakeActionHandlerTests {
         // Arrange: Create item that *won't* be added to location
         let nonexistentItem = Item(
             id: "figurine",
-            name: "jade figurine",
-            parent: .nowhere, // Not in scope
-            attributes: [.isTakable: true]
+            .name("jade figurine"),
+            .in(.nowhere), // Not in scope
+            .isTakable
         )
 
         let game = MinimalGame(items: [nonexistentItem])
@@ -210,7 +208,7 @@ struct TakeActionHandlerTests {
         // Arrange: Create item *without* .isTakable attribute
         let testItem = Item(
             id: "rock",
-            name: "heavy rock",
+            .name("heavy rock"),
             .in(.location("startRoom"))
             // No .isTakable: true
         )
@@ -268,16 +266,14 @@ struct TakeActionHandlerTests {
             id: "box",
             name: "wooden box",
             .in(.location("startRoom")),
-            attributes: [
-                .isContainer: true,
-                .isOpen: true // Explicitly open
-            ]
+            .isContainer,
+            .isOpen
         )
         let itemInContainer = Item(
             id: "gem",
             name: "ruby gem",
             parent: .item("box"),
-            attributes: [.isTakable: true]
+            .isTakable
         )
         let initialParent = itemInContainer.parent
         let initialAttributes = itemInContainer.attributes // Capture initial
@@ -325,17 +321,15 @@ struct TakeActionHandlerTests {
             id: "pouch",
             name: "leather pouch",
             .in(.player),
-            attributes: [
-                .isContainer: true,
-                .isOpen: true, // Explicitly open
-                .isTakable: true // Player must be able to hold it
-            ]
+            .isContainer,
+            .isOpen, // Explicitly open
+            .isTakable // Player must be able to hold it
         )
         let itemInContainer = Item(
             id: "coin",
             name: "gold coin",
             parent: .item("pouch"),
-            attributes: [.isTakable: true]
+            .isTakable
         )
         let initialParent = itemInContainer.parent
         let initialAttributes = itemInContainer.attributes // Capture initial
@@ -383,13 +377,13 @@ struct TakeActionHandlerTests {
             id: "box",
             name: "wooden box",
             .in(.location("startRoom")),
-            attributes: [.isContainer: true] // Closed by default (no .isOpen)
+            .isContainer
         )
         let itemInContainer = Item(
             id: "gem",
             name: "ruby gem",
             parent: .item("box"),
-            attributes: [.isTakable: true]
+            .isTakable
         )
 
         let game = MinimalGame(items: [container, itemInContainer])
@@ -434,7 +428,7 @@ struct TakeActionHandlerTests {
             id: "chip",
             name: "stone chip",
             parent: .item("statue"),
-            attributes: [.isTakable: true]
+            .isTakable
         )
 
         let game = MinimalGame(items: [nonContainer, itemInside])
@@ -452,7 +446,7 @@ struct TakeActionHandlerTests {
         let command = Command(
             verbID: "take",
             directObject: "chip",
-            indirectObject: "statue", // Specify source
+            indirectObject: .item("statue"), // Specify source
             rawInput: "take chip from statue"
         )
 
@@ -478,10 +472,8 @@ struct TakeActionHandlerTests {
             id: "heavy",
             name: "heavy thing",
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .size: 101 // Exceeds default capacity (100) if player has 0
-            ]
+            .isTakable,
+            .size(101) // Exceeds default capacity (100) if player has 0
         )
         // Player with capacity 0
         let player = Player(in: "startRoom", carryingCapacity: 0)
@@ -517,11 +509,9 @@ struct TakeActionHandlerTests {
             id: "cloak",
             name: "dark cloak",
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .isWearable: true,
-                .size: 2
-            ]
+            .isTakable,
+            .isWearable,
+            .size(2)
         )
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Capture initial
@@ -569,16 +559,14 @@ struct TakeActionHandlerTests {
             id: "table",
             name: "wooden table",
             .in(.location("startRoom")),
-            attributes: [.isSurface: true]
+            .isSurface
         )
         let itemOnSurface = Item(
             id: "book",
             name: "old book",
             parent: .item(surfaceItem.id),
-            attributes: [
-                .isTakable: true,
-                .isReadable: true
-            ]
+            .isTakable,
+            .isReadable
         )
         let initialParent = itemOnSurface.parent
         let initialAttributes = itemOnSurface.attributes // Capture initial
@@ -625,13 +613,11 @@ struct TakeActionHandlerTests {
         // Arrange: Item is takable and already touched
         let testItem = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .isTouched: true, // Start touched
-                .size: 3
-            ]
+            .isTakable,
+            .isTouched, // Start touched
+            .size(3)
         )
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Includes .isTouched: true
@@ -687,19 +673,15 @@ struct TakeActionHandlerTests {
             id: "sword",
             name: "sword",
             .in(.player),
-            attributes: [
-                .isTakable: true,
-                .size: 7
-            ]
+            .isTakable,
+            .size(7)
         )
         let itemToTake = Item(
             id: "key",
             name: "brass key",
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .size: 3
-            ]
+            .isTakable,
+            .size(3)
         )
         let initialParent = itemToTake.parent
         let initialAttributes = itemToTake.attributes // Capture initial
@@ -749,16 +731,14 @@ struct TakeActionHandlerTests {
             id: "jar",
             name: "glass jar",
             .in(.location("startRoom")),
-            attributes: [
-                .isContainer: true,
-                .isTransparent: true // Closed by default, but transparent
-            ]
+            .isContainer,
+            .isTransparent // Closed by default, but transparent
         )
         let itemInContainer = Item(
             id: "fly",
             name: "dead fly",
             parent: .item("jar"),
-            attributes: [.isTakable: true]
+            .isTakable
         )
 
         // Define player with capacity
@@ -805,19 +785,15 @@ struct TakeActionHandlerTests {
             id: "sword",
             name: "sword",
             .in(.player),
-            attributes: [
-                .isTakable: true,
-                .size: 8
-            ]
+            .isTakable,
+            .size(8)
         )
         let itemToTake = Item(
             id: "shield",
             name: "shield",
             .in(.location("startRoom")),
-            attributes: [
-                .isTakable: true,
-                .size: 7
-            ]
+            .isTakable,
+            .size(7)
         )
         // Define player with low capacity
         let player = Player(in: "startRoom", carryingCapacity: 10)

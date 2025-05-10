@@ -9,7 +9,7 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "pebble"
         let item = Item(
             id: itemID,
-            name: "small pebble",
+            .name("small pebble"),
             .description("A smooth, grey pebble."),
             .in(.player)
         )
@@ -50,7 +50,7 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "locket"
         let item = Item(
             id: itemID,
-            name: "engraved locket",
+            .name("engraved locket"),
             .description("A small, tarnished silver locket."),
             .in(.player)
         )
@@ -88,13 +88,13 @@ struct ExamineActionHandlerTests {
         let roomID: LocationID = "garden"
         let item = Item(
             id: itemID,
-            name: "stone statue",
+            .name("stone statue"),
             .description("A weathered statue of a grue."),
             .in(.location(roomID))
         )
         let room = Location(
             id: roomID,
-            name: "Garden",
+            .name("Garden"),
             .inherentlyLit
         )
         let game = MinimalGame(
@@ -134,18 +134,18 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "hiddenGem"
         let item = Item(
             id: itemID,
-            name: "hidden gem",
+            .name("hidden gem"),
             .description("Should not see this."),
             .in(.location("farAwayRoom"))
         )
         let startRoom = Location(
             id: "startRoom",
-            name: "Start Room",
+            .name("Start Room"),
             .inherentlyLit
         )
         let farRoom = Location(
             id: "farAwayRoom",
-            name: "Far Room",
+            .name("Far Room"),
             .inherentlyLit
         )
         let game = MinimalGame(
@@ -176,19 +176,19 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "hiddenGem"
         let item = Item(
             id: itemID,
-            name: "hidden gem",
+            .name("hidden gem"),
             .description("Should not see this."),
             .in(.location("farAwayRoom")),
             .isTouched
         )
         let startRoom = Location(
             id: "startRoom",
-            name: "Start Room",
+            .name("Start Room"),
             .inherentlyLit
         )
         let farRoom = Location(
             id: "farAwayRoom",
-            name: "Far Room",
+            .name("Far Room"),
             .inherentlyLit
         )
         let game = MinimalGame(
@@ -241,23 +241,19 @@ struct ExamineActionHandlerTests {
         let itemID2: ItemID = "blueBall"
         let item1 = Item(
             id: itemID1,
-            name: "red ball",
-            description: "A red ball.",
+            .name("red ball"),
+            .description("A red ball."),
             .in(.player),
-            attributes: [
-                .adjectives: ["red"],
-                .synonyms: ["ball"],
-            ],
+            .adjectives("red"),
+            .synonyms("ball")
         )
         let item2 = Item(
             id: itemID2,
-            name: "blue ball",
-            description: "A blue ball.",
+            .name("blue ball"),
+            .description("A blue ball."),
             .in(.player),
-            attributes: [
-                .adjectives: ["blue"],
-                .synonyms: ["ball"],
-            ],
+            .adjectives("blue"),
+            .synonyms("ball")
         )
         let game = MinimalGame(
             items: [item1, item2],
@@ -313,8 +309,8 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "magicMirror"
         let item = Item(
             id: itemID,
-            name: "magic mirror",
-            description: "A dusty old mirror.",
+            .name("magic mirror"),
+            .description("A dusty old mirror."),
             .in(.player)
         )
         let game = MinimalGame(

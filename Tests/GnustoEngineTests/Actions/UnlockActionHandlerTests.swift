@@ -10,7 +10,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Key held, box reachable and locked
         let initialBox = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isLockable,
@@ -20,7 +20,7 @@ struct UnlockActionHandlerTests {
         )
         let initialKey = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player), // Key is held
             .isTakable,
         )
@@ -80,7 +80,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Player holds key
         let key = Item(
             id: "key",
-            name: "key",
+            .name("key"),
             .in(.player),
             .isTakable,
         )
@@ -112,7 +112,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Box is reachable and locked
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.location("startRoom")),
             .isContainer,
             .isLockable,
@@ -147,7 +147,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Key is in the room, not held; box is locked
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.location("startRoom")),
             .isContainer,
             .isLockable,
@@ -156,7 +156,7 @@ struct UnlockActionHandlerTests {
         )
         let key = Item(
             id: "key",
-            name: "key",
+            .name("key"),
             .in(.location("startRoom")),
             .isTakable,
         )
@@ -188,7 +188,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Box is locked in another room, player holds key
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.location("otherRoom")),
             .isContainer,
             .isLockable,
@@ -197,18 +197,18 @@ struct UnlockActionHandlerTests {
         )
         let key = Item(
             id: "key",
-            name: "key",
+            .name("key"),
             .in(.player),
             .isTakable,
         )
         let room1 = Location(
             id: "startRoom",
-            name: "Start",
+            .name("Start"),
             .inherentlyLit
         ) // Correct parameter name
         let room2 = Location(
             id: "otherRoom",
-            name: "Other",
+            .name("Other"),
             .inherentlyLit
         ) // Correct parameter name
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
@@ -239,12 +239,12 @@ struct UnlockActionHandlerTests {
         // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(
             id: "pebble",
-            name: "pebble",
+            .name("pebble"),
             .in(.location("startRoom"))
         ) // Not lockable
         let key = Item(
             id: "key",
-            name: "key",
+            .name("key"),
             .in(.player),
             .isTakable,
         )
@@ -276,7 +276,6 @@ struct UnlockActionHandlerTests {
         // Arrange: Box locked, requires 'key', player holds 'wrongkey'
         let box = Item(
             id: "box",
-            name: "box",
             .in(.location("startRoom")),
             .lockKey("key"),
             .isContainer,
@@ -285,7 +284,7 @@ struct UnlockActionHandlerTests {
         )
         let wrongKey = Item(
             id: "wrongkey",
-            name: "bent key",
+            .name("bent key"),
             .in(.player), // Player holds this
             .isTakable,
         )
@@ -317,7 +316,6 @@ struct UnlockActionHandlerTests {
         // Arrange: Box is already unlocked, player holds key
         let box = Item(
             id: "box",
-            name: "box",
             .in(.location("startRoom")),
             .isContainer,
             .isLockable, // Start unlocked
@@ -325,7 +323,7 @@ struct UnlockActionHandlerTests {
         )
         let key = Item(
             id: "key",
-            name: "key",
+            .name("key"),
             .in(.player),
             .isTakable,
         )

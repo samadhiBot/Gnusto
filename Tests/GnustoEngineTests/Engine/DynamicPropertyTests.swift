@@ -45,15 +45,17 @@ struct DynamicPropertyTests {
         func testGetSetSimpleItemValue() async throws {
         let testItem = Item(
             id: "testItem",
-            name: "widget",
-            parent: .location("testLocation"),
-            attributes: ["simpleProp": StateValue.int(10)]
+            .name("widget"),
+            .in(.location("testLocation")),
+            .description("A test widget")
         )
+
         let testLocation = Location(
             id: "testLocation",
-            name: "Test Chamber",
-            description: "A dark, dark room."
+            .name("Test Chamber"),
+            .description("A dark, dark room.")
         )
+
         let game = MinimalGame(
             locations: [testLocation],
             items: [testItem],
@@ -65,6 +67,9 @@ struct DynamicPropertyTests {
             parser: MockParser(),
             ioHandler: mockIO
         )
+
+        // Set initial value through engine
+        try await engine.setDynamicItemValue(itemID: "testItem", key: "simpleProp", newValue: StateValue.int(10))
 
         // Get initial value
         let initialValue: Int = try await engine.fetch("testItem", "simpleProp")

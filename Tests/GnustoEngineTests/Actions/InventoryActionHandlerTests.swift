@@ -11,12 +11,12 @@ struct InventoryActionHandlerTests {
             items: [
                 Item(
                     id: "key",
-                    name: "brass key",
+                    .name("brass key"),
                     .in(.player)
                 ),
                 Item(
                     id: "lamp",
-                    name: "brass lamp",
+                    .name("brass lamp"),
                     .in(.player)
                 ),
             ]
@@ -50,12 +50,12 @@ struct InventoryActionHandlerTests {
             items: [
                 Item(
                     id: "key",
-                    name: "brass key",
+                    .name("brass key"),
                     .in(.location("startRoom"))
                 ),
                 Item(
                     id: "lamp",
-                    name: "brass lamp",
+                    .name("brass lamp"),
                     .in(.location("startRoom"))
                 ),
             ]

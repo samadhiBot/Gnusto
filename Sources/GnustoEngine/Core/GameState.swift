@@ -178,7 +178,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemName change")
             }
-            items[itemID]?.name = newName
+            items[itemID]?.attributes[.name] = .string(newName)
 
         case .itemParent:
             // Expecting a .parentEntity for itemParent
@@ -245,7 +245,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationName change")
             }
-            locations[locationID]?.name = newName
+            locations[locationID]?.attributes[.name] = .string(newName)
 
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")

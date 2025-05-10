@@ -36,19 +36,19 @@ struct LookActionHandlerTests {
         // Arrange
         let litRoom = Location(
             id: "litRoom",
-            name: "Bright Room",
+            .name("Bright Room"),
             .description("A brightly lit room."),
             .inherentlyLit
         )
         let item1 = Item(
             id: "table",
-            name: "wooden table",
+            .name("wooden table"),
             .in(.location("litRoom")),
             .isSurface
         )
         let item2 = Item(
             id: "rug",
-            name: "woven rug",
+            .name("woven rug"),
             .in(.location("litRoom"))
         )
 
@@ -85,28 +85,28 @@ struct LookActionHandlerTests {
         // Arrange
         let litRoom = Location(
             id: "litRoom",
-            name: "Test Room",
+            .name("Test Room"),
             .description("A basic room."),
             .inherentlyLit
         )
         let item1 = Item(
             id: "apple",
-            name: "apple",
+            .name("apple"),
             .in(.location("litRoom"))
         )
         let item2 = Item(
             id: "banana",
-            name: "banana",
+            .name("banana"),
             .in(.location("litRoom"))
         )
         let item3 = Item(
             id: "pear",
-            name: "pear",
+            .name("pear"),
             .in(.location("litRoom"))
         )
         let item4 = Item(
             id: "orange",
-            name: "orange",
+            .name("orange"),
             .in(.location("litRoom"))
         )
 
@@ -148,12 +148,12 @@ struct LookActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
+            .name("Dark Room"),
             .description("You see nothing.") // inherentlyLit defaults false
         )
         let item1 = Item(
             id: "shadow",
-            name: "shadow",
+            .name("shadow"),
             .in(.location("darkRoom"))
         )
 
@@ -190,19 +190,19 @@ struct LookActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
+            .name("Dark Room"),
             .description("A dark, damp room.")
         )
         let activeLamp = Item(
             id: "lamp",
-            name: "brass lamp",
+            .name("brass lamp"),
             .in(.player),
             .isLightSource,
             .isOn
         )
         let item1 = Item(
             id: "table",
-            name: "wooden table",
+            .name("wooden table"),
             .in(.location(darkRoom.id))
         )
 
@@ -243,7 +243,7 @@ struct LookActionHandlerTests {
         // Arrange
         let litRoom = Location(
             id: "litRoom",
-            name: "Plain Room",
+            .name("Plain Room"),
             // No description provided - should be nil by default
             .inherentlyLit
         )
@@ -279,7 +279,7 @@ struct LookActionHandlerTests {
 
         let dynamicRoom = Location(
             id: "dynamicRoom",
-            name: "Magic Room",
+            .name("Magic Room"),
             // Provide a default description; dynamic logic will override
             .description("The room seems normal."),
             .inherentlyLit
@@ -338,7 +338,7 @@ struct LookActionHandlerTests {
         // Arrange
         let item = Item(
             id: "rock",
-            name: "grey rock",
+            .name("grey rock"),
             .description("Just a plain rock."),
             .in(.location("startRoom"))
         )
@@ -379,7 +379,7 @@ struct LookActionHandlerTests {
         // Arrange
         let item = Item(
             id: "pebble",
-            name: "smooth pebble",
+            .name("smooth pebble"),
             .in(.location("startRoom")),
             .firstDescription("You notice a small pebble.")
         )
@@ -420,7 +420,7 @@ struct LookActionHandlerTests {
         // Arrange
         let item = Item(
             id: "stone",
-            name: "chipped stone",
+            .name("chipped stone"),
             .description("A worn stone."),
             .in(.location("startRoom")),
             .firstDescription("This shouldn't appear."),
@@ -465,7 +465,7 @@ struct LookActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -473,7 +473,7 @@ struct LookActionHandlerTests {
         )
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.item("box")),
             .isTakable
         )
@@ -514,14 +514,14 @@ struct LookActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable
         )
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.item("box")),
             .isTakable
         )
@@ -563,7 +563,7 @@ struct LookActionHandlerTests {
         // Arrange
         let jar = Item(
             id: "jar",
-            name: "glass jar",
+            .name("glass jar"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -571,7 +571,7 @@ struct LookActionHandlerTests {
         )
         let fly = Item(
             id: "fly",
-            name: "dead fly",
+            .name("dead fly"),
             .in(.item("jar"))
         )
         let initialAttributes = jar.attributes
@@ -613,18 +613,18 @@ struct LookActionHandlerTests {
         // Arrange
         let table = Item(
             id: "table",
-            name: "kitchen table",
+            .name("kitchen table"),
             .in(.location("startRoom")),
             .isSurface
         )
         let book = Item(
             id: "book",
-            name: "dusty book",
+            .name("dusty book"),
             .in(.item("table"))
         )
         let candle = Item(
             id: "candle",
-            name: "lit candle",
+            .name("lit candle"),
             .in(.item("table")),
             .isLightSource,
             .isOn
@@ -670,17 +670,16 @@ struct LookActionHandlerTests {
         // Arrange: Item exists but is in another room
         let item = Item(
             id: "artifact",
-            name: "glowing artifact",
+            .name("glowing artifact"),
             .in(.location("otherRoom"))
         )
         let room1 = Location(
             id: "startRoom",
-            name: "Start Room",
+            .name("Start Room"),
             .inherentlyLit
         )
         let room2 = Location(
             id: "otherRoom",
-            name: "Other Room",
             .description("A very dark room.")
         ) // inherentlyLit defaults false
 

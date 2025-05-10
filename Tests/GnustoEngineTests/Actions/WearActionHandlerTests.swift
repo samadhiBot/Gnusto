@@ -12,7 +12,7 @@ struct WearActionHandlerTests {
     func testWearItemSuccess() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "velvet cloak",
+            .name("velvet cloak"),
             .in(.player),
             .isWearable,
             .isTakable
@@ -94,7 +94,7 @@ struct WearActionHandlerTests {
     func testWearItemNotWearable() async throws {
         let rock = Item(
             id: "rock",
-            name: "heavy rock",
+            .name("heavy rock"),
             .in(.player),
             .isTakable
         )
@@ -123,7 +123,7 @@ struct WearActionHandlerTests {
     func testWearItemAlreadyWorn() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "velvet cloak",
+            .name("velvet cloak"),
             .in(.player),
             .isWearable,
             .isTakable,

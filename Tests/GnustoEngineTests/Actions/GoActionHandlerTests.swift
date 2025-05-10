@@ -11,14 +11,14 @@ struct GoActionHandlerTests {
     func testGoNorth() async throws {
         let startRoom = Location(
             id: "startRoom",
-            name: "Start Room",
+            .name("Start Room"),
             .description("You are here."),
             .exits([.north: Exit(destination: "end")]),
             .inherentlyLit
         )
         let endRoom = Location(
             id: "end",
-            name: "End Room",
+            .name("End Room"),
             .description("You went there."),
             .inherentlyLit
         )
@@ -50,14 +50,14 @@ struct GoActionHandlerTests {
     func testGoNorthBlocked() async throws {
         let startRoom = Location(
             id: "startRoom",
-            name: "Start Room",
-            description: "You are here.",
-            exits: [
+            .name("Start Room"),
+            .description("You are here."),
+            .exits([
                 .north: Exit(
                     destination: "end",
                     blockedMessage: "A wall blocks your path."
                 )
-            ]
+            ])
         )
         let endRoom = Location(
             id: "end",
@@ -101,13 +101,13 @@ struct GoActionHandlerTests {
     func testGoNorthNoExit() async throws {
         let startRoom = Location(
             id: "startRoom",
-            name: "Start Room",
-            description: "You are here."
+            .name("Start Room"),
+            .description("You are here.")
         )
         let endRoom = Location(
             id: "end",
-            name: "End Room",
-            description: "You went there."
+            .name("End Room"),
+            .description("You went there.")
         )
 
         let game = MinimalGame(
@@ -147,16 +147,16 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
-            exits: [.north: Exit(destination: "hall")],
-            isLit: true
+            .name("Foyer"),
+            .description("A grand foyer."),
+            .exits([.north: Exit(destination: "hall")]),
+            .inherentlyLit
         )
         let hall = Location(
             id: "hall",
-            name: "Hall",
-            description: "A long hall.",
-            isLit: true
+            .name("Hall"),
+            .description("A long hall."),
+            .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
@@ -176,9 +176,9 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
-            isLit: true
+            .name("Foyer"),
+            .description("A grand foyer."),
+            .inherentlyLit
             // No exit north
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
@@ -201,32 +201,30 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
-            exits: [
+            .name("Foyer"),
+            .description("A grand foyer."),
+            .exits([
                 .north: Exit(
                     destination: "vault",
                     doorID: "vaultDoor"
                 )
-            ],
-            isLit: true
+            ]),
+            .inherentlyLit
         )
         let vaultDoor = Item(
             id: "vaultDoor",
-            name: "door to the vault",
-            description: """
+            .name("door to the vault"),
+            .description("""
                 A massive, reinforced steel door dominates one wall of the grand foyer.
-                """,
-            parent: .location(foyer.id),
-            attributes: [
-                .isLocked: true,
-            ]
+                """),
+            .in(.location(foyer.id)),
+            .isLocked
         )
         let vault = Location(
             id: "vault",
-            name: "Vault",
-            description: "A secure vault.",
-            isLit: true
+            .name("Vault"),
+            .description("A secure vault."),
+            .inherentlyLit
         )
         let game = MinimalGame(
             player: Player(in: "foyer"),
@@ -256,17 +254,17 @@ struct GoActionHandlerTests {
 
         let foyer = Location(
             id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
+            .name("Foyer"),
+            .description("A grand foyer."),
             // Initially, the exit does not exist if the condition is not met
-            exits: [:],
-            isLit: true
+            .exits([:]),
+            .inherentlyLit
         )
         let garden = Location(
             id: "garden",
-            name: "Garden",
-            description: "A beautiful garden.",
-            isLit: true
+            .name("Garden"),
+            .description("A beautiful garden."),
+            .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
@@ -341,9 +339,9 @@ struct GoActionHandlerTests {
         // Arrange
         let foyer = Location(
             id: "foyer",
-            name: "Foyer",
-            description: "A grand foyer.",
-            isLit: true
+            .name("Foyer"),
+            .description("A grand foyer."),
+            .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()

@@ -11,11 +11,11 @@ struct RemoveActionHandlerTests {
     func testRemoveItemSuccess() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "cloak",
+            .name("cloak"),
             .in(.player),
             .isTakable,
             .isWearable,
-            .isWorn,
+            .isWorn
         )
         let game = MinimalGame(items: [cloak])
         let mockIO = await MockIOHandler()
@@ -78,10 +78,10 @@ struct RemoveActionHandlerTests {
     func testRemoveItemNotWorn() async throws {
         let cloak = Item(
             id: "cloak",
-            name: "cloak",
+            .name("cloak"),
             .in(.player),
             .isTakable,
-            .isWearable,
+            .isWearable
         )
         let game = MinimalGame(items: [cloak])
         let engine = await GameEngine(
@@ -158,11 +158,11 @@ struct RemoveActionHandlerTests {
     func testRemoveFailsIfFixed() async throws {
         let amulet = Item(
             id: "amulet",
-            name: "cursed amulet",
+            .name("cursed amulet"),
             .in(.player),
             .isFixed,
             .isWearable,
-            .isWorn,
+            .isWorn
         )
         let game = MinimalGame(items: [amulet])
         let engine = await GameEngine(
