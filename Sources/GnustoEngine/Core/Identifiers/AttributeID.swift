@@ -34,9 +34,15 @@ public extension AttributeID {
 
     /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
     static let localGlobals = AttributeID("localGlobals")
+    
+    /// The available exits from a location.
+    static let locationExits = AttributeID("locationExits")
 
     /// The key needed to lock/unlock an item (if `.isLockable`).
     static let lockKey = AttributeID("lockKey")
+    
+    /// The identifier of the item's parent entity.
+    static let parentEntity = AttributeID("parentEntity")
 
     /// An item's size, influencing carrying capacity and container limits.
     static let size = AttributeID("size")

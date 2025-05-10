@@ -155,7 +155,8 @@ struct StandardParserTests {
             ),
             Item(
                 id: "rug",
-                name: "rug"
+                name: "rug",
+                .in(.nowhere)
             ),
             Item(
                 id: "sword",
@@ -811,7 +812,7 @@ struct StandardParserTests {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict[lampID]?.parent = .nowhere // Move lamp out of scope
+        itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
         let customState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -893,7 +894,7 @@ struct StandardParserTests {
     func testExtractNounModsPronoun() async throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"]?.parent = .player // Put key in inventory
+        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player) // Put key in inventory
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -913,7 +914,7 @@ struct StandardParserTests {
     func testExtractNounModsPronounNoise() async throws {
         // "drop the it"
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"]?.parent = .player
+        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player)
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),

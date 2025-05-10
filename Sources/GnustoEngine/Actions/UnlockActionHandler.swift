@@ -80,25 +80,18 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if targetItem.attributes[.isTouched] != true {
-            let targetTouchedChange = StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(targetTouchedChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if keyItem.attributes[.isTouched] != true {
-            let keyTouchedChange = StateChange(
-                entityID: .item(keyItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: keyItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(keyTouchedChange)
+        if let addTouchedFlag = await context.engine.flag(keyItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
+        }
+
+        // Change 3: Update pronouns
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem, keyItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

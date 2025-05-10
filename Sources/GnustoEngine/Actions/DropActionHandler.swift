@@ -55,13 +55,13 @@ public struct DropActionHandler: ActionHandler {
         stateChanges.append(parentChange)
 
         // Change 2: Ensure `.isTouched` is true
-        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Update pronoun
-        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // Change 4: Ensure `.isWorn` is false

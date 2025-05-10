@@ -24,11 +24,11 @@ struct LocationTests {
         return Location(
             id: "livingRoom",
             name: "Living Room",
-            exits: [.west: westExit, .east: eastExit],
             .description("A comfortably furnished living room. There are exits west and east."),
+            .exits([.west: westExit, .east: eastExit]),
             .inherentlyLit,
             .isSacred,
-            .localGlobals("rug", "fireplace")
+            .localGlobals("rug", "fireplace"),
         )
     }
 

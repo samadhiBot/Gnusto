@@ -12,7 +12,7 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             name: "wooden box",
-            in: .location("startRoom"),
+            .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
             .isOpen // Start open

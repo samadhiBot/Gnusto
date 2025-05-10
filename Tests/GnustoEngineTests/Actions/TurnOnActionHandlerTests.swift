@@ -12,10 +12,11 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            in: .player,
+            .description("A brass lantern."),
+            .in(.player),
+            .isDevice,
             .isLightSource,
-            .isTakable
+            .isTakable,
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -51,16 +52,16 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            description: "This is a dark room that should now be lit.",
-            .isVisited
+            .description("This is a dark room that should now be lit.")
         )
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            in: .location(darkRoom.id),
+            .description("A brass lantern."),
+            .in(.location(darkRoom.id)),
+            .isDevice,
             .isLightSource,
-            .isTakable
+            .isTakable,
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -79,8 +80,11 @@ struct TurnOnActionHandlerTests {
         let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")
         #expect(initiallyLit == false)
 
-        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
-        let command = try parseResult.get()
+        let command = Command(
+            verbID: "turn on",
+            directObject: "lamp",
+            rawInput: "turn on lamp"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -105,13 +109,12 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            parent: .player,
-            attributes: [
-                .isLightSource: true,
-                .isOn: true,
-                .isTakable: true
-            ]
+            .description("A brass lantern."),
+            .in(.player),
+            .isDevice,
+            .isLightSource,
+            .isOn,
+            .isTakable,
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -122,8 +125,11 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
-        let command = try parseResult.get()
+        let command = Command(
+            verbID: "turn on",
+            directObject: "lamp",
+            rawInput: "turn on lamp"
+        )
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already on.")) {
@@ -148,9 +154,9 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            parent: .player,
-            attributes: [.isTakable: true]
+            .description("A brass lantern."),
+            .in(.player),
+            .isTakable,
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -161,8 +167,11 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let parseResult = await parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
-        let command = try parseResult.get()
+        let command = Command(
+            verbID: "turn on",
+            directObject: "lamp",
+            rawInput: "turn on lamp"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
@@ -172,7 +181,7 @@ struct TurnOnActionHandlerTests {
                     engine: engine,
                     stateSnapshot: engine.gameState
                 )
-            ) // Changed to validate
+            )
         }
 
         let finalItemState = await engine.item("lamp")
@@ -186,12 +195,10 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            parent: .nowhere, // Not accessible
-            attributes: [
-                .isLightSource: true,
-                .isTakable: true
-            ]
+            .description("A brass lantern."),
+            .in(.nowhere), // Not accessible
+            .isLightSource,
+            .isTakable,
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -202,10 +209,21 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
+        let command = Command(
+            verbID: "turn on",
+            directObject: "lamp",
+            rawInput: "turn on lamp"
+        )
+
         // Act & Assert: Expect parser error because item is out of scope
-        let expectedError = ParseError.itemNotInScope(noun: "lamp")
-        await #expect(throws: expectedError) {
-            _ = try parser.parse(input: "turn on lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState).get()
+        await #expect(throws: ActionError.itemNotAccessible("lamp")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -215,14 +233,15 @@ struct TurnOnActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Dark Room",
-            description: "A dark room."
+            .description("A dark room.")
         )
         let radio = Item(
             id: "radio",
             name: "portable radio",
-            description: "A portable radio.",
-            parent: .player,
-            attributes: [.isTakable: true]
+            .description("A portable radio."),
+            .in(.player),
+            .isDevice,
+            .isTakable,
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -237,8 +256,11 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let parseResult = await parser.parse(input: "turn on radio", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
-        let command = try parseResult.get()
+        let command = Command(
+            verbID: "turn on",
+            directObject: "radio",
+            rawInput: "turn on radio"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -263,12 +285,11 @@ struct TurnOnActionHandlerTests {
         let lamp = Item(
             id: "lamp",
             name: "brass lantern",
-            description: "A brass lantern.",
-            parent: .player,
-            attributes: [
-                .isLightSource: true,
-                .isTakable: true
-            ]
+            .description("A brass lantern."),
+            .in(.player),
+            .isDevice,
+            .isLightSource,
+            .isTakable,
         )
         let game = MinimalGame(items: [lamp])
         let mockIO = await MockIOHandler()
@@ -279,7 +300,11 @@ struct TurnOnActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let parseResult = await parser.parse(input: "light lamp", vocabulary: await engine.gameState.vocabulary, gameState: await engine.gameState)
+        let parseResult = parser.parse(
+            input: "light lamp",
+            vocabulary: await engine.gameState.vocabulary,
+            gameState: await engine.gameState
+        )
         let command = try parseResult.get()
 
         // Act

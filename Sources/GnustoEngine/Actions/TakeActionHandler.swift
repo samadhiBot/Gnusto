@@ -91,13 +91,13 @@ public struct TakeActionHandler: ActionHandler {
         stateChanges.append(parentChange)
 
         // Change 2: Set `.isTouched` flag if not already set
-        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Pronoun ("it")
-        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

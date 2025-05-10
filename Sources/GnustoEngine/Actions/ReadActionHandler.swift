@@ -47,13 +47,13 @@ public struct ReadActionHandler: ActionHandler {
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
 
-        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // --- State Change: Update pronoun "it" ---
-        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Determine Message ---

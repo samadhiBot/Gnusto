@@ -84,18 +84,18 @@ public struct LockActionHandler: ActionHandler {
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if let touchedStateChange = await context.engine.flag(keyItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(keyItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 4: Update pronoun
-        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

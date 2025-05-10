@@ -81,18 +81,18 @@ struct PutOnActionHandler: ActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if let touchedStateChange = await context.engine.flag(itemToPut, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(itemToPut, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Mark surface touched
-        if let touchedStateChange = await context.engine.flag(surface, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(surface, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 4: Update pronoun "it"
-        if let pronounStateChange = await context.engine.pronounStateChange(for: itemToPut) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: itemToPut) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

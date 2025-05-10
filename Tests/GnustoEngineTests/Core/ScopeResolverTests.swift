@@ -67,7 +67,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",
@@ -124,7 +124,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",
@@ -225,7 +225,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
             // No .inherentlyLit property
         )
         let item = Item(
@@ -385,7 +385,8 @@ struct ScopeResolverTests {
     )
     let baseItemInBox = Item(
         id: "itemInBox",
-        name: "item in box"
+        name: "item in box",
+        .in(.nowhere)
     )
 
     @Test("Reachable includes inventory")
@@ -436,7 +437,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let locationItem = Item(
             id: "locItem",
@@ -645,7 +646,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let openBox = Item(
             id: "openBox",
@@ -684,7 +685,7 @@ struct ScopeResolverTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",

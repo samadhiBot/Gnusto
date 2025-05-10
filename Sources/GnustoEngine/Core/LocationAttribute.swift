@@ -27,6 +27,17 @@ extension LocationAttribute {
             rawValue: .string(description)
         )
     }
+    
+    /// The available exits from a location.
+    ///
+    /// - Parameter exits: The available exits from a location.
+    /// - Returns: A .locationExits attribute.
+    static func exits(_ exits: [Direction: Exit]) -> LocationAttribute {
+        LocationAttribute(
+            id: .locationExits,
+            rawValue: .locationExits(exits)
+        )
+    }
 
     /// Items that are considered local to a location (e.g. fixed scenery) and always in scope.
     ///
@@ -43,7 +54,7 @@ extension LocationAttribute {
 // MARK: - Flag attributes
 
 extension LocationAttribute {
-    /// RLIGHTBIT: Location is inherently lit (e.g., outdoors).
+    /// Location is inherently lit (e.g., outdoors) (ZIL `RLIGHTBIT`).
     static var inherentlyLit: LocationAttribute {
         LocationAttribute(id: .inherentlyLit, rawValue: true)
     }
@@ -58,12 +69,12 @@ extension LocationAttribute {
         LocationAttribute(id: .isSacred, rawValue: true)
     }
 
-    /// RMUNGBIT: Location description has been changed.
+    /// Location description has been changed (ZIL `RMUNGBIT`).
     static var isChanged: LocationAttribute {
         LocationAttribute(id: .isChanged, rawValue: true)
     }
 
-    /// RLANDBIT: Location is land, not water/air.
+    /// Location is land, not water/air (ZIL `RLANDBIT`).
     static var isLand: LocationAttribute {
         LocationAttribute(id: .isLand, rawValue: true)
     }

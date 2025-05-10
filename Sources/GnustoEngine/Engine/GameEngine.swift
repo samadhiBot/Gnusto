@@ -536,7 +536,9 @@ extension GameEngine {
                 // This case should ideally not be reached if parser validates verbs
                 logger.warning("""
                     💥 Internal Error: Unknown verb ID \
-                    '\(command.verbID.rawValue, privacy: .public)' reached execution.
+                    '\(command.verbID.rawValue, privacy: .public)' reached execution. \
+                    If you encounter this error during testing, make sure to use \ 
+                    `parse(input:vocabulary:gameState:)` to generate the command.
                     """)
                 await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
                 return

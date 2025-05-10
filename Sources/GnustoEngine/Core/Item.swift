@@ -8,9 +8,6 @@ public struct Item: Codable, Identifiable, Sendable {
     /// The primary noun used to refer to the item (ZIL: `DESC`).
     public var name: String
 
-    /// The entity that currently contains or supports this item (ZIL: `IN`)
-    public var parent: ParentEntity
-
     /// A dictionary that holds the item's current attributes.
     ///
     /// Some attributes are static under normal circumstances, but any can change when necessary.
@@ -19,19 +16,13 @@ public struct Item: Codable, Identifiable, Sendable {
     public init(
         id: ItemID,
         name: String,
-        description: String? = nil,
-        in parent: ParentEntity = .nowhere,
         _ attributes: ItemAttribute...
     ) {
         self.id = id
         self.name = name
-        self.parent = parent
         self.attributes = Dictionary(
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
-        if let description, self.attributes[.description] == nil {
-            self.attributes[.description] = .string(description)
-        }
     }
 
     @available(*, deprecated,
@@ -42,17 +33,19 @@ public struct Item: Codable, Identifiable, Sendable {
         id: ItemID,
         name: String,
         description: String? = nil,
-        parent: ParentEntity = .nowhere,
+        parent: ParentEntity? = nil,
         attributes: [AttributeID: StateValue] = [:]
     ) {
         self.id = id
         self.name = name
-        self.parent = parent
-        var initial = attributes
+        self.attributes = attributes
         if let description {
-            initial[.description] = .string(description)
+            assert(attributes[.description] == nil, "Long description defined twice.")
+            self.attributes[.description] = .string(description)
         }
-        self.attributes = initial
+        if let parent {
+            self.attributes[.parentEntity] = .parentEntity(parent)
+        }
     }
 
     // MARK: - Convenience Accessors
@@ -74,7 +67,12 @@ public struct Item: Codable, Identifiable, Sendable {
     public func hasFlag(_ id: AttributeID) -> Bool {
         attributes[id] == true
     }
-    
+
+    /// The entity that currently contains or supports this item (ZIL: `IN`)
+    public var parent: ParentEntity {
+        attributes[.parentEntity]?.toParentEntity ?? .nowhere
+    }
+
     /// The item's size.
     public var size: Int {
         attributes[.size]?.toInt ?? 1

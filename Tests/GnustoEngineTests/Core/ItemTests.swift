@@ -11,8 +11,11 @@ struct ItemTests {
     let defaultItemName = "thing"
 
     func createDefaultItem() -> Item {
-        // Default parent is .nowhere
-        Item(id: defaultItemID, name: defaultItemName)
+        Item(
+            id: defaultItemID,
+            name: defaultItemName,
+            .in(.nowhere)
+        )
     }
 
     func createCustomItem() -> Item {
@@ -20,22 +23,20 @@ struct ItemTests {
         Item(
             id: "customItem",
             name: "lantern",
-            description: "A sturdy brass lantern.",
-            parent: .player,
-            attributes: [
-                .adjectives: .stringSet(["brass", "shiny"]),
-                .synonyms: .stringSet(["lamp", "light"]),
-                .shortDescription: .string("The brass lantern is here."),
-                .firstDescription: .string("A shiny brass lantern rests here."),
-                .readText: .string("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
-                .readWhileHeldText: .string("It feels warm."),
-                .isTakable: true,
-                .isLightSource: true,
-                .isOn: true,
-                .isOpenable: true,
-                .size: .int(10),
-                .capacity: .int(5)
-            ]
+            .adjectives("brass", "shiny"),
+            .capacity(5),
+            .description("A sturdy brass lantern."),
+            .firstDescription("A shiny brass lantern rests here."),
+            .in(.player),
+            .isLightSource,
+            .isOn,
+            .isOpenable,
+            .isTakable,
+            .readText("Engraved on the bottom: \"Property of Frobozz Magic Lantern Co.\""),
+            .readWhileHeldText("It feels warm."),
+            .shortDescription("The brass lantern is here."),
+            .size(10),
+            .synonyms("lamp", "light"),
         )
     }
 
@@ -150,7 +151,7 @@ struct ItemTests {
         // Modify the copy (item2)
         item2.name = "modified thing"
         item2.attributes[.isInvisible] = true
-        item2.parent = .location("limbo")
+        item2.attributes[.parentEntity] = .parentEntity(.location("limbo"))
 
         // Assert that the original (item1) is unchanged
         #expect(item1.name == "thing")

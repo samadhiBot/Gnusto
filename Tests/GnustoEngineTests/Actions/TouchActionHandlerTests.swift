@@ -164,7 +164,7 @@ struct TouchActionHandlerTests {
         let table = Item(
             id: "table",
             name: "wooden table",
-            in: .location("startRoom"),
+            .in(.location("startRoom")),
             .isSurface
         )
         let book = Item(
@@ -203,13 +203,13 @@ struct TouchActionHandlerTests {
         let chest = Item(
             id: "chest",
             name: "locked chest",
-            in: .location("startRoom"),
+            .in(.location("startRoom")),
             .isContainer // Closed by default
         )
         let coin = Item(
             id: "coin",
             name: "gold coin",
-            in: .item(chest.id)
+            .in(.item(chest.id))
         )
         let game = MinimalGame(items: [chest, coin])
         let mockIO = await MockIOHandler()

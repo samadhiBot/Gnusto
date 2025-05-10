@@ -60,8 +60,22 @@ extension ItemAttribute {
             rawValue: .string(description)
         )
     }
+    
+    /// The item's parent entity (ZIL `IN`).
+    ///
+    /// - Parameter parent: The item's parent entity.
+    /// - Returns: A .parentEntity attribute.
+    static func `in`(_ parent: ParentEntity) -> ItemAttribute {
+        ItemAttribute(
+            id: .parentEntity,
+            rawValue: .parentEntity(parent)
+        )
+    }
 
     /// The key needed to lock/unlock an item (if `.isLockable`).
+    ///
+    /// - Parameter lockKey: <#lockKey description#>
+    /// - Returns: <#description#>
     static func lockKey(_ lockKey: ItemID) -> ItemAttribute {
         ItemAttribute(
             id: .lockKey,

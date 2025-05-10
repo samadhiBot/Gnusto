@@ -29,7 +29,7 @@ extension GameEngine {
     /// <#Description#>
     /// - Parameter item: <#item description#>
     /// - Returns: <#description#>
-    public func pronounStateChange(for items: Item...) -> StateChange? {
+    public func updatePronouns(to items: Item...) -> StateChange? {
         let pronoun = switch items.count {
         case 0: "it"
         case 1: items[0].hasFlag(.isPlural) ? "them" : "it"

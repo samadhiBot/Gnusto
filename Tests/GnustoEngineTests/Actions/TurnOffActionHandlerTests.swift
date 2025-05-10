@@ -317,7 +317,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
@@ -370,7 +370,7 @@ struct TurnOffActionHandlerTests {
         let darkRoom = Location(
             id: "darkRoom",
             name: "Pitch Black Room",
-            description: "It's dark."
+            .description("It's dark.")
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),

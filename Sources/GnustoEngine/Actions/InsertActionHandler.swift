@@ -108,18 +108,18 @@ struct InsertActionHandler: ActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if let touchedStateChange = await context.engine.flag(itemToInsert, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(itemToInsert, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 2: Mark container touched
-        if let touchedStateChange = await context.engine.flag(container, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(container, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 4: Update pronoun
-        if let pronounStateChange = await context.engine.pronounStateChange(for: itemToInsert) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: itemToInsert) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

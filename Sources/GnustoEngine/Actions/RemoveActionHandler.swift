@@ -37,18 +37,18 @@ public struct RemoveActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if let touchedStateChange = await context.engine.flag(targetItem, remove: .isWorn) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, remove: .isWorn) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 2: Set `.isTouched` to true
-        if let touchedStateChange = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(touchedStateChange)
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // Change 3: Update pronoun "it"
-        if let pronounStateChange = await context.engine.pronounStateChange(for: targetItem) {
-            stateChanges.append(pronounStateChange)
+        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(updatePronoun)
         }
 
         // --- Prepare Result ---

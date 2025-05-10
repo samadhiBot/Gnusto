@@ -8,9 +8,6 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     /// The display name of the location.
     public var name: String
 
-    /// Defines the connections (exits) from this location to others.
-    public var exits: [Direction: Exit]
-
     /// A dictionary that holds the location's current attributes.
     ///
     /// Some attributes are static under normal circumstances, but any can change when necessary.
@@ -21,19 +18,13 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     public init(
         id: LocationID,
         name: String,
-        description: String? = nil,
-        exits: [Direction: Exit] = [:],
         _ attributes: LocationAttribute...
     ) {
         self.id = id
         self.name = name
-        self.exits = exits
         self.attributes = Dictionary(
             uniqueKeysWithValues: attributes.map { ($0.id, $0.rawValue) }
         )
-        if let description, self.attributes[.description] == nil {
-            self.attributes[.description] = .string(description)
-        }
     }
 
     @available(*, deprecated,
@@ -50,11 +41,13 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     ) {
         self.id = id
         self.name = name
-        self.exits = exits
         self.attributes = attributes
         if let description {
             assert(attributes[.description] == nil, "Long description defined twice.")
             self.attributes[.description] = .string(description)
+        }
+        if !exits.isEmpty {
+            self.attributes[.locationExits] = .locationExits(exits)
         }
         self.attributes[.inherentlyLit] = .bool(
             isLit || (attributes[.inherentlyLit]?.toBool ?? false)
@@ -62,6 +55,11 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     }
 
     // MARK: - Convenience Accessors
+
+    /// Defines the connections (exits) from this location to others.
+    public var exits: [Direction: Exit] {
+        attributes[.locationExits]?.toLocationExits ?? [:]
+    }
 
     /// Checks if a flag is set in the location's `attributes`.
     ///

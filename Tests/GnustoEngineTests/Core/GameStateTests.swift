@@ -389,11 +389,11 @@ struct GameStateTests {
         // Valid: Simulate state changes by modifying Item parents
         // Again, modify copy and reassign
         var lanternForParent = state.items[Self.itemLantern]!
-        lanternForParent.parent = .player
+        lanternForParent.attributes[.parentEntity] = .parentEntity(.player)
         state.items[Self.itemLantern] = lanternForParent
 
         var swordForParent = state.items[Self.itemSword]!
-        swordForParent.parent = .location(state.player.currentLocationID)
+        swordForParent.attributes[.parentEntity] = .parentEntity(.location(state.player.currentLocationID))
         state.items[Self.itemSword] = swordForParent
 
         // Assertions for the valid modifications:
@@ -417,7 +417,7 @@ struct GameStateTests {
         // Modify an item *before* encoding
         var lantern = originalState.items[Self.itemLantern]!
         lantern.attributes[.isOn] = true
-        lantern.parent = .player // Put lantern in inventory
+        lantern.attributes[.parentEntity] = .parentEntity(.player) // Put lantern in inventory
         originalState.items[Self.itemLantern] = lantern
 
         let encoder = JSONEncoder()
@@ -470,7 +470,7 @@ struct GameStateTests {
         // Modify reference type contained within struct (Item dict value) *in* state2
         var lantern2 = state2.items[Self.itemLantern]!
         lantern2.name = "Shiny Lantern"
-        lantern2.parent = .player // Also move it for state2
+        lantern2.attributes[.parentEntity] = .parentEntity(.player) // Also move it for state2
         state2.items[Self.itemLantern] = lantern2 // Reassign modified copy back
 
         // Verify state1's value types remain unchanged

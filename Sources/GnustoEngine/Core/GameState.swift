@@ -191,7 +191,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemParent change")
             }
-            items[itemID]?.parent = newParent
+            items[itemID]?.attributes[.parentEntity] = .parentEntity(newParent)
 
         case .itemSize:
             // Expecting an .int for itemSize
@@ -261,7 +261,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationExits change")
             }
-            locations[locationID]?.exits = newExits
+            locations[locationID]?.attributes[.locationExits] = .locationExits(newExits)
 
         // MARK: Attributes (Item or Location)
 

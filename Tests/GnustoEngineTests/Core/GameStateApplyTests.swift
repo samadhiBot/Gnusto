@@ -190,7 +190,7 @@ struct GameStateApplyTests {
         var state = helper.createInitialState()
         let itemID: ItemID = "testItem"
         // Pre-move item to player
-        state.items[itemID]?.parent = .player
+        state.items[itemID]?.attributes[.parentEntity] = .parentEntity(.player) 
         #expect(state.items[itemID]?.parent == .player)
         state.changeHistory = [] // Clear history
 
