@@ -88,30 +88,46 @@ struct ItemTests {
         var item = createDefaultItem()
 
         #expect(!item.hasFlag(.isTakable))
-        #expect(item.attributes.isEmpty) // Default item has no attributes initially
+        #expect(item.attributes == [.name: "thing"])
 
         item.attributes[.isTakable] = true
         #expect(item.hasFlag(.isTakable))
-        #expect(item.attributes.count == 1)
+        #expect(item.attributes == [
+            .name: "thing",
+            .isTakable: true,
+        ])
 
         item.attributes[.isTakable] = true // Setting again should have no effect
-        #expect(item.attributes.count == 1)
+        #expect(item.attributes == [
+            .name: "thing",
+            .isTakable: true,
+        ])
 
         item.attributes[.isLightSource] = true
         #expect(item.hasFlag(.isLightSource))
-        #expect(item.attributes.count == 2)
+        #expect(item.attributes == [
+            .name: "thing",
+            .isTakable: true,
+            .isLightSource: true,
+        ])
 
         item.attributes[.isTakable] = nil // Remove the key
         #expect(!item.hasFlag(.isTakable))
         #expect(item.hasFlag(.isLightSource))
-        #expect(item.attributes.count == 1)
+        #expect(item.attributes == [
+            .name: "thing",
+            .isLightSource: true,
+        ])
 
         item.attributes[.isTakable] = nil // Removing again should have no effect
-        #expect(item.attributes.count == 1)
+        #expect(item.attributes == [
+            .name: "thing",
+            .isLightSource: true,
+        ])
 
         item.attributes[.isLightSource] = nil // Remove the other key
         #expect(!item.hasFlag(.isLightSource))
-        #expect(item.attributes.isEmpty)
+        #expect(item.attributes == [.name: "thing"])
     }
 
     @Test("Item Codable Conformance")

@@ -42,10 +42,16 @@ struct LocationTests {
         #expect(location.name == defaultLocationName)
         // Check attributes for descriptions
         #expect(location.attributes[.description] == .string("A nondescript room."))
-        #expect(location.attributes[.shortDescription] == nil) // Verify shortDescription is nil by default
+        #expect(location.attributes[.shortDescription] == nil)
         #expect(location.exits.isEmpty)
-        #expect(location.attributes.count == 3)
-        #expect(location.attributes[.inherentlyLit] == false)
+        #expect(location.attributes == [
+            .name: "Room",
+            .description: "A nondescript room.",
+        ])
+
+        #expect(location.attributes[.inherentlyLit] == nil)
+        #expect(location.hasFlag(.inherentlyLit) == false)
+
         #expect(location.localGlobals.isEmpty)
     }
 
@@ -67,12 +73,25 @@ struct LocationTests {
         #expect(location.localGlobals.count == 2)
         #expect(location.localGlobals.contains(rugID))
         // Check the full attributes dictionary for completeness
-        #expect(location.attributes == [
-            .description: .string("A comfortably furnished living room. There are exits west and east."),
-            .inherentlyLit: true,
-            .isSacred: true,
-            .localGlobals: .itemIDSet(["rug", "fireplace"])
-        ])
+        #expect(
+            location.attributes == [
+                .name: "Living Room",
+                .description: "A comfortably furnished living room. There are exits west and east.",
+                .locationExits: .locationExits([
+                    .west: Exit(
+                        destination: "westOfHouse",
+                        blockedMessage: "You head west."
+                    ),
+                    .east: Exit(
+                        destination: "nowhere",
+                        blockedMessage: "A solid wall blocks your path."
+                    )
+                ]),
+                .inherentlyLit: true,
+                .isSacred: true,
+                .localGlobals: .itemIDSet(["rug", "fireplace"])
+            ]
+        )
     }
 
     @Test("Location Attribute Management")
