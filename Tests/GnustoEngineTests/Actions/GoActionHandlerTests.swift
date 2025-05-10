@@ -253,8 +253,16 @@ struct GoActionHandlerTests {
             .description("A beautiful garden."),
             .inherentlyLit
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let game = MinimalGame(
+            player: Player(in: "foyer"),
+            locations: [foyer, garden],
+            globalState: [conditionGlobalID: false]
+        )
+        let engine = await GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
         // Check flags set using contains
         #expect(await engine.gameState.globalState[conditionGlobalID] == false)

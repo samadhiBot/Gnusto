@@ -68,20 +68,15 @@ struct GameStateTests {
 
     // 4. Helper to create the GameState with defined placements
     func createSampleGameState(
-        activeFuses: [FuseID: Int] = [:] // Add optional parameter
+        activeFuses: [FuseID: Int] = [:]
     ) async -> GameState {
-        let items = createSampleItems()
-        let locations = createSampleLocations()
-        let player = createSamplePlayer()
-        let globalState: Set<GlobalID> = ["gameStarted"]
-        let pronouns: [String: Set<ItemID>] = ["it": [Self.itemMailbox]]
-
-        return GameState(
-            locations: locations,
-            items: items,
-            player: player,
-            pronouns: pronouns,
-            activeFuses: activeFuses // Pass parameter to initializer
+        GameState(
+            locations: createSampleLocations(),
+            items: createSampleItems(),
+            player: createSamplePlayer(),
+            pronouns: ["it": [Self.itemMailbox]],
+            activeFuses: activeFuses,
+            globalState: ["gameStarted": true]
         )
     }
 

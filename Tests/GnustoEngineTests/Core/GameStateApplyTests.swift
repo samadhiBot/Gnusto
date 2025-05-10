@@ -1037,12 +1037,12 @@ struct GameStateApplyTests {
         let flagID: GlobalID = "testFlag"
 
         // Initial state check
-        #expect(gameState.globalState[flagID] == false)
+        #expect(gameState.globalState[flagID] == nil)
 
         let change = StateChange(
             entityID: .global,
             attributeKey: .setFlag(flagID),
-            oldValue: nil, // Or false
+            oldValue: nil,
             newValue: true,
         )
 
@@ -1080,8 +1080,11 @@ struct GameStateApplyTests {
 
     @Test("Apply flag change with invalid old value fails")
     func testApplyFlagChangeInvalidOldValue() async throws {
-        var gameState = await helper.createSampleGameState()
         let flagID: GlobalID = "testFlag"
+        var gameState = await helper.createSampleGameState()
+        gameState.globalState[flagID] = false
+        print("🎾", gameState.globalState)
+
         let actualOldValue = gameState.globalState[flagID]
         #expect(actualOldValue == false)
 
@@ -1092,17 +1095,16 @@ struct GameStateApplyTests {
             newValue: true,
         )
 
-        var validationErrorThrown = false
         do {
             try gameState.apply(change)
+            Issue.record("Expected validation error to be thrown")
         } catch ActionError.stateValidationFailed(let failedChange, let reportedActualValue) {
-            validationErrorThrown = true
             expectNoDifference(failedChange, change)
             #expect(reportedActualValue == false) // actual value was false
         } catch {
             Issue.record("Threw unexpected error type: \(error)")
         }
-        #expect(validationErrorThrown)
+
         // Assert state unchanged
         #expect(gameState.globalState[flagID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
