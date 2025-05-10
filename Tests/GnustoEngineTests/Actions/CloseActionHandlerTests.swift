@@ -6,12 +6,12 @@ import Testing
 @Suite("CloseActionHandler Tests")
 struct CloseActionHandlerTests {
     let handler = CloseActionHandler()
-    
+
     @Test("Close open container successfully")
     func testCloseOpenContainerSuccessfully() async throws {
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -25,26 +25,26 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        
+
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
-        
+
         // Initial state check
         let initialBox = await engine.item("box")
         #expect(initialBox?.attributes[.isOpen] == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
-        
+
         // Act
         await engine.execute(command: command)
-        
+
         // Assert State Change
         let finalBox = await engine.item("box")
         #expect(finalBox?.attributes[.isOpen] == false)
         #expect(finalBox?.attributes[.isTouched] == true)
-        
+
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "Closed.")
-        
+
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, [
@@ -68,12 +68,12 @@ struct CloseActionHandlerTests {
             ),
         ])
     }
-    
+
     @Test("Close fails if already closed")
     func testCloseFailsIfAlreadyClosed() async throws {
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable
@@ -87,25 +87,25 @@ struct CloseActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        
+
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
-        
+
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
-        
+
         // Assert Output
         let output = await mockIO.flush()
         expectNoDifference(output, "The wooden box is already closed.")
-        
+
         // Assert Change History
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
-    
+
     @Test("Close fails if not openable")
     func testCloseFailsIfNotOpenable() async throws {
         let rock = Item(
             id: "rock",
-            name: "smooth rock",
+            .name("smooth rock"),
             .in(.location("startRoom"))
             // isContainer/isOpenable are false by default
         )
@@ -115,9 +115,9 @@ struct CloseActionHandlerTests {
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
-        
+
         let command = Command(verbID: "close", directObject: "rock", rawInput: "close rock")
-        
+
         // Act & Assert Error
         await #expect(throws: ActionError.itemNotClosable("rock")) {
             try await handler.validate(
@@ -130,12 +130,12 @@ struct CloseActionHandlerTests {
         }
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
-    
+
     @Test("Close fails if item not accessible")
     func testCloseFailsIfNotAccessible() async throws {
         let box = Item(
             id: "box",
-            name: "distant box",
+            .name("wooden box"),
             .in(.nowhere),
             .isOpenable,
             .isOpen // Start open
@@ -146,9 +146,9 @@ struct CloseActionHandlerTests {
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
-        
+
         let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
-        
+
         // Act & Assert Error
         await #expect(throws: ActionError.itemNotAccessible("box")) {
             try await handler.validate(
@@ -161,7 +161,7 @@ struct CloseActionHandlerTests {
         }
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
-    
+
     @Test("Close fails with no direct object")
     func testCloseFailsWithNoObject() async throws {
         let game = MinimalGame()
@@ -170,9 +170,9 @@ struct CloseActionHandlerTests {
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
-        
+
         let command = Command(verbID: "close", rawInput: "close")
-        
+
         // Act & Assert Error
         await #expect(throws: ActionError.prerequisiteNotMet("Close what?")) {
             try await handler.validate(

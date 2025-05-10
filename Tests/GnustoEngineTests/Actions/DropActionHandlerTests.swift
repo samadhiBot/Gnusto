@@ -10,7 +10,7 @@ struct DropActionHandlerTests {
         // Arrange: Create item
         let testItem = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.player),
             .isTakable
         )
@@ -84,7 +84,7 @@ struct DropActionHandlerTests {
         // Arrange: Item exists but is in the room
         let testItem = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.location("startRoom")),
             .isTakable
         )
@@ -123,7 +123,7 @@ struct DropActionHandlerTests {
         // Arrange: Create a wearable item
         let testItem = Item(
             id: "cloak",
-            name: "dark cloak",
+            .name("dark cloak"),
             .in(.player),
             .isTakable,
             .isWearable,
@@ -179,7 +179,7 @@ struct DropActionHandlerTests {
         // Arrange: Fixed item held by player
         let testItem = Item(
             id: "sword-in-stone",
-            name: "sword in stone",
+            .name("sword in stone"),
             .in(.player), // Hypothetically held
             .isFixed
         )

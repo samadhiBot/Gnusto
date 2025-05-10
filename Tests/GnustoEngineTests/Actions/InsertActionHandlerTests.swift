@@ -10,20 +10,20 @@ struct InsertActionHandlerTests {
     // --- Test Setup ---
     let coin = Item(
         id: "coin",
-        name: "gold coin",
+        .name("gold coin"),
         .isTakable
     )
 
     let box = Item(
         id: "box",
-        name: "wooden box",
+        .name("wooden box"),
         .isContainer,
         .isOpenable,
     )
 
     let openBox = Item(
         id: "openBox",
-        name: "open box",
+        .name("open box"),
         .isContainer,
         .isOpenable,
         .isOpen,
@@ -36,13 +36,13 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds coin, open box is reachable
         let initialCoin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let initialBox = Item(
             id: "openBox",
-            name: "open box",
+            .name("open box"),
             .in(.location("startRoom")),
             .isOpen,
             .isContainer,
@@ -99,7 +99,7 @@ struct InsertActionHandlerTests {
         // Arrange: Open box is reachable
         let box = Item(
             id: "openBox",
-            name: "open box",
+            .name("open box"),
             .in(.location("startRoom")),
             .isOpen,
             .isContainer,
@@ -132,7 +132,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds coin
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
@@ -164,13 +164,13 @@ struct InsertActionHandlerTests {
         // Arrange: Coin is in the room, not held; box is open
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.location("startRoom")),
             .isTakable,
         )
         let box = Item(
             id: "openBox",
-            name: "open box",
+            .name("open box"),
             .in(.location("startRoom")),
             .isOpen,
             .isContainer,
@@ -204,13 +204,13 @@ struct InsertActionHandlerTests {
         // Arrange: Box is in another room, player holds coin
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let box = Item(
             id: "distantBox",
-            name: "distant box",
+            .name("distant box"),
             .in(.nowhere),
             .isContainer,
             .isOpenable,
@@ -244,13 +244,13 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds coin, target is statue (not container)
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let statue = Item(
             id: "statue",
-            name: "stone statue",
+            .name("stone statue"),
             .in(.location("startRoom")),
             .isOpenable
         )
@@ -282,12 +282,12 @@ struct InsertActionHandlerTests {
         // Arrange: Box is closed, player holds coin
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
         )
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -320,7 +320,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds box
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.player),
             .isOpen,
         )
@@ -352,14 +352,14 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds bag, bag contains box
         let bag = Item(
             id: "bag",
-            name: "bag",
+            .name("bag"),
             .in(.player),
             .isContainer,
             .isOpen,
         )
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.item("bag")),
             .isContainer,
             .isOpen,
@@ -402,19 +402,19 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds coin (size 5), box has capacity 10 but already contains item size 6
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .size(5)
         )
         let existingItem = Item(
             id: "rock",
-            name: "rock",
+            .name("rock"),
             .in(.item("fullBox")),
             .size(6),
         )
         let box = Item(
             id: "fullBox",
-            name: "nearly full box",
+            .name("nearly full box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -450,19 +450,19 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds coin (size 5), box has capacity 10 and contains item size 5
         let initialCoin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .size(5)
         )
         let existingItem = Item(
             id: "rock",
-            name: "rock",
+            .name("rock"),
             .in(.item("exactBox")),
             .size(5)
         )
         let initialBox = Item(
             id: "exactBox",
-            name: "half-full box",
+            .name("half-full box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -515,12 +515,12 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds key, box is in the room
         let itemToInsert = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player)
         )
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -528,7 +528,7 @@ struct InsertActionHandlerTests {
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         ) // Assuming lit for test
 
@@ -572,7 +572,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds open container
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.player),
             .isContainer,
             .isOpenable,
@@ -580,7 +580,7 @@ struct InsertActionHandlerTests {
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         )
 
@@ -609,12 +609,12 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds key, container is in another room
         let itemToInsert = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player)
         )
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("otherRoom")),
             .isContainer,
             .isOpenable,
@@ -622,12 +622,12 @@ struct InsertActionHandlerTests {
         )
         let room1 = Location(
             id: "startRoom",
-            name: "Start Room",
+            .name("Start Room"),
             .inherentlyLit
         )
         let room2 = Location(
             id: "otherRoom",
-            name: "Other Room",
+            .name("Other Room"),
             .inherentlyLit
         )
 
@@ -656,17 +656,17 @@ struct InsertActionHandlerTests {
         // Arrange: Target is a rock (not a container)
         let itemToInsert = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player)
         )
         let target = Item(
             id: "rock",
-            name: "smooth rock",
+            .name("smooth rock"),
             .in(.location("startRoom"))
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         )
 
@@ -695,19 +695,19 @@ struct InsertActionHandlerTests {
         // Arrange: Container is closed
         let itemToInsert = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player)
         )
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         )
 
@@ -736,18 +736,18 @@ struct InsertActionHandlerTests {
         // Arrange: Container has capacity 1, already contains an item
         let itemToInsert = Item(
             id: "key",
-            name: "small key",
+            .name("small key"),
             .in(.player)
         )
         let existingItem = Item(
             id: "gem",
-            name: "shiny gem",
+            .name("shiny gem"),
             .in(.item("box")),
             .size(1)
         )
         let container = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -756,7 +756,7 @@ struct InsertActionHandlerTests {
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         )
 
@@ -795,13 +795,13 @@ struct InsertActionHandlerTests {
         // Arrange: Item size is 5, container capacity is 3
         let itemToInsert = Item(
             id: "key",
-            name: "large key",
+            .name("large key"),
             .in(.player),
             .size(5)
         )
         let container = Item(
             id: "box",
-            name: "small box",
+            .name("small box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -810,7 +810,7 @@ struct InsertActionHandlerTests {
         )
         let room = Location(
             id: "startRoom",
-            name: "Room",
+            .name("Room"),
             .inherentlyLit
         )
 
@@ -838,14 +838,14 @@ struct InsertActionHandlerTests {
     // Helper to setup game state for nested container tests
     private func setupNestedContainerTest() async -> (GameEngine, MockIOHandler) {
         let outerBox = Item(
-            id: "outerBox", name: "large box",
+            id: "outerBox", .name("large box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
             .isOpen,
         )
         let innerBox = Item(
-            id: "innerBox", name: "small box",
+            id: "innerBox", .name("small box"),
             .in(.item("outerBox")),
             .isContainer,
             .isOpenable,
@@ -853,7 +853,7 @@ struct InsertActionHandlerTests {
         )
         let coin = Item(
             id: "coin",
-            name: "shiny coin",
+            .name("shiny coin"),
             .in(.player),
             .isTakable
         )
@@ -939,7 +939,7 @@ struct InsertActionHandlerTests {
     func testInsertIntoSelfFails() async throws {
         // Arrange: Player holds a bag (which is a container)
         let bag = Item(
-            id: "bag", name: "cloth bag",
+            id: "bag", .name("cloth bag"),
             .in(.player),
             .isTakable,
             .isContainer,
@@ -973,7 +973,7 @@ struct InsertActionHandlerTests {
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
-            name: "box A",
+            .name("box A"),
             .in(.item("boxB")), // Box A is INSIDE Box B
             .isContainer, // Technically, for it to be a target container, it needs this
             .isOpen,
@@ -981,7 +981,7 @@ struct InsertActionHandlerTests {
         )
         let boxB = Item( // This is itemToInsert (X)
             id: "boxB",
-            name: "box B",
+            .name("box B"),
             .in(.player), // Held by player
             .isContainer,
             .isOpen,
@@ -1020,7 +1020,7 @@ struct InsertActionHandlerTests {
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
-            name: "box A",
+            .name("box A"),
             .in(.item("boxB")), // A is in B
             .isTakable,
             .isContainer, // Target for insertion
@@ -1028,7 +1028,7 @@ struct InsertActionHandlerTests {
         )
         let boxB = Item(
             id: "boxB",
-            name: "box B",
+            .name("box B"),
             .in(.item("boxC")), // B is in C
             .isContainer,
             .isOpenable,
@@ -1036,7 +1036,7 @@ struct InsertActionHandlerTests {
         )
         let boxC = Item( // This is itemToInsert (X)
             id: "boxC",
-            name: "box C",
+            .name("box C"),
             .in(.player), // Held by player
             .isContainer,
             .isOpenable,
@@ -1075,13 +1075,13 @@ struct InsertActionHandlerTests {
         // Arrange: Coin is in the room, not held; box is open
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.location("startRoom")),
             .isTakable,
         )
         let box = Item(
             id: "openBox",
-            name: "open box",
+            .name("open box"),
             .in(.location("startRoom")),
             .isOpen,
             .isContainer,
@@ -1105,13 +1105,13 @@ struct InsertActionHandlerTests {
         // Arrange: Box is nowhere, player holds coin
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let box = Item(
             id: "distantBox",
-            name: "distant box",
+            .name("distant box"),
             .in(.nowhere),
             .isContainer,
             .isOpenable,
@@ -1135,13 +1135,13 @@ struct InsertActionHandlerTests {
         // Arrange: Target is a statue (not a container)
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let statue = Item(
             id: "statue",
-            name: "stone statue",
+            .name("stone statue"),
             .in(.location("startRoom")),
         )
         let game = MinimalGame(items: [coin, statue])
@@ -1168,13 +1168,13 @@ struct InsertActionHandlerTests {
         // Arrange: Box is closed
         let coin = Item(
             id: "coin",
-            name: "gold coin",
+            .name("gold coin"),
             .in(.player),
             .isTakable,
         )
         let box = Item(
             id: "closedBox",
-            name: "closed box",
+            .name("closed box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -1197,14 +1197,14 @@ struct InsertActionHandlerTests {
         // Arrange: Boulder is size 10, box capacity is 5
         let boulder = Item(
             id: "boulder",
-            name: "huge boulder",
+            .name("huge boulder"),
             .in(.player),
             .isTakable,
             .size(10)
         )
         let box = Item(
             id: "box",
-            name: "small box",
+            .name("small box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
@@ -1229,7 +1229,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds a bag (which is a container)
         let bag = Item(
             id: "bag",
-            name: "cloth bag",
+            .name("cloth bag"),
             .in(.player),
             .isTakable,
             .isContainer,
@@ -1273,7 +1273,7 @@ struct InsertActionHandlerTests {
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
-            name: "box A",
+            .name("box A"),
             .in(.item("boxB")), // Box A is INSIDE Box B
             .isTakable,
             .isContainer, // Target for insertion
@@ -1281,7 +1281,7 @@ struct InsertActionHandlerTests {
         )
         let boxB = Item( // This is itemToInsert (X)
             id: "boxB",
-            name: "box B",
+            .name("box B"),
             .in(.player), // Held by player
             .isContainer,
             .isOpenable,
@@ -1309,14 +1309,14 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds trophy (scenery), box is open
         let trophy = Item(
             id: "trophy",
-            name: "glass trophy",
+            .name("glass trophy"),
             .in(.player),
             .isTakable,
             .isFixed,
         )
         let box = Item(
             id: "openBox",
-            name: "open box",
+            .name("open box"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,

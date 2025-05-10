@@ -10,12 +10,12 @@ struct TurnOffActionHandlerTests {
     func testTurnOffLightSource() async throws {
         let room = Location(
             id: "room",
-            name: "Test Room",
+            .name("Test Room"),
             .description("You are here.")
         )
         let lamp = Item(
             id: "lamp",
-            name: "lamp",
+            .name("lamp"),
             .in(.player),
             .isDevice,
             .isLightSource,
@@ -53,13 +53,13 @@ struct TurnOffActionHandlerTests {
     func testTurnOffNonLightSource() async throws {
         let room = Location(
             id: "room",
-            name: "Test Room",
+            .name("Test Room"),
             .description("You are here."),
             .inherentlyLit
         )
         let book = Item(
             id: "book",
-            name: "book",
+            .name("book"),
             .in(.location(room.id))
         )
 
@@ -93,7 +93,7 @@ struct TurnOffActionHandlerTests {
     func testTurnOffNonExistentItem() async throws {
         let room = Location(
             id: "room",
-            name: "Test Room",
+            .name("Test Room"),
             .description("You are here.")
         )
 
@@ -127,7 +127,7 @@ struct TurnOffActionHandlerTests {
     func testTurnOffLightSourceInInventory() async throws {
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isDevice,
@@ -160,12 +160,12 @@ struct TurnOffActionHandlerTests {
     func testTurnOffLightSourceCausesDarkness() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
+            .name("Dark Room"),
             .description("This room will become dark.")
         )
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.location(darkRoom.id)),
             .isDevice,
@@ -213,7 +213,7 @@ struct TurnOffActionHandlerTests {
     func testTurnOffItemAlreadyOff() async throws {
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isDevice,
@@ -253,7 +253,7 @@ struct TurnOffActionHandlerTests {
     func testTurnOffNonDeviceItem() async throws {
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isTakable,
@@ -290,7 +290,7 @@ struct TurnOffActionHandlerTests {
     func testTurnOffItemNotAccessible() async throws {
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.nowhere),
             .isDevice,
@@ -323,7 +323,7 @@ struct TurnOffActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .in(.location("darkRoom")),
             .isDevice,
             .isLightSource,
@@ -332,7 +332,7 @@ struct TurnOffActionHandlerTests {
         )
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let game = MinimalGame(
@@ -379,7 +379,7 @@ struct TurnOffActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .in(.location("darkRoom")),
             .isDevice,
             .isLightSource,
@@ -388,7 +388,7 @@ struct TurnOffActionHandlerTests {
         )
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
         let game = MinimalGame(

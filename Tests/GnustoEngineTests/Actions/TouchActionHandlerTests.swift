@@ -12,7 +12,7 @@ struct TouchActionHandlerTests {
         // Arrange
         let rock = Item(
             id: "rock",
-            name: "smooth rock",
+            .name("smooth rock"),
             .in(.player)
         ) // Not necessarily takable
         let game = MinimalGame(items: [rock])
@@ -41,9 +41,9 @@ struct TouchActionHandlerTests {
         // Arrange
         let key = Item(
             id: "key",
-            name: "brass key",
+            .name("brass key"),
             .in(.player),
-            attributes: [.isTakable: true]
+            .isTakable
         )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
@@ -97,8 +97,8 @@ struct TouchActionHandlerTests {
     func testTouchFailsItemNotAccessible() async throws {
         let figurine = Item(
             id: "figurine",
-            name: "jade figurine",
-            parent: .nowhere
+            .name("jade figurine"),
+            .in(.nowhere)
         )
         let game = MinimalGame(items: [figurine])
         let mockIO = await MockIOHandler()
@@ -128,14 +128,15 @@ struct TouchActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.location("startRoom")),
-            attributes: [.isContainer: true, .isOpen: true]
+            .isContainer,
+            .isOpen
         )
         let gem = Item(
             id: "gem",
-            name: "ruby gem",
-            parent: .item(box.id)
+            .name("ruby gem"),
+            .in(.item("box"))
         )
         let game = MinimalGame(items: [box, gem])
         let mockIO = await MockIOHandler()
@@ -163,14 +164,14 @@ struct TouchActionHandlerTests {
         // Arrange
         let table = Item(
             id: "table",
-            name: "wooden table",
+            .name("wooden table"),
             .in(.location("startRoom")),
             .isSurface
         )
         let book = Item(
             id: "book",
-            name: "dusty book",
-            parent: .item(table.id)
+            .name("dusty book"),
+            .in(.item("table"))
         )
         let game = MinimalGame(items: [table, book])
         let mockIO = await MockIOHandler()
@@ -202,14 +203,14 @@ struct TouchActionHandlerTests {
         // Arrange
         let chest = Item(
             id: "chest",
-            name: "locked chest",
+            .name("locked chest"),
             .in(.location("startRoom")),
             .isContainer // Closed by default
         )
         let coin = Item(
             id: "coin",
-            name: "gold coin",
-            .in(.item(chest.id))
+            .name("gold coin"),
+            .in(.item("chest"))
         )
         let game = MinimalGame(items: [chest, coin])
         let mockIO = await MockIOHandler()

@@ -52,7 +52,4 @@ extension GameEngine {
         }
         // No output if no items are visible
     }
-
-
-
 }

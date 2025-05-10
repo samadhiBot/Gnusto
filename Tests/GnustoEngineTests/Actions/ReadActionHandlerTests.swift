@@ -10,7 +10,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let book = Item(
             id: "book",
-            name: "dusty book",
+            .name("dusty book"),
             .in(.player),
             .readText("It reads: \"Beware the Grue!\""),
             .isTakable,
@@ -43,14 +43,14 @@ struct ReadActionHandlerTests {
         // Arrange
         let sign = Item(
             id: "sign",
-            name: "warning sign",
+            .name("warning sign"),
             .in(.location("litRoom")),
             .readText("DANGER AHEAD"),
             .isReadable
         )
         let litRoom = Location(
             id: "litRoom",
-            name: "Bright Room",
+            .name("Bright Room"),
             .description("It's bright here."),
             .inherentlyLit
         )
@@ -118,7 +118,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let scroll = Item(
             id: "scroll",
-            name: "ancient scroll",
+            .name("ancient scroll"),
             .in(.nowhere),
             .readText("Secrets within"),
             .isReadable
@@ -157,7 +157,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let rock = Item(
             id: "rock",
-            name: "plain rock",
+            .name("plain rock"),
             .in(.location("startRoom"))
         )
 
@@ -190,7 +190,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let map = Item(
             id: "map",
-            name: "folded map",
+            .name("folded map"),
             .in(.location("darkRoom")),
             .readText("X marks the spot"),
             .isTakable,
@@ -198,7 +198,7 @@ struct ReadActionHandlerTests {
         )
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
 
@@ -237,7 +237,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let blankPaper = Item(
             id: "paper",
-            name: "blank paper",
+            .name("blank paper"),
             .in(.player),
             .readText(""),
             .isTakable,
@@ -270,7 +270,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let glowingTablet = Item(
             id: "tablet",
-            name: "glowing tablet",
+            .name("glowing tablet"),
             .in(.location("darkRoom")),
             .isLightSource,
             .isOn,
@@ -279,7 +279,7 @@ struct ReadActionHandlerTests {
         )
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
+            .name("Pitch Black Room"),
             .description("It's dark.")
         )
 
@@ -313,7 +313,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let scroll = Item(
             id: "scroll",
-            name: "ancient scroll",
+            .name("ancient scroll"),
             .in(.location("startRoom")),
             .readText("Beware the Grue!"),
             .isReadable
@@ -348,7 +348,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let note = Item(
             id: "note",
-            name: "blank note",
+            .name("blank note"),
             .in(.location("startRoom")),
             .readText(""),
             .isReadable
@@ -383,7 +383,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let tablet = Item(
             id: "tablet",
-            name: "stone tablet",
+            .name("stone tablet"),
             .in(.location("startRoom")),
             .isReadable
         )
@@ -421,7 +421,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let book = Item(
             id: "book",
-            name: "ancient book",
+            .name("ancient book"),
             .in(.nowhere),
             .readText("Secrets within."),
             .isReadable
@@ -449,7 +449,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let rock = Item(
             id: "rock",
-            name: "plain rock",
+            .name("plain rock"),
             .in(.location("startRoom"))
         )
         let game = MinimalGame(items: [rock])
@@ -475,12 +475,12 @@ struct ReadActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
-            description: "A dark, dark room."
+            .name("Dark Room"),
+            .description("A dark, dark room.")
         )
         let scroll = Item(
             id: "scroll",
-            name: "ancient scroll",
+            .name("ancient scroll"),
             .in(.location(darkRoom.id)),
             .readText("Can't read this."),
             .isReadable
@@ -508,12 +508,12 @@ struct ReadActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
-            description: "A dark, dark room."
+            .name("Dark Room"),
+            .description("A dark, dark room.")
         )
         let glowingTablet = Item(
             id: "tablet",
-            name: "glowing tablet",
+            .name("glowing tablet"),
             .in(.location(darkRoom.id)),
             .readText("Luminous secrets!"),
             .isReadable,
@@ -571,7 +571,7 @@ struct ReadActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            name: "wooden box",
+            .name("wooden box"),
             .in(.player),
             .isTakable,
             .isContainer,
@@ -579,7 +579,7 @@ struct ReadActionHandlerTests {
         )
         let note = Item(
             id: "note",
-            name: "folded note",
+            .name("folded note"),
             .in(.item("box")),
             .readText("Meet at midnight."),
             .isReadable
@@ -612,14 +612,14 @@ struct ReadActionHandlerTests {
         // Arrange
         let chest = Item(
             id: "chest",
-            name: "iron chest",
+            .name("iron chest"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpen
         )
         let letter = Item(
             id: "letter",
-            name: "sealed letter",
+            .name("sealed letter"),
             .in(.item("chest")),
             .readText("Important news."),
             .isReadable
@@ -652,14 +652,14 @@ struct ReadActionHandlerTests {
         // Arrange
         let lockedBox = Item(
             id: "lockedBox",
-            name: "locked box",
+            .name("locked box"),
             .in(.location("startRoom")),
             .isContainer,
             .isLockable
         )
         let secret = Item(
             id: "secret",
-            name: "secret paper",
+            .name("secret paper"),
             .in(.item("lockedBox")),
             .readText("Top Secret!"),
             .isReadable

@@ -9,13 +9,13 @@ struct PutOnActionHandlerTests {
     // --- Test Setup ---
     let book = Item(
         id: "book",
-        name: "heavy book",
+        .name("heavy book"),
         .isTakable
     )
 
     let table = Item(
         id: "table",
-        name: "sturdy table",
+        .name("sturdy table"),
         .isSurface
     )
 
@@ -74,13 +74,13 @@ struct PutOnActionHandlerTests {
         // Arrange: Player holds book, table is reachable
         let initialBook = Item(
             id: "book",
-            name: "heavy book",
+            .name("heavy book"),
             .in(.player),
             .isTakable
         )
         let initialTable = Item(
             id: "table",
-            name: "sturdy table",
+            .name("sturdy table"),
             .in(.location("startRoom")),
             .isSurface
         )
@@ -139,7 +139,7 @@ struct PutOnActionHandlerTests {
         // Arrange: Table is reachable
         let table = Item(
             id: "table",
-            name: "table",
+            .name("table"),
             .in(.location("startRoom")),
             .isSurface
         )
@@ -171,7 +171,7 @@ struct PutOnActionHandlerTests {
         // Arrange: Player holds book
         let book = Item(
             id: "book",
-            name: "book",
+            .name("book"),
             .in(.player)
         )
         let game = MinimalGame(items: [book])
@@ -202,12 +202,12 @@ struct PutOnActionHandlerTests {
         // Arrange: Book is on the floor, table is reachable
         let book = Item(
             id: "book",
-            name: "heavy book",
+            .name("heavy book"),
             .in(.location("startRoom"))
         )
         let table = Item(
             id: "table",
-            name: "sturdy table",
+            .name("sturdy table"),
             .in(.location("startRoom")),
             .isSurface
         )
@@ -239,23 +239,23 @@ struct PutOnActionHandlerTests {
         // Arrange: Table is in another room, player holds book
         let book = Item(
             id: "book",
-            name: "heavy book",
+            .name("heavy book"),
             .in(.player)
         )
         let table = Item(
             id: "table",
-            name: "sturdy table",
+            .name("sturdy table"),
             .in(.location("otherRoom")),
             .isSurface
         )
         let room1 = Location(
             id: "startRoom",
-            name: "Start",
+            .name("Start"),
             .inherentlyLit
         )
         let room2 = Location(
             id: "otherRoom",
-            name: "Other",
+            .name("Other"),
             .inherentlyLit
         )
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
@@ -286,12 +286,12 @@ struct PutOnActionHandlerTests {
         // Arrange: Target is a box (not surface), player holds book
         let book = Item(
             id: "book",
-            name: "heavy book",
+            .name("heavy book"),
             .in(.player)
         )
         let box = Item(
             id: "box",
-            name: "box",
+            .name("box"),
             .in(.location("startRoom")),
             .isContainer // Not a surface
         )
@@ -323,7 +323,7 @@ struct PutOnActionHandlerTests {
         // Arrange: Player holds table
         let table = Item(
             id: "table",
-            name: "table",
+            .name("table"),
             .in(.player),
             .isSurface,
         )
@@ -355,14 +355,14 @@ struct PutOnActionHandlerTests {
         // Arrange: Player holds tray, tray is on table
         let tray = Item(
             id: "tray",
-            name: "silver tray",
+            .name("silver tray"),
             .in(.player),
             .isSurface,
             .isTakable
         )
         let table = Item(
             id: "table",
-            name: "table",
+            .name("table"),
             .in(.item("tray")),
             .isSurface // Table is also a surface
         )

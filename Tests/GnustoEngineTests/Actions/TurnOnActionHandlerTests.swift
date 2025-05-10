@@ -11,7 +11,7 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isDevice,
@@ -51,12 +51,12 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
+            .name("Dark Room"),
             .description("This is a dark room that should now be lit.")
         )
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.location(darkRoom.id)),
             .isDevice,
@@ -108,7 +108,7 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isDevice,
@@ -153,7 +153,7 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isTakable,
@@ -194,7 +194,7 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.nowhere), // Not accessible
             .isLightSource,
@@ -232,12 +232,12 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Dark Room",
+            .name("Dark Room"),
             .description("A dark room.")
         )
         let radio = Item(
             id: "radio",
-            name: "portable radio",
+            .name("portable radio"),
             .description("A portable radio."),
             .in(.player),
             .isDevice,
@@ -284,7 +284,7 @@ struct TurnOnActionHandlerTests {
         // Arrange
         let lamp = Item(
             id: "lamp",
-            name: "brass lantern",
+            .name("brass lantern"),
             .description("A brass lantern."),
             .in(.player),
             .isDevice,

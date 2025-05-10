@@ -268,7 +268,7 @@ struct OpenActionHandlerTests {
         // Arrange
         let lockedChest = Item(
             id: "chest",
-            name: "iron chest",
+            .name("iron chest"),
             .in(.location("startRoom")),
             .isContainer,
             .isOpenable,
