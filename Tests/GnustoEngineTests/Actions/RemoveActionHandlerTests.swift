@@ -152,13 +152,13 @@ struct RemoveActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
-    @Test("Remove fails if item is fixed (cursed)")
+    @Test("Remove fails if item is fixed scenery (which can be worn)")
     func testRemoveFailsIfFixed() async throws {
         let amulet = Item(
             id: "amulet",
             .name("cursed amulet"),
             .in(.player),
-            .isFixed,
+            .isScenery,
             .isWearable,
             .isWorn
         )

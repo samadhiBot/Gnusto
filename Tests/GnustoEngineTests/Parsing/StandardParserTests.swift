@@ -649,8 +649,7 @@ struct StandardParserTests {
         let commandBox = try resultBox.get()
         #expect(commandBox.directObject == "box")
 
-        // Placeholder until scope logic is fixed
-        #expect(true)
+        #expect(false)
     }
 
     @Test("Direct Inventory Item Preferred Over Item In Container", .tags(.parser, .resolution, .scope, .container))

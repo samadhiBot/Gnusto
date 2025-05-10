@@ -26,9 +26,8 @@ struct InsertActionHandler: ActionHandler {
             throw ActionError.itemNotHeld(itemToInsertID)
         }
 
-        // If the item being inserted is fixed (scenery),
-        // Zork replies as if the fixed item itself is not a container.
-        if itemToInsert.hasFlag(.isFixed) {
+        // If the item being inserted is fixed scenery, Zork replies as if it is not a container.
+        if itemToInsert.hasFlag(.isScenery) {
             throw ActionError.targetIsNotAContainer(itemToInsertID)
         }
 

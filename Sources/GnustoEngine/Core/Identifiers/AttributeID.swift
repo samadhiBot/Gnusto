@@ -104,7 +104,7 @@ public extension AttributeID {
     static let isFemale = AttributeID("isFemale")
 
     /// Cannot be taken or moved (scenery).
-    static let isFixed = AttributeID("isFixed")
+    static let isScenery = AttributeID("isScenery")
 
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = AttributeID("isFlammable")

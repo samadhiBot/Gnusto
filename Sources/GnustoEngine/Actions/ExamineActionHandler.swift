@@ -35,14 +35,17 @@ public struct ExamineActionHandler: ActionHandler {
 
         var stateChanges: [StateChange] = []
 
-        // --- State Change: Mark as Touched ---
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
-        }
+        // Special case: examining 'self' should not record any state changes
+        if targetItemID != "self" {
+            // --- State Change: Mark as Touched ---
+            if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+                stateChanges.append(addTouchedFlag)
+            }
 
-        // --- State Change: Update pronouns ---
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+            // --- State Change: Update pronouns ---
+            if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+                stateChanges.append(updatePronoun)
+            }
         }
 
         // --- Determine Message ---

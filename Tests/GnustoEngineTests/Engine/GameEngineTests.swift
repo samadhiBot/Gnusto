@@ -1202,12 +1202,12 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotDroppable")
     func testReportErrorItemNotDroppable() async throws {
-        // Initialize fixed item held by player
+        // Initialize fixed scenery item held by player
         let item = Item(
             id: "statue",
             .name("statue"),
             .in(.player),
-            .isFixed
+            .isScenery
         )
         let startRoom = Location(
             id: "startRoom",
@@ -1227,14 +1227,14 @@ struct GameEngineTests {
 
     @Test("ReportActionError: .itemNotRemovable")
     func testReportErrorItemNotRemovable() async throws {
-        // Initialize fixed, worn item held by player
+        // Initialize fixed scenery, worn item held by player
         let item = Item(
             id: "amulet",
             .name("cursed amulet"),
             .in(.player),
             .isWearable,
             .isWorn,
-            .isFixed
+            .isScenery
         )
         let startRoom = Location(
             id: "startRoom",

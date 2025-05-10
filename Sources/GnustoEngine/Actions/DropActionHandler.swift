@@ -21,8 +21,8 @@ public struct DropActionHandler: ActionHandler {
             return
         }
 
-        // 4. Check if item is droppable (not fixed)
-        if targetItem.hasFlag(.isFixed) {
+        // 4. Check if item is droppable (not fixed scenery)
+        if targetItem.hasFlag(.isScenery) {
             throw ActionError.itemNotDroppable(targetItemID)
         }
     }

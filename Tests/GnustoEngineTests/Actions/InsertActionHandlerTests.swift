@@ -1304,7 +1304,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
-    @Test("Insert fails when item is fixed (scenery)")
+    @Test("Insert fails when item is fixed scenery")
     func testInsertFailsItemIsFixed() async throws {
         // Arrange: Player holds trophy (scenery), box is open
         let trophy = Item(
@@ -1312,7 +1312,7 @@ struct InsertActionHandlerTests {
             .name("glass trophy"),
             .in(.player),
             .isTakable,
-            .isFixed,
+            .isScenery,
         )
         let box = Item(
             id: "openBox",

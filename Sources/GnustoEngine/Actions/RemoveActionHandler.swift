@@ -20,8 +20,8 @@ public struct RemoveActionHandler: ActionHandler {
             throw ActionError.itemIsNotWorn(targetItemID)
         }
 
-        // 4. Check if the item is fixed (e.g., cursed amulet)
-        guard !targetItem.hasFlag(.isFixed) else {
+        // 4. Check if the item is fixed scenery (e.g., the ground)
+        guard !targetItem.hasFlag(.isScenery) else {
             throw ActionError.itemNotRemovable(targetItemID)
         }
     }

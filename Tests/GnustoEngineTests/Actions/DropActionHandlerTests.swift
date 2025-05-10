@@ -174,14 +174,14 @@ struct DropActionHandlerTests {
         expectNoDifference(changeHistory, expectedChanges)
     }
 
-    @Test("Drop fixed item fails")
+    @Test("Drop fixed scenery item fails")
     func testDropFixedItemFails() async throws {
         // Arrange: Fixed item held by player
         let testItem = Item(
             id: "sword-in-stone",
             .name("sword in stone"),
             .in(.player), // Hypothetically held
-            .isFixed
+            .isScenery
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()

@@ -30,6 +30,13 @@ struct MinimalGame: GameBlueprint {
                 .name("pebble"),
                 .in(.location("startRoom")),
                 .isTakable
+            ),
+            Item(
+                id: "self",
+                .name("self"),
+                .description("You are your usual self."),
+                .in(.player),
+                .isScenery
             )
         ]
 

@@ -200,8 +200,8 @@ extension ItemAttribute {
     }
 
     /// Cannot be taken or moved (scenery).
-    static var isFixed: ItemAttribute {
-        ItemAttribute(id: .isFixed, rawValue: true)
+    static var isScenery: ItemAttribute {
+        ItemAttribute(id: .isScenery, rawValue: true)
     }
 
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
