@@ -1,4 +1,6 @@
-# Gnusto Engine
+![Gnusto Interactive Fiction Engine Hero Graphic](Docs/Images/gnusto-heading.png)
+
+# Gnusto Interactive Fiction Engine
 
 A modern Swift implementation of an Interactive Fiction (IF) engine, designed to be powerful, flexible, and maintainable. The engine is built with a focus on clean, efficient, and well-structured code, adhering to SOLID principles and modern Swift practices.
 
