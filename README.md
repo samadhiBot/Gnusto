@@ -1,6 +1,84 @@
 ![Gnusto Interactive Fiction Engine Hero Graphic](Docs/Images/gnusto-heading.png)
 
-A modern Swift implementation of an Interactive Fiction (IF) engine, designed to be powerful, flexible, and maintainable. The engine is built with a focus on clean, efficient, and well-structured code, adhering to SOLID principles and modern Swift practices.
+# Gnusto: A Modern Interactive Fiction Engine
+
+Gnusto is a powerful, flexible framework for creating interactive fiction games. Drawing inspiration from the classic Infocom games, it provides a modern Swift-based toolkit that makes building rich, dynamic text adventures easy and enjoyable.
+
+## For Game Creators
+
+### Why Gnusto?
+
+- **Modern Development Experience:** Write clean, maintainable code with Swift's modern features and safety guarantees
+- **Cross-Platform:** Deploy your game anywhere - macOS, iOS, Linux, Windows, and Android
+- **Powerful Yet Approachable:** Start with simple text adventures and scale up to complex, dynamic worlds
+- **Battle-Tested Patterns:** Leverage proven design patterns from the golden age of interactive fiction
+- **Focus on Storytelling:** Spend less time on engine mechanics, more time crafting your narrative
+
+### Key Features for Creators
+
+- **Dynamic Content:** Create living, breathing worlds with state-driven descriptions and behaviors
+- **Rich Action System:** Support complex player interactions with a flexible action pipeline
+- **Smart Parser:** Natural language understanding with support for complex commands and object references
+- **State Management:** Track game progress, handle timed events, and manage complex game states
+- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine
+
+### Quick Start for Creators
+
+1. **Install Gnusto:** Add it to your Swift project
+2. **Define Your World:** Create locations and items
+3. **Add Descriptions:** Write static text or dynamic handlers
+4. **Define Actions:** Specify how objects interact
+5. **Run Your Game:** Deploy to any supported platform
+
+### Example Code
+
+```swift
+struct OperaHouse: AreaContents {
+    let foyer = Location(
+        id: "foyer",
+        .name("Foyer of the Opera House"),
+        .description("""
+                You are standing in a spacious hall, splendidly decorated in red
+                and gold, with glittering chandeliers overhead. The entrance from
+                the street is to the north, and there are doorways south and west.
+                """),
+        .exits([
+            .south: Exit(destination: "bar"),
+            .west: Exit(destination: "cloakroom"),
+            .north: Exit(
+                destination: "street",
+                blockedMessage: """
+                    You've only just arrived, and besides, the weather outside
+                    seems to be getting worse.
+                    """
+            )
+        ]),
+        .inherentlyLit
+    )
+
+    let cloak = Item(
+        id: "cloak",
+        .name("velvet cloak"),
+        .description("A handsome velvet cloak, of exquisite quality."),
+        .in(.player),
+        .isTakable,
+        .isWearable,
+        .isWorn,
+    )
+}
+```
+
+### Ready to Start?
+
+Check out our example games and documentation:
+
+- [Cloak of Darkness](Executables/CloakOfDarkness): A complete, playable example
+- [Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit): Templates and patterns
+- [Documentation](Docs/): Detailed guides and API reference
+
+---
+
+## For Engine Developers
 
 ## Project Structure
 
