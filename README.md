@@ -65,6 +65,18 @@ struct OperaHouse: AreaContents {
         .isWearable,
         .isWorn,
     )
+
+    func hookAction(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+        guard command.verbID == "examine", let cloak = await engine.item("cloak") else {
+            return false
+        }
+        let hookDetail = if cloak.parent == .item("hook") {
+            "with a cloak hanging on it"
+        } else {
+            "screwed to the wall"
+        }
+        throw ActionError.customResponse("It's just a small brass hook, \(hookDetail).")
+    }
 }
 ```
 
