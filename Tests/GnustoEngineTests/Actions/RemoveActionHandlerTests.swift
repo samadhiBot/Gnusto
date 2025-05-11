@@ -95,7 +95,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Act & Assert Error (on validate)
-        await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
+        await #expect(throws: ActionResponse.itemIsNotWorn("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -123,7 +123,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Act & Assert Error (on validate)
-        await #expect(throws: ActionError.itemNotHeld("cloak")) {
+        await #expect(throws: ActionResponse.itemNotHeld("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -151,7 +151,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Act & Assert Error (on validate)
-        await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("Remove what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -187,7 +187,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Act & Assert Error (on validate)
-        await #expect(throws: ActionError.itemNotRemovable("amulet")) {
+        await #expect(throws: ActionResponse.itemNotRemovable("amulet")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

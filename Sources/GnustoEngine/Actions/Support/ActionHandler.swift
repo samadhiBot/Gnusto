@@ -10,7 +10,7 @@ public protocol ActionHandler: Sendable {
     /// This step should check prerequisites but not modify the game state.
     /// - Parameters:
     ///   - context: The context surrounding the action execution.
-    /// - Throws: An `ActionError` if validation fails.
+    /// - Throws: An `ActionResponse` if validation fails.
     func validate(
         context: ActionContext
     ) async throws
@@ -20,7 +20,7 @@ public protocol ActionHandler: Sendable {
     /// - Parameters:
     ///   - context: The context surrounding the action execution.
     /// - Returns: An `ActionResult` detailing the outcome, including success status, messages, state changes, and side effects.
-    /// - Throws: An `ActionError` or other error if processing fails unexpectedly.
+    /// - Throws: An `ActionResponse` or other error if processing fails unexpectedly.
     func process(
         context: ActionContext
     ) async throws -> ActionResult

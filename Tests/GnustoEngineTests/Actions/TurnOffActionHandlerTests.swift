@@ -86,7 +86,7 @@ struct TurnOffActionHandlerTests {
             rawInput: "turn off book"
         )
 
-        await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -124,7 +124,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Expect internalEngineError when item ID doesn't exist in gameState
-        await #expect(throws: ActionError.unknownItem("lamp")) {
+        await #expect(throws: ActionResponse.unknownItem("lamp")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -257,7 +257,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Act & Assert: Expect error during validation
-        await #expect(throws: ActionError.customResponse("It's already off.")) {
+        await #expect(throws: ActionResponse.custom("It's already off.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -299,7 +299,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Act & Assert: Expect error during validation
-        await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

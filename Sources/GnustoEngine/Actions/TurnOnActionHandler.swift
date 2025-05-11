@@ -8,12 +8,12 @@ struct TurnOnActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
         // 1. Get direct object ID
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.customResponse("Turn on what?")
+            throw ActionResponse.custom("Turn on what?")
         }
 
         // 2. Fetch the item snapshot.
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.unknownItem(targetItemID)
+            throw ActionResponse.unknownItem(targetItemID)
         }
 
         // 3. Verify the item is reachable (with light source exception in dark).
@@ -35,27 +35,27 @@ struct TurnOnActionHandler: ActionHandler {
             }
         }
         guard isNormallyReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check if the item has the `.device` property.
         guard targetItem.hasFlag(.isDevice) else {
-            throw ActionError.prerequisiteNotMet("You can't turn that on.")
+            throw ActionResponse.prerequisiteNotMet("You can't turn that on.")
         }
 
         // 5. Check if the item already has the `.on` property.
         if targetItem.hasFlag(.isOn) {
-            throw ActionError.customResponse("It's already on.")
+            throw ActionResponse.custom("It's already on.")
         }
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError("TURN ON context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("TURN ON context.command reached process without direct object.")
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
+            throw ActionResponse.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
         }
 
         // --- State Changes ---

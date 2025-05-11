@@ -131,7 +131,7 @@ struct CloseActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemNotClosable("rock")) {
+        await #expect(throws: ActionResponse.itemNotClosable("rock")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -166,7 +166,7 @@ struct CloseActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemNotAccessible("box")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("box")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -193,7 +193,7 @@ struct CloseActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.prerequisiteNotMet("Close what?")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("Close what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

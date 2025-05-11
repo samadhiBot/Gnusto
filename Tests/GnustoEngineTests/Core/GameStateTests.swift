@@ -557,18 +557,18 @@ struct GameStateTests {
 
         // Expect an error because the oldValue is wrong
         // Expect stateValidationFailed because the validation should catch the mismatch
-        // let expectedError = ActionError.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseID: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
+        // let expectedError = ActionResponse.internalEngineError("StateChange oldValue mismatch for removeActiveFuse(fuseID: \"existingFuse\") on global. Expected: int(1), Actual: int(5)")
         do {
             try gameState.apply(change)
-            Issue.record("Expected apply to throw ActionError.stateValidationFailed, but it did not throw.")
-        } catch let error as ActionError {
+            Issue.record("Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw.")
+        } catch let error as ActionResponse {
             if case .stateValidationFailed = error {
                 // Correct error type thrown, continue verification
             } else {
-                Issue.record("Expected ActionError.stateValidationFailed, but got \(error)")
+                Issue.record("Expected ActionResponse.stateValidationFailed, but got \(error)")
             }
         } catch {
-            Issue.record("Expected ActionError, but got unexpected error type: \(error)")
+            Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
         // Verify state hasn't changed unexpectedly
@@ -684,15 +684,15 @@ struct GameStateTests {
 
         do {
             try state.apply(incorrectChange)
-            Issue.record("Expected apply to throw ActionError.stateValidationFailed, but it did not throw.")
-        } catch let error as ActionError {
+            Issue.record("Expected apply to throw ActionResponse.stateValidationFailed, but it did not throw.")
+        } catch let error as ActionResponse {
             if case .stateValidationFailed = error {
                 // Correct error type thrown, test passes this part
             } else {
-                Issue.record("Expected ActionError.stateValidationFailed, but got \(error)")
+                Issue.record("Expected ActionResponse.stateValidationFailed, but got \(error)")
             }
         } catch {
-            Issue.record("Expected ActionError, but got unexpected error type: \(error)")
+            Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
         // Verify the state hasn't changed

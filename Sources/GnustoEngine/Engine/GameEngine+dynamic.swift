@@ -12,7 +12,7 @@ extension GameEngine {
         case nil:
             return false
         default:
-            throw ActionError.invalidValue("""
+            throw ActionResponse.invalidValue("""
                 Cannot fetch boolean value for \(itemID.rawValue).\(key.rawValue): \
                 \(value ?? .undefined)
                 """)
@@ -25,7 +25,7 @@ extension GameEngine {
         case .int(let intValue):
             return intValue
         default:
-            throw ActionError.invalidValue("""
+            throw ActionResponse.invalidValue("""
                 Cannot fetch integer value for \(itemID.rawValue).\(key.rawValue): \
                 \(value ?? .undefined)
                 """)
@@ -38,7 +38,7 @@ extension GameEngine {
         case .string(let stringValue):
             return stringValue
         default:
-            throw ActionError.invalidValue("""
+            throw ActionResponse.invalidValue("""
                 Cannot fetch string value for \(itemID.rawValue).\(key.rawValue): \
                 \(value ?? .undefined)
                 """)
@@ -51,7 +51,7 @@ extension GameEngine {
         case .string(let stringValue):
             return stringValue
         default:
-            throw ActionError.invalidValue("""
+            throw ActionResponse.invalidValue("""
                 Cannot fetch string value for \(locationID.rawValue).\(key.rawValue): \
                 \(value ?? .undefined)
                 """)
@@ -133,10 +133,10 @@ extension GameEngine {
     ///   - itemID: The unique identifier of the item to modify.
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
-    /// - Throws: An `ActionError` if the item doesn't exist, validation fails, or state application fails.
+    /// - Throws: An `ActionResponse` if the item doesn't exist, validation fails, or state application fails.
     public func setDynamicItemValue(itemID: ItemID, key: AttributeID, newValue: StateValue) async throws {
         guard let item = gameState.items[itemID] else {
-            throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
+            throw ActionResponse.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
         }
 
         // Check registry for validate handler
@@ -146,7 +146,7 @@ extension GameEngine {
                 if !isValid {
                     // Use a generic invalid value error, or could the handler throw a more specific one?
                     // For now, use invalidValue.
-                    throw ActionError.invalidValue("Validation failed for dynamic item value '\(key.rawValue)' on \(itemID.rawValue): \(newValue)")
+                    throw ActionResponse.invalidValue("Validation failed for dynamic item value '\(key.rawValue)' on \(itemID.rawValue): \(newValue)")
                 }
             } catch {
                 // If validator throws, propagate the error
@@ -181,17 +181,17 @@ extension GameEngine {
     ///   - locationID: The unique identifier of the location to modify.
     ///   - key: The `AttributeID` of the value to set.
     ///   - newValue: The new `StateValue`.
-    /// - Throws: An `ActionError` if the location doesn't exist, validation fails, or state application fails.
+    /// - Throws: An `ActionResponse` if the location doesn't exist, validation fails, or state application fails.
     public func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
         guard let location = gameState.locations[locationID] else {
-            throw ActionError.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
+            throw ActionResponse.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }
 
         if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: key) {
             do {
                 let isValid = try await validateHandler(location, newValue)
                 if !isValid {
-                    throw ActionError.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
+                    throw ActionResponse.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
                 }
             } catch {
                 logger.error("""

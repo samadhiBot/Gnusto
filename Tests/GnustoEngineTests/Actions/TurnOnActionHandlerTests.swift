@@ -132,7 +132,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Act & Assert: Expect error during validation
-        await #expect(throws: ActionError.customResponse("It's already on.")) {
+        await #expect(throws: ActionResponse.custom("It's already on.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -174,7 +174,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that on.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that on.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -216,7 +216,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Act & Assert: Expect parser error because item is out of scope
-        await #expect(throws: ActionError.itemNotAccessible("lamp")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("lamp")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

@@ -136,91 +136,91 @@ public struct GameState: Codable, Equatable, Sendable {
         case .itemAdjectives:
             // Expecting a .stringSet for itemAdjectives
             guard case .stringSet(let newAdjectives) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemAdjectives: expected .stringSet, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemAdjectives: expected .stringSet, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemAdjectives: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemAdjectives: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAdjectives change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemAdjectives change")
             }
             items[itemID]?.attributes[.adjectives] = .stringSet(newAdjectives)
 
         case .itemCapacity:
             // Expecting an .int for itemCapacity
             guard case .int(let newCapacity) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemCapacity: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemCapacity: expected .int, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemCapacity: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemCapacity: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemCapacity change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemCapacity change")
             }
             items[itemID]?.attributes[.capacity] = .int(newCapacity)
 
         case .itemName:
             // Expecting a .string for itemName
             guard case .string(let newName) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemName: expected .string, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemName: expected .string, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemName: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemName: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemName change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemName change")
             }
             items[itemID]?.attributes[.name] = .string(newName)
 
         case .itemParent:
             // Expecting a .parentEntity for itemParent
             guard case .parentEntity(let newParent) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemParent: expected .parentEntity, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemParent: expected .parentEntity, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemParent: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemParent: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemParent change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemParent change")
             }
             items[itemID]?.attributes[.parentEntity] = .parentEntity(newParent)
 
         case .itemSize:
             // Expecting an .int for itemSize
             guard case .int(let newSize) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemSize: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemSize: expected .int, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemSize: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemSize: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSize change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemSize change")
             }
             items[itemID]?.attributes[.size] = .int(newSize)
 
         case .itemSynonyms:
             // Expecting a .stringSet for itemSynonyms
             guard case .stringSet(let newSynonyms) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for itemSynonyms: expected .stringSet, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemSynonyms: expected .stringSet, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemSynonyms: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemSynonyms: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemSynonyms change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemSynonyms change")
             }
             items[itemID]?.attributes[.synonyms] = .stringSet(newSynonyms)
 
         case .itemValue:
             // Expecting an .int for itemValue
             guard case .int = change.newValue else { // Ignore newValue for now
-                throw ActionError.internalEngineError("Type mismatch for itemValue: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for itemValue: expected .int, got \(change.newValue)")
             }
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemValue: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemValue: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemValue change")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemValue change")
             }
             print("WARN: Item value setting not yet implemented in Item struct.") // Placeholder
 
@@ -229,29 +229,29 @@ public struct GameState: Codable, Equatable, Sendable {
         case .locationName:
             // Expecting a .string for locationName
             guard case .string(let newName) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for locationName: expected .string, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for locationName: expected .string, got \(change.newValue)")
             }
             guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationName: expected .location, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for locationName: expected .location, got \(change.entityID)")
             }
             guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationName change")
+                throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for locationName change")
             }
             locations[locationID]?.attributes[.name] = .string(newName)
 
         case .locationDescription: // REMOVED - Cannot change description via StateChange
-             throw ActionError.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
+             throw ActionResponse.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
 
         case .exits:
             // Expecting .exits
             guard case .exits(let newExits) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for exits: expected .exits, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for exits: expected .exits, got \(change.newValue)")
             }
             guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for exits: expected .location, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for exits: expected .location, got \(change.entityID)")
             }
             guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for exits change")
+                throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for exits change")
             }
             locations[locationID]?.attributes[.exits] = .exits(newExits)
 
@@ -259,10 +259,10 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .itemAttribute(let key):
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for itemAttribute: expected .item, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for itemAttribute: expected .item, got \(change.entityID)")
             }
             guard items[itemID] != nil else {
-                throw ActionError.internalEngineError("Item \(itemID.rawValue) not found for itemAttribute change ('\(key.rawValue)')")
+                throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemAttribute change ('\(key.rawValue)')")
             }
             // Directly update the StateValue in the dictionary.
             // Assumes validation happened *before* StateChange creation.
@@ -270,10 +270,10 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("EntityID mismatch for locationAttribute: expected .location, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for locationAttribute: expected .location, got \(change.entityID)")
             }
             guard locations[locationID] != nil else {
-                throw ActionError.internalEngineError("Location \(locationID.rawValue) not found for locationAttribute change ('\(key.rawValue)')")
+                throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for locationAttribute change ('\(key.rawValue)')")
             }
             locations[locationID]?.attributes[key] = change.newValue
 
@@ -282,44 +282,44 @@ public struct GameState: Codable, Equatable, Sendable {
         case .playerScore:
             // Expecting .int
             guard case .int(let newScore) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for playerScore: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for playerScore: expected .int, got \(change.newValue)")
             }
             guard change.entityID == .player else {
-                throw ActionError.internalEngineError("EntityID mismatch for playerScore: expected .player, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for playerScore: expected .player, got \(change.entityID)")
             }
             player.score = newScore
 
         case .playerMoves:
             // Expecting .int
             guard case .int(let newMoves) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for playerMoves: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for playerMoves: expected .int, got \(change.newValue)")
             }
             guard change.entityID == .player else {
-                throw ActionError.internalEngineError("EntityID mismatch for playerMoves: expected .player, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for playerMoves: expected .player, got \(change.entityID)")
             }
             player.moves = newMoves
 
         case .playerInventoryLimit:
             // Expecting .int
             guard case .int(let newLimit) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for playerInventoryLimit: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for playerInventoryLimit: expected .int, got \(change.newValue)")
             }
             guard change.entityID == .player else {
-                throw ActionError.internalEngineError("EntityID mismatch for playerInventoryLimit: expected .player, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for playerInventoryLimit: expected .player, got \(change.entityID)")
             }
             player.carryingCapacity = newLimit // Use correct property name
 
         case .playerLocation:
             // Expecting .locationID
             guard case .locationID(let newLocationID) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for playerLocation: expected .locationID, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for playerLocation: expected .locationID, got \(change.newValue)")
             }
             guard change.entityID == .player else {
-                throw ActionError.internalEngineError("EntityID mismatch for playerLocation: expected .player, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for playerLocation: expected .player, got \(change.entityID)")
             }
             // Ensure destination exists before moving player
             guard locations[newLocationID] != nil else {
-                 throw ActionError.internalEngineError("Attempted to move player to non-existent location: \(newLocationID.rawValue)")
+                 throw ActionResponse.internalEngineError("Attempted to move player to non-existent location: \(newLocationID.rawValue)")
             }
             player.currentLocationID = newLocationID // Use correct property name
 
@@ -335,7 +335,7 @@ public struct GameState: Codable, Equatable, Sendable {
                  return // Exit scope if newValue is not as expected
              }
              guard change.entityID == .global else {
-                 throw ActionError.internalEngineError("EntityID mismatch for setFlag: expected .global, got \(change.entityID)")
+                 throw ActionResponse.internalEngineError("EntityID mismatch for setFlag: expected .global, got \(change.entityID)")
              }
             globalState[key] = change.newValue
 
@@ -346,29 +346,29 @@ public struct GameState: Codable, Equatable, Sendable {
                  return // Exit scope if newValue is not as expected
              }
              guard change.entityID == .global else {
-                 throw ActionError.internalEngineError("EntityID mismatch for clearFlag: expected .global, got \(change.entityID)")
+                 throw ActionResponse.internalEngineError("EntityID mismatch for clearFlag: expected .global, got \(change.entityID)")
              }
             globalState[key] = change.newValue
 
         case .globalState(let key):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for globalState: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for globalState: expected .global, got \(change.entityID)")
             }
              globalState[key] = change.newValue
 
         case .pronounReference(let pronoun):
             // Expecting .itemIDSet
             guard case .itemIDSet(let newItemIDSet) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for pronounReference \(pronoun): expected .itemIDSet, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for pronounReference \(pronoun): expected .itemIDSet, got \(change.newValue)")
             }
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for pronounReference: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for pronounReference: expected .global, got \(change.entityID)")
             }
             pronouns[pronoun] = newItemIDSet
 
         case .addActiveDaemon(let daemonID):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for addActiveDaemon: expected .global, got \(change.entityID)")
             }
             guard case true = change.newValue else {
                  print("WARN: addActiveDaemon StateChange newValue was not true, was \(change.newValue). Proceeding anyway.")
@@ -378,34 +378,34 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .addActiveFuse(let fuseID, let initialTurns):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for addActiveFuse: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for addActiveFuse: expected .global, got \(change.entityID)")
             }
             guard case .int(let turnsValue) = change.newValue, turnsValue == initialTurns else {
-                throw ActionError.internalEngineError("StateChange newValue (\(change.newValue)) does not match initialTurns (\(initialTurns)) in addActiveFuse key.")
+                throw ActionResponse.internalEngineError("StateChange newValue (\(change.newValue)) does not match initialTurns (\(initialTurns)) in addActiveFuse key.")
             }
             activeFuses[fuseID] = initialTurns
 
         case .removeActiveDaemon(let daemonID):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for removeActiveDaemon: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for removeActiveDaemon: expected .global, got \(change.entityID)")
             }
             activeDaemons.remove(daemonID)
 
         case .removeActiveFuse(let fuseID):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for removeActiveFuse: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for removeActiveFuse: expected .global, got \(change.entityID)")
             }
             activeFuses.removeValue(forKey: fuseID)
 
         case .updateFuseTurns(let fuseID):
             guard change.entityID == .global else {
-                throw ActionError.internalEngineError("EntityID mismatch for updateFuseTurns: expected .global, got \(change.entityID)")
+                throw ActionResponse.internalEngineError("EntityID mismatch for updateFuseTurns: expected .global, got \(change.entityID)")
             }
             guard case .int(let newTurns) = change.newValue else {
-                throw ActionError.internalEngineError("Type mismatch for updateFuseTurns: expected .int, got \(change.newValue)")
+                throw ActionResponse.internalEngineError("Type mismatch for updateFuseTurns: expected .int, got \(change.newValue)")
             }
             guard activeFuses[fuseID] != nil else {
-                throw ActionError.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseID)")
+                throw ActionResponse.internalEngineError("Attempted to update turns for non-existent active fuse: \(fuseID)")
             }
             activeFuses[fuseID] = newTurns
         }
@@ -424,48 +424,48 @@ public struct GameState: Codable, Equatable, Sendable {
         // Item Properties
         case .itemAdjectives:
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemAdjectives")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemAdjectives")
             }
             // Map item's adjectives Set<String> to .stringSet
             actualCurrentValue = items[itemID].map { .stringSet($0.adjectives) }
 
         case .itemCapacity:
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemCapacity")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemCapacity")
             }
             // Map item's optional capacity Int? to .int, defaulting to 0
             actualCurrentValue = items[itemID].map { .int($0.capacity) }
 
         case .itemName:
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemName")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemName")
             }
             // Map item's name String to .string
             actualCurrentValue = items[itemID].map { .string($0.name) }
 
         case .itemSynonyms:
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSynonyms")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemSynonyms")
             }
             // Map item's synonyms Set<String> to .stringSet
             actualCurrentValue = items[itemID].map { .stringSet($0.synonyms) }
 
         case .itemParent:
             guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemParent")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemParent")
             }
             // Map item's parent ParentEntity to .parentEntity
             actualCurrentValue = items[itemID].map { .parentEntity($0.parent) }
 
         case .itemSize:
             guard case .item(let id) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemSize")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemSize")
             }
             // Map item's size Int to .int
             actualCurrentValue = items[id].map { .int($0.size) }
         case .itemValue:
             guard case .item = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemValue")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemValue")
             }
             print("WARN: Old value validation skipped for itemValue (property not implemented).")
             actualCurrentValue = nil // Skip validation for unimplemented property
@@ -473,17 +473,17 @@ public struct GameState: Codable, Equatable, Sendable {
         // Location Properties
         case .locationName:
             guard case .location(let id) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationName")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for locationName")
             }
             // Map location's name String to .string
             actualCurrentValue = locations[id].map { .string($0.name) }
 
         case .locationDescription:
-             throw ActionError.internalEngineError("Old value validation cannot be performed on locationDescription.")
+             throw ActionResponse.internalEngineError("Old value validation cannot be performed on locationDescription.")
 
         case .exits:
             guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for exits")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for exits")
             }
             // Map location's exits [Direction: Exit] to .exits
             actualCurrentValue = if let exits = locations[locationID]?.exits {
@@ -544,13 +544,13 @@ public struct GameState: Codable, Equatable, Sendable {
 
         case .itemAttribute(let key):
              guard case .item(let itemID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for itemAttribute")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemAttribute")
              }
              actualCurrentValue = items[itemID]?.attributes[key]
 
         case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityID else {
-                throw ActionError.internalEngineError("Validation: Invalid entity ID for locationAttribute")
+                throw ActionResponse.internalEngineError("Validation: Invalid entity ID for locationAttribute")
              }
              actualCurrentValue = locations[locationID]?.attributes[key]
         }
@@ -560,7 +560,7 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue == expectedOldValue ||
             (actualCurrentValue == nil && expectedOldValue == false)
         else {
-            throw ActionError.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
+            throw ActionResponse.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
         }
     }
 }

@@ -91,7 +91,7 @@ struct TouchActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.customResponse("Touch what?")) {
+        await #expect(throws: ActionResponse.custom("Touch what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -127,7 +127,7 @@ struct TouchActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("figurine")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("figurine")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -249,7 +249,7 @@ struct TouchActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("coin")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("coin")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

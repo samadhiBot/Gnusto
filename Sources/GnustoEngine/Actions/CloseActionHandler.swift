@@ -5,24 +5,24 @@ public struct CloseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Close what?")
+            throw ActionResponse.prerequisiteNotMet("Close what?")
         }
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check reachability using ScopeResolver
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check if item is closable (using .openable for symmetry)
         guard targetItem.hasFlag(.isOpenable) else {
-            throw ActionError.itemNotClosable(targetItemID)
+            throw ActionResponse.itemNotClosable(targetItemID)
         }
 
         // 5. Check if already closed (using dynamic property)
@@ -37,11 +37,11 @@ public struct CloseActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             // Should be caught by validate, but defensive check.
-            throw ActionError.internalEngineError("Close context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("Close context.command reached process without direct object.")
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Close context.command target item disappeared between validate and process.")
+            throw ActionResponse.internalEngineError("Close context.command target item disappeared between validate and process.")
         }
 
         // Handle "already closed" case detected (but not thrown) in validate
@@ -87,4 +87,4 @@ public struct CloseActionHandler: ActionHandler {
     // Rely on default postProcess to print the message.
 }
 
-// TODO: Add/verify ActionError cases: .itemNotClosable, .itemAlreadyClosed
+// TODO: Add/verify ActionResponse cases: .itemNotClosable, .itemAlreadyClosed

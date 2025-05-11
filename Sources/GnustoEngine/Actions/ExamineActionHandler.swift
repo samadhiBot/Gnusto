@@ -5,12 +5,12 @@ public struct ExamineActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.customResponse("Examine what?")
+            throw ActionResponse.custom("Examine what?")
         }
 
         // 2. Check if item exists
         guard await context.engine.item(targetItemID) != nil else {
-            throw ActionError.unknownItem(targetItemID)
+            throw ActionResponse.unknownItem(targetItemID)
         }
 
         // 3. Check reachability
@@ -19,7 +19,7 @@ public struct ExamineActionHandler: ActionHandler {
                 .itemsReachableByPlayer()
                 .contains(targetItemID)
         else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
@@ -28,7 +28,7 @@ public struct ExamineActionHandler: ActionHandler {
             let targetItemID = context.command.directObject,
             let targetItem = await context.engine.item(targetItemID)
         else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Examine context.command reached process without direct object."
             )
         }

@@ -1222,7 +1222,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemNotHeld("coin")) { // Correct error type
+        await #expect(throws: ActionResponse.itemNotHeld("coin")) { // Correct error type
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
             )
@@ -1258,7 +1258,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemNotAccessible("distantBox")) { // Correct error type
+        await #expect(throws: ActionResponse.itemNotAccessible("distantBox")) { // Correct error type
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
             )
@@ -1291,7 +1291,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.targetIsNotAContainer("statue")) {
+        await #expect(throws: ActionResponse.targetIsNotAContainer("statue")) {
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
             )
@@ -1326,7 +1326,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.containerIsClosed("closedBox")) { // Correct error type
+        await #expect(throws: ActionResponse.containerIsClosed("closedBox")) { // Correct error type
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
             )
@@ -1364,7 +1364,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionError.itemTooLargeForContainer(item: "boulder", container: "box")) { // Correct error type
+        await #expect(throws: ActionResponse.itemTooLargeForContainer(item: "boulder", container: "box")) { // Correct error type
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
             )
@@ -1400,7 +1400,7 @@ struct InsertActionHandlerTests {
 
         // Act & Assert Error
         await #expect(
-            throws: ActionError.prerequisiteNotMet("You can't put something inside itself.")
+            throws: ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
         ) { // Correct error type
             try await handler.validate(
                 context: ActionContext(
@@ -1450,7 +1450,7 @@ struct InsertActionHandlerTests {
 
         // Act & Assert Error
         let expectedMessage = "You can't put the box B in the box A, because the box A is inside the box B!"
-        await #expect(throws: ActionError.prerequisiteNotMet(expectedMessage)) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet(expectedMessage)) {
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: await engine.gameState)
             )

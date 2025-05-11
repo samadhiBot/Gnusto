@@ -5,23 +5,23 @@ public struct TouchActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.customResponse("Touch what?")
+            throw ActionResponse.custom("Touch what?")
         }
 
         // 2. Check if item exists
         guard await context.engine.item(targetItemID) != nil else {
-            throw ActionError.unknownItem(targetItemID)        }
+            throw ActionResponse.unknownItem(targetItemID)        }
 
         // 3. Check reachability
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "TOUCH context.command reached process without direct object."
             )
         }
@@ -40,7 +40,7 @@ public struct TouchActionHandler: ActionHandler {
             }
         } else {
             // Should not happen if validate passed
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Target item '\(targetItemID)' disappeared between validate and process for TOUCH."
             )
         }

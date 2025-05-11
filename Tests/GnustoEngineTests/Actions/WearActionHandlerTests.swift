@@ -86,7 +86,7 @@ struct WearActionHandlerTests {
             rawInput: "wear cloak"
         )
 
-        await #expect(throws: ActionError.itemNotHeld("cloak")) {
+        await #expect(throws: ActionResponse.itemNotHeld("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -119,7 +119,7 @@ struct WearActionHandlerTests {
             rawInput: "wear rock"
         )
 
-        await #expect(throws: ActionError.itemNotWearable("rock")) {
+        await #expect(throws: ActionResponse.itemNotWearable("rock")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -154,7 +154,7 @@ struct WearActionHandlerTests {
             rawInput: "wear cloak"
         )
 
-        await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
+        await #expect(throws: ActionResponse.itemIsAlreadyWorn("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -180,7 +180,7 @@ struct WearActionHandlerTests {
             rawInput: "wear"
         )
 
-        await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("Wear what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

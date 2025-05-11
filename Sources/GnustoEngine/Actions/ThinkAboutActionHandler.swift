@@ -5,7 +5,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.customResponse("Think about what?")
+            throw ActionResponse.custom("Think about what?")
         }
 
         // 2. Skip further checks if thinking about self (PLAYER)
@@ -13,20 +13,20 @@ public struct ThinkAboutActionHandler: ActionHandler {
 
         // 3. Check if item exists
         guard await context.engine.item(targetItemID) != nil else {
-            throw ActionError.unknownItem(targetItemID)
+            throw ActionResponse.unknownItem(targetItemID)
         }
 
         // 4. Check reachability
         let isReachable = await context.engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
         guard isReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             // Should be caught by validate
-            throw ActionError.internalEngineError("THINK ABOUT context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("THINK ABOUT context.command reached process without direct object.")
         }
 
         let message: String
@@ -39,7 +39,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
             // Handle thinking about an item
             guard let targetItem = await context.engine.item(targetItemID) else {
                  // Should be caught by validate
-                throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+                throw ActionResponse.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
             }
 
             // Mark as touched if not already

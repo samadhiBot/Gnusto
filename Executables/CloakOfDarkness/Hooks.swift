@@ -51,7 +51,7 @@ struct Hooks {
                     )
 
                     // Throw error to display message and halt default action
-                    throw ActionError.prerequisiteNotMet("You grope around clumsily in the dark. Better be careful.")
+                    throw ActionResponse.prerequisiteNotMet("You grope around clumsily in the dark. Better be careful.")
                     // return true // Implicitly handled by throwing
                 }
             }

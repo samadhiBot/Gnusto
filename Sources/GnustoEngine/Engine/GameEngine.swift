@@ -1,6 +1,5 @@
 import Foundation
 import OSLog
-//import Markdown
 
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
@@ -181,19 +180,17 @@ extension GameEngine {
     }
 
     /// Reports user-friendly messages for action failures to the player.
-    private func report(actionError: ActionError) async {
+    private func report(actionError: ActionResponse) async {
         // Determine the user-facing message
         let message = switch actionError {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
         case .containerIsOpen(let item):
             "\(theThat(item).capitalizedFirst) is already open."
-        case .customResponse(let message):
+        case .custom(let message):
             message
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
-        case .general(let message):
-            message
         case .internalEngineError:
             "A strange buzzing sound indicates something is wrong."
         case .invalidDirection:
@@ -270,9 +267,9 @@ extension GameEngine {
         // Log detailed errors separately
         switch actionError {
         case .internalEngineError(let msg):
-            logger.error("💥 ActionError: Internal Engine Error: \(msg, privacy: .public)")
+            logger.error("💥 ActionResponse: Internal Engine Error: \(msg, privacy: .public)")
         case .invalidValue(let msg):
-            logger.error("💥 ActionError: Invalid Value: \(msg, privacy: .public)")
+            logger.error("💥 ActionResponse: Invalid Value: \(msg, privacy: .public)")
         case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
             // Construct the log string first
             let logDetail = """
@@ -281,7 +278,7 @@ extension GameEngine {
                     - Expected Old Value: \(String(describing: change.oldValue))
                     - Actual Old Value: \(String(describing: actualOldValue))
                 """
-            logger.error("💥 ActionError: \(logDetail, privacy: .public)")
+            logger.error("💥 ActionResponse: \(logDetail, privacy: .public)")
         default:
             break // No detailed logging needed for other handled errors
         }
@@ -515,7 +512,7 @@ extension GameEngine {
 
         if let error = actionError {
             // An object handler threw an error
-            if let specificError = error as? ActionError {
+            if let specificError = error as? ActionResponse {
                 await report(actionError: specificError)
             } else {
                 logger.warning("""
@@ -579,8 +576,8 @@ extension GameEngine {
                     // Call postProcess (even if default is empty)
                     try await verbHandler.postProcess(context: context, result: result)
 
-                } catch let actionErr as ActionError {
-                    // Catch ActionError specifically for reporting
+                } catch let actionErr as ActionResponse {
+                    // Catch ActionResponse specifically for reporting
                     await report(actionError: actionErr)
                 } catch {
                     // Catch any other unexpected errors from handlers

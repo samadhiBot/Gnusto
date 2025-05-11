@@ -117,7 +117,7 @@ struct GameEngineTests {
     }
 
     @Test("Engine Handles Action Error")
-    func testEngineHandlesActionError() async throws {
+    func testEngineHandlesActionResponse() async throws {
         let mockTakeHandler = MockActionHandler(
             errorToThrow: .itemNotTakable("startItem"),
             throwFrom: .process
@@ -588,7 +588,7 @@ struct GameEngineTests {
             func process(context: ActionContext) async throws -> ActionResult {
                 // Use snapshot for checks
                 guard let item = context.stateSnapshot.items[itemIDToModify] else {
-                    throw ActionError.internalEngineError("Test item missing")
+                    throw ActionResponse.internalEngineError("Test item missing")
                 }
 
                 // Define multiple changes
@@ -854,7 +854,7 @@ struct GameEngineTests {
 
     // MARK: - Helper Functions & Error Tests
 
-    @Test("ReportActionError: .invalidDirection")
+    @Test("ReportActionResponse: .invalidDirection")
     func testReportErrorInvalidDirection() async throws {
         // Initialize location with properties directly
         let startRoom = Location(
@@ -877,7 +877,7 @@ struct GameEngineTests {
         expectNoDifference(output, "Go where?")
     }
 
-    @Test("ReportActionError: .itemNotTakable")
+    @Test("ReportActionResponse: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
         let pebble = Item(
@@ -907,7 +907,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't take the pebble.")
     }
 
-    @Test("ReportActionError: .itemNotHeld")
+    @Test("ReportActionResponse: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
         let pebble = Item(
@@ -937,7 +937,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You aren't holding the pebble.")
     }
 
-    @Test("ReportActionError: .containerIsClosed")
+    @Test("ReportActionResponse: .containerIsClosed")
     func testReportErrorContainerIsClosed() async throws {
         // Initialize items directly
         let itemToPut = Item(
@@ -974,7 +974,7 @@ struct GameEngineTests {
         expectNoDifference(output, "The box is closed.")
     }
 
-    @Test("ReportActionError: .itemNotOpenable")
+    @Test("ReportActionResponse: .itemNotOpenable")
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
         let item = Item(
@@ -1002,7 +1002,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't open the rock.")
     }
 
-    @Test("ReportActionError: .itemNotWearable")
+    @Test("ReportActionResponse: .itemNotWearable")
     func testReportErrorItemNotWearable() async throws {
         // Initialize item directly, held by player
         let item = Item(
@@ -1031,7 +1031,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't wear the rock.")
     }
 
-    @Test("ReportActionError: .playerCannotCarryMore")
+    @Test("ReportActionResponse: .playerCannotCarryMore")
     func testReportErrorPlayerCannotCarryMore() async throws {
         // Initialize items and player with capacity
         let itemHeld = Item(
@@ -1072,7 +1072,7 @@ struct GameEngineTests {
         expectNoDifference(output, "Your hands are full.")
     }
 
-    @Test("ReportActionError: .targetIsNotAContainer")
+    @Test("ReportActionResponse: .targetIsNotAContainer")
     func testReportErrorTargetIsNotContainer() async throws {
         // Initialize items directly
         let itemToPut = Item(
@@ -1107,7 +1107,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't put things in the rock.")
     }
 
-    @Test("ReportActionError: .targetIsNotASurface")
+    @Test("ReportActionResponse: .targetIsNotASurface")
     func testReportErrorTargetIsNotSurface() async throws {
         // Initialize items directly
         let itemToPut = Item(
@@ -1142,7 +1142,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't put things on the rock.")
     }
 
-    @Test("ReportActionError: .directionIsBlocked")
+    @Test("ReportActionResponse: .directionIsBlocked")
     func testReportErrorDirectionIsBlocked() async throws {
         // Initialize location with blocked exit
         let blockedExit = Exit(
@@ -1171,7 +1171,7 @@ struct GameEngineTests {
         expectNoDifference(output, "A shimmering curtain bars the way.")
     }
 
-    @Test("ReportActionError: .itemAlreadyClosed")
+    @Test("ReportActionResponse: .itemAlreadyClosed")
     func testReportErrorItemAlreadyClosed() async throws {
         // Initialize item as closed container
         let container = Item(
@@ -1201,7 +1201,7 @@ struct GameEngineTests {
         expectNoDifference(output, "The box is already closed.")
     }
 
-    @Test("ReportActionError: .itemIsUnlocked")
+    @Test("ReportActionResponse: .itemIsUnlocked")
     func testReportErrorItemIsUnlocked() async throws {
         // Initialize unlocked container and key held by player
         let container = Item(
@@ -1242,7 +1242,7 @@ struct GameEngineTests {
         expectNoDifference(output, "The chest is already unlocked.")
     }
 
-    @Test("ReportActionError: .itemNotClosable")
+    @Test("ReportActionResponse: .itemNotClosable")
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
         let item = Item(
@@ -1270,7 +1270,7 @@ struct GameEngineTests {
         expectNoDifference(output, "The book is not something you can close.")
     }
 
-    @Test("ReportActionError: .itemNotDroppable")
+    @Test("ReportActionResponse: .itemNotDroppable")
     func testReportErrorItemNotDroppable() async throws {
         // Initialize fixed scenery item held by player
         let item = Item(
@@ -1299,7 +1299,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't drop the statue.")
     }
 
-    @Test("ReportActionError: .itemNotRemovable")
+    @Test("ReportActionResponse: .itemNotRemovable")
     func testReportErrorItemNotRemovable() async throws {
         // Initialize fixed scenery, worn item held by player
         let item = Item(
@@ -1330,7 +1330,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You can't remove the cursed amulet.")
     }
 
-    @Test("ReportActionError: .prerequisiteNotMet")
+    @Test("ReportActionResponse: .prerequisiteNotMet")
     func testReportErrorPrerequisiteNotMet() async throws {
         // Initialize location with conditional exit
         let conditionalExit = Exit(
@@ -1359,7 +1359,7 @@ struct GameEngineTests {
         expectNoDifference(output, "You must first find inner peace.")
     }
 
-    @Test("ReportActionError: .roomIsDark")
+    @Test("ReportActionResponse: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
         // Initialize dark room with an item
         let item = Item(
@@ -1394,7 +1394,7 @@ struct GameEngineTests {
         expectNoDifference(output, "It's too dark to do that.")
     }
 
-    @Test("ReportActionError: .wrongKey")
+    @Test("ReportActionResponse: .wrongKey")
     func testReportErrorWrongKey() async throws {
         // Initialize locked container and wrong key held by player
         let container = Item(

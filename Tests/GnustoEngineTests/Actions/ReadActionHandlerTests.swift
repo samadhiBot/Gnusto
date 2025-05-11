@@ -107,7 +107,7 @@ struct ReadActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.customResponse("Read what?")) {
+        await #expect(throws: ActionResponse.custom("Read what?")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -148,7 +148,7 @@ struct ReadActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("scroll")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("scroll")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -185,7 +185,7 @@ struct ReadActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotReadable("rock")) {
+        await #expect(throws: ActionResponse.itemNotReadable("rock")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -235,7 +235,7 @@ struct ReadActionHandlerTests {
 
         // Act & Assert
         await #expect(
-            throws: ActionError.roomIsDark
+            throws: ActionResponse.roomIsDark
         ) {
             try await handler.validate(
                 context: ActionContext(

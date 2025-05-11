@@ -6,40 +6,40 @@ struct PutOnActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
         guard let itemToPutID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Put what?") // Changed from Insert
+            throw ActionResponse.prerequisiteNotMet("Put what?") // Changed from Insert
         }
         guard let surfaceID = context.command.indirectObject else {
             let itemName = await context.engine.item(itemToPutID)?.name ?? "item"
-            throw ActionError.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
+            throw ActionResponse.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
         }
 
         // 2. Get Item s
         guard let itemToPut = await context.engine.item(itemToPutID) else {
-            throw ActionError.itemNotAccessible(itemToPutID)
+            throw ActionResponse.itemNotAccessible(itemToPutID)
         }
         guard let surfaceItem = await context.engine.item(surfaceID) else {
-            throw ActionError.itemNotAccessible(surfaceID)
+            throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
         // 3. Perform Basic Checks
         guard itemToPut.parent == .player else {
-            throw ActionError.itemNotHeld(itemToPutID)
+            throw ActionResponse.itemNotHeld(itemToPutID)
         }
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(surfaceID) else {
-             throw ActionError.itemNotAccessible(surfaceID)
+             throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
         // Prevent putting item onto itself
         if itemToPutID == surfaceID {
-             throw ActionError.prerequisiteNotMet("You can't put something on itself.")
+             throw ActionResponse.prerequisiteNotMet("You can't put something on itself.")
         }
         // Recursive check: is the target surface inside the item we are putting?
         var currentParent = surfaceItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToPutID {
                 // Slightly awkward message, but covers the case
-                throw ActionError.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
+                throw ActionResponse.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
             }
             guard let parentItem = await context.engine.item(parentItemID) else { break }
             currentParent = parentItem.parent
@@ -47,7 +47,7 @@ struct PutOnActionHandler: ActionHandler {
 
         // 4. Target Checks (Specific to PUT ON)
         guard surfaceItem.hasFlag(.isSurface) else {
-            throw ActionError.targetIsNotASurface(surfaceID)
+            throw ActionResponse.targetIsNotASurface(surfaceID)
         }
         // TODO: Add surface capacity/volume checks?
     }
@@ -62,7 +62,7 @@ struct PutOnActionHandler: ActionHandler {
             let itemToPut = await context.engine.item(itemToPutID),
             let surface = await context.engine.item(surfaceID)
         else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Item snapshot disappeared between validate and process for PUT ON."
             )
         }

@@ -8,7 +8,7 @@ actor MockActionHandler: ActionHandler {
     let processHandler: (@Sendable (ActionContext) async throws -> ActionResult)?
 
     /// A predefined error to throw immediately when `process` (or `validate`) is called.
-    let errorToThrow: ActionError?
+    let errorToThrow: ActionResponse?
     /// Where the error should be thrown from.
     let throwFrom: ThrowPhase
 
@@ -27,7 +27,7 @@ actor MockActionHandler: ActionHandler {
     // Initializer for the actor
     init(
         processHandler: (@Sendable (ActionContext) async throws -> ActionResult)? = nil,
-        errorToThrow: ActionError? = nil,
+        errorToThrow: ActionResponse? = nil,
         throwFrom: ThrowPhase = .process // Default to throwing from process
     ) {
         self.processHandler = processHandler

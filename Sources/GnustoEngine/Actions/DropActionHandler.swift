@@ -5,14 +5,14 @@ public struct DropActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Drop what?")
+            throw ActionResponse.prerequisiteNotMet("Drop what?")
         }
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
             // If parser resolved it, but it's gone, treat as inaccessible/not held.
             // For DROP, the more specific error is relevant.
-            throw ActionError.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
+            throw ActionResponse.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
         }
 
         // 3. Check if player is holding the item
@@ -23,17 +23,17 @@ public struct DropActionHandler: ActionHandler {
 
         // 4. Check if item is droppable (not fixed scenery)
         if targetItem.hasFlag(.isScenery) {
-            throw ActionError.itemNotDroppable(targetItemID)
+            throw ActionResponse.itemNotDroppable(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError("Drop context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("Drop context.command reached process without direct object.")
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Drop context.command target item disappeared between validate and process.")
+            throw ActionResponse.internalEngineError("Drop context.command target item disappeared between validate and process.")
         }
 
         // Handle "not holding" case detected (but not thrown) in validate

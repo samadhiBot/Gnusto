@@ -286,7 +286,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't unlock the pebble.") // Uses ActionError.itemNotUnlockable message
+        expectNoDifference(output, "You can't unlock the pebble.") // Uses ActionResponse.itemNotUnlockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)

@@ -5,12 +5,12 @@ public struct TakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Take what?")
+            throw ActionResponse.prerequisiteNotMet("Take what?")
         }
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.unknownItem(targetItemID)
+            throw ActionResponse.unknownItem(targetItemID)
         }
 
         // 3. Check if player already has the item
@@ -30,7 +30,7 @@ public struct TakeActionHandler: ActionHandler {
             let isSurface = parentItem.hasFlag(.isSurface)
             if !isContainer && !isSurface {
                 // Custom message similar to Zork's, using the plain name.
-                throw ActionError.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
+                throw ActionResponse.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
             }
         }
 
@@ -41,9 +41,9 @@ public struct TakeActionHandler: ActionHandler {
            !container.hasFlag(.isOpen)
         {
             if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
-                throw ActionError.containerIsClosed(parentID)
+                throw ActionResponse.containerIsClosed(parentID)
             } else {
-                throw ActionError.itemNotAccessible(targetItemID)
+                throw ActionResponse.itemNotAccessible(targetItemID)
             }
         }
 
@@ -51,17 +51,17 @@ public struct TakeActionHandler: ActionHandler {
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
             // If not reachable for other reasons (e.g., too far, darkness affecting scope)
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 7. Check if the item is takable
         guard targetItem.hasFlag(.isTakable) else {
-            throw ActionError.itemNotTakable(targetItemID)
+            throw ActionResponse.itemNotTakable(targetItemID)
         }
 
         // 8. Check capacity <-- Check added here
         guard await context.engine.playerCanCarry(targetItem) else {
-            throw ActionError.playerCannotCarryMore
+            throw ActionResponse.playerCannotCarryMore
         }
     }
 
@@ -70,7 +70,7 @@ public struct TakeActionHandler: ActionHandler {
             let targetItemID = context.command.directObject,
             let targetItem = await context.engine.item(targetItemID)
         else {
-            throw ActionError.internalEngineError("Take context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("Take context.command reached process without direct object.")
         }
 
         // Handle "already have" case detected (but not thrown) in validate

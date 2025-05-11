@@ -12,14 +12,14 @@ public struct LookActionHandler: ActionHandler {
         guard let _ = await context.engine.item(targetItemID) else {
             // Should not happen if parser resolved correctly, but safety first.
             // Or perhaps the item *just* disappeared.
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // Check reachability using ScopeResolver
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer() // Returns Set<ItemID>
         guard reachableItems.contains(targetItemID) else {
             // Use a standard message even if item technically exists elsewhere
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
@@ -43,7 +43,7 @@ public struct LookActionHandler: ActionHandler {
             // 2. Location is lit, proceed with description
             guard let currentLocation = await engine.location(with: currentLocationID) else {
                 // Should not happen if player location is valid and not dark
-                throw ActionError.internalEngineError(
+                throw ActionResponse.internalEngineError(
                     "Player is in an invalid location: \(currentLocationID)"
                 )
             }
@@ -60,7 +60,7 @@ public struct LookActionHandler: ActionHandler {
         // Validation ensures item exists and is reachable
         guard let targetItem = await engine.item(targetItemID) else {
             // This should not happen due to validation, but guard defensively.
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Item \(targetItemID) disappeared between validate and process."
             )
         }

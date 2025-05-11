@@ -5,47 +5,47 @@ struct InsertActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
         guard let itemToInsertID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Insert what?")
+            throw ActionResponse.prerequisiteNotMet("Insert what?")
         }
         guard let containerID = context.command.indirectObject else {
             // Fetch name for better error message if possible
             let itemName = await context.engine.item(itemToInsertID)?.name ?? "item"
-            throw ActionError.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
+            throw ActionResponse.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
 
         // 2. Get Item s
         guard let itemToInsert = await context.engine.item(itemToInsertID) else {
-            throw ActionError.itemNotAccessible(itemToInsertID)
+            throw ActionResponse.itemNotAccessible(itemToInsertID)
         }
         guard let containerItem = await context.engine.item(containerID) else {
-            throw ActionError.itemNotAccessible(containerID)
+            throw ActionResponse.itemNotAccessible(containerID)
         }
 
         // 3. Perform Basic Checks
         guard itemToInsert.parent == .player else {
-            throw ActionError.itemNotHeld(itemToInsertID)
+            throw ActionResponse.itemNotHeld(itemToInsertID)
         }
 
         // If the item being inserted is fixed scenery, Zork replies as if it is not a container.
         if itemToInsert.hasFlag(.isScenery) {
-            throw ActionError.targetIsNotAContainer(itemToInsertID)
+            throw ActionResponse.targetIsNotAContainer(itemToInsertID)
         }
 
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(containerID) else {
-             throw ActionError.itemNotAccessible(containerID)
+             throw ActionResponse.itemNotAccessible(containerID)
         }
 
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
-             throw ActionError.prerequisiteNotMet("You can't put something inside itself.")
+             throw ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
         }
 
         // Recursive check: is the target container inside the item we are inserting?
         var currentParent = containerItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToInsertID {
-                throw ActionError.prerequisiteNotMet(
+                throw ActionResponse.prerequisiteNotMet(
                     "You can't put the \(itemToInsert.name) in the \(containerItem.name), because the \(containerItem.name) is inside the \(itemToInsert.name)!"
                 )
             }
@@ -55,11 +55,11 @@ struct InsertActionHandler: ActionHandler {
 
         // 4. Target Checks (Specific to INSERT)
         guard containerItem.hasFlag(.isContainer) else {
-            throw ActionError.targetIsNotAContainer(containerID)
+            throw ActionResponse.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
         guard try await context.engine.fetch(containerID, .isOpen) else {
-            throw ActionError.containerIsClosed(containerID)
+            throw ActionResponse.containerIsClosed(containerID)
         }
 
         // Capacity Check (New)
@@ -70,7 +70,7 @@ struct InsertActionHandler: ActionHandler {
             let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
             let itemSize = itemToInsert.size
             if currentLoad + itemSize > containerItem.capacity {
-                throw ActionError.itemTooLargeForContainer(
+                throw ActionResponse.itemTooLargeForContainer(
                     item: itemToInsertID,
                     container: containerID
                 )
@@ -88,7 +88,7 @@ struct InsertActionHandler: ActionHandler {
             let itemToInsert = await context.engine.item(itemToInsertID),
             let container = await context.engine.item(containerID)
         else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Item snapshot disappeared between validate and process for INSERT."
             )
         }

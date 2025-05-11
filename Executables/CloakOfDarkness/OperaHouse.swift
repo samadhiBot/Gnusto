@@ -92,11 +92,11 @@ extension OperaHouse {
     static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
         switch command.verbID {
         case "examine":
-            throw ActionError.customResponse("The cloak is unnaturally dark.")
+            throw ActionResponse.custom("The cloak is unnaturally dark.")
 
         case "drop":
             if await engine.gameState.player.currentLocationID != "cloakroom" {
-                throw ActionError.prerequisiteNotMet(
+                throw ActionResponse.prerequisiteNotMet(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
             } else {
@@ -121,7 +121,7 @@ extension OperaHouse {
         } else {
             "screwed to the wall"
         }
-        throw ActionError.customResponse("It's just a small brass hook, \(hookDetail).")
+        throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
     static func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
@@ -134,10 +134,10 @@ extension OperaHouse {
         // Fix: Check location exists before accessing properties
         guard let bar = await engine.location(with: "bar") else {
             // Should not happen if game setup is correct
-            throw ActionError.internalEngineError("Location 'bar' not found.")
+            throw ActionResponse.internalEngineError("Location 'bar' not found.")
         }
         guard bar.hasFlag(.isLit) else {
-            throw ActionError.prerequisiteNotMet("It's too dark to do that.")
+            throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }
 
         let disturbedCount = await engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
@@ -150,6 +150,6 @@ extension OperaHouse {
             await engine.requestQuit()
         }
         // Throw error to display the message via engine reporting
-        throw ActionError.customResponse(finalMessage)
+        throw ActionResponse.custom(finalMessage)
     }
 }

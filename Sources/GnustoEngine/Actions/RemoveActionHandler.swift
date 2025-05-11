@@ -5,24 +5,24 @@ public struct RemoveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Remove what?")
+            throw ActionResponse.prerequisiteNotMet("Remove what?")
         }
 
         // 2. Check if the item exists and is held by the player
         guard let targetItem = await context.engine.item(targetItemID),
               targetItem.parent == .player else
         {
-            throw ActionError.itemNotHeld(targetItemID)
+            throw ActionResponse.itemNotHeld(targetItemID)
         }
 
         // 3. Check if the (held) item is currently worn
         guard targetItem.hasFlag(.isWorn) else {
-            throw ActionError.itemIsNotWorn(targetItemID)
+            throw ActionResponse.itemIsNotWorn(targetItemID)
         }
 
         // 4. Check if the item is fixed scenery (e.g., the ground)
         guard !targetItem.hasFlag(.isScenery) else {
-            throw ActionError.itemNotRemovable(targetItemID)
+            throw ActionResponse.itemNotRemovable(targetItemID)
         }
     }
 
@@ -31,7 +31,7 @@ public struct RemoveActionHandler: ActionHandler {
             let targetItemID = context.command.directObject,
             let targetItem = await context.engine.item(targetItemID)
         else {
-            throw ActionError.internalEngineError("Item snapshot disappeared!")
+            throw ActionResponse.internalEngineError("Item snapshot disappeared!")
         }
 
         var stateChanges: [StateChange] = []

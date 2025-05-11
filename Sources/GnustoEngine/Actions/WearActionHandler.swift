@@ -5,24 +5,24 @@ public struct WearActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Wear what?")
+            throw ActionResponse.prerequisiteNotMet("Wear what?")
         }
 
         // 2. Check if the item exists and is held by the player
         guard let targetItem = await context.engine.item(targetItemID),
               targetItem.parent == .player else
         {
-            throw ActionError.itemNotHeld(targetItemID)
+            throw ActionResponse.itemNotHeld(targetItemID)
         }
 
         // 3. Check if the (held) item is wearable
         guard targetItem.hasFlag(.isWearable) else {
-            throw ActionError.itemNotWearable(targetItemID)
+            throw ActionResponse.itemNotWearable(targetItemID)
         }
 
         // 4. Check if already worn
         guard !targetItem.hasFlag(.isWorn) else {
-            throw ActionError.itemIsAlreadyWorn(targetItemID)
+            throw ActionResponse.itemIsAlreadyWorn(targetItemID)
         }
     }
 
@@ -31,7 +31,7 @@ public struct WearActionHandler: ActionHandler {
         let targetItemID = context.command.directObject!
         guard let itemSnapshot = await context.engine.item(targetItemID) else {
             // Should not happen if validate passed
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
+            throw ActionResponse.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
         }
 
         var stateChanges: [StateChange] = []

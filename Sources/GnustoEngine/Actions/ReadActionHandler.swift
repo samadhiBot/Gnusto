@@ -5,41 +5,41 @@ public struct ReadActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.customResponse("Read what?")
+            throw ActionResponse.custom("Read what?")
         }
 
         // 2. Check if item exists
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.unknownItem(targetItemID)
+            throw ActionResponse.unknownItem(targetItemID)
         }
 
         // 3. Check if room is lit (unless item provides light)
         let currentLocationID = await context.engine.gameState.player.currentLocationID
         let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
         guard isLit else {
-            throw ActionError.roomIsDark
+            throw ActionResponse.roomIsDark
         }
 
         // 4. Check reachability
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 5. Check if item is readable
         guard targetItem.hasFlag(.isReadable) else {
-            throw ActionError.itemNotReadable(targetItemID)
+            throw ActionResponse.itemNotReadable(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "READ context.command reached process without direct object."
             )
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Target item '\(targetItemID)' disappeared between validate and process."
             )
         }

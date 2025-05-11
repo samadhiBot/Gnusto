@@ -5,7 +5,7 @@ public struct OpenActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let targetItemID = context.command.directObject else {
-            throw ActionError.prerequisiteNotMet("Open what?")
+            throw ActionResponse.prerequisiteNotMet("Open what?")
         }
 
         // 2. Check if item exists and is accessible using ScopeResolver
@@ -13,39 +13,39 @@ public struct OpenActionHandler: ActionHandler {
             // If snapshot is nil, it implies item doesn't exist in current state.
             // ScopeResolver checks typically operate on existing items.
             // Let's use the standard not accessible error.
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // Use ScopeResolver to determine reachability
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check if item is openable
         guard targetItem.hasFlag(.isOpenable) else {
-            throw ActionError.itemNotOpenable(targetItemID)
+            throw ActionResponse.itemNotOpenable(targetItemID)
         }
 
         // 4. Check if locked
         if targetItem.hasFlag(.isLocked) {
-            throw ActionError.itemIsLocked(targetItemID)
+            throw ActionResponse.itemIsLocked(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetItemID = context.command.directObject else {
             // Should be caught by validate, but defensive check.
-            throw ActionError.internalEngineError("Open context.command reached process without direct object.")
+            throw ActionResponse.internalEngineError("Open context.command reached process without direct object.")
         }
         guard let targetItem = await context.engine.item(targetItemID) else {
             // Should be caught by validate.
-            throw ActionError.internalEngineError("Open context.command target item disappeared between validate and process.")
+            throw ActionResponse.internalEngineError("Open context.command target item disappeared between validate and process.")
         }
 
         // Check if already open using dynamic property
         if try await context.engine.fetch(targetItemID, .isOpen) {
-            throw ActionError.itemAlreadyOpen(targetItemID)
+            throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 
         // Set the dynamic value for 'isOpen' to true
@@ -80,4 +80,4 @@ public struct OpenActionHandler: ActionHandler {
     // Engine's execute method handles applying the stateChanges.
 }
 
-// TODO: Add/verify ActionError cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked
+// TODO: Add/verify ActionResponse cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked

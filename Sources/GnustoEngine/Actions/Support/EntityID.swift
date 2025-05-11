@@ -22,28 +22,28 @@ public enum EntityID: Codable, Sendable, Hashable {
 extension EntityID {
     func daemonID() throws -> DaemonID {
         guard case .daemon(let daemonID) = self else {
-            throw ActionError.internalEngineError("EntityID expected to be DaemonID, got: \(self)")
+            throw ActionResponse.internalEngineError("EntityID expected to be DaemonID, got: \(self)")
         }
         return daemonID
     }
 
     func fuseID() throws -> FuseID {
         guard case .fuse(let fuseID) = self else {
-            throw ActionError.internalEngineError("EntityID expected to be FuseID, got: \(self)")
+            throw ActionResponse.internalEngineError("EntityID expected to be FuseID, got: \(self)")
         }
         return fuseID
     }
 
     func itemID() throws -> ItemID {
         guard case .item(let itemID) = self else {
-            throw ActionError.internalEngineError("EntityID expected to be ItemID, got: \(self)")
+            throw ActionResponse.internalEngineError("EntityID expected to be ItemID, got: \(self)")
         }
         return itemID
     }
 
     func locationID() throws -> LocationID {
         guard case .location(let locationID) = self else {
-            throw ActionError.internalEngineError("EntityID expected to be LocationID, got: \(self)")
+            throw ActionResponse.internalEngineError("EntityID expected to be LocationID, got: \(self)")
         }
         return locationID
     }

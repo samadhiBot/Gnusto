@@ -21,7 +21,7 @@ extension GameEngine {
                     for: try effect.targetID.fuseID()
                 )
             else {
-                throw ActionError.internalEngineError("""
+                throw ActionResponse.internalEngineError("""
                     No FuseDefinition found for fuse ID '\(effect.targetID)' \
                     in startFuse side effect.
                     """)
@@ -53,7 +53,7 @@ extension GameEngine {
         case .runDaemon:
             let daemonID = try effect.targetID.daemonID()
             guard definitionRegistry.daemonDefinition(for: daemonID) != nil else {
-                throw ActionError.internalEngineError("""
+                throw ActionResponse.internalEngineError("""
                     No DaemonDefinition found for daemon ID '\(daemonID)' \
                     in runDaemon side effect.
                     """)

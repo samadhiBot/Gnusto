@@ -5,10 +5,10 @@ public struct LockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate context.command structure: Need DO and IO
         guard context.command.directObject != nil else {
-            throw ActionError.prerequisiteNotMet("Lock what?")
+            throw ActionResponse.prerequisiteNotMet("Lock what?")
         }
         guard context.command.indirectObject != nil else {
-            throw ActionError.prerequisiteNotMet("Lock it with what?")
+            throw ActionResponse.prerequisiteNotMet("Lock it with what?")
         }
 
         // Safely unwrap IDs after checks
@@ -18,24 +18,24 @@ public struct LockActionHandler: ActionHandler {
         // 2. Get item snapshots
         guard let targetItem = await context.engine.item(targetItemID) else {
             // If parser resolved it but it's gone now, treat as inaccessible.
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
         guard let keyItem = await context.engine.item(keyItemID) else {
-            throw ActionError.itemNotAccessible(keyItemID)
+            throw ActionResponse.itemNotAccessible(keyItemID)
         }
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
-            throw ActionError.itemNotHeld(keyItemID)
+            throw ActionResponse.itemNotHeld(keyItemID)
         }
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check item properties
         guard targetItem.hasFlag(.isLockable) else {
-            throw ActionError.itemNotLockable(targetItemID)
+            throw ActionResponse.itemNotLockable(targetItemID)
         }
         guard !targetItem.hasFlag(.isLocked) else {
             // Don't throw, let process handle the message
@@ -44,7 +44,7 @@ public struct LockActionHandler: ActionHandler {
 
         // 5. Check if it's the correct key
         guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
-            throw ActionError.wrongKey(keyID: keyItemID, lockID: targetItemID)
+            throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
     }
 
@@ -55,7 +55,7 @@ public struct LockActionHandler: ActionHandler {
             let targetItem = await context.engine.item(targetItemID),
             let keyItem = await context.engine.item(keyItemID)
         else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Missing directObject or indirectObject in LOCK context.command."
             )
         }

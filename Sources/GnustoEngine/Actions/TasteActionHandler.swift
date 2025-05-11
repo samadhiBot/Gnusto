@@ -5,7 +5,7 @@ struct TasteActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {
-            throw ActionError.customResponse("Taste what?")
+            throw ActionResponse.custom("Taste what?")
         }
         // Basic TASTE doesn't need reachability check by default.
     }

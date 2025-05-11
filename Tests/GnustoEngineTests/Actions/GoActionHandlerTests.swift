@@ -79,7 +79,7 @@ struct GoActionHandlerTests {
             rawInput: "north"
         )
 
-        await #expect(throws: ActionError.directionIsBlocked("A wall blocks your path.")) {
+        await #expect(throws: ActionResponse.directionIsBlocked("A wall blocks your path.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -122,7 +122,7 @@ struct GoActionHandlerTests {
             rawInput: "north"
         )
 
-        await #expect(throws: ActionError.invalidDirection) {
+        await #expect(throws: ActionResponse.invalidDirection) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

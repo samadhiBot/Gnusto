@@ -125,7 +125,7 @@ struct DynamicPropertyTests {
 //        )
 //
 //        // Attempt to set an invalid value (zero)
-//        await #expect(throws: ActionError.self) {
+//        await #expect(throws: ActionResponse.self) {
 //             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: StateValue.int(0))
 //        }
 //
@@ -134,7 +134,7 @@ struct DynamicPropertyTests {
 //        #expect(item?.attributes["validatedProp"] == StateValue.int(1))
 //
 //        // Attempt to set wrong type
-//         await #expect(throws: ActionError.self) {
+//         await #expect(throws: ActionResponse.self) {
 //             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: StateValue.string("invalid"))
 //        }
 //         #expect(item?.attributes["validatedProp"] == StateValue.int(1))

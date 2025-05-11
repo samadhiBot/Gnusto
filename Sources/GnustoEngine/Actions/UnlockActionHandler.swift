@@ -5,10 +5,10 @@ public struct UnlockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate context.command structure: Need DO and IO
         guard context.command.directObject != nil else {
-            throw ActionError.prerequisiteNotMet("Unlock what?")
+            throw ActionResponse.prerequisiteNotMet("Unlock what?")
         }
         guard context.command.indirectObject != nil else {
-            throw ActionError.prerequisiteNotMet("Unlock it with what?")
+            throw ActionResponse.prerequisiteNotMet("Unlock it with what?")
         }
 
         // Safely unwrap IDs after checks
@@ -17,24 +17,24 @@ public struct UnlockActionHandler: ActionHandler {
 
         // 2. Get item snapshots
         guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
         guard let keyItem = await context.engine.item(keyItemID) else {
-            throw ActionError.itemNotAccessible(keyItemID)
+            throw ActionResponse.itemNotAccessible(keyItemID)
         }
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
-            throw ActionError.itemNotHeld(keyItemID)
+            throw ActionResponse.itemNotHeld(keyItemID)
         }
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
         guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check item properties
         guard targetItem.hasFlag(.isLockable) else {
-            throw ActionError.itemNotUnlockable(targetItemID)
+            throw ActionResponse.itemNotUnlockable(targetItemID)
         }
         guard targetItem.hasFlag(.isLocked) else {
             // Target is already unlocked. Don't throw, let process handle the message.
@@ -43,7 +43,7 @@ public struct UnlockActionHandler: ActionHandler {
 
         // 5. Check if it's the correct key
         guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
-            throw ActionError.wrongKey(keyID: keyItemID, lockID: targetItemID)
+            throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
     }
 
@@ -56,7 +56,7 @@ public struct UnlockActionHandler: ActionHandler {
         guard let targetItem = await context.engine.item(targetItemID),
               let keyItem = await context.engine.item(keyItemID) else
         {
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
+            throw ActionResponse.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
         }
 
         // Handle case: Already unlocked (detected in validate)

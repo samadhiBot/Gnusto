@@ -5,44 +5,44 @@ public struct GoActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Identify Direction
         guard let direction = context.command.direction else {
-            throw ActionError.prerequisiteNotMet("Go where?")
+            throw ActionResponse.prerequisiteNotMet("Go where?")
         }
 
         // 2. Get Current Location data
         let currentLocationID = await context.engine.gameState.player.currentLocationID
         guard let currentLoc = await context.engine.location(with: currentLocationID) else {
-            throw ActionError.internalEngineError(
+            throw ActionResponse.internalEngineError(
                 "Player's current location ID '\(currentLocationID)' is invalid."
             )
         }
 
         // 3. Find Exit
         guard let exit = currentLoc.exits[direction] else {
-            throw ActionError.invalidDirection // Standard message: "You can't go that way."
+            throw ActionResponse.invalidDirection // Standard message: "You can't go that way."
         }
 
         // 4. Check Exit Conditions
 
         // Check for static blocked message first
         if let staticBlockedMessage = exit.blockedMessage {
-            throw ActionError.directionIsBlocked(staticBlockedMessage)
+            throw ActionResponse.directionIsBlocked(staticBlockedMessage)
         }
 
         // Continue if exit is a door, otherwise validation is done
         guard let doorID = exit.doorID else { return }
 
         guard let door = await context.engine.item(doorID) else {
-            throw ActionError.internalEngineError("Exit specifies unknown door '\(doorID)'.")
+            throw ActionResponse.internalEngineError("Exit specifies unknown door '\(doorID)'.")
         }
 
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
-            throw ActionError.directionIsBlocked("The \(door.name) is locked.")
+            throw ActionResponse.directionIsBlocked("The \(door.name) is locked.")
         }
 
         // Check if the door is open
         if !door.hasFlag(.isOpen) {
-            throw ActionError.directionIsBlocked("The \(direction.rawValue) door is closed.")
+            throw ActionResponse.directionIsBlocked("The \(direction.rawValue) door is closed.")
         }
     }
 
@@ -56,7 +56,7 @@ public struct GoActionHandler: ActionHandler {
             let exit = currentLoc.exits[direction]
         else {
             // Should not happen if validate passed, but defensive check
-            throw ActionError.internalEngineError("Exit disappeared between validate and process for GO context.command.")
+            throw ActionResponse.internalEngineError("Exit disappeared between validate and process for GO context.command.")
         }
 
         // --- Create State Change ---

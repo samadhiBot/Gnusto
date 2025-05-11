@@ -75,7 +75,7 @@ struct OperaHouse: AreaContents {
         } else {
             "screwed to the wall"
         }
-        throw ActionError.customResponse("It's just a small brass hook, \(hookDetail).")
+        throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 }
 ```
