@@ -5,37 +5,40 @@ extension GameEngine {
     /// Games can override these via the `DefinitionRegistry`.
     static let defaultActionHandlers: [VerbID: ActionHandler] = [
         // Movement & World Interaction
-        "close": CloseActionHandler(),
-        "examine": ExamineActionHandler(),
-        "go": GoActionHandler(),
-        "insert": InsertActionHandler(),
-        "lock": LockActionHandler(),
-        "look": LookActionHandler(),
-        "open": OpenActionHandler(),
-        "put-on": PutOnActionHandler(),
-        "unlock": UnlockActionHandler(),
 
-        // Inventory Management
-        "drop": DropActionHandler(),
-        "inventory": InventoryActionHandler(),
-        "remove": RemoveActionHandler(),
-        "take": TakeActionHandler(),
-        "wear": WearActionHandler(),
-
-        // Other Actions
-        "listen": ListenActionHandler(),
-        "read": ReadActionHandler(),
-        "smell": SmellActionHandler(),
-        "taste": TasteActionHandler(),
-        "think": ThinkAboutActionHandler(),
-        "touch": TouchActionHandler(),
-        "turn off": TurnOffActionHandler(),
-        "turn on": TurnOnActionHandler(),
-        "wait": WaitActionHandler(),
+        .close: CloseActionHandler(),
+        .drop: DropActionHandler(),
+        .examine: ExamineActionHandler(),
+        .go: GoActionHandler(),
+        .insert: InsertActionHandler(),
+        .inventory: InventoryActionHandler(),
+        .listen: ListenActionHandler(),
+        .lock: LockActionHandler(),
+        .look: LookActionHandler(),
+        .open: OpenActionHandler(),
+        .putOn: PutOnActionHandler(),
+        .read: ReadActionHandler(),
+        .remove: RemoveActionHandler(),
+        .smell: SmellActionHandler(),
+        .take: TakeActionHandler(),
+        .taste: TasteActionHandler(),
+        .thinkAbout: ThinkAboutActionHandler(),
+        .touch: TouchActionHandler(),
+        .turnOff: TurnOffActionHandler(),
+        .turnOn: TurnOnActionHandler(),
+        .unlock: UnlockActionHandler(),
+        .wear: WearActionHandler(),
 
         // Meta Actions
-        "quit": QuitActionHandler(),
-        "score": ScoreActionHandler(),
+
+//        .brief: BriefActionHandler(),
+//        .help: HelpActionHandler(),
+        .quit: QuitActionHandler(),
+//        .restore: RestoreActionHandler(),
+//        .save: SaveActionHandler(),
+        .score: ScoreActionHandler(),
+//        .verbose: VerboseActionHandler(),
+        .wait: WaitActionHandler(),
 
         // TODO: Add more default handlers (Attack, Read, Eat, Drink, etc.)
     ]

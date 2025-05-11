@@ -77,7 +77,10 @@ struct LookActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -135,7 +138,10 @@ struct LookActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -181,7 +187,10 @@ struct LookActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -230,7 +239,10 @@ struct LookActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -265,7 +277,10 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -313,7 +328,10 @@ struct LookActionHandlerTests {
             return .string(text)
         }
 
-        let command = Command(verbID: "look", rawInput: "look")
+        let command = Command(
+            verbID: .look,
+            rawInput: "look"
+        )
 
         // Act 1: Flag is ON
         await engine.execute(command: command)
@@ -365,7 +383,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("rock")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "rock", rawInput: "x rock")
+        let command = Command(
+            verbID: .examine,
+            directObject: "rock",
+            rawInput: "x rock"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -406,7 +428,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("pebble")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "look", directObject: "pebble", rawInput: "l pebble")
+        let command = Command(
+            verbID: .look,
+            directObject: "pebble",
+            rawInput: "l pebble"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -449,7 +475,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("stone")?.hasFlag(.isTouched) == true)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "stone", rawInput: "x stone")
+        let command = Command(
+            verbID: .examine,
+            directObject: "stone",
+            rawInput: "x stone"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -512,7 +542,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("box")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
+        let command = Command(
+            verbID: .examine,
+            directObject: "box",
+            rawInput: "x box"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -565,7 +599,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("box")?.attributes["isOpen"] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "box", rawInput: "x box")
+        let command = Command(
+            verbID: .examine,
+            directObject: "box",
+            rawInput: "x box"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -619,7 +657,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("jar")?.attributes["isTransparent"] == true)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "jar", rawInput: "x jar")
+        let command = Command(
+            verbID: .examine,
+            directObject: "jar",
+            rawInput: "x jar"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -676,7 +718,11 @@ struct LookActionHandlerTests {
         #expect(await engine.item("table")?.hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "table", rawInput: "x table")
+        let command = Command(
+            verbID: .examine,
+            directObject: "table",
+            rawInput: "x table"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)
@@ -734,7 +780,11 @@ struct LookActionHandlerTests {
         #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "examine", directObject: "artifact", rawInput: "x artifact")
+        let command = Command(
+            verbID: .examine,
+            directObject: "artifact",
+            rawInput: "x artifact"
+        )
 
         // Act: Use engine.execute
         await engine.execute(command: command)

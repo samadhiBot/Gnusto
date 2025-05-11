@@ -106,7 +106,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+        let command = Command(
+            verbID: .take,
+            directObject: "key",
+            rawInput: "take key"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -148,7 +152,11 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+        let command = Command(
+            verbID: .take,
+            directObject: "key",
+            rawInput: "take key"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -187,7 +195,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "figurine", rawInput: "take figurine")
+        let command = Command(
+            verbID: .take,
+            directObject: "figurine",
+            rawInput: "take figurine"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -222,7 +234,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "rock", rawInput: "take rock")
+        let command = Command(
+            verbID: .take,
+            directObject: "rock",
+            rawInput: "take rock"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -246,7 +262,10 @@ struct TakeActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let command = Command(verbID: "take", rawInput: "take")
+        let command = Command(
+            verbID: .take,
+            rawInput: "take"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -283,7 +302,11 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
+        let command = Command(
+            verbID: .take,
+            directObject: "gem",
+            rawInput: "take gem"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -339,7 +362,11 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(verbID: "take", directObject: "coin", rawInput: "take coin")
+        let command = Command(
+            verbID: .take,
+            directObject: "coin",
+            rawInput: "take coin"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -397,7 +424,11 @@ struct TakeActionHandlerTests {
 
         #expect(await engine.item("box")?.hasFlag(.isOpen) == false) // Verify closed
 
-        let command = Command(verbID: "take", directObject: "gem", rawInput: "take gem")
+        let command = Command(
+            verbID: .take,
+            directObject: "gem",
+            rawInput: "take gem"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -444,9 +475,10 @@ struct TakeActionHandlerTests {
 
         // Command targets the chip, but context is "from statue"
         let command = Command(
-            verbID: "take",
+            verbID: .take,
             directObject: "chip",
-            indirectObject: "statue", // Specify source
+            indirectObject: "statue",
+            // Specify source
             rawInput: "take chip from statue"
         )
 
@@ -485,7 +517,11 @@ struct TakeActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "take", directObject: "heavy", rawInput: "take heavy")
+        let command = Command(
+            verbID: .take,
+            directObject: "heavy",
+            rawInput: "take heavy"
+        )
 
         // We need to use the engine.execute to get the standard error message
         await engine.execute(command: command)
@@ -523,7 +559,11 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(verbID: "take", directObject: "cloak", rawInput: "take cloak")
+        let command = Command(
+            verbID: .take,
+            directObject: "cloak",
+            rawInput: "take cloak"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -578,7 +618,11 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(verbID: "take", directObject: itemOnSurface.id, rawInput: "take book")
+        let command = Command(
+            verbID: .take,
+            directObject: itemOnSurface.id,
+            rawInput: "take book"
+        )
 
         // Initial state check
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -633,7 +677,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+        let command = Command(
+            verbID: .take,
+            directObject: "key",
+            rawInput: "take key"
+        )
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -696,7 +744,11 @@ struct TakeActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "take", directObject: "key", rawInput: "take key")
+        let command = Command(
+            verbID: .take,
+            directObject: "key",
+            rawInput: "take key"
+        )
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -753,7 +805,7 @@ struct TakeActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "take",
+            verbID: .take,
             directObject: "fly",
             rawInput: "take fly"
         )
@@ -801,7 +853,11 @@ struct TakeActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
-        let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
+        let command = Command(
+            verbID: .take,
+            directObject: "shield",
+            rawInput: "take shield"
+        )
 
         // Act
         await engine.execute(command: command)

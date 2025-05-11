@@ -33,7 +33,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "go",
+            verbID: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -74,7 +74,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "go",
+            verbID: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -117,7 +117,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "go",
+            verbID: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -153,7 +153,11 @@ struct GoActionHandlerTests {
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+        let command = Command(
+            verbID: .go,
+            direction: .north,
+            rawInput: "go north"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -176,7 +180,11 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+        let command = Command(
+            verbID: .go,
+            direction: .north,
+            rawInput: "go north"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -223,7 +231,11 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
-        let command = Command(verbID: "go", direction: .north, rawInput: "go north")
+        let command = Command(
+            verbID: .go,
+            direction: .north,
+            rawInput: "go north"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -267,7 +279,11 @@ struct GoActionHandlerTests {
         // Check flags set using contains
         #expect(await engine.gameState.globalState[conditionGlobalID] == false)
 
-        let command = Command(verbID: "go", direction: .east, rawInput: "go east")
+        let command = Command(
+            verbID: .go,
+            direction: .east,
+            rawInput: "go east"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -319,7 +335,7 @@ struct GoActionHandlerTests {
         // Update the location in the game state directly for the test setup
 //        await engine.TEST_ONLY_updateLocation(foyer)
 
-        let command = Command(verbID: "go", direction: .east, rawInput: "go east")
+        let command = Command(verbID: .go, direction: .east, rawInput: "go east")
 
         // Act
         await engine.execute(command: command)
@@ -341,7 +357,10 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
-        let command = Command(verbID: "go", rawInput: "go") // No direction
+        let command = Command(
+            verbID: .go,
+            rawInput: "go"
+        ) // No direction
 
         // Act
         await engine.execute(command: command)

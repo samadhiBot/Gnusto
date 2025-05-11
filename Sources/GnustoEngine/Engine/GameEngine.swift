@@ -545,16 +545,14 @@ extension GameEngine {
             }
 
             // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
-            let isTurnOn = command.verbID == VerbID("turn on") // Special case for turning on lights
-            if !isLit && verb.requiresLight && !isTurnOn {
+            if !isLit && verb.requiresLight && command.verbID != .turnOn {
                 await report(actionError: .roomIsDark)
-                // Do not proceed to execute the handler
             } else {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verbID] else {
                     // No handler registered for this verb (should match vocabulary definition)
                     logger.warning("""
-                        💥 Internal Error: No ActionHandler registered for verb ID  \
+                        💥 Internal Error: No ActionHandler registered for verb ID \
                         '\(command.verbID.rawValue, privacy: .public)'.
                         """)
                     await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")

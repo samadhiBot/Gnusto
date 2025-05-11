@@ -24,7 +24,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "rock", rawInput: "touch rock")
+        let command = Command(
+            verbID: .touch,
+            directObject: "rock",
+            rawInput: "touch rock"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -54,7 +58,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "key", rawInput: "touch key")
+        let command = Command(
+            verbID: .touch,
+            directObject: "key",
+            rawInput: "touch key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -77,7 +85,10 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", rawInput: "touch")
+        let command = Command(
+            verbID: .touch,
+            rawInput: "touch"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.customResponse("Touch what?")) {
@@ -109,7 +120,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "figurine", rawInput: "touch figurine")
+        let command = Command(
+            verbID: .touch,
+            directObject: "figurine",
+            rawInput: "touch figurine"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotAccessible("figurine")) {
@@ -147,7 +162,11 @@ struct TouchActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "gem", rawInput: "touch gem")
+        let command = Command(
+            verbID: .touch,
+            directObject: "gem",
+            rawInput: "touch gem"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -183,7 +202,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "touch",
+            verbID: .touch,
             directObject: "book",
             rawInput: "touch book"
         )
@@ -224,7 +243,7 @@ struct TouchActionHandlerTests {
         #expect(chest.attributes[.isOpen] == nil) // Verify closed
 
         let command = Command(
-            verbID: "touch",
+            verbID: .touch,
             directObject: "coin",
             rawInput: "touch coin"
         )

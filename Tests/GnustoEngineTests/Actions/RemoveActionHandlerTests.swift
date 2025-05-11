@@ -25,7 +25,7 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "remove",
+            verbID: .remove,
             directObject: "cloak",
             rawInput: "remove cloak"
         )
@@ -88,7 +88,11 @@ struct RemoveActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "remove", directObject: "cloak", rawInput: "take off cloak")
+        let command = Command(
+            verbID: .remove,
+            directObject: "cloak",
+            rawInput: "take off cloak"
+        )
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemIsNotWorn("cloak")) {
@@ -112,7 +116,11 @@ struct RemoveActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "remove", directObject: "cloak", rawInput: "remove cloak")
+        let command = Command(
+            verbID: .remove,
+            directObject: "cloak",
+            rawInput: "remove cloak"
+        )
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
@@ -137,7 +145,10 @@ struct RemoveActionHandlerTests {
         )
 
         // Command with nil directObject
-        let command = Command(verbID: "remove", rawInput: "remove")
+        let command = Command(
+            verbID: .remove,
+            rawInput: "remove"
+        )
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.prerequisiteNotMet("Remove what?")) {
@@ -169,7 +180,11 @@ struct RemoveActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
+        let command = Command(
+            verbID: .remove,
+            directObject: "amulet",
+            rawInput: "remove amulet"
+        )
 
         // Act & Assert Error (on validate)
         await #expect(throws: ActionError.itemNotRemovable("amulet")) {

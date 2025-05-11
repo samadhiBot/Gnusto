@@ -21,7 +21,10 @@ struct ScoreActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "score", rawInput: "score")
+        let command = Command(
+            verbID: .score,
+            rawInput: "score"
+        )
 
         // Act
         // Call perform(), which uses the default implementation

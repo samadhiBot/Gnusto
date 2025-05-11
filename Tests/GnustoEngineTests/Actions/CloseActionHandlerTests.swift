@@ -26,7 +26,11 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
+        let command = Command(
+            verbID: .close,
+            directObject: "box",
+            rawInput: "close box"
+        )
 
         // Initial state check
         let initialBox = await engine.item("box")
@@ -88,7 +92,11 @@ struct CloseActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
+        let command = Command(
+            verbID: .close,
+            directObject: "box",
+            rawInput: "close box"
+        )
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -116,7 +124,11 @@ struct CloseActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "close", directObject: "rock", rawInput: "close rock")
+        let command = Command(
+            verbID: .close,
+            directObject: "rock",
+            rawInput: "close rock"
+        )
 
         // Act & Assert Error
         await #expect(throws: ActionError.itemNotClosable("rock")) {
@@ -147,7 +159,11 @@ struct CloseActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
+        let command = Command(
+            verbID: .close,
+            directObject: "box",
+            rawInput: "close box"
+        )
 
         // Act & Assert Error
         await #expect(throws: ActionError.itemNotAccessible("box")) {
@@ -171,7 +187,10 @@ struct CloseActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "close", rawInput: "close")
+        let command = Command(
+            verbID: .close,
+            rawInput: "close"
+        )
 
         // Act & Assert Error
         await #expect(throws: ActionError.prerequisiteNotMet("Close what?")) {

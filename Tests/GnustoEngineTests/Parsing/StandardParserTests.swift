@@ -343,7 +343,7 @@ struct StandardParserTests {
         // 'leaflet' (DO) is in inventory, 'sword' (IO) is in the room
         let result = parser.parse(input: "put leaflet on sword", vocabulary: vocabulary, gameState: gameState)
         let command = try result.get()
-        #expect(command.verbID == "put-on")
+        #expect(command.verbID == .putOn)
         #expect(command.directObject == "leaflet")
         #expect(command.directObjectModifiers.isEmpty)
         #expect(command.preposition == "on")
@@ -538,7 +538,7 @@ struct StandardParserTests {
         )
         let result = parser.parse(input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
         let command = try result.get()
-        #expect(command.verbID == "put-on")
+        #expect(command.verbID == .putOn)
         #expect(command.directObject == "leaflet")
         #expect(command.preposition == "on")
         #expect(command.indirectObject == "sword")

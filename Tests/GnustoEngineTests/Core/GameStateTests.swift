@@ -138,39 +138,49 @@ struct GameStateTests {
     func testInitWithAreas() {
         // Define mock AreaContents with *instance* properties
         struct Area1: AreaContents {
-            let locations: [Location] = [Location(
+            let loc1 = Location(
                 id: "loc1",
                 .name("Area 1 Room"),
                 .description("A dark, dark room.")
-            )]
-            let items: [Item] = [Item(
+            )
+            let item1 = Item(
                 id: "item1",
                 .name("Area 1 Item"),
                 .in(.location("loc1"))
-            )]
+            )
         }
         struct Area2: AreaContents {
-            let locations: [Location] = [Location(
+            let loc2 = Location(
                 id: "loc2",
                 .name("Area 2 Room"),
                 .description("A dark, dark room.")
-            )]
-            let items: [Item] = [Item(
+            )
+            let loc3 = Location(
+                id: "loc3",
+                .name("Area 3 Room"),
+                .description("A dark, dark room.")
+            )
+            let item2 = Item(
                 id: "item2",
                 .name("Area 2 Item"),
                 .in(.location("loc2"))
-            )]
+            )
+            let item3 = Item(
+                id: "item3",
+                .name("Area 3 Item"),
+                .in(.location("loc2"))
+            )
         }
 
         let player = Player(in: "loc1")
         let state = GameState(areas: [Area1.self, Area2.self], player: player)
 
-        #expect(state.locations.count == 2)
-        #expect(state.locations["loc1"] != nil)
-        #expect(state.locations["loc2"] != nil)
-        #expect(state.items.count == 2)
-        #expect(state.items["item1"] != nil)
-        #expect(state.items["item2"] != nil)
+        #expect(state.locations.count == 3)
+        #expect(state.locations.keys.map(\.rawValue).sorted() == ["loc1", "loc2", "loc3"])
+
+        #expect(state.items.count == 3)
+        #expect(state.items.keys.map(\.rawValue).sorted() == ["item1", "item2", "item3"])
+
         #expect(state.items["item1"]?.parent == .location("loc1"))
         #expect(!state.vocabulary.items.isEmpty)
     }

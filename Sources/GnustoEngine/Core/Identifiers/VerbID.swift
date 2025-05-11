@@ -20,3 +20,42 @@ public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral,
         lhs.rawValue < rhs.rawValue
     }
 }
+
+extension VerbID {
+
+    // Interactive
+
+    static let close = VerbID("close")
+    static let drop = VerbID("drop")
+    static let examine = VerbID("examine")
+    static let go = VerbID("go")
+    static let insert = VerbID("insert")
+    static let inventory = VerbID("inventory")
+    static let listen = VerbID("listen")
+    static let lock = VerbID("lock")
+    static let look = VerbID("look")
+    static let open = VerbID("open")
+    static let putOn = VerbID("putOn")
+    static let read = VerbID("read")
+    static let remove = VerbID("remove")
+    static let smell = VerbID("smell")
+    static let take = VerbID("take")
+    static let taste = VerbID("taste")
+    static let thinkAbout = VerbID("thinkAbout")
+    static let touch = VerbID("touch")
+    static let turnOff = VerbID("turnOff")
+    static let turnOn = VerbID("turnOn")
+    static let unlock = VerbID("unlock")
+    static let wear = VerbID("wear")
+
+    // Meta Actions
+
+    static let brief = VerbID("brief")
+    static let help = VerbID("help")
+    static let quit = VerbID("quit")
+    static let restore = VerbID("restore")
+    static let save = VerbID("save")
+    static let score = VerbID("score")
+    static let verbose = VerbID("verbose")
+    static let wait = VerbID("wait")
+}

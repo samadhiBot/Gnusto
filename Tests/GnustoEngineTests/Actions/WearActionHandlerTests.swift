@@ -26,7 +26,11 @@ struct WearActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
+        let command = Command(
+            verbID: .wear,
+            directObject: "cloak",
+            rawInput: "wear cloak"
+        )
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
         let initialItem = await engine.item("cloak")
@@ -76,7 +80,11 @@ struct WearActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
+        let command = Command(
+            verbID: .wear,
+            directObject: "cloak",
+            rawInput: "wear cloak"
+        )
 
         await #expect(throws: ActionError.itemNotHeld("cloak")) {
             try await handler.validate(
@@ -105,7 +113,11 @@ struct WearActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
+        let command = Command(
+            verbID: .wear,
+            directObject: "rock",
+            rawInput: "wear rock"
+        )
 
         await #expect(throws: ActionError.itemNotWearable("rock")) {
             try await handler.validate(
@@ -136,7 +148,11 @@ struct WearActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "wear", directObject: "cloak", rawInput: "wear cloak")
+        let command = Command(
+            verbID: .wear,
+            directObject: "cloak",
+            rawInput: "wear cloak"
+        )
 
         await #expect(throws: ActionError.itemIsAlreadyWorn("cloak")) {
             try await handler.validate(
@@ -159,7 +175,10 @@ struct WearActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
 
-        let command = Command(verbID: "wear", rawInput: "wear")
+        let command = Command(
+            verbID: .wear,
+            rawInput: "wear"
+        )
 
         await #expect(throws: ActionError.prerequisiteNotMet("Wear what?")) {
             try await handler.validate(

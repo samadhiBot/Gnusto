@@ -74,7 +74,11 @@ struct OpenActionHandlerTests {
         #expect(!initialBoxState!.hasFlag(.isTouched), "Box should start untouched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
+        let command = Command(
+            verbID: .open,
+            directObject: "box",
+            rawInput: "open box"
+        )
 
         // Act: Call the engine's execute method
         await engine.execute(command: command)
@@ -125,7 +129,11 @@ struct OpenActionHandlerTests {
         #expect(initialBoxState!.hasFlag(.isTouched), "Box should start touched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
+        let command = Command(
+            verbID: .open,
+            directObject: "box",
+            rawInput: "open box"
+        )
 
         // Act: Call the engine's execute method
         await engine.execute(command: command)
@@ -158,7 +166,10 @@ struct OpenActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "open", rawInput: "open")
+        let command = Command(
+            verbID: .open,
+            rawInput: "open"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -184,7 +195,11 @@ struct OpenActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
-        let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
+        let command = Command(
+            verbID: .open,
+            directObject: "box",
+            rawInput: "open box"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -216,7 +231,11 @@ struct OpenActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
+        let command = Command(
+            verbID: .open,
+            directObject: "rock",
+            rawInput: "open rock"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -250,7 +269,11 @@ struct OpenActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "open", directObject: "box", rawInput: "open box")
+        let command = Command(
+            verbID: .open,
+            directObject: "box",
+            rawInput: "open box"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -284,7 +307,11 @@ struct OpenActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "open", directObject: "chest", rawInput: "open chest")
+        let command = Command(
+            verbID: .open,
+            directObject: "chest",
+            rawInput: "open chest"
+        )
 
         // Act
         await engine.execute(command: command)

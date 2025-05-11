@@ -42,7 +42,7 @@ struct UnlockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: "unlock",
+            verbID: .unlock,
             directObject: "box",
             indirectObject: "key",
             rawInput: "unlock box with key"
@@ -94,7 +94,11 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", indirectObject: "key", rawInput: "unlock with key") // No direct object
+        let command = Command(
+            verbID: .unlock,
+            indirectObject: "key",
+            rawInput: "unlock with key"
+        ) // No direct object
 
         // Act
         await engine.execute(command: command)
@@ -129,7 +133,11 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "box", rawInput: "unlock box") // No indirect object
+        let command = Command(
+            verbID: .unlock,
+            directObject: "box",
+            rawInput: "unlock box"
+        ) // No indirect object
 
         // Act
         await engine.execute(command: command)
@@ -170,7 +178,12 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
+        let command = Command(
+            verbID: .unlock,
+            directObject: "box",
+            indirectObject: "key",
+            rawInput: "unlock box with key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -221,7 +234,12 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
+        let command = Command(
+            verbID: .unlock,
+            directObject: "box",
+            indirectObject: "key",
+            rawInput: "unlock box with key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -256,7 +274,12 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "pebble", indirectObject: "key", rawInput: "unlock pebble with key")
+        let command = Command(
+            verbID: .unlock,
+            directObject: "pebble",
+            indirectObject: "key",
+            rawInput: "unlock pebble with key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -296,7 +319,12 @@ struct UnlockActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "box", indirectObject: "wrongkey", rawInput: "unlock box with bent key")
+        let command = Command(
+            verbID: .unlock,
+            directObject: "box",
+            indirectObject: "wrongkey",
+            rawInput: "unlock box with bent key"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -336,7 +364,12 @@ struct UnlockActionHandlerTests {
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "unlock", directObject: "box", indirectObject: "key", rawInput: "unlock box with key")
+        let command = Command(
+            verbID: .unlock,
+            directObject: "box",
+            indirectObject: "key",
+            rawInput: "unlock box with key"
+        )
 
         // Act
         await engine.execute(command: command)

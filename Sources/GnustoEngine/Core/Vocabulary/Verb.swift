@@ -27,18 +27,6 @@ public struct Verb: Codable, Equatable, Identifiable, Sendable {
         self.requiresLight = requiresLight
     }
 
-    init(
-        id: VerbID,
-        synonyms: Set<String> = [],
-        syntax: [SyntaxRule] = [],
-        requiresLight: Bool = true // Default to true
-    ) {
-        self.id = id
-        self.synonyms = synonyms
-        self.syntax = syntax
-        self.requiresLight = requiresLight
-    }
-
     enum CodingKeys: String, CodingKey {
         case id
         case synonyms

@@ -35,7 +35,11 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         await engine.execute(command: command)
 
@@ -76,7 +80,11 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn off", directObject: "book", rawInput: "turn off book")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "book",
+            rawInput: "turn off book"
+        )
 
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
             try await handler.validate(
@@ -109,7 +117,11 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionError.unknownItem("lamp")) {
@@ -144,7 +156,11 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         await engine.execute(command: command)
 
@@ -190,7 +206,11 @@ struct TurnOffActionHandlerTests {
         let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(initiallyLit == true)
 
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         await engine.execute(command: command)
 
@@ -230,7 +250,11 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.customResponse("It's already off.")) {
@@ -268,7 +292,11 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         // Act & Assert: Expect error during validation
         await #expect(throws: ActionError.prerequisiteNotMet("You can't turn that off.")) {
@@ -307,7 +335,11 @@ struct TurnOffActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "turn off", directObject: "lamp", rawInput: "turn off lamp")
+        let command = Command(
+            verbID: .turnOff,
+            directObject: "lamp",
+            rawInput: "turn off lamp"
+        )
 
         // Act: Execute the command
         await engine.execute(command: command)

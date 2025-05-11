@@ -1,4 +1,4 @@
-# Enhanced Action Handling System Design
+# Enhanced Action Handling System Design [DONE]
 
 ## Overview
 
@@ -203,7 +203,7 @@ public protocol ActionContextProvider {
 
 - [x] Update existing action handlers to use new system
 - [x] Add support for dynamic descriptions
-- [ ] Implement state-dependent behavior
+- [x] Implement state-dependent behavior
 
 ## Testing Strategy
 

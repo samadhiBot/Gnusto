@@ -81,7 +81,7 @@ struct TurnOnActionHandlerTests {
         #expect(initiallyLit == false)
 
         let command = Command(
-            verbID: "turn on",
+            verbID: .turnOn,
             directObject: "lamp",
             rawInput: "turn on lamp"
         )
@@ -126,7 +126,7 @@ struct TurnOnActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "turn on",
+            verbID: .turnOn,
             directObject: "lamp",
             rawInput: "turn on lamp"
         )
@@ -168,7 +168,7 @@ struct TurnOnActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "turn on",
+            verbID: .turnOn,
             directObject: "lamp",
             rawInput: "turn on lamp"
         )
@@ -210,7 +210,7 @@ struct TurnOnActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "turn on",
+            verbID: .turnOn,
             directObject: "lamp",
             rawInput: "turn on lamp"
         )
@@ -257,7 +257,7 @@ struct TurnOnActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "turn on",
+            verbID: .turnOn,
             directObject: "radio",
             rawInput: "turn on radio"
         )

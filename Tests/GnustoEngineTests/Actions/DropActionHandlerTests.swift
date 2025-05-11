@@ -31,7 +31,11 @@ struct DropActionHandlerTests {
         #expect(await engine.item("key")?.parent == .player) // Verify setup
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
+        let command = Command(
+            verbID: .drop,
+            directObject: "key",
+            rawInput: "drop key"
+        )
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -69,7 +73,10 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "drop", rawInput: "drop") // No direct object
+        let command = Command(
+            verbID: .drop,
+            rawInput: "drop"
+        ) // No direct object
 
         // Act
         await engine.execute(command: command)
@@ -101,7 +108,11 @@ struct DropActionHandlerTests {
         #expect(await engine.item("key")?.parent == .location("startRoom"))
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "drop", directObject: "key", rawInput: "drop key")
+        let command = Command(
+            verbID: .drop,
+            directObject: "key",
+            rawInput: "drop key"
+        )
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -147,7 +158,11 @@ struct DropActionHandlerTests {
         #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true) // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
-        let command = Command(verbID: "drop", directObject: "cloak", rawInput: "drop cloak")
+        let command = Command(
+            verbID: .drop,
+            directObject: "cloak",
+            rawInput: "drop cloak"
+        )
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -192,7 +207,11 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "drop", directObject: "sword-in-stone", rawInput: "drop sword")
+        let command = Command(
+            verbID: .drop,
+            directObject: "sword-in-stone",
+            rawInput: "drop sword"
+        )
 
         // Act
         await engine.execute(command: command)

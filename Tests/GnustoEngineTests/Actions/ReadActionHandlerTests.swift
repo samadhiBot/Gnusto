@@ -26,7 +26,11 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
+        let command = Command(
+            verbID: .read,
+            directObject: "book",
+            rawInput: "read book"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -69,7 +73,7 @@ struct ReadActionHandlerTests {
         )
 
         let command = Command(
-            verbID: "read",
+            verbID: .read,
             directObject: "sign",
             rawInput: "read sign"
         )
@@ -97,7 +101,10 @@ struct ReadActionHandlerTests {
         )
 
         let handler = ReadActionHandler()
-        let command = Command(verbID: "read", rawInput: "read")
+        let command = Command(
+            verbID: .read,
+            rawInput: "read"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.customResponse("Read what?")) {
@@ -135,7 +142,7 @@ struct ReadActionHandlerTests {
 
         let handler = ReadActionHandler()
         let command = Command(
-            verbID: "read",
+            verbID: .read,
             directObject: "scroll",
             rawInput: "read scroll"
         )
@@ -171,7 +178,11 @@ struct ReadActionHandlerTests {
         )
 
         let handler = ReadActionHandler()
-        let command = Command(verbID: "read", directObject: "rock", rawInput: "read rock")
+        let command = Command(
+            verbID: .read,
+            directObject: "rock",
+            rawInput: "read rock"
+        )
 
         // Act & Assert
         await #expect(throws: ActionError.itemNotReadable("rock")) {
@@ -216,7 +227,11 @@ struct ReadActionHandlerTests {
         )
 
         let handler = ReadActionHandler()
-        let command = Command(verbID: "read", directObject: "map", rawInput: "read map")
+        let command = Command(
+            verbID: .read,
+            directObject: "map",
+            rawInput: "read map"
+        )
 
         // Act & Assert
         await #expect(
@@ -253,7 +268,11 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "read", directObject: "paper", rawInput: "read paper")
+        let command = Command(
+            verbID: .read,
+            directObject: "paper",
+            rawInput: "read paper"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -296,7 +315,11 @@ struct ReadActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
+        let command = Command(
+            verbID: .read,
+            directObject: "tablet",
+            rawInput: "read tablet"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -329,7 +352,11 @@ struct ReadActionHandlerTests {
         )
         #expect(await engine.item("scroll")?.hasFlag(.isTouched) == false)
 
-        let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
+        let command = Command(
+            verbID: .read,
+            directObject: "scroll",
+            rawInput: "read scroll"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -364,7 +391,11 @@ struct ReadActionHandlerTests {
         )
         #expect(await engine.item("note")?.hasFlag(.isTouched) == false)
 
-        let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
+        let command = Command(
+            verbID: .read,
+            directObject: "note",
+            rawInput: "read note"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -399,7 +430,7 @@ struct ReadActionHandlerTests {
         #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
         let command = Command(
-            verbID: "read",
+            verbID: .read,
             directObject: "tablet",
             rawInput: "read tablet"
         )
@@ -434,7 +465,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "book", rawInput: "read book")
+        let command = Command(
+            verbID: .read,
+            directObject: "book",
+            rawInput: "read book"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -460,7 +495,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "rock", rawInput: "read rock")
+        let command = Command(
+            verbID: .read,
+            directObject: "rock",
+            rawInput: "read rock"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -493,7 +532,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "scroll", rawInput: "read scroll")
+        let command = Command(
+            verbID: .read,
+            directObject: "scroll",
+            rawInput: "read scroll"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -531,7 +574,11 @@ struct ReadActionHandlerTests {
         )
         #expect(await engine.item("tablet")?.hasFlag(.isTouched) == false)
 
-        let command = Command(verbID: "read", directObject: "tablet", rawInput: "read tablet")
+        let command = Command(
+            verbID: .read,
+            directObject: "tablet",
+            rawInput: "read tablet"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -556,7 +603,10 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", rawInput: "read")
+        let command = Command(
+            verbID: .read,
+            rawInput: "read"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -593,7 +643,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "note", rawInput: "read note")
+        let command = Command(
+            verbID: .read,
+            directObject: "note",
+            rawInput: "read note"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -633,7 +687,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "letter", rawInput: "read letter")
+        let command = Command(
+            verbID: .read,
+            directObject: "letter",
+            rawInput: "read letter"
+        )
 
         // Act
         await engine.execute(command: command)
@@ -673,7 +731,11 @@ struct ReadActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let command = Command(verbID: "read", directObject: "secret", rawInput: "read secret")
+        let command = Command(
+            verbID: .read,
+            directObject: "secret",
+            rawInput: "read secret"
+        )
 
         // Act & Assert
         await engine.execute(command: command)

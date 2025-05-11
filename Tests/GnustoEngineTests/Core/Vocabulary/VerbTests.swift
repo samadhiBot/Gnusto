@@ -12,11 +12,11 @@ struct VerbTests {
     let verbIDLook: VerbID = "look"
 
     func createTakeVerb() -> Verb {
-        Verb(id: verbIDTake, synonyms: synonymsTake)
+        Verb(id: "take", synonyms: "get", "pick up")
     }
 
     func createLookVerb() -> Verb {
-        Verb(id: verbIDLook) // No synonyms provided initially
+        Verb(id: verbIDLook)
     }
 
     // --- Tests ---

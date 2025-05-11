@@ -19,7 +19,10 @@ struct WaitActionHandlerTests {
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "wait", rawInput: "wait")
+        let command = Command(
+            verbID: .wait,
+            rawInput: "wait"
+        )
 
         // Act
         // We call perform(), which uses the default implementation
