@@ -9,9 +9,9 @@ struct CloakOfDarkness: GameBlueprint {
     init() {
         definitionRegistry = DefinitionRegistry(
             objectActionHandlers: [
-                "cloak": Handlers.cloakHandler,
-                "hook": OperaHouse.hookDescription,
-                "message": Handlers.messageHandler
+                "cloak": OperaHouse.cloakHandler,
+                "hook": OperaHouse.hookHandler,
+                "message": OperaHouse.messageHandler
             ]
         )
         dynamicAttributeRegistry = DynamicAttributeRegistry()
