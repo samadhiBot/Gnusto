@@ -96,26 +96,12 @@ extension GameEngine {
 
     // MARK: Private helpers
 
-    private func anySuch(_ itemID: ItemID) -> String {
-        if let item = item(itemID), item.hasFlag(.isTouched) {
-            "the \(item.name)"
-        } else {
-            "any such thing"
-        }
-    }
-
     /// Processes a single turn of the game.
     private func processTurn() async {
-        // --- Custom Hook: Before Turn ---
-        // Moved hook call to *after* successful parsing
-        // await beforeTurn?(self)
-        // guard !shouldQuit else { return }
-        // --------------------------------
-
         // --- Tick the Clock (Fuses & Daemons) ---
         await tickClock()
-        guard !shouldQuit else { return } // Clock tick might trigger quit
-                                          // -----------------------------------------
+
+        if shouldQuit { return } // Clock tick might trigger quit
 
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
@@ -132,7 +118,11 @@ extension GameEngine {
 
         // 2. Parse Input
         let vocabulary = gameState.vocabulary
-        let parseResult = parser.parse(input: input, vocabulary: vocabulary, gameState: gameState)
+        let parseResult = parser.parse(
+            input: input,
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
         do {
@@ -162,16 +152,27 @@ extension GameEngine {
             }
             await execute(command: command)
 
-            // Describe location AFTER executing command if no error occurred during execution
-            // (Errors are handled within execute/report)
-            // Only describe if the command wasn't a quit command (already handled)
-            // Also check if shouldQuit was set during execute
-            if command.verbID != "quit" && !shouldQuit {
-                // TODO: Only describe if the action *might* have changed the view
-                // (e.g., movement, light change, taking/dropping items). LOOK already handles it.
-                if command.verbID != "look" { // Avoid double-description for LOOK
-                    await describeCurrentLocation()
+            if command.verbID == .quit || shouldQuit {
+                return
+            }
+
+            // Handle location description after movement
+            let shouldDescribe = switch command.verbID {
+            case .go:
+                // Show full description if room hasn't been visited
+                gameState.changeHistory.contains {
+                    print("🎾", $0)
+                    return $0.attributeKey == .locationAttribute(.isVisited) &&
+                    $0.entityID == .location(gameState.player.currentLocationID)
                 }
+            case .turnOn, .turnOff:
+                true // Light change commands
+            default:
+                false
+            }
+
+            if shouldDescribe {
+                await describeCurrentLocation()
             }
 
         case .failure(let error):
@@ -323,6 +324,18 @@ extension GameEngine {
             turns: gameState.player.moves
         )
     }
+}
+
+// MARK: - Decorators
+
+extension GameEngine {
+    private func anySuch(_ itemID: ItemID) -> String {
+        if let item = item(itemID), item.hasFlag(.isTouched) {
+            "the \(item.name)"
+        } else {
+            "any such thing"
+        }
+    }
 
     /// Returns `the {name}` of an item, or an alternate reference if the name is unknown.
     ///
@@ -458,7 +471,7 @@ extension GameEngine {
     /// - Parameter command: The command to execute.
     func execute(command: Command) async {
         var actionHandled = false
-        var actionError: Error? = nil // To store error from object handlers
+        var actionResponse: Error? = nil // To store error from object handlers
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = gameState.player.currentLocationID
@@ -488,36 +501,36 @@ extension GameEngine {
             do {
                 // Pass the engine and the full command to the handler
                 actionHandled = try await objectHandler(self, command)
-            } catch {
-                actionError = error // Store the error
+            } catch let response {
+                actionResponse = response
                 actionHandled = true // Treat error as handled to prevent default handler
             }
         }
 
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
-        if !actionHandled, actionError == nil,
+        if !actionHandled, actionResponse == nil,
            let ioID = command.indirectObject,
            let objectHandler = definitionRegistry.objectActionHandlers[ioID]
         {
             do {
                 actionHandled = try await objectHandler(self, command)
-            } catch {
-                actionError = error
+            } catch let response {
+                actionResponse = response
                 actionHandled = true
             }
         }
 
         // --- Execute Default Handler or Report Error ---
 
-        if let error = actionError {
+        if let response = actionResponse {
             // An object handler threw an error
-            if let specificError = error as? ActionResponse {
+            if let specificError = response as? ActionResponse {
                 await report(actionError: specificError)
             } else {
                 logger.warning("""
                     💥 An unexpected error occurred in an object handler: \
-                    \(error, privacy: .public)
+                    \(response, privacy: .public)
                     """)
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
@@ -534,7 +547,7 @@ extension GameEngine {
                 logger.warning("""
                     💥 Internal Error: Unknown verb ID \
                     '\(command.verbID.rawValue, privacy: .public)' reached execution. \
-                    If you encounter this error during testing, make sure to use \ 
+                    If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
                     """)
                 await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")

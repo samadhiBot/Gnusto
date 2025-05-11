@@ -50,10 +50,10 @@ public struct GoActionHandler: ActionHandler {
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
         guard
             let direction = context.command.direction,
-            let currentLoc = await context.engine.location(
+            let currentLocation = await context.engine.location(
                 with: await context.engine.gameState.player.currentLocationID
             ),
-            let exit = currentLoc.exits[direction]
+            let exit = currentLocation.exits[direction]
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError("Exit disappeared between validate and process for GO context.command.")
@@ -63,12 +63,29 @@ public struct GoActionHandler: ActionHandler {
         let oldLocationID = await context.engine.gameState.player.currentLocationID
         let newLocationID = exit.destination
 
-        let change = StateChange(
-            entityID: .player,
-            attributeKey: .playerLocation,
-            oldValue: .locationID(oldLocationID),
-            newValue: .locationID(newLocationID)
-        )
+        // Create state changes
+        var changes: [StateChange] = [
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerLocation,
+                oldValue: .locationID(oldLocationID),
+                newValue: .locationID(newLocationID)
+            )
+        ]
+
+        // Set isVisited flag for the new location if it hasn't been visited yet
+        if let newLocation = await context.engine.location(with: newLocationID),
+           !newLocation.hasFlag(.isVisited)
+        {
+            changes.append(
+                StateChange(
+                    entityID: .location(newLocationID),
+                    attributeKey: .locationAttribute(.isVisited),
+                    oldValue: false,
+                    newValue: true
+                )
+            )
+        }
 
         // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
@@ -76,7 +93,7 @@ public struct GoActionHandler: ActionHandler {
         return ActionResult(
             success: true,
             message: "", // No specific message for GO action itself
-            stateChanges: [change]
+            stateChanges: changes
         )
     }
 }
