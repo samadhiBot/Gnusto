@@ -1,56 +1,8 @@
 import GnustoEngine
 
 struct OperaHouse: AreaContents {
-    // MARK: - Bar
-
-    let bar = Location(
-        id: "bar",
-        .name("Bar"),
-        .description("""
-            The bar, much rougher than you'd have guessed after the opulence
-            of the foyer to the north, is completely empty. There seems to be
-            some sort of message scrawled in the sawdust on the floor.
-            """),
-        .exits([
-            .north: Exit(destination: "foyer"),
-        ])
-        // Note: Bar lighting is handled dynamically by hooks
-    )
-
-    let message = Item(
-        id: "message",
-        .name("crumpled message"),
-        .description("A message appears to be written on the note."),
-        .in(.location("bar")),
-        .hasNoDescription,
-        .isReadable,
-    )
-
-    // MARK: - Cloakroom
-
-    let cloakroom = Location(
-        id: "cloakroom",
-        .name("Cloakroom"),
-        .description("""
-            The walls of this small room were clearly once lined with hooks,
-            though now only one remains. The exit is a door to the east.
-            """),
-        .exits([
-            .east: Exit(destination: "foyer"),
-        ]),
-        .inherentlyLit
-    )
-
-    let hook = Item(
-        id: "hook",
-        .name("small brass hook"),
-        .description("It's just a small brass hook, firmly fixed to the wall."),
-        .in(.location("cloakroom")),
-        .isSurface,
-    )
-
     // MARK: - Foyer of the Opera House
-    
+
     let foyer = Location(
         id: "foyer",
         .name("Foyer of the Opera House"),
@@ -73,13 +25,77 @@ struct OperaHouse: AreaContents {
         .inherentlyLit
     )
 
+    // MARK: - Cloakroom
+
+    let cloakroom = Location(
+        id: "cloakroom",
+        .name("Cloakroom"),
+        .description("""
+            The walls of this small room were clearly once lined with hooks,
+            though now only one remains. The exit is a door to the east.
+            """),
+        .exits([
+            .east: Exit(destination: "foyer"),
+        ]),
+        .inherentlyLit
+    )
+
+    let hook = Item(
+        id: "hook",
+        .adjectives("small", "brass"),
+        .in(.location("cloakroom")),
+        .isSurface,
+        .name("small brass hook"),
+        .synonyms("peg"),
+    )
+
+    static func hookDescription(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+        guard
+            command.verbID == "examine",
+            let cloak = await engine.item("cloak")
+        else {
+            return false
+        }
+        let hookDetail = if cloak.parent == .item("hook") {
+            "with a cloak hanging on it"
+        } else {
+            "screwed to the wall"
+        }
+        throw ActionError.customResponse("It's just a small brass hook, \(hookDetail).")
+    }
+
+    // MARK: - Bar
+
+    let bar = Location(
+        id: "bar",
+        .name("Bar"),
+        .description("""
+            The bar, much rougher than you'd have guessed after the opulence
+            of the foyer to the north, is completely empty. There seems to be
+            some sort of message scrawled in the sawdust on the floor.
+            """),
+        .exits([
+            .north: Exit(destination: "foyer"),
+        ])
+        // Note: Bar lighting is handled dynamically by hooks
+    )
+
+    let message = Item(
+        id: "message",
+        .name("crumpled message"),
+        .description("A message appears to be written on the note."),
+        .in(.location("bar")),
+//        .hasNoDescription,
+        .isReadable,
+    )
+
     // MARK: - Items
 
     let cloak = Item(
         id: "cloak",
         .name("velvet cloak"),
         .description("A handsome velvet cloak, of exquisite quality."),
-        .in(.location("cloakroom")),
+        .in(.player),
         .isTakable,
         .isWearable,
         .isWorn,

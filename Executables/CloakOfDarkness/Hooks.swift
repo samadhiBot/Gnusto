@@ -5,9 +5,10 @@ struct Hooks {
         guard location == "bar" else { return false }
         let cloakIsWorn = await engine.item("cloak")?.hasFlag(.isWorn) ?? false
         if cloakIsWorn {
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(false))
+            try? await engine
+                .setDynamicLocationValue(locationID: "bar", key: .isLit, newValue: .bool(false))
         } else {
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .isLit, newValue: true,)
         }
         return false
     }
@@ -20,11 +21,11 @@ struct Hooks {
 
         if cloakIsWorn {
             // Ensure bar is dark if cloak is worn
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: .bool(false))
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .isLit, newValue: .bool(false))
 
             // Now check for unsafe actions IN THE DARK
             // Re-check lit status *after* potentially removing it
-            let isLitNow = await engine.location(with: locationID)?.hasFlag(.locationIsLit) ?? false
+            let isLitNow = await engine.location(with: locationID)?.hasFlag(.isLit) ?? false
 
             if !isLitNow { // Should definitely be false here if update worked
                 let verb = command.verbID
@@ -58,7 +59,7 @@ struct Hooks {
             return false
         } else {
             // Cloak is not worn, ensure bar is lit
-            try? await engine.setDynamicLocationValue(locationID: "bar", key: .locationIsLit, newValue: true,)
+            try? await engine.setDynamicLocationValue(locationID: "bar", key: .isLit, newValue: true,)
             return false // Hook didn't handle the command itself
         }
     }

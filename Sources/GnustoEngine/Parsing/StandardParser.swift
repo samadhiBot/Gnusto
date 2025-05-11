@@ -3,6 +3,8 @@ import Foundation
 /// A standard implementation of the Parser protocol.
 /// Aims to replicate common ZIL parser behaviors.
 public struct StandardParser: Parser {
+    public init() {}
+
     /// Parses a raw input string into a structured `Command`.
     ///
     /// Follows a ZIL-inspired process:

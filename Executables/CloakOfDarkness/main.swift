@@ -1,11 +1,9 @@
 import GnustoEngine
 
-print("Initializing Cloak of Darkness...\n")
+let ioHandler = ConsoleIOHandler()
 
-let ioHandler = await ConsoleIOHandler()
-
-await ioHandler.print("Cloak of Darkness", style: .strong)
-await ioHandler.print("""
+ioHandler.print("Cloak of Darkness", style: .strong)
+ioHandler.print("""
     A basic IF demonstration.
     
     Hurrying through the rainswept November night, you're glad to see the
