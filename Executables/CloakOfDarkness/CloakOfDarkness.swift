@@ -9,9 +9,12 @@ struct CloakOfDarkness: GameBlueprint {
     init() {
         definitionRegistry = DefinitionRegistry(
             objectActionHandlers: [
-                "cloak": OperaHouse.cloakHandler,
-                "hook": OperaHouse.hookHandler,
-                "message": OperaHouse.messageHandler
+                .cloak: OperaHouse.cloakHandler,
+                .hook: OperaHouse.hookHandler,
+                .message: OperaHouse.messageHandler,
+            ],
+            locationActionHandlers: [
+                .bar: OperaHouse.barHandler,
             ]
         )
         dynamicAttributeRegistry = DynamicAttributeRegistry()
@@ -21,4 +24,16 @@ struct CloakOfDarkness: GameBlueprint {
             player: Player(in: "foyer")
         )
     }
+}
+
+extension ItemID {
+    static let cloak = ItemID("cloak")
+    static let hook = ItemID("hook")
+    static let message = ItemID("message")
+}
+
+extension LocationID {
+    static let bar = LocationID("bar")
+    static let cloakroom = LocationID("cloakroom")
+    static let foyer = LocationID("foyer")
 }

@@ -17,7 +17,7 @@ public struct DefinitionRegistry: Sendable {
     public let objectActionHandlers: [ItemID: ObjectActionHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
-    public let roomActionHandlers: [LocationID: RoomActionHandler]
+    public let locationActionHandlers: [LocationID: LocationActionHandler]
 
     /// Initializes the registry with definitions and handlers.
     /// - Parameters:
@@ -25,13 +25,13 @@ public struct DefinitionRegistry: Sendable {
     ///   - daemonDefinitions: An array of `DaemonDefinition`s.
     ///   - customActionHandlers: A dictionary of verb-specific custom action handlers.
     ///   - objectActionHandlers: A dictionary of item-specific action handlers.
-    ///   - roomActionHandlers: A dictionary of location-specific action handlers.
+    ///   - locationActionHandlers: A dictionary of location-specific action handlers.
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
         customActionHandlers: [VerbID: ActionHandler] = [:],
         objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
-        roomActionHandlers: [LocationID: RoomActionHandler] = [:]
+        locationActionHandlers: [LocationID: LocationActionHandler] = [:]
     ) {
         self.fuseDefinitions = Dictionary(
             uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
@@ -41,7 +41,7 @@ public struct DefinitionRegistry: Sendable {
         )
         self.customActionHandlers = customActionHandlers
         self.objectActionHandlers = objectActionHandlers
-        self.roomActionHandlers = roomActionHandlers
+        self.locationActionHandlers = locationActionHandlers
     }
 
     /// Fetches a `DaemonDefinition` by its ID.
@@ -60,11 +60,11 @@ public struct DefinitionRegistry: Sendable {
         fuseDefinitions[id]
     }
 
-    /// Fetches a `RoomActionHandler` by its ID.
+    /// Fetches a `LocationActionHandler` by its ID.
     ///
     /// - Parameter id: The `LocationID` to look up.
-    /// - Returns: The `RoomActionHandler` if found, otherwise `nil`.
-    internal func roomActionHandler(for id: LocationID) -> RoomActionHandler? {
-        roomActionHandlers[id]
+    /// - Returns: The `LocationActionHandler` if found, otherwise `nil`.
+    internal func roomActionHandler(for id: LocationID) -> LocationActionHandler? {
+        locationActionHandlers[id]
     }
 }

@@ -4,7 +4,7 @@ struct OperaHouse: AreaContents {
     // MARK: - Foyer of the Opera House
 
     let foyer = Location(
-        id: "foyer",
+        id: .foyer,
         .name("Foyer of the Opera House"),
         .description("""
                 You are standing in a spacious hall, splendidly decorated in red
@@ -28,7 +28,7 @@ struct OperaHouse: AreaContents {
     // MARK: - Cloakroom
 
     let cloakroom = Location(
-        id: "cloakroom",
+        id: .cloakroom,
         .name("Cloakroom"),
         .description("""
             The walls of this small room were clearly once lined with hooks,
@@ -41,7 +41,7 @@ struct OperaHouse: AreaContents {
     )
 
     let hook = Item(
-        id: "hook",
+        id: .hook,
         .adjectives("small", "brass"),
         .in(.location("cloakroom")),
         .isScenery,
@@ -53,7 +53,7 @@ struct OperaHouse: AreaContents {
     // MARK: - Bar
 
     let bar = Location(
-        id: "bar",
+        id: .bar,
         .name("Bar"),
         .description("""
             The bar, much rougher than you'd have guessed after the opulence
@@ -67,7 +67,7 @@ struct OperaHouse: AreaContents {
     )
 
     let message = Item(
-        id: "message",
+        id: .message,
         .name("crumpled message"),
         .in(.location("bar")),
         .isReadable,
@@ -76,7 +76,7 @@ struct OperaHouse: AreaContents {
     // MARK: - Items
 
     let cloak = Item(
-        id: "cloak",
+        id: .cloak,
         .name("velvet cloak"),
         .description("A handsome velvet cloak, of exquisite quality."),
         .in(.player),
@@ -86,7 +86,32 @@ struct OperaHouse: AreaContents {
     )
 }
 
-// MARK: -  Object action handlers
+// MARK: - Location action handlers
+
+extension OperaHouse {
+    static func barHandler(_ engine: GameEngine, _ action: LocationActionMessage) async throws -> Bool {
+        switch action {
+        case .beforeTurn(let command):
+            switch command.verbID {
+            case VerbID.go:
+
+            }
+        case .afterTurn(let command):
+            break
+        case .onEnter:
+            break
+        }
+//        switch command.verbID {
+//        case "examine":
+//            throw ActionResponse.custom("The bar is covered in dust.")
+//            
+//        default:
+//            return false
+//        }
+    }
+}
+
+// MARK: - Object action handlers
 
 extension OperaHouse {
     static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {

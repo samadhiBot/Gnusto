@@ -491,7 +491,7 @@ extension GameEngine {
         if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if try await roomHandler(self, RoomActionMessage.beforeTurn(command)) {
+                if try await roomHandler(self, LocationActionMessage.beforeTurn(command)) {
                     // Room handler blocked further action, return immediately.
                     // We don't increment moves or run afterTurn hook here.
                     return
@@ -619,7 +619,7 @@ extension GameEngine {
         if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                _ = try await roomHandler(self, RoomActionMessage.afterTurn(command))
+                _ = try await roomHandler(self, LocationActionMessage.afterTurn(command))
             } catch {
                 logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }
