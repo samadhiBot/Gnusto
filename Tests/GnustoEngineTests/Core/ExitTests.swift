@@ -9,7 +9,7 @@ struct ExitTests {
         let destination: LocationID = "clearing"
         let exit = Exit(destination: destination)
 
-        #expect(exit.destination == destination)
+        #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == nil)
         #expect(exit.doorID == nil)
     }
@@ -21,7 +21,7 @@ struct ExitTests {
         let destination: LocationID = "nowhere"
         let exit = Exit(destination: destination, blockedMessage: message)
 
-        #expect(exit.destination == destination)
+        #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == message)
     }
 
@@ -31,7 +31,7 @@ struct ExitTests {
         let message = "You push through the bushes."
         let exit = Exit(destination: destination, blockedMessage: message)
 
-        #expect(exit.destination == destination)
+        #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == message)
     }
 
@@ -45,7 +45,7 @@ struct ExitTests {
             .name("Jail cell door"),
             .lockKey(keyID)
         )
-        #expect(exit.destination == destination)
+        #expect(exit.destinationID == destination)
         #expect(exit.doorID == "jailCellDoor")
         #expect(exit.blockedMessage == nil)
         #expect(exit.doorID == door.id)

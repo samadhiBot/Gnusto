@@ -346,7 +346,7 @@ struct TurnOffActionHandlerTests {
 
         // Assert: Check IOHandler output for the expected error message
         let output = await mockIO.flush()
-        // The specific error message comes from GameEngine.report(actionError:)
+        // The specific response message comes from GameEngine.report
         expectNoDifference(output, "You can't see any such thing.")
     }
 

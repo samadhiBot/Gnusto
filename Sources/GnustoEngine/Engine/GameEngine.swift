@@ -135,41 +135,44 @@ extension GameEngine {
             )
             try gameState.apply(change)
         } catch {
-            // Log error if applying the move increment fails (should be rare)
-            print("Critical Error: Failed to apply player move increment state change: \(error)")
-            // Depending on desired robustness, might want to halt or handle differently.
+            logger.error(
+                "💥 Failed to apply player move increment state change: \(error, privacy: .public)"
+            )
         }
 
         // 3. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
-            // --- Custom Hook: Before Turn (called only on success) ---
-            if await beforeTurn?(self, command) ?? false {
-                return
-            }
-            guard !shouldQuit else {
-                return // Hook might quit
-            }
-            await execute(command: command)
-
-            if command.verbID == .quit || shouldQuit {
+            // --- Custom Hook: Before Turn ---
+            if await beforeTurn?(self, command) == true || shouldQuit {
                 return
             }
 
-            // Handle location description after movement
+            if command.verbID == .quit || shouldQuit { return }
+
+            // Handle location description after movement or light change
             let shouldDescribe = switch command.verbID {
             case .go:
-                // Show full description if room hasn't been visited
-                gameState.changeHistory.contains {
-                    print("🎾", $0)
-                    return $0.attributeKey == .locationAttribute(.isVisited) &&
-                    $0.entityID == .location(gameState.player.currentLocationID)
+                // Check if the destination room was visited before the movement
+                if let exit = command.direction.flatMap({ direction in
+                    location(with: gameState.player.currentLocationID)?.exits[direction]
+                }),
+                   let destinationLoc = location(with: exit.destinationID),
+                   !destinationLoc.hasFlag(.isVisited)
+                {
+                    true
+                } else {
+                    false
                 }
             case .turnOn, .turnOff:
                 true // Light change commands
             default:
                 false
             }
+
+            await execute(command: command)
+
+            if command.verbID == .quit || shouldQuit { return }
 
             if shouldDescribe {
                 await describeCurrentLocation()
@@ -180,10 +183,10 @@ extension GameEngine {
         }
     }
 
-    /// Reports user-friendly messages for action failures to the player.
-    private func report(actionError: ActionResponse) async {
+    /// Reports user-friendly messages for action responses to the player.
+    private func report(_ response: ActionResponse) async {
         // Determine the user-facing message
-        let message = switch actionError {
+        let message = switch response {
         case .containerIsClosed(let item):
             "\(theThat(item).capitalizedFirst) is closed."
         case .containerIsOpen(let item):
@@ -266,7 +269,7 @@ extension GameEngine {
         await ioHandler.print(message)
 
         // Log detailed errors separately
-        switch actionError {
+        switch response {
         case .internalEngineError(let msg):
             logger.error("💥 ActionResponse: Internal Engine Error: \(msg, privacy: .public)")
         case .invalidValue(let msg):
@@ -525,8 +528,8 @@ extension GameEngine {
 
         if let response = actionResponse {
             // An object handler threw an error
-            if let specificError = response as? ActionResponse {
-                await report(actionError: specificError)
+            if let specificResponse = response as? ActionResponse {
+                await report(specificResponse)
             } else {
                 logger.warning("""
                     💥 An unexpected error occurred in an object handler: \
@@ -556,7 +559,7 @@ extension GameEngine {
 
             // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
             if !isLit && verb.requiresLight && command.verbID != .turnOn {
-                await report(actionError: .roomIsDark)
+                await report(.roomIsDark)
             } else {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verbID] else {
@@ -589,9 +592,9 @@ extension GameEngine {
                     // Call postProcess (even if default is empty)
                     try await verbHandler.postProcess(context: context, result: result)
 
-                } catch let actionErr as ActionResponse {
+                } catch let actionResponse as ActionResponse {
                     // Catch ActionResponse specifically for reporting
-                    await report(actionError: actionErr)
+                    await report(actionResponse)
                 } catch {
                     // Catch any other unexpected errors from handlers
                     logger.error("💥 Unexpected error during handler execution: \(error)")

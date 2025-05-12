@@ -53,38 +53,26 @@ public struct GoActionHandler: ActionHandler {
             let currentLocation = await context.engine.location(
                 with: await context.engine.gameState.player.currentLocationID
             ),
-            let exit = currentLocation.exits[direction]
+            let exit = currentLocation.exits[direction],
+            let destination = await context.engine.location(with: exit.destinationID)
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError("Exit disappeared between validate and process for GO context.command.")
         }
 
-        // --- Create State Change ---
-        let oldLocationID = await context.engine.gameState.player.currentLocationID
-        let newLocationID = exit.destination
-
         // Create state changes
-        var changes: [StateChange] = [
+        var stateChanges: [StateChange] = [
             StateChange(
                 entityID: .player,
                 attributeKey: .playerLocation,
-                oldValue: .locationID(oldLocationID),
-                newValue: .locationID(newLocationID)
+                oldValue: .locationID(currentLocation.id),
+                newValue: .locationID(exit.destinationID)
             )
         ]
 
         // Set isVisited flag for the new location if it hasn't been visited yet
-        if let newLocation = await context.engine.location(with: newLocationID),
-           !newLocation.hasFlag(.isVisited)
-        {
-            changes.append(
-                StateChange(
-                    entityID: .location(newLocationID),
-                    attributeKey: .locationAttribute(.isVisited),
-                    oldValue: false,
-                    newValue: true
-                )
-            )
+        if let setIsVisited = await context.engine.flag(destination, with: .isVisited) {
+            stateChanges.append(setIsVisited)
         }
 
         // --- Create Result ---
@@ -93,7 +81,7 @@ public struct GoActionHandler: ActionHandler {
         return ActionResult(
             success: true,
             message: "", // No specific message for GO action itself
-            stateChanges: changes
+            stateChanges: stateChanges
         )
     }
 }

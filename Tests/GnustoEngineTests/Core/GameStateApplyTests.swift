@@ -65,22 +65,22 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
 
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state was not changed
@@ -140,22 +140,22 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
 
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state was not changed
@@ -258,21 +258,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -322,21 +322,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -386,21 +386,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -450,21 +450,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -514,21 +514,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -591,21 +591,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -655,21 +655,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -721,21 +721,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -783,21 +783,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -845,21 +845,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -907,21 +907,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -970,21 +970,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1008,20 +1008,20 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
-            if case .internalEngineError = actionError { } else {
-                Issue.record("Expected .internalEngineError case, got \(actionError)")
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
+            if case .internalEngineError = actionResponse { } else {
+                Issue.record("Expected .internalEngineError case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1193,21 +1193,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1324,21 +1324,21 @@ struct GameStateApplyTests {
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionResponse {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionResponse: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged

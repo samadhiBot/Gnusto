@@ -3,7 +3,7 @@ import Foundation
 /// Represents a connection from one location to another in a specific direction.
 public struct Exit: Codable, Hashable, Sendable {
     /// The unique identifier of the location this exit leads to.
-    public var destination: LocationID
+    public var destinationID: LocationID
 
     /// An optional message printed when movement is attempted but fails due to this exit
     /// being blocked. If nil, a default message like "The way is blocked." might be used.
@@ -19,7 +19,7 @@ public struct Exit: Codable, Hashable, Sendable {
         blockedMessage: String? = nil,
         doorID: ItemID? = nil
     ) {
-        self.destination = destination
+        self.destinationID = destination
         self.blockedMessage = blockedMessage
         self.doorID = doorID
     }
