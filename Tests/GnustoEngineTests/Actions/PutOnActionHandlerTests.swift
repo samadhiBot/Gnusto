@@ -29,40 +29,48 @@ struct PutOnActionHandlerTests {
         var changes: [StateChange] = []
 
         // Change 1: Item parent
-        changes.append(StateChange(
-            entityID: .item(itemToPutID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(.player),
-            newValue: .parentEntity(.item(surfaceID))
-        ))
+        changes.append(
+            StateChange(
+                entityID: .item(itemToPutID),
+                attributeKey: .itemParent,
+                oldValue: .parentEntity(.player),
+                newValue: .parentEntity(.item(surfaceID))
+            )
+        )
 
         // Change 2: Item touched (if needed)
         if oldItemAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(itemToPutID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(itemToPutID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Change 3: Surface touched (if needed)
         if oldSurfaceAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(surfaceID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(surfaceID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Change 4: Pronoun "it"
-        changes.append(StateChange(
-            entityID: .global, // Pronoun is global
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToPutID])
-        ))
+        changes.append(
+            StateChange(
+                entityID: .global, // Pronoun is global
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([itemToPutID])
+            )
+        )
 
         return changes
     }

@@ -58,3 +58,7 @@ struct MinimalGame: GameBlueprint {
         )
     }
 }
+
+extension LocationID {
+    static let startRoom: LocationID = "startRoom"
+}

@@ -234,39 +234,47 @@ extension DropActionHandlerTests {
         var changes: [StateChange] = []
 
         // Parent change
-        changes.append(StateChange(
-            entityID: .item(itemID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(initialParent),
-            newValue: .parentEntity(.location(newLocation))
-        ))
+        changes.append(
+            StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemParent,
+                oldValue: .parentEntity(initialParent),
+                newValue: .parentEntity(.location(newLocation))
+            )
+        )
 
         // Touched change (if needed)
         if !initialTouched {
-            changes.append(StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(itemID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Update pronoun
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemID])
-        ))
+        changes.append(
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([itemID])
+            )
+        )
 
         // Worn change (if needed)
         if initialWorn {
-            changes.append(StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isWorn),
-                oldValue: true,
-                newValue: false
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(itemID),
+                    attributeKey: .itemAttribute(.isWorn),
+                    oldValue: true,
+                    newValue: false
+                )
+            )
         }
 
         return changes

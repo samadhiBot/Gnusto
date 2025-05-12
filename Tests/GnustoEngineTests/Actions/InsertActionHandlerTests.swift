@@ -1513,40 +1513,48 @@ extension InsertActionHandlerTests {
         var changes: [StateChange] = []
 
         // Change 1: Item parent
-        changes.append(StateChange(
-            entityID: .item(itemToInsertID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(initialParent),
-            newValue: .parentEntity(.item(containerID))
-        ))
+        changes.append(
+            StateChange(
+                entityID: .item(itemToInsertID),
+                attributeKey: .itemParent,
+                oldValue: .parentEntity(initialParent),
+                newValue: .parentEntity(.item(containerID))
+            )
+        )
 
         // Change 2: Item touched (if needed)
         if initialItemAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(itemToInsertID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(itemToInsertID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Change 3: Container touched (if needed)
         if initialContainerAttributes[.isTouched] != true {
-            changes.append(StateChange(
-                entityID: .item(containerID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
-                newValue: true,
-            ))
+            changes.append(
+                StateChange(
+                    entityID: .item(containerID),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: nil,
+                    newValue: true,
+                )
+            )
         }
 
         // Change 4: Pronoun "it"
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToInsertID])
-        ))
+        changes.append(
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil,
+                newValue: .itemIDSet([itemToInsertID])
+            )
+        )
 
         return changes
     }

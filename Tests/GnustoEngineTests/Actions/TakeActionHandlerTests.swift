@@ -40,12 +40,14 @@ struct TakeActionHandlerTests {
 
             // Use nil-coalescing or direct comparison where appropriate
             if oldValue != newValue {
-                changes.append(StateChange(
-                    entityID: .item(itemID),
-                    attributeKey: .itemAttribute(key),
-                    oldValue: oldValue,
-                    newValue: newValue
-                ))
+                changes.append(
+                    StateChange(
+                        entityID: .item(itemID),
+                        attributeKey: .itemAttribute(key),
+                        oldValue: oldValue,
+                        newValue: newValue
+                    )
+                )
             }
         }
 
@@ -72,12 +74,14 @@ struct TakeActionHandlerTests {
         }
 
         // Add pronoun change (assuming 'it' always refers to the taken item now)
-        changes.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
-            newValue: .itemIDSet([itemID])
-        ))
+        changes.append(
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
+                newValue: .itemIDSet([itemID])
+            )
+        )
 
         return changes.sorted() // Sort for consistent comparison
     }

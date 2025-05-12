@@ -111,9 +111,19 @@ struct GameEngineTests {
 
         // Check change history only contains the move increment
         let history = await engine.getChangeHistory()
-        #expect(history.count == 1, "Only move increment should be in history on parse error")
-        #expect(history.first?.attributeKey == .playerMoves)
-        #expect(history.first?.newValue == .int(1))
+        expectNoDifference(history, [
+            StateChange(
+                entityID: .location("startRoom"),
+                attributeKey: .locationAttribute(.isVisited),
+                newValue: true
+            ),
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                oldValue: 0,
+                newValue: 1
+            )
+        ])
     }
 
     @Test("Engine Handles Action Error")

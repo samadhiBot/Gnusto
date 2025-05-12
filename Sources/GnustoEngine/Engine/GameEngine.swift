@@ -84,6 +84,15 @@ extension GameEngine {
     /// Starts and runs the main game loop.
     public func run() async {
         await ioHandler.setup()
+
+        // Set isVisited flag for starting location
+        let startingLocationID = gameState.player.currentLocationID
+        if let startingLoc = location(with: startingLocationID),
+           let addVisitedFlag = flag(startingLoc, with: .isVisited)
+        {
+            try? gameState.apply(addVisitedFlag)
+        }
+
         await describeCurrentLocation() // Initial look
 
         while !shouldQuit {

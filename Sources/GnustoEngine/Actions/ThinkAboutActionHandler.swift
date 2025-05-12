@@ -43,14 +43,8 @@ public struct ThinkAboutActionHandler: ActionHandler {
             }
 
             // Mark as touched if not already
-            if targetItem.attributes[.isTouched] != true {
-                let change = StateChange(
-                    entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: targetItem.attributes[.isTouched] ?? false,
-                    newValue: true,
-                )
-                stateChanges.append(change)
+            if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+                stateChanges.append(addTouchedFlag)
             }
 
             // Set the standard message
