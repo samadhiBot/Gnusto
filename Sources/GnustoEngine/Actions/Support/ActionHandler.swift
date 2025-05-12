@@ -58,9 +58,3 @@ extension ActionHandler {
         // Default: Do nothing
     }
 }
-
-// MARK: - Associated Types & Aliases
-
-/// A closure that handles a specific action potentially targeting a specific item.
-/// Return `true` if the action was fully handled (preventing default verb handler), `false` otherwise.
-public typealias ObjectActionHandler = @Sendable (GameEngine, Command) async throws -> Bool

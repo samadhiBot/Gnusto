@@ -89,32 +89,52 @@ struct OperaHouse: AreaContents {
 // MARK: - Location action handlers
 
 extension OperaHouse {
-    static func barHandler(_ engine: GameEngine, _ action: LocationActionMessage) async throws -> Bool {
+    static func barHandler(
+        _ engine: GameEngine,
+        _ action: LocationActionMessage
+    ) async throws -> ActionResult? {
+        var disturbances = await engine.gameState
+            .globalState[.barMessageDisturbances]?.toInt ?? 0
         switch action {
         case .beforeTurn(let command):
             switch command.verbID {
-            case VerbID.go:
-
+            case .go:
+                if await engine.location(with: .bar)?.hasFlag(.isLit) == true ||
+                   command.direction == .north
+                {
+                    return nil
+                }
+                let stateChange = StateChange(
+                    entityID: .global,
+                    attributeKey: .globalState(key: .barMessageDisturbances),
+                    oldValue: .int(disturbances),
+                    newValue: .int(disturbances + 2)
+                )
+                let beersDrunk = await engine.gameState.globalState["beersDrunk"]?.toInt ?? 0
+                return ActionResult(
+                    success: true,
+                    message: "You drink the beer. That's your \(beersDrunk)th one today!",
+                    stateChanges: [stateChange]
+                )
+            case .look, .inventory:
+                return nil
+            default:
+                break
             }
         case .afterTurn(let command):
             break
         case .onEnter:
             break
         }
-//        switch command.verbID {
-//        case "examine":
-//            throw ActionResponse.custom("The bar is covered in dust.")
-//            
-//        default:
-//            return false
-//        }
+        if disturbances != 0 {}
+        return nil
     }
 }
 
 // MARK: - Object action handlers
 
 extension OperaHouse {
-    static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+    static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
         switch command.verbID {
         case "examine":
             throw ActionResponse.custom("The cloak is unnaturally dark.")
@@ -125,21 +145,21 @@ extension OperaHouse {
                     "This isn't the best place to leave a smart cloak lying around."
                 )
             } else {
-                return false
+                return nil
             }
 
         default:
             // Any other verb targeting the cloak is not handled by this custom handler.
-            return false
+            return nil
         }
     }
 
-    static func hookHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+    static func hookHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
         guard
             command.verbID == "examine",
             let cloak = await engine.item("cloak")
         else {
-            return false
+            return nil
         }
         let hookDetail = if cloak.parent == .item("hook") {
             "with a cloak hanging on it"
@@ -149,12 +169,12 @@ extension OperaHouse {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    static func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+    static func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
         guard
             command.verbID == "examine",
             await engine.gameState.player.currentLocationID == "bar"
         else {
-            return false
+            return nil
         }
         // Fix: Check location exists before accessing properties
         guard let bar = await engine.location(with: "bar") else {

@@ -8,7 +8,7 @@ struct CloakOfDarkness: GameBlueprint {
 
     init() {
         definitionRegistry = DefinitionRegistry(
-            objectActionHandlers: [
+            itemActionHandlers: [
                 .cloak: OperaHouse.cloakHandler,
                 .hook: OperaHouse.hookHandler,
                 .message: OperaHouse.messageHandler,
@@ -21,9 +21,16 @@ struct CloakOfDarkness: GameBlueprint {
         state = GameState(
             locations: OperaHouse.locations,
             items: OperaHouse.items,
-            player: Player(in: "foyer")
+            player: Player(in: "foyer"),
+            globalState: [
+                .barMessageDisturbances: 0
+            ]
         )
     }
+}
+
+extension GlobalID {
+    static let barMessageDisturbances = GlobalID("barMessageDisturbances")
 }
 
 extension ItemID {

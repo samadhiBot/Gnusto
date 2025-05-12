@@ -45,7 +45,7 @@ public struct TouchActionHandler: ActionHandler {
             )
         }
 
-        // TODO: Allow item-specific touch actions via ObjectActionHandler?
+        // TODO: Allow item-specific touch actions via ItemActionHandler?
 
         // --- Create Result ---
         return ActionResult(

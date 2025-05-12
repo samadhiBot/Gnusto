@@ -313,10 +313,14 @@ struct ExamineActionHandlerTests {
             .in(.player)
         )
         let definitionRegistry = DefinitionRegistry(
-            objectActionHandlers: [
+            itemActionHandlers: [
                 "magicMirror": { engine, command in
-                    await engine.ioHandler.print("You see your reflection in the magic mirror.")
-                    return true
+                    ActionResult(
+                        success: true,
+                        message: "You see your reflection in the magic mirror.",
+                        stateChanges: [],
+                        sideEffects: []
+                    )
                 }
             ]
         )

@@ -14,7 +14,7 @@ public struct DefinitionRegistry: Sendable {
     public let customActionHandlers: [VerbID: ActionHandler]
 
     /// Handlers triggered when an action targets a specific item ID.
-    public let objectActionHandlers: [ItemID: ObjectActionHandler]
+    public let itemActionHandlers: [ItemID: ItemActionHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
     public let locationActionHandlers: [LocationID: LocationActionHandler]
@@ -24,13 +24,13 @@ public struct DefinitionRegistry: Sendable {
     ///   - fuseDefinitions: An array of `FuseDefinition`s.
     ///   - daemonDefinitions: An array of `DaemonDefinition`s.
     ///   - customActionHandlers: A dictionary of verb-specific custom action handlers.
-    ///   - objectActionHandlers: A dictionary of item-specific action handlers.
+    ///   - itemActionHandlers: A dictionary of item-specific action handlers.
     ///   - locationActionHandlers: A dictionary of location-specific action handlers.
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
         customActionHandlers: [VerbID: ActionHandler] = [:],
-        objectActionHandlers: [ItemID: ObjectActionHandler] = [:],
+        itemActionHandlers: [ItemID: ItemActionHandler] = [:],
         locationActionHandlers: [LocationID: LocationActionHandler] = [:]
     ) {
         self.fuseDefinitions = Dictionary(
@@ -40,7 +40,7 @@ public struct DefinitionRegistry: Sendable {
             uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
         )
         self.customActionHandlers = customActionHandlers
-        self.objectActionHandlers = objectActionHandlers
+        self.itemActionHandlers = itemActionHandlers
         self.locationActionHandlers = locationActionHandlers
     }
 

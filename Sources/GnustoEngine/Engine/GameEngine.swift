@@ -491,10 +491,10 @@ extension GameEngine {
         if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if try await roomHandler(self, LocationActionMessage.beforeTurn(command)) {
-                    // Room handler blocked further action, return immediately.
-                    // We don't increment moves or run afterTurn hook here.
-                    return
+                if let result = try await roomHandler(self, LocationActionMessage.beforeTurn(command)) {
+                    // Room handler returned a result, process it
+                    try await processActionResult(result)
+                    return // Room handler handled everything
                 }
             } catch {
                 // Log error and potentially halt turn?
@@ -509,11 +509,15 @@ extension GameEngine {
 
         // 1. Check Direct Object Handler
         if let doID = command.directObject,
-           let objectHandler = definitionRegistry.objectActionHandlers[doID]
+           let objectHandler = definitionRegistry.itemActionHandlers[doID]
         {
             do {
                 // Pass the engine and the full command to the handler
-                actionHandled = try await objectHandler(self, command)
+                if let result = try await objectHandler(self, command) {
+                    // Object handler returned a result, process it
+                    try await processActionResult(result)
+                    return // Object handler handled everything
+                }
             } catch let response {
                 actionResponse = response
                 actionHandled = true // Treat error as handled to prevent default handler
@@ -524,10 +528,14 @@ extension GameEngine {
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
            let ioID = command.indirectObject,
-           let objectHandler = definitionRegistry.objectActionHandlers[ioID]
+           let objectHandler = definitionRegistry.itemActionHandlers[ioID]
         {
             do {
-                actionHandled = try await objectHandler(self, command)
+                if let result = try await objectHandler(self, command) {
+                    // Object handler returned a result, process it
+                    try await processActionResult(result)
+                    return // Object handler handled everything
+                }
             } catch let response {
                 actionResponse = response
                 actionHandled = true

@@ -13,7 +13,7 @@ struct SmellActionHandler: ActionHandler {
             message = "You smell nothing unusual."
         } else {
             // If smelling a specific item, give a generic response.
-            // Specific items could be handled by ObjectActionHandler or custom handlers.
+            // Specific items could be handled by ItemActionHandler or custom handlers.
             message = "That smells about average."
         }
 

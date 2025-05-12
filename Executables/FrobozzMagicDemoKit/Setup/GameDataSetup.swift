@@ -29,7 +29,7 @@ enum GameDataSetup {
         )
 
         // --- Define Object Action Handlers ---
-        let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+        let itemActionHandlers: [ItemID: ItemActionHandler] = [
             // Handle OPEN/CLOSE/EXAMINE for Iron Door
             "ironDoor": { engine, command in
                 switch command.verbID {
@@ -134,7 +134,7 @@ enum GameDataSetup {
                 Components.Lantern.createLanternTimerDaemon(),
                 Components.Weather.createWeatherDaemon()
             ],
-            objectActionHandlers: objectActionHandlers // Pass handlers
+            itemActionHandlers: itemActionHandlers // Pass handlers
         )
 
         return (initialState, registry)
