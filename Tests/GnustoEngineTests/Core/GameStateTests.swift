@@ -307,7 +307,11 @@ struct GameStateTests {
         let state2 = state1 // Create a copy (structs are value types)
 
         // Modify state1
-        let change = StateChange(entityID: .player, attributeKey: .playerScore, newValue: .int(10))
+        let change = StateChange(
+            entityID: .player,
+            attributeKey: .playerScore,
+            newValue: .int(10)
+        )
         try state1.apply(change)
 
         // Verify state2 remains unchanged
