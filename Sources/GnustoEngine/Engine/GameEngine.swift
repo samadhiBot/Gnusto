@@ -87,7 +87,7 @@ extension GameEngine {
 
         // Set isVisited flag for starting location
         let startingLocationID = gameState.player.currentLocationID
-        if let startingLoc = location(with: startingLocationID),
+        if let startingLoc = location(startingLocationID),
            let addVisitedFlag = flag(startingLoc, with: .isVisited)
         {
             try? gameState.apply(addVisitedFlag)
@@ -165,9 +165,9 @@ extension GameEngine {
             case .go:
                 // Check if the destination room was visited before the movement
                 if let exit = command.direction.flatMap({ direction in
-                    location(with: gameState.player.currentLocationID)?.exits[direction]
+                    location(gameState.player.currentLocationID)?.exits[direction]
                 }),
-                   let destinationLoc = location(with: exit.destinationID),
+                   let destinationLoc = location(exit.destinationID),
                    !destinationLoc.hasFlag(.isVisited)
                 {
                     true

@@ -10,7 +10,7 @@ public struct GoActionHandler: ActionHandler {
 
         // 2. Get Current Location data
         let currentLocationID = await context.engine.gameState.player.currentLocationID
-        guard let currentLoc = await context.engine.location(with: currentLocationID) else {
+        guard let currentLoc = await context.engine.location(currentLocationID) else {
             throw ActionResponse.internalEngineError(
                 "Player's current location ID '\(currentLocationID)' is invalid."
             )
@@ -51,10 +51,10 @@ public struct GoActionHandler: ActionHandler {
         guard
             let direction = context.command.direction,
             let currentLocation = await context.engine.location(
-                with: await context.engine.gameState.player.currentLocationID
+                await context.engine.gameState.player.currentLocationID
             ),
             let exit = currentLocation.exits[direction],
-            let destination = await context.engine.location(with: exit.destinationID)
+            let destination = await context.engine.location(exit.destinationID)
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError("Exit disappeared between validate and process for GO context.command.")

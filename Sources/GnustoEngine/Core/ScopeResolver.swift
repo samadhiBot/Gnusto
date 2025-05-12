@@ -12,12 +12,12 @@ public struct ScopeResolver: Sendable {
     }
 
     /// Checks if the specified location is currently lit.
+    /// 
     /// A location is lit if it has the `.inherentlyLit` property, or if the player
     /// (or perhaps an NPC in the same location) is carrying an active light source
     /// (`.lightSource` and `.on` properties).
     ///
-    /// - Parameters:
-    ///   - locationID: The unique identifier of the location to check.
+    /// - Parameter locationID: The unique identifier of the location to check.
     /// - Returns: `true` if the location is lit, `false` otherwise.
     public func isLocationLit(locationID: LocationID) async -> Bool {
         let gameState = await engine.gameState

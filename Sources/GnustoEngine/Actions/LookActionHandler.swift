@@ -41,7 +41,7 @@ public struct LookActionHandler: ActionHandler {
             }
 
             // 2. Location is lit, proceed with description
-            guard let currentLocation = await engine.location(with: currentLocationID) else {
+            guard let currentLocation = await engine.location(currentLocationID) else {
                 // Should not happen if player location is valid and not dark
                 throw ActionResponse.internalEngineError(
                     "Player is in an invalid location: \(currentLocationID)"
@@ -172,18 +172,12 @@ public struct LookActionHandler: ActionHandler {
         await engine.ioHandler.print(longDesc)
 
         // List visible items, passing the snapshot
-        await listVisibleItems(in: location, engine: engine, showVerbose: showVerbose, stateSnapshot: stateSnapshot)
-
-        // Print obvious exits
-        // TODO: Consider visibility/obstructions
-        let exits = location.exits
-        if !exits.isEmpty {
-            let exitStrings = exits.keys.sorted().map { $0.rawValue }
-            await engine.ioHandler.print(
-                "Obvious exits: \(exitStrings.joined(separator: ", "))",
-                style: .normal // Assume .normal exists
-            )
-        }
+        await listVisibleItems(
+            in: location,
+            engine: engine,
+            showVerbose: showVerbose,
+            stateSnapshot: stateSnapshot
+        )
     }
 
     /// Lists items visible in the location.

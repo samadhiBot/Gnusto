@@ -18,7 +18,7 @@ extension GameEngine {
         }
 
         // 2. If lit, get snapshot and print name
-        guard let location = location(with: locationID) else {
+        guard let location = location(locationID) else {
             logger.warning("💥 Error: Current location snapshot not found!")
             return
         }

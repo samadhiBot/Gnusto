@@ -97,7 +97,7 @@ extension GameEngine {
 
         // Check if destination is valid (e.g., Location exists)
         if case .location(let locationID) = newParent {
-            guard location(with: locationID) != nil else {
+            guard location(locationID) != nil else {
                 logger.warning("""
                     💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
                     non-existent location '\(locationID.rawValue, privacy: .public)'.
@@ -142,7 +142,7 @@ extension GameEngine {
         let oldLocationID = gameState.player.currentLocationID
 
         // Check if destination is valid
-        guard location(with: newLocationID) != nil else {
+        guard location(newLocationID) != nil else {
             logger
                 .warning("""
                     💥 Cannot move player to non-existent location \

@@ -25,7 +25,7 @@ struct Hooks {
 
             // Now check for unsafe actions IN THE DARK
             // Re-check lit status *after* potentially removing it
-            let isLitNow = await engine.location(with: locationID)?.hasFlag(.isLit) ?? false
+            let isLitNow = await engine.location(locationID)?.hasFlag(.isLit) ?? false
 
             if !isLitNow { // Should definitely be false here if update worked
                 let verb = command.verbID

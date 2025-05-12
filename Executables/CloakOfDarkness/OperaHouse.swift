@@ -93,41 +93,48 @@ extension OperaHouse {
         _ engine: GameEngine,
         _ action: LocationActionMessage
     ) async throws -> ActionResult? {
-        var disturbances = await engine.gameState
-            .globalState[.barMessageDisturbances]?.toInt ?? 0
-        switch action {
-        case .beforeTurn(let command):
-            switch command.verbID {
-            case .go:
-                if await engine.location(with: .bar)?.hasFlag(.isLit) == true ||
-                   command.direction == .north
-                {
-                    return nil
-                }
-                let stateChange = StateChange(
-                    entityID: .global,
-                    attributeKey: .globalState(key: .barMessageDisturbances),
-                    oldValue: .int(disturbances),
-                    newValue: .int(disturbances + 2)
-                )
-                let beersDrunk = await engine.gameState.globalState["beersDrunk"]?.toInt ?? 0
-                return ActionResult(
-                    success: true,
-                    message: "You drink the beer. That's your \(beersDrunk)th one today!",
-                    stateChanges: [stateChange]
-                )
-            case .look, .inventory:
-                return nil
-            default:
-                break
-            }
-        case .afterTurn(let command):
-            break
-        case .onEnter:
-            break
+        guard
+            case .beforeTurn(let command) = action,
+            await engine.isPlayerLocationLit() == false
+        else {
+            return nil
         }
-        if disturbances != 0 {}
-        return nil
+        let disturbances = await engine.gameState.globalState[.barMessageDisturbances]?.toInt ?? 0
+
+        return switch command.verbID {
+        case .go:
+            if command.direction == .north {
+                nil
+            } else {
+                ActionResult(
+                    success: true,
+                    message: "Blundering around in the dark isn't a good idea!",
+                    stateChanges: [
+                        StateChange(
+                            entityID: .global,
+                            attributeKey: .globalState(key: .barMessageDisturbances),
+                            oldValue: .int(disturbances),
+                            newValue: .int(disturbances + 2)
+                        ),
+                    ]
+                )
+            }
+        case .look, .inventory:
+            nil
+        default:
+            ActionResult(
+                success: true,
+                message: "In the dark? You could easily disturb something!",
+                stateChanges: [
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .globalState(key: .barMessageDisturbances),
+                        oldValue: .int(disturbances),
+                        newValue: .int(disturbances + 1)
+                    ),
+                ]
+            )
+        }
     }
 }
 
@@ -177,7 +184,7 @@ extension OperaHouse {
             return nil
         }
         // Fix: Check location exists before accessing properties
-        guard let bar = await engine.location(with: "bar") else {
+        guard let bar = await engine.location("bar") else {
             // Should not happen if game setup is correct
             throw ActionResponse.internalEngineError("Location 'bar' not found.")
         }

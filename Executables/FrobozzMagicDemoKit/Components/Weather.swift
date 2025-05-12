@@ -24,7 +24,7 @@ extension Components {
             ) { engine in
                 // Only affects outdoor locations
                 let locationID = await engine.gameState.player.currentLocationID
-                let location = await engine.location(with: locationID)
+                let location = await engine.location(locationID)
 
                 // Randomly change the weather
                 let weatherStates = ["sunny", "cloudy", "rainy"]

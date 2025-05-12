@@ -73,7 +73,7 @@ struct TurnOffActionHandler: ActionHandler {
         let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         if isLightSourceBeingTurnedOff {
             let currentLocationID = await context.engine.gameState.player.currentLocationID
-            let currentLocation = await context.engine.location(with: currentLocationID)
+            let currentLocation = await context.engine.location(currentLocationID)
 
             // 1. Is the room inherently lit?
             let locationIsInherentlyLit = currentLocation?.hasFlag(.inherentlyLit) ?? false
