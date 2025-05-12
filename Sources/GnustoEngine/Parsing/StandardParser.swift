@@ -271,7 +271,7 @@ public struct StandardParser: Parser {
     }
 
     /// Splits the input string into lowercase tokens.
-    internal func tokenize(input: String) -> [String] {
+    func tokenize(input: String) -> [String] {
         // Simple whitespace and punctuation separation, converts to lowercase.
         // ZIL tokenization was more complex (e.g., dictionary separators).
 
@@ -285,7 +285,7 @@ public struct StandardParser: Parser {
     }
 
     /// Filters out noise words from a token list.
-    internal func removeNoise(
+    func removeNoise(
         tokens: [String],
         noiseWords: Set<String>
     ) -> [String] {
@@ -514,7 +514,7 @@ public struct StandardParser: Parser {
 
     /// Resolves a noun phrase (noun + modifiers) to a specific ItemID within the game context.
     /// Incorporates checking required conditions based on the SyntaxRule.
-    internal func resolveObject(
+    func resolveObject(
         noun: String,
         modifiers: [String],
         isPronoun: Bool,
@@ -574,7 +574,7 @@ public struct StandardParser: Parser {
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.
-    internal func gatherCandidates(
+    func gatherCandidates(
         in gameState: GameState,
         requiredConditions: ObjectCondition
     ) -> [ItemID: Item] {
@@ -650,7 +650,7 @@ public struct StandardParser: Parser {
     }
 
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
-    internal func filterCandidates(
+    func filterCandidates(
         ids: Set<ItemID>,
         modifiers: [String],
         candidates: [ItemID: Item]

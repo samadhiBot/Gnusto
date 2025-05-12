@@ -31,10 +31,13 @@ public struct DynamicAttributeRegistry: Sendable {
 
     /// Storage for item compute handlers, keyed by AttributeID.
     private var itemComputeHandlers: [AttributeID: ItemComputeHandler] = [:]
+
     /// Storage for item validate handlers.
     private var itemValidateHandlers: [AttributeID: ItemValidateHandler] = [:]
+
     /// Storage for location compute handlers.
     private var locationComputeHandlers: [AttributeID: LocationComputeHandler] = [:]
+
     /// Storage for location validate handlers.
     private var locationValidateHandlers: [AttributeID: LocationValidateHandler] = [:]
 
@@ -89,22 +92,22 @@ public struct DynamicAttributeRegistry: Sendable {
     // MARK: - Retrieval Methods (Internal Access)
 
     /// Retrieves the compute handler for a specific item property, if one exists.
-    internal func itemComputeHandler(for key: AttributeID) -> ItemComputeHandler? {
+    func itemComputeHandler(for key: AttributeID) -> ItemComputeHandler? {
         itemComputeHandlers[key]
     }
 
     /// Retrieves the validate handler for a specific item property, if one exists.
-    internal func itemValidateHandler(for key: AttributeID) -> ItemValidateHandler? {
+    func itemValidateHandler(for key: AttributeID) -> ItemValidateHandler? {
         itemValidateHandlers[key]
     }
 
     /// Retrieves the compute handler for a specific location property, if one exists.
-    internal func locationComputeHandler(for key: AttributeID) -> LocationComputeHandler? {
+    func locationComputeHandler(for key: AttributeID) -> LocationComputeHandler? {
         locationComputeHandlers[key]
     }
 
     /// Retrieves the validate handler for a specific location property, if one exists.
-    internal func locationValidateHandler(for key: AttributeID) -> LocationValidateHandler? {
+    func locationValidateHandler(for key: AttributeID) -> LocationValidateHandler? {
         locationValidateHandlers[key]
     }
 }

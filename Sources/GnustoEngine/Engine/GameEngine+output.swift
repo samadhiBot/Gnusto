@@ -5,7 +5,7 @@ import OSLog
 
 extension GameEngine {
     /// Displays the description of the current location, considering light level.
-    internal func describeCurrentLocation() async {
+    func describeCurrentLocation() async {
         let locationID = gameState.player.currentLocationID
 
         // 1. Check for light

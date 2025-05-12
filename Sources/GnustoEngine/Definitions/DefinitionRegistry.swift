@@ -48,7 +48,7 @@ public struct DefinitionRegistry: Sendable {
     ///
     /// - Parameter id: The `DaemonID` to look up.
     /// - Returns: The `DaemonDefinition` if found, otherwise `nil`.
-    internal func daemonDefinition(for id: DaemonID) -> DaemonDefinition? {
+    func daemonDefinition(for id: DaemonID) -> DaemonDefinition? {
         daemonDefinitions[id]
     }
 
@@ -56,7 +56,7 @@ public struct DefinitionRegistry: Sendable {
     ///
     /// - Parameter id: The `FuseID` to look up.
     /// - Returns: The `FuseDefinition` if found, otherwise `nil`.
-    internal func fuseDefinition(for id: FuseID) -> FuseDefinition? {
+    func fuseDefinition(for id: FuseID) -> FuseDefinition? {
         fuseDefinitions[id]
     }
 
@@ -64,7 +64,7 @@ public struct DefinitionRegistry: Sendable {
     ///
     /// - Parameter id: The `LocationID` to look up.
     /// - Returns: The `LocationActionHandler` if found, otherwise `nil`.
-    internal func roomActionHandler(for id: LocationID) -> LocationActionHandler? {
+    func roomActionHandler(for id: LocationID) -> LocationActionHandler? {
         locationActionHandlers[id]
     }
 }
