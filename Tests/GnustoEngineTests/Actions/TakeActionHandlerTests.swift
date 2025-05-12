@@ -92,14 +92,14 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "key",
             .name("brass key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .size(3)
         )
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Capture initial attributes
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
@@ -225,7 +225,7 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "rock",
             .name("heavy rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
             // No .isTakable: true
         )
 
@@ -256,7 +256,7 @@ struct TakeActionHandlerTests {
 
         // Assert: Check item parent DID NOT change
         let finalItemState = await engine.item("rock")
-        #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
+        #expect(finalItemState?.parent == .location(.startRoom), "Item should still be in the room")
     }
 
     @Test("Take fails with no direct object")
@@ -288,7 +288,7 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpen
         )
@@ -323,7 +323,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalContainerState = await engine.item("box")
-        #expect(finalContainerState?.parent == .location("startRoom"))
+        #expect(finalContainerState?.parent == .location(.startRoom))
         #expect(finalContainerState?.hasFlag(.isOpen) == true) // Check flag
         #expect(await engine.getPronounReference(pronoun: "it") == ["gem"])
 
@@ -407,7 +407,7 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer
         )
         let itemInContainer = Item(
@@ -456,7 +456,7 @@ struct TakeActionHandlerTests {
         let nonContainer = Item(
             id: "statue",
             .name("stone statue"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
             // Not a container by default
         )
         let itemInside = Item(
@@ -507,12 +507,12 @@ struct TakeActionHandlerTests {
         let heavyItem = Item(
             id: "heavy",
             .name("heavy thing"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .size(101) // Exceeds default capacity (100) if player has 0
         )
         // Player with capacity 0
-        let player = Player(in: "startRoom", carryingCapacity: 0)
+        let player = Player(in: .startRoom, carryingCapacity: 0)
         let game = MinimalGame(player: player, items: [heavyItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -538,7 +538,7 @@ struct TakeActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         // Assert item is still in the room
-        #expect(await engine.item("heavy")?.parent == .location("startRoom"))
+        #expect(await engine.item("heavy")?.parent == .location(.startRoom))
     }
 
     /// Tests that taking a wearable item successfully moves it to inventory but does not wear it.
@@ -548,7 +548,7 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "cloak",
             .name("dark cloak"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .isWearable,
             .size(2)
@@ -556,7 +556,7 @@ struct TakeActionHandlerTests {
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Capture initial
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
@@ -602,7 +602,7 @@ struct TakeActionHandlerTests {
         let surfaceItem = Item(
             id: "table",
             .name("wooden table"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isSurface
         )
         let itemOnSurface = Item(
@@ -615,7 +615,7 @@ struct TakeActionHandlerTests {
         let initialParent = itemOnSurface.parent
         let initialAttributes = itemOnSurface.attributes // Capture initial
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [surfaceItem, itemOnSurface])
         let mockIO = await MockIOHandler()
@@ -639,7 +639,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState?.parent == .player)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let finalSurfaceState = await engine.item(surfaceItem.id)
-        #expect(finalSurfaceState?.parent == .location("startRoom"))
+        #expect(finalSurfaceState?.parent == .location(.startRoom))
         #expect(await engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
 
         // Assert Output
@@ -662,7 +662,7 @@ struct TakeActionHandlerTests {
         let testItem = Item(
             id: "key",
             .name("brass key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .isTouched, // Start touched
             .size(3)
@@ -670,7 +670,7 @@ struct TakeActionHandlerTests {
         let initialParent = testItem.parent
         let initialAttributes = testItem.attributes // Includes .isTouched: true
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [testItem])
         let mockIO = await MockIOHandler()
@@ -730,14 +730,14 @@ struct TakeActionHandlerTests {
         let itemToTake = Item(
             id: "key",
             .name("brass key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .size(3)
         )
         let initialParent = itemToTake.parent
         let initialAttributes = itemToTake.attributes // Capture initial
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [heldItem, itemToTake])
         let mockIO = await MockIOHandler()
@@ -785,7 +785,7 @@ struct TakeActionHandlerTests {
         let container = Item(
             id: "jar",
             .name("glass jar"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isTransparent // Closed by default, but transparent
         )
@@ -797,7 +797,7 @@ struct TakeActionHandlerTests {
         )
 
         // Define player with capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [container, itemInContainer])
         let mockIO = await MockIOHandler()
@@ -845,12 +845,12 @@ struct TakeActionHandlerTests {
         let itemToTake = Item(
             id: "shield",
             .name("shield"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .size(7)
         )
         // Define player with low capacity
-        let player = Player(in: "startRoom", carryingCapacity: 10)
+        let player = Player(in: .startRoom, carryingCapacity: 10)
 
         let game = MinimalGame(player: player, items: [itemHeld, itemToTake])
         let mockIO = await MockIOHandler()
@@ -875,7 +875,7 @@ struct TakeActionHandlerTests {
 
         // Assert: Check item parent DID NOT change
         let finalItemState = await engine.item("shield")
-        #expect(finalItemState?.parent == .location("startRoom"), "Shield should still be in the room")
+        #expect(finalItemState?.parent == .location(.startRoom), "Shield should still be in the room")
     }
 }
 

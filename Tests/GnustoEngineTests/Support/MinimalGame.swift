@@ -6,7 +6,7 @@ struct MinimalGame: GameBlueprint {
     var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     init(
-        player: Player = Player(in: "startRoom"),
+        player: Player = Player(in: .startRoom),
         locations: [Location]? = nil,
         items: [Item]? = nil,
         globalState: [GlobalID: StateValue]? = nil,
@@ -18,7 +18,7 @@ struct MinimalGame: GameBlueprint {
 
         let gameLocations = locations ?? [
             Location(
-                id: "startRoom",
+                id: .startRoom,
                 .name("Void"),
                 .description("An empty void."),
                 .inherentlyLit
@@ -28,7 +28,7 @@ struct MinimalGame: GameBlueprint {
             Item(
                 id: "startItem",
                 .name("pebble"),
-                .in(.location("startRoom")),
+                .in(.location(.startRoom)),
                 .isTakable
             ),
             Item(

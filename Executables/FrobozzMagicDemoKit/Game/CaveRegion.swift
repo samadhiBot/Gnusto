@@ -33,7 +33,7 @@ enum CaveRegion {
 extension CaveRegion {
     // Starting location
     static let startRoom = Location(
-        id: "startRoom",
+        id: .startRoom,
         name: "Cave Entrance",
         description: """
                 You stand at the entrance to a dark cave. Sunlight streams in from the
@@ -59,7 +59,7 @@ extension CaveRegion {
                 """,
         exits: [
             .north: Exit(destination: "treasureRoom"),
-            .south: Exit(destination: "startRoom"),
+            .south: Exit(destination: .startRoom),
             .west: Exit(destination: "crystalGrotto"),
         ]
     )
@@ -87,7 +87,7 @@ extension CaveRegion {
                 continues east, and the cave entrance is to the west.
                 """,
         exits: [
-            .west: Exit(destination: "startRoom"),
+            .west: Exit(destination: .startRoom),
             .east: Exit(destination: "ironDoorRoom"),
         ]
     )

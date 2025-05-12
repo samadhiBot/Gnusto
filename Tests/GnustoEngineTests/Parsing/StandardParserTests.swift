@@ -654,13 +654,13 @@ struct StandardParserTests {
         let tempKeyOnGround = Item(
             id: "tempKeyOnGround",
             .name("key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .adjectives("temp")
         )
         let permKey = Item(
             id: "permKey",
             .name("key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .adjectives("perm")
         )
         itemsDict[tempKeyInBackpack.id] = tempKeyInBackpack
@@ -677,8 +677,8 @@ struct StandardParserTests {
         // Verify setup
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["tempKeyInBackpack"]?.parent == .item("backpack"))
-        #expect(initState.items["tempKeyOnGround"]?.parent == .location("startRoom"))
-        #expect(initState.items["permKey"]?.parent == .location("startRoom"))
+        #expect(initState.items["tempKeyOnGround"]?.parent == .location(.startRoom))
+        #expect(initState.items["permKey"]?.parent == .location(.startRoom))
 
         // Update vocab temporarily ONLY for this test's state
         var tempVocabulary = vocabulary

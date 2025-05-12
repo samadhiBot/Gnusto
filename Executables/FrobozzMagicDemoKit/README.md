@@ -49,7 +49,7 @@ Item(
     synonyms: "lamp", "light",
     description: "A sturdy brass lantern, useful for exploring dark places.",
     properties: .takable, .lightSource,
-    .in(.location("startRoom"))
+    .in(.location(.startRoom))
 )
 ```
 

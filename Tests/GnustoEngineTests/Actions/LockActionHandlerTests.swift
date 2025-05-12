@@ -11,7 +11,7 @@ struct LockActionHandlerTests {
         let initialBox = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable,
@@ -116,7 +116,7 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable
@@ -154,7 +154,7 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable
@@ -162,7 +162,7 @@ struct LockActionHandlerTests {
         let key = Item(
             id: "key",
             .name("key"),
-            .in(.location("startRoom")), // Key also in room
+            .in(.location(.startRoom)), // Key also in room
             .isTakable
         )
         let game = MinimalGame(items: [box, key])
@@ -211,7 +211,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let room1 = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start"),
             .inherentlyLit
         )
@@ -253,7 +253,7 @@ struct LockActionHandlerTests {
         // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(
             id: "pebble",
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         ) // Not lockable
         let key = Item(
             id: "key",
@@ -294,7 +294,7 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable
@@ -339,7 +339,7 @@ struct LockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable,

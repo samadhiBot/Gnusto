@@ -69,14 +69,14 @@ struct DynamicPropertyTests {
         )
 
         // Set initial value through engine
-        try await engine.setDynamicItemValue(itemID: "testItem", key: "simpleProp", newValue: StateValue.int(10))
+        try await engine.setDynamicItemValue(itemID: "testItem", key: "simpleProp", newValue: .int(10))
 
         // Get initial value
         let initialValue: Int = try await engine.fetch("testItem", "simpleProp")
         #expect(initialValue == 10)
 
         // Set new value
-        try await engine.setDynamicItemValue(itemID: "testItem", key: "simpleProp", newValue: StateValue.int(20))
+        try await engine.setDynamicItemValue(itemID: "testItem", key: "simpleProp", newValue: .int(20))
 
         // Verify new value in GameState
         let updatedItem = await engine.gameState.items["testItem"]
@@ -102,7 +102,7 @@ struct DynamicPropertyTests {
 //        let engine = createTestEngine(dynamicRegistry: registry, ioHandler: ioHandler)
 //
 //        // Set a valid value
-//        try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: StateValue.int(5))
+//        try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: .int(5))
 //
 //        // Verify value in GameState
 //        let updatedItem = await engine.gameState.items["testItem"]
@@ -126,7 +126,7 @@ struct DynamicPropertyTests {
 //
 //        // Attempt to set an invalid value (zero)
 //        await #expect(throws: ActionResponse.self) {
-//             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: StateValue.int(0))
+//             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: .int(0))
 //        }
 //
 //        // Verify value in GameState hasn't changed
@@ -135,7 +135,7 @@ struct DynamicPropertyTests {
 //
 //        // Attempt to set wrong type
 //         await #expect(throws: ActionResponse.self) {
-//             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: StateValue.string("invalid"))
+//             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: .string("invalid"))
 //        }
 //         #expect(item?.attributes["validatedProp"] == StateValue.int(1))
 //    }

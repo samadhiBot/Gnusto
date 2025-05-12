@@ -109,11 +109,10 @@ struct GameEngineTests {
         let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
-        // Check change history only contains the move increment
-        let history = await engine.getChangeHistory()
-        expectNoDifference(history, [
+        // Check change history only contains 1st room visit and move increment
+        #expect(await engine.getChangeHistory() == [
             StateChange(
-                entityID: .location("startRoom"),
+                entityID: .location(.startRoom),
                 attributeKey: .locationAttribute(.isVisited),
                 newValue: true
             ),
@@ -122,7 +121,7 @@ struct GameEngineTests {
                 attributeKey: .playerMoves,
                 oldValue: 0,
                 newValue: 1
-            )
+            ),
         ])
     }
 
@@ -136,10 +135,10 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -176,7 +175,7 @@ struct GameEngineTests {
         // Make pebble non-takable in this test's state
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
         // Ensure room is lit for this test - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -209,11 +208,20 @@ struct GameEngineTests {
         let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
-        // Check change history only contains the move increment
-        let history = await engine.getChangeHistory()
-        #expect(history.count == 1, "Only move increment should be in history on action error")
-        #expect(history.first?.attributeKey == .playerMoves)
-        #expect(history.first?.newValue == .int(1))
+        // Check change history only contains 1st room visit and move increment
+        #expect(await engine.getChangeHistory() == [
+            StateChange(
+                entityID: .location(.startRoom),
+                attributeKey: .locationAttribute(.isVisited),
+                newValue: true
+            ),
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                oldValue: 0,
+                newValue: 1
+            ),
+        ])
     }
 
     @Test("Engine Processes Successful Command")
@@ -222,7 +230,7 @@ struct GameEngineTests {
 
         // Initialize room with isLit: true
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -239,7 +247,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -291,7 +299,7 @@ struct GameEngineTests {
 
         // Initialize room with isLit: true
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -311,7 +319,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations["startRoom"]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -495,11 +503,11 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -539,7 +547,7 @@ struct GameEngineTests {
 
         // Ensure pebble is initially takable and in the room (check initial game state)
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
-        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
+        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
             game: game,
@@ -567,7 +575,7 @@ struct GameEngineTests {
         let finalInventorySnapshots = await engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = await engine.items(in: .location("startRoom"))
+        let finalRoomSnapshots = await engine.items(in: .location(.startRoom))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
@@ -647,14 +655,14 @@ struct GameEngineTests {
             .name("brass lamp"),
             .description("A small brass lamp."),
             .isLightSource,
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let mockEnhancedHandler = MockMultiChangeHandler(
             itemIDToModify: testItemID,
             flagToSet: testFlagKey.rawValue
         ) // Pass rawValue if handler needs string
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -746,7 +754,10 @@ struct GameEngineTests {
         )
 
         // Optionally, still check count if exact number is important
-        #expect(history.count == 4, "Expected exactly 4 changes: moves + item props + flag")
+        #expect(
+            history.count == 5,
+            "Expected exactly 5 changes: 1st room visited + moves + item props + flag"
+        )
 
         // Check output message
         let output = await mockIO.recordedOutput
@@ -868,7 +879,7 @@ struct GameEngineTests {
     func testReportErrorInvalidDirection() async throws {
         // Initialize location with properties directly
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -893,10 +904,10 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -923,16 +934,16 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
+        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let command = Command(
             verbID: .wear,
@@ -958,12 +969,12 @@ struct GameEngineTests {
         let target = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -990,10 +1001,10 @@ struct GameEngineTests {
         let item = Item(
             id: "rock",
             .name("rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1022,7 +1033,7 @@ struct GameEngineTests {
             .isTakable
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1054,16 +1065,16 @@ struct GameEngineTests {
         let itemToTake = Item(
             id: "shield",
             .name("shield"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
             .size(7)
         )
         let player = Player(
-            in: "startRoom",
+            in: .startRoom,
             carryingCapacity: 10 // Set low capacity
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1093,10 +1104,10 @@ struct GameEngineTests {
         let target = Item(
             id: "rock",
             .name("rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1128,10 +1139,10 @@ struct GameEngineTests {
         let target = Item(
             id: "rock",
             .name("rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1160,7 +1171,7 @@ struct GameEngineTests {
             blockedMessage: "A shimmering curtain bars the way."
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .exits([.north: blockedExit]),
             .inherentlyLit
@@ -1187,12 +1198,12 @@ struct GameEngineTests {
         let container = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1217,7 +1228,7 @@ struct GameEngineTests {
         let container = Item(
             id: "chest",
             .name("chest"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isLockable,
@@ -1230,11 +1241,11 @@ struct GameEngineTests {
             .isTakable
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
-        let player = Player(in: "startRoom")
+        let player = Player(in: .startRoom)
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
         let command = Command(
@@ -1258,10 +1269,10 @@ struct GameEngineTests {
         let item = Item(
             id: "book",
             .name("book"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1290,7 +1301,7 @@ struct GameEngineTests {
             .isScenery
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1321,7 +1332,7 @@ struct GameEngineTests {
             .isScenery
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -1348,7 +1359,7 @@ struct GameEngineTests {
             blockedMessage: "You must first find inner peace."
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .exits([.up: conditionalExit]),
             .inherentlyLit
@@ -1375,10 +1386,10 @@ struct GameEngineTests {
         let item = Item(
             id: "shadow",
             .name("shadow"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Dark Room"),
             .description("A dark, dark room.")
         )
@@ -1388,7 +1399,7 @@ struct GameEngineTests {
         )
 
         #expect(
-            game.state.locations["startRoom"]?.hasFlag(.inherentlyLit) == false
+            game.state.locations[.startRoom]?.hasFlag(.inherentlyLit) == false
         )
 
         let command = Command(
@@ -1410,7 +1421,7 @@ struct GameEngineTests {
         let container = Item(
             id: "chest",
             .name("chest"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable,
             .isLocked,
@@ -1423,11 +1434,11 @@ struct GameEngineTests {
             .isTakable
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
-        let player = Player(in: "startRoom")
+        let player = Player(in: .startRoom)
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
         let command = Command(
@@ -1454,7 +1465,7 @@ struct GameEngineTests {
             .name("brass lamp"),
             .description("A small brass lamp."),
             .isLightSource,
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
 
         // Define the desired state changes

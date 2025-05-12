@@ -173,7 +173,7 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityID: .item(itemID),
             attributeKey: .itemParent,
-            oldValue: .parentEntity(.location("startRoom")),
+            oldValue: .parentEntity(.location(.startRoom)),
             newValue: .parentEntity(.player)
         )
 

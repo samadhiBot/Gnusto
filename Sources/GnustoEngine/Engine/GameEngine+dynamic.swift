@@ -159,18 +159,18 @@ extension GameEngine {
         }
 
         // Validation passed (or no validator), proceed with StateChange
-        let oldValue = item.attributes[key] // Get current value for oldValue
+        let oldValue = item.attributes[key]
 
         // Only apply if value is actually changing
         if oldValue != newValue {
-            let change = StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemAttribute(key), // Use the new key
-                oldValue: oldValue,
-                newValue: newValue
+            try gameState.apply(
+                StateChange(
+                    entityID: .item(itemID),
+                    attributeKey: .itemAttribute(key),
+                    oldValue: oldValue,
+                    newValue: newValue
+                )
             )
-            // Directly apply to gameState (we are already async)
-            try gameState.apply(change)
         }
     }
 
@@ -205,14 +205,14 @@ extension GameEngine {
         let oldValue = location.attributes[key]
 
         if oldValue != newValue {
-            let change = StateChange(
-                entityID: .location(locationID),
-                attributeKey: .locationAttribute(key), // Use the new key
-                oldValue: oldValue,
-                newValue: newValue
+            try gameState.apply(
+                StateChange(
+                    entityID: .location(locationID),
+                    attributeKey: .locationAttribute(key), // Use the new key
+                    oldValue: oldValue,
+                    newValue: newValue
+                )
             )
-            // Directly apply to gameState (we are already async)
-            try gameState.apply(change)
         }
     }
 }

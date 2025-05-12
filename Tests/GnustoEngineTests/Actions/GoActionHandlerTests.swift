@@ -10,7 +10,7 @@ struct GoActionHandlerTests {
     @Test("GO NORTH moves player to connected room")
     func testGoNorth() async throws {
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .description("You are here."),
             .exits([.north: Exit(destination: "end")]),
             .inherentlyLit
@@ -47,7 +47,7 @@ struct GoActionHandlerTests {
     @Test("GO NORTH prints blocked message when exit is blocked")
     func testGoNorthBlocked() async throws {
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .description("You are here."),
             .exits([
                 .north: Exit(
@@ -62,7 +62,7 @@ struct GoActionHandlerTests {
         )
 
         let game = MinimalGame(
-            player: Player(in: "startRoom"),
+            player: Player(in: .startRoom),
             locations: [startRoom, endRoom]
         )
         let mockIO = await MockIOHandler()
@@ -96,7 +96,7 @@ struct GoActionHandlerTests {
     @Test("GO NORTH fails when no exit exists")
     func testGoNorthNoExit() async throws {
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .description("You are here.")
         )
         let endRoom = Location(
@@ -105,7 +105,7 @@ struct GoActionHandlerTests {
         )
 
         let game = MinimalGame(
-            player: Player(in: "startRoom"),
+            player: Player(in: .startRoom),
             locations: [startRoom, endRoom]
         )
         let mockIO = await MockIOHandler()

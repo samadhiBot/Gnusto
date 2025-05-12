@@ -12,7 +12,7 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen // Start open
@@ -78,7 +78,7 @@ struct CloseActionHandlerTests {
         let box = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable
             // Starts closed by default (no .isOpen)
@@ -114,7 +114,7 @@ struct CloseActionHandlerTests {
         let rock = Item(
             id: "rock",
             .name("smooth rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
             // isContainer/isOpenable are false by default
         )
         let game = MinimalGame(items: [rock])

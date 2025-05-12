@@ -27,7 +27,7 @@ extension ForestRegion {
                 the entrance to a cave. A small stream flows to the west.
                 """,
         exits: [
-            .north: Exit(destination: "startRoom"), // Exit to CaveRegion
+            .north: Exit(destination: .startRoom), // Exit to CaveRegion
             .west: Exit(destination: "streamBank"),
         ],
         isLit: true, .outside

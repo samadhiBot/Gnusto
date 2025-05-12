@@ -368,7 +368,7 @@ struct LookActionHandlerTests {
             id: "rock",
             .name("grey rock"),
             .description("Just a plain rock."),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let initialAttributes = item.attributes
 
@@ -412,7 +412,7 @@ struct LookActionHandlerTests {
         let item = Item(
             id: "pebble",
             .name("smooth pebble"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .firstDescription("You notice a small pebble.")
         )
         let initialAttributes = item.attributes
@@ -458,7 +458,7 @@ struct LookActionHandlerTests {
             id: "stone",
             .name("chipped stone"),
             .description("A worn stone."),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .firstDescription("This shouldn't appear."),
             .isTouched
         )
@@ -517,7 +517,7 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .description("On its lid is a rough carving of a skull."),
             .isContainer,
             .isOpenable,
@@ -574,7 +574,7 @@ struct LookActionHandlerTests {
         let box = Item(
             id: "box",
             .description("On its lid is a rough carving of a skull."),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .name("wooden box"),
@@ -631,7 +631,7 @@ struct LookActionHandlerTests {
         let jar = Item(
             id: "jar",
             .name("glass jar"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .description("An old canning jar, probably from the 1940s."),
             .isContainer,
             .isOpenable,
@@ -690,7 +690,7 @@ struct LookActionHandlerTests {
             id: "table",
             .name("kitchen table"),
             .description("A shabby wooden table, worn from years of use."),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isSurface
         )
         let book = Item(
@@ -754,7 +754,7 @@ struct LookActionHandlerTests {
             .in(.location("otherRoom"))
         )
         let room1 = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -764,7 +764,7 @@ struct LookActionHandlerTests {
         ) // inherentlyLit defaults false
 
         let game = MinimalGame(
-            player: Player(in: "startRoom"),
+            player: Player(in: .startRoom),
             locations: [room1, room2],
             items: [item]
         )

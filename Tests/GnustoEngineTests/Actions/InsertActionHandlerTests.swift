@@ -43,7 +43,7 @@ struct InsertActionHandlerTests {
         let initialBox = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isOpen,
             .isContainer,
             .isOpenable,
@@ -106,7 +106,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isOpen,
             .isContainer,
         )
@@ -181,13 +181,13 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             .name("gold coin"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
         )
         let box = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isOpen,
             .isContainer,
             .isOpenable,
@@ -279,7 +279,7 @@ struct InsertActionHandlerTests {
         let statue = Item(
             id: "statue",
             .name("stone statue"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isOpenable
         )
         let game = MinimalGame(items: [coin, statue])
@@ -322,7 +322,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
         ) // Closed
@@ -461,7 +461,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "fullBox",
             .name("nearly full box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
@@ -515,7 +515,7 @@ struct InsertActionHandlerTests {
         let initialBox = Item(
             id: "exactBox",
             .name("half-full box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
@@ -579,13 +579,13 @@ struct InsertActionHandlerTests {
         let container = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen // Starts open
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         ) // Assuming lit for test
@@ -643,7 +643,7 @@ struct InsertActionHandlerTests {
             .isOpen
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         )
@@ -691,7 +691,7 @@ struct InsertActionHandlerTests {
             .isOpen
         )
         let room1 = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -738,10 +738,10 @@ struct InsertActionHandlerTests {
         let target = Item(
             id: "rock",
             .name("smooth rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         )
@@ -783,12 +783,12 @@ struct InsertActionHandlerTests {
         let container = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         )
@@ -836,14 +836,14 @@ struct InsertActionHandlerTests {
         let container = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
             .capacity(1)
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         )
@@ -890,14 +890,14 @@ struct InsertActionHandlerTests {
         let container = Item(
             id: "box",
             .name("small box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
             .capacity(3)
         )
         let room = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Room"),
             .inherentlyLit
         )
@@ -933,7 +933,7 @@ struct InsertActionHandlerTests {
     private func setupNestedContainerTest() async -> (GameEngine, MockIOHandler) {
         let outerBox = Item(
             id: "outerBox", .name("large box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
@@ -1200,13 +1200,13 @@ struct InsertActionHandlerTests {
         let coin = Item(
             id: "coin",
             .name("gold coin"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
         )
         let box = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isOpen,
             .isContainer,
             .isOpenable,
@@ -1278,7 +1278,7 @@ struct InsertActionHandlerTests {
         let statue = Item(
             id: "statue",
             .name("stone statue"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
         )
         let game = MinimalGame(items: [coin, statue])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
@@ -1311,7 +1311,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "closedBox",
             .name("closed box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
         )
@@ -1347,7 +1347,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "box",
             .name("small box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,
@@ -1471,7 +1471,7 @@ struct InsertActionHandlerTests {
         let box = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen,

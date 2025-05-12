@@ -89,7 +89,7 @@ struct PutOnActionHandlerTests {
         let initialTable = Item(
             id: "table",
             .name("sturdy table"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isSurface
         )
         let initialBookAttributes = initialBook.attributes
@@ -154,7 +154,7 @@ struct PutOnActionHandlerTests {
         let table = Item(
             id: "table",
             .name("table"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isSurface
         )
         let game = MinimalGame(items: [table])
@@ -227,12 +227,12 @@ struct PutOnActionHandlerTests {
         let book = Item(
             id: "book",
             .name("heavy book"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let table = Item(
             id: "table",
             .name("sturdy table"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isSurface
         )
         let game = MinimalGame(items: [book, table])
@@ -279,7 +279,7 @@ struct PutOnActionHandlerTests {
             .isSurface
         )
         let room1 = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start"),
             .inherentlyLit
         )
@@ -328,7 +328,7 @@ struct PutOnActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer // Not a surface
         )
         let game = MinimalGame(items: [book, box])

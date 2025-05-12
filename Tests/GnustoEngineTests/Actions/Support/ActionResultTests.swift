@@ -122,7 +122,7 @@ struct ActionResultTests {
         let change = StateChange(
             entityID: .player,
             attributeKey: .playerScore,
-            newValue: StateValue.int(10)
+            newValue: .int(10)
         )
 
         #expect(change.entityID == .player)
@@ -150,8 +150,8 @@ struct ActionResultTests {
         let change = StateChange(
             entityID: .global,
             attributeKey: .globalState(key: "puzzleCounter"),
-            oldValue: StateValue.int(5),
-            newValue: StateValue.int(6)
+            oldValue: .int(5),
+            newValue: .int(6)
         )
 
         #expect(change.attributeKey == AttributeKey.globalState(key: "puzzleCounter"))

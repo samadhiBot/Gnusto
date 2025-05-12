@@ -139,7 +139,7 @@ struct ExamineActionHandlerTests {
             .in(.location("farAwayRoom"))
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )
@@ -182,7 +182,7 @@ struct ExamineActionHandlerTests {
             .isTouched
         )
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start Room"),
             .inherentlyLit
         )

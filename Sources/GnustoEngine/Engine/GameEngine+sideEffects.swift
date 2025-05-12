@@ -35,7 +35,7 @@ extension GameEngine {
                             initialTurns: initialTurns
                         ),
                 oldValue: gameState.activeFuses[definition.id].map { .int($0) },
-                newValue: StateValue.int(initialTurns)
+                newValue: .int(initialTurns)
             )
             try gameState.apply(addChange)
 
@@ -46,7 +46,7 @@ extension GameEngine {
                 entityID: .global,
                 attributeKey: .removeActiveFuse(fuseID: fuseID),
                 oldValue: oldTurns.map { StateValue.int($0) },
-                newValue: StateValue.int(0)
+                newValue: .int(0)
             )
             try gameState.apply(removeChange)
 

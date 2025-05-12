@@ -11,7 +11,7 @@ struct UnlockActionHandlerTests {
         let initialBox = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable,
             .isLocked,
@@ -117,7 +117,7 @@ struct UnlockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable,
             .isLocked,
@@ -156,7 +156,7 @@ struct UnlockActionHandlerTests {
         let box = Item(
             id: "box",
             .name("box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable,
             .isLocked,
@@ -165,7 +165,7 @@ struct UnlockActionHandlerTests {
         let key = Item(
             id: "key",
             .name("key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable,
         )
         let game = MinimalGame(items: [box, key])
@@ -215,7 +215,7 @@ struct UnlockActionHandlerTests {
             .isTakable,
         )
         let room1 = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Start"),
             .inherentlyLit
         ) // Correct parameter name
@@ -257,7 +257,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Target lacks .lockable, player holds key
         let pebble = Item(
             id: "pebble",
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         ) // Not lockable
         let key = Item(
             id: "key",
@@ -297,7 +297,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Box locked, requires 'key', player holds 'wrongkey'
         let box = Item(
             id: "box",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .lockKey("key"),
             .isContainer,
             .isLockable,
@@ -342,7 +342,7 @@ struct UnlockActionHandlerTests {
         // Arrange: Box is already unlocked, player holds key
         let box = Item(
             id: "box",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable, // Start unlocked
             .lockKey("key"),

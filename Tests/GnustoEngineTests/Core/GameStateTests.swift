@@ -83,16 +83,16 @@ struct GameStateTests {
     // Helper to create a consistent initial state for tests
     func createInitialState() -> GameState {
         let startRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Starting Room"),
             .description("A dark, dark room.")
         )
         let testItem = Item(
             id: "testItem",
             .name("Test Item"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
-        let player = Player(in: "startRoom")
+        let player = Player(in: .startRoom)
         let vocab = Vocabulary.build(items: [testItem]) // Build basic vocab
 
         var state = GameState(
@@ -121,8 +121,8 @@ struct GameStateTests {
         #expect(state.items.count == 1)
         #expect(state.items["testItem"]?.name == "Test Item")
         #expect(state.locations.count == 1)
-        #expect(state.locations["startRoom"]?.name == "Starting Room")
-        #expect(state.player.currentLocationID == "startRoom")
+        #expect(state.locations[.startRoom]?.name == "Starting Room")
+        #expect(state.player.currentLocationID == .startRoom)
         #expect(state.globalState["gameStarted"] == true)
         #expect(state.globalState["testFlag"] == nil)
         #expect(state.pronouns["it"] == ["testItem"])
@@ -198,7 +198,7 @@ struct GameStateTests {
         let item2 = Item(
             id: "item2",
             .name("Item 2"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let item3 = Item(
             id: "item3",
@@ -217,7 +217,7 @@ struct GameStateTests {
     @Test("Items in Location Test")
     func testItemsInLocation() {
         var state = createInitialState() // Make mutable to modify items
-        let locID: LocationID = "startRoom"
+        let locID: LocationID = .startRoom
         let item1 = Item(
             id: "item1",
             .name("Item 1"),
@@ -253,14 +253,14 @@ struct GameStateTests {
         let item2 = Item(
             id: "item2",
             .name("Item 2"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         state.items["item1"] = item1 // Add items
         state.items["item2"] = item2
 
         #expect(state.items["item1"]?.parent == .player)
-        #expect(state.items["item2"]?.parent == .location("startRoom"))
-        #expect(state.items["testItem"]?.parent == .location("startRoom")) // Check original
+        #expect(state.items["item2"]?.parent == .location(.startRoom))
+        #expect(state.items["testItem"]?.parent == .location(.startRoom)) // Check original
         #expect(state.items["nonExistentItem"]?.parent == nil)
     }
 
@@ -321,7 +321,7 @@ struct GameStateTests {
 
         // Check location dictionaries too
         #expect(state1.locations.count == state2.locations.count)
-        #expect(state1.locations["startRoom"] == state2.locations["startRoom"])
+        #expect(state1.locations[.startRoom] == state2.locations[.startRoom])
     }
 
     // --- Tests ---
@@ -662,23 +662,23 @@ struct GameStateTests {
         var state = createInitialState()
         // Ensure startRoom has a description attribute for the test
         let updatedStartRoom = Location(
-            id: "startRoom",
+            id: .startRoom,
             .name("Starting Room"),
             .description("Initial Room Desc")
         )
-        state.locations["startRoom"] = updatedStartRoom
+        state.locations[.startRoom] = updatedStartRoom
 
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
-            entityID: .location("startRoom"),
+            entityID: .location(.startRoom),
             attributeKey: .locationAttribute(.description),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
-            entityID: .location("startRoom"),
+            entityID: .location(.startRoom),
             attributeKey: .locationAttribute(.description),
-            oldValue: state.locations["startRoom"]?.attributes[.description],
+            oldValue: state.locations[.startRoom]?.attributes[.description],
             newValue: .string("New Description")
         )
 
@@ -696,12 +696,12 @@ struct GameStateTests {
         }
 
         // Verify the state hasn't changed
-        #expect(state.locations["startRoom"]?.attributes[.description] == correctChange.oldValue)
+        #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.oldValue)
         #expect(state.changeHistory.isEmpty) // No change should be recorded
 
         // Now apply the correct change
         try? state.apply(correctChange) // Use try? as we don't care about the error here
-        #expect(state.locations["startRoom"]?.attributes[.description] == correctChange.newValue)
+        #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }
 }

@@ -9,14 +9,15 @@ extension GameEngine {
     public func setFlag(_ id: GlobalID) async {
         // Only apply if the flag isn't already set
         if gameState.globalState[id] != true {
-            let change = StateChange(
-                entityID: .global,
-                attributeKey: .setFlag(id),
-                oldValue: gameState.globalState[id],
-                newValue: true,
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .setFlag(id),
+                        oldValue: gameState.globalState[id],
+                        newValue: true,
+                    )
+                )
             } catch {
                 logger.warning("""
                     💥 Failed to apply .setFlag change for '\(id.rawValue, privacy: .public)': \
@@ -34,14 +35,15 @@ extension GameEngine {
     public func clearFlag(_ id: GlobalID) async {
         // Only apply if the flag is currently set
         if gameState.globalState[id] != false {
-            let change = StateChange(
-                entityID: .global,
-                attributeKey: .clearFlag(id),
-                oldValue: gameState.globalState[id],
-                newValue: false
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .clearFlag(id),
+                        oldValue: gameState.globalState[id],
+                        newValue: false
+                    )
+                )
             } catch {
                 logger.warning("""
                     💥 Failed to apply .clearFlag change for \
@@ -61,14 +63,15 @@ extension GameEngine {
         let oldSet = gameState.pronouns[pronoun]
 
         if oldSet != newSet {
-            let change = StateChange(
-                entityID: .global,
-                attributeKey: .pronounReference(pronoun: pronoun),
-                oldValue: oldSet.map { .itemIDSet($0) },
-                newValue: .itemIDSet(newSet)
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .pronounReference(pronoun: pronoun),
+                        oldValue: oldSet.map { .itemIDSet($0) },
+                        newValue: .itemIDSet(newSet)
+                    )
+                )
             } catch {
                 logger.warning("""
                     💥 Failed to apply pronoun change for '\(pronoun, privacy: .public)': \
@@ -93,11 +96,11 @@ extension GameEngine {
         let oldParent = moveItem.parent
 
         // Check if destination is valid (e.g., Location exists)
-        if case .location(let locID) = newParent {
-            guard location(with: locID) != nil else {
+        if case .location(let locationID) = newParent {
+            guard location(with: locationID) != nil else {
                 logger.warning("""
                     💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
-                    non-existent location '\(locID.rawValue, privacy: .public)'.
+                    non-existent location '\(locationID.rawValue, privacy: .public)'.
                     """)
                 return
             }
@@ -114,14 +117,15 @@ extension GameEngine {
         }
 
         if oldParent != newParent {
-            let change = StateChange(
-                entityID: .item(itemID),
-                attributeKey: .itemParent,
-                oldValue: .parentEntity(oldParent),
-                newValue: .parentEntity(newParent)
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .item(itemID),
+                        attributeKey: .itemParent,
+                        oldValue: .parentEntity(oldParent),
+                        newValue: .parentEntity(newParent)
+                    )
+                )
             } catch {
                 logger.warning("""
                     💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \
@@ -148,14 +152,15 @@ extension GameEngine {
         }
 
         if oldLocationID != newLocationID {
-            let change = StateChange(
-                entityID: .player,
-                attributeKey: .playerLocation,
-                oldValue: .locationID(oldLocationID),
-                newValue: .locationID(newLocationID)
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .player,
+                        attributeKey: .playerLocation,
+                        oldValue: .locationID(oldLocationID),
+                        newValue: .locationID(newLocationID)
+                    )
+                )
 
                 // --- Trigger onEnterRoom Hook --- (Moved from changePlayerLocation)
                 if let hook = onEnterRoom {
@@ -212,14 +217,15 @@ extension GameEngine {
 
         // Only apply if the value is changing
         if value != oldValue {
-            let change = StateChange( // Add explicit type
-                entityID: .global,
-                attributeKey: .globalState(key: key), // Use GameStateKey
-                oldValue: oldValue, // Pass the existing StateValue? as oldValue
-                newValue: value
-            )
             do {
-                try gameState.apply(change)
+                try gameState.apply(
+                    StateChange(
+                        entityID: .global,
+                        attributeKey: .globalState(key: key), // Use GameStateKey
+                        oldValue: oldValue, // Pass the existing StateValue? as oldValue
+                        newValue: value
+                    )
+                )
             } catch {
                 logger.warning("""
                     💥 Failed to apply game specific state change for key \

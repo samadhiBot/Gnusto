@@ -53,7 +53,7 @@ struct OpenActionHandlerTests {
         let closedBox = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable
             // Starts closed (no .isOpen attribute)
@@ -108,7 +108,7 @@ struct OpenActionHandlerTests {
         let closedBox = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isTouched // Already touched
@@ -219,7 +219,7 @@ struct OpenActionHandlerTests {
         let rock = Item(
             id: "rock",
             .name("heavy rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         ) // No .openable
 
         let game = MinimalGame(items: [rock])
@@ -254,7 +254,7 @@ struct OpenActionHandlerTests {
         let openBox = Item(
             id: "box",
             .name("wooden box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isOpen // Already open
@@ -292,7 +292,7 @@ struct OpenActionHandlerTests {
         let lockedChest = Item(
             id: "chest",
             .name("iron chest"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpenable,
             .isLocked // Locked

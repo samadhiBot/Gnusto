@@ -54,12 +54,12 @@ struct InventoryActionHandlerTests {
                 Item(
                     id: "key",
                     .name("brass key"),
-                    .in(.location("startRoom"))
+                    .in(.location(.startRoom))
                 ),
                 Item(
                     id: "lamp",
                     .name("brass lamp"),
-                    .in(.location("startRoom"))
+                    .in(.location(.startRoom))
                 ),
             ]
         )

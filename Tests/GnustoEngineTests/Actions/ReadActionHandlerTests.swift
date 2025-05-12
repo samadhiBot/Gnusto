@@ -165,7 +165,7 @@ struct ReadActionHandlerTests {
         let rock = Item(
             id: "rock",
             .name("plain rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
 
         let game = MinimalGame(items: [rock])
@@ -337,7 +337,7 @@ struct ReadActionHandlerTests {
         let scroll = Item(
             id: "scroll",
             .name("ancient scroll"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .readText("Beware the Grue!"),
             .isReadable
         )
@@ -376,7 +376,7 @@ struct ReadActionHandlerTests {
         let note = Item(
             id: "note",
             .name("blank note"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .readText(""),
             .isReadable
         )
@@ -415,7 +415,7 @@ struct ReadActionHandlerTests {
         let tablet = Item(
             id: "tablet",
             .name("stone tablet"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isReadable
         )
 
@@ -485,7 +485,7 @@ struct ReadActionHandlerTests {
         let rock = Item(
             id: "rock",
             .name("plain rock"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
@@ -667,7 +667,7 @@ struct ReadActionHandlerTests {
         let chest = Item(
             id: "chest",
             .name("iron chest"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpen
         )
@@ -711,7 +711,7 @@ struct ReadActionHandlerTests {
         let lockedBox = Item(
             id: "lockedBox",
             .name("locked box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isLockable
         )

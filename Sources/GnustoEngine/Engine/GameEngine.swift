@@ -135,14 +135,15 @@ extension GameEngine {
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
         do {
-            let oldMoves = gameState.player.moves
-            let change = StateChange(
-                entityID: .player,
-                attributeKey: .playerMoves,
-                oldValue: StateValue.int(oldMoves),
-                newValue: StateValue.int(oldMoves + 1)
+            let moves = gameState.player.moves
+            try gameState.apply(
+                StateChange(
+                    entityID: .player,
+                    attributeKey: .playerMoves,
+                    oldValue: .int(moves),
+                    newValue: .int(moves + 1)
+                )
             )
-            try gameState.apply(change)
         } catch {
             logger.error(
                 "💥 Failed to apply player move increment state change: \(error, privacy: .public)"
@@ -409,8 +410,8 @@ extension GameEngine {
             let updateChange = StateChange(
                 entityID: .global,
                 attributeKey: .updateFuseTurns(fuseID: fuseID),
-                oldValue: StateValue.int(currentTurns),
-                newValue: StateValue.int(newTurns)
+                oldValue: .int(currentTurns),
+                newValue: .int(newTurns)
             )
             do {
                 try gameState.apply(updateChange)
@@ -424,8 +425,8 @@ extension GameEngine {
                     let removeChangeOnError = StateChange(
                         entityID: .global,
                         attributeKey: .removeActiveFuse(fuseID: fuseID),
-                        oldValue: StateValue.int(newTurns),
-                        newValue: StateValue.int(0)
+                        oldValue: .int(newTurns),
+                        newValue: .int(0)
                     )
                     do {
                         try gameState.apply(removeChangeOnError)
@@ -439,8 +440,8 @@ extension GameEngine {
                 let removeChange = StateChange(
                     entityID: .global,
                     attributeKey: .removeActiveFuse(fuseID: fuseID),
-                    oldValue: StateValue.int(newTurns),
-                    newValue: StateValue.int(0)
+                    oldValue: .int(newTurns),
+                    newValue: .int(0)
                 )
                 do {
                     try gameState.apply(removeChange)

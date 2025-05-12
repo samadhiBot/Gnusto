@@ -3,8 +3,6 @@ import Testing
 
 @Suite("ScopeResolver Tests")
 struct ScopeResolverTests {
-    let testLocationID = Location.ID("startRoom")
-
     @Test("Location is lit if inherentlyLit property is present")
     func testIsLitInherentlyLit() async throws {
         let game = MinimalGame()
@@ -17,12 +15,12 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        await #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if not inherentlyLit and no light source")
     func testIsLitDarkNoSource() async throws {
-        let darkRoom = Location(id: "startRoom")
+        let darkRoom = Location(id: .startRoom)
         let game = MinimalGame(locations: [darkRoom])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -33,7 +31,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        await #expect(resolver.isLocationLit(locationID: "startRoom") == false)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == false)
     }
 
     @Test("Location is lit if player holds active light source")
@@ -55,7 +53,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        await #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if player holds inactive light source")
@@ -92,7 +90,7 @@ struct ScopeResolverTests {
     func testIsLitRoomActiveLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isLightSource,
             .isOn
         )
@@ -106,7 +104,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        await #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if inactive light source is in room")
@@ -157,7 +155,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        await #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if location ID does not exist")
@@ -181,11 +179,11 @@ struct ScopeResolverTests {
     func testVisibleItemsInherentlyLit() async throws {
         let visibleItem = Item(
             id: "key",
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let invisibleItem = Item(
             id: "dust",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
@@ -198,7 +196,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        let visibleIDs = await resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -235,7 +233,7 @@ struct ScopeResolverTests {
         let resolver = await engine.scopeResolver
 
         // No need to modify state after initialization
-        // game.state.locations["startRoom"]?.attributes.remove(.inherentlyLit)
+        // game.state.locations[.startRoom]?.attributes.remove(.inherentlyLit)
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
@@ -252,11 +250,11 @@ struct ScopeResolverTests {
         )
         let visibleItem = Item(
             id: "key",
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let invisibleItem = Item(
             id: "dust",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
@@ -269,7 +267,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        let visibleIDs = await resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -278,17 +276,17 @@ struct ScopeResolverTests {
     func testVisibleItemsRoomLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isLightSource,
             .isOn
         )
         let visibleItem = Item(
             id: "key",
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
 )
         let invisibleItem = Item(
             id: "dust",
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
@@ -301,7 +299,7 @@ struct ScopeResolverTests {
         )
         let resolver = await engine.scopeResolver
 
-        let visibleIDs = await resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([activeLamp.id, visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -381,7 +379,7 @@ struct ScopeResolverTests {
         let locationItem = Item(
             id: "locItem",
             .name("Location Item"),
-            .in(.location("startRoom"))
+            .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [locationItem])
         let mockIO = await MockIOHandler()
@@ -518,7 +516,7 @@ struct ScopeResolverTests {
         let openBox = Item(
             id: "openBox",
             .name("open box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isOpen
         )
@@ -546,7 +544,7 @@ struct ScopeResolverTests {
         let closedBox = Item(
             id: "closedBox",
             .name("closed box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer
         )
         let itemInBox = Item(
@@ -575,7 +573,7 @@ struct ScopeResolverTests {
         let transparentBox = Item(
             id: "transBox",
             .name("transparent box"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isContainer,
             .isTransparent
         )

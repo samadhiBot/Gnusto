@@ -92,7 +92,7 @@ struct DropActionHandlerTests {
         let testItem = Item(
             id: "key",
             .name("brass key"),
-            .in(.location("startRoom")),
+            .in(.location(.startRoom)),
             .isTakable
         )
 
@@ -105,7 +105,7 @@ struct DropActionHandlerTests {
             ioHandler: mockIO
         )
 
-        #expect(await engine.item("key")?.parent == .location("startRoom"))
+        #expect(await engine.item("key")?.parent == .location(.startRoom))
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -119,7 +119,7 @@ struct DropActionHandlerTests {
 
         // Assert Final State (Unchanged)
         let finalItemState = await engine.item("key")
-        #expect(finalItemState?.parent == .location("startRoom"), "Item should still be in the room")
+        #expect(finalItemState?.parent == .location(.startRoom), "Item should still be in the room")
 
         // Assert Output
         let output = await mockIO.flush()

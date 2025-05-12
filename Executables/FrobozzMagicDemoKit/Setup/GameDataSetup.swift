@@ -15,7 +15,7 @@ enum GameDataSetup {
         let verbs = VocabularySetup.verbs // Assuming verbs are defined here
 
         // Create player
-        let player = Player(in: "startRoom") // Start room ID
+        let player = Player(in: .startRoom) // Start room ID
 
         // Build vocabulary
         let vocabulary = Vocabulary.build(items: items, verbs: verbs)

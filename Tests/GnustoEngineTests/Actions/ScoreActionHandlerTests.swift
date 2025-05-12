@@ -11,7 +11,7 @@ struct ScoreActionHandlerTests {
     func testScorePerformsSuccessfully() async throws {
         // Arrange
         // Set up initial player state
-        let initialPlayer = Player(in: "startRoom", moves: 10, score: 42)
+        let initialPlayer = Player(in: .startRoom, moves: 10, score: 42)
         let game = MinimalGame(player: initialPlayer)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
