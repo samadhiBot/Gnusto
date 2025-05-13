@@ -36,7 +36,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("book")
+        let finalItemState = try await engine.item("book")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "It reads: \"Beware the Grue!\"")
@@ -82,7 +82,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("sign")
+        let finalItemState = try await engine.item("sign")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "DANGER AHEAD")
@@ -278,7 +278,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("paper")
+        let finalItemState = try await engine.item("paper")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "There's nothing written on the blank paper.")
@@ -325,7 +325,7 @@ struct ReadActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("tablet")
+        let finalItemState = try await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "Ancient Runes")
@@ -366,7 +366,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Beware the Grue!")
 
         // Assert Final State
-        let finalItemState = await engine.item("scroll")
+        let finalItemState = try await engine.item("scroll")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -405,7 +405,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the blank note.")
 
         // Assert Final State
-        let finalItemState = await engine.item("note")
+        let finalItemState = try await engine.item("note")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -443,7 +443,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "There's nothing written on the stone tablet.")
 
         // Assert Final State
-        let finalItemState = await engine.item("tablet")
+        let finalItemState = try await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -588,7 +588,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Luminous secrets!")
 
         // Assert Final State
-        let finalItemState = await engine.item("tablet")
+        let finalItemState = try await engine.item("tablet")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -657,7 +657,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Meet at midnight.")
 
         // Assert Final State
-        let finalItemState = await engine.item("note")
+        let finalItemState = try await engine.item("note")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -701,7 +701,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "Important news.")
 
         // Assert Final State
-        let finalItemState = await engine.item("letter")
+        let finalItemState = try await engine.item("letter")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
 
@@ -743,7 +743,7 @@ struct ReadActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Also assert the item wasn't touched
-        let finalSecretState = await engine.item("secret")
+        let finalSecretState = try await engine.item("secret")
         #expect(finalSecretState?.hasFlag(.isTouched) == false)
     }
 }

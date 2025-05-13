@@ -3,7 +3,7 @@
 //struct Hooks {
 //        public func onEnterRoom(engine: GameEngine, location: LocationID) async -> Bool {
 //        guard location == "bar" else { return false }
-//        let cloakIsWorn = await engine.item("cloak")?.hasFlag(.isWorn) ?? false
+//        let cloakIsWorn = try await engine.item("cloak")?.hasFlag(.isWorn) ?? false
 //        if cloakIsWorn {
 //            try? await engine
 //                .setDynamicLocationValue(locationID: "bar", key: .isLit, newValue: .bool(false))
@@ -17,7 +17,7 @@
 //        let locationID = await engine.playerLocationID
 //        guard locationID == "bar" else { return false } // Only care about the bar
 //
-//        let cloakIsWorn = await engine.item("cloak")?.hasFlag(.isWorn) ?? false
+//        let cloakIsWorn = try await engine.item("cloak")?.hasFlag(.isWorn) ?? false
 //
 //        if cloakIsWorn {
 //            // Ensure bar is dark if cloak is worn

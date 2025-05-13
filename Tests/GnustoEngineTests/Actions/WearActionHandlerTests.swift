@@ -33,13 +33,13 @@ struct WearActionHandlerTests {
         )
         mockParser.parseHandler = { _, _, _ in .success(command) }
 
-        let initialItem = await engine.item("cloak")
+        let initialItem = try await engine.item("cloak")
         #expect(initialItem?.hasFlag(.isWorn) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         await engine.execute(command: command)
 
-        let finalCloakState = await engine.item("cloak")
+        let finalCloakState = try await engine.item("cloak")
         #expect(finalCloakState?.parent == .player)
         #expect(finalCloakState?.hasFlag(.isWorn) == true, "Cloak should have .worn property")
         #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .touched property")

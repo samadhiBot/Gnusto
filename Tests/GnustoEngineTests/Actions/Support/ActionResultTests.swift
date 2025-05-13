@@ -383,8 +383,8 @@ struct ActionResultTests {
 
         try await result.apply(to: mockState)
 
-        #expect(mockState.items["lamp"]?.attributes[.isOn] == true)
-        #expect(mockState.locations["cave"]?.attributes[.isVisited] == true)
+        #expect(mockState.items["lamp"].attributes[.isOn] == true)
+        #expect(mockState.locations["cave"].attributes[.isVisited] == true)
         #expect(mockState.globals[.playerLocation] == .locationID("cave"))
     }
     */

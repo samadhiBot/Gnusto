@@ -33,17 +33,17 @@ struct CloseActionHandlerTests {
         )
 
         // Initial state check
-        let initialBox = await engine.item("box")
-        #expect(initialBox?.attributes[.isOpen] == true)
+        let initialBox = try await engine.item("box")
+        #expect(initialBox.attributes[.isOpen] == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalBox = await engine.item("box")
-        #expect(finalBox?.attributes[.isOpen] == false)
-        #expect(finalBox?.attributes[.isTouched] == true)
+        let finalBox = try await engine.item("box")
+        #expect(finalBox.attributes[.isOpen] == false)
+        #expect(finalBox.attributes[.isTouched] == true)
 
         // Assert Output
         let output = await mockIO.flush()

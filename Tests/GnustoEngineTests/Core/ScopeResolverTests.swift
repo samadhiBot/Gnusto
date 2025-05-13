@@ -233,7 +233,7 @@ struct ScopeResolverTests {
         let resolver = await engine.scopeResolver
 
         // No need to modify state after initialization
-        // game.state.locations[.startRoom]?.attributes.remove(.inherentlyLit)
+        // game.state.locations[.startRoom].attributes.remove(.inherentlyLit)
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)

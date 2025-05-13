@@ -19,29 +19,21 @@ public struct LookActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let engine = context.engine
-        let stateSnapshot = context.stateSnapshot // Use the snapshot provided by context
-
         // LOOK (no object)
         guard let targetItemID = context.command.directObject else {
-            let currentLocationID = stateSnapshot.player.currentLocationID
-
             // 1. Check for darkness FIRST
-            if await engine.scopeResolver.isLocationLit(locationID: currentLocationID) == false {
+            guard await context.engine.playerLocationIsLit() else {
                 return ActionResult(
                     message: "It is pitch black. You are likely to be eaten by a grue."
                 )
             }
 
             // 2. Location is lit, proceed with description
-            let currentLocation = try await engine.playerLocation()
-
-            // Call helper to print description, passing the snapshot
             await describeLocation(
-                currentLocation,
-                engine: engine,
+                try context.engine.playerLocation(),
+                engine: context.engine,
                 showVerbose: true,
-                stateSnapshot: stateSnapshot
+                stateSnapshot: context.stateSnapshot
             )
 
             // LOOK itself doesn't change state or usually have a message beyond the description
@@ -51,22 +43,28 @@ public struct LookActionHandler: ActionHandler {
 
         // EXAMINE [Object]
         // Validation ensures item exists and is reachable
-        let targetItem = try await engine.item(targetItemID)
+        let targetItem = try await context.engine.item(targetItemID)
 
         var stateChanges: [StateChange] = []
 
         // 1. Get base description using the registry
         var descriptionLines: [String] = []
-        let baseDescription = await engine.generateDescription(
+        let baseDescription = await context.engine.generateDescription(
             for: targetItem.id, // Use item ID
             key: .description, // Specify the key
-            engine: engine
+            engine: context.engine
         )
         descriptionLines.append(baseDescription)
 
         // 2. Add container/surface contents
         // Pass the Item to the helper
-        descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: engine, stateSnapshot: stateSnapshot))
+        descriptionLines.append(
+            contentsOf: await describeContents(
+                of: targetItem,
+                engine: context.engine,
+                stateSnapshot: context.stateSnapshot
+            )
+        )
 
         // 3. Prepare state change (mark as touched)
         if let update = await context.engine.flag(targetItem, with: .isTouched) {
@@ -92,18 +90,18 @@ public struct LookActionHandler: ActionHandler {
     /// Generates description lines for the contents of a container or surface.
     /// Accepts an Item and uses the GameState snapshot for consistency.
     private func describeContents(
-        of item: Item, // The item definition (might be slightly stale if state changed)
-        engine: GameEngine, // Needed for helper methods like listWithIndefiniteArticles
-        stateSnapshot: GameState // Use snapshot to find current items inside/on
+        of item: Item,
+        engine: GameEngine,
+        stateSnapshot: GameState
     ) async -> [String] {
         var lines: [String] = []
         let itemID = item.id
 
-        // Container contents - Check flags on the potentially stale item definition
-        if item.hasFlag(.isContainer) { // Use flag()
-            // Check current state (open/closed) using dynamic value from the snapshot
-            let isOpen = stateSnapshot.items[itemID]?.attributes[.isOpen]?.toBool ?? false
-            let isTransparent = item.hasFlag(.isTransparent) // Use flag()
+        // Container contents
+        if item.hasFlag(.isContainer) {
+            // Check current state (open/closed)
+            let isOpen = item.hasFlag(.isOpen)
+            let isTransparent = item.hasFlag(.isTransparent)
 
             if isOpen || isTransparent {
                 // Get items *inside* the container from the snapshot

@@ -39,7 +39,7 @@ struct RemoveActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert State Change
-        let finalCloakState = await engine.item("cloak")
+        let finalCloakState = try await engine.item("cloak")
         #expect(finalCloakState?.parent == .player)
         #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
         #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added

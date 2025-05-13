@@ -397,7 +397,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "Just a plain rock.")
 
         // Assert Final State
-        let finalItemState = await engine.item("rock")
+        let finalItemState = try await engine.item("rock")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should be marked touched")
 
         // Assert Change History
@@ -442,7 +442,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You see nothing special about the smooth pebble.")
 
         // Assert Final State
-        let finalItemState = await engine.item("pebble")
+        let finalItemState = try await engine.item("pebble")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should be marked touched")
 
         // Assert Change History
@@ -500,7 +500,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.count == 1)
 
         // Assert Final State (remains touched)
-        let finalItemState = await engine.item("stone")
+        let finalItemState = try await engine.item("stone")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should still be marked touched")
 
         // Assert Change History (Should be empty)
@@ -559,7 +559,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Container marked touched)
-        let finalItemState = await engine.item("box")
+        let finalItemState = try await engine.item("box")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -596,7 +596,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(await engine.item("box")?.hasFlag(.isTouched) == false)
-        #expect(await engine.item("box")?.attributes["isOpen"] == nil)
+        #expect(await engine.item("box").attributes["isOpen"] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -616,7 +616,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Container marked touched)
-        let finalItemState = await engine.item("box")
+        let finalItemState = try await engine.item("box")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -653,8 +653,8 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(await engine.item("jar")?.hasFlag(.isTouched) == false)
-        #expect(await engine.item("jar")?.attributes["isOpen"] == nil)
-        #expect(await engine.item("jar")?.attributes["isTransparent"] == true)
+        #expect(await engine.item("jar").attributes["isOpen"] == nil)
+        #expect(await engine.item("jar").attributes["isTransparent"] == true)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -674,7 +674,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Container marked touched)
-        let finalItemState = await engine.item("jar")
+        let finalItemState = try await engine.item("jar")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Container should be marked touched")
 
         // Assert Change History
@@ -736,7 +736,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert Final State (Surface marked touched)
-        let finalItemState = await engine.item("table")
+        let finalItemState = try await engine.item("table")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Surface should be marked touched")
 
         // Assert Change History
@@ -794,7 +794,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "You can't see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
-        let finalItemState = await engine.item("artifact")
+        let finalItemState = try await engine.item("artifact")
         #expect(finalItemState?.hasFlag(.isTouched) == false)
         #expect(finalItemState?.parent == .location("otherRoom"))
 

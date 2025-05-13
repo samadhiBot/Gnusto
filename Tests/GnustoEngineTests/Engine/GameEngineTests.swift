@@ -150,7 +150,7 @@ struct GameEngineTests {
                 customActionHandlers: [VerbID("take"): mockTakeHandler]
             )
         )
-//        game.state.items["startItem"]?.attributes[.isTakable] = nil // Removed direct state modification
+//        game.state.items["startItem"].attributes[.isTakable] = nil // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -174,9 +174,9 @@ struct GameEngineTests {
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.state.items["startItem"].attributes[.isTakable] == nil)
         // Ensure room is lit for this test - Done via initializer now
-//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -248,7 +248,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -320,7 +320,7 @@ struct GameEngineTests {
             )
         )
         // Ensure room is lit - Done via initializer now
-//        game.state.locations[.startRoom]?.attributes[.inherentlyLit] = true // Removed direct state modification
+//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -548,7 +548,7 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
+        #expect(game.state.items["startItem"].attributes[.isTakable] == true)
         #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
@@ -571,7 +571,7 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = await engine.item("startItem")
+        let finalPebbleSnapshot = try await engine.item("startItem")
         #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
 
         let finalInventorySnapshots = await engine.items(in: .player)
@@ -700,8 +700,8 @@ struct GameEngineTests {
 
         // Ensure initial state
         #expect(await engine.isFlagSet(testFlagKey) == false)
-        #expect(await engine.item(testItemID)?.attributes[.isOn] == nil)
-        #expect(await engine.item(testItemID)?.attributes[.isTouched] == nil)
+        #expect(await engine.item(testItemID).attributes[.isOn] == nil)
+        #expect(await engine.item(testItemID).attributes[.isTouched] == nil)
         #expect(await engine.getChangeHistory().isEmpty)
 
         // Act
@@ -712,11 +712,11 @@ struct GameEngineTests {
         // Check final state
         #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
         #expect(
-            await engine.item(testItemID)?.attributes[.isOn] == true,
+            await engine.item(testItemID).attributes[.isOn] == true,
             "Item .on property should be set"
         )
         #expect(
-            await engine.item(testItemID)?.attributes[.isTouched] == true,
+            await engine.item(testItemID).attributes[.isTouched] == true,
             "Item .touched property should be set"
         )
 
@@ -914,7 +914,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.state.items["startItem"].attributes[.isTakable] == nil)
 
         let command = Command(
             verbID: .take,
@@ -1522,9 +1522,9 @@ struct GameEngineTests {
 
         // Assert:
         // Verify the state changes were applied
-        let finalLamp = await engine.item(itemID)
-        #expect(finalLamp?.attributes[.isOn] == true, "Lamp should be ON")
-        #expect(finalLamp?.attributes[.isTouched] == true, "Lamp should be TOUCHED")
+        let finalLamp = try await engine.item(itemID)
+        #expect(finalLamp.attributes[.isOn] == true, "Lamp should be ON")
+        #expect(finalLamp.attributes[.isTouched] == true, "Lamp should be TOUCHED")
 
         // Verify the message was printed
         let output = await mockIO.flush()

@@ -41,7 +41,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = await engine.item("key")
+        let finalItemState = try await engine.item("key")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified
 
@@ -118,7 +118,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State (Unchanged)
-        let finalItemState = await engine.item("key")
+        let finalItemState = try await engine.item("key")
         #expect(finalItemState?.parent == .location(.startRoom), "Item should still be in the room")
 
         // Assert Output
@@ -168,7 +168,7 @@ struct DropActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = await engine.item("cloak")
+        let finalItemState = try await engine.item("cloak")
         #expect(finalItemState?.parent == .location(finalLocation), "Item should be in the room")
         #expect(finalItemState?.hasFlag(.isWorn) == false, "Item should NOT have .worn property") // Qualified
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should have .touched property") // Qualified

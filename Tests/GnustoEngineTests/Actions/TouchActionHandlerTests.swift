@@ -34,7 +34,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("rock")
+        let finalItemState = try await engine.item("rock")
         #expect(finalItemState?.hasFlag(.isTouched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -68,7 +68,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("key")
+        let finalItemState = try await engine.item("key")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -172,7 +172,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("gem")
+        let finalItemState = try await engine.item("gem")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
@@ -211,7 +211,7 @@ struct TouchActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("book")
+        let finalItemState = try await engine.item("book")
         #expect(finalItemState?.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")

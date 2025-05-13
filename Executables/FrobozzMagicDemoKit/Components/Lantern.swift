@@ -84,7 +84,7 @@ enum Components {
                     ?? Constants.defaultBatteryLife
 
                 // Check lantern state directly via snapshot to avoid direct gameState access
-                guard let lantern = await engine.item(Constants.itemID) else {
+                guard let lantern = try await engine.item(Constants.itemID) else {
                     Swift.print("Warning: Lantern item '\(Constants.itemID)' not found in game state for daemon.")
                     return
                 }

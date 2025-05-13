@@ -48,7 +48,7 @@ struct TurnOffActionHandlerTests {
             The lamp is now off.
             It is now pitch black. You are likely to be eaten by a grue.
             """)
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
     }
@@ -164,7 +164,7 @@ struct TurnOffActionHandlerTests {
 
         await engine.execute(command: command)
 
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -214,7 +214,7 @@ struct TurnOffActionHandlerTests {
 
         await engine.execute(command: command)
 
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -268,7 +268,7 @@ struct TurnOffActionHandlerTests {
         }
 
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
@@ -309,7 +309,7 @@ struct TurnOffActionHandlerTests {
             )
         }
         // Check state remains unchanged - touched should NOT be added if validation fails
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == true)
         #expect(finalItemState?.hasFlag(.isTouched) == false)
     }
@@ -394,7 +394,7 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 
@@ -446,7 +446,7 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("lamp")
+        let finalItemState = try await engine.item("lamp")
         #expect(finalItemState?.hasFlag(.isOn) == false)
         #expect(finalItemState?.hasFlag(.isTouched) == true)
 

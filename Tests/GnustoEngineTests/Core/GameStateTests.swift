@@ -404,7 +404,7 @@ struct GameStateTests {
 
         // Assertions for the valid modifications:
         #expect(
-            state.locations[Self.locWOH]?.attributes[.description] == .string("A new description.")
+            state.locations[Self.locWOH].attributes[.description] == .string("A new description.")
         )
         #expect(state.items[Self.itemLantern]?.name == "Magic Lantern")
 
@@ -447,11 +447,11 @@ struct GameStateTests {
 
         // Check content of locations (comparing key properties)
         #expect(decodedState.locations[Self.locWOH]?.name == originalState.locations[Self.locWOH]?.name)
-        #expect(decodedState.locations[Self.locNorth]?.attributes[.description] == originalState.locations[Self.locNorth]?.attributes[.description])
+        #expect(decodedState.locations[Self.locNorth].attributes[.description] == originalState.locations[Self.locNorth].attributes[.description])
 
         // Check content of items (comparing key properties, including parent)
         #expect(decodedState.items[Self.itemLantern]?.name == originalState.items[Self.itemLantern]?.name)
-        #expect(decodedState.items[Self.itemLantern]?.attributes == originalState.items[Self.itemLantern]?.attributes)
+        #expect(decodedState.items[Self.itemLantern].attributes == originalState.items[Self.itemLantern].attributes)
         #expect(decodedState.items[Self.itemLantern]?.parent == originalState.items[Self.itemLantern]?.parent)
         #expect(decodedState.items[Self.itemMailbox]?.parent == originalState.items[Self.itemMailbox]?.parent)
         #expect(decodedState.items[Self.itemLeaflet]?.parent == originalState.items[Self.itemLeaflet]?.parent)
@@ -594,7 +594,7 @@ struct GameStateTests {
         let change = StateChange(
             entityID: .location("testLoc"),
             attributeKey: .locationAttribute(.isLit),
-            oldValue: state.locations["testLoc"]?.attributes[.isLit],
+            oldValue: state.locations["testLoc"].attributes[.isLit],
             newValue: true
         )
         try? state.apply(change)
@@ -604,8 +604,8 @@ struct GameStateTests {
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
-        #expect(state.locations["testLoc"]?.attributes[.isLit] == true)
-        #expect(state.locations["testLoc"]?.attributes[.description] == .string("Original Desc"))
+        #expect(state.locations["testLoc"].attributes[.isLit] == true)
+        #expect(state.locations["testLoc"].attributes[.description] == .string("Original Desc"))
     }
 
     @Test("apply - Modify Location Properties - Remove")
@@ -629,8 +629,8 @@ struct GameStateTests {
         try? state.apply(change)
 
         // Verify description remains untouched
-        #expect(state.locations["testLoc"]?.attributes[.inherentlyLit] == false)
-        #expect(state.locations["testLoc"]?.attributes[.description] == .string("Original Desc"))
+        #expect(state.locations["testLoc"].attributes[.inherentlyLit] == false)
+        #expect(state.locations["testLoc"].attributes[.description] == .string("Original Desc"))
     }
 
     @Test("apply - Modify Location Dynamic Value")
@@ -657,8 +657,8 @@ struct GameStateTests {
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
-        #expect(state.locations["testLoc"]?.attributes[.description] == .string("Updated Desc"))
-        #expect(state.locations["testLoc"]?.attributes[.isLit] == nil)
+        #expect(state.locations["testLoc"].attributes[.description] == .string("Updated Desc"))
+        #expect(state.locations["testLoc"].attributes[.isLit] == nil)
     }
 
     @Test("apply - Validation Failure - OldValue Mismatch")
@@ -682,7 +682,7 @@ struct GameStateTests {
         let correctChange = StateChange(
             entityID: .location(.startRoom),
             attributeKey: .locationAttribute(.description),
-            oldValue: state.locations[.startRoom]?.attributes[.description],
+            oldValue: state.locations[.startRoom].attributes[.description],
             newValue: .string("New Description")
         )
 
@@ -700,12 +700,12 @@ struct GameStateTests {
         }
 
         // Verify the state hasn't changed
-        #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.oldValue)
+        #expect(state.locations[.startRoom].attributes[.description] == correctChange.oldValue)
         #expect(state.changeHistory.isEmpty) // No change should be recorded
 
         // Now apply the correct change
         try? state.apply(correctChange) // Use try? as we don't care about the error here
-        #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.newValue)
+        #expect(state.locations[.startRoom].attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }
 }

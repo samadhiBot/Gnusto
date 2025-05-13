@@ -69,7 +69,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        let initialBoxState = await engine.item("box")
+        let initialBoxState = try await engine.item("box")
         #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
         #expect(!initialBoxState!.hasFlag(.isTouched), "Box should start untouched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -90,14 +90,14 @@ struct OpenActionHandlerTests {
         // Assert Change History
         let expectedChanges = expectedOpenChanges(
             itemID: "box",
-            initialAttributes: initialBoxState?.attributes
+            initialAttributes: initialBoxState.attributes
         )
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
 
         // Optional: Verify final state via snapshot if needed for complex scenarios,
         // but primarily rely on change history for handler correctness.
-        let finalBoxState = await engine.item("box")
+        let finalBoxState = try await engine.item("box")
         #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
         #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should be touched")
     }
@@ -124,7 +124,7 @@ struct OpenActionHandlerTests {
         )
 
         // Initial state check
-        let initialBoxState = await engine.item("box")
+        let initialBoxState = try await engine.item("box")
         #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
         #expect(initialBoxState!.hasFlag(.isTouched), "Box should start touched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -143,14 +143,14 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You open the wooden box.")
 
         // Assert Change History
-        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState?.attributes)
+        let expectedChanges = expectedOpenChanges(itemID: "box", initialAttributes: initialBoxState.attributes)
         // Should not include .isTouched change as it was already true
         #expect(expectedChanges.count == 2) // isOpen + pronoun
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
 
         // Optional: Verify final state
-        let finalBoxState = await engine.item("box")
+        let finalBoxState = try await engine.item("box")
         #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
         #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should still be touched")
     }

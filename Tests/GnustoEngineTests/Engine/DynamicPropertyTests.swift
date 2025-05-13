@@ -80,7 +80,7 @@ struct DynamicPropertyTests {
 
         // Verify new value in GameState
         let updatedItem = await engine.gameState.items["testItem"]
-        #expect(updatedItem?.attributes["simpleProp"] == StateValue.int(20))
+        #expect(updatedItem.attributes["simpleProp"] == StateValue.int(20))
 
         // Verify getting the value again works
         let finalValue: Int = try await engine.fetch("testItem", "simpleProp")
@@ -106,7 +106,7 @@ struct DynamicPropertyTests {
 //
 //        // Verify value in GameState
 //        let updatedItem = await engine.gameState.items["testItem"]
-//        #expect(updatedItem?.attributes["validatedProp"] == StateValue.int(5))
+//        #expect(updatedItem.attributes["validatedProp"] == StateValue.int(5))
 //    }
 //
 //    @Test("Set Validated Item Value - Failure")
@@ -131,13 +131,13 @@ struct DynamicPropertyTests {
 //
 //        // Verify value in GameState hasn't changed
 //        let item = await engine.gameState.items["testItem"]
-//        #expect(item?.attributes["validatedProp"] == StateValue.int(1))
+//        #expect(item.attributes["validatedProp"] == StateValue.int(1))
 //
 //        // Attempt to set wrong type
 //         await #expect(throws: ActionResponse.self) {
 //             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: .string("invalid"))
 //        }
-//         #expect(item?.attributes["validatedProp"] == StateValue.int(1))
+//         #expect(item.attributes["validatedProp"] == StateValue.int(1))
 //    }
 //
 //    // TODO: Add tests for Location dynamic properties
