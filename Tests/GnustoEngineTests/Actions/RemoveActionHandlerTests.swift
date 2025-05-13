@@ -123,7 +123,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Act & Assert Error (on validate)
-        await #expect(throws: ActionResponse.itemNotHeld("cloak")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

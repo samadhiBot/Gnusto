@@ -124,7 +124,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Expect internalEngineError when item ID doesn't exist in gameState
-        await #expect(throws: ActionResponse.unknownItem("lamp")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("lamp")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

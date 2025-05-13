@@ -51,13 +51,13 @@ struct WearActionHandlerTests {
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isWorn),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: false,
+                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
