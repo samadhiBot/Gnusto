@@ -7,8 +7,9 @@ extension GameEngine {
     ///   - item: The item to set the flag on.
     ///   - attributeID: The flag to set.
     /// - Returns: A `StateChange` to set the flag, or `nil` if the flag is already set.
-    public func flag(_ item: Item, with attributeID: AttributeID) -> StateChange? {
-        if item.attributes[attributeID] == true {
+    public func flag(_ item: Item?, with attributeID: AttributeID) -> StateChange? {
+        guard let item else { return nil }
+        return if item.attributes[attributeID] == true {
             nil
         } else {
             StateChange(
@@ -26,8 +27,9 @@ extension GameEngine {
     ///   - item: The item to remove the flag from.
     ///   - attributeID: The flag to remove.
     /// - Returns: A `StateChange` to remove the flag, or `nil` if the flag isn't set.
-    public func flag(_ item: Item, remove attributeID: AttributeID) -> StateChange? {
-        if item.attributes[attributeID] != true {
+    public func flag(_ item: Item?, remove attributeID: AttributeID) -> StateChange? {
+        guard let item else { return nil }
+        return if item.attributes[attributeID] != true {
             nil
         } else {
             StateChange(
@@ -45,8 +47,9 @@ extension GameEngine {
     ///   - location: The location to set the flag on.
     ///   - attributeID: The flag to set.
     /// - Returns: A `StateChange` to set the flag, or `nil` if the flag is already set.
-    public func flag(_ location: Location, with attributeID: AttributeID) -> StateChange? {
-        if location.attributes[attributeID] == true {
+    public func flag(_ location: Location?, with attributeID: AttributeID) -> StateChange? {
+        guard let location else { return nil }
+        return if location.attributes[attributeID] == true {
             nil
         } else {
             StateChange(
@@ -64,8 +67,9 @@ extension GameEngine {
     ///   - location: The location to remove the flag from.
     ///   - attributeID: The flag to remove.
     /// - Returns: A `StateChange` to remove the flag, or `nil` if the flag isn't set.
-    public func flag(_ location: Location, remove attributeID: AttributeID) -> StateChange? {
-        if location.attributes[attributeID] != true {
+    public func flag(_ location: Location?, remove attributeID: AttributeID) -> StateChange? {
+        guard let location else { return nil }
+        return if location.attributes[attributeID] != true {
             nil
         } else {
             StateChange(

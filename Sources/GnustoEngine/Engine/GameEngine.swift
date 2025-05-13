@@ -648,6 +648,7 @@ extension GameEngine {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.stateChanges {
+            guard let change else { continue }
             do {
                 try gameState.apply(change)
             } catch {

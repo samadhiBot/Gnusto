@@ -151,7 +151,7 @@ extension OperaHouse {
                 return ActionResult(
                     stateChanges: [
                         await engine.scoreChange(by: 1),
-//                        await engine.flag(engine.location(.bar), with: .isLit)
+                        //                        await engine.flag(engine.location(.bar), with: .isLit)
                     ]
                 )
             } else {
@@ -169,16 +169,22 @@ extension OperaHouse {
                 return nil
             }
             return ActionResult(
-                stateChanges: [await engine.scoreChange(by: 2 - score)]
+                stateChanges: [
+                    await engine.scoreChange(by: 2 - score),
+                    await engine.flag(engine.location(.bar), with: .isLit),
+                ]
             )
         case .take:
-            if await engine.isPlayerHolding(.cloak) {
-                print("🎾 engine.isPlayerHolding(.cloak)")
+            guard let bar = await engine.location("bar") else {
+                throw ActionResponse.internalEngineError("Location 'bar' not found.")
             }
-            return nil
+            if let removeLit = await engine.flag(engine.location(.bar), remove: .isLit) {
+                return ActionResult(stateChanges: [removeLit])
+            }
         default:
-            return nil
+            break
         }
+        return nil
     }
 
     static func hookHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
@@ -205,7 +211,6 @@ extension OperaHouse {
         }
         // Fix: Check location exists before accessing properties
         guard let bar = await engine.location("bar") else {
-            // Should not happen if game setup is correct
             throw ActionResponse.internalEngineError("Location 'bar' not found.")
         }
         guard bar.hasFlag(.isLit) else {

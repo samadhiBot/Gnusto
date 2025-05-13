@@ -10,7 +10,7 @@ public struct ActionResult: Sendable {
     public let message: String?
 
     /// Any state changes that occurred.
-    public let stateChanges: [StateChange]
+    public let stateChanges: [StateChange?]
 
     /// Any side effects that need to be processed.
     public let sideEffects: [SideEffect]
@@ -23,7 +23,7 @@ public struct ActionResult: Sendable {
     ///   - sideEffects: Any side effects to be processed.
     public init(
         message: String? = nil,
-        stateChanges: [StateChange] = [],
+        stateChanges: [StateChange?] = [],
         sideEffects: [SideEffect] = []
     ) {
         self.message = message
