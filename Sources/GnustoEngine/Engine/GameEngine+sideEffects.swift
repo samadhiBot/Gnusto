@@ -26,11 +26,10 @@ extension GameEngine {
             let initialTurns = effect.parameters["turns"]?.toInt ?? definition.initialTurns
             let addChange = StateChange(
                 entityID: .global,
-                attributeKey:
-                        .addActiveFuse(
-                            fuseID: definition.id,
-                            initialTurns: initialTurns
-                        ),
+                attributeKey: .addActiveFuse(
+                    fuseID: definition.id,
+                    initialTurns: initialTurns
+                ),
                 oldValue: gameState.activeFuses[definition.id].map { .int($0) },
                 newValue: .int(initialTurns)
             )

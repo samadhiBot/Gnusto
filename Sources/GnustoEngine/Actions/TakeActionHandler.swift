@@ -75,22 +75,17 @@ public struct TakeActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Parent
-        let parentChange = StateChange(
-            entityID: .item(targetItem.id),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(targetItem.parent),
-            newValue: .parentEntity(.player)
-        )
-        stateChanges.append(parentChange)
+        let update = await context.engine.move(targetItem, to: .player)
+        stateChanges.append(update)
 
         // Change 2: Set `.isTouched` flag if not already set
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 3: Pronoun ("it")
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---

@@ -4,16 +4,12 @@ import Foundation
 public struct UnlockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate context.command structure: Need DO and IO
-        guard context.command.directObject != nil else {
+        guard let targetItemID = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Unlock what?")
         }
-        guard context.command.indirectObject != nil else {
+        guard let keyItemID = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet("Unlock it with what?")
         }
-
-        // Safely unwrap IDs after checks
-        let targetItemID = context.command.directObject!
-        let keyItemID = context.command.indirectObject!
 
         // 2. Get item snapshots
         let targetItem = try await context.engine.item(targetItemID)
@@ -23,8 +19,8 @@ public struct UnlockActionHandler: ActionHandler {
         guard keyItem.parent == .player else {
             throw ActionResponse.itemNotHeld(keyItemID)
         }
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        let update = await context.engine.scopeResolver.itemsReachableByPlayer()
+        guard update.contains(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -32,9 +28,9 @@ public struct UnlockActionHandler: ActionHandler {
         guard targetItem.hasFlag(.isLockable) else {
             throw ActionResponse.itemNotUnlockable(targetItemID)
         }
+
         guard targetItem.hasFlag(.isLocked) else {
-            // Target is already unlocked. Don't throw, let process handle the message.
-            return
+            throw ActionResponse.prerequisiteNotMet("The \(targetItem.name) is already unlocked.")
         }
 
         // 5. Check if it's the correct key
@@ -44,52 +40,37 @@ public struct UnlockActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        // IDs are guaranteed non-nil by validate
-        guard
-            let targetItemID = context.command.directObject,
-            let keyItemID = context.command.indirectObject
-        else {
-            throw ActionResponse.internalEngineError(
-                "Item snapshot disappeared between validate and process for UNLOCK."
-            )
-        }
         // Get snapshots (existence guaranteed by validate)
-        let targetItem = try await context.engine.item(targetItemID)
-        let keyItem = try await context.engine.item(keyItemID)
+        let targetItem = try await context.engine.item(context.command.directObject)
+        let keyItem = try await context.engine.item(context.command.indirectObject)
 
-        // Handle case: Already unlocked (detected in validate)
-        if !targetItem.hasFlag(.isLocked) {
-            // Manually construct definite article message
-            return ActionResult("The \(targetItem.name) is already unlocked.")
-        }
+//        // Handle case: Already unlocked (detected in validate)
+//        if !targetItem.hasFlag(.isLocked) {
+//            // Manually construct definite article message
+//            return ActionResult()
+//        }
 
         // --- Unlock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Remove .locked from target (if currently locked)
-        if targetItem.attributes[.isLocked] == true {
-            let lockedChange = StateChange(
-                entityID: .item(targetItem.id),
-                attributeKey: .itemAttribute(.isLocked),
-                oldValue: true,
-                newValue: false
-            )
-            stateChanges.append(lockedChange)
+        if let update = await context.engine.flag(targetItem, remove: .isLocked) {
+            stateChanges.append(update)
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if let addTouchedFlag = await context.engine.flag(keyItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(keyItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 3: Update pronouns
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem, keyItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem, keyItem) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---

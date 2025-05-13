@@ -55,14 +55,8 @@ public struct LockActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .locked to target (if not already set)
-        if targetItem.attributes[.isLocked] != true {
-            let lockedChange = StateChange(
-                entityID: .item(targetItem.id),
-                attributeKey: .itemAttribute(.isLocked),
-                oldValue: targetItem.attributes[.isLocked] ?? false,
-                newValue: true,
-            )
-            stateChanges.append(lockedChange)
+        if let update = await context.engine.flag(targetItem, with: .isLocked) {
+            stateChanges.append(update)
         }
 
         // Change 2: Add .touched to target (if not already set)

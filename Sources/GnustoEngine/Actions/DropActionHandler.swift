@@ -50,26 +50,13 @@ public struct DropActionHandler: ActionHandler {
         }
 
         // Change 4: Ensure `.isWorn` is false
-        if targetItem.attributes[.isWorn] == true { // Only add change if it was worn
-            let wornChange = StateChange(
-                entityID: .item(targetItem.id),
-                attributeKey: .itemAttribute(.isWorn),
-                oldValue: true,
-                newValue: false
-            )
-            stateChanges.append(wornChange)
+        if let update = await context.engine.flag(targetItem, remove: .isWorn) {
+            stateChanges.append(update)
         }
 
-        // Dropping usually doesn't affect pronouns unless maybe it was the last thing referred to?
-        // For simplicity, let's not change pronouns on drop for now.
-        // We could potentially clear the pronoun if it referred *only* to the dropped item.
-
-        // --- Prepare Result ---
         return ActionResult(
             message: "Dropped.",
             stateChanges: stateChanges
         )
     }
-
-    // Rely on default postProcess to print the message.
 }
