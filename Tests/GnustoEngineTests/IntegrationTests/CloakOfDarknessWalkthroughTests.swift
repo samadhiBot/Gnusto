@@ -31,7 +31,7 @@ struct CloakOfDarknessWalkthroughTests {
             parser: StandardParser(),
             ioHandler: mockIO
         )
-        await engine.run()
+        try await engine.run()
 
         let actualTranscript = await mockIO.flush()
 
@@ -125,7 +125,7 @@ struct CloakOfDarknessWalkthroughTests {
             parser: StandardParser(),
             ioHandler: mockIO
         )
-        await engine.run()
+        try await engine.run()
 
         let actualTranscript = await mockIO.flush()
 
@@ -168,7 +168,7 @@ struct CloakOfDarknessWalkthroughTests {
             parser: StandardParser(),
             ioHandler: mockIO
         )
-        await engine.run()
+        try await engine.run()
 
         let actualTranscript = await mockIO.flush()
 
@@ -212,7 +212,7 @@ struct CloakOfDarknessWalkthroughTests {
             parser: StandardParser(),
             ioHandler: mockIO
         )
-        await engine.run()
+        try await engine.run()
 
         let actualTranscript = await mockIO.flush()
 
@@ -251,7 +251,7 @@ struct CloakOfDarknessWalkthroughTests {
             parser: StandardParser(),
             ioHandler: mockIO
         )
-        await engine.run()
+        try await engine.run()
 
         let actualTranscript = await mockIO.flush()
 

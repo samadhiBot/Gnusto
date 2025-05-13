@@ -78,11 +78,11 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the open box.")
 
         // Assert Final State
-        let finalCoinState = try #require(await engine.item("coin"))
+        let finalCoinState = try #require(try await engine.item("coin"))
         #expect(finalCoinState.parent == .item("openBox"), "Coin should be in the box")
         #expect(finalCoinState.attributes[.isTouched] == true, "Coin should be touched")
 
-        let finalBoxState = try #require(await engine.item("openBox"))
+        let finalBoxState = try #require(try await engine.item("openBox"))
         #expect(finalBoxState.attributes[.isTouched] == true, "Box should be touched")
 
         // Assert Pronoun
@@ -493,7 +493,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The gold coin won't fit in the nearly full box.")
 
         // Assert No State Change
-        #expect(await engine.item("coin")?.parent == .player) // Coin still held
+        #expect(try await engine.item("coin").parent == .player) // Coin still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -550,7 +550,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the gold coin in the half-full box.") // Success message
 
         // Assert Final State
-        #expect(await engine.item("coin")?.parent == .item("exactBox")) // Coin is in box
+        #expect(try await engine.item("coin").parent == .item("exactBox")) // Coin is in box
                                                                         // Final state check - Calculate manually
         let itemsInsideFinal = await engine.items(in: .item("exactBox"))
         let finalLoad = itemsInsideFinal.reduce(0) { $0 + $1.size }
@@ -612,9 +612,9 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the small key in the wooden box.")
 
         // Assert Final State
-        let finalItemState = try #require(await engine.item("key"))
+        let finalItemState = try #require(try await engine.item("key"))
         #expect(finalItemState.parent == .item("box"))
-        let finalContainerState = try #require(await engine.item("box"))
+        let finalContainerState = try #require(try await engine.item("box"))
         #expect(finalContainerState.hasFlag(.isTouched) == true)
 
         // Assert Pronoun
@@ -874,7 +874,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The small key won't fit in the wooden box.")
 
         // Assert No State Change
-        #expect(await engine.item("key")?.parent == .player) // Key still held
+        #expect(try await engine.item("key").parent == .player) // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -925,7 +925,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The large key won't fit in the small box.")
 
         // Assert No State Change
-        #expect(await engine.item("key")?.parent == .player) // Key still held
+        #expect(try await engine.item("key").parent == .player) // Key still held
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
@@ -963,8 +963,8 @@ struct InsertActionHandlerTests {
     func testInsertIntoNestedOuter() async throws {
         // Arrange
         let (engine, mockIO) = await setupNestedContainerTest()
-        let initialCoin = try #require(await engine.item("coin"))
-        let initialOuterBox = try #require(await engine.item("outerBox"))
+        let initialCoin = try #require(try await engine.item("coin"))
+        let initialOuterBox = try #require(try await engine.item("outerBox"))
         let initialParent = initialCoin.parent
         let initialItemAttributes = initialCoin.attributes
         let initialContainerAttributes = initialOuterBox.attributes
@@ -985,7 +985,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the shiny coin in the large box.")
 
         // Assert State
-        let finalCoin = try #require(await engine.item("coin"))
+        let finalCoin = try #require(try await engine.item("coin"))
         #expect(finalCoin.parent == .item("outerBox"))
 
         // Assert History
@@ -1004,8 +1004,8 @@ struct InsertActionHandlerTests {
     func testInsertIntoNestedInner() async throws {
         // Arrange
         let (engine, mockIO) = await setupNestedContainerTest()
-        let initialCoin = try #require(await engine.item("coin"))
-        let initialInnerBox = try #require(await engine.item("innerBox"))
+        let initialCoin = try #require(try await engine.item("coin"))
+        let initialInnerBox = try #require(try await engine.item("innerBox"))
         let initialParent = initialCoin.parent
         let initialItemAttributes = initialCoin.attributes
         let initialContainerAttributes = initialInnerBox.attributes
@@ -1026,7 +1026,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You put the shiny coin in the small box.")
 
         // Assert State
-        let finalCoin = try #require(await engine.item("coin"))
+        let finalCoin = try #require(try await engine.item("coin"))
         #expect(finalCoin.parent == .item("innerBox"))
 
         // Assert History
@@ -1122,9 +1122,9 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can't put the box B in the box A, because the box A is inside the box B!")
 
         // Assert No State Change (Box A still in Box B, Box B still held)
-        let finalBoxA = try #require(await engine.item("boxA"))
+        let finalBoxA = try #require(try await engine.item("boxA"))
         #expect(finalBoxA.parent == .item("boxB"))
-        let finalBoxB = try #require(await engine.item("boxB"))
+        let finalBoxB = try #require(try await engine.item("boxB"))
         #expect(finalBoxB.parent == .player)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
@@ -1183,11 +1183,11 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can't put the box C in the box A, because the box A is inside the box C!")
 
         // Assert No State Change
-        let finalBoxA = try #require(await engine.item("boxA"))
+        let finalBoxA = try #require(try await engine.item("boxA"))
         #expect(finalBoxA.parent == .item("boxB"))
-        let finalBoxB = try #require(await engine.item("boxB"))
+        let finalBoxB = try #require(try await engine.item("boxB"))
         #expect(finalBoxB.parent == .item("boxC"))
-        let finalBoxC = try #require(await engine.item("boxC"))
+        let finalBoxC = try #require(try await engine.item("boxC"))
         #expect(finalBoxC.parent == .player)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }

@@ -70,8 +70,8 @@ struct OpenActionHandlerTests {
 
         // Initial state check
         let initialBoxState = try await engine.item("box")
-        #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
-        #expect(!initialBoxState!.hasFlag(.isTouched), "Box should start untouched")
+        #expect(!initialBoxState.hasFlag(.isOpen), "Box should start closed")
+        #expect(!initialBoxState.hasFlag(.isTouched), "Box should start untouched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -98,8 +98,8 @@ struct OpenActionHandlerTests {
         // Optional: Verify final state via snapshot if needed for complex scenarios,
         // but primarily rely on change history for handler correctness.
         let finalBoxState = try await engine.item("box")
-        #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
-        #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should be touched")
+        #expect(finalBoxState.hasFlag(.isOpen) == true, "Box should be open")
+        #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched")
     }
 
     @Test("Open item that is already touched")
@@ -125,8 +125,8 @@ struct OpenActionHandlerTests {
 
         // Initial state check
         let initialBoxState = try await engine.item("box")
-        #expect(!initialBoxState!.hasFlag(.isOpen), "Box should start closed")
-        #expect(initialBoxState!.hasFlag(.isTouched), "Box should start touched")
+        #expect(!initialBoxState.hasFlag(.isOpen), "Box should start closed")
+        #expect(initialBoxState.hasFlag(.isTouched), "Box should start touched")
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -151,8 +151,8 @@ struct OpenActionHandlerTests {
 
         // Optional: Verify final state
         let finalBoxState = try await engine.item("box")
-        #expect(finalBoxState?.hasFlag(.isOpen) == true, "Box should be open")
-        #expect(finalBoxState?.hasFlag(.isTouched) == true, "Box should still be touched")
+        #expect(finalBoxState.hasFlag(.isOpen) == true, "Box should be open")
+        #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should still be touched")
     }
 
     @Test("Open fails with no direct object")

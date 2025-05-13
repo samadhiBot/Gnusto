@@ -121,17 +121,11 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You put the heavy book on the sturdy table.")
 
         // Assert Final State
-        guard let finalBookState = try await engine.item("book") else {
-            Issue.record("Final book snapshot was nil")
-            return
-        }
+        let finalBookState = try await engine.item("book")
         #expect(finalBookState.parent == .item("table"), "Book should be on the table")
         #expect(finalBookState.hasFlag(.isTouched), "Book should be touched")
 
-        guard let finalTableState = try await engine.item("table") else {
-            Issue.record("Final table snapshot was nil")
-            return
-        }
+        let finalTableState = try await engine.item("table")
         #expect(finalTableState.hasFlag(.isTouched), "Table should be touched")
 
         // Assert Pronoun

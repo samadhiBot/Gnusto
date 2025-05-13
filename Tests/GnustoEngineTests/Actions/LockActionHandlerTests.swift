@@ -34,9 +34,9 @@ struct LockActionHandlerTests {
         )
 
         // Check initial state
-        let initialBoxSnapshot = try #require(await engine.item("box"))
+        let initialBoxSnapshot = try #require(try await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false) // Qualified
-        let initialKeySnapshot = try #require(await engine.item("key"))
+        let initialKeySnapshot = try #require(try await engine.item("key"))
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -55,11 +55,11 @@ struct LockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now locked.")
 
         // Assert Final State
-        let finalBoxState = try #require(await engine.item("box"))
+        let finalBoxState = try #require(try await engine.item("box"))
         #expect(finalBoxState.hasFlag(.isLocked), "Box should be locked")
         #expect(finalBoxState.hasFlag(.isTouched), "Box should be touched")
 
-        let finalKeyState = try #require(await engine.item("key"))
+        let finalKeyState = try #require(try await engine.item("key"))
         #expect(finalKeyState.hasFlag(.isTouched), "Key should be touched")
 
         // Assert Change History
@@ -359,7 +359,7 @@ struct LockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(await engine.item("box"))
+        let initialBoxSnapshot = try #require(try await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -396,7 +396,7 @@ extension LockActionHandlerTests {
         if !initialTargetLocked {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItem.id),
+                    entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isLocked),
                     oldValue: false,
                     newValue: true,
@@ -408,7 +408,7 @@ extension LockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItem.id),
+                    entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: nil,
                     newValue: true,

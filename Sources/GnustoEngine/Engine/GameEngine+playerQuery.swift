@@ -39,7 +39,7 @@ extension GameEngine {
 
     /// Returns the identifier of the player's current location.
     public var playerLocationID: LocationID {
-        playerLocationID
+        gameState.player.currentLocationID
     }
 
     /// The player's current score.

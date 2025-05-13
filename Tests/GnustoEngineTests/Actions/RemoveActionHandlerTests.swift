@@ -31,7 +31,7 @@ struct RemoveActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true)
+        #expect(try await engine.item("cloak").hasFlag(.isWorn) == true)
         let initialHistory = await engine.gameState.changeHistory
         #expect(initialHistory.isEmpty)
 
@@ -40,9 +40,9 @@ struct RemoveActionHandlerTests {
 
         // Assert State Change
         let finalCloakState = try await engine.item("cloak")
-        #expect(finalCloakState?.parent == .player)
-        #expect(finalCloakState?.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
-        #expect(finalCloakState?.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
+        #expect(finalCloakState.parent == .player)
+        #expect(finalCloakState.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
+        #expect(finalCloakState.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()

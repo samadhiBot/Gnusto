@@ -38,7 +38,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         // Verify setup was called
@@ -85,7 +85,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("xyzzy", "quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -174,7 +174,7 @@ struct GameEngineTests {
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"].attributes[.isTakable] == nil)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
         // Ensure room is lit for this test - Done via initializer now
 //        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
@@ -182,7 +182,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("take pebble", "quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -274,7 +274,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("look", "quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -355,7 +355,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -419,7 +419,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -465,7 +465,7 @@ struct GameEngineTests {
         )
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         // Verify setup and teardown were called
@@ -548,7 +548,7 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"].attributes[.isTakable] == true)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
         #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
@@ -562,7 +562,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
 
         // Act
-        await engine.run()
+        try await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -572,7 +572,7 @@ struct GameEngineTests {
 
         // Verify the final state using safe engine accessors
         let finalPebbleSnapshot = try await engine.item("startItem")
-        #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
+        #expect(finalPebbleSnapshot.parent == .player, "Pebble snapshot should show parent as player")
 
         let finalInventorySnapshots = await engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
@@ -700,23 +700,23 @@ struct GameEngineTests {
 
         // Ensure initial state
         #expect(await engine.isFlagSet(testFlagKey) == false)
-        #expect(await engine.item(testItemID).attributes[.isOn] == nil)
-        #expect(await engine.item(testItemID).attributes[.isTouched] == nil)
+        #expect(try await engine.item(testItemID).attributes[.isOn] == nil)
+        #expect(try await engine.item(testItemID).attributes[.isTouched] == nil)
         #expect(await engine.getChangeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
-        await engine.run()
+        try await engine.run()
 
         // Then
         // Check final state
         #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
         #expect(
-            await engine.item(testItemID).attributes[.isOn] == true,
+            try await engine.item(testItemID).attributes[.isOn] == true,
             "Item .on property should be set"
         )
         #expect(
-            await engine.item(testItemID).attributes[.isTouched] == true,
+            try await engine.item(testItemID).attributes[.isTouched] == true,
             "Item .touched property should be set"
         )
 
@@ -891,7 +891,7 @@ struct GameEngineTests {
             preposition: "xyzzy",
             rawInput: "go xyzzy"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go xyzzy",
             commandToParse: command
@@ -914,14 +914,14 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"].attributes[.isTakable] == nil)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
 
         let command = Command(
             verbID: .take,
             directObject: "startItem",
             rawInput: "take pebble"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "take pebble",
             commandToParse: command
@@ -951,7 +951,7 @@ struct GameEngineTests {
             directObject: "startItem",
             rawInput: "wear pebble"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "wear pebble",
             commandToParse: command
@@ -988,7 +988,7 @@ struct GameEngineTests {
             preposition: "in",
             rawInput: "put key in box"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key in box",
             commandToParse: command
@@ -1016,7 +1016,7 @@ struct GameEngineTests {
             directObject: "rock",
             rawInput: "open rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "open rock",
             commandToParse: command
@@ -1045,7 +1045,7 @@ struct GameEngineTests {
             directObject: "rock",
             rawInput: "wear rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "wear rock",
             commandToParse: command
@@ -1086,7 +1086,7 @@ struct GameEngineTests {
             directObject: "shield",
             rawInput: "take shield"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "take shield",
             commandToParse: command
@@ -1121,7 +1121,7 @@ struct GameEngineTests {
             preposition: "in",
             rawInput: "put key in rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key in rock",
             commandToParse: command
@@ -1156,7 +1156,7 @@ struct GameEngineTests {
             preposition: "on",
             rawInput: "put key on rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key on rock",
             commandToParse: command
@@ -1185,7 +1185,7 @@ struct GameEngineTests {
             direction: .north,
             rawInput: "go north"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go north",
             commandToParse: command
@@ -1215,7 +1215,7 @@ struct GameEngineTests {
             directObject: "box",
             rawInput: "close box"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "close box",
             commandToParse: command
@@ -1256,7 +1256,7 @@ struct GameEngineTests {
             preposition: "with",
             rawInput: "unlock chest with key"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key",
             commandToParse: command
@@ -1284,7 +1284,7 @@ struct GameEngineTests {
             directObject: "book",
             rawInput: "close book"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "close book",
             commandToParse: command
@@ -1313,7 +1313,7 @@ struct GameEngineTests {
             directObject: "statue",
             rawInput: "drop statue"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "drop statue",
             commandToParse: command
@@ -1344,7 +1344,7 @@ struct GameEngineTests {
             directObject: "amulet",
             rawInput: "remove amulet"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "remove amulet",
             commandToParse: command
@@ -1373,7 +1373,7 @@ struct GameEngineTests {
             direction: .up,
             rawInput: "go up"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go up",
             commandToParse: command
@@ -1408,7 +1408,7 @@ struct GameEngineTests {
             directObject: "shadow",
             rawInput: "examine shadow"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "examine shadow",
             commandToParse: command
@@ -1449,7 +1449,7 @@ struct GameEngineTests {
             preposition: "with",
             rawInput: "unlock chest with key2"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key2",
             commandToParse: command
@@ -1552,7 +1552,7 @@ extension GameEngineTests {
         game: GameBlueprint,
         commandInput: String,
         commandToParse: Command
-    ) async -> String {
+    ) async throws -> String {
         var mockParser = MockParser()
         let mockIO = await MockIOHandler()
 
@@ -1569,7 +1569,7 @@ extension GameEngineTests {
         )
 
         await mockIO.enqueueInput(commandInput, "quit")
-        await engine.run()
+        try await engine.run()
         let outputCalls = await mockIO.recordedOutput
         var commandOutput = "" // Default to empty string
         var promptEncountered = false

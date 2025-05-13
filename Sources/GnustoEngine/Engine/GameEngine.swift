@@ -158,10 +158,13 @@ extension GameEngine {
             switch command.verbID {
             case .go:
                 // Check if the destination room was visited before the movement
-                let exit = try command.direction.flatMap {
+                shouldDescribe = if let exit = try command.direction.flatMap({
                     try location(playerLocationID).exits[$0]
+                }) {
+                    try location(exit.destinationID).hasFlag(.isVisited)
+                } else {
+                    false
                 }
-                shouldDescribe = try location(exit?.destinationID).hasFlag(.isVisited)
 
 //                if let exit = try command.direction.flatMap({ direction in
 //                       try location(playerLocationID).exits[direction]

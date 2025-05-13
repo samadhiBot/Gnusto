@@ -144,7 +144,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemAdjectives change")
             }
-            items[itemID].attributes[.adjectives] = .stringSet(newAdjectives)
+            items[itemID]?.attributes[.adjectives] = .stringSet(newAdjectives)
 
         case .itemCapacity:
             // Expecting an .int for itemCapacity
@@ -157,7 +157,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemCapacity change")
             }
-            items[itemID].attributes[.capacity] = .int(newCapacity)
+            items[itemID]?.attributes[.capacity] = .int(newCapacity)
 
         case .itemName:
             // Expecting a .string for itemName
@@ -170,7 +170,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemName change")
             }
-            items[itemID].attributes[.name] = .string(newName)
+            items[itemID]?.attributes[.name] = .string(newName)
 
         case .itemParent:
             // Expecting a .parentEntity for itemParent
@@ -183,7 +183,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemParent change")
             }
-            items[itemID].attributes[.parentEntity] = .parentEntity(newParent)
+            items[itemID]?.attributes[.parentEntity] = .parentEntity(newParent)
 
         case .itemSize:
             // Expecting an .int for itemSize
@@ -196,7 +196,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemSize change")
             }
-            items[itemID].attributes[.size] = .int(newSize)
+            items[itemID]?.attributes[.size] = .int(newSize)
 
         case .itemSynonyms:
             // Expecting a .stringSet for itemSynonyms
@@ -209,7 +209,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard items[itemID] != nil else {
                 throw ActionResponse.internalEngineError("Item \(itemID.rawValue) not found for itemSynonyms change")
             }
-            items[itemID].attributes[.synonyms] = .stringSet(newSynonyms)
+            items[itemID]?.attributes[.synonyms] = .stringSet(newSynonyms)
 
         case .itemValue:
             // Expecting an .int for itemValue
@@ -237,7 +237,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for locationName change")
             }
-            locations[locationID].attributes[.name] = .string(newName)
+            locations[locationID]?.attributes[.name] = .string(newName)
 
         case .locationDescription: // REMOVED - Cannot change description via StateChange
              throw ActionResponse.internalEngineError("Attempted to apply StateChange to location description. Use DescriptionHandlerRegistry for dynamic descriptions.")
@@ -253,7 +253,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for exits change")
             }
-            locations[locationID].attributes[.exits] = .exits(newExits)
+            locations[locationID]?.attributes[.exits] = .exits(newExits)
 
         // MARK: Attributes (Item or Location)
 
@@ -266,7 +266,7 @@ public struct GameState: Codable, Equatable, Sendable {
             }
             // Directly update the StateValue in the dictionary.
             // Assumes validation happened *before* StateChange creation.
-            items[itemID].attributes[key] = change.newValue
+            items[itemID]?.attributes[key] = change.newValue
 
         case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityID else {
@@ -275,7 +275,7 @@ public struct GameState: Codable, Equatable, Sendable {
             guard locations[locationID] != nil else {
                 throw ActionResponse.internalEngineError("Location \(locationID.rawValue) not found for locationAttribute change ('\(key.rawValue)')")
             }
-            locations[locationID].attributes[key] = change.newValue
+            locations[locationID]?.attributes[key] = change.newValue
 
         // MARK: Player Properties
 
@@ -546,13 +546,13 @@ public struct GameState: Codable, Equatable, Sendable {
              guard case .item(let itemID) = change.entityID else {
                 throw ActionResponse.internalEngineError("Validation: Invalid entity ID for itemAttribute")
              }
-             actualCurrentValue = items[itemID].attributes[key]
+             actualCurrentValue = items[itemID]?.attributes[key]
 
         case .locationAttribute(let key):
              guard case .location(let locationID) = change.entityID else {
                 throw ActionResponse.internalEngineError("Validation: Invalid entity ID for locationAttribute")
              }
-             actualCurrentValue = locations[locationID].attributes[key]
+             actualCurrentValue = locations[locationID]?.attributes[key]
         }
 
         // Perform the validation

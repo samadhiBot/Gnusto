@@ -577,7 +577,7 @@ struct StandardParserTests {
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
         #expect(initState.items["note"]?.parent == .item("chest"))
-        #expect(initState.items["chest"].attributes["isOpen"] == nil)
+        #expect(initState.items["chest"]?.attributes["isOpen"] == nil)
 
         // Only the key should be resolved from "them" because the note is out of scope
         let result = parser.parse(input: "drop them", vocabulary: vocabulary, gameState: initState)
@@ -762,7 +762,7 @@ struct StandardParserTests {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict[lampID].attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
+        itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
         let customState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -804,7 +804,7 @@ struct StandardParserTests {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["lantern"].attributes[.isContainer] = true
+        itemsDict["lantern"]?.attributes[.isContainer] = true
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -844,7 +844,7 @@ struct StandardParserTests {
     func testExtractNounModsPronoun() async throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"].attributes[.parentEntity] = .parentEntity(.player) // Put key in inventory
+        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player) // Put key in inventory
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),
@@ -864,7 +864,7 @@ struct StandardParserTests {
     func testExtractNounModsPronounNoise() async throws {
         // "drop the it"
         var itemsDict = self.gameState.items // Base items copy
-        itemsDict["key"].attributes[.parentEntity] = .parentEntity(.player)
+        itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player)
         let modifiedState = GameState(
             locations: Array(self.gameState.locations.values),
             items: Array(itemsDict.values),

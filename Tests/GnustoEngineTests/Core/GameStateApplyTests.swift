@@ -36,7 +36,7 @@ struct GameStateApplyTests {
 
         // Then
         let finalItem = gameState.items[itemID]
-        #expect(finalItem.attributes[attributeID] == newAttributeValue, "Item attribute should be updated")
+        #expect(finalItem?.attributes[attributeID] == newAttributeValue, "Item attribute should be updated")
 
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
@@ -86,7 +86,7 @@ struct GameStateApplyTests {
         // Verify state was not changed
         let finalItem = gameState.items[itemID]
         #expect(
-            finalItem.attributes[attributeID] == actualOldValue,
+            finalItem?.attributes[attributeID] == actualOldValue,
             "Item attribute should not be updated on error"
         )
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
@@ -190,7 +190,7 @@ struct GameStateApplyTests {
         var state = helper.createInitialState()
         let itemID: ItemID = "testItem"
         // Pre-move item to player
-        state.items[itemID].attributes[.parentEntity] = .parentEntity(.player) 
+        state.items[itemID]?.attributes[.parentEntity] = .parentEntity(.player)
         #expect(state.items[itemID]?.parent == .player)
         state.changeHistory = [] // Clear history
 
@@ -563,7 +563,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Then
-        #expect(gameState.locations[locationID].attributes[attributeID] == newAttributeValue)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == newAttributeValue)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -609,7 +609,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(gameState.locations[locationID].attributes[attributeID] == actualOldValue)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
     }
 
@@ -935,7 +935,7 @@ struct GameStateApplyTests {
     func testApplyValidPlayerLocationChange() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialLocation = playerLocationID
+        let initialLocation = gameState.player.currentLocationID
         let newLocation = GameStateTests.locNorth // Should exist in sample state
         #expect(gameState.locations[newLocation] != nil, "Target location must exist")
 
@@ -950,7 +950,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Then
-        #expect(playerLocationID == newLocation)
+        #expect(gameState.player.currentLocationID == newLocation)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -958,7 +958,7 @@ struct GameStateApplyTests {
     func testApplyInvalidPlayerLocationChangeOldValue() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let actualOldLocation = playerLocationID
+        let actualOldLocation = gameState.player.currentLocationID
         let incorrectOldLocation: LocationID = "attic" // Incorrect
         let newLocation = GameStateTests.locNorth
 
@@ -988,7 +988,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(playerLocationID == actualOldLocation)
+        #expect(gameState.player.currentLocationID == actualOldLocation)
         #expect(gameState.changeHistory.isEmpty)
     }
 
@@ -996,7 +996,7 @@ struct GameStateApplyTests {
     func testApplyPlayerLocationChangeToInvalidID() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialLocation = playerLocationID
+        let initialLocation = gameState.player.currentLocationID
         let invalidNewLocation: LocationID = "nonExistentRoom"
         #expect(gameState.locations[invalidNewLocation] == nil, "Target location must not exist")
 
@@ -1025,7 +1025,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(playerLocationID == initialLocation)
+        #expect(gameState.player.currentLocationID == initialLocation)
         #expect(gameState.changeHistory.isEmpty)
     }
 

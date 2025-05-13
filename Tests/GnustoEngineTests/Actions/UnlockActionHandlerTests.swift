@@ -35,9 +35,9 @@ struct UnlockActionHandlerTests {
         )
 
         // Check initial state
-        let initialBoxSnapshot = try #require(await engine.item("box"))
+        let initialBoxSnapshot = try #require(try await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true)
-        let initialKeySnapshot = try #require(await engine.item("key"))
+        let initialKeySnapshot = try #require(try await engine.item("key"))
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -56,11 +56,11 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        let finalBoxState = try #require(await engine.item("box"))
+        let finalBoxState = try #require(try await engine.item("box"))
         #expect(finalBoxState.hasFlag(.isLocked) == false, "Box should be unlocked")
         #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched")
 
-        let finalKeyState = try #require(await engine.item("key"))
+        let finalKeyState = try #require(try await engine.item("key"))
         #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched")
 
         // Assert Change History
@@ -360,7 +360,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(await engine.item("box"))
+        let initialBoxSnapshot = try #require(try await engine.item("box"))
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -397,7 +397,7 @@ extension UnlockActionHandlerTests {
         if initialTargetLocked {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItem.id),
+                    entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isLocked),
                     oldValue: true,
                     newValue: false
@@ -409,7 +409,7 @@ extension UnlockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItem.id),
+                    entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: nil,
                     newValue: true,
