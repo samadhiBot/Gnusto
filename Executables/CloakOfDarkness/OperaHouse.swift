@@ -157,43 +157,30 @@ extension OperaHouse {
             default:
                 break
             }
+
         case .afterTurn(let command):
+            guard  await engine.playerLocationID == .cloakroom else { return nil }
+
+//            let bar = try await engine.location(.bar)
+
             switch command.verbID {
             case .drop, .putOn:
-                if await engine.playerLocationID == .cloakroom, await engine.playerScore < 1 {
-                    return ActionResult(
-                        stateChanges: [
-                            await engine.scoreChange(by: 1),
-                        ]
-                    )
-                } else {
-                    throw ActionResponse.prerequisiteNotMet(
-                        "This isn't the best place to leave a smart cloak lying around."
-                    )
+                var stateChanges = [StateChange]()
+                if await engine.playerScore < 1 {
+                    stateChanges.append(await engine.scoreChange(by: 1))
                 }
-            case .putOn:
-                let score = await engine.playerScore
-                guard
-                    score < 2,
-                    command.indirectObject == .hook,
-                    await engine.playerLocationID == .cloakroom
-                else {
-                    return nil
+                if let lightenBar = try await engine.flag(engine.location(.bar), with: .isLit) {
+                    stateChanges.append(lightenBar)
                 }
-                return ActionResult(
-                    stateChanges: [
-                        await engine.scoreChange(by: 2 - score),
-                        try await engine.flag(engine.location(.bar), with: .isLit),
-                    ]
-                )
+                return ActionResult(stateChanges: stateChanges)
             case .take:
-                let bar = try await engine.location(.bar)
-                if let removeLit = try await engine.flag(engine.location(.bar), remove: .isLit) {
-                    return ActionResult(stateChanges: [removeLit])
+                if let darkenBar = try await engine.flag(engine.location(.bar), remove: .isLit) {
+                    return ActionResult(stateChanges: [darkenBar])
                 }
             default:
                 break
-            }        }
+            }
+        }
         return nil
     }
 
