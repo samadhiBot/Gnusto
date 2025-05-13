@@ -513,8 +513,8 @@ extension GameEngine {
            let itemHandler = definitionRegistry.itemActionHandlers[doID]
         {
             do {
-                // Pass the engine and the full command to the handler
-                if let result = try await itemHandler(self, command) {
+                // Pass the engine and the event to the handler
+                if let result = try await itemHandler(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Object handler handled everything
@@ -533,7 +533,7 @@ extension GameEngine {
            let itemHandler = definitionRegistry.itemActionHandlers[indirectObject]
         {
             do {
-                if let result = try await itemHandler(self, command) {
+                if let result = try await itemHandler(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Object handler handled everything
@@ -626,6 +626,32 @@ extension GameEngine {
         }
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
 
+        // --- Item AfterTurn Hooks ---
+
+        // 1. Check Direct Object AfterTurn Handler
+        if let doID = command.directObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[doID]
+        {
+            do {
+                _ = try await itemHandler(self, .afterTurn(command))
+            } catch {
+                logger.warning("💥 Error in direct object afterTurn handler: \(error, privacy: .public)")
+            }
+            if shouldQuit { return }
+        }
+
+        // 2. Check Indirect Object AfterTurn Handler
+        if let indirectObject = command.indirectObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[indirectObject]
+        {
+            do {
+                _ = try await itemHandler(self, .afterTurn(command))
+            } catch {
+                logger.warning("💥 Error in indirect object afterTurn handler: \(error, privacy: .public)")
+            }
+            if shouldQuit { return }
+        }
+
         // --- Room AfterTurn Hook ---
         if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
@@ -640,7 +666,7 @@ extension GameEngine {
     }
 
     /// Processes the result of an action, applying state changes and printing the message.
-    /// 
+    ///
     /// - Parameter result: The `ActionResult` returned by an `ActionHandler`.
     /// - Returns: Whether the action result emitted a message.
     /// - Throws: Re-throws errors encountered during state application.

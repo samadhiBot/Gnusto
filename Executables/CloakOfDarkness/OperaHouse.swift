@@ -144,53 +144,57 @@ extension OperaHouse {
 // MARK: - Object action handlers
 
 extension OperaHouse {
-    static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
-        switch command.verbID {
-        case .drop:
-            if await engine.playerLocationID == "cloakroom", await engine.playerScore < 1 {
+    static func cloakHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verbID {
+            case .drop:
+                if await engine.playerLocationID == "cloakroom", await engine.playerScore < 1 {
+                    return ActionResult(
+                        stateChanges: [
+                            await engine.scoreChange(by: 1),
+                        ]
+                    )
+                } else {
+                    throw ActionResponse.prerequisiteNotMet(
+                        "This isn't the best place to leave a smart cloak lying around."
+                    )
+                }
+            case .putOn:
+                let score = await engine.playerScore
+                guard
+                    score < 2,
+                    command.indirectObject == .hook,
+                    await engine.playerLocationID == "cloakroom"
+                else {
+                    return nil
+                }
                 return ActionResult(
                     stateChanges: [
-                        await engine.scoreChange(by: 1),
-                        //                        await engine.flag(engine.location(.bar), with: .isLit)
+                        await engine.scoreChange(by: 2 - score),
+                        await engine.flag(engine.location(.bar), with: .isLit),
                     ]
                 )
-            } else {
-                throw ActionResponse.prerequisiteNotMet(
-                    "This isn't the best place to leave a smart cloak lying around."
-                )
+            case .take:
+                guard let bar = await engine.location("bar") else {
+                    throw ActionResponse.internalEngineError("Location 'bar' not found.")
+                }
+                if let removeLit = await engine.flag(engine.location(.bar), remove: .isLit) {
+                    return ActionResult(stateChanges: [removeLit])
+                }
+            default:
+                break
             }
-        case .putOn:
-            let score = await engine.playerScore
-            guard
-                score < 2,
-                command.indirectObject == .hook,
-                await engine.playerLocationID == "cloakroom"
-            else {
-                return nil
-            }
-            return ActionResult(
-                stateChanges: [
-                    await engine.scoreChange(by: 2 - score),
-                    await engine.flag(engine.location(.bar), with: .isLit),
-                ]
-            )
-        case .take:
-            guard let bar = await engine.location("bar") else {
-                throw ActionResponse.internalEngineError("Location 'bar' not found.")
-            }
-            if let removeLit = await engine.flag(engine.location(.bar), remove: .isLit) {
-                return ActionResult(stateChanges: [removeLit])
-            }
-        default:
+        case .afterTurn, .onInitialize, .onDestroy:
             break
         }
         return nil
     }
 
-    static func hookHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
-        guard
-            command.verbID == "examine",
-            let cloak = await engine.item("cloak")
+    static func hookHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+        guard case .beforeTurn(let command) = event,
+              command.verbID == "examine",
+              let cloak = await engine.item("cloak")
         else {
             return nil
         }
@@ -202,10 +206,10 @@ extension OperaHouse {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    static func messageHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
-        guard
-            command.verbID == "examine",
-            await engine.gameState.player.currentLocationID == "bar"
+    static func messageHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+        guard case .beforeTurn(let command) = event,
+              command.verbID == "examine",
+              await engine.gameState.player.currentLocationID == "bar"
         else {
             return nil
         }
