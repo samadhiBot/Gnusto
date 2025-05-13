@@ -12,9 +12,7 @@ struct TurnOnActionHandler: ActionHandler {
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.unknownItem(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Verify the item is reachable (with light source exception in dark).
         let currentLocationID = await context.engine.gameState.player.currentLocationID
@@ -50,13 +48,7 @@ struct TurnOnActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionResponse.internalEngineError("TURN ON context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // Should be caught by validate
-            throw ActionResponse.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN ON.")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
@@ -64,7 +56,7 @@ struct TurnOnActionHandler: ActionHandler {
         // Change 1: Add .touched property change if needed
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -74,7 +66,7 @@ struct TurnOnActionHandler: ActionHandler {
         // Change 2: Add .on property change (only if currently off)
         if targetItem.attributes[.isOn] != true {
             stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isOn),
                 oldValue: targetItem.attributes[.isOn] ?? false,
                 newValue: true,

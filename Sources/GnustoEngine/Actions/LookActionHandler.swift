@@ -9,15 +9,10 @@ public struct LookActionHandler: ActionHandler {
         }
 
         // EXAMINE [Object] - Ensure item exists and is reachable
-        guard let _ = await context.engine.item(targetItemID) else {
-            // Should not happen if parser resolved correctly, but safety first.
-            // Or perhaps the item *just* disappeared.
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
+        let _ = try await context.engine.item(targetItemID)
 
         // Check reachability using ScopeResolver
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer() // Returns Set<ItemID>
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             // Use a standard message even if item technically exists elsewhere
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
@@ -39,15 +34,15 @@ public struct LookActionHandler: ActionHandler {
             }
 
             // 2. Location is lit, proceed with description
-            guard let currentLocation = await engine.location(currentLocationID) else {
-                // Should not happen if player location is valid and not dark
-                throw ActionResponse.internalEngineError(
-                    "Player is in an invalid location: \(currentLocationID)"
-                )
-            }
+            let currentLocation = try await engine.playerLocation()
 
             // Call helper to print description, passing the snapshot
-            await describeLocation(currentLocation, engine: engine, showVerbose: true, stateSnapshot: stateSnapshot)
+            await describeLocation(
+                currentLocation,
+                engine: engine,
+                showVerbose: true,
+                stateSnapshot: stateSnapshot
+            )
 
             // LOOK itself doesn't change state or usually have a message beyond the description
             // printed by the helper.
@@ -56,12 +51,9 @@ public struct LookActionHandler: ActionHandler {
 
         // EXAMINE [Object]
         // Validation ensures item exists and is reachable
-        guard let targetItem = await engine.item(targetItemID) else {
-            // This should not happen due to validation, but guard defensively.
-            throw ActionResponse.internalEngineError(
-                "Item \(targetItemID) disappeared between validate and process."
-            )
-        }
+        let targetItem = try await engine.item(targetItemID)
+
+        var stateChanges: [StateChange] = []
 
         // 1. Get base description using the registry
         var descriptionLines: [String] = []
@@ -77,14 +69,13 @@ public struct LookActionHandler: ActionHandler {
         descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: engine, stateSnapshot: stateSnapshot))
 
         // 3. Prepare state change (mark as touched)
-        var stateChanges: [StateChange] = []
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // 4: Update pronoun
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
         }
 
         // 5. Combine description lines and return result

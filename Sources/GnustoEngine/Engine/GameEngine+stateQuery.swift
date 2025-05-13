@@ -13,20 +13,34 @@ extension GameEngine {
         await scopeResolver.isLocationLit(locationID: locationID)
     }
 
-    /// Retrieves as copy of a specific location.
+    /// Retrieves a copy of a specific location.
     ///
     /// - Parameter id: The `LocationID` of the location to retrieve.
-    /// - Returns: A `Location` struct if the location is found, otherwise `nil`.
-    public func location(_ id: LocationID) -> Location? {
-        gameState.locations[id]
+    /// - Returns: A copy of the specified location.
+    /// - Throws: If the specified location cannot be found.
+    public func location(_ id: LocationID?) throws -> Location {
+        guard let id else {
+            throw ActionResponse.internalEngineError("No location identifier provided.")
+        }
+        guard let location = gameState.locations[id] else {
+            throw ActionResponse.internalEngineError("Location `\(id)` not found.")
+        }
+        return location
     }
 
-    /// Retrieves as copy of a specific item.
+    /// Retrieves a copy of a specific item.
     ///
     /// - Parameter id: The `ItemID` of the item to retrieve.
-    /// - Returns: An `Item` struct if the item is found, otherwise `nil`.
-    public func item(_ id: ItemID) -> Item? {
-        gameState.items[id]
+    /// - Returns: A copy of the specified item.
+    /// - Throws: If the specified item cannot be found.
+    public func item(_ id: ItemID?) throws -> Item {
+        guard let id else {
+            throw ActionResponse.internalEngineError("No item identifier provided.")
+        }
+        guard let item = gameState.items[id] else {
+            throw ActionResponse.itemNotAccessible(id)
+        }
+        return item
     }
 
     /// Retrieves as copy of all items with a specific parent.
@@ -36,34 +50,5 @@ extension GameEngine {
     public func items(in parent: ParentEntity) -> [Item] {
         gameState.items.values
             .filter { $0.parent == parent }
-    }
-}
-
-// MARK: - Player-specific
-
-extension GameEngine {
-    /// Returns the player's inventory.
-    public var playerInventory: [Item] {
-        items(in: .player)
-    }
-
-    /// Returns the player's current location.
-    public var playerLocation: Location? {
-        location(playerLocationID)
-    }
-
-    /// Returns the identifier of the player's current location.
-    public var playerLocationID: LocationID {
-        gameState.player.currentLocationID
-    }
-
-    /// Checks whether the player has an item in their inventory.
-    public func isPlayerHolding(_ itemID: ItemID) async -> Bool {
-        playerInventory.contains { $0.id == itemID }
-    }
-
-    /// Checks whether the player's location is currently lit.
-    public func isPlayerLocationLit() async -> Bool {
-        await isLocationLit(at: gameState.player.currentLocationID)
     }
 }

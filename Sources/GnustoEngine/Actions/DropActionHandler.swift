@@ -9,11 +9,7 @@ public struct DropActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // If parser resolved it, but it's gone, treat as inaccessible/not held.
-            // For DROP, the more specific error is relevant.
-            throw ActionResponse.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if player is holding the item
         guard targetItem.parent == .player else {
@@ -28,13 +24,7 @@ public struct DropActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionResponse.internalEngineError("Drop context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // Should be caught by validate.
-            throw ActionResponse.internalEngineError("Drop context.command target item disappeared between validate and process.")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // Handle "not holding" case detected (but not thrown) in validate
         if targetItem.parent != .player {
@@ -42,32 +32,27 @@ public struct DropActionHandler: ActionHandler {
         }
 
         // --- Calculate State Changes ---
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         var stateChanges: [StateChange] = []
 
         // Change 1: Parent
-        let parentChange = StateChange(
-            entityID: .item(targetItemID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(.player),
-            newValue: .parentEntity(.location(currentLocationID))
-        )
-        stateChanges.append(parentChange)
+        let update = await context.engine.move(targetItem, to: .location(currentLocationID))
+        stateChanges.append(update)
 
         // Change 2: Ensure `.isTouched` is true
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 3: Update pronoun
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
         }
 
         // Change 4: Ensure `.isWorn` is false
         if targetItem.attributes[.isWorn] == true { // Only add change if it was worn
             let wornChange = StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false

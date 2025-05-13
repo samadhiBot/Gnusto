@@ -16,20 +16,14 @@ public struct LockActionHandler: ActionHandler {
         let keyItemID = context.command.indirectObject!
 
         // 2. Get item snapshots
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // If parser resolved it but it's gone now, treat as inaccessible.
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-        guard let keyItem = await context.engine.item(keyItemID) else {
-            throw ActionResponse.itemNotAccessible(keyItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
+        let keyItem = try await context.engine.item(keyItemID)
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
             throw ActionResponse.itemNotHeld(keyItemID)
         }
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -49,16 +43,8 @@ public struct LockActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard
-            let targetItemID = context.command.directObject,
-            let keyItemID = context.command.indirectObject,
-            let targetItem = await context.engine.item(targetItemID),
-            let keyItem = await context.engine.item(keyItemID)
-        else {
-            throw ActionResponse.internalEngineError(
-                "Missing directObject or indirectObject in LOCK context.command."
-            )
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
+        let keyItem = try await context.engine.item(context.command.indirectObject)
 
         // Handle case: Already locked (detected in validate)
         if targetItem.hasFlag(.isLocked) {
@@ -71,7 +57,7 @@ public struct LockActionHandler: ActionHandler {
         // Change 1: Add .locked to target (if not already set)
         if targetItem.attributes[.isLocked] != true {
             let lockedChange = StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isLocked),
                 oldValue: targetItem.attributes[.isLocked] ?? false,
                 newValue: true,
@@ -80,22 +66,23 @@ public struct LockActionHandler: ActionHandler {
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if let addTouchedFlag = await context.engine.flag(keyItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(keyItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 4: Update pronoun
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---
         let message = "The \(targetItem.name) is now locked."
+
         return ActionResult(
             message: message,
             stateChanges: stateChanges

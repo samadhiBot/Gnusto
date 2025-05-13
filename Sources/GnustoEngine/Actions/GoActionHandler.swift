@@ -10,14 +10,10 @@ public struct GoActionHandler: ActionHandler {
 
         // 2. Get Current Location data
         let currentLocationID = await context.engine.gameState.player.currentLocationID
-        guard let currentLoc = await context.engine.location(currentLocationID) else {
-            throw ActionResponse.internalEngineError(
-                "Player's current location ID '\(currentLocationID)' is invalid."
-            )
-        }
+        let currentLocation = try await context.engine.location(currentLocationID)
 
         // 3. Find Exit
-        guard let exit = currentLoc.exits[direction] else {
+        guard let exit = currentLocation.exits[direction] else {
             throw ActionResponse.invalidDirection // Standard message: "You can't go that way."
         }
 
@@ -30,10 +26,7 @@ public struct GoActionHandler: ActionHandler {
 
         // Continue if exit is a door, otherwise validation is done
         guard let doorID = exit.doorID else { return }
-
-        guard let door = await context.engine.item(doorID) else {
-            throw ActionResponse.internalEngineError("Exit specifies unknown door '\(doorID)'.")
-        }
+        let door = try await context.engine.item(doorID)
 
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
@@ -48,17 +41,17 @@ public struct GoActionHandler: ActionHandler {
 
     public func process(context: ActionContext) async throws -> ActionResult {
         // Validation passed, find exit again (state might have changed, though unlikely for exits)
+        let currentLocation = try await context.engine.playerLocation()
         guard
             let direction = context.command.direction,
-            let currentLocation = await context.engine.location(
-                await context.engine.gameState.player.currentLocationID
-            ),
-            let exit = currentLocation.exits[direction],
-            let destination = await context.engine.location(exit.destinationID)
+            let exit = currentLocation.exits[direction]
         else {
             // Should not happen if validate passed, but defensive check
-            throw ActionResponse.internalEngineError("Exit disappeared between validate and process for GO context.command.")
+            throw ActionResponse.internalEngineError(
+                "Exit disappeared between validate and process for GO context.command."
+            )
         }
+        let destination = try await context.engine.location(exit.destinationID)
 
         // Create state changes
         var stateChanges: [StateChange] = [
@@ -71,8 +64,8 @@ public struct GoActionHandler: ActionHandler {
         ]
 
         // Set isVisited flag for the new location if it hasn't been visited yet
-        if let setIsVisited = await context.engine.flag(destination, with: .isVisited) {
-            stateChanges.append(setIsVisited)
+        if let update = await context.engine.flag(destination, with: .isVisited) {
+            stateChanges.append(update)
         }
 
         // --- Create Result ---

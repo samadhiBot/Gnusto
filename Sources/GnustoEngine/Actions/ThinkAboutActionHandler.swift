@@ -12,9 +12,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         if targetItemID.rawValue == "player" { return }
 
         // 3. Check if item exists
-        guard await context.engine.item(targetItemID) != nil else {
-            throw ActionResponse.unknownItem(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 4. Check reachability
         let isReachable = await context.engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
@@ -24,26 +22,15 @@ public struct ThinkAboutActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            // Should be caught by validate
-            throw ActionResponse.internalEngineError("THINK ABOUT context.command reached process without direct object.")
-        }
-
+        let targetItem = try await context.engine.item(context.command.directObject)
         let message: String
         var stateChanges: [StateChange] = []
 
         // Handle thinking about player
-        if targetItemID.rawValue == "player" {
+        // TODO: command.directObject may need to be EntityID
+        if targetItem.id.rawValue == "player" {
             message = "Yes, yes, you're very important."
         } else {
-            // Handle thinking about an item
-            guard let targetItem = await context.engine.item(targetItemID) else {
-                 // Should be caught by validate
-                throw ActionResponse.internalEngineError(
-                    "Target item '\(targetItemID)' disappeared between validate and process."
-                )
-            }
-
             // Mark as touched if not already
             if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
                 stateChanges.append(addTouchedFlag)

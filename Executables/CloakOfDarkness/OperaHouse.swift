@@ -13,7 +13,7 @@ struct OperaHouse: AreaContents {
                 """),
         .exits([
             .south: Exit(destination: "bar"),
-            .west: Exit(destination: "cloakroom"),
+            .west: Exit(destination: .cloakroom),
             .north: Exit(
                 destination: "street",
                 blockedMessage: """
@@ -43,7 +43,7 @@ struct OperaHouse: AreaContents {
     let hook = Item(
         id: .hook,
         .adjectives("small", "brass"),
-        .in(.location("cloakroom")),
+        .in(.location(.cloakroom)),
         .isScenery,
         .isSurface,
         .name("small brass hook"),
@@ -69,7 +69,7 @@ struct OperaHouse: AreaContents {
     let message = Item(
         id: .message,
         .name("crumpled message"),
-        .in(.location("bar")),
+        .in(.location(.bar)),
         .isReadable,
     )
 
@@ -100,7 +100,7 @@ extension OperaHouse {
     ) async throws -> ActionResult? {
         guard
             case .beforeTurn(let command) = action,
-            await engine.isPlayerLocationLit() == false
+            await engine.playerLocationIsLit() == false
         else {
             return nil
         }
@@ -148,8 +148,19 @@ extension OperaHouse {
         switch event {
         case .beforeTurn(let command):
             switch command.verbID {
-            case .drop:
-                if await engine.playerLocationID == "cloakroom", await engine.playerScore < 1 {
+            case .drop, .putOn:
+                guard await engine.playerLocationID == .cloakroom else {
+                    throw ActionResponse.prerequisiteNotMet(
+                        "This isn't the best place to leave a smart cloak lying around."
+                    )
+                }
+            default:
+                break
+            }
+        case .afterTurn(let command):
+            switch command.verbID {
+            case .drop, .putOn:
+                if await engine.playerLocationID == .cloakroom, await engine.playerScore < 1 {
                     return ActionResult(
                         stateChanges: [
                             await engine.scoreChange(by: 1),
@@ -165,39 +176,32 @@ extension OperaHouse {
                 guard
                     score < 2,
                     command.indirectObject == .hook,
-                    await engine.playerLocationID == "cloakroom"
+                    await engine.playerLocationID == .cloakroom
                 else {
                     return nil
                 }
                 return ActionResult(
                     stateChanges: [
                         await engine.scoreChange(by: 2 - score),
-                        await engine.flag(engine.location(.bar), with: .isLit),
+                        try await engine.flag(engine.location(.bar), with: .isLit),
                     ]
                 )
             case .take:
-                guard let bar = await engine.location("bar") else {
-                    throw ActionResponse.internalEngineError("Location 'bar' not found.")
-                }
-                if let removeLit = await engine.flag(engine.location(.bar), remove: .isLit) {
+                let bar = try await engine.location(.bar)
+                if let removeLit = try await engine.flag(engine.location(.bar), remove: .isLit) {
                     return ActionResult(stateChanges: [removeLit])
                 }
             default:
                 break
-            }
-        case .afterTurn, .onInitialize, .onDestroy:
-            break
-        }
+            }        }
         return nil
     }
 
     static func hookHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
-        guard case .beforeTurn(let command) = event,
-              command.verbID == "examine",
-              let cloak = await engine.item("cloak")
-        else {
+        guard case .beforeTurn(let command) = event, command.verbID == "examine" else {
             return nil
         }
+        let cloak = try await engine.item("cloak")
         let hookDetail = if cloak.parent == .item("hook") {
             "with a cloak hanging on it"
         } else {
@@ -214,9 +218,7 @@ extension OperaHouse {
             return nil
         }
         // Fix: Check location exists before accessing properties
-        guard let bar = await engine.location("bar") else {
-            throw ActionResponse.internalEngineError("Location 'bar' not found.")
-        }
+        let bar = try await engine.location(.bar)
         guard bar.hasFlag(.isLit) else {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }

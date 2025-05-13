@@ -9,9 +9,7 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.unknownItem(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if player already has the item
         if targetItem.parent == .player {
@@ -22,8 +20,9 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 4. Check if item is inside something invalid (non-container/non-surface)
-        if case .item(let parentID) = targetItem.parent,
-           let parentItem = await context.engine.item(parentID) {
+        if case .item(let parentID) = targetItem.parent {
+            let parentItem = try await context.engine.item(parentID)
+
             // Fail only if the parent is NOT a container and NOT a surface.
             // We allow taking from *closed* containers here; reachability handles closed state later.
             let isContainer = parentItem.hasFlag(.isContainer)
@@ -35,15 +34,14 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 5. Handle specific container closed errors before general unreachability
-        if case .item(let parentID) = targetItem.parent,
-           let container = await context.engine.item(parentID),
-           container.hasFlag(.isContainer),
-           !container.hasFlag(.isOpen)
-        {
-            if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
-                throw ActionResponse.containerIsClosed(parentID)
-            } else {
-                throw ActionResponse.itemNotAccessible(targetItemID)
+        if case .item(let parentID) = targetItem.parent {
+            let container = try await context.engine.item(parentID)
+            if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
+                if targetItem.hasFlag(.isTouched) || container.hasFlag(.isTransparent) {
+                    throw ActionResponse.containerIsClosed(parentID)
+                } else {
+                    throw ActionResponse.itemNotAccessible(targetItemID)
+                }
             }
         }
 
@@ -66,12 +64,7 @@ public struct TakeActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard
-            let targetItemID = context.command.directObject,
-            let targetItem = await context.engine.item(targetItemID)
-        else {
-            throw ActionResponse.internalEngineError("Take context.command reached process without direct object.")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // Handle "already have" case detected (but not thrown) in validate
         if targetItem.parent == .player {
@@ -83,7 +76,7 @@ public struct TakeActionHandler: ActionHandler {
 
         // Change 1: Parent
         let parentChange = StateChange(
-            entityID: .item(targetItemID),
+            entityID: .item(targetItem.id),
             attributeKey: .itemParent,
             oldValue: .parentEntity(targetItem.parent),
             newValue: .parentEntity(.player)

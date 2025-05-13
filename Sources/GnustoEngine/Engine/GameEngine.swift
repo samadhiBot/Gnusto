@@ -82,15 +82,14 @@ public actor GameEngine: Sendable {
 
 extension GameEngine {
     /// Starts and runs the main game loop.
-    public func run() async {
+    public func run() async throws {
         await ioHandler.setup()
 
         // Set isVisited flag for starting location
         let startingLocationID = gameState.player.currentLocationID
-        if let startingLoc = location(startingLocationID),
-           let addVisitedFlag = flag(startingLoc, with: .isVisited)
-        {
-            try? gameState.apply(addVisitedFlag)
+        let startingLoc = try location(startingLocationID)
+        if let addVisitedFlag = flag(startingLoc, with: .isVisited) {
+            try gameState.apply(addVisitedFlag)
         }
 
         await describeCurrentLocation() // Initial look
@@ -561,7 +560,7 @@ extension GameEngine {
         } else if !actionHandled {
             // No object handler took charge, check for darkness before running default verb handler
 
-            let isLit = await isPlayerLocationLit()
+            let isLit = await playerLocationIsLit()
 
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary

@@ -9,9 +9,10 @@ public struct WearActionHandler: ActionHandler {
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await context.engine.item(targetItemID),
-              targetItem.parent == .player else
-        {
+
+        let targetItem = try await context.engine.item(targetItemID)
+
+        guard await context.engine.playerIsHolding(targetItemID) else {
             throw ActionResponse.itemNotHeld(targetItemID)
         }
 
@@ -27,46 +28,27 @@ public struct WearActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        // IDs and validation guaranteed by validate()
-        let targetItemID = context.command.directObject!
-        guard let itemSnapshot = await context.engine.item(targetItemID) else {
-            // Should not happen if validate passed
-            throw ActionResponse.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
-        }
-
+        let targetItem = try await context.engine.item(context.command.directObject)
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .worn (if not already worn)
-        if itemSnapshot.attributes[.isWorn] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isWorn),
-                oldValue: itemSnapshot.attributes[.isWorn] ?? false,
-                newValue: true,
-            ))
+        if let update = await context.engine.flag(targetItem, with: .isWorn) {
+            stateChanges.append(update)
         }
 
         // Change 2: Add .touched (if not already touched)
-        if itemSnapshot.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
-                attributeKey: .itemAttribute(.isTouched),
-                oldValue: itemSnapshot.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([targetItemID])
-        ))
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
 
         // --- Prepare Result ---
         return ActionResult(
-            message: "You put on the \(itemSnapshot.name).",
+            message: "You put on the \(targetItem.name).",
             stateChanges: stateChanges
         )
     }

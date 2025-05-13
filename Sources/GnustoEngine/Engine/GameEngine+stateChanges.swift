@@ -80,7 +80,16 @@ extension GameEngine {
             )
         }
     }
-    
+
+    public func move(_ item: Item, to newParent: ParentEntity) -> StateChange {
+        StateChange(
+            entityID: .item(item.id),
+            attributeKey: .itemParent,
+            oldValue: .parentEntity(item.parent),
+            newValue: .parentEntity(newParent)
+        )
+    }
+
     /// <#Description#>
     /// - Parameter delta: <#delta description#>
     /// - Returns: <#description#>

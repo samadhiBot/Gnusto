@@ -9,14 +9,13 @@ public struct CloseActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(targetItemID) else {
+        guard let targetItem = try? await context.engine.item(targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check reachability using ScopeResolver
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -35,17 +34,10 @@ public struct CloseActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            // Should be caught by validate, but defensive check.
-            throw ActionResponse.internalEngineError("Close context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            // Should be caught by validate.
-            throw ActionResponse.internalEngineError("Close context.command target item disappeared between validate and process.")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // Handle "already closed" case detected (but not thrown) in validate
-        guard try await context.engine.fetch(targetItemID, .isOpen) else {
+        guard try await context.engine.fetch(targetItem.id, .isOpen) else {
             return ActionResult(
                 message: "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
             )
@@ -55,23 +47,18 @@ public struct CloseActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set dynamic property isOpen to false
-        // This call applies the state change internally.
-        // NOTE: The state change for `isOpen` is generated *inside* setDynamicItemValue.
-        // We only need to manually create the change for `.isTouched` here.
-        try await context.engine.setDynamicItemValue(
-            itemID: targetItemID,
-            key: .isOpen,
-            newValue: false
-        )
+        if let update = await context.engine.flag(targetItem, remove: .isOpen) {
+            stateChanges.append(update)
+        }
 
         // --- State Change: Mark as Touched ---
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // --- State Change: Update pronouns ---
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---

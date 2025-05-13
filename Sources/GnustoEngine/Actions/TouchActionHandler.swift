@@ -9,8 +9,7 @@ public struct TouchActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard await context.engine.item(targetItemID) != nil else {
-            throw ActionResponse.unknownItem(targetItemID)        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check reachability
         let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
@@ -20,29 +19,13 @@ public struct TouchActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionResponse.internalEngineError(
-                "TOUCH context.command reached process without direct object."
-            )
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        // Get snapshot again to ensure properties are current
-        if let targetItem = await context.engine.item(targetItemID) {
-            if targetItem.attributes[.isTouched] != true {
-                stateChanges.append(StateChange(
-                    entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isTouched),
-                    oldValue: targetItem.attributes[.isTouched] ?? false,
-                    newValue: true,
-                ))
-            }
-        } else {
-            // Should not happen if validate passed
-            throw ActionResponse.internalEngineError(
-                "Target item '\(targetItemID)' disappeared between validate and process for TOUCH."
-            )
+
+        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            stateChanges.append(addTouchedFlag)
         }
 
         // TODO: Allow item-specific touch actions via ItemActionHandler?

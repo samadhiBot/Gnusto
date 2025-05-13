@@ -9,24 +9,20 @@ struct PutOnActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet("Put what?") // Changed from Insert
         }
         guard let surfaceID = context.command.indirectObject else {
-            let itemName = await context.engine.item(itemToPutID)?.name ?? "item"
-            throw ActionResponse.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
+            let item = try await context.engine.item(itemToPutID)
+            throw ActionResponse.prerequisiteNotMet("Put the \(item.name) on what?")
         }
 
-        // 2. Get Item s
-        guard let itemToPut = await context.engine.item(itemToPutID) else {
-            throw ActionResponse.itemNotAccessible(itemToPutID)
-        }
-        guard let surfaceItem = await context.engine.item(surfaceID) else {
-            throw ActionResponse.itemNotAccessible(surfaceID)
-        }
+        // 2. Get Items
+        let itemToPut = try await context.engine.item(itemToPutID)
+        let surfaceItem = try await context.engine.item(surfaceID)
 
         // 3. Perform Basic Checks
-        guard itemToPut.parent == .player else {
+        guard await context.engine.playerIsHolding(itemToPutID) else {
             throw ActionResponse.itemNotHeld(itemToPutID)
         }
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(surfaceID) else {
+
+        guard await context.engine.playerCanReach(surfaceID) else {
              throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
@@ -34,6 +30,7 @@ struct PutOnActionHandler: ActionHandler {
         if itemToPutID == surfaceID {
              throw ActionResponse.prerequisiteNotMet("You can't put something on itself.")
         }
+
         // Recursive check: is the target surface inside the item we are putting?
         var currentParent = surfaceItem.parent
         while case .item(let parentItemID) = currentParent {
@@ -41,7 +38,7 @@ struct PutOnActionHandler: ActionHandler {
                 // Slightly awkward message, but covers the case
                 throw ActionResponse.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
             }
-            guard let parentItem = await context.engine.item(parentItemID) else { break }
+            let parentItem = try await context.engine.item(parentItemID)
             currentParent = parentItem.parent
         }
 
@@ -53,32 +50,17 @@ struct PutOnActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        // IDs guaranteed non-nil by validate
-        let itemToPutID = context.command.directObject!
-        let surfaceID = context.command.indirectObject!
-
         // Get snapshots (existence guaranteed by validate)
-        guard
-            let itemToPut = await context.engine.item(itemToPutID),
-            let surface = await context.engine.item(surfaceID)
-        else {
-            throw ActionResponse.internalEngineError(
-                "Item snapshot disappeared between validate and process for PUT ON."
-            )
-        }
+        let itemToPut = try await context.engine.item(context.command.directObject)
+        let surface = try await context.engine.item(context.command.indirectObject)
 
         // --- Put Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Update item parent
-        let oldParent = itemToPut.parent // Should be .player
-        let newParent: ParentEntity = .item(surfaceID)
-        stateChanges.append(StateChange(
-            entityID: .item(itemToPutID),
-            attributeKey: .itemParent,
-            oldValue: .parentEntity(oldParent),
-            newValue: .parentEntity(newParent)
-        ))
+        if let update = await context.engine.move(itemToPut, to: .item(surface.id)) {
+            stateChanges.append(update)
+        }
 
         // Change 2: Mark item touched
         if let addTouchedFlag = await context.engine.flag(itemToPut, with: .isTouched) {

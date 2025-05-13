@@ -9,7 +9,7 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard await context.engine.item(targetItemID) != nil else {
+        guard let _ = try? await context.engine.item(targetItemID) else {
             throw ActionResponse.unknownItem(targetItemID)
         }
 
@@ -24,27 +24,20 @@ public struct ExamineActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard
-            let targetItemID = context.command.directObject,
-            let targetItem = await context.engine.item(targetItemID)
-        else {
-            throw ActionResponse.internalEngineError(
-                "Examine context.command reached process without direct object."
-            )
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         var stateChanges: [StateChange] = []
 
         // Special case: examining 'self' should not record any state changes
-        if targetItemID != "self" {
+        if targetItem.id != "self" {
             // --- State Change: Mark as Touched ---
-            if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
-                stateChanges.append(addTouchedFlag)
+            if let update = await context.engine.flag(targetItem, with: .isTouched) {
+                stateChanges.append(update)
             }
 
             // --- State Change: Update pronouns ---
-            if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-                stateChanges.append(updatePronoun)
+            if let update = await context.engine.updatePronouns(to: targetItem) {
+                stateChanges.append(update)
             }
         }
 
@@ -53,7 +46,7 @@ public struct ExamineActionHandler: ActionHandler {
 
         // Priority 1: Readable Text (Check dynamic value)
         if targetItem.hasFlag(.isReadable),
-           let readText: String = try? await context.engine.fetch(targetItemID, .readText),
+           let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
            !readText.isEmpty
         {
             message = readText

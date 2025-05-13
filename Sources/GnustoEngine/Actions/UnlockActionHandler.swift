@@ -16,12 +16,8 @@ public struct UnlockActionHandler: ActionHandler {
         let keyItemID = context.command.indirectObject!
 
         // 2. Get item snapshots
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
-        }
-        guard let keyItem = await context.engine.item(keyItemID) else {
-            throw ActionResponse.itemNotAccessible(keyItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
+        let keyItem = try await context.engine.item(keyItemID)
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
@@ -49,15 +45,17 @@ public struct UnlockActionHandler: ActionHandler {
 
     public func process(context: ActionContext) async throws -> ActionResult {
         // IDs are guaranteed non-nil by validate
-        let targetItemID = context.command.directObject!
-        let keyItemID = context.command.indirectObject!
-
-        // Get snapshots (existence guaranteed by validate)
-        guard let targetItem = await context.engine.item(targetItemID),
-              let keyItem = await context.engine.item(keyItemID) else
-        {
-            throw ActionResponse.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
+        guard
+            let targetItemID = context.command.directObject,
+            let keyItemID = context.command.indirectObject
+        else {
+            throw ActionResponse.internalEngineError(
+                "Item snapshot disappeared between validate and process for UNLOCK."
+            )
         }
+        // Get snapshots (existence guaranteed by validate)
+        let targetItem = try await context.engine.item(targetItemID)
+        let keyItem = try await context.engine.item(keyItemID)
 
         // Handle case: Already unlocked (detected in validate)
         if !targetItem.hasFlag(.isLocked) {
@@ -71,7 +69,7 @@ public struct UnlockActionHandler: ActionHandler {
         // Change 1: Remove .locked from target (if currently locked)
         if targetItem.attributes[.isLocked] == true {
             let lockedChange = StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isLocked),
                 oldValue: true,
                 newValue: false

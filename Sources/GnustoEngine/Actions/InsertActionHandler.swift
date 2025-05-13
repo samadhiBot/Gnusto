@@ -9,17 +9,15 @@ struct InsertActionHandler: ActionHandler {
         }
         guard let containerID = context.command.indirectObject else {
             // Fetch name for better error message if possible
-            let itemName = await context.engine.item(itemToInsertID)?.name ?? "item"
-            throw ActionResponse.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
+            let itemName = try? await context.engine.item(itemToInsertID)
+            throw ActionResponse.prerequisiteNotMet(
+                "Where do you want to insert the \(itemName?.name ?? itemToInsertID.rawValue)?"
+            )
         }
 
         // 2. Get Item s
-        guard let itemToInsert = await context.engine.item(itemToInsertID) else {
-            throw ActionResponse.itemNotAccessible(itemToInsertID)
-        }
-        guard let containerItem = await context.engine.item(containerID) else {
-            throw ActionResponse.itemNotAccessible(containerID)
-        }
+        let itemToInsert = try await context.engine.item(itemToInsertID)
+        let containerItem = try await context.engine.item(containerID)
 
         // 3. Perform Basic Checks
         guard itemToInsert.parent == .player else {
@@ -31,8 +29,7 @@ struct InsertActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotAContainer(itemToInsertID)
         }
 
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(containerID) else {
+        guard await context.engine.playerCanReach(containerID) else {
              throw ActionResponse.itemNotAccessible(containerID)
         }
 
@@ -49,7 +46,7 @@ struct InsertActionHandler: ActionHandler {
                     "You can't put the \(itemToInsert.name) in the \(containerItem.name), because the \(containerItem.name) is inside the \(itemToInsert.name)!"
                 )
             }
-            guard let parentItem = await context.engine.item(parentItemID) else { break }
+            let parentItem = try await context.engine.item(parentItemID)
             currentParent = parentItem.parent
         }
 
@@ -84,14 +81,8 @@ struct InsertActionHandler: ActionHandler {
         let containerID = context.command.indirectObject!
 
         // Get snapshots (existence guaranteed by validate)
-        guard
-            let itemToInsert = await context.engine.item(itemToInsertID),
-            let container = await context.engine.item(containerID)
-        else {
-            throw ActionResponse.internalEngineError(
-                "Item snapshot disappeared between validate and process for INSERT."
-            )
-        }
+        let itemToInsert = try await context.engine.item(itemToInsertID)
+        let container = try await context.engine.item(containerID)
 
         // --- Insert Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
@@ -107,18 +98,18 @@ struct InsertActionHandler: ActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if let addTouchedFlag = await context.engine.flag(itemToInsert, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(itemToInsert, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 2: Mark container touched
-        if let addTouchedFlag = await context.engine.flag(container, with: .isTouched) {
-            stateChanges.append(addTouchedFlag)
+        if let update = await context.engine.flag(container, with: .isTouched) {
+            stateChanges.append(update)
         }
 
         // Change 4: Update pronoun
-        if let updatePronoun = await context.engine.updatePronouns(to: itemToInsert) {
-            stateChanges.append(updatePronoun)
+        if let update = await context.engine.updatePronouns(to: itemToInsert) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---

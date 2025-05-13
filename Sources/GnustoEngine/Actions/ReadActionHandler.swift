@@ -9,9 +9,7 @@ public struct ReadActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.unknownItem(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if room is lit (unless item provides light)
         let currentLocationID = await context.engine.gameState.player.currentLocationID
@@ -33,16 +31,7 @@ public struct ReadActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionResponse.internalEngineError(
-                "READ context.command reached process without direct object."
-            )
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.internalEngineError(
-                "Target item '\(targetItemID)' disappeared between validate and process."
-            )
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
@@ -61,7 +50,7 @@ public struct ReadActionHandler: ActionHandler {
 
         // Fetch text from dynamic values
         do {
-            let textToRead: String = try await context.engine.fetch(targetItemID, .readText)
+            let textToRead: String = try await context.engine.fetch(targetItem.id, .readText)
             if textToRead.isEmpty {
                 message = "There's nothing written on the \(targetItem.name)."
             } else {

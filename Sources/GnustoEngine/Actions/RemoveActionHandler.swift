@@ -9,11 +9,7 @@ public struct RemoveActionHandler: ActionHandler {
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await context.engine.item(targetItemID),
-              targetItem.parent == .player else
-        {
-            throw ActionResponse.itemNotHeld(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if the (held) item is currently worn
         guard targetItem.hasFlag(.isWorn) else {
@@ -27,12 +23,7 @@ public struct RemoveActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard
-            let targetItemID = context.command.directObject,
-            let targetItem = await context.engine.item(targetItemID)
-        else {
-            throw ActionResponse.internalEngineError("Item snapshot disappeared!")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         var stateChanges: [StateChange] = []
 

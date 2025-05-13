@@ -19,9 +19,11 @@ public enum ItemEvent: Sendable {
     /// Called after processing the player's command for the turn.
     case afterTurn(Command)
 
+    /*
     /// Called when the item is first created or loaded into the game.
     case onInitialize
 
     /// Called when the item is destroyed or removed from the game.
     case onDestroy
+     */
 }

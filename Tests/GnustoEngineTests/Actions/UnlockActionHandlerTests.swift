@@ -397,7 +397,7 @@ extension UnlockActionHandlerTests {
         if initialTargetLocked {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItemID),
+                    entityID: .item(targetItem.id),
                     attributeKey: .itemAttribute(.isLocked),
                     oldValue: true,
                     newValue: false
@@ -409,7 +409,7 @@ extension UnlockActionHandlerTests {
         if !initialTargetTouched {
             changes.append(
                 StateChange(
-                    entityID: .item(targetItemID),
+                    entityID: .item(targetItem.id),
                     attributeKey: .itemAttribute(.isTouched),
                     oldValue: nil,
                     newValue: true,

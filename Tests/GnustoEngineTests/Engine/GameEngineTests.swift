@@ -98,7 +98,7 @@ struct GameEngineTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             Void
-            ‾‾‾‾
+            ────
             An empty void.
             You can see a pebble here.
             > xyzzy
@@ -478,7 +478,7 @@ struct GameEngineTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             Void
-            ‾‾‾‾
+            ────
             An empty void.
             You can see a pebble here.
             >

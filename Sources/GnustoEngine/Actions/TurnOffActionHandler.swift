@@ -2,9 +2,6 @@ import Foundation
 
 /// Handles the "TURN OFF" action for items, primarily light sources.
 struct TurnOffActionHandler: ActionHandler {
-
-    // MARK: - ActionHandler Methods
-
     func validate(context: ActionContext) async throws {
         // 1. Get direct object ID
         guard let targetItemID = context.command.directObject else {
@@ -12,13 +9,10 @@ struct TurnOffActionHandler: ActionHandler {
         }
 
         // 2. Fetch the item snapshot.
-        guard let targetItem = await context.engine.item(targetItemID) else {
-            throw ActionResponse.unknownItem(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Verify the item is reachable.
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
@@ -34,13 +28,7 @@ struct TurnOffActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        guard let targetItemID = context.command.directObject else {
-            throw ActionResponse.internalEngineError("TURN OFF context.command reached process without direct object.")
-        }
-        guard let targetItem = await context.engine.item(targetItemID) else {
-             // Should be caught by validate
-            throw ActionResponse.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TURN OFF.")
-        }
+        let targetItem = try await context.engine.item(context.command.directObject)
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []
@@ -48,7 +36,7 @@ struct TurnOffActionHandler: ActionHandler {
         // Change 1: Add .touched property change if needed
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
@@ -58,7 +46,7 @@ struct TurnOffActionHandler: ActionHandler {
         // Change 2: Remove .on property change (only if currently on)
         if targetItem.attributes[.isOn] == true {
             stateChanges.append(StateChange(
-                entityID: .item(targetItemID),
+                entityID: .item(targetItem.id),
                 attributeKey: .itemAttribute(.isOn),
                 oldValue: true,
                 newValue: false
@@ -72,19 +60,18 @@ struct TurnOffActionHandler: ActionHandler {
         // Check if location became dark
         let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         if isLightSourceBeingTurnedOff {
-            let currentLocationID = await context.engine.gameState.player.currentLocationID
-            let currentLocation = await context.engine.location(currentLocationID)
+            let currentLocation = try await context.engine.playerLocation()
 
             // 1. Is the room inherently lit?
-            let locationIsInherentlyLit = currentLocation?.hasFlag(.inherentlyLit) ?? false
+            let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
 
             if !locationIsInherentlyLit {
                 // 2. Check for other active light sources (inventory or location)
                 let allItems = await context.engine.gameState.items.values
                 let otherActiveLightSources = allItems.filter { item in
-                    guard item.id != targetItemID else { return false } // Exclude the item being turned off
+                    guard item.id != targetItem.id else { return false } // Exclude the item being turned off
                     let isInPlayerInventory = item.parent == .player
-                    let isInCurrentLocation = item.parent == .location(currentLocationID)
+                    let isInCurrentLocation = item.parent == .location(currentLocation.id)
                     let providesLight = item.hasFlag(.isLightSource)
                     let isOn = item.hasFlag(.isOn)
                     return (isInPlayerInventory || isInCurrentLocation) && providesLight && isOn
