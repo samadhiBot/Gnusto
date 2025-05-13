@@ -22,7 +22,7 @@ extension GameEngine {
             logger.warning("💥 Error: Current location snapshot not found!")
             return
         }
-        await ioHandler.print("\(location.name)\n", style: .strong)
+        let underscore = String(repeating: "─", count: location.name.count)
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await generateDescription(
@@ -30,7 +30,12 @@ extension GameEngine {
             key: .description,
             engine: self
         )
-        await ioHandler.print(description)
+
+        await ioHandler.print("""
+            \(location.name)
+            \(underscore)
+            \(description)
+            """, style: .strong)
 
         // 4. List visible items
         await listItemsInLocation(locationID: locationID)

@@ -491,7 +491,7 @@ extension GameEngine {
         if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if let result = try await locationHandler(self, LocationActionMessage.beforeTurn(command)) {
+                if let result = try await locationHandler(self, LocationEvent.beforeTurn(command)) {
                     // Room handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Room handler handled everything
@@ -630,7 +630,7 @@ extension GameEngine {
         if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                _ = try await locationHandler(self, LocationActionMessage.afterTurn(command))
+                _ = try await locationHandler(self, LocationEvent.afterTurn(command))
             } catch {
                 logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }

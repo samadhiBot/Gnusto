@@ -36,7 +36,8 @@ struct CloakOfDarknessWalkthroughTests {
         let actualTranscript = await mockIO.flush()
 
         expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
+            Foyer of the Opera House
+            ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.

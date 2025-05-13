@@ -97,7 +97,8 @@ struct GameEngineTests {
         // Check that the specific error message was printed
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            --- Void ---
+            Void
+            ‾‾‾‾
             An empty void.
             You can see a pebble here.
             > xyzzy
@@ -476,7 +477,8 @@ struct GameEngineTests {
         // Verify initial output occurred (room desc, status, prompt)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            --- Void ---
+            Void
+            ‾‾‾‾
             An empty void.
             You can see a pebble here.
             >

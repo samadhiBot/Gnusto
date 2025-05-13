@@ -96,7 +96,7 @@ struct OperaHouse: AreaContents {
 extension OperaHouse {
     static func barHandler(
         _ engine: GameEngine,
-        _ action: LocationActionMessage
+        _ action: LocationEvent
     ) async throws -> ActionResult? {
         guard
             case .beforeTurn(let command) = action,
