@@ -9,7 +9,7 @@ public struct GoActionHandler: ActionHandler {
         }
 
         // 2. Get Current Location data
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         let currentLocation = try await context.engine.location(currentLocationID)
 
         // 3. Find Exit

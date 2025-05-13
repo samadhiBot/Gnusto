@@ -76,7 +76,7 @@ enum Hooks {
         }
 
         // Add atmospheric messages based on location
-        let locationID = await engine.gameState.player.currentLocationID // Safe accessor
+        let locationID = await engine.playerLocationID // Safe accessor
         let turnCount = await engine.playerMoves      // Safe accessor
 
         // Only show atmospheric messages occasionally (every 5 turns)

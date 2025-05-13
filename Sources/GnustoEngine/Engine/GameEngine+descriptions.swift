@@ -38,7 +38,7 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        let item = await engine.item(itemID)
+        let item = try? await engine.item(itemID)
         return switch key {
         case .description:
             "You see nothing special about \(item?.withDefiniteArticle ?? "it")."

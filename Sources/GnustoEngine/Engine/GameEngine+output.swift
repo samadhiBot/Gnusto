@@ -5,11 +5,9 @@ import OSLog
 
 extension GameEngine {
     /// Displays the description of the current location, considering light level.
-    func describeCurrentLocation() async {
-        let locationID = gameState.player.currentLocationID
-
+    func describeCurrentLocation() async throws {
         // 1. Check for light
-        let isLitResult = await scopeResolver.isLocationLit(locationID: locationID)
+        let isLitResult = await scopeResolver.isLocationLit(locationID: playerLocationID)
         guard isLitResult else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
@@ -18,10 +16,7 @@ extension GameEngine {
         }
 
         // 2. If lit, get snapshot and print name
-        guard let location = location(locationID) else {
-            logger.warning("💥 Error: Current location snapshot not found!")
-            return
-        }
+        let location = try location(playerLocationID)
         let underscore = String(repeating: "─", count: location.name.count)
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
@@ -38,16 +33,16 @@ extension GameEngine {
             """, style: .strong)
 
         // 4. List visible items
-        await listItemsInLocation(locationID: locationID)
+        try await listItemsInLocation(locationID: playerLocationID)
     }
 
     /// Helper to list items visible in a location (only called if lit).
-    private func listItemsInLocation(locationID: LocationID) async {
+    private func listItemsInLocation(locationID: LocationID) async throws {
         // 1. Get visible item IDs using ScopeResolver
         let visibleItemIDs = await scopeResolver.visibleItemsIn(locationID: locationID)
 
         // 2. Asynchronously fetch Item objects/snapshots for the visible IDs
-        let visibleItems = visibleItemIDs.compactMap(item(_:))
+        let visibleItems = try visibleItemIDs.compactMap(item(_:))
 
         // 3. Format and print the list if not empty
         if !visibleItems.isEmpty {

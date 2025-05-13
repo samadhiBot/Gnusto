@@ -34,12 +34,12 @@ extension GameEngine {
 
     /// Checks whether the player's location is currently lit.
     public func playerLocationIsLit() async -> Bool {
-        await isLocationLit(at: gameState.player.currentLocationID)
+        await isLocationLit(at: playerLocationID)
     }
 
     /// Returns the identifier of the player's current location.
     public var playerLocationID: LocationID {
-        gameState.player.currentLocationID
+        playerLocationID
     }
 
     /// The player's current score.

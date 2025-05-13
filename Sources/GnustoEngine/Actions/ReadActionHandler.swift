@@ -12,7 +12,7 @@ public struct ReadActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if room is lit (unless item provides light)
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
         guard isLit else {
             throw ActionResponse.roomIsDark

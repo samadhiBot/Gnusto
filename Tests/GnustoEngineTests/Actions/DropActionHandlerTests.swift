@@ -26,7 +26,7 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = await engine.gameState.player.currentLocationID
+        let finalLocation = await engine.playerLocationID
 
         #expect(await engine.item("key")?.parent == .player) // Verify setup
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -152,7 +152,7 @@ struct DropActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let finalLocation = await engine.gameState.player.currentLocationID
+        let finalLocation = await engine.playerLocationID
 
         #expect(await engine.item("cloak")?.parent == .player)
         #expect(await engine.item("cloak")?.hasFlag(.isWorn) == true) // Qualified

@@ -86,70 +86,64 @@ extension GameEngine {
     /// - Parameters:
     ///   - itemID: The unique identifier of the item to move.
     ///   - newParent: The target parent entity.
-    public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async {
-        guard let moveItem = item(itemID) else {
-            logger.warning(
-                "💥 Cannot move non-existent item '\(itemID.rawValue, privacy: .public)'."
-            )
-            return
-        }
+    public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async throws {
+        let moveItem = try item(itemID)
         let oldParent = moveItem.parent
+
+        guard newParent != oldParent else { return }
 
         // Check if destination is valid (e.g., Location exists)
         if case .location(let locationID) = newParent {
-            guard location(locationID) != nil else {
-                logger.warning("""
-                    💥 Cannot move item '\(itemID.rawValue, privacy: .public)' to \
-                    non-existent location '\(locationID.rawValue, privacy: .public)'.
-                    """)
-                return
-            }
+            let _ = try location(locationID)
         } else if case .item(let containerID) = newParent {
-             guard item(containerID) != nil else {
-                 logger
-                     .warning("""
-                        💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \
-                        non-existent container '\(containerID.rawValue, privacy: .public)'.
-                        """)
-                return
+            let container = try item(containerID)
+            guard container.capacity > moveItem.size else {
+                throw ActionResponse.itemTooLargeForContainer(
+                    item: itemID,
+                    container: containerID
+                )
             }
+//             guard item(containerID) != nil else {
+//                 logger.warning("""
+//                    💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \
+//                    non-existent container '\(containerID.rawValue, privacy: .public)'.
+//                    """)
+//                return
+//            }
             // TODO: Add container capacity check?
         }
 
-        if oldParent != newParent {
-            do {
-                try gameState.apply(
-                    StateChange(
-                        entityID: .item(itemID),
-                        attributeKey: .itemParent,
-                        oldValue: .parentEntity(oldParent),
-                        newValue: .parentEntity(newParent)
-                    )
-                )
-            } catch {
-                logger.warning("""
-                    💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \
-                    \(error, privacy: .public)
-                    """)
-            }
-        }
+        try gameState.apply(
+            move(moveItem, to: newParent)
+        )
+
+//        if oldParent != newParent {
+//            do {
+//                try gameState.apply(
+//                    StateChange(
+//                        entityID: .item(itemID),
+//                        attributeKey: .itemParent,
+//                        oldValue: .parentEntity(oldParent),
+//                        newValue: .parentEntity(newParent)
+//                    )
+//                )
+//            } catch {
+//                logger.warning("""
+//                    💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \
+//                    \(error, privacy: .public)
+//                    """)
+//            }
+//        }
     }
 
     /// Moves the player to a new location.
     ///
     /// - Parameter newLocationID: The unique identifier of the destination location.
-    public func applyPlayerMove(to newLocationID: LocationID) async {
-        let oldLocationID = gameState.player.currentLocationID
+    public func applyPlayerMove(to newLocationID: LocationID) async throws {
+        let oldLocationID = playerLocationID
 
         // Check if destination is valid
-        guard location(newLocationID) != nil else {
-            logger
-                .warning("""
-                    💥 Cannot move player to non-existent location \
-                    '\(newLocationID.rawValue, privacy: .public)'.
-                    """)
-            return
-        }
+        let _ = try location(newLocationID)
 
         if oldLocationID != newLocationID {
             do {

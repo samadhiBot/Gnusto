@@ -23,7 +23,7 @@ extension Components {
                 frequency: 10 // Change every 10 turns
             ) { engine in
                 // Only affects outdoor locations
-                let locationID = await engine.gameState.player.currentLocationID
+                let locationID = await engine.playerLocationID
                 let location = await engine.location(locationID)
 
                 // Randomly change the weather

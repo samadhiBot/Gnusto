@@ -86,17 +86,17 @@ extension GameEngine {
         await ioHandler.setup()
 
         // Set isVisited flag for starting location
-        let startingLocationID = gameState.player.currentLocationID
+        let startingLocationID = playerLocationID
         let startingLoc = try location(startingLocationID)
         if let addVisitedFlag = flag(startingLoc, with: .isVisited) {
             try gameState.apply(addVisitedFlag)
         }
 
-        await describeCurrentLocation() // Initial look
+        try await describeCurrentLocation() // Initial look
 
         while !shouldQuit {
             await showStatus()
-            await processTurn()
+            try await processTurn()
         }
 
         await ioHandler.teardown()
@@ -105,7 +105,7 @@ extension GameEngine {
     // MARK: Private helpers
 
     /// Processes a single turn of the game.
-    private func processTurn() async {
+    private func processTurn() async throws {
         // --- Tick the Clock (Fuses & Daemons) ---
         await tickClock()
 
@@ -133,21 +133,15 @@ extension GameEngine {
         )
 
         // Increment turn counter AFTER clock tick and BEFORE command execution
-        do {
-            let moves = gameState.player.moves
-            try gameState.apply(
-                StateChange(
-                    entityID: .player,
-                    attributeKey: .playerMoves,
-                    oldValue: .int(moves),
-                    newValue: .int(moves + 1)
-                )
+        let moves = gameState.player.moves
+        try gameState.apply(
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                oldValue: .int(moves),
+                newValue: .int(moves + 1)
             )
-        } catch {
-            logger.error(
-                "💥 Failed to apply player move increment state change: \(error, privacy: .public)"
-            )
-        }
+        )
 
         // 3. Execute Command or Handle Error
         switch parseResult {
@@ -160,23 +154,28 @@ extension GameEngine {
             if command.verbID == .quit || shouldQuit { return }
 
             // Handle location description after movement or light change
-            let shouldDescribe = switch command.verbID {
+            let shouldDescribe: Bool
+            switch command.verbID {
             case .go:
                 // Check if the destination room was visited before the movement
-                if let exit = command.direction.flatMap({ direction in
-                    location(gameState.player.currentLocationID)?.exits[direction]
-                }),
-                   let destinationLoc = location(exit.destinationID),
-                   !destinationLoc.hasFlag(.isVisited)
-                {
-                    true
-                } else {
-                    false
+                let exit = try command.direction.flatMap {
+                    try location(playerLocationID).exits[$0]
                 }
+                shouldDescribe = try location(exit?.destinationID).hasFlag(.isVisited)
+
+//                if let exit = try command.direction.flatMap({ direction in
+//                       try location(playerLocationID).exits[direction]
+//                   }),
+//                   try location(exit.destinationID).hasFlag(.isVisited)
+//                {
+//                    true
+//                } else {
+//                    false
+//                }
             case .turnOn, .turnOff:
-                true // Light change commands
+                shouldDescribe = true // Light change commands
             default:
-                false
+                shouldDescribe = false
             }
 
             await execute(command: command)
@@ -184,7 +183,7 @@ extension GameEngine {
             if command.verbID == .quit || shouldQuit { return }
 
             if shouldDescribe {
-                await describeCurrentLocation()
+                try await describeCurrentLocation()
             }
 
         case .failure(let error):
@@ -329,7 +328,7 @@ extension GameEngine {
 
     /// Displays the status line.
     private func showStatus() async {
-        guard let currentLocation = gameState.locations[gameState.player.currentLocationID] else { return }
+        guard let currentLocation = gameState.locations[playerLocationID] else { return }
         await ioHandler.showStatusLine(
             roomName: currentLocation.name,
             score: gameState.player.score,
@@ -342,7 +341,7 @@ extension GameEngine {
 
 extension GameEngine {
     private func anySuch(_ itemID: ItemID) -> String {
-        if let item = item(itemID), item.hasFlag(.isTouched) {
+        if let item = try? item(itemID), item.hasFlag(.isTouched) {
             "the \(item.name)"
         } else {
             "any such thing"
@@ -359,7 +358,7 @@ extension GameEngine {
         _ itemID: ItemID,
         alternate: String = "that"
     ) -> String {
-        if let item = item(itemID) {
+        if let item = try? item(itemID) {
             "the \(item.name)"
         } else {
             alternate
@@ -486,7 +485,7 @@ extension GameEngine {
         var actionResponse: Error? = nil // To store error from object handlers
 
         // --- Room BeforeTurn Hook ---
-        let currentLocationID = gameState.player.currentLocationID
+        let currentLocationID = playerLocationID
         if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax

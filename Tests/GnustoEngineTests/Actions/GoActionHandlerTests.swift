@@ -163,7 +163,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "hall")
+        #expect(await engine.playerLocationID == "hall")
         // Output handled by GameEngine's look after move, not tested here directly
     }
 
@@ -190,7 +190,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "You can't go that way.")
     }
@@ -241,7 +241,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "The door to the vault is locked.")
     }
@@ -289,7 +289,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
     }
 
     /* TODO: implement conditional exits
@@ -341,7 +341,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "garden") // Player moved
+        #expect(await engine.playerLocationID == "garden") // Player moved
     }
      */
 
@@ -366,7 +366,7 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        #expect(await engine.gameState.player.currentLocationID == "foyer") // Player hasn't moved
+        #expect(await engine.playerLocationID == "foyer") // Player hasn't moved
         let output = await mockIO.flush()
         expectNoDifference(output, "Go where?")
     }

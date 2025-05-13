@@ -213,7 +213,7 @@ extension OperaHouse {
     static func messageHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
         guard case .beforeTurn(let command) = event,
               command.verbID == "examine",
-              await engine.gameState.player.currentLocationID == "bar"
+              await engine.playerLocationID == "bar"
         else {
             return nil
         }

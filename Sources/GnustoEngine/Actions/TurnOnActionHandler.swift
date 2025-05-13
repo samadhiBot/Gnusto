@@ -15,7 +15,7 @@ struct TurnOnActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Verify the item is reachable (with light source exception in dark).
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLight = targetItem.hasFlag(.isLightSource)

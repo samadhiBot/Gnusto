@@ -935,7 +935,7 @@ struct GameStateApplyTests {
     func testApplyValidPlayerLocationChange() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialLocation = gameState.player.currentLocationID
+        let initialLocation = playerLocationID
         let newLocation = GameStateTests.locNorth // Should exist in sample state
         #expect(gameState.locations[newLocation] != nil, "Target location must exist")
 
@@ -950,7 +950,7 @@ struct GameStateApplyTests {
         try gameState.apply(change)
 
         // Then
-        #expect(gameState.player.currentLocationID == newLocation)
+        #expect(playerLocationID == newLocation)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -958,7 +958,7 @@ struct GameStateApplyTests {
     func testApplyInvalidPlayerLocationChangeOldValue() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let actualOldLocation = gameState.player.currentLocationID
+        let actualOldLocation = playerLocationID
         let incorrectOldLocation: LocationID = "attic" // Incorrect
         let newLocation = GameStateTests.locNorth
 
@@ -988,7 +988,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(gameState.player.currentLocationID == actualOldLocation)
+        #expect(playerLocationID == actualOldLocation)
         #expect(gameState.changeHistory.isEmpty)
     }
 
@@ -996,7 +996,7 @@ struct GameStateApplyTests {
     func testApplyPlayerLocationChangeToInvalidID() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialLocation = gameState.player.currentLocationID
+        let initialLocation = playerLocationID
         let invalidNewLocation: LocationID = "nonExistentRoom"
         #expect(gameState.locations[invalidNewLocation] == nil, "Target location must not exist")
 
@@ -1025,7 +1025,7 @@ struct GameStateApplyTests {
         }
 
         // Verify state unchanged
-        #expect(gameState.player.currentLocationID == initialLocation)
+        #expect(playerLocationID == initialLocation)
         #expect(gameState.changeHistory.isEmpty)
     }
 

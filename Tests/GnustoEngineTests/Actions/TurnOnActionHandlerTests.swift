@@ -38,9 +38,9 @@ struct TurnOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = await engine.item("lamp")
-        #expect(finalItemState?.hasFlag(.isOn) == true)
-        #expect(finalItemState?.hasFlag(.isTouched) == true)
+        let finalItemState = try await engine.item("lamp")
+        #expect(finalItemState.hasFlag(.isOn) == true)
+        #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The brass lantern is now on.")
