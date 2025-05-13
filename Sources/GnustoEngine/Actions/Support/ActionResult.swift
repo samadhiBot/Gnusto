@@ -2,11 +2,12 @@ import Foundation
 
 /// Result of an action execution with enhanced information.
 public struct ActionResult: Sendable {
-    /// Whether the action was successful.
-    public let success: Bool
-
     /// Message to display to the player.
-    public let message: String
+    ///
+    /// When a message is provided, the engine outputs the message and stops further processing.
+    /// When no message is provided, it applies the state changes, but then proceeds with the
+    /// command's normal messaging.
+    public let message: String?
 
     /// Any state changes that occurred.
     public let stateChanges: [StateChange]
@@ -15,20 +16,25 @@ public struct ActionResult: Sendable {
     public let sideEffects: [SideEffect]
 
     /// Creates a new action result.
+    ///
     /// - Parameters:
-    ///   - success: Whether the action was successful.
-    ///   - message: Message to display to the player.
+    ///   - message: Any message to display to the player.
     ///   - stateChanges: Any state changes that occurred.
     ///   - sideEffects: Any side effects to be processed.
     public init(
-        success: Bool,
-        message: String,
+        message: String? = nil,
         stateChanges: [StateChange] = [],
         sideEffects: [SideEffect] = []
     ) {
-        self.success = success
         self.message = message
         self.stateChanges = stateChanges
         self.sideEffects = sideEffects
+    }
+    
+    /// Creates a new action result with no state changes or side effects.
+    ///
+    /// - Parameter message: A message to display to the player.
+    public init(_ message: String) {
+        self = .init(message: message)
     }
 }

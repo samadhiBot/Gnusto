@@ -1,3 +1,5 @@
+import Foundation
+
 /// Represents a side effect of an action (e.g., starting a fuse, running a daemon).
 public struct SideEffect: Sendable, Equatable {
     /// The type of side effect.

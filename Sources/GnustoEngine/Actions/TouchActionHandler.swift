@@ -49,7 +49,6 @@ public struct TouchActionHandler: ActionHandler {
 
         // --- Create Result ---
         return ActionResult(
-            success: true,
             message: "You feel nothing special.",
             stateChanges: stateChanges
         )

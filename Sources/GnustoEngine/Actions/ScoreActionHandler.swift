@@ -9,14 +9,7 @@ struct ScoreActionHandler: ActionHandler {
         let turnCount = await context.engine.gameState.player.moves
 
         // The SCORE context.command only reports information, it doesn't change state.
-        let message = "Your score is \(currentScore) in \(turnCount) moves."
-
-        return ActionResult(
-            success: true,
-            message: message,
-            stateChanges: [], // No state changes
-            sideEffects: []  // No side effects
-        )
+        return ActionResult("Your score is \(currentScore) in \(turnCount) moves.")
     }
 
     // Relies on default validate() and postProcess().

@@ -16,11 +16,31 @@ public struct ConsoleIOHandler: IOHandler {
     }
 
     public func showStatusLine(roomName: String, score: Int, turns: Int) {
-        // Simple single-line status. A more sophisticated handler
-        // might use terminal manipulation (like ncurses) to keep it fixed.
-        let status = "[ \(roomName)  Score: \(score)  Turns: \(turns) ]"
-        // Print a newline above status line for separation
-        Swift.print("\n" + status)
+        let width = 70
+        let scoreCol = 40
+
+        // Truncate room name if too long
+        let maxRoomLen = scoreCol - 2
+        let displayRoom = roomName.count > maxRoomLen
+        ? roomName.prefix(maxRoomLen - 1) + "…"
+        : roomName
+
+        let scoreStr = "Score: \(score)"
+        let turnsStr = "Turns: \(turns)"
+
+        // Compose left part (room name, padded to scoreCol)
+        let leftPart = displayRoom.padding(toLength: scoreCol, withPad: " ", startingAt: 0)
+        // Compose right part (turns, right-aligned)
+        let rightPartLen = width - (leftPart.count + scoreStr.count)
+        let rightPart = String(repeating: " ", count: max(1, rightPartLen - turnsStr.count)) + turnsStr
+
+        // Final line
+        let line = leftPart + scoreStr + rightPart
+
+        // Separator
+        let separator = String(repeating: "─", count: width)
+
+        Swift.print("\n\(line)\n\(separator)")
         fflush(stdout)
     }
 

@@ -84,7 +84,6 @@ public struct ExamineActionHandler: ActionHandler {
 
         // --- Create Result ---
         return ActionResult(
-            success: true,
             message: message,
             stateChanges: stateChanges
         )

@@ -47,7 +47,6 @@ public struct CloseActionHandler: ActionHandler {
         // Handle "already closed" case detected (but not thrown) in validate
         guard try await context.engine.fetch(targetItemID, .isOpen) else {
             return ActionResult(
-                success: false,
                 message: "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
             )
         }
@@ -77,10 +76,8 @@ public struct CloseActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            success: true,
             message: "Closed.", // Standard Zork message
-            stateChanges: stateChanges, // Only includes touched change if needed
-            sideEffects: []
+            stateChanges: stateChanges
         )
     }
 

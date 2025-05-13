@@ -4,20 +4,20 @@ import Foundation
 /// This registry allows the engine to look up definitions by their IDs.
 public struct DefinitionRegistry: Sendable {
     /// Dictionary mapping Fuse IDs to their definitions.
-    private let fuseDefinitions: [FuseID: FuseDefinition]
+    let fuseDefinitions: [FuseID: FuseDefinition]
 
     /// Dictionary mapping Daemon IDs to their definitions.
-    private let daemonDefinitions: [DaemonID: DaemonDefinition]
+    let daemonDefinitions: [DaemonID: DaemonDefinition]
 
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
-    public let customActionHandlers: [VerbID: ActionHandler]
+    let customActionHandlers: [VerbID: ActionHandler]
 
     /// Handlers triggered when an action targets a specific item ID.
-    public let itemActionHandlers: [ItemID: ItemActionHandler]
+    let itemActionHandlers: [ItemID: ItemActionHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
-    public let locationActionHandlers: [LocationID: LocationActionHandler]
+    let locationActionHandlers: [LocationID: LocationActionHandler]
 
     /// Initializes the registry with definitions and handlers.
     /// - Parameters:
@@ -42,29 +42,5 @@ public struct DefinitionRegistry: Sendable {
         self.customActionHandlers = customActionHandlers
         self.itemActionHandlers = itemActionHandlers
         self.locationActionHandlers = locationActionHandlers
-    }
-
-    /// Fetches a `DaemonDefinition` by its ID.
-    ///
-    /// - Parameter id: The `DaemonID` to look up.
-    /// - Returns: The `DaemonDefinition` if found, otherwise `nil`.
-    func daemonDefinition(for id: DaemonID) -> DaemonDefinition? {
-        daemonDefinitions[id]
-    }
-
-    /// Fetches a `FuseDefinition` by its ID.
-    ///
-    /// - Parameter id: The `FuseID` to look up.
-    /// - Returns: The `FuseDefinition` if found, otherwise `nil`.
-    func fuseDefinition(for id: FuseID) -> FuseDefinition? {
-        fuseDefinitions[id]
-    }
-
-    /// Fetches a `LocationActionHandler` by its ID.
-    ///
-    /// - Parameter id: The `LocationID` to look up.
-    /// - Returns: The `LocationActionHandler` if found, otherwise `nil`.
-    func roomActionHandler(for id: LocationID) -> LocationActionHandler? {
-        locationActionHandlers[id]
     }
 }

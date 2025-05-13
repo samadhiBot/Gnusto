@@ -78,7 +78,12 @@ struct OperaHouse: AreaContents {
     let cloak = Item(
         id: .cloak,
         .name("velvet cloak"),
-        .description("A handsome velvet cloak, of exquisite quality."),
+        .description("""
+            A handsome cloak, of velvet trimmed with satin, and slightly
+            spattered with raindrops. Its blackness is so deep that it
+            almost seems to suck light from the room.
+            """),
+        .adjectives("handsome", "dark", "black", "velvet", "satin"),
         .in(.player),
         .isTakable,
         .isWearable,
@@ -107,7 +112,6 @@ extension OperaHouse {
                 nil
             } else {
                 ActionResult(
-                    success: true,
                     message: "Blundering around in the dark isn't a good idea!",
                     stateChanges: [
                         StateChange(
@@ -123,7 +127,6 @@ extension OperaHouse {
             nil
         default:
             ActionResult(
-                success: true,
                 message: "In the dark? You could easily disturb something!",
                 stateChanges: [
                     StateChange(
@@ -143,20 +146,37 @@ extension OperaHouse {
 extension OperaHouse {
     static func cloakHandler(_ engine: GameEngine, _ command: Command) async throws -> ActionResult? {
         switch command.verbID {
-        case "examine":
-            throw ActionResponse.custom("The cloak is unnaturally dark.")
-
-        case "drop":
-            if await engine.gameState.player.currentLocationID != "cloakroom" {
+        case .drop:
+            if await engine.playerLocationID == "cloakroom", await engine.playerScore < 1 {
+                return ActionResult(
+                    stateChanges: [
+                        await engine.scoreChange(by: 1),
+//                        await engine.flag(engine.location(.bar), with: .isLit)
+                    ]
+                )
+            } else {
                 throw ActionResponse.prerequisiteNotMet(
                     "This isn't the best place to leave a smart cloak lying around."
                 )
-            } else {
+            }
+        case .putOn:
+            let score = await engine.playerScore
+            guard
+                score < 2,
+                command.indirectObject == .hook,
+                await engine.playerLocationID == "cloakroom"
+            else {
                 return nil
             }
-
+            return ActionResult(
+                stateChanges: [await engine.scoreChange(by: 2 - score)]
+            )
+        case .take:
+            if await engine.isPlayerHolding(.cloak) {
+                print("🎾 engine.isPlayerHolding(.cloak)")
+            }
+            return nil
         default:
-            // Any other verb targeting the cloak is not handled by this custom handler.
             return nil
         }
     }

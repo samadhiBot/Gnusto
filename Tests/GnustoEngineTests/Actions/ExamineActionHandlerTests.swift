@@ -315,12 +315,7 @@ struct ExamineActionHandlerTests {
         let definitionRegistry = DefinitionRegistry(
             itemActionHandlers: [
                 "magicMirror": { engine, command in
-                    ActionResult(
-                        success: true,
-                        message: "You see your reflection in the magic mirror.",
-                        stateChanges: [],
-                        sideEffects: []
-                    )
+                    ActionResult("You see your reflection in the magic mirror.")
                 }
             ]
         )

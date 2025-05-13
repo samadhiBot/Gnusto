@@ -65,10 +65,8 @@ public struct WearActionHandler: ActionHandler {
         ))
 
         // --- Prepare Result ---
-        let message = "You put on the \(itemSnapshot.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You put on the \(itemSnapshot.name).",
             stateChanges: stateChanges
         )
     }

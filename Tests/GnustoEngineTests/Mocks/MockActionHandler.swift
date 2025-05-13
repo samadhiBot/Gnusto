@@ -55,7 +55,7 @@ actor MockActionHandler: ActionHandler {
         }
 
         // Default success result if no handler or error
-        return ActionResult(success: true, message: "Mock action succeeded.")
+        return ActionResult("Mock action succeeded.")
     }
 
     func postProcess(context: ActionContext, result: ActionResult) async throws {

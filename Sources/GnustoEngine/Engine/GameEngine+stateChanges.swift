@@ -76,6 +76,18 @@ extension GameEngine {
             )
         }
     }
+    
+    /// <#Description#>
+    /// - Parameter delta: <#delta description#>
+    /// - Returns: <#description#>
+    public func scoreChange(by delta: Int) -> StateChange {
+        StateChange(
+            entityID: .player,
+            attributeKey: .playerScore,
+            oldValue: .int(playerScore),
+            newValue: .int(playerScore + delta)
+        )
+    }
 
     /// Creates a state change to update the pronoun references for items.
     ///

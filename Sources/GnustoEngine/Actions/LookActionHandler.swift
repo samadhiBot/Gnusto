@@ -34,9 +34,7 @@ public struct LookActionHandler: ActionHandler {
             // 1. Check for darkness FIRST
             if await engine.scopeResolver.isLocationLit(locationID: currentLocationID) == false {
                 return ActionResult(
-                    success: true,
                     message: "It is pitch black. You are likely to be eaten by a grue."
-                    // No state changes for looking in the dark
                 )
             }
 
@@ -51,9 +49,9 @@ public struct LookActionHandler: ActionHandler {
             // Call helper to print description, passing the snapshot
             await describeLocation(currentLocation, engine: engine, showVerbose: true, stateSnapshot: stateSnapshot)
 
-            // LOOK itself doesn't change state or usually have a message beyond the description printed by the helper.
-            // Explicitly initialize the struct.
-            return ActionResult(success: true, message: "", stateChanges: [], sideEffects: [])
+            // LOOK itself doesn't change state or usually have a message beyond the description
+            // printed by the helper.
+            return ActionResult()
         }
 
         // EXAMINE [Object]
@@ -90,10 +88,8 @@ public struct LookActionHandler: ActionHandler {
         }
 
         // 5. Combine description lines and return result
-        let finalMessage = descriptionLines.joined(separator: "\n")
         return ActionResult(
-            success: true,
-            message: finalMessage,
+            message: descriptionLines.joined(separator: "\n"),
             stateChanges: stateChanges
         )
     }

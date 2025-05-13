@@ -38,7 +38,7 @@ public struct DropActionHandler: ActionHandler {
 
         // Handle "not holding" case detected (but not thrown) in validate
         if targetItem.parent != .player {
-            return ActionResult(success: false, message: "You aren't holding the \(targetItem.name).")
+            return ActionResult("You aren't holding the \(targetItem.name).")
         }
 
         // --- Calculate State Changes ---
@@ -81,8 +81,7 @@ public struct DropActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            success: true,
-            message: "Dropped.", // Zork 1 message
+            message: "Dropped.",
             stateChanges: stateChanges
         )
     }

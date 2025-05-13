@@ -122,10 +122,8 @@ struct InsertActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        let message = "You put the \(itemToInsert.name) in the \(container.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You put the \(itemToInsert.name) in the \(container.name).",
             stateChanges: stateChanges
         )
     }

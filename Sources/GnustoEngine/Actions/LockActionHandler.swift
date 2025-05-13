@@ -62,11 +62,7 @@ public struct LockActionHandler: ActionHandler {
 
         // Handle case: Already locked (detected in validate)
         if targetItem.hasFlag(.isLocked) {
-            // Manually construct definite article message
-            return ActionResult(
-                success: false,
-                message: "The \(targetItem.name) is already locked."
-            )
+            return ActionResult("The \(targetItem.name) is already locked.")
         }
 
         // --- Lock Successful: Calculate State Changes ---
@@ -99,10 +95,8 @@ public struct LockActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        // Manually construct definite article message
         let message = "The \(targetItem.name) is now locked."
         return ActionResult(
-            success: true,
             message: message,
             stateChanges: stateChanges
         )

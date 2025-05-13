@@ -638,7 +638,6 @@ struct GameEngineTests {
                 )
 
                 return ActionResult(
-                    success: true,
                     message: "Multiple changes applied.",
                     stateChanges: [change1, change2, change3]
                 )
@@ -1486,7 +1485,6 @@ struct GameEngineTests {
 
         // Define the ActionResult to be returned by the mock handler
         let resultToTest = ActionResult(
-            success: true,
             message: "Lamp turned on!",
             stateChanges: turnOnChanges
         )

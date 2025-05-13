@@ -420,7 +420,7 @@ extension GameEngine {
             }
 
             if newTurns <= 0 {
-                guard let definition = definitionRegistry.fuseDefinition(for: fuseID) else {
+                guard let definition = definitionRegistry.fuseDefinitions[fuseID] else {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
                         entityID: .global,
@@ -461,7 +461,7 @@ extension GameEngine {
         // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
-            guard let definition = definitionRegistry.daemonDefinition(for: daemonID) else {
+            guard let definition = definitionRegistry.daemonDefinitions[daemonID] else {
                 print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }
@@ -488,13 +488,14 @@ extension GameEngine {
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = gameState.player.currentLocationID
-        if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
+        if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if let result = try await roomHandler(self, LocationActionMessage.beforeTurn(command)) {
+                if let result = try await locationHandler(self, LocationActionMessage.beforeTurn(command)) {
                     // Room handler returned a result, process it
-                    try await processActionResult(result)
-                    return // Room handler handled everything
+                    if try await processActionResult(result) {
+                        return // Room handler handled everything
+                    }
                 }
             } catch {
                 // Log error and potentially halt turn?
@@ -509,14 +510,15 @@ extension GameEngine {
 
         // 1. Check Direct Object Handler
         if let doID = command.directObject,
-           let objectHandler = definitionRegistry.itemActionHandlers[doID]
+           let itemHandler = definitionRegistry.itemActionHandlers[doID]
         {
             do {
                 // Pass the engine and the full command to the handler
-                if let result = try await objectHandler(self, command) {
+                if let result = try await itemHandler(self, command) {
                     // Object handler returned a result, process it
-                    try await processActionResult(result)
-                    return // Object handler handled everything
+                    if try await processActionResult(result) {
+                        return // Object handler handled everything
+                    }
                 }
             } catch let response {
                 actionResponse = response
@@ -527,14 +529,15 @@ extension GameEngine {
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
-           let ioID = command.indirectObject,
-           let objectHandler = definitionRegistry.itemActionHandlers[ioID]
+           let indirectObject = command.indirectObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[indirectObject]
         {
             do {
-                if let result = try await objectHandler(self, command) {
+                if let result = try await itemHandler(self, command) {
                     // Object handler returned a result, process it
-                    try await processActionResult(result)
-                    return // Object handler handled everything
+                    if try await processActionResult(result) {
+                        return // Object handler handled everything
+                    }
                 }
             } catch let response {
                 actionResponse = response
@@ -558,7 +561,7 @@ extension GameEngine {
         } else if !actionHandled {
             // No object handler took charge, check for darkness before running default verb handler
 
-            let isLit = await scopeResolver.isLocationLit(locationID: currentLocationID)
+            let isLit = await isPlayerLocationLit()
 
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
@@ -605,7 +608,7 @@ extension GameEngine {
                     let result = try await verbHandler.process(context: context)
 
                     // Process the result (apply changes, print message)
-                    try await processActionResult(result)
+                    _ = try await processActionResult(result)
 
                     // Call postProcess (even if default is empty)
                     try await verbHandler.postProcess(context: context, result: result)
@@ -624,10 +627,10 @@ extension GameEngine {
         // If actionHandled is true and error is nil, the object handler succeeded silently (or printed its own msg).
 
         // --- Room AfterTurn Hook ---
-        if let roomHandler = definitionRegistry.roomActionHandler(for: currentLocationID) {
+        if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                _ = try await roomHandler(self, LocationActionMessage.afterTurn(command))
+                _ = try await locationHandler(self, LocationActionMessage.afterTurn(command))
             } catch {
                 logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }
@@ -637,10 +640,11 @@ extension GameEngine {
     }
 
     /// Processes the result of an action, applying state changes and printing the message.
-    ///
+    /// 
     /// - Parameter result: The `ActionResult` returned by an `ActionHandler`.
+    /// - Returns: Whether the action result emitted a message.
     /// - Throws: Re-throws errors encountered during state application.
-    private func processActionResult(_ result: ActionResult) async throws {
+    private func processActionResult(_ result: ActionResult) async throws -> Bool {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.stateChanges {
@@ -657,9 +661,13 @@ extension GameEngine {
         }
 
         // 2. Print Result Message
-        await ioHandler.print(result.message)
+        if let message = result.message {
+            await ioHandler.print(message)
+            return true
+        } else {
+            return false
+        }
 
         // TODO: Handle SideEffects if they are added to ActionResult?
     }
-
 }

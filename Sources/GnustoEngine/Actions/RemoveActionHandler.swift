@@ -52,18 +52,9 @@ public struct RemoveActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        let message = "You take off the \(targetItem.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You take off the \(targetItem.name).",
             stateChanges: stateChanges
         )
     }
-
-    // Remove the old perform method
-    /*
-    public func perform(context: ActionContext) async throws {
-        // ... old implementation ...
-    }
-    */
 }

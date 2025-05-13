@@ -211,7 +211,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .putOn,
-            synonyms: "put", "place", "set",
+            synonyms: "hang", "put", "place", "set",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],

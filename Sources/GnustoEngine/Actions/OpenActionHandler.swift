@@ -69,7 +69,6 @@ public struct OpenActionHandler: ActionHandler {
 
         // Prepare the result
         return ActionResult(
-            success: true,
             message: "You open the \(targetItem.name).",
             // Only includes touched change if it happened. The open change is applied by setDynamicItemValue.
             stateChanges: stateChanges

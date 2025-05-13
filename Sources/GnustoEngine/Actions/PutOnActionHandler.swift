@@ -96,10 +96,8 @@ struct PutOnActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        let message = "You put the \(itemToPut.name) on the \(surface.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You put the \(itemToPut.name) on the \(surface.name).",
             stateChanges: stateChanges
         )
     }

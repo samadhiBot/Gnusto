@@ -16,11 +16,8 @@ extension GameEngine {
     private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
         switch effect.type {
         case .startFuse:
-            guard
-                let definition = definitionRegistry.fuseDefinition(
-                    for: try effect.targetID.fuseID()
-                )
-            else {
+            let fuseID = try effect.targetID.fuseID()
+            guard let definition = definitionRegistry.fuseDefinitions[fuseID] else {
                 throw ActionResponse.internalEngineError("""
                     No FuseDefinition found for fuse ID '\(effect.targetID)' \
                     in startFuse side effect.
@@ -52,7 +49,7 @@ extension GameEngine {
 
         case .runDaemon:
             let daemonID = try effect.targetID.daemonID()
-            guard definitionRegistry.daemonDefinition(for: daemonID) != nil else {
+            guard definitionRegistry.daemonDefinitions[daemonID] != nil else {
                 throw ActionResponse.internalEngineError("""
                     No DaemonDefinition found for daemon ID '\(daemonID)' \
                     in runDaemon side effect.

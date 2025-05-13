@@ -13,9 +13,6 @@ struct QuitActionHandler: ActionHandler {
         // TODO: Implement confirmation? ("Are you sure you want to quit?")
         await context.engine.requestQuit()
 
-        return ActionResult(
-            success: true,
-            message: "Goodbye!"
-        )
+        return ActionResult("Goodbye!")
     }
 }

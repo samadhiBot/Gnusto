@@ -39,7 +39,9 @@ public struct ThinkAboutActionHandler: ActionHandler {
             // Handle thinking about an item
             guard let targetItem = await context.engine.item(targetItemID) else {
                  // Should be caught by validate
-                throw ActionResponse.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
+                throw ActionResponse.internalEngineError(
+                    "Target item '\(targetItemID)' disappeared between validate and process."
+                )
             }
 
             // Mark as touched if not already
@@ -48,12 +50,14 @@ public struct ThinkAboutActionHandler: ActionHandler {
             }
 
             // Set the standard message
-            message = "You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind."
+            message = """
+                You contemplate the \(targetItem.name) for a bit, \
+                but nothing fruitful comes to mind.
+                """
         }
 
         // Create result
         return ActionResult(
-            success: true,
             message: message,
             stateChanges: stateChanges
         )

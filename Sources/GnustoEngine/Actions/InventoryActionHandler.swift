@@ -27,10 +27,6 @@ public struct InventoryActionHandler: ActionHandler {
 
         // Inventory context.command typically takes no game time.
         // No state changes occur.
-        return ActionResult(
-            success: true,
-            message: message
-            // stateChanges and sideEffects default to empty
-        )
+        return ActionResult(message: message)
     }
 }

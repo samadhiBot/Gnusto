@@ -62,7 +62,7 @@ public struct UnlockActionHandler: ActionHandler {
         // Handle case: Already unlocked (detected in validate)
         if !targetItem.hasFlag(.isLocked) {
             // Manually construct definite article message
-            return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
+            return ActionResult("The \(targetItem.name) is already unlocked.")
         }
 
         // --- Unlock Successful: Calculate State Changes ---
@@ -96,10 +96,8 @@ public struct UnlockActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         // Manually construct definite article message
-        let message = "The \(targetItem.name) is now unlocked."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "The \(targetItem.name) is now unlocked.",
             stateChanges: stateChanges
         )
     }

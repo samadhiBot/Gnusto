@@ -75,7 +75,7 @@ public struct TakeActionHandler: ActionHandler {
 
         // Handle "already have" case detected (but not thrown) in validate
         if targetItem.parent == .player {
-            return ActionResult(success: false, message: "You already have that.")
+            return ActionResult("You already have that.")
         }
 
         // --- Calculate State Changes ---
@@ -102,7 +102,6 @@ public struct TakeActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            success: true,
             message: "Taken.",
             stateChanges: stateChanges
         )

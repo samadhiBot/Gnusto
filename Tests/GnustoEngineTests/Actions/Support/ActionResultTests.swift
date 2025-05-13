@@ -47,7 +47,6 @@ struct ActionResultTests {
     // Computed property to create the ActionResult using other instance properties
     private var testResult: ActionResult {
         ActionResult(
-            success: true, // Added success
             message: "Test message", // Message as String
             stateChanges: [change1, change2, change3] // Use instance properties
             // sideEffects: [] // Add if needed
@@ -75,13 +74,11 @@ struct ActionResultTests {
     @Test("ActionResult Initialization - Full")
     func testActionResultFullInitialization() {
         let result = ActionResult(
-            success: true,
             message: "The lamp is now on.",
             stateChanges: [simpleChange],
             sideEffects: [simpleEffect]
         )
 
-        #expect(result.success == true)
         #expect(result.message == "The lamp is now on.")
         #expect(result.stateChanges.count == 1)
         #expect(result.sideEffects.count == 1)
@@ -91,12 +88,8 @@ struct ActionResultTests {
 
     @Test("ActionResult Initialization - Defaults")
     func testActionResultDefaultInitialization() {
-        let result = ActionResult(
-            success: false,
-            message: "You can't do that."
-        )
+        let result = ActionResult("You can't do that.")
 
-        #expect(result.success == false)
         #expect(result.message == "You can't do that.")
         #expect(result.stateChanges.isEmpty == true)
         #expect(result.sideEffects.isEmpty == true)
@@ -284,14 +277,12 @@ struct ActionResultTests {
 
     @Test func testMergeSimpleResults() throws {
         let result1 = ActionResult(
-            success: true,
             message: "First action.",
             stateChanges: [
                 createTestItemChange(id: "lamp", key: .isOn, oldValue: false, newValue: true)
             ]
         )
         let result2 = ActionResult(
-            success: true,
             message: "Second action.",
             stateChanges: [
                 createTestLocationChange(id: "room", key: .isVisited, oldValue: false, newValue: true)
@@ -309,14 +300,12 @@ struct ActionResultTests {
 
     @Test func testMergeOverlappingChanges_SameEntitySameProperty() throws {
         let result1 = ActionResult(
-            success: true,
             message: "Action 1.",
             stateChanges: [
                 createTestItemChange(id: "lamp", key: .isOn, oldValue: false, newValue: true) // Lamp Off -> On
             ]
         )
         let result2 = ActionResult(
-            success: true,
             message: "Action 2.",
             stateChanges: [
                 createTestItemChange(id: "lamp", key: .isOn, oldValue: true, newValue: false) // Lamp On -> Off
@@ -346,7 +335,6 @@ struct ActionResultTests {
         mockState.locations["cave"] = Location(id: "cave", name: "Cave", attributes: [.isVisited: false])
 
         let result = ActionResult(
-            success: true,
             message: "Turned on lamp and noted visit.",
             stateChanges: turnOnLampChanges
         )
@@ -359,7 +347,6 @@ struct ActionResultTests {
         mockState.items["lamp"] = Item(id: "lamp", name: "Lamp", attributes: [.isOn: true]) // Lamp starts ON
 
         let result = ActionResult(
-            success: true,
             message: "Turn on lamp.",
             stateChanges: [
                  StateChange(
@@ -383,7 +370,6 @@ struct ActionResultTests {
         mockState.globals[.playerLocation] = .locationID("start")
 
         let result = ActionResult(
-            success: true,
             message: "Applied changes.",
             stateChanges: turnOnLampChanges + [
                  StateChange(
@@ -427,13 +413,11 @@ struct ActionResultTests {
     func testInitializationFromPreviousStyle() {
         // Initialize here where self.change1, self.change2 etc. are accessible
         let resultWithChangesAndEffects = ActionResult(
-            success: true,
             message: "Action succeeded.",
             stateChanges: [change1, change2], // Using the corrected change1/change2
             sideEffects: [sideEffect1]      // Using the corrected sideEffect1
         )
 
-        #expect(resultWithChangesAndEffects.success == true)
         #expect(resultWithChangesAndEffects.message == "Action succeeded.")
         #expect(resultWithChangesAndEffects.stateChanges.count == 2)
         #expect(resultWithChangesAndEffects.stateChanges.contains(change1))

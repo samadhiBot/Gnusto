@@ -98,7 +98,6 @@ struct TurnOffActionHandler: ActionHandler {
 
         // --- Create Result ---
         return ActionResult(
-            success: true,
             message: messageParts.joined(separator: "\n"),
             stateChanges: stateChanges
         )

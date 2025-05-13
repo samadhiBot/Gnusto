@@ -78,10 +78,6 @@ public struct GoActionHandler: ActionHandler {
         // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
         // The context.engine's run loop will trigger describeCurrentLocation after state changes.
-        return ActionResult(
-            success: true,
-            message: "", // No specific message for GO action itself
-            stateChanges: stateChanges
-        )
+        return ActionResult(stateChanges: stateChanges)
     }
 }

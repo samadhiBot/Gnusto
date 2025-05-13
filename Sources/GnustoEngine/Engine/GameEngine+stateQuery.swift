@@ -57,6 +57,11 @@ extension GameEngine {
         gameState.player.currentLocationID
     }
 
+    /// Checks whether the player has an item in their inventory.
+    public func isPlayerHolding(_ itemID: ItemID) async -> Bool {
+        playerInventory.contains { $0.id == itemID }
+    }
+
     /// Checks whether the player's location is currently lit.
     public func isPlayerLocationLit() async -> Bool {
         await isLocationLit(at: gameState.player.currentLocationID)

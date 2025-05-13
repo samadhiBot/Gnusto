@@ -22,7 +22,7 @@ extension GameEngine {
             logger.warning("💥 Error: Current location snapshot not found!")
             return
         }
-        await ioHandler.print("--- \(location.name) ---", style: .strong)
+        await ioHandler.print("\(location.name)\n", style: .strong)
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await generateDescription(

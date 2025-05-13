@@ -9,9 +9,6 @@ struct ListenActionHandler: ActionHandler {
 
     func process(context: ActionContext) async throws -> ActionResult {
         // TODO: Could check for specific sounds defined in the room/location?
-        return ActionResult(
-            success: true,
-            message: "You hear nothing unusual."
-        )
+        return ActionResult("You hear nothing unusual.")
     }
 }

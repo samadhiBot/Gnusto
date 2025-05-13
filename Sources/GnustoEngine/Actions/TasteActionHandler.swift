@@ -12,9 +12,6 @@ struct TasteActionHandler: ActionHandler {
 
     func process(context: ActionContext) async throws -> ActionResult {
         // Generic response. Tasting specific items (like food) would need custom logic.
-        return ActionResult(
-            success: true,
-            message: "That tastes about average."
-        )
+        return ActionResult("That tastes about average.")
     }
 }
