@@ -59,13 +59,11 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
                 newValue: true
             ),
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet(["cloak"])
             )
         ]

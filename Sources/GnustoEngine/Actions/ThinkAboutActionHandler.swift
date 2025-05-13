@@ -12,11 +12,10 @@ public struct ThinkAboutActionHandler: ActionHandler {
         if targetItemID.rawValue == "player" { return }
 
         // 3. Check if item exists
-        let targetItem = try await context.engine.item(targetItemID)
+        let _ = try await context.engine.item(targetItemID)
 
         // 4. Check reachability
-        let isReachable = await context.engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
-        guard isReachable else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }

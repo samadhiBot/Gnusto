@@ -12,8 +12,7 @@ public struct OpenActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Use ScopeResolver to determine reachability
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 

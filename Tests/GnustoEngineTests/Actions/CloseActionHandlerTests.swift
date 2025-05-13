@@ -61,13 +61,11 @@ struct CloseActionHandlerTests {
             StateChange(
                 entityID: .item(box.id),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([box.id])
             ),
         ])

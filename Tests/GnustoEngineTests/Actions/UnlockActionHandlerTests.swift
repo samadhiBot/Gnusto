@@ -411,8 +411,7 @@ extension UnlockActionHandlerTests {
                 StateChange(
                     entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -423,8 +422,7 @@ extension UnlockActionHandlerTests {
                 StateChange(
                     entityID: .item(keyItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }

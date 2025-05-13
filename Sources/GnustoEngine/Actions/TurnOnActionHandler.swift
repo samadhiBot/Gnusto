@@ -19,15 +19,14 @@ struct TurnOnActionHandler: ActionHandler {
         let isHeld = targetItem.parent == .player
         let isInLocation = targetItem.parent == .location(currentLocationID)
         let isLight = targetItem.hasFlag(.isLightSource)
-        let roomIsDark = !(await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID))
+        let roomIsDark = await context.engine.playerLocationIsLit() == false
 
         var isNormallyReachable = false
         if isHeld {
             isNormallyReachable = true
         } else if isInLocation {
             if !roomIsDark || !isLight {
-                let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-                isNormallyReachable = reachableItems.contains(targetItemID)
+                isNormallyReachable = await context.engine.playerCanReach(targetItemID)
             } else {
                 isNormallyReachable = true // Allow turning on light in dark room
             }

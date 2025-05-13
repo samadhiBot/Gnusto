@@ -12,15 +12,12 @@ public struct ReadActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if room is lit (unless item provides light)
-        let currentLocationID = await context.engine.playerLocationID
-        let isLit = await context.engine.scopeResolver.isLocationLit(locationID: currentLocationID)
-        guard isLit else {
+        guard await context.engine.playerLocationIsLit() else {
             throw ActionResponse.roomIsDark
         }
 
         // 4. Check reachability
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 

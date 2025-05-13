@@ -44,8 +44,7 @@ struct PutOnActionHandlerTests {
                 StateChange(
                     entityID: .item(itemToPutID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -56,8 +55,7 @@ struct PutOnActionHandlerTests {
                 StateChange(
                     entityID: .item(surfaceID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -67,7 +65,6 @@ struct PutOnActionHandlerTests {
             StateChange(
                 entityID: .global, // Pronoun is global
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([itemToPutID])
             )
         )

@@ -46,9 +46,7 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // 6. Check reachability using ScopeResolver (general check)
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
-            // If not reachable for other reasons (e.g., too far, darkness affecting scope)
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 

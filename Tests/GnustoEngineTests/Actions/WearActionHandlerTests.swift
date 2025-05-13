@@ -51,19 +51,16 @@ struct WearActionHandlerTests {
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isWorn),
-                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
                 entityID: .item("cloak"),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet(["cloak"])
             )
         ]
@@ -86,7 +83,7 @@ struct WearActionHandlerTests {
             rawInput: "wear cloak"
         )
 
-        await #expect(throws: ActionResponse.itemNotHeld("cloak")) {
+        await #expect(throws: ActionResponse.itemNotAccessible("cloak")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

@@ -249,8 +249,7 @@ extension DropActionHandlerTests {
                 StateChange(
                     entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -260,7 +259,6 @@ extension DropActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([itemID])
             )
         )

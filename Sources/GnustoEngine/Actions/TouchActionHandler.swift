@@ -9,11 +9,10 @@ public struct TouchActionHandler: ActionHandler {
         }
 
         // 2. Check if item exists
-        let targetItem = try await context.engine.item(targetItemID)
+        let _ = try await context.engine.item(targetItemID)
 
         // 3. Check reachability
-        let reachableItems = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }

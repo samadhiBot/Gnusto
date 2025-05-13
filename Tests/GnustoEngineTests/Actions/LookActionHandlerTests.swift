@@ -19,13 +19,11 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .item(itemID),
                 attributeKey: .itemAttribute(.isTouched),
-                oldValue: nil,
                 newValue: true,
             ),
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([itemID])
             )
         ]
@@ -493,7 +491,6 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet(["stone"])
             )
         ])

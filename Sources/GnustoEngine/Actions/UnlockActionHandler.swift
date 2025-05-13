@@ -19,8 +19,8 @@ public struct UnlockActionHandler: ActionHandler {
         guard keyItem.parent == .player else {
             throw ActionResponse.itemNotHeld(keyItemID)
         }
-        let update = await context.engine.scopeResolver.itemsReachableByPlayer()
-        guard update.contains(targetItemID) else {
+
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 

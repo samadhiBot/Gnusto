@@ -14,11 +14,7 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // 3. Check reachability
-        guard
-            await context.engine.scopeResolver
-                .itemsReachableByPlayer()
-                .contains(targetItemID)
-        else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }

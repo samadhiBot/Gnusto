@@ -373,7 +373,6 @@ extension ExamineActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([itemID])
             )
         )

@@ -1528,8 +1528,7 @@ extension InsertActionHandlerTests {
                 StateChange(
                     entityID: .item(itemToInsertID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -1540,8 +1539,7 @@ extension InsertActionHandlerTests {
                 StateChange(
                     entityID: .item(containerID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: nil,
-                    newValue: true,
+                        newValue: true,
                 )
             )
         }
@@ -1551,7 +1549,6 @@ extension InsertActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil,
                 newValue: .itemIDSet([itemToInsertID])
             )
         )
