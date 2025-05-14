@@ -13,6 +13,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["brass": ["lantern", "hook"], "rusty": ["knife"]]`
     public var adjectives: [String: Set<ItemID>]
 
+    /// Maps known location names to the LocationID they refer to.
+    public var locationNames: [String: LocationID]
+
     /// A set of "noise" words to be ignored by the parser (articles, punctuation, etc.).
     /// Example: `["a", "an", "the", ".", ","]`
     public var noiseWords: Set<String>
@@ -52,6 +55,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.verbDefinitions = [:] // Initialize new dictionary
         self.items = [:]
         self.adjectives = [:]
+        self.locationNames = [:] // Initialize new property
         self.noiseWords = Vocabulary.defaultNoiseWords
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
@@ -63,6 +67,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         verbDefinitions: [VerbID: Verb] = [:], // Use verbDefinitions
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
+        locationNames: [String: LocationID] = [:], // Added parameter
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
@@ -71,6 +76,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
         self.adjectives = adjectives
+        self.locationNames = locationNames // Assign new property
         self.directions = directions
         self.noiseWords = noiseWords
         self.prepositions = prepositions
@@ -399,15 +405,28 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         }
     }
 
+    /// Adds a location and its name to the vocabulary.
+    /// - Parameter location: The `Location` object to add.
+    public mutating func add(location: Location) {
+        let locationID = location.id
+        let lowercasedName = location.name.lowercased()
+        let lowercasedID = locationID.rawValue.lowercased()
+
+        self.locationNames[lowercasedName] = locationID
+        self.locationNames[lowercasedID] = locationID
+    }
+
     /// Builds a basic vocabulary from arrays of items and verbs, including standard directions
     /// and optionally including default verbs.
     /// - Parameters:
     ///   - items: An array of `Item` objects specific to the game.
+    ///   - locations: An array of `Location` objects specific to the game.
     ///   - verbs: An array of `Verb` objects specific to the game (can override defaults).
     ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
     public static func build(
         items: [Item],
+        locations: [Location],
         verbs: [Verb] = [],
         useDefaultVerbs: Bool = true
     ) -> Vocabulary {
@@ -433,6 +452,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         // Add game-specific items
         for item in items {
             vocab.add(item: item)
+        }
+        // Add game-specific locations
+        for location in locations {
+            vocab.add(location: location)
         }
         // Add game-specific verbs (allowing overrides of defaults)
         for verb in verbs {
@@ -477,6 +500,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case verbDefinitions // Updated key
         case items
         case adjectives
+        case locationNames // Added coding key
         case noiseWords
         case prepositions
         case pronouns
@@ -490,6 +514,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         verbDefinitions = try container.decodeIfPresent([VerbID: Verb].self, forKey: .verbDefinitions) ?? [:]
         items = try container.decode([String: Set<ItemID>].self, forKey: .items)
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
+        locationNames = try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:] // Decode new property
         noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
@@ -501,6 +526,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(verbDefinitions, forKey: .verbDefinitions)
         try container.encode(items, forKey: .items)
         try container.encode(adjectives, forKey: .adjectives)
+        try container.encode(locationNames, forKey: .locationNames) // Encode new property
         try container.encode(noiseWords, forKey: .noiseWords)
         try container.encode(prepositions, forKey: .prepositions)
         try container.encode(pronouns, forKey: .pronouns)

@@ -57,7 +57,7 @@ public struct GameState: Codable, Equatable, Sendable {
         self.pronouns = pronouns
         self.globalState = globalState
         self.changeHistory = changeHistory
-        self.vocabulary = vocabulary ?? .build(items: items)
+        self.vocabulary = vocabulary ?? .build(items: items, locations: locations)
     }
 
     public init(
