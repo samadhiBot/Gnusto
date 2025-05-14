@@ -512,8 +512,8 @@ extension GameEngine {
         // --- Try Object Action Handlers ---
 
         // 1. Check Direct Object Handler
-        if let doID = command.directObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[doID]
+        if case .item(let doItemID) = command.directObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[doItemID]
         {
             do {
                 // Pass the engine and the event to the handler
@@ -532,8 +532,8 @@ extension GameEngine {
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
-           let indirectObject = command.indirectObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[indirectObject]
+           case .item(let ioItemID) = command.indirectObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler(self, .beforeTurn(command)) {
@@ -632,8 +632,8 @@ extension GameEngine {
         // --- Item AfterTurn Hooks ---
 
         // 1. Check Direct Object AfterTurn Handler
-        if let doID = command.directObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[doID]
+        if case .item(let doItemID) = command.directObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[doItemID]
         {
             do {
                 _ = try await itemHandler(self, .afterTurn(command))
@@ -644,8 +644,8 @@ extension GameEngine {
         }
 
         // 2. Check Indirect Object AfterTurn Handler
-        if let indirectObject = command.indirectObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[indirectObject]
+        if case .item(let ioItemID) = command.indirectObject,
+           let itemHandler = definitionRegistry.itemActionHandlers[ioItemID]
         {
             do {
                 _ = try await itemHandler(self, .afterTurn(command))

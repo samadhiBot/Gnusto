@@ -103,10 +103,11 @@ extension Attribute {
     private var underlyingValue: Any {
         switch rawValue {
         case .bool(let value): value
+        case .entityReferenceSet(let value): value ?? []
+        case .exits(let value): value
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .exits(let value): value
         case .locationID(let value): value
         case .parentEntity(let value): value
         case .string(let value): value
