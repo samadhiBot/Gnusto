@@ -294,7 +294,7 @@ struct ExamineActionHandlerTests {
 
         let command = Command(
             verbID: VerbID("examine"),
-            directObject: "self",
+            directObject: .player,
             rawInput: "examine self"
         )
         await engine.execute(command: command)
@@ -337,7 +337,7 @@ struct ExamineActionHandlerTests {
 
         let command = Command(
             verbID: VerbID("examine"),
-            directObject: "magicMirror",
+            directObject: .item(item.id),
             rawInput: "examine mirror"
         )
         await engine.execute(command: command)

@@ -1133,15 +1133,15 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let pronoun = "it"
-        let initialValue = gameState.pronouns[pronoun]
-        #expect(initialValue == [GameStateTests.itemMailbox])
-        let newValue: Set<ItemID> = [GameStateTests.itemLantern]
+        let initialValue: Set<EntityReference> = [.item(GameStateTests.itemMailbox)]
+        #expect(gameState.pronouns[pronoun] == initialValue)
+        let newValue: Set<EntityReference> = [.item(GameStateTests.itemLantern)]
 
         let change = StateChange(
             entityID: .global,
             attributeKey: .pronounReference(pronoun: pronoun),
-            oldValue: .itemIDSet(initialValue!), // Correct old value
-            newValue: .itemIDSet(newValue)
+            oldValue: .entityReferenceSet(initialValue), // Correct old value
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When
@@ -1158,13 +1158,16 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let pronoun = "them"
         #expect(gameState.pronouns[pronoun] == nil)
-        let newValue: Set<ItemID> = [GameStateTests.itemSword, GameStateTests.itemLeaflet]
+        let newValue: Set<EntityReference> = [
+            .item(GameStateTests.itemSword),
+            .item(GameStateTests.itemLeaflet)
+        ]
 
         let change = StateChange(
             entityID: .global,
             attributeKey: .pronounReference(pronoun: pronoun),
             oldValue: nil, // Expecting nil
-            newValue: .itemIDSet(newValue)
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When
@@ -1180,16 +1183,16 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let pronoun = "it"
-        let actualOldValue = gameState.pronouns[pronoun]
-        #expect(actualOldValue == [GameStateTests.itemMailbox])
-        let incorrectOldValue: Set<ItemID> = [GameStateTests.itemSword] // Incorrect
-        let newValue: Set<ItemID> = [GameStateTests.itemLantern]
+        let actualOldValue: Set<EntityReference> = [.item(GameStateTests.itemMailbox)]
+        #expect(gameState.pronouns[pronoun] == actualOldValue)
+        let incorrectOldValue: Set<EntityReference> = [.item(GameStateTests.itemSword)] // Incorrect
+        let newValue: Set<EntityReference> = [.item(GameStateTests.itemLantern)]
 
         let change = StateChange(
             entityID: .global,
             attributeKey: .pronounReference(pronoun: pronoun),
-            oldValue: .itemIDSet(incorrectOldValue),
-            newValue: .itemIDSet(newValue)
+            oldValue: .entityReferenceSet(incorrectOldValue),
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When & Then

@@ -38,7 +38,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         // Verify setup was called
@@ -85,7 +85,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("xyzzy", "quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -182,7 +182,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("take pebble", "quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -275,7 +275,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert IO
         let setupCount = await mockIO.setupCallCount
@@ -359,7 +359,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -413,7 +413,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("quit")
 
         // Act: This should not throw and complete normally
-        try await engine.run()
+        await engine.run()
 
         // Assert IO
         let setupCount = await mockIO.setupCallCount
@@ -438,7 +438,7 @@ struct GameEngineTests {
         )
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         // Verify setup and teardown were called
@@ -535,7 +535,7 @@ struct GameEngineTests {
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
 
         // Act
-        try await engine.run()
+        await engine.run()
 
         // Assert
         let setupCount = await mockIO.setupCallCount
@@ -655,7 +655,7 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let activateCommand = Command(
             verbID: VerbID("activate"),
-            directObject: testItemID,
+            directObject: .item(testItemID),
             rawInput: "activate lamp"
         )
 
@@ -679,7 +679,7 @@ struct GameEngineTests {
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
-        try await engine.run()
+        await engine.run()
 
         // Then
         // Check final state
@@ -1154,7 +1154,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .go,
-            directObject: "north",
+            directObject: .item("north"),
             direction: .north,
             rawInput: "go north"
         )
@@ -1185,7 +1185,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "box",
+            directObject: .item(container.id),
             rawInput: "close box"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1224,8 +1224,8 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "chest",
-            indirectObject: "key1",
+            directObject: .item(container.id),
+            indirectObject: .item(key.id),
             preposition: "with",
             rawInput: "unlock chest with key"
         )
@@ -1254,7 +1254,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "book",
+            directObject: .item(item.id),
             rawInput: "close book"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1283,7 +1283,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .drop,
-            directObject: "statue",
+            directObject: .item(item.id),
             rawInput: "drop statue"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1314,7 +1314,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .remove,
-            directObject: "amulet",
+            directObject: .item(item.id),
             rawInput: "remove amulet"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1342,7 +1342,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .go,
-            directObject: "up",
+            directObject: .item("up"),
             direction: .up,
             rawInput: "go up"
         )
@@ -1378,7 +1378,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "shadow",
+            directObject: .item(item.id),
             rawInput: "examine shadow"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1417,8 +1417,8 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "chest",
-            indirectObject: "key2",
+            directObject: .item(container.id),
+            indirectObject: .item(wrongKey.id),
             preposition: "with",
             rawInput: "unlock chest with key2"
         )
@@ -1504,11 +1504,12 @@ struct GameEngineTests {
         expectNoDifference(output, "Lamp turned on!")
     }
 
-    @Test("applyPronounChange updates game state correctly") async throws {
+    @Test("applyPronounChange updates game state correctly")
+    func testApplyPronounChange_Success() async throws {
         let engine = await GameEngine(game: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
         let itemID: ItemID = "testItem"
 
-        await engine.applyPronounChange(pronoun: "it", entityReference: .item(itemID))
+        await engine.applyPronounChange(pronoun: "it", itemID: itemID)
 
         let pronouns = await engine.gameState.pronouns
         #expect(pronouns["it"] == [.item(itemID)])
@@ -1525,32 +1526,33 @@ struct GameEngineTests {
     }
 
     // Test for GameEngine.updatePronouns
-    @Test("updatePronouns updates game state correctly for single item") async throws {
+    @Test("updatePronouns updates game state correctly for single item")
+    func testUpdatePronounsSingle() async throws {
         let item = Item(id: "testItem", .name("Test Item"))
         let engine = await GameEngine(game: MinimalGame(items: [item]), parser: MockParser(), ioHandler: await MockIOHandler())
 
-        await engine.updatePronouns(for: item)
+        let stateChange = await engine.updatePronouns(to: item)
+        #expect(stateChange == StateChange(
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: "it"),
+            newValue: .entityReferenceSet([.item(item.id)])
+        ))
 
         let pronouns = await engine.gameState.pronouns
         #expect(pronouns["it"] == [.item(item.id)])
 
         // Check change history
         let history = await engine.gameState.changeHistory
-        expectNoDifference(history, [
-            StateChange(
-                entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(item.id)])
-            )
-        ])
+        expectNoDifference(history, [stateChange])
     }
 
-    @Test("updatePronouns updates game state correctly for multiple items (them)") async throws {
+    @Test("updatePronouns updates game state correctly for multiple items (them)")
+    func testUpdatePronounsMultiple() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let engine = await GameEngine(game: MinimalGame(items: [item1, item2]), parser: MockParser(), ioHandler: await MockIOHandler())
 
-        await engine.updatePronouns(for: item1, item2) // Assuming variadic version exists or pass as array
+        await engine.updatePronouns(to: item1, item2) // Assuming variadic version exists or pass as array
 
         let pronouns = await engine.gameState.pronouns
         #expect(pronouns["them"] == [.item(item1.id), .item(item2.id)])
@@ -1604,7 +1606,7 @@ extension GameEngineTests {
         )
 
         await mockIO.enqueueInput(commandInput, "quit")
-        try await engine.run()
+        await engine.run()
         let outputCalls = await mockIO.recordedOutput
         var commandOutput = "" // Default to empty string
         var promptEncountered = false

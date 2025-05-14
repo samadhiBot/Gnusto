@@ -624,7 +624,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: .item(ItemID(itemOnSurface.id)),
+            directObject: .item(itemOnSurface.id),
             rawInput: "take book"
         )
 
@@ -635,12 +635,12 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = try await engine.item(ItemID(itemOnSurface.id))
+        let finalItemState = try await engine.item(itemOnSurface.id)
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true)
-        let finalSurfaceState = try await engine.item(ItemID(surfaceItem.id))
+        let finalSurfaceState = try await engine.item(surfaceItem.id)
         #expect(finalSurfaceState.parent == .location(.startRoom))
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID(itemOnSurface.id))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(itemOnSurface.id)])
 
         // Assert Output
         let output = await mockIO.flush()

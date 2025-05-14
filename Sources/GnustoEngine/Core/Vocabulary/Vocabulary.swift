@@ -425,8 +425,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
     public static func build(
-        items: [Item],
-        locations: [Location],
+        items: [Item] = [],
+        locations: [Location] = [],
         verbs: [Verb] = [],
         useDefaultVerbs: Bool = true
     ) -> Vocabulary {

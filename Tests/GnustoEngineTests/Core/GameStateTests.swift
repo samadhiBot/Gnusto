@@ -74,7 +74,7 @@ struct GameStateTests {
             locations: createSampleLocations(),
             items: createSampleItems(),
             player: createSamplePlayer(),
-            pronouns: ["it": [Self.itemMailbox]],
+            pronouns: ["it": [.item(Self.itemMailbox)]],
             activeFuses: activeFuses,
             globalState: ["gameStarted": true]
         )
@@ -102,7 +102,7 @@ struct GameStateTests {
             vocabulary: vocab
         )
         // Add some initial values if needed by tests
-        state.pronouns["it"] = ["testItem"]
+        state.pronouns["it"] = [.item("testItem")]
         state.globalState["counter"] = .int(0)
         state.globalState["gameStarted"] = true
         state.activeFuses = ["testFuse": 10]
@@ -125,7 +125,7 @@ struct GameStateTests {
         #expect(state.player.currentLocationID == .startRoom)
         #expect(state.globalState["gameStarted"] == true)
         #expect(state.globalState["testFlag"] == nil)
-        #expect(state.pronouns["it"] == ["testItem"])
+        #expect(state.pronouns["it"] == [.item("testItem")])
         #expect(state.activeFuses.count == 1)
         #expect(state.activeDaemons.count == 1)
         #expect(state.changeHistory.isEmpty)
@@ -358,7 +358,7 @@ struct GameStateTests {
 
         // Check other state properties
         #expect(state.globalState == ["gameStarted": true])
-        #expect(state.pronouns == ["it": [Self.itemMailbox]])
+        #expect(state.pronouns == ["it": [.item(Self.itemMailbox)]])
 
         // Check derived inventory
         let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
