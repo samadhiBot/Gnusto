@@ -31,6 +31,9 @@ let package = Package(
             name: "GnustoEngine",
             dependencies: [
                 .product(name: "Markdown", package: "swift-markdown"),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
             ]
         ),
         .executableTarget(

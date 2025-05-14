@@ -75,6 +75,10 @@ public actor GameEngine: Sendable {
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.onEnterRoom = game.onEnterRoom
         self.beforeTurn = game.beforeTurn
+
+        #if DEBUG
+        self.actionHandlers[.debug] = DebugActionHandler()
+        #endif
     }
 }
 

@@ -58,4 +58,10 @@ extension VerbID {
     public static let score = VerbID("score")
     public static let verbose = VerbID("verbose")
     public static let wait = VerbID("wait")
+
+    // Debug Action
+
+    #if DEBUG
+    public static let debug = VerbID("debug")
+    #endif
 }

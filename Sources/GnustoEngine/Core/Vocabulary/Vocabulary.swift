@@ -123,7 +123,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Default set of common English pronouns.
     public static let defaultPronouns: Set<String> = [
-        "it", 
+        "it",
         "them"
     ]
 
@@ -419,6 +419,16 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 vocab.add(verb: verb) // Uses the updated add(verb:)
             }
         }
+
+        #if DEBUG
+        vocab.add(
+            verb: Verb(
+                id: .debug,
+                syntax: [SyntaxRule(.verb, .directObject)],
+                requiresLight: false
+            )
+        )
+        #endif
 
         // Add game-specific items
         for item in items {
