@@ -6,13 +6,13 @@ public struct Command: Equatable, Sendable {
 
     /// The resolved direct object(s), if any.
     /// Note: Using `ItemID?` for now. Might evolve to `[EntityID]?` or similar for plural/ambiguous cases.
-    public var directObject: ItemID?
+    public var directObject: EntityReference?
 
     /// Any modifiers associated with the direct object (adjectives, ordinals).
     public let directObjectModifiers: [String]
 
     /// The resolved indirect object(s), if any.
-    public var indirectObject: ItemID?
+    public var indirectObject: EntityReference?
 
     /// Any modifiers associated with the indirect object.
     public let indirectObjectModifiers: [String]
@@ -34,9 +34,9 @@ public struct Command: Equatable, Sendable {
     /// Initializes a new Command structure.
     public init(
         verbID: VerbID,
-        directObject: ItemID? = nil,
+        directObject: EntityReference? = nil,
         directObjectModifiers: [String] = [],
-        indirectObject: ItemID? = nil,
+        indirectObject: EntityReference? = nil,
         indirectObjectModifiers: [String] = [],
         preposition: String? = nil,
         direction: Direction? = nil,

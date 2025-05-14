@@ -12,7 +12,7 @@ extension GameEngine {
             .go: GoActionHandler(),
             .insert: InsertActionHandler(),
             .inventory: InventoryActionHandler(),
-            .listen: ListenActionHandledr(),
+            .listen: ListenActionHandler(),
             .lock: LockActionHandler(),
             .look: LookActionHandler(),
             .open: OpenActionHandler(),
