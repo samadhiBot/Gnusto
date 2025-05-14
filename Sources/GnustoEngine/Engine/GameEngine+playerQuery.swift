@@ -1,10 +1,4 @@
-//
-//  GameEngine+player.swift
-//  Gnusto
-//
-//  Created by Chris Sessions on 5/8/25.
-//
-
+import Foundation
 
 // MARK: - Player State Accessors
 

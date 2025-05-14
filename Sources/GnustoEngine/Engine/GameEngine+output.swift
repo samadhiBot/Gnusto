@@ -7,8 +7,7 @@ extension GameEngine {
     /// Displays the description of the current location, considering light level.
     func describeCurrentLocation() async throws {
         // 1. Check for light
-        let isLitResult = await scopeResolver.isLocationLit(locationID: playerLocationID)
-        guard isLitResult else {
+        guard await playerLocationIsLit() else {
             // It's dark!
             await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
             // Do not describe the room or list items.
