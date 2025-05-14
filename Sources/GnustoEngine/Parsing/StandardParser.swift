@@ -409,13 +409,12 @@ public struct StandardParser: Parser {
         let nounToResolveIO = ioNounExtracted ?? indirectObjectPhraseTokens.last
         let modsToUseIO = (ioNounExtracted != nil) ? ioModsExtracted : Array(indirectObjectPhraseTokens.dropLast())
 
-        let resolvedDirectObjectResult: Result<ItemID?, ParseError>
+        let resolvedDirectObjectResult: Result<EntityReference?, ParseError>
         if rule.pattern.contains(.directObject) {
              if let actualNoun = nounToResolveDO {
                  resolvedDirectObjectResult = resolveObject(
                      noun: actualNoun,
                      modifiers: modsToUseDO,
-                     isPronoun: vocabulary.isPronoun(actualNoun),
                      in: gameState,
                      using: vocabulary,
                      requiredConditions: rule.directObjectConditions
@@ -427,13 +426,12 @@ public struct StandardParser: Parser {
              resolvedDirectObjectResult = .success(nil)
         }
 
-        let resolvedIndirectObjectResult: Result<ItemID?, ParseError>
+        let resolvedIndirectObjectResult: Result<EntityReference?, ParseError>
         if rule.pattern.contains(.indirectObject) {
             if let actualNoun = nounToResolveIO {
                 resolvedIndirectObjectResult = resolveObject(
                     noun: actualNoun,
                     modifiers: modsToUseIO,
-                    isPronoun: vocabulary.isPronoun(actualNoun),
                     in: gameState,
                     using: vocabulary,
                     requiredConditions: rule.indirectObjectConditions
@@ -446,12 +444,12 @@ public struct StandardParser: Parser {
         }
 
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
-        case (.success(let doID), .success(let ioID)):
+        case (.success(let doRef), .success(let ioRef)):
             let command = Command(
                 verbID: verbID,
-                directObject: doID,
+                directObject: doRef,
                 directObjectModifiers: modsToUseDO,
-                indirectObject: ioID,
+                indirectObject: ioRef,
                 indirectObjectModifiers: modsToUseIO,
                 preposition: matchedPreposition,
                 direction: matchedDirection,
@@ -474,11 +472,14 @@ public struct StandardParser: Parser {
         let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
         guard !significantPhrase.isEmpty else { return (nil, []) }
 
+        let playerAliases: Set<String> = ["me", "self", "myself"]
         var knownNounIndices: [Int] = []
         for (index, word) in significantPhrase.enumerated() {
             let isItemNoun = vocabulary.items.keys.contains(word)
-            let isPronoun = (vocabulary.pronouns.contains(word))
-            if isItemNoun || isPronoun {
+            let isLocationNoun = vocabulary.locationNames.keys.contains(word)
+            let isPlayerAlias = playerAliases.contains(word)
+            let isPronoun = vocabulary.pronouns.contains(word)
+            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun {
                 knownNounIndices.append(index)
             }
         }
@@ -486,6 +487,8 @@ public struct StandardParser: Parser {
         guard let lastNounIndex = knownNounIndices.last else {
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word) &&
+                !vocabulary.locationNames.keys.contains(word) &&
+                !playerAliases.contains(word) &&
                 !vocabulary.verbSynonyms.keys.contains(word) &&
                 !vocabulary.prepositions.contains(word) &&
                 !vocabulary.directions.keys.contains(word)
@@ -512,68 +515,132 @@ public struct StandardParser: Parser {
 
     // MARK: - Object Resolution Helpers
 
-    /// Resolves a noun phrase (noun + modifiers) to a specific ItemID within the game context.
-    /// Incorporates checking required conditions based on the SyntaxRule.
+    /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
     func resolveObject(
         noun: String,
         modifiers: [String],
-        isPronoun: Bool,
         in gameState: GameState,
         using vocabulary: Vocabulary,
         requiredConditions: ObjectCondition
-    ) -> Result<ItemID?, ParseError> {
-        if isPronoun {
+    ) -> Result<EntityReference?, ParseError> {
+        let lowercasedNoun = noun.lowercased()
+        let playerAliases: Set<String> = ["me", "self", "myself"]
+
+        // 1. Handle Player Aliases
+        if playerAliases.contains(lowercasedNoun) {
             guard modifiers.isEmpty else {
-                return .failure(.badGrammar("Pronouns like '\(noun)' usually cannot be modified."))
+                return .failure(.badGrammar("Player reference '\(lowercasedNoun)' cannot be modified by '\(modifiers.joined(separator: " "))'."))
             }
-            guard let referredIDs = gameState.pronouns[noun] else {
-                return .failure(.pronounNotSet(pronoun: noun))
+            return .success(.player)
+        }
+
+        // 2. Handle Pronouns (Placeholder for GameState.pronouns update)
+        if vocabulary.pronouns.contains(lowercasedNoun) {
+            // TODO: This section needs to be updated when GameState.pronouns stores EntityReference(s).
+            // For now, it attempts to resolve as an ItemID and wraps it.
+            guard modifiers.isEmpty else {
+                return .failure(.badGrammar("Pronouns like '\(lowercasedNoun)' usually cannot be modified."))
             }
-            guard !referredIDs.isEmpty else {
-                 return .failure(.pronounNotSet(pronoun: noun))
+            guard let referredItemIDs = gameState.pronouns[lowercasedNoun], !referredItemIDs.isEmpty else {
+                return .failure(.pronounNotSet(pronoun: lowercasedNoun))
             }
-            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
-            let resolvedIDsInScope = referredIDs.filter { candidatesInScope.keys.contains($0) }
-            if resolvedIDsInScope.isEmpty {
-                return .failure(.pronounRefersToOutOfScopeItem(pronoun: noun))
-            } else if resolvedIDsInScope.count > 1 {
-                 return .failure(.ambiguousPronounReference("Which one of \"\(noun)\" do you mean?"))
+
+            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions) // Item-focused
+            let resolvedItemIDsInScope = referredItemIDs.filter { candidatesInScope.keys.contains($0) }
+
+            if resolvedItemIDsInScope.isEmpty {
+                return .failure(.pronounRefersToOutOfScopeItem(pronoun: lowercasedNoun))
+            } else if resolvedItemIDsInScope.count > 1 {
+                // This ambiguity message might need to be more generic if pronouns can refer to non-items.
+                return .failure(.ambiguousPronounReference("Which one of \"\(lowercasedNoun)\" do you mean (referring to items)?"))
             } else {
-                return .success(resolvedIDsInScope.first!)
+                return .success(.item(resolvedItemIDsInScope.first!)) // Wrap as .item
             }
         }
 
-        guard let potentialItemIDs = vocabulary.items[noun] else {
+        // 3. Noun Resolution (Items and Locations)
+        var potentialEntities: [EntityReference] = []
+
+        // Check for items
+        if let itemIDs = vocabulary.items[lowercasedNoun] {
+            for itemID in itemIDs {
+                potentialEntities.append(.item(itemID))
+            }
+        }
+
+        // Check for locations
+        if let locationID = vocabulary.locationNames[lowercasedNoun] {
+            potentialEntities.append(.location(locationID))
+        }
+
+        guard !potentialEntities.isEmpty else {
             return .failure(.unknownNoun(noun))
         }
 
-        let candidatesMatchingScopeAndConditions = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
-        let relevantCandidateIDs = potentialItemIDs.filter { candidatesMatchingScopeAndConditions.keys.contains($0) }
+        // 4. Scope, Conditions, Modifiers, and Disambiguation
+        var resolvedAndScopedEntities: [EntityReference] = []
 
-        guard !relevantCandidateIDs.isEmpty else {
-             return .failure(.itemNotInScope(noun: noun))
+        for entityRef in potentialEntities {
+            switch entityRef {
+            case .item(let itemID):
+                // Use existing item-centric scoping and filtering
+                let itemCandidates = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
+                if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                    let itemWrapperSet: Set<ItemID> = [itemID]
+                    let matchingIDs = filterCandidates(ids: itemWrapperSet, modifiers: modifiers, candidates: itemCandidates)
+                    if !matchingIDs.isEmpty {
+                        resolvedAndScopedEntities.append(.item(matchingIDs.first!))
+                    } else if !modifiers.isEmpty {
+                        // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
+                    }
+                }
+            case .location(let locationID):
+                // Location scope: A named location is generally considered in scope.
+                // Conditions for locations are less common in ObjectCondition but could be checked.
+                guard modifiers.isEmpty else {
+                    // Locations typically aren't modified by adjectives in the same way items are.
+                    // Consider this a parse error for now or decide to ignore modifiers for locations.
+                    // Returning nothing here, will lead to .modifierMismatch if no item matches.
+                    continue // Skip this candidate if modifiers are present
+                }
+                // TODO: Add check for location-specific requiredConditions if they become a concept.
+                // For now, if it's a location reference, it's valid if named.
+                if let _ = gameState.locations[locationID] { // Verify location actually exists in current game state
+                    resolvedAndScopedEntities.append(.location(locationID))
+                }
+
+            case .player: // Should have been handled by player alias check, but defensive
+                if modifiers.isEmpty {
+                    resolvedAndScopedEntities.append(.player)
+                }
+            }
         }
 
-        if modifiers.isEmpty {
-            if relevantCandidateIDs.count > 1 {
-                return .failure(.ambiguity("Which \(noun) do you mean?"))
-            } else {
-                return .success(relevantCandidateIDs.first!)
+        if resolvedAndScopedEntities.isEmpty {
+            // If we had potential entities but none survived scoping/modifiers
+            if !potentialEntities.isEmpty && !modifiers.isEmpty {
+                 return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
             }
-        } else {
-            let matchingIDs = filterCandidates(ids: relevantCandidateIDs, modifiers: modifiers, candidates: candidatesMatchingScopeAndConditions)
-
-            if matchingIDs.isEmpty {
-                return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
-            } else if matchingIDs.count > 1 {
-                return .failure(.ambiguity("Which \(modifiers.joined(separator: " ")) \(noun) do you mean?"))
-            } else {
-                return .success(matchingIDs.first!)
-            }
+            return .failure(.itemNotInScope(noun: noun)) // Or a more generic EntityNotInScope
         }
+
+        if resolvedAndScopedEntities.count > 1 {
+            // Build a descriptive ambiguity message
+            let descriptions = resolvedAndScopedEntities.map {
+                switch $0 {
+                case .item(let id): return "the item '\(gameState.items[id]?.name ?? id.rawValue)'"
+                case .location(let id): return "the location '\(gameState.locations[id]?.name ?? id.rawValue)'"
+                case .player: return "yourself"
+                }
+            }
+            return .failure(.ambiguity("Which do you mean: \(descriptions.joined(separator: ", or "))?"))
+        }
+
+        return .success(resolvedAndScopedEntities.first!)
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.
+    /// NOTE: This function remains item-centric for now. It's used by `resolveObject` for item candidates.
     func gatherCandidates(
         in gameState: GameState,
         requiredConditions: ObjectCondition
@@ -635,7 +702,7 @@ public struct StandardParser: Parser {
 
         gatherRecursive(parentEntity: .player)
         gatherRecursive(parentEntity: .location(currentLocationID))
-        
+
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
             if let location = gameState.locations[currentLocationID] {
                 for itemID in location.localGlobals {
@@ -645,7 +712,7 @@ public struct StandardParser: Parser {
                 }
             }
         }
-        
+
         return candidates
     }
 
@@ -735,7 +802,7 @@ public struct StandardParser: Parser {
 
 // Helper to access failure value easily (avoids force unwrap)
 // Moved to file scope
-private extension Result where Success == ItemID?, Failure == ParseError {
+private extension Result where Success == EntityReference?, Failure == ParseError {
     var failureValue: Failure? {
         guard case .failure(let error) = self else { return nil }
         return error

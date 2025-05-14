@@ -19,3 +19,16 @@ public enum EntityReference: Hashable, Sendable, Codable {
     // /// A reference to the entity that was the primary result/target of the previous action.
     // case previous
 }
+
+extension EntityReference: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .item(let itemID):
+            itemID.rawValue
+        case .location(let locationID):
+            locationID.rawValue
+        case .player:
+            "yourself"
+        }
+    }
+}

@@ -3,12 +3,15 @@ import Foundation
 /// Handles the "TOUCH" context.command and its synonyms (e.g., "FEEL", "RUB", "PAT").
 public struct TouchActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Touch what?")
         }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only touch items.")
+        }
 
-        // 2. Check if item exists
+        // 2. Check if item exists (engine.item() will throw if not found)
         let _ = try await context.engine.item(targetItemID)
 
         // 3. Check reachability
@@ -18,7 +21,11 @@ public struct TouchActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Touch: directObject was not an item in process.")
+        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []

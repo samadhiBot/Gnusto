@@ -4,42 +4,57 @@ import Foundation
 public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Think about what?")
         }
 
-        // 2. Skip further checks if thinking about self (PLAYER)
-        if targetItemID.rawValue == "player" { return }
-
-        // 3. Check if item exists
-        let _ = try await context.engine.item(targetItemID)
-
-        // 4. Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
+        switch directObjectRef {
+        case .player:
+            return // Thinking about self is always valid.
+        case .item(let targetItemID):
+            // 2. Check if item exists
+            let _ = try await context.engine.item(targetItemID) // Will throw if not found
+            // 3. Check reachability
+            guard await context.engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+        case .location(_):
+            // For now, only allow thinking about items or the player.
+            // TODO: Consider if thinking about locations should have a custom response.
+            throw ActionResponse.prerequisiteNotMet("You can only think about items or yourself.")
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject else {
+            // Should be caught by validate.
+            throw ActionResponse.internalEngineError("ThinkAbout: directObject was nil in process.")
+        }
+
         let message: String
         var stateChanges: [StateChange] = []
 
-        // Handle thinking about player
-        // TODO: command.directObject may need to be EntityID
-        if targetItem.id.rawValue == "player" {
+        switch directObjectRef {
+        case .player:
             message = "Yes, yes, you're very important."
-        } else {
+        case .item(let targetItemID):
+            let targetItem = try await context.engine.item(targetItemID)
             // Mark as touched if not already
             if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
                 stateChanges.append(addTouchedFlag)
             }
-
-            // Set the standard message
+            // Update pronoun
+            if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+                stateChanges.append(updatePronoun)
+            }
             message = """
                 You contemplate the \(targetItem.name) for a bit, \
                 but nothing fruitful comes to mind.
                 """
+        case .location(_):
+            // Should be caught by validate if we decide not to support thinking about locations.
+            // If supported, a custom message would go here.
+            message = "You ponder the location, but it remains stubbornly locational."
         }
 
         // Create result

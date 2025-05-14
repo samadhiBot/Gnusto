@@ -6,9 +6,12 @@ struct TurnOnActionHandler: ActionHandler {
     // MARK: - ActionHandler Methods
 
     func validate(context: ActionContext) async throws {
-        // 1. Get direct object ID
-        guard let targetItemID = context.command.directObject else {
+        // 1. Get direct object and ensure it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Turn on what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only turn on items.")
         }
 
         // 2. Fetch the item snapshot.
@@ -47,7 +50,11 @@ struct TurnOnActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("TurnOn: directObject was not an item in process.")
+        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []

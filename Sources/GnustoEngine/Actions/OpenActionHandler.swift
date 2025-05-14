@@ -3,9 +3,12 @@ import Foundation
 /// Handles the "OPEN" context.command.
 public struct OpenActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Open what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only open items.")
         }
 
         // 2. Check if item exists and is accessible using ScopeResolver
@@ -28,11 +31,17 @@ public struct OpenActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            // Should not be reached if validate is correct.
+            throw ActionResponse.internalEngineError("Open: directObject was not an item in process.")
+        }
+
+        let targetItem = try await context.engine.item(targetItemID)
 
         // Check if already open
         if try await context.engine.fetch(targetItem.id, .isOpen) {
-            throw ActionResponse.itemAlreadyOpen(targetItem.id)
+            throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 
         var stateChanges: [StateChange] = []

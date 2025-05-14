@@ -3,14 +3,20 @@ import Foundation
 /// Handles the "EXAMINE" context.command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
 public struct ExamineActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Examine what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            // TODO: Consider if examining non-items (e.g., player, location) should be allowed
+            //       and how that would be handled here and in process().
+            //       For now, only items are examinable.
+            throw ActionResponse.prerequisiteNotMet("You can only examine items.")
         }
 
         // 2. Check if item exists
-        guard let _ = try? await context.engine.item(targetItemID) else {
-            throw ActionResponse.unknownItem(targetItemID)
+        guard (try? await context.engine.item(targetItemID)) != nil else {
+            throw ActionResponse.unknownEntity(directObjectRef) // Changed from unknownItem
         }
 
         // 3. Check reachability
@@ -20,7 +26,15 @@ public struct ExamineActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            // This path should ideally be caught by validate.
+            // If directObjectRef was .player or .location, and validate allowed it,
+            // process would need to handle those cases here.
+            return ActionResult("You can only examine items.") // Or a more generic error
+        }
+
+        let targetItem = try await context.engine.item(targetItemID)
 
         var stateChanges: [StateChange] = []
 

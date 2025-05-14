@@ -3,9 +3,13 @@ import Foundation
 /// Handles the "CLOSE" context.command.
 public struct CloseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Close what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            // TODO: Consider a more specific message if the entity is known.
+            throw ActionResponse.prerequisiteNotMet("You can't close that.")
         }
 
         // 2. Check if item exists
@@ -34,7 +38,15 @@ public struct CloseActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard
+            let directObjectRef = context.command.directObject,
+            case .item(let targetItemID) = directObjectRef
+        else {
+            // This case should ideally be caught by the validate function.
+            return ActionResult("You can't close that.")
+        }
+
+        let targetItem = try await context.engine.item(targetItemID)
 
         // Handle "already closed" case detected (but not thrown) in validate
         guard try await context.engine.fetch(targetItem.id, .isOpen) else {

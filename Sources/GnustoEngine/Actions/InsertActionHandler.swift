@@ -4,18 +4,22 @@ import Foundation
 struct InsertActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
-        guard let itemToInsertID = context.command.directObject else {
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Insert what?")
         }
-        guard let containerID = context.command.indirectObject else {
-            // Fetch name for better error message if possible
-            let itemName = try? await context.engine.item(itemToInsertID)
-            throw ActionResponse.prerequisiteNotMet(
-                "Where do you want to insert the \(itemName?.name ?? itemToInsertID.rawValue)?"
-            )
+        guard case .item(let itemToInsertID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only insert items.")
         }
 
-        // 2. Get Item s
+        guard let indirectObjectRef = context.command.indirectObject else {
+            let itemName = (try? await context.engine.item(itemToInsertID))?.name ?? itemToInsertID.rawValue
+            throw ActionResponse.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
+        }
+        guard case .item(let containerID) = indirectObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only insert items into other items (that are containers).")
+        }
+
+        // 2. Get Items (existence validated by directObjectRef/indirectObjectRef checks if entities exist)
         let itemToInsert = try await context.engine.item(itemToInsertID)
         let containerItem = try await context.engine.item(containerID)
 
@@ -76,11 +80,19 @@ struct InsertActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        // IDs guaranteed non-nil by validate
-        let itemToInsertID = context.command.directObject!
-        let containerID = context.command.indirectObject!
+        // Direct and Indirect objects are guaranteed to be items by validate.
+        guard let directObjectRef = context.command.directObject,
+              case .item(let itemToInsertID) = directObjectRef else {
+            // Should not happen if validate passed.
+            throw ActionResponse.internalEngineError("Insert: Direct object not an item in process.")
+        }
+        guard let indirectObjectRef = context.command.indirectObject,
+              case .item(let containerID) = indirectObjectRef else {
+            // Should not happen if validate passed.
+            throw ActionResponse.internalEngineError("Insert: Indirect object not an item in process.")
+        }
 
-        // Get snapshots (existence guaranteed by validate)
+        // Get snapshots (existence should be guaranteed by validate)
         let itemToInsert = try await context.engine.item(itemToInsertID)
         let container = try await context.engine.item(containerID)
 

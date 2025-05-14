@@ -3,9 +3,12 @@ import Foundation
 /// Handles the "TURN OFF" action for items, primarily light sources.
 struct TurnOffActionHandler: ActionHandler {
     func validate(context: ActionContext) async throws {
-        // 1. Get direct object ID
-        guard let targetItemID = context.command.directObject else {
+        // 1. Get direct object and ensure it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Turn off what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only turn off items.")
         }
 
         // 2. Fetch the item snapshot.
@@ -28,7 +31,11 @@ struct TurnOffActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("TurnOff: directObject was not an item in process.")
+        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // --- State Changes ---
         var stateChanges: [StateChange] = []

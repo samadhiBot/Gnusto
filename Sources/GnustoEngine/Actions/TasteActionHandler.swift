@@ -4,13 +4,17 @@ import Foundation
 struct TasteActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
-        guard context.command.directObject != nil else {
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Taste what?")
         }
-        // Basic TASTE doesn't need reachability check by default.
+        guard case .item(_) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only taste items.")
+        }
+        // Basic TASTE doesn't need further validation like reachability by default.
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
+        // Validate ensures directObject is an item if present.
         // Generic response. Tasting specific items (like food) would need custom logic.
         return ActionResult("That tastes about average.")
     }

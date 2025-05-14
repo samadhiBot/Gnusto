@@ -3,13 +3,15 @@ import Foundation
 /// Handles the "WEAR" context.command and its synonyms (e.g., "DON").
 public struct WearActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Wear what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only wear items.")
         }
 
         // 2. Check if the item exists and is held by the player
-
         let targetItem = try await context.engine.item(targetItemID)
 
         guard await context.engine.playerIsHolding(targetItemID) else {
@@ -28,7 +30,11 @@ public struct WearActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Wear: directObject was not an item in process.")
+        }
+        let targetItem = try await context.engine.item(targetItemID)
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .worn (if not already worn)

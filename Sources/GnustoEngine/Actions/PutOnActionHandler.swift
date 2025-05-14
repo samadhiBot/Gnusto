@@ -4,16 +4,23 @@ import Foundation
 struct PutOnActionHandler: ActionHandler {
 
     func validate(context: ActionContext) async throws {
-        // 1. Validate Direct and Indirect Objects
-        guard let itemToPutID = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Put what?") // Changed from Insert
+        // 1. Validate Direct and Indirect Objects - both must be items
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Put what?")
         }
-        guard let surfaceID = context.command.indirectObject else {
-            let item = try await context.engine.item(itemToPutID)
-            throw ActionResponse.prerequisiteNotMet("Put the \(item.name) on what?")
+        guard case .item(let itemToPutID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only put items on things.")
         }
 
-        // 2. Get Items
+        guard let indirectObjectRef = context.command.indirectObject else {
+            let itemToPut = try await context.engine.item(itemToPutID) // Fetch for name
+            throw ActionResponse.prerequisiteNotMet("Put the \(itemToPut.name) on what?")
+        }
+        guard case .item(let surfaceID) = indirectObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only put things on items (that are surfaces).")
+        }
+
+        // 2. Get Items (existence should be implicitly validated by parser/scope or engine.item() will throw)
         let itemToPut = try await context.engine.item(itemToPutID)
         let surfaceItem = try await context.engine.item(surfaceID)
 
@@ -50,9 +57,19 @@ struct PutOnActionHandler: ActionHandler {
     }
 
     func process(context: ActionContext) async throws -> ActionResult {
+        // Direct and Indirect objects are guaranteed to be items by validate.
+        guard let directObjectRef = context.command.directObject,
+              case .item(let itemToPutID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("PutOn: Direct object not an item in process.")
+        }
+        guard let indirectObjectRef = context.command.indirectObject,
+              case .item(let surfaceID) = indirectObjectRef else {
+            throw ActionResponse.internalEngineError("PutOn: Indirect object not an item in process.")
+        }
+
         // Get snapshots (existence guaranteed by validate)
-        let itemToPut = try await context.engine.item(context.command.directObject)
-        let surface = try await context.engine.item(context.command.indirectObject)
+        let itemToPut = try await context.engine.item(itemToPutID)
+        let surface = try await context.engine.item(surfaceID)
 
         // --- Put Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []

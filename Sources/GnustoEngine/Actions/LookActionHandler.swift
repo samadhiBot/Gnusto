@@ -3,13 +3,22 @@ import Foundation
 /// Handles the "LOOK" context.command and its synonyms (e.g., "L", "EXAMINE").
 public struct LookActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // LOOK (no object) always validates
-        guard let targetItemID = context.command.directObject else {
+        // LOOK (no direct object) always validates.
+        guard let directObjectRef = context.command.directObject else {
             return
         }
 
-        // EXAMINE [Object] - Ensure item exists and is reachable
-        let _ = try await context.engine.item(targetItemID)
+        // If a direct object is present, it must be an item for LOOK/EXAMINE.
+        guard case .item(let targetItemID) = directObjectRef else {
+            // TODO: Consider if LOOK/EXAMINE should support .player or .location directly.
+            // For now, only items are supported when a direct object is specified.
+            throw ActionResponse.prerequisiteNotMet("You can only look at items this way.")
+        }
+
+        // EXAMINE [Item] - Ensure item exists and is reachable
+        guard (try? await context.engine.item(targetItemID)) != nil else {
+            throw ActionResponse.unknownEntity(directObjectRef) // Was unknownItem
+        }
 
         // Check reachability using ScopeResolver
         guard await context.engine.playerCanReach(targetItemID) else {
@@ -19,8 +28,8 @@ public struct LookActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        // LOOK (no object)
-        guard let targetItemID = context.command.directObject else {
+        // LOOK (no direct object)
+        guard let directObjectRef = context.command.directObject else {
             // 1. Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
                 return ActionResult(
@@ -41,7 +50,13 @@ public struct LookActionHandler: ActionHandler {
             return ActionResult()
         }
 
-        // EXAMINE [Object]
+        // EXAMINE [Object] - directObjectRef is non-nil here.
+        // Validate ensures it's an .item, so we can extract targetItemID.
+        guard case .item(let targetItemID) = directObjectRef else {
+            // This should not be reached if validate is correct.
+            throw ActionResponse.internalEngineError("Look: directObject was not an item in process.")
+        }
+
         // Validation ensures item exists and is reachable
         let targetItem = try await context.engine.item(targetItemID)
 

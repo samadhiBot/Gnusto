@@ -3,9 +3,12 @@ import Foundation
 /// Handles the "REMOVE" context.command and its synonyms (e.g., "DOFF", "TAKE OFF").
 public struct RemoveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = context.command.directObject else {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Remove what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only remove items.")
         }
 
         // 2. Check if the item exists and is held by the player
@@ -23,7 +26,11 @@ public struct RemoveActionHandler: ActionHandler {
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        let targetItem = try await context.engine.item(context.command.directObject)
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Remove: directObject was not an item in process.")
+        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         var stateChanges: [StateChange] = []
 
