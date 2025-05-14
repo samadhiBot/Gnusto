@@ -25,8 +25,8 @@ public struct GameState: Codable, Equatable, Sendable {
     /// Value is irrelevant (presence indicates active).
     public internal(set) var activeDaemons: Set<DaemonID>
 
-    /// Pronoun references, mapping String pronouns ("it", "them") to specific item ID sets.
-    public internal(set) var pronouns: [String: Set<ItemID>]
+    /// Pronoun references, mapping String pronouns ("it", "them") to specific entity references.
+    public internal(set) var pronouns: [String: Set<EntityReference>]
 
     /// Game-specific key-value storage for miscellaneous state.
     public internal(set) var globalState: [GlobalID: StateValue]
@@ -43,7 +43,7 @@ public struct GameState: Codable, Equatable, Sendable {
         items: [Item],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        pronouns: [String: Set<ItemID>] = [:],
+        pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         globalState: [GlobalID: StateValue] = [:], // Keep AnyCodable
@@ -64,7 +64,7 @@ public struct GameState: Codable, Equatable, Sendable {
         areas: [AreaContents.Type],
         player: Player,
         vocabulary: Vocabulary? = nil,
-        pronouns: [String: Set<ItemID>] = [:],
+        pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
         globalState: [GlobalID: StateValue] = [:],
@@ -357,14 +357,15 @@ public struct GameState: Codable, Equatable, Sendable {
              globalState[key] = change.newValue
 
         case .pronounReference(let pronoun):
-            // Expecting .itemIDSet
-            guard case .itemIDSet(let newItemIDSet) = change.newValue else {
-                throw ActionResponse.internalEngineError("Type mismatch for pronounReference \(pronoun): expected .itemIDSet, got \(change.newValue)")
+            // Expecting .entityReferenceSet
+            guard case .entityReferenceSet(let newEntityReferenceSet) = change.newValue else {
+                throw ActionResponse.internalEngineError("Type mismatch for pronounReference \(pronoun): expected .entityReferenceSet, got \(change.newValue)")
             }
             guard change.entityID == .global else {
                 throw ActionResponse.internalEngineError("EntityID mismatch for pronounReference: expected .global, got \(change.entityID)")
             }
-            pronouns[pronoun] = newItemIDSet
+            // Ensure newEntityReferenceSet is not nil before assignment, or assign an empty set.
+            pronouns[pronoun] = newEntityReferenceSet ?? []
 
         case .addActiveDaemon(let daemonID):
             guard change.entityID == .global else {
@@ -522,7 +523,7 @@ public struct GameState: Codable, Equatable, Sendable {
              actualCurrentValue = globalState[key]
 
         case .pronounReference(let pronoun):
-            actualCurrentValue = pronouns[pronoun].map { StateValue.itemIDSet($0) }
+            actualCurrentValue = pronouns[pronoun].map { StateValue.entityReferenceSet($0) }
 
         // Fuses & Daemons
         case .addActiveDaemon, .addActiveFuse:

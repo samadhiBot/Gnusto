@@ -534,27 +534,47 @@ public struct StandardParser: Parser {
             return .success(.player)
         }
 
-        // 2. Handle Pronouns (Placeholder for GameState.pronouns update)
+        // 2. Handle Pronouns
         if vocabulary.pronouns.contains(lowercasedNoun) {
-            // TODO: This section needs to be updated when GameState.pronouns stores EntityReference(s).
-            // For now, it attempts to resolve as an ItemID and wraps it.
             guard modifiers.isEmpty else {
                 return .failure(.badGrammar("Pronouns like '\(lowercasedNoun)' usually cannot be modified."))
             }
-            guard let referredItemIDs = gameState.pronouns[lowercasedNoun], !referredItemIDs.isEmpty else {
+            // gameState.pronouns now stores Set<EntityReference>?
+            guard let referredEntityRefs = gameState.pronouns[lowercasedNoun], !referredEntityRefs.isEmpty else {
                 return .failure(.pronounNotSet(pronoun: lowercasedNoun))
             }
 
-            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions) // Item-focused
-            let resolvedItemIDsInScope = referredItemIDs.filter { candidatesInScope.keys.contains($0) }
+            var resolvedPronounCandidates: [EntityReference] = []
 
-            if resolvedItemIDsInScope.isEmpty {
+            for ref in referredEntityRefs {
+                switch ref {
+                case .item(let itemID):
+                    // Check scope for this specific itemID
+                    let itemCandidates = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
+                    if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                        // Modifiers (adjectives) usually don't apply to pronouns directly,
+                        // but if they did, this is where they'd be checked against the item's adjectives.
+                        // For now, if the pronoun refers to an item and that item is in scope, consider it a match.
+                        resolvedPronounCandidates.append(ref)
+                    }
+                case .location(let locID):
+                    // Location scope: A named location is generally considered in scope if it exists.
+                    if gameState.locations[locID] != nil {
+                        resolvedPronounCandidates.append(ref)
+                    }
+                case .player: // Pronoun referring to player
+                    resolvedPronounCandidates.append(ref)
+                }
+            }
+
+            if resolvedPronounCandidates.isEmpty {
                 return .failure(.pronounRefersToOutOfScopeItem(pronoun: lowercasedNoun))
-            } else if resolvedItemIDsInScope.count > 1 {
-                // This ambiguity message might need to be more generic if pronouns can refer to non-items.
-                return .failure(.ambiguousPronounReference("Which one of \"\(lowercasedNoun)\" do you mean (referring to items)?"))
+            } else if resolvedPronounCandidates.count > 1 {
+                // Build a more generic ambiguity message if pronouns can refer to non-items.
+                let descriptions = resolvedPronounCandidates.map { entityRefToString($0, gameState: gameState) }
+                return .failure(.ambiguousPronounReference("Which '\(lowercasedNoun)' do you mean: \(descriptions.joined(separator: ", or "))?"))
             } else {
-                return .success(.item(resolvedItemIDsInScope.first!)) // Wrap as .item
+                return .success(resolvedPronounCandidates.first!)
             }
         }
 
@@ -586,12 +606,17 @@ public struct StandardParser: Parser {
                 // Use existing item-centric scoping and filtering
                 let itemCandidates = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
                 if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
-                    let itemWrapperSet: Set<ItemID> = [itemID]
-                    let matchingIDs = filterCandidates(ids: itemWrapperSet, modifiers: modifiers, candidates: itemCandidates)
-                    if !matchingIDs.isEmpty {
-                        resolvedAndScopedEntities.append(.item(matchingIDs.first!))
-                    } else if !modifiers.isEmpty {
-                        // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
+                    // Pass the specific item's snapshot for modifier checking
+                    if let itemSnapshot = gameState.items[itemID] {
+                        if filterCandidates(item: itemSnapshot, modifiers: modifiers) {
+                            resolvedAndScopedEntities.append(.item(itemID))
+                        } else if !modifiers.isEmpty {
+                            // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
+                        }
+                    } else {
+                        // This case should ideally not be reached if itemID came from vocabulary.items
+                        // and gameState.items is consistent. Perhaps a warning or error here?
+                        // For now, if itemSnapshot is nil, it won't be added.
                     }
                 }
             case .location(let locationID):
@@ -627,11 +652,7 @@ public struct StandardParser: Parser {
         if resolvedAndScopedEntities.count > 1 {
             // Build a descriptive ambiguity message
             let descriptions = resolvedAndScopedEntities.map {
-                switch $0 {
-                case .item(let id): return "the item '\(gameState.items[id]?.name ?? id.rawValue)'"
-                case .location(let id): return "the location '\(gameState.locations[id]?.name ?? id.rawValue)'"
-                case .player: return "yourself"
-                }
+                entityRefToString($0, gameState: gameState)
             }
             return .failure(.ambiguity("Which do you mean: \(descriptions.joined(separator: ", or "))?"))
         }
@@ -718,23 +739,27 @@ public struct StandardParser: Parser {
 
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
     func filterCandidates(
-        ids: Set<ItemID>,
-        modifiers: [String],
-        candidates: [ItemID: Item]
-    ) -> Set<ItemID> {
+        item: Item,
+        modifiers: [String]
+    ) -> Bool {
         guard !modifiers.isEmpty else {
-            return ids
+            return true // No modifiers, the item is a valid match by default
         }
 
         let lowercasedModifiers = Set(modifiers.map { $0.lowercased() })
-
-        return ids.filter { itemID in
-            guard let item = candidates[itemID] else { return false }
-            return lowercasedModifiers.isSubset(of: Set(item.adjectives.map { $0.lowercased() }))
-        }
+        return lowercasedModifiers.isSubset(of: Set(item.adjectives.map { $0.lowercased() }))
     }
 
     // MARK: - Private Helpers (New/Modified for Syntax Matching)
+
+    /// Helper to convert an EntityReference to a descriptive string for ambiguity messages.
+    private func entityRefToString(_ ref: EntityReference, gameState: GameState) -> String {
+        switch ref {
+        case .item(let id): return "the item '\(gameState.items[id]?.name ?? id.rawValue)'"
+        case .location(let id): return "the location '\(gameState.locations[id]?.name ?? id.rawValue)'"
+        case .player: return "yourself"
+        }
+    }
 
     /// Finds the range of tokens corresponding to a noun phrase within the token list,
     /// starting from a given index.

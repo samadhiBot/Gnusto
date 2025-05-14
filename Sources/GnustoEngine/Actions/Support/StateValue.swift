@@ -5,6 +5,7 @@ public enum StateValue: Codable, Sendable, Hashable {
     case int(Int)
     case itemID(ItemID)
     case itemIDSet(Set<ItemID>)
+    case entityReferenceSet(Set<EntityReference>?)
     case exits([Direction: Exit])
     case locationID(LocationID)
     case parentEntity(ParentEntity)
@@ -67,6 +68,12 @@ extension StateValue {
     public var toStrings: Set<String>? {
         underlyingValue as? Set<String>
     }
+
+    /// Returns the `StateValue` underlying value as a `Set<EntityReference>`, or `nil` if the type
+    /// does not match.
+    public var toEntityReferenceSet: Set<EntityReference>? {
+        underlyingValue as? Set<EntityReference>
+    }
 }
 
 // MARK: - Private helpers
@@ -79,6 +86,7 @@ extension StateValue {
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
+        case .entityReferenceSet(let value): value
         case .exits(let value): value
         case .locationID(let value): value
         case .parentEntity(let value): value

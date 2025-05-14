@@ -116,14 +116,16 @@ extension GameEngine {
         case 1: items[0].hasFlag(.isPlural) ? "them" : "it"
         default: "them"
         }
-        let newItemIDs = Set(items.map(\.id))
-        let oldItemIDs = gameState.pronouns[pronoun]
-        if newItemIDs == oldItemIDs { return nil }
+        let newEntityReferences = Set(items.map { EntityReference.item($0.id) })
+        let oldEntityReferences = gameState.pronouns[pronoun]
+
+        if newEntityReferences == oldEntityReferences { return nil }
+
         return StateChange(
             entityID: .global,
             attributeKey: .pronounReference(pronoun: pronoun),
-            oldValue: oldItemIDs.map { .itemIDSet($0) },
-            newValue: .itemIDSet(newItemIDs)
+            oldValue: oldEntityReferences.map { .entityReferenceSet($0) },
+            newValue: .entityReferenceSet(newEntityReferences)
         )
     }
 }

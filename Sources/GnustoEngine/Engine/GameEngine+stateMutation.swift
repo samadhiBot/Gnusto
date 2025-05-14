@@ -59,7 +59,7 @@ extension GameEngine {
     ///   - pronoun: The pronoun (e.g., "it").
     ///   - itemID: The ItemID the pronoun should refer to.
     public func applyPronounChange(pronoun: String, itemID: ItemID) async {
-        let newSet: Set<ItemID> = [itemID]
+        let newSet: Set<EntityReference> = [.item(itemID)]
         let oldSet = gameState.pronouns[pronoun]
 
         if oldSet != newSet {
@@ -68,8 +68,8 @@ extension GameEngine {
                     StateChange(
                         entityID: .global,
                         attributeKey: .pronounReference(pronoun: pronoun),
-                        oldValue: oldSet.map { .itemIDSet($0) },
-                        newValue: .itemIDSet(newSet)
+                        oldValue: oldSet.map { .entityReferenceSet($0) },
+                        newValue: .entityReferenceSet(newSet)
                     )
                 )
             } catch {
@@ -189,7 +189,7 @@ extension GameEngine {
     ///
     /// - Parameter pronoun: The pronoun string (e.g., "it").
     /// - Returns: The set of `ItemID`s the pronoun refers to, or `nil` if not set.
-    public func getPronounReference(pronoun: String) -> Set<ItemID>? {
+    public func getPronounReference(pronoun: String) -> Set<EntityReference>? {
         gameState.pronouns[pronoun.lowercased()]
     }
 
