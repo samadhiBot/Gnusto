@@ -18,4 +18,4 @@ let engine = await GameEngine(
     ioHandler: ioHandler
 )
 
-try await engine.run()
+await engine.run()

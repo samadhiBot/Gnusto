@@ -82,24 +82,31 @@ public actor GameEngine: Sendable {
 
 extension GameEngine {
     /// Starts and runs the main game loop.
-    public func run() async throws {
+    public func run() async {
         await ioHandler.setup()
 
-        // Set isVisited flag for starting location
-        let startingLocationID = playerLocationID
-        let startingLoc = try location(startingLocationID)
-        if let addVisitedFlag = flag(startingLoc, with: .isVisited) {
-            try gameState.apply(addVisitedFlag)
+        do {
+            let startingLocationID = playerLocationID
+            let startingLoc = try location(startingLocationID)
+            if let addVisitedFlag = flag(startingLoc, with: .isVisited) {
+                try gameState.apply(addVisitedFlag)
+            }
+            try await describeCurrentLocation()
+        } catch {
+            logger.error("💥 \(error, privacy: .public)")
         }
-
-        try await describeCurrentLocation() // Initial look
 
         while !shouldQuit {
             await showStatus()
-            try await processTurn()
+            do {
+                try await processTurn()
+            } catch {
+                logger.error("💥 \(error, privacy: .public)")
+            }
         }
 
         await ioHandler.teardown()
+
     }
 
     // MARK: Private helpers
@@ -161,8 +168,11 @@ extension GameEngine {
                 let exit = try command.direction.flatMap { direction in
                     try location(playerLocationID).exits[direction]
                 }
-                let destination = try location(exit?.destinationID)
-                shouldDescribe = !destination.hasFlag(.isVisited)
+                shouldDescribe = if let destination = try? location(exit?.destinationID) {
+                    !destination.hasFlag(.isVisited)
+                } else {
+                    false
+                }
             case .turnOn, .turnOff:
                 shouldDescribe = true // Light change commands
             default:
