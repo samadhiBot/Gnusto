@@ -73,16 +73,15 @@ extension GameEngine {
         engine: GameEngine
     ) async -> String {
         if let actualDescription = try? await engine.fetch(locationID, key) {
-            print("🎾", actualDescription)
-            return formatDescription(actualDescription)
+            formatDescription(actualDescription)
         } else {
-            let defaultDesc = await defaultLocationDescription(
-                for: locationID,
-                key: key,
-                engine: engine
+            formatDescription(
+                await defaultLocationDescription(
+                    for: locationID,
+                    key: key,
+                    engine: engine
+                )
             )
-            print("🎾", defaultDesc)
-            return formatDescription(defaultDesc)
         }
     }
 
