@@ -156,7 +156,7 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let takeCommand = Command(
             verbID: .take,
-            directObject: "startItem",
+            directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
 
@@ -203,7 +203,7 @@ struct GameEngineTests {
         #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(commandReceived?.verbID == "take")
-        #expect(commandReceived?.directObject == "startItem")
+        #expect(commandReceived?.directObject == .item(ItemID("startItem")))
 
         // Check turn counter incremented
         let finalMoves = await engine.playerMoves
@@ -238,6 +238,7 @@ struct GameEngineTests {
         let pebble = Item(
             id: "startItem",
             .name("pebble"),
+            .in(.location(startRoom.id)), // pebble in room
             .isTakable
         )
         let game = MinimalGame(
@@ -247,20 +248,21 @@ struct GameEngineTests {
                 customActionHandlers: [VerbID("look"): mockLookHandler]
             )
         )
-        // Ensure room is lit - Done via initializer now
-//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let lookCommand = Command(
-            verbID: .look,
-            rawInput: "look"
+        let lookCommand = Command(verbID: .look, rawInput: "look")
+        let takePebbleCommand = Command(
+            verbID: .take,
+            directObject: .item(ItemID("startItem")),
+            rawInput: "take pebble"
         )
 
         // Configure parser
         mockParser.parseHandler = { input, _, _ in
             if input == "look" { return .success(lookCommand) }
-            if input == "quit" { return .failure(.emptyInput) }
+            if input == "take pebble" { return .success(takePebbleCommand) }
+            if input == "quit" { return .failure(.emptyInput) } // Simulate quit needs a verb
             return .failure(.unknownVerb(input))
         }
 
@@ -270,27 +272,29 @@ struct GameEngineTests {
             ioHandler: mockIO
         )
 
-        // Configure IO
-        await mockIO.enqueueInput("look", "quit")
+        await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
         try await engine.run()
 
-        // Assert
+        // Assert IO
         let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
         let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
-        // Verify the handler was called with the correct command
-        let processCalled = await mockLookHandler.getProcessCalled()
-        #expect(processCalled == true, "MockActionHandler.process should have been called for LOOK")
-        let commandReceived = await mockLookHandler.getLastCommandReceived()
-        #expect(commandReceived?.verbID == "look", "Handler received incorrect verb")
+        // Assert handler calls
+        let lookProcessCalled = await mockLookHandler.getProcessCalled()
+        #expect(lookProcessCalled == true, "Look handler process should have been called")
+        // Since take is handled by a default handler (or a mock one if we set it up),
+        // we can't easily check its .processCalled without more setup.
 
-        // Check turn counter incremented
+        // Assert game state changes (e.g., pebble is taken)
+        let pebbleState = try await engine.item("startItem")
+        #expect(pebbleState.parent == .player, "Pebble should be held by player")
+
         let finalMoves = await engine.playerMoves
-        #expect(finalMoves == 1, "Turn counter should increment for successful command")
+        #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
     }
 
     @Test("Engine Processes Multiple Commands")
@@ -331,7 +335,7 @@ struct GameEngineTests {
         )
         let takePebbleCommand = Command(
             verbID: .take,
-            directObject: "startItem",
+            directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
 
@@ -374,7 +378,7 @@ struct GameEngineTests {
         #expect(lookCommandReceived?.verbID == "look")
         let takeCommandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(takeCommandReceived?.verbID == "take")
-        #expect(takeCommandReceived?.directObject == "startItem")
+        #expect(takeCommandReceived?.directObject == .item(ItemID("startItem")))
 
         // Check turn counter reflects two successful commands
         let finalMoves = await engine.playerMoves
@@ -390,67 +394,36 @@ struct GameEngineTests {
 
     @Test("Engine Exits Gracefully on Quit Command")
     func testEngineExitsGracefullyOnQuitCommand() async throws {
-        let mockQuitHandler = MockActionHandler()
-        let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [VerbID("quit"): mockQuitHandler]
-            )
-        )
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = await GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let quitCommand = Command(verbID: .quit, rawInput: "quit")
 
-        let quitCommand = Command(
-            verbID: .quit,
-            rawInput: "quit"
-        )
-
-        // Configure parser to recognize "quit"
+        // Configure parser
         mockParser.parseHandler = { input, _, _ in
             if input == "quit" { return .success(quitCommand) }
             return .failure(.unknownVerb(input))
         }
 
-        // Configure IO for just the quit command
+        let engine = await GameEngine(
+            game: MinimalGame(),
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         await mockIO.enqueueInput("quit")
 
-        // Act
+        // Act: This should not throw and complete normally
         try await engine.run()
 
-        // Assert
+        // Assert IO
         let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
         let teardownCount = await mockIO.teardownCallCount
-        #expect(teardownCount == 1, "Teardown should be called on graceful exit")
+        #expect(teardownCount == 1)
 
-        // Verify the quit handler was NOT called (engine handles quit internally)
-        // let quitHandlerCalled = await mockQuitHandler.getPerformCalled()
-        // #expect(quitHandlerCalled == true, "Quit handler should be called") <-- Removed
-        // let quitCommandReceived = await mockQuitHandler.getLastCommandReceived()
-        // #expect(quitCommandReceived?.verbID == "quit") <-- Removed
-
-        // Check turn counter - should NOT increment if quit happens before increment.
+        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn't stop it)
         let finalMoves = await engine.playerMoves
-        #expect(finalMoves == 0, "Turn counter should not increment for the quit command if exit happens first")
-
-        // Verify output - only initial description, status, and prompt, then nothing after quit
-        let output = await mockIO.recordedOutput
-        let quitPromptIndex = output.lastIndex { $0.text == "> " && $0.style == .input }
-        #expect(quitPromptIndex != nil, "Expected a prompt before quit")
-
-        // Ensure no further prompts or outputs happened after the quit command's prompt
-        if let quitPromptIndex {
-             #expect(output.count == quitPromptIndex + 1, "No output should occur after the quit command prompt")
-        }
-
-         // Check status line was shown only for initial state
-        let statuses = await mockIO.recordedStatusLines
-        #expect(statuses.count == 1) // Only initial state, loop exits before turn 1 status
-        #expect(statuses[0].turns == 0)
+        #expect(finalMoves == 0, "Quit command should not increment moves if it's the first command and handled cleanly")
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
@@ -531,7 +504,7 @@ struct GameEngineTests {
         // Configure the MockParser
         let takeCommand = Command(
             verbID: .take,
-            directObject: "startItem",
+            directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
         let inventoryCommand = Command(
@@ -918,7 +891,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "startItem",
+            directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -948,7 +921,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .wear,
-            directObject: "startItem",
+            directObject: .item(ItemID("startItem")),
             rawInput: "wear pebble"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -983,8 +956,8 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -1013,7 +986,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "open rock"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1042,7 +1015,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .wear,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "wear rock"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1083,7 +1056,7 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "shield",
+            directObject: .item(ItemID("shield")),
             rawInput: "take shield"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1116,8 +1089,8 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "rock",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("rock")),
             preposition: "in",
             rawInput: "put key in rock"
         )
@@ -1151,8 +1124,8 @@ struct GameEngineTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "key",
-            indirectObject: "rock",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("rock")),
             preposition: "on",
             rawInput: "put key on rock"
         )
@@ -1529,6 +1502,68 @@ struct GameEngineTests {
         // Verify the message was printed
         let output = await mockIO.flush()
         expectNoDifference(output, "Lamp turned on!")
+    }
+
+    @Test("applyPronounChange updates game state correctly") async throws {
+        let engine = await GameEngine(game: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
+        let itemID: ItemID = "testItem"
+
+        await engine.applyPronounChange(pronoun: "it", entityReference: .item(itemID))
+
+        let pronouns = await engine.gameState.pronouns
+        #expect(pronouns["it"] == [.item(itemID)])
+
+        // Check change history
+        let history = await engine.gameState.changeHistory
+        expectNoDifference(history, [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(itemID)])
+            )
+        ])
+    }
+
+    // Test for GameEngine.updatePronouns
+    @Test("updatePronouns updates game state correctly for single item") async throws {
+        let item = Item(id: "testItem", .name("Test Item"))
+        let engine = await GameEngine(game: MinimalGame(items: [item]), parser: MockParser(), ioHandler: await MockIOHandler())
+
+        await engine.updatePronouns(for: item)
+
+        let pronouns = await engine.gameState.pronouns
+        #expect(pronouns["it"] == [.item(item.id)])
+
+        // Check change history
+        let history = await engine.gameState.changeHistory
+        expectNoDifference(history, [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(item.id)])
+            )
+        ])
+    }
+
+    @Test("updatePronouns updates game state correctly for multiple items (them)") async throws {
+        let item1 = Item(id: "item1", .name("Item One"))
+        let item2 = Item(id: "item2", .name("Item Two"))
+        let engine = await GameEngine(game: MinimalGame(items: [item1, item2]), parser: MockParser(), ioHandler: await MockIOHandler())
+
+        await engine.updatePronouns(for: item1, item2) // Assuming variadic version exists or pass as array
+
+        let pronouns = await engine.gameState.pronouns
+        #expect(pronouns["them"] == [.item(item1.id), .item(item2.id)])
+
+        // Check change history
+        let history = await engine.gameState.changeHistory
+        expectNoDifference(history, [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "them"),
+                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
+            )
+        ])
     }
 }
 

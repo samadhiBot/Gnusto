@@ -37,7 +37,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -82,7 +82,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verbID: .turnOff,
-            directObject: "book",
+            directObject: .item(ItemID("book")),
             rawInput: "turn off book"
         )
 
@@ -119,7 +119,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -158,7 +158,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -208,7 +208,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -252,7 +252,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -294,7 +294,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 
@@ -337,7 +337,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verbID: .turnOff,
-            directObject: "lamp",
+            directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
 

@@ -79,7 +79,7 @@ struct TakeActionHandlerTests {
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
                 oldValue: nil, // Simplified assumption: previous 'it' is irrelevant
-                newValue: .itemIDSet([itemID])
+                newValue: .entityReferenceSet([.item(itemID)])
             )
         )
 
@@ -112,7 +112,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "take key"
         )
 
@@ -126,7 +126,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true) // Use convenience accessor
-        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -158,7 +158,7 @@ struct TakeActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(
             verbID: .take,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "take key"
         )
 
@@ -201,7 +201,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "figurine",
+            directObject: .item(ItemID("figurine")),
             rawInput: "take figurine"
         )
 
@@ -240,7 +240,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "take rock"
         )
 
@@ -308,7 +308,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "gem",
+            directObject: .item(ItemID("gem")),
             rawInput: "take gem"
         )
 
@@ -325,7 +325,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = try await engine.item("box")
         #expect(finalContainerState.parent == .location(.startRoom))
         #expect(finalContainerState.hasFlag(.isOpen) == true) // Check flag
-        #expect(await engine.getPronounReference(pronoun: "it") == ["gem"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("gem"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -368,7 +368,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "coin",
+            directObject: .item(ItemID("coin")),
             rawInput: "take coin"
         )
 
@@ -385,7 +385,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = try await engine.item("pouch")
         #expect(finalContainerState.parent == .player)
         #expect(finalContainerState.hasFlag(.isOpen) == true) // Check flag
-        #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("coin"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -430,7 +430,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "gem",
+            directObject: .item(ItemID("gem")),
             rawInput: "take gem"
         )
 
@@ -480,8 +480,8 @@ struct TakeActionHandlerTests {
         // Command targets the chip, but context is "from statue"
         let command = Command(
             verbID: .take,
-            directObject: "chip",
-            indirectObject: "statue",
+            directObject: .item(ItemID("chip")),
+            indirectObject: .item(ItemID("statue")),
             // Specify source
             rawInput: "take chip from statue"
         )
@@ -523,7 +523,7 @@ struct TakeActionHandlerTests {
         )
         let command = Command(
             verbID: .take,
-            directObject: "heavy",
+            directObject: .item(ItemID("heavy")),
             rawInput: "take heavy"
         )
 
@@ -565,7 +565,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "cloak",
+            directObject: .item(ItemID("cloak")),
             rawInput: "take cloak"
         )
 
@@ -580,7 +580,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true)
         #expect(finalItemState.hasFlag(.isWorn) == false) // Not worn
-        #expect(await engine.getPronounReference(pronoun: "it") == ["cloak"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("cloak"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -624,7 +624,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: itemOnSurface.id,
+            directObject: .item(ItemID(itemOnSurface.id)),
             rawInput: "take book"
         )
 
@@ -635,12 +635,12 @@ struct TakeActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Final State
-        let finalItemState = try await engine.item(itemOnSurface.id)
+        let finalItemState = try await engine.item(ItemID(itemOnSurface.id))
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true)
-        let finalSurfaceState = try await engine.item(surfaceItem.id)
+        let finalSurfaceState = try await engine.item(ItemID(surfaceItem.id))
         #expect(finalSurfaceState.parent == .location(.startRoom))
-        #expect(await engine.getPronounReference(pronoun: "it") == [itemOnSurface.id])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID(itemOnSurface.id))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -683,7 +683,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "take key"
         )
 
@@ -696,7 +696,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true) // Still touched
-        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -750,7 +750,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "take key"
         )
 
@@ -763,7 +763,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player) // Should succeed
         #expect(finalItemState.hasFlag(.isTouched) == true)
-        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -810,7 +810,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "fly",
+            directObject: .item(ItemID("fly")),
             rawInput: "take fly"
         )
 
@@ -859,7 +859,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verbID: .take,
-            directObject: "shield",
+            directObject: .item(ItemID("shield")),
             rawInput: "take shield"
         )
 

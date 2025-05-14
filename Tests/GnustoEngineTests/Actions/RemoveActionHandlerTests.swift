@@ -26,7 +26,7 @@ struct RemoveActionHandlerTests {
 
         let command = Command(
             verbID: .remove,
-            directObject: "cloak",
+            directObject: .item(ItemID("cloak")),
             rawInput: "remove cloak"
         )
 
@@ -64,7 +64,7 @@ struct RemoveActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet(["cloak"])
+                newValue: .entityReferenceSet([.item(ItemID("cloak"))])
             )
         ]
         let finalHistory = await engine.gameState.changeHistory
@@ -88,7 +88,7 @@ struct RemoveActionHandlerTests {
 
         let command = Command(
             verbID: .remove,
-            directObject: "cloak",
+            directObject: .item(ItemID("cloak")),
             rawInput: "take off cloak"
         )
 
@@ -116,7 +116,7 @@ struct RemoveActionHandlerTests {
 
         let command = Command(
             verbID: .remove,
-            directObject: "cloak",
+            directObject: .item(ItemID("cloak")),
             rawInput: "remove cloak"
         )
 
@@ -180,7 +180,7 @@ struct RemoveActionHandlerTests {
 
         let command = Command(
             verbID: .remove,
-            directObject: "amulet",
+            directObject: .item(ItemID("amulet")),
             rawInput: "remove amulet"
         )
 

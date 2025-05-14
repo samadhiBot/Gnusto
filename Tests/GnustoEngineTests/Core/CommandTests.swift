@@ -35,10 +35,10 @@ struct CommandTests {
     @Test("Command Initialization - Verb + Direct Object")
     func testCommandInitVerbDirect() throws {
         let raw = "take lantern"
-        let command = Command(verbID: verbTake, directObject: itemLantern, rawInput: raw)
+        let command = Command(verbID: verbTake, directObject: .item(itemLantern), rawInput: raw)
 
         #expect(command.verbID == verbTake)
-        #expect(command.directObject == itemLantern)
+        #expect(command.directObject == .item(itemLantern))
         #expect(command.directObjectModifiers.isEmpty)
         #expect(command.indirectObject == nil)
         #expect(command.indirectObjectModifiers.isEmpty)
@@ -49,10 +49,10 @@ struct CommandTests {
     @Test("Command Initialization - Verb + Direct Object + Modifiers")
     func testCommandInitVerbDirectMods() throws {
         let raw = "take shiny lantern"
-        let command = Command(verbID: verbTake, directObject: itemLantern, directObjectModifiers: modsShiny, rawInput: raw)
+        let command = Command(verbID: verbTake, directObject: .item(itemLantern), directObjectModifiers: modsShiny, rawInput: raw)
 
         #expect(command.verbID == verbTake)
-        #expect(command.directObject == itemLantern)
+        #expect(command.directObject == .item(itemLantern))
         #expect(command.directObjectModifiers == modsShiny)
         #expect(command.indirectObject == nil)
         #expect(command.indirectObjectModifiers.isEmpty)
@@ -65,16 +65,16 @@ struct CommandTests {
         let raw = "put lantern in case"
         let command = Command(
             verbID: verbPut,
-            directObject: itemLantern,
-            indirectObject: itemCase,
+            directObject: .item(itemLantern),
+            indirectObject: .item(itemCase),
             preposition: prepIn,
             rawInput: raw
         )
 
         #expect(command.verbID == verbPut)
-        #expect(command.directObject == itemLantern)
+        #expect(command.directObject == .item(itemLantern))
         #expect(command.directObjectModifiers.isEmpty)
-        #expect(command.indirectObject == itemCase)
+        #expect(command.indirectObject == .item(itemCase))
         #expect(command.indirectObjectModifiers.isEmpty)
         #expect(command.preposition == prepIn)
         #expect(command.rawInput == raw)
@@ -85,18 +85,18 @@ struct CommandTests {
         let raw = "put shiny lantern in brass case"
         let command = Command(
             verbID: verbPut,
-            directObject: itemLantern,
+            directObject: .item(itemLantern),
             directObjectModifiers: modsShiny,
-            indirectObject: itemCase,
+            indirectObject: .item(itemCase),
             indirectObjectModifiers: modsBrass,
             preposition: prepIn,
             rawInput: raw
         )
 
         #expect(command.verbID == verbPut)
-        #expect(command.directObject == itemLantern)
+        #expect(command.directObject == .item(itemLantern))
         #expect(command.directObjectModifiers == modsShiny)
-        #expect(command.indirectObject == itemCase)
+        #expect(command.indirectObject == .item(itemCase))
         #expect(command.indirectObjectModifiers == modsBrass)
         #expect(command.preposition == prepIn)
         #expect(command.rawInput == raw)
@@ -106,7 +106,7 @@ struct CommandTests {
     func testCommandValueSemantics() throws {
         // Since all properties are `let`, Command is implicitly immutable after creation.
         // We just test that assignment creates a true copy.
-        let command1 = Command(verbID: verbTake, directObject: itemLantern, rawInput: "take lantern")
+        let command1 = Command(verbID: verbTake, directObject: .item(itemLantern), rawInput: "take lantern")
         let command2 = command1 // Creates a copy
 
         // There's nothing mutable to change in command2, but we verify the copy has the same values.

@@ -28,7 +28,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "book",
+            directObject: .item(ItemID("book")),
             rawInput: "read book"
         )
 
@@ -74,7 +74,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "sign",
+            directObject: .item(ItemID("sign")),
             rawInput: "read sign"
         )
 
@@ -143,7 +143,7 @@ struct ReadActionHandlerTests {
         let handler = ReadActionHandler()
         let command = Command(
             verbID: .read,
-            directObject: "scroll",
+            directObject: .item(ItemID("scroll")),
             rawInput: "read scroll"
         )
 
@@ -180,7 +180,7 @@ struct ReadActionHandlerTests {
         let handler = ReadActionHandler()
         let command = Command(
             verbID: .read,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "read rock"
         )
 
@@ -229,7 +229,7 @@ struct ReadActionHandlerTests {
         let handler = ReadActionHandler()
         let command = Command(
             verbID: .read,
-            directObject: "map",
+            directObject: .item(ItemID("map")),
             rawInput: "read map"
         )
 
@@ -270,7 +270,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "paper",
+            directObject: .item(ItemID("paper")),
             rawInput: "read paper"
         )
 
@@ -317,7 +317,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "tablet",
+            directObject: .item(ItemID("tablet")),
             rawInput: "read tablet"
         )
 
@@ -354,7 +354,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "scroll",
+            directObject: .item(ItemID("scroll")),
             rawInput: "read scroll"
         )
 
@@ -393,7 +393,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "note",
+            directObject: .item(ItemID("note")),
             rawInput: "read note"
         )
 
@@ -431,7 +431,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "tablet",
+            directObject: .item(ItemID("tablet")),
             rawInput: "read tablet"
         )
 
@@ -467,7 +467,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "book",
+            directObject: .item(ItemID("book")),
             rawInput: "read book"
         )
 
@@ -497,7 +497,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "read rock"
         )
 
@@ -534,7 +534,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "scroll",
+            directObject: .item(ItemID("scroll")),
             rawInput: "read scroll"
         )
 
@@ -576,7 +576,7 @@ struct ReadActionHandlerTests {
 
         let command = Command(
             verbID: .read,
-            directObject: "tablet",
+            directObject: .item(ItemID("tablet")),
             rawInput: "read tablet"
         )
 
@@ -645,7 +645,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "note",
+            directObject: .item(ItemID("note")),
             rawInput: "read note"
         )
 
@@ -689,7 +689,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "letter",
+            directObject: .item(ItemID("letter")),
             rawInput: "read letter"
         )
 
@@ -733,7 +733,7 @@ struct ReadActionHandlerTests {
         )
         let command = Command(
             verbID: .read,
-            directObject: "secret",
+            directObject: .item(ItemID("secret")),
             rawInput: "read secret"
         )
 

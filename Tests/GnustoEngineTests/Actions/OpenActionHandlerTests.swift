@@ -40,7 +40,7 @@ struct OpenActionHandlerTests {
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
                 oldValue: nil, // Assume no prior "it" for simplicity
-                newValue: .itemIDSet([itemID])
+                newValue: .entityReferenceSet([.item(itemID)])
             )
         )
 
@@ -76,7 +76,7 @@ struct OpenActionHandlerTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
 
@@ -131,7 +131,7 @@ struct OpenActionHandlerTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
 
@@ -197,7 +197,7 @@ struct OpenActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(
             verbID: .open,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
 
@@ -233,7 +233,7 @@ struct OpenActionHandlerTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "open rock"
         )
 
@@ -271,7 +271,7 @@ struct OpenActionHandlerTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
 
@@ -309,7 +309,7 @@ struct OpenActionHandlerTests {
 
         let command = Command(
             verbID: .open,
-            directObject: "chest",
+            directObject: .item(ItemID("chest")),
             rawInput: "open chest"
         )
 

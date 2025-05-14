@@ -27,7 +27,7 @@ struct ExamineActionHandlerTests {
 
         let command = Command(
             verbID: VerbID("examine"),
-            directObject: itemID,
+            directObject: .item(itemID),
             rawInput: "examine pebble"
         )
         await engine.execute(command: command)
@@ -66,7 +66,7 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine locket")
+        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine locket")
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -113,7 +113,7 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine statue")
+        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine statue")
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -161,7 +161,7 @@ struct ExamineActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine hidden gem")
+        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine hidden gem")
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -204,7 +204,7 @@ struct ExamineActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine hidden gem")
+        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine hidden gem")
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -227,7 +227,7 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "ghost"
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: itemID, rawInput: "examine ghost")
+        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine ghost")
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -354,29 +354,35 @@ struct ExamineActionHandlerTests {
 extension ExamineActionHandlerTests {
     private func expectedExamineChanges(
         itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]?
+        initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
-        var changes = [StateChange]()
+        var changes: [StateChange] = []
 
-        if initialAttributes?[.isTouched] != true {
+        // Item is touched
+        if initialAttributes[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes?[.isTouched],
-                    newValue: true,
+                    oldValue: initialAttributes[.isTouched] ?? false,
+                    newValue: true
                 )
             )
         }
 
+        // Pronoun "it" is set to this item
+        // TODO: This might need to be more sophisticated if "them" is possible
+        // or if the existing pronoun was different.
         changes.append(
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([itemID])
+                // Old value might be nil or another item, for simplicity in test we assume nil or different
+                // A more robust test might capture the actual old pronoun state.
+                oldValue: nil, // Assuming it wasn't set or was different
+                newValue: .entityReferenceSet([.item(itemID)]) // Use .entityReferenceSet
             )
         )
-
         return changes
     }
 }

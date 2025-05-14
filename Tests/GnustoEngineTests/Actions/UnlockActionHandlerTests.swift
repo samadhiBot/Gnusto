@@ -43,8 +43,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock box with key"
         )
 
@@ -96,7 +96,7 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            indirectObject: "key",
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock with key"
         ) // No direct object
 
@@ -135,7 +135,7 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "unlock box"
         ) // No indirect object
 
@@ -180,8 +180,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock box with key"
         )
 
@@ -236,8 +236,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock box with key"
         )
 
@@ -276,8 +276,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "pebble",
-            indirectObject: "key",
+            directObject: .item(ItemID("pebble")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock pebble with key"
         )
 
@@ -321,8 +321,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
-            indirectObject: "wrongkey",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("wrongkey")),
             rawInput: "unlock box with bent key"
         )
 
@@ -366,8 +366,8 @@ struct UnlockActionHandlerTests {
 
         let command = Command(
             verbID: .unlock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "unlock box with key"
         )
 
@@ -427,13 +427,14 @@ extension UnlockActionHandlerTests {
             )
         }
 
-        // Add pronoun change
+        // Pronoun "it" is set to the target item
+        // Assuming "it" wasn't already referring to targetItemID or was nil.
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "them"),
-                oldValue: nil, // Assuming previous 'it' is irrelevant for this action
-                newValue: .itemIDSet([keyItemID, targetItemID]) // Both key and target are relevant
+                attributeKey: .pronounReference(pronoun: "it"),
+                oldValue: nil, // Simplified for test
+                newValue: .entityReferenceSet([.item(targetItemID)])
             )
         )
 

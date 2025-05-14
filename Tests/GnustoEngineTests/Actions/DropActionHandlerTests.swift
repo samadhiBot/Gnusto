@@ -33,7 +33,7 @@ struct DropActionHandlerTests {
 
         let command = Command(
             verbID: .drop,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "drop key"
         )
 
@@ -110,7 +110,7 @@ struct DropActionHandlerTests {
 
         let command = Command(
             verbID: .drop,
-            directObject: "key",
+            directObject: .item(ItemID("key")),
             rawInput: "drop key"
         )
 
@@ -160,7 +160,7 @@ struct DropActionHandlerTests {
 
         let command = Command(
             verbID: .drop,
-            directObject: "cloak",
+            directObject: .item(ItemID("cloak")),
             rawInput: "drop cloak"
         )
 
@@ -209,7 +209,7 @@ struct DropActionHandlerTests {
 
         let command = Command(
             verbID: .drop,
-            directObject: "sword-in-stone",
+            directObject: .item(ItemID("sword-in-stone")),
             rawInput: "drop sword"
         )
 

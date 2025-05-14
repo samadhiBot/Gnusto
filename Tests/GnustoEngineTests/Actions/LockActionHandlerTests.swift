@@ -42,8 +42,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
         )
 
@@ -95,7 +95,7 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            indirectObject: "key",
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock with key"
         ) // No direct object
 
@@ -133,7 +133,7 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "lock box"
         ) // No indirect object
 
@@ -177,8 +177,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
         )
 
@@ -232,8 +232,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
         )
 
@@ -272,8 +272,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "pebble",
-            indirectObject: "key",
+            directObject: .item(ItemID("pebble")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock pebble with key"
         )
 
@@ -317,8 +317,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
-            indirectObject: "wrongkey",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("wrongkey")),
             rawInput: "lock box with bent key"
         )
 
@@ -365,8 +365,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verbID: .lock,
-            directObject: "box",
-            indirectObject: "key",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
         )
 
@@ -392,45 +392,50 @@ extension LockActionHandlerTests {
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
-        // Target change: Lock (if it wasn't locked)
+        // Target item is locked (if not already)
         if !initialTargetLocked {
             changes.append(
                 StateChange(
                     entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isLocked),
-                        newValue: true,
+                    oldValue: false,
+                    newValue: true
                 )
             )
         }
 
-        // Target change: Touch (if not already touched)
+        // Target item is touched (if not already)
         if !initialTargetTouched {
             changes.append(
                 StateChange(
                     entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                        newValue: true,
+                    oldValue: false,
+                    newValue: true
                 )
             )
         }
 
-        // Key change: Touch (if not already touched)
+        // Key is touched (if not already)
         if !initialKeyTouched {
             changes.append(
                 StateChange(
                     entityID: .item(keyItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                        newValue: true,
+                    oldValue: false,
+                    newValue: true
                 )
             )
         }
 
-        // Add pronoun change
+        // Pronoun "it" is set to the target item
+        // Assuming "it" wasn't already referring to targetItemID or was nil.
         changes.append(
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([targetItemID])
+                oldValue: nil, // Simplified for test
+                newValue: .entityReferenceSet([.item(targetItemID)])
             )
         )
 

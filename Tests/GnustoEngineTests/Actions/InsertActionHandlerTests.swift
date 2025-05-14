@@ -64,8 +64,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "openBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put coin in open box"
         )
@@ -86,7 +86,7 @@ struct InsertActionHandlerTests {
         #expect(finalBoxState.attributes[.isTouched] == true, "Box should be touched")
 
         // Assert Pronoun
-        #expect(await engine.getPronounReference(pronoun: "it") == ["coin"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("coin"))])
 
         // Assert Change History
         let expectedChanges = expectedInsertChanges(
@@ -122,7 +122,7 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            indirectObject: "openBox",
+            indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put in open box"
         ) // No DO
@@ -159,7 +159,7 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
+            directObject: .item(ItemID("coin")),
             preposition: "in",
             rawInput: "put coin in"
         ) // No IO
@@ -204,8 +204,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "openBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put coin in box"
         )
@@ -250,8 +250,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "distantBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("distantBox")),
             preposition: "in",
             rawInput: "put coin in distant box"
         )
@@ -294,8 +294,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "statue",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("statue")),
             preposition: "in",
             rawInput: "put coin in statue"
         )
@@ -338,8 +338,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "box",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put coin in box"
         )
@@ -376,8 +376,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "box",
-            indirectObject: "box",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put box in box"
         )
@@ -423,8 +423,8 @@ struct InsertActionHandlerTests {
         // Try to put the bag into the box (which is inside the bag)
         let command = Command(
             verbID: .insert,
-            directObject: "bag",
-            indirectObject: "box",
+            directObject: .item(ItemID("bag")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put bag in box"
         )
@@ -479,8 +479,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "fullBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("fullBox")),
             preposition: "in",
             rawInput: "put coin in box"
         )
@@ -536,8 +536,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "exactBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("exactBox")),
             preposition: "in",
             rawInput: "put coin in box"
         )
@@ -598,8 +598,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -618,7 +618,7 @@ struct InsertActionHandlerTests {
         #expect(finalContainerState.hasFlag(.isTouched) == true)
 
         // Assert Pronoun
-        #expect(await engine.getPronounReference(pronoun: "it") == ["key"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
 
         // Assert Change History
         let expectedChanges = expectedInsertChanges(
@@ -657,8 +657,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "box",
-            indirectObject: "box",
+            directObject: .item(ItemID("box")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put box in box"
         )
@@ -710,8 +710,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -755,8 +755,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "rock",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("rock")),
             preposition: "in",
             rawInput: "put key in rock"
         )
@@ -802,8 +802,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -860,8 +860,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -911,8 +911,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "key",
-            indirectObject: "box",
+            directObject: .item(ItemID("key")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -971,8 +971,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "outerBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("outerBox")),
             preposition: "in",
             rawInput: "put coin in large box"
         )
@@ -1012,8 +1012,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "innerBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("innerBox")),
             preposition: "in",
             rawInput: "put coin in small box"
         )
@@ -1060,8 +1060,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "bag",
-            indirectObject: "bag",
+            directObject: .item(ItemID("bag")),
+            indirectObject: .item(ItemID("bag")),
             preposition: "in",
             rawInput: "put bag in bag"
         )
@@ -1108,8 +1108,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "boxB",
-            indirectObject: "boxA",
+            directObject: .item(ItemID("boxB")),
+            indirectObject: .item(ItemID("boxA")),
             preposition: "in",
             rawInput: "put box B in box A"
         )
@@ -1169,8 +1169,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "boxC",
-            indirectObject: "boxA",
+            directObject: .item(ItemID("boxC")),
+            indirectObject: .item(ItemID("boxA")),
             preposition: "in",
             rawInput: "put box C in box A"
         )
@@ -1215,8 +1215,8 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "openBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put coin in box"
         )
@@ -1251,8 +1251,8 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "distantBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("distantBox")),
             preposition: "in",
             rawInput: "put coin in distant box"
         )
@@ -1284,8 +1284,8 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "statue",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("statue")),
             preposition: "in",
             rawInput: "put coin in statue"
         )
@@ -1319,8 +1319,8 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verbID: .insert,
-            directObject: "coin",
-            indirectObject: "closedBox",
+            directObject: .item(ItemID("coin")),
+            indirectObject: .item(ItemID("closedBox")),
             preposition: "in",
             rawInput: "put coin in closed box"
         )
@@ -1357,8 +1357,8 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verbID: .insert,
-            directObject: "boulder",
-            indirectObject: "box",
+            directObject: .item(ItemID("boulder")),
+            indirectObject: .item(ItemID("box")),
             preposition: "in",
             rawInput: "put boulder in box"
         )
@@ -1392,8 +1392,8 @@ struct InsertActionHandlerTests {
         )
         let command = Command(
             verbID: .insert,
-            directObject: "bag",
-            indirectObject: "bag",
+            directObject: .item(ItemID("bag")),
+            indirectObject: .item(ItemID("bag")),
             preposition: "in",
             rawInput: "put bag in bag"
         )
@@ -1423,9 +1423,9 @@ struct InsertActionHandlerTests {
             id: "boxA",
             .name("box A"),
             .in(.item("boxB")), // Box A is INSIDE Box B
-            .isTakable,
             .isContainer, // Target for insertion
-            .isOpen
+            .isOpen,
+            .isTakable,
         )
         let boxB = Item( // This is itemToInsert (X)
             id: "boxB",
@@ -1442,8 +1442,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "boxB",
-            indirectObject: "boxA",
+            directObject: .item(ItemID("boxB")),
+            indirectObject: .item(ItemID("boxA")),
             preposition: "in",
             rawInput: "put box B in box A"
         )
@@ -1484,8 +1484,8 @@ struct InsertActionHandlerTests {
 
         let command = Command(
             verbID: .insert,
-            directObject: "trophy",
-            indirectObject: "openBox",
+            directObject: .item(ItemID("trophy")),
+            indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put trophy in the open box"
         )
@@ -1512,7 +1512,7 @@ extension InsertActionHandlerTests {
     ) -> [StateChange] {
         var changes: [StateChange] = []
 
-        // Change 1: Item parent
+        // 1. Item's parent changes to the container
         changes.append(
             StateChange(
                 entityID: .item(itemToInsertID),
@@ -1522,34 +1522,39 @@ extension InsertActionHandlerTests {
             )
         )
 
-        // Change 2: Item touched (if needed)
+        // 2. Item is touched (if not already)
         if initialItemAttributes[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityID: .item(itemToInsertID),
                     attributeKey: .itemAttribute(.isTouched),
-                        newValue: true,
+                    oldValue: initialItemAttributes[.isTouched] ?? false,
+                    newValue: true
                 )
             )
         }
 
-        // Change 3: Container touched (if needed)
+        // 3. Container is touched (if not already)
         if initialContainerAttributes[.isTouched] != true {
             changes.append(
                 StateChange(
                     entityID: .item(containerID),
                     attributeKey: .itemAttribute(.isTouched),
-                        newValue: true,
+                    oldValue: initialContainerAttributes[.isTouched] ?? false,
+                    newValue: true
                 )
             )
         }
 
-        // Change 4: Pronoun "it"
+        // 4. Pronoun "it" is set to the inserted item
+        // Assuming "it" wasn't already referring to itemToInsertID or was nil.
+        // For more robust tests, capture existing pronoun state.
         changes.append(
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([itemToInsertID])
+                oldValue: nil, // Simplified for test
+                newValue: .entityReferenceSet([.item(itemToInsertID)])
             )
         )
 

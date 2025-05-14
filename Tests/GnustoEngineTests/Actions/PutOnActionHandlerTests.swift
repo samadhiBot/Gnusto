@@ -65,7 +65,7 @@ struct PutOnActionHandlerTests {
             StateChange(
                 entityID: .global, // Pronoun is global
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([itemToPutID])
+                newValue: .entityReferenceSet([.item(itemToPutID)])
             )
         )
 
@@ -104,8 +104,8 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "book",
-            indirectObject: "table",
+            directObject: .item(ItemID("book")),
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put book on table"
         )
@@ -126,7 +126,7 @@ struct PutOnActionHandlerTests {
         #expect(finalTableState.hasFlag(.isTouched), "Table should be touched")
 
         // Assert Pronoun
-        #expect(await engine.getPronounReference(pronoun: "it") == ["book"])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("book"))])
 
         // Assert Change History
         let expectedChanges = expectedPutOnChanges(
@@ -160,7 +160,7 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            indirectObject: "table",
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put on table"
         ) // No DO
@@ -196,7 +196,7 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "book",
+            directObject: .item(ItemID("book")),
             preposition: "on",
             rawInput: "put book on"
         ) // No IO
@@ -238,8 +238,8 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "book",
-            indirectObject: "table",
+            directObject: .item(ItemID("book")),
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put book on table"
         )
@@ -291,8 +291,8 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "book",
-            indirectObject: "table",
+            directObject: .item(ItemID("book")),
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put book on table"
         )
@@ -334,8 +334,8 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "book",
-            indirectObject: "box",
+            directObject: .item(ItemID("book")),
+            indirectObject: .item(ItemID("box")),
             preposition: "on",
             rawInput: "put book on box"
         )
@@ -372,8 +372,8 @@ struct PutOnActionHandlerTests {
 
         let command = Command(
             verbID: .putOn,
-            directObject: "table",
-            indirectObject: "table",
+            directObject: .item(ItemID("table")),
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put table on table"
         )
@@ -418,8 +418,8 @@ struct PutOnActionHandlerTests {
         // Try to put the tray onto the table (which is on the tray)
         let command = Command(
             verbID: .putOn,
-            directObject: "tray",
-            indirectObject: "table",
+            directObject: .item(ItemID("tray")),
+            indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put tray on table"
         )

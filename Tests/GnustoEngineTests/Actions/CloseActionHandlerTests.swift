@@ -28,7 +28,7 @@ struct CloseActionHandlerTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
 
@@ -66,7 +66,7 @@ struct CloseActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([box.id])
+                newValue: .entityReferenceSet([.item(box.id)])
             ),
         ])
     }
@@ -92,7 +92,7 @@ struct CloseActionHandlerTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
 
@@ -124,7 +124,7 @@ struct CloseActionHandlerTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "rock",
+            directObject: .item(ItemID("rock")),
             rawInput: "close rock"
         )
 
@@ -159,7 +159,7 @@ struct CloseActionHandlerTests {
 
         let command = Command(
             verbID: .close,
-            directObject: "box",
+            directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
 

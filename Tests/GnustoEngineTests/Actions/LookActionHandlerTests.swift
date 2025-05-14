@@ -24,7 +24,7 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([itemID])
+                newValue: .entityReferenceSet([.item(itemID)])
             )
         ]
     }
@@ -383,7 +383,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "rock",
+            directObject: .item("rock"),
             rawInput: "x rock"
         )
 
@@ -428,7 +428,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .look,
-            directObject: "pebble",
+            directObject: .item("pebble"),
             rawInput: "l pebble"
         )
 
@@ -475,7 +475,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "stone",
+            directObject: .item("stone"),
             rawInput: "x stone"
         )
 
@@ -491,7 +491,7 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet(["stone"])
+                newValue: .entityReferenceSet([.item(ItemID("stone"))])
             )
         ])
         #expect(await engine.gameState.changeHistory.count == 1)
@@ -541,7 +541,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "box",
+            directObject: .item("box"),
             rawInput: "x box"
         )
 
@@ -598,7 +598,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "box",
+            directObject: .item("box"),
             rawInput: "x box"
         )
 
@@ -656,7 +656,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "jar",
+            directObject: .item("jar"),
             rawInput: "x jar"
         )
 
@@ -717,7 +717,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "table",
+            directObject: .item("table"),
             rawInput: "x table"
         )
 
@@ -779,7 +779,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verbID: .examine,
-            directObject: "artifact",
+            directObject: .item("artifact"),
             rawInput: "x artifact"
         )
 
@@ -797,5 +797,159 @@ struct LookActionHandlerTests {
 
         // Assert Change History (Should be empty)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
+    }
+
+    @Test("LOOK AT item in room shows description and sets touched")
+    func testLookAtItemInRoom() async throws {
+        // Arrange
+        let itemID: ItemID = "desk"
+        let roomID: LocationID = "office"
+        let desk = Item(
+            id: itemID,
+            .name("large wooden desk"),
+            .description("A large, imposing wooden desk."),
+            .in(.location(roomID))
+        )
+        let office = Location(
+            id: roomID,
+            .name("Office"),
+            .inherentlyLit
+        )
+        let game = MinimalGame(
+            player: Player(in: roomID),
+            locations: [office],
+            items: [desk]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let initialItemState = try await engine.item(itemID)
+        #expect(initialItemState.attributes[.isTouched] != true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
+
+        // Command for LOOK AT (often parsed as EXAMINE with DO)
+        let command = Command(
+            verbID: .look, // Could also be .examine depending on parser aliasing
+            directObject: .item(itemID),
+            rawInput: "look at desk"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "A large, imposing wooden desk.")
+
+        // Assert State Change
+        let finalItemState = try await engine.item(itemID)
+        #expect(finalItemState.attributes[.isTouched] == true)
+
+        let expectedChanges = expectedLookChanges(
+            itemID: itemID,
+            initialAttributes: initialItemState.attributes
+        )
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
+    @Test("LOOK AT item held shows description and sets touched")
+    func testLookAtItemHeld() async throws {
+        // Arrange
+        let itemID: ItemID = "note"
+        let note = Item(
+            id: itemID,
+            .name("crumpled note"),
+            .description("A note with faint writing."),
+            .in(.player)
+        )
+        let game = MinimalGame(items: [note])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let initialItemState = try await engine.item(itemID)
+        #expect(initialItemState.attributes[.isTouched] != true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
+
+        let command = Command(
+            verbID: .look, // or .examine
+            directObject: .item(itemID),
+            rawInput: "look at note"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "A note with faint writing.")
+
+        // Assert State Change
+        let finalItemState = try await engine.item(itemID)
+        #expect(finalItemState.attributes[.isTouched] == true)
+
+        let expectedChanges = expectedLookChanges(
+            itemID: itemID,
+            initialAttributes: initialItemState.attributes
+        )
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
+    @Test("LOOK AT non-existent item")
+    func testLookAtNonExistentItem() async throws {
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verbID: .look, // or .examine
+            directObject: .item(ItemID("unicorn")),
+            rawInput: "look at unicorn"
+        )
+
+        await engine.execute(command: command)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
+        #expect(await engine.gameState.changeHistory.isEmpty)
+    }
+
+    @Test("LOOK AT item not in scope")
+    func testLookAtItemNotInScope() async throws {
+        let item = Item(id: "artifact", .name("ancient artifact"), .in(.nowhere))
+        let game = MinimalGame(items: [item])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            game: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verbID: .look, // or .examine
+            directObject: .item(ItemID("artifact")),
+            rawInput: "look at artifact"
+        )
+
+        await engine.execute(command: command)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can't see any such thing.")
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }
