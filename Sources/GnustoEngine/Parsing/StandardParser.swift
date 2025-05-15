@@ -650,7 +650,34 @@ public struct StandardParser: Parser {
         }
 
         if resolvedAndScopedEntities.count > 1 {
-            // Build a descriptive ambiguity message
+            // Enhanced ambiguity message logic
+            let itemEntities = resolvedAndScopedEntities.compactMap { ref -> Item? in
+                if case let .item(id) = ref { return gameState.items[id] } else { return nil }
+            }
+            if !itemEntities.isEmpty && itemEntities.count == resolvedAndScopedEntities.count {
+                // All ambiguous are items
+                let baseName = itemEntities.first?.name ?? "item"
+                let allSameName = itemEntities.allSatisfy { $0.name == baseName }
+                let adjectiveSets = itemEntities.map { Set($0.adjectives) }
+                let allSameAdjectives = adjectiveSets.dropFirst().allSatisfy { $0 == adjectiveSets.first }
+                if allSameName {
+                    if !allSameAdjectives {
+                        // List with adjectives
+                        let descriptions: [String] = itemEntities.map { item in
+                            if let adj = item.adjectives.sorted().first {
+                                "the \(adj) \(item.name)"
+                            } else {
+                                "the \(item.name)"
+                            }
+                        }
+                        return .failure(.ambiguity("Which do you mean, \(descriptions.commaListing("or"))?"))
+                    } else {
+                        // All truly identical
+                        return .failure(.ambiguity("Which \(baseName) do you mean?"))
+                    }
+                }
+            }
+            // Fallback: original logic
             let descriptions = resolvedAndScopedEntities.map {
                 entityRefToString($0, gameState: gameState)
             }
@@ -758,7 +785,7 @@ public struct StandardParser: Parser {
         gameState: GameState
     ) -> String {
         switch reference {
-        case .item(let id): 
+        case .item(let id):
             "the \(gameState.items[id]?.name ?? id.rawValue)"
         case .location(let id):
             "the \(gameState.locations[id]?.name ?? id.rawValue)"
