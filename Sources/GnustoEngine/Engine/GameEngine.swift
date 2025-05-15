@@ -636,7 +636,8 @@ extension GameEngine {
            let itemHandler = definitionRegistry.itemActionHandlers[doItemID]
         {
             do {
-                _ = try await itemHandler(self, .afterTurn(command))
+                if let result = try await itemHandler(self, .afterTurn(command)),
+                   try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in direct object afterTurn handler: \(error, privacy: .public)")
             }
@@ -648,7 +649,8 @@ extension GameEngine {
            let itemHandler = definitionRegistry.itemActionHandlers[ioItemID]
         {
             do {
-                _ = try await itemHandler(self, .afterTurn(command))
+                if let result = try await itemHandler(self, .afterTurn(command)),
+                   try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in indirect object afterTurn handler: \(error, privacy: .public)")
             }
@@ -659,7 +661,8 @@ extension GameEngine {
         if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                _ = try await locationHandler(self, LocationEvent.afterTurn(command))
+                if let result = try await locationHandler(self, LocationEvent.afterTurn(command)),
+                   try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
             }
