@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// A unique identifier for a location within the game world.
@@ -18,5 +19,13 @@ public struct LocationID: Hashable, Comparable, Codable, ExpressibleByStringLite
 
     public static func < (lhs: LocationID, rhs: LocationID) -> Bool {
         lhs.rawValue < rhs.rawValue
+    }
+}
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension LocationID: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        ".\(rawValue)"
     }
 }

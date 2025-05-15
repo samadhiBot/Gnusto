@@ -161,8 +161,6 @@ extension OperaHouse {
         case .afterTurn(let command):
             guard  await engine.playerLocationID == .cloakroom else { return nil }
 
-//            let bar = try await engine.location(.bar)
-
             switch command.verbID {
             case .drop, .putOn:
                 var stateChanges = [StateChange]()

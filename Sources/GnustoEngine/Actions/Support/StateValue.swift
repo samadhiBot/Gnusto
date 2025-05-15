@@ -1,3 +1,5 @@
+import CustomDump
+
 /// Represents the possible types of values that can be tracked in state changes.
 /// Ensures values are both Codable and Sendable.
 public enum StateValue: Codable, Sendable, Hashable {
@@ -86,7 +88,7 @@ extension StateValue {
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .entityReferenceSet(let value): value
+        case .entityReferenceSet(let value): value as Any
         case .exits(let value): value
         case .locationID(let value): value
         case .parentEntity(let value): value
@@ -122,5 +124,38 @@ extension StateValue: ExpressibleByIntegerLiteral {
 extension StateValue: ExpressibleByStringLiteral {
     public init(stringLiteral value: String) {
         self = .string(value)
+    }
+}
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension StateValue: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        switch self {
+        case .bool(let bool):
+            "\(bool)"
+        case .int(let int):
+            "\(int)"
+        case .itemID(let itemID):
+            ".\(itemID)"
+        case .itemIDSet(let itemIDSet):
+            itemIDSet.map(\.customDumpDescription).joined(separator: ", ")
+        case .entityReferenceSet(let entityReferenceSet):
+            entityReferenceSet?.map(\.customDumpDescription).joined(separator: ", ") ?? "[]"
+        case .exits(let exits):
+            exits.map {
+                "\n\($0.customDumpDescription): \($1.customDumpDescription)"
+            }.joined().indent()
+        case .locationID(let locationID):
+            ".\(locationID)"
+        case .parentEntity(let parentEntity):
+            parentEntity.customDumpDescription
+        case .string(let string):
+            string.multiline
+        case .stringSet(let stringSet):
+            stringSet.map { "'\($0)'" }.joined(separator: ", ")
+        case .undefined:
+            ".undefined"
+        }
     }
 }

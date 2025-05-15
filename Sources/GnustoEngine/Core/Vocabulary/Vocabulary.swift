@@ -443,6 +443,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         vocab.add(
             verb: Verb(
                 id: .debug,
+                synonyms: "db",
                 syntax: [SyntaxRule(.verb, .directObject)],
                 requiresLight: false
             )

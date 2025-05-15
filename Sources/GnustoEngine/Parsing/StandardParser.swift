@@ -418,6 +418,7 @@ public struct StandardParser: Parser {
              if let actualNoun = nounToResolveDO {
                  resolvedDirectObjectResult = resolveObject(
                      noun: actualNoun,
+                     verb: verbID,
                      modifiers: modsToUseDO,
                      in: gameState,
                      using: vocabulary,
@@ -435,6 +436,7 @@ public struct StandardParser: Parser {
             if let actualNoun = nounToResolveIO {
                 resolvedIndirectObjectResult = resolveObject(
                     noun: actualNoun,
+                    verb: verbID,
                     modifiers: modsToUseIO,
                     in: gameState,
                     using: vocabulary,
@@ -522,6 +524,7 @@ public struct StandardParser: Parser {
     /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
     func resolveObject(
         noun: String,
+        verb: VerbID,
         modifiers: [String],
         in gameState: GameState,
         using vocabulary: Vocabulary,
@@ -533,7 +536,12 @@ public struct StandardParser: Parser {
         // 1. Handle Player Aliases
         if playerAliases.contains(lowercasedNoun) {
             guard modifiers.isEmpty else {
-                return .failure(.badGrammar("Player reference '\(lowercasedNoun)' cannot be modified by '\(modifiers.joined(separator: " "))'."))
+                return .failure(
+                    .badGrammar("""
+                        Player reference '\(lowercasedNoun)' cannot be modified by \
+                        '\(modifiers.joined(separator: " "))'.
+                        """)
+                )
             }
             return .success(.player)
         }
@@ -541,10 +549,17 @@ public struct StandardParser: Parser {
         // 2. Handle Pronouns
         if vocabulary.pronouns.contains(lowercasedNoun) {
             guard modifiers.isEmpty else {
-                return .failure(.badGrammar("Pronouns like '\(lowercasedNoun)' usually cannot be modified."))
+                return .failure(
+                    .badGrammar(
+                        "Pronouns like '\(lowercasedNoun)' usually cannot be modified."
+                    )
+                )
             }
             // gameState.pronouns now stores Set<EntityReference>?
-            guard let referredEntityRefs = gameState.pronouns[lowercasedNoun], !referredEntityRefs.isEmpty else {
+            guard
+                let referredEntityRefs = gameState.pronouns[lowercasedNoun],
+                !referredEntityRefs.isEmpty
+            else {
                 return .failure(.pronounNotSet(pronoun: lowercasedNoun))
             }
 
@@ -554,7 +569,10 @@ public struct StandardParser: Parser {
                 switch ref {
                 case .item(let itemID):
                     // Check scope for this specific itemID
-                    let itemCandidates = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
+                    let itemCandidates = gatherCandidates(
+                        in: gameState,
+                        requiredConditions: requiredConditions
+                    )
                     if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
                         // Modifiers (adjectives) usually don't apply to pronouns directly,
                         // but if they did, this is where they'd be checked against the item's adjectives.
@@ -575,8 +593,15 @@ public struct StandardParser: Parser {
                 return .failure(.pronounRefersToOutOfScopeItem(pronoun: lowercasedNoun))
             } else if resolvedPronounCandidates.count > 1 {
                 // Build a more generic ambiguity message if pronouns can refer to non-items.
-                let descriptions = resolvedPronounCandidates.map { entityRefToString($0, gameState: gameState) }
-                return .failure(.ambiguousPronounReference("Which '\(lowercasedNoun)' do you mean: \(descriptions.joined(separator: ", or "))?"))
+                let descriptions = resolvedPronounCandidates.map {
+                    entityRefToString($0, gameState: gameState)
+                }
+                return .failure(
+                    .ambiguousPronounReference("""
+                        Which '\(lowercasedNoun)' do you mean: \
+                        \(descriptions.joined(separator: ", or "))?
+                        """)
+                )
             } else {
                 return .success(resolvedPronounCandidates.first!)
             }
@@ -607,12 +632,18 @@ public struct StandardParser: Parser {
         for entityRef in potentialEntities {
             switch entityRef {
             case .item(let itemID):
+                // Debug returns success on first ID match
+                if verb == .debug, itemID.rawValue == noun { return .success(entityRef) }
+
                 // Use existing item-centric scoping and filtering
-                let itemCandidates = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
+                let itemCandidates = gatherCandidates(
+                    in: gameState,
+                    requiredConditions: requiredConditions
+                )
                 if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
                     // Pass the specific item's snapshot for modifier checking
-                    if let itemSnapshot = gameState.items[itemID] {
-                        if filterCandidates(item: itemSnapshot, modifiers: modifiers) {
+                    if let item = gameState.items[itemID] {
+                        if filterCandidates(item: item, modifiers: modifiers) {
                             resolvedAndScopedEntities.append(.item(itemID))
                         } else if !modifiers.isEmpty {
                             // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
@@ -620,10 +651,13 @@ public struct StandardParser: Parser {
                     } else {
                         // This case should ideally not be reached if itemID came from vocabulary.items
                         // and gameState.items is consistent. Perhaps a warning or error here?
-                        // For now, if itemSnapshot is nil, it won't be added.
+                        // For now, if item is nil, it won't be added.
                     }
                 }
             case .location(let locationID):
+                // Debug returns success on first ID match
+                if verb == .debug, locationID.rawValue == noun { return .success(entityRef) }
+
                 // Location scope: A named location is generally considered in scope.
                 // Conditions for locations are less common in ObjectCondition but could be checked.
                 guard modifiers.isEmpty else {
@@ -671,7 +705,10 @@ public struct StandardParser: Parser {
                 if allSameName {
                     if allSameAdjectives {
                         // All truly identical
-                        logger.error("💥 StandardParser cannot distinguish between \(itemEntities.count) identical items")
+                        logger.error("""
+                            💥 StandardParser cannot distinguish between \
+                            \(itemEntities.count) identical items
+                            """)
                         return .failure(.ambiguity("Which \(baseName) do you mean?"))
                     } else {
                         // List with adjectives
@@ -682,7 +719,11 @@ public struct StandardParser: Parser {
                                 "the \(item.name)"
                             }
                         }
-                        return .failure(.ambiguity("Which do you mean, \(descriptions.commaListing("or"))?"))
+                        return .failure(
+                            .ambiguity(
+                                "Which do you mean, \(descriptions.commaListing("or"))?"
+                            )
+                        )
                     }
                 }
             }

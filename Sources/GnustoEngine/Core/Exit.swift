@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// Represents a connection from one location to another in a specific direction.
@@ -28,4 +29,25 @@ public struct Exit: Codable, Hashable, Sendable {
     // - Visibility (e.g., hidden exit)
     // - One-way exits
     // - Action routines associated with traversing (e.g., FEXIT in ZIL)
+}
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension Exit: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        var details = ["to: \(destinationID.customDumpDescription)"]
+        if let blockedMessage { details.append("blocked: \(blockedMessage.multiline)") }
+        if let doorID { details.append("door: \(doorID.customDumpDescription)")}
+        return "\n\(details.joined(separator: "\n").indent())"
+
+    }
+}
+
+extension Dictionary: @retroactive CustomDumpStringConvertible where Key == Direction, Value == Exit {
+    public var customDumpDescription: String {
+        let elements = self.map { "\($0.customDumpDescription): \($1.customDumpDescription)" }
+        return """
+            \(elements.joined(separator: "\n").indent())
+            """
+    }
 }

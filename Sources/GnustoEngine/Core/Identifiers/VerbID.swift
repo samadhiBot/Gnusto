@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// A unique identifier for a verb within the game's vocabulary.
@@ -21,10 +22,9 @@ public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral,
     }
 }
 
+// MARK: - Interactive verbs
+
 extension VerbID {
-
-    // Interactive
-
     public static let close = VerbID("close")
     public static let drop = VerbID("drop")
     public static let examine = VerbID("examine")
@@ -47,9 +47,11 @@ extension VerbID {
     public static let turnOn = VerbID("turnOn")
     public static let unlock = VerbID("unlock")
     public static let wear = VerbID("wear")
+}
 
-    // Meta Actions
+// MARK: - Meta verbs
 
+extension VerbID {
     public static let brief = VerbID("brief")
     public static let help = VerbID("help")
     public static let quit = VerbID("quit")
@@ -58,10 +60,22 @@ extension VerbID {
     public static let score = VerbID("score")
     public static let verbose = VerbID("verbose")
     public static let wait = VerbID("wait")
+}
 
-    // Debug Action
+#if DEBUG
 
-    #if DEBUG
+// MARK: - Debug verb
+
+extension VerbID {
     public static let debug = VerbID("debug")
-    #endif
+}
+
+#endif
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension VerbID: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        ".\(rawValue)"
+    }
 }

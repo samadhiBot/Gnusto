@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// Represents cardinal and other directions used for navigation and spatial representation.
@@ -38,5 +39,13 @@ extension Direction: Comparable {
 
     public static func < (lhs: Direction, rhs: Direction) -> Bool {
         lhs.sortOrder < rhs.sortOrder
+    }
+}
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension Direction: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        ".\(rawValue)"
     }
 }

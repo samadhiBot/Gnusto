@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// A unique identifier for an item (GameObject) within the game world.
@@ -14,6 +15,12 @@ public struct ItemID: Hashable, Codable, Sendable {
 extension ItemID: Comparable {
     public static func < (lhs: ItemID, rhs: ItemID) -> Bool {
         lhs.rawValue < rhs.rawValue
+    }
+}
+
+extension ItemID: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        ".\(rawValue)"
     }
 }
 
