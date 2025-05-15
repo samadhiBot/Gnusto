@@ -23,11 +23,30 @@ extension String {
 }
 
 extension Array where Element == String {
-    /// Returns a grammatically correct string listing the elements,
-    /// sorted alphabetically, with appropriate indefinite articles prepended.
+    /// Returns a grammatically correct string listing the elements, sorted alphabetically,
+    /// comma-separated with the specified conjunction.
+    ///
+    /// - Parameter conjunction: The list's conjunction, i.e. "and" or "or".
+    /// - Returns: The string listing the sorted elements.
+    func commaListing(_ conjunction: String) -> String {
+        switch count {
+        case 0:
+            return ""
+        case 1:
+            return self[0]
+        default:
+            var items = sorted()
+            let lastItem = items.removeLast()
+            return items.joined(separator: ", ") +
+                   (count == 2 ? "" : ",") +
+                   " \(conjunction) \(lastItem)"
+        }
+    }
+
+    /// Returns a grammatically correct string listing the elements, sorted alphabetically,
+    /// with appropriate indefinite articles prepended, or "nothing" for an empty array.
     ///
     /// Example: `["pear", "apple", "banana"]` becomes `"an apple, a banana and a pear"`.
-    /// Returns "nothing" for an empty array.
     var listWithDefiniteArticles: String {
         switch count {
         case 0:

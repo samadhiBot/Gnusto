@@ -654,7 +654,7 @@ public struct StandardParser: Parser {
             let descriptions = resolvedAndScopedEntities.map {
                 entityRefToString($0, gameState: gameState)
             }
-            return .failure(.ambiguity("Which do you mean: \(descriptions.joined(separator: ", or "))?"))
+            return .failure(.ambiguity("Which do you mean: \(descriptions.commaListing("or"))?"))
         }
 
         return .success(resolvedAndScopedEntities.first!)

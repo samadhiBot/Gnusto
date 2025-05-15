@@ -276,7 +276,9 @@ struct ExamineActionHandlerTests {
         )
 
         // Assert
-        #expect(throws: ParseError.ambiguity("Which do you mean: the item 'red ball', or the item 'blue ball'?")) {
+        #expect(
+            throws: ParseError.ambiguity("Which do you mean: the blue ball or the red ball?")
+        ) {
             try parseResult.get()
         }
     }
