@@ -259,7 +259,7 @@ extension DropActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .itemIDSet([itemID])
+                newValue: .entityReferenceSet([.item(itemID)])
             )
         )
 

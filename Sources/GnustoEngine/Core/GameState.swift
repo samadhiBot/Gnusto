@@ -7,32 +7,32 @@ import Foundation
 /// tracked and validated.
 public struct GameState: Codable, Equatable, Sendable {
     /// All items currently existing in the game world, indexed by their `ItemID`.
-    public internal(set) var items: [ItemID: Item]
+    public private(set) var items: [ItemID: Item]
 
     /// All locations defined in the game, indexed by their `LocationID`.
-    public internal(set) var locations: [LocationID: Location]
+    public private(set) var locations: [LocationID: Location]
 
     /// The current state of the player.
-    public internal(set) var player: Player
+    public private(set) var player: Player
 
     /// Active fuses (timed events), indexed by their `FuseID`.
     ///
     /// Value is remaining turns.
-    public internal(set) var activeFuses: [FuseID: Int]
+    public private(set) var activeFuses: [FuseID: Int]
 
     /// Active daemons (background processes), indexed by their `DaemonID`.
     ///
     /// Value is irrelevant (presence indicates active).
-    public internal(set) var activeDaemons: Set<DaemonID>
+    public private(set) var activeDaemons: Set<DaemonID>
 
     /// Pronoun references, mapping String pronouns ("it", "them") to specific entity references.
-    public internal(set) var pronouns: [String: Set<EntityReference>]
+    public private(set) var pronouns: [String: Set<EntityReference>]
 
     /// Game-specific key-value storage for miscellaneous state.
-    public internal(set) var globalState: [GlobalID: StateValue]
+    public private(set) var globalState: [GlobalID: StateValue]
 
     /// A history of all state changes applied to this game state instance.
-    public internal(set) var changeHistory: [StateChange]
+    public private(set) var changeHistory: [StateChange]
 
     /// The game's vocabulary (assumed immutable after init).
     public let vocabulary: Vocabulary
@@ -72,25 +72,25 @@ public struct GameState: Codable, Equatable, Sendable {
     ) {
         var allItems: [Item] = []
         var allLocations: [Location] = []
-        var seenItemIds = Set<ItemID>()
-        var seenLocationIds = Set<LocationID>()
+        var knownItems = Set<ItemID>()
+        var knownLocations = Set<LocationID>()
 
         for areaType in areas {
-            let currentItems = areaType.items
-            for item in currentItems {
-                guard !seenItemIds.contains(item.id) else {
-                    fatalError("Duplicate ItemID '\(item.id)' found across multiple AreaContents types (detected in \(areaType)).")
-                }
-                seenItemIds.insert(item.id)
+            for item in areaType.items {
+                assert(!knownItems.contains(item.id), """
+                    Duplicate ItemID '\(item.id)' found across multiple AreaContents \
+                    types (detected in \(areaType)).
+                    """)
+                knownItems.insert(item.id)
                 allItems.append(item)
             }
 
-            let currentLocations = areaType.locations
-            for location in currentLocations {
-                 guard !seenLocationIds.contains(location.id) else {
-                    fatalError("Duplicate LocationID '\(location.id)' found across multiple AreaContents types (detected in \(areaType)).")
-                }
-                seenLocationIds.insert(location.id)
+            for location in areaType.locations {
+                assert(!knownLocations.contains(location.id), """
+                    Duplicate LocationID '\(location.id)' found across multiple AreaContents \
+                    types (detected in \(areaType)).
+                    """)
+                knownLocations.insert(location.id)
                 allLocations.append(location)
             }
         }
@@ -123,8 +123,14 @@ public struct GameState: Codable, Equatable, Sendable {
 
     // MARK: - State Mutation
 
+    public mutating func apply(_ changes: StateChange...) throws {
+        for change in changes {
+            try apply(change)
+        }
+    }
+
     /// Applies a `StateChange` to the game state, modifying the relevant property and recording the change.
-    public mutating func apply(_ change: StateChange) throws {
+    private mutating func apply(_ change: StateChange) throws {
         // --- Validation Phase ---
         try validateOldValue(for: change)
 

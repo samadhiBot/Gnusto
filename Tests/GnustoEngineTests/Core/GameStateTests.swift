@@ -81,7 +81,17 @@ struct GameStateTests {
     }
 
     // Helper to create a consistent initial state for tests
-    func createInitialState() -> GameState {
+    func createInitialState(
+        locations: [Location]? = nil,
+//        items: [Item],
+//        player: Player,
+//        vocabulary: Vocabulary? = nil,
+//        pronouns: [String: Set<EntityReference>] = [:],
+//        activeFuses: [FuseID: Int] = [:],
+//        activeDaemons: Set<DaemonID> = [],
+//        globalState: [GlobalID: StateValue] = [:], // Keep AnyCodable
+//        changeHistory: [StateChange] = []
+    ) -> GameState {
         let startRoom = Location(
             id: .startRoom,
             .name("Starting Room"),
@@ -92,24 +102,19 @@ struct GameStateTests {
             .name("Test Item"),
             .in(.location(.startRoom))
         )
-        let player = Player(in: .startRoom)
-        let vocab = Vocabulary.build(items: [testItem]) // Build basic vocab
-
-        var state = GameState(
-            locations: [startRoom],
+        return GameState(
+            locations: locations ?? [startRoom],
             items: [testItem],
-            player: player,
-            vocabulary: vocab
+            player: Player(in: .startRoom),
+            vocabulary: Vocabulary.build(items: [testItem]),
+            pronouns: ["it": [.item("testItem")]],
+            activeFuses: ["testFuse": 10],
+            activeDaemons: ["testDaemon"],
+            globalState: [
+                "counter": 0,
+                "gameStarted": true
+            ]
         )
-        // Add some initial values if needed by tests
-        state.pronouns["it"] = [.item("testItem")]
-        state.globalState["counter"] = .int(0)
-        state.globalState["gameStarted"] = true
-        state.activeFuses = ["testFuse": 10]
-        state.activeDaemons = ["testDaemon"]
-        state.changeHistory = [] // Start with empty history for most tests
-
-        return state
     }
 
     // MARK: - Initialization Tests
@@ -372,18 +377,34 @@ struct GameStateTests {
         // Valid: Modify properties of reference types (Location, Item)
         // Note: Since Item/Location are structs, direct modification like this
         // modifies a *copy*. To persist, reassign to the dictionary.
-        var woh = state.locations[Self.locWOH]!
-        woh.attributes[.description] = .string("A new description.")
-        state.locations[Self.locWOH] = woh
-
-        // Create new lantern with updated name
-        let updatedLantern = Item(
-            id: Self.itemLantern,
-            .name("Magic Lantern"),
-            .isTakable,
-            .isLightSource
+//        var woh = state.locations[Self.locWOH]!
+//        woh.attributes[.description] = .string("A new description.")
+//        state.locations[Self.locWOH] = woh
+        try state.apply(
+            StateChange(
+                entityID: .location(Self.locWOH),
+                attributeKey: .locationAttribute(.description),
+                newValue: "A new description."
+            ),
+            StateChange(
+                entityID: .item(Self.itemLantern),
+                attributeKey: .itemName,
+                newValue: "Magic Lantern"
+            ),
+            StateChange(
+                entityID: .item("heldLantern"),
+                attributeKey: .itemParent,
+                newValue: .parentEntity(.player)
+            ),
         )
-        state.items[Self.itemLantern] = updatedLantern
+        // Create new lantern with updated name
+//        let updatedLantern = Item(
+//            id: Self.itemLantern,
+//            .name("Magic Lantern"),
+//            .isTakable,
+//            .isLightSource
+//        )
+//        state.items[Self.itemLantern] = updatedLantern
 
         // Create new lantern with updated parent
         let lanternWithNewParent = Item(
@@ -421,13 +442,24 @@ struct GameStateTests {
         var originalState = await createSampleGameState()
 
         // Create new lantern with updated attributes
-        let updatedLantern = Item(
-            id: Self.itemLantern,
-            .in(.player),
-            .isLightSource,
-            .isOn
+//        let updatedLantern = Item(
+//            id: Self.itemLantern,
+//            .in(.player),
+//            .isLightSource,
+//            .isOn
+//        )
+        try originalState.apply(
+            StateChange(
+                entityID: .item(Self.itemLantern),
+                attributeKey: .itemParent,
+                newValue: .parentEntity(.player)
+            ),
+            StateChange(
+                entityID: .item(Self.itemLantern),
+                attributeKey: .itemAttribute(.isOn),
+                newValue: true
+            )
         )
-        originalState.items[Self.itemLantern] = updatedLantern
 
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
@@ -474,17 +506,34 @@ struct GameStateTests {
         #expect(state1.locations == state2.locations) // Locations dict should be equal
 
         // Modify value type (Player) *in* state2
-        state2.player.moves = 5
+        try state2.apply(
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                newValue: 5
+            )
+        )
 
         // Create new lantern with updated properties
-        let updatedLantern = Item(
-            id: Self.itemLantern,
-            .name("Shiny Lantern"),
-            .in(.player),
-            .isTakable,
-            .isLightSource
+//        let updatedLantern = Item(
+//            id: Self.itemLantern,
+//            .name("Shiny Lantern"),
+//            .in(.player),
+//            .isTakable,
+//            .isLightSource
+//        )
+        try state2.apply(
+            StateChange(
+                entityID: .item(Self.itemLantern),
+                attributeKey: .itemName,
+                newValue: "Shiny Lantern"
+            ),
+            StateChange(
+                entityID: .item(Self.itemLantern),
+                attributeKey: .itemParent,
+                newValue: .parentEntity(.player)
+            ),
         )
-        state2.items[Self.itemLantern] = updatedLantern
 
         // Verify state1's value types remain unchanged
         let initialPlayer = state1.player // Capture initial player state from state1
@@ -582,14 +631,15 @@ struct GameStateTests {
 
     @Test("apply - Modify Location Properties - Set")
     func testApplyModifyLocationPropertiesSet() {
-        var state = createInitialState()
         // Add the location explicitly before applying the change
         let testLoc = Location(
             id: "testLoc",
             .name("Test Location"),
             .description("Original Desc")
         )
-        state.locations["testLoc"] = testLoc
+        var state = createInitialState(
+            locations: [testLoc]
+        )
 
         let change = StateChange(
             entityID: .location("testLoc"),
@@ -610,7 +660,6 @@ struct GameStateTests {
 
     @Test("apply - Modify Location Properties - Remove")
     func testApplyModifyLocationPropertiesRemove() {
-        var state = createInitialState()
         // Add the location explicitly before applying the change
         let testLoc = Location(
             id: "testLoc",
@@ -618,7 +667,9 @@ struct GameStateTests {
             .description("Original Desc"),
             .inherentlyLit
         )
-        state.locations["testLoc"] = testLoc
+        var state = createInitialState(
+            locations: [testLoc]
+        )
 
         let change = StateChange(
             entityID: .location("testLoc"),
@@ -635,14 +686,15 @@ struct GameStateTests {
 
     @Test("apply - Modify Location Dynamic Value")
     func testApplyModifyLocationAttribute() {
-        var state = createInitialState()
         // Add the location explicitly before applying the change
         let testLoc = Location(
             id: "testLoc",
             .name("Test Location"),
             .description("Original Desc")
         )
-        state.locations["testLoc"] = testLoc
+        var state = createInitialState(
+            locations: [testLoc]
+        )
 
         let change = StateChange(
             entityID: .location("testLoc"),
@@ -663,14 +715,15 @@ struct GameStateTests {
 
     @Test("apply - Validation Failure - OldValue Mismatch")
     func testApplyValidationFailureOldValueMismatch() {
-        var state = createInitialState()
         // Ensure startRoom has a description attribute for the test
         let updatedStartRoom = Location(
             id: .startRoom,
             .name("Starting Room"),
             .description("Initial Room Desc")
         )
-        state.locations[.startRoom] = updatedStartRoom
+        var state = createInitialState(
+            locations: [updatedStartRoom]
+        )
 
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(

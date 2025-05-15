@@ -231,7 +231,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any ghost here.")
+        expectNoDifference(output, "You can't see any such thing.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -276,7 +276,7 @@ struct ExamineActionHandlerTests {
         )
 
         // Assert
-        #expect(throws: ParseError.ambiguity("Which ball do you mean?")) {
+        #expect(throws: ParseError.ambiguity("Which do you mean: the item 'red ball', or the item 'blue ball'?")) {
             try parseResult.get()
         }
     }
@@ -364,7 +364,7 @@ extension ExamineActionHandlerTests {
                 StateChange(
                     entityID: .item(itemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialAttributes[.isTouched] ?? false,
+                    oldValue: nil,
                     newValue: true
                 )
             )

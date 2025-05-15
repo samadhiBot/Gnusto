@@ -753,11 +753,17 @@ public struct StandardParser: Parser {
     // MARK: - Private Helpers (New/Modified for Syntax Matching)
 
     /// Helper to convert an EntityReference to a descriptive string for ambiguity messages.
-    private func entityRefToString(_ ref: EntityReference, gameState: GameState) -> String {
-        switch ref {
-        case .item(let id): return "the item '\(gameState.items[id]?.name ?? id.rawValue)'"
-        case .location(let id): return "the location '\(gameState.locations[id]?.name ?? id.rawValue)'"
-        case .player: return "yourself"
+    private func entityRefToString(
+        _ reference: EntityReference,
+        gameState: GameState
+    ) -> String {
+        switch reference {
+        case .item(let id): 
+            "the \(gameState.items[id]?.name ?? id.rawValue)"
+        case .location(let id):
+            "the \(gameState.locations[id]?.name ?? id.rawValue)"
+        case .player:
+            "yourself"
         }
     }
 
