@@ -170,8 +170,8 @@ struct StandardParserTests {
         let player = Player(in: roomID)
 
         // 5. Define initial pronouns
-        let initialPronouns: [String: Set<ItemID>] = [
-            "it": ["box"] // Let's say "it" initially refers to the box in the room
+        let initialPronouns: [String: Set<EntityReference>] = [
+            "it": [.item("box")] // Let's say "it" initially refers to the box in the room
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
@@ -182,9 +182,7 @@ struct StandardParserTests {
             locations: locations,
             items: allItems,
             player: player,
-            pronouns: [
-                "it": [.item("box")] // Let's say "it" initially refers to the box in the room
-            ]
+            pronouns: initialPronouns
         )
 
         // --- Sanity Checks (Optional but Recommended) ---
@@ -252,7 +250,11 @@ struct StandardParserTests {
     @Test("Parse Verb + Direct Object (Ambiguous)")
     func testParseVerbDirectObject() async throws {
         // "lantern" is ambiguous because both "lantern" and "lantern2" are in scope
-        let result = parser.parse(input: "take lantern", vocabulary: vocabulary, gameState: gameState)
+        let result = parser.parse(
+            input: "take lantern",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
         // Update to expect ambiguity
         #expect(result.isFailure(matching: ParseError.ambiguity("Which lantern do you mean?")))
     }

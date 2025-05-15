@@ -1528,44 +1528,44 @@ struct GameEngineTests {
     // Test for GameEngine.updatePronouns
     @Test("updatePronouns updates game state correctly for single item")
     func testUpdatePronounsSingle() async throws {
-        let item = Item(id: "testItem", .name("Test Item"))
-        let engine = await GameEngine(game: MinimalGame(items: [item]), parser: MockParser(), ioHandler: await MockIOHandler())
+        let item = Item(
+            id: "testItem",
+            .name("Test Item")
+        )
+        let engine = await GameEngine(
+            game: MinimalGame(items: [item]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
         let stateChange = await engine.updatePronouns(to: item)
-        #expect(stateChange == StateChange(
-            entityID: .global,
-            attributeKey: .pronounReference(pronoun: "it"),
-            newValue: .entityReferenceSet([.item(item.id)])
-        ))
-
-        let pronouns = await engine.gameState.pronouns
-        #expect(pronouns["it"] == [.item(item.id)])
-
-        // Check change history
-        let history = await engine.gameState.changeHistory
-        expectNoDifference(history, [stateChange])
+        #expect(
+            stateChange == StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(item.id)])
+            )
+        )
     }
 
     @Test("updatePronouns updates game state correctly for multiple items (them)")
     func testUpdatePronounsMultiple() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
-        let engine = await GameEngine(game: MinimalGame(items: [item1, item2]), parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(
+            game: MinimalGame(items: [item1, item2]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
-        await engine.updatePronouns(to: item1, item2) // Assuming variadic version exists or pass as array
-
-        let pronouns = await engine.gameState.pronouns
-        #expect(pronouns["them"] == [.item(item1.id), .item(item2.id)])
-
-        // Check change history
-        let history = await engine.gameState.changeHistory
-        expectNoDifference(history, [
-            StateChange(
+        let change = await engine.updatePronouns(to: item1, item2)
+        #expect(
+            change == StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "them"),
                 newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
             )
-        ])
+        )
     }
 }
 

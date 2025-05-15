@@ -35,9 +35,9 @@ struct UnlockActionHandlerTests {
         )
 
         // Check initial state
-        let initialBoxSnapshot = try #require(try await engine.item("box"))
+        let initialBoxSnapshot = try await engine.item("box")
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true)
-        let initialKeySnapshot = try #require(try await engine.item("key"))
+        let initialKeySnapshot = try await engine.item("key")
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -56,11 +56,11 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The wooden box is now unlocked.")
 
         // Assert Final State
-        let finalBoxState = try #require(try await engine.item("box"))
+        let finalBoxState = try await engine.item("box")
         #expect(finalBoxState.hasFlag(.isLocked) == false, "Box should be unlocked")
         #expect(finalBoxState.hasFlag(.isTouched) == true, "Box should be touched")
 
-        let finalKeyState = try #require(try await engine.item("key"))
+        let finalKeyState = try await engine.item("key")
         #expect(finalKeyState.hasFlag(.isTouched) == true, "Key should be touched")
 
         // Assert Change History
@@ -360,7 +360,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        let initialBoxSnapshot = try #require(try await engine.item("box"))
+        let initialBoxSnapshot = try await engine.item("box")
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -427,14 +427,16 @@ extension UnlockActionHandlerTests {
             )
         }
 
-        // Pronoun "it" is set to the target item
-        // Assuming "it" wasn't already referring to targetItemID or was nil.
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
-                oldValue: nil, // Simplified for test
-                newValue: .entityReferenceSet([.item(targetItemID)])
+                attributeKey: .pronounReference(pronoun: "them"),
+                oldValue: nil,
+                // Simplified for test
+                newValue: .entityReferenceSet([
+                    .item(targetItemID),
+                    .item(keyItemID),
+                ])
             )
         )
 
