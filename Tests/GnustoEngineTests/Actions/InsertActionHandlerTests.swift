@@ -1528,7 +1528,7 @@ extension InsertActionHandlerTests {
                 StateChange(
                     entityID: .item(itemToInsertID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialItemAttributes[.isTouched] ?? false,
+                    oldValue: initialItemAttributes[.isTouched],
                     newValue: true
                 )
             )
@@ -1540,7 +1540,7 @@ extension InsertActionHandlerTests {
                 StateChange(
                     entityID: .item(containerID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: initialContainerAttributes[.isTouched] ?? false,
+                    oldValue: initialContainerAttributes[.isTouched],
                     newValue: true
                 )
             )

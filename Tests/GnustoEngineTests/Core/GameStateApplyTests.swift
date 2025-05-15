@@ -1072,30 +1072,25 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let flagID: GlobalID = "testFlagInitiallyTrue"
         // Set the flag using apply instead of direct assignment
-        try gameState.apply(
-            StateChange(
-                entityID: .global,
-                attributeKey: .setFlag(flagID),
-                oldValue: nil,
-                newValue: true
-            )
+        let setFlag = StateChange(
+            entityID: .global,
+            attributeKey: .setFlag(flagID),
+            oldValue: nil,
+            newValue: true
         )
-        // Initial state check
+        try gameState.apply(setFlag)
         #expect(gameState.globalState[flagID] == true)
 
-        let change = StateChange(
+        let clearFlag = StateChange(
             entityID: .global,
             attributeKey: .clearFlag(flagID),
             oldValue: true, // Expecting it was true
             newValue: false
         )
-
-        try gameState.apply(change)
-
-        // Assert final state
+        try gameState.apply(clearFlag)
         #expect(gameState.globalState[flagID] == false)
-        #expect(gameState.changeHistory.count == 1)
-        #expect(gameState.changeHistory.first == change)
+
+        #expect(gameState.changeHistory == [setFlag, clearFlag])
     }
 
     @Test("Apply flag change with invalid old value fails")

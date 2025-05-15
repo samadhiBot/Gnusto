@@ -398,7 +398,6 @@ extension LockActionHandlerTests {
                 StateChange(
                     entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isLocked),
-                    oldValue: false,
                     newValue: true
                 )
             )
@@ -410,7 +409,6 @@ extension LockActionHandlerTests {
                 StateChange(
                     entityID: .item(targetItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: false,
                     newValue: true
                 )
             )
@@ -422,7 +420,6 @@ extension LockActionHandlerTests {
                 StateChange(
                     entityID: .item(keyItemID),
                     attributeKey: .itemAttribute(.isTouched),
-                    oldValue: false,
                     newValue: true
                 )
             )
