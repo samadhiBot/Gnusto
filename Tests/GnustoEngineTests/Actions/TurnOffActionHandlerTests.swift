@@ -36,7 +36,7 @@ struct TurnOffActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -81,7 +81,7 @@ struct TurnOffActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("book")),
             rawInput: "turn off book"
         )
@@ -118,7 +118,7 @@ struct TurnOffActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -157,7 +157,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -207,7 +207,7 @@ struct TurnOffActionHandlerTests {
         #expect(initiallyLit == true)
 
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -251,7 +251,7 @@ struct TurnOffActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -293,7 +293,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )
@@ -336,7 +336,7 @@ struct TurnOffActionHandlerTests {
             ioHandler: mockIO
         )
         let command = Command(
-            verbID: .turnOff,
+            verb: .turnOff,
             directObject: .item(ItemID("lamp")),
             rawInput: "turn off lamp"
         )

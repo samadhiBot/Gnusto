@@ -28,12 +28,12 @@ public struct Command: Equatable, Sendable {
     public let rawInput: String
 
     /// The primary verb identified in the input.
-    public let verbID: VerbID
+    public let verb: VerbID
 
     // --- Initialization ---
     /// Initializes a new Command structure.
     public init(
-        verbID: VerbID,
+        verb: VerbID,
         directObject: EntityReference? = nil,
         directObjectModifiers: [String] = [],
         indirectObject: EntityReference? = nil,
@@ -42,7 +42,7 @@ public struct Command: Equatable, Sendable {
         direction: Direction? = nil,
         rawInput: String
     ) {
-        self.verbID = verbID
+        self.verb = verb
         self.directObject = directObject
         self.directObjectModifiers = directObjectModifiers
         self.indirectObject = indirectObject

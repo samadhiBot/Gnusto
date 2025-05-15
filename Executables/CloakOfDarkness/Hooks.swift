@@ -28,7 +28,7 @@
 //            let isLitNow = await engine.location(locationID)?.hasFlag(.isLit) ?? false
 //
 //            if !isLitNow { // Should definitely be false here if update worked
-//                let verb = command.verbID
+//                let verb = command.verb
 //
 //                // Original ZIL safe verbs in dark Bar: LOOK, GAME-VERB?, THINK-ABOUT, GO NORTH
 //                // GAME-VERB? includes meta verbs like QUIT, SCORE, VERBOSE, etc.

@@ -27,7 +27,7 @@ struct WearActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("cloak")),
             rawInput: "wear cloak"
         )
@@ -78,7 +78,7 @@ struct WearActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("cloak")),
             rawInput: "wear cloak"
         )
@@ -111,7 +111,7 @@ struct WearActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("rock")),
             rawInput: "wear rock"
         )
@@ -146,7 +146,7 @@ struct WearActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("cloak")),
             rawInput: "wear cloak"
         )
@@ -173,7 +173,7 @@ struct WearActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             rawInput: "wear"
         )
 

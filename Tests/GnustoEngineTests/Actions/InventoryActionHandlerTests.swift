@@ -30,7 +30,7 @@ struct InventoryActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .inventory,
+            verb: .inventory,
             rawInput: "inventory"
         )
 
@@ -72,7 +72,7 @@ struct InventoryActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .inventory,
+            verb: .inventory,
             rawInput: "inventory"
         )
 

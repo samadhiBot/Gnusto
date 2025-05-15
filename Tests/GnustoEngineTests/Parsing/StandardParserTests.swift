@@ -249,7 +249,7 @@ struct StandardParserTests {
                 gameState: gameState
             )
             let command = try result.get()
-            #expect(command.verbID == "look")
+            #expect(command.verb == "look")
             #expect(command.directObject == nil)
             #expect(command.indirectObject == nil)
             #expect(command.rawInput == input)
@@ -307,7 +307,7 @@ struct StandardParserTests {
         )
         // Revert to expecting success
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("lantern"))
         #expect(command.directObjectModifiers == ["brass"])
         #expect(command.indirectObject == nil)
@@ -323,7 +323,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "examine") // Expect examine, not look
+        #expect(command.verb == .examine) // Expect examine, not look
         #expect(command.directObject == .item("key"))
         #expect(Set(command.directObjectModifiers) == Set(["rusty", "small"]))
         #expect(command.indirectObject == nil)
@@ -340,7 +340,7 @@ struct StandardParserTests {
         )
         // Should now SUCCEED because "box" is in scope (in the room)
         let command = try result.get()
-        #expect(command.verbID == "insert")
+        #expect(command.verb == "insert")
         #expect(command.directObject == .item("key"))
         #expect(command.indirectObject == .item("box"))
         #expect(command.preposition == "in")
@@ -356,7 +356,7 @@ struct StandardParserTests {
         )
         // Should now SUCCEED because "box" is in scope (in the room)
         let command = try result.get()
-        #expect(command.verbID == "insert")
+        #expect(command.verb == "insert")
         #expect(command.directObject == .item("key"))
         #expect(Set(command.directObjectModifiers) == Set(["small"]))
         #expect(command.indirectObject == .item("box"))
@@ -374,7 +374,7 @@ struct StandardParserTests {
         )
         // Should SUCCEED now.
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("box"))
         #expect(command.indirectObject == nil)
     }
@@ -390,7 +390,7 @@ struct StandardParserTests {
         )
         // Should SUCCEED now.
         let command = try result.get()
-        #expect(command.verbID == "insert")
+        #expect(command.verb == "insert")
         #expect(command.directObject == .item("leaflet"))
         #expect(command.indirectObject == .item("box"))
         #expect(command.preposition == "in")
@@ -423,7 +423,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == .putOn)
+        #expect(command.verb == .putOn)
         #expect(command.directObject == .item("leaflet"))
         #expect(command.directObjectModifiers.isEmpty)
         #expect(command.preposition == "on")
@@ -440,7 +440,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "drop")
+        #expect(command.verb == "drop")
         #expect(command.directObject == .item("leaflet"))
         #expect(command.indirectObject == nil)
     }
@@ -454,7 +454,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("sword"))
         #expect(command.indirectObject == nil)
     }
@@ -468,7 +468,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "examine") // Expect examine, not look
+        #expect(command.verb == .examine) // Expect examine, not look
         #expect(command.directObject == .item("rug"))
         #expect(command.indirectObject == nil)
     }
@@ -484,7 +484,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("lantern")) // Should resolve to the brass one
         #expect(command.directObjectModifiers == ["brass"])
     }
@@ -498,7 +498,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "examine") // Expect examine, not look
+        #expect(command.verb == .examine) // Expect examine, not look
         #expect(command.directObject == .item("lantern2")) // Should resolve to the rusty one
         #expect(command.directObjectModifiers == ["rusty"])
     }
@@ -512,7 +512,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "drop")
+        #expect(command.verb == "drop")
         #expect(command.directObject == .item("key"))
         #expect(Set(command.directObjectModifiers) == Set(["small", "rusty"]))
     }
@@ -628,7 +628,7 @@ struct StandardParserTests {
             gameState: initState
         )
         let command = try result.get()
-        #expect(command.verbID == "examine") // Expect examine, not look
+        #expect(command.verb == .examine) // Expect examine, not look
         #expect(command.directObject == .item("sword"))
     }
 
@@ -672,7 +672,7 @@ struct StandardParserTests {
         )
         let result = parser.parse(input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
         let command = try result.get()
-        #expect(command.verbID == .putOn)
+        #expect(command.verb == .putOn)
         #expect(command.directObject == .item("leaflet"))
         #expect(command.preposition == "on")
         #expect(command.indirectObject == .item("sword"))
@@ -730,7 +730,7 @@ struct StandardParserTests {
             gameState: initState
         )
         let command = try result.get()
-        #expect(command.verbID == "drop")
+        #expect(command.verb == "drop")
         #expect(command.directObject == .item("key")) // Successfully resolved to the only one in scope
     }
 
@@ -745,7 +745,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("coin"))
         #expect(command.indirectObject == nil)
     }
@@ -759,7 +759,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("coin"))
         #expect(command.directObjectModifiers == ["gold"])
         #expect(command.indirectObject == nil)
@@ -968,7 +968,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("lantern")) // Noun = lantern
         #expect(command.directObjectModifiers == ["brass"]) // Mods = [brass]
     }
@@ -982,7 +982,7 @@ struct StandardParserTests {
             gameState: gameState
         )
         let command = try result.get()
-        #expect(command.verbID == "take")
+        #expect(command.verb == "take")
         #expect(command.directObject == .item("key")) // Noun = key
         #expect(command.directObjectModifiers == ["small", "rusty"]) // Mods = [small, rusty], "the" filtered
     }
@@ -1008,7 +1008,7 @@ struct StandardParserTests {
         )
         let command = try result.get()
 
-        #expect(command.verbID == "insert")
+        #expect(command.verb == "insert")
         // DO: noun = key (last known noun), mods = [small] ("box" is noun, not modifier)
         #expect(command.directObject == .item("key"))
         #expect(command.directObjectModifiers == ["small"])
@@ -1059,7 +1059,7 @@ struct StandardParserTests {
             gameState: modifiedState
         )
         let command = try result.get()
-        #expect(command.verbID == "drop")
+        #expect(command.verb == "drop")
         #expect(command.directObject == .item("key")) // Noun = it (resolved to key)
         #expect(command.directObjectModifiers == []) // Mods = []
     }
@@ -1083,7 +1083,7 @@ struct StandardParserTests {
             gameState: modifiedState
         )
         let command = try result.get()
-        #expect(command.verbID == "drop")
+        #expect(command.verb == "drop")
         #expect(command.directObject == .item("key")) // Noun = it
         #expect(command.directObjectModifiers == []) // Mods = [], "the" filtered
     }
@@ -1114,7 +1114,7 @@ struct StandardParserTests {
                 gameState: gameState
             )
             let command = try result.get()
-            #expect(command.verbID == "go") // Should assume "go"
+            #expect(command.verb == "go") // Should assume "go"
             #expect(command.direction == expectedDirection)
             #expect(command.directObject == nil)
             #expect(command.indirectObject == nil)
@@ -1148,7 +1148,7 @@ struct StandardParserTests {
                 gameState: gameState
             )
             let command = try result.get()
-            #expect(command.verbID == "go")
+            #expect(command.verb == "go")
             #expect(command.direction == expectedDirection)
             #expect(command.directObject == nil)
             #expect(command.indirectObject == nil)

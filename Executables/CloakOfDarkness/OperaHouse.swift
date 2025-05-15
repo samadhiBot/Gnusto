@@ -68,8 +68,9 @@ struct OperaHouse: AreaContents {
 
     let message = Item(
         id: .message,
-        .name("crumpled message"),
+        .name("scrawled message"),
         .in(.location(.bar)),
+        .synonyms("sawdust", "floor"),
         .isReadable,
     )
 
@@ -106,7 +107,7 @@ extension OperaHouse {
         }
         let disturbances = await engine.gameState.globalState[.barMessageDisturbances]?.toInt ?? 0
 
-        return switch command.verbID {
+        return switch command.verb {
         case .go:
             if command.direction == .north {
                 nil
@@ -147,7 +148,7 @@ extension OperaHouse {
     static func cloakHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
         switch event {
         case .beforeTurn(let command):
-            switch command.verbID {
+            switch command.verb {
             case .drop, .putOn:
                 guard await engine.playerLocationID == .cloakroom else {
                     throw ActionResponse.prerequisiteNotMet(
@@ -161,7 +162,7 @@ extension OperaHouse {
         case .afterTurn(let command):
             guard  await engine.playerLocationID == .cloakroom else { return nil }
 
-            switch command.verbID {
+            switch command.verb {
             case .drop, .putOn:
                 var stateChanges = [StateChange]()
                 if await engine.playerScore < 1 {
@@ -183,11 +184,11 @@ extension OperaHouse {
     }
 
     static func hookHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
-        guard case .beforeTurn(let command) = event, command.verbID == "examine" else {
+        guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
-        let cloak = try await engine.item("cloak")
-        let hookDetail = if cloak.parent == .item("hook") {
+        let cloak = try await engine.item(.cloak)
+        let hookDetail = if cloak.parent == .item(.hook) {
             "with a cloak hanging on it"
         } else {
             "screwed to the wall"
@@ -196,9 +197,10 @@ extension OperaHouse {
     }
 
     static func messageHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
-        guard case .beforeTurn(let command) = event,
-              command.verbID == "examine",
-              await engine.playerLocationID == "bar"
+        guard
+            case .beforeTurn(let command) = event,
+            command.verb == .examine,
+            await engine.playerLocationID == .bar
         else {
             return nil
         }

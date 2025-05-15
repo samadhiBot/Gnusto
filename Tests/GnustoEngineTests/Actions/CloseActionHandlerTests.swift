@@ -27,7 +27,7 @@ struct CloseActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
@@ -91,7 +91,7 @@ struct CloseActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
@@ -123,7 +123,7 @@ struct CloseActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(ItemID("rock")),
             rawInput: "close rock"
         )
@@ -158,7 +158,7 @@ struct CloseActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(ItemID("box")),
             rawInput: "close box"
         )
@@ -186,7 +186,7 @@ struct CloseActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             rawInput: "close"
         )
 

@@ -103,7 +103,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("book")),
             indirectObject: .item(ItemID("table")),
             preposition: "on",
@@ -159,7 +159,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             indirectObject: .item(ItemID("table")),
             preposition: "on",
             rawInput: "put on table"
@@ -195,7 +195,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("book")),
             preposition: "on",
             rawInput: "put book on"
@@ -237,7 +237,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("book")),
             indirectObject: .item(ItemID("table")),
             preposition: "on",
@@ -290,7 +290,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("book")),
             indirectObject: .item(ItemID("table")),
             preposition: "on",
@@ -333,7 +333,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("book")),
             indirectObject: .item(ItemID("box")),
             preposition: "on",
@@ -371,7 +371,7 @@ struct PutOnActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("table")),
             indirectObject: .item(ItemID("table")),
             preposition: "on",
@@ -417,7 +417,7 @@ struct PutOnActionHandlerTests {
 
         // Try to put the tray onto the table (which is on the tray)
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("tray")),
             indirectObject: .item(ItemID("table")),
             preposition: "on",

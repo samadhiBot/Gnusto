@@ -75,7 +75,7 @@ struct OpenActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
@@ -130,7 +130,7 @@ struct OpenActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
@@ -167,7 +167,7 @@ struct OpenActionHandlerTests {
             ioHandler: mockIO
         )
         let command = Command(
-            verbID: .open,
+            verb: .open,
             rawInput: "open"
         )
 
@@ -196,7 +196,7 @@ struct OpenActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
@@ -232,7 +232,7 @@ struct OpenActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("rock")),
             rawInput: "open rock"
         )
@@ -270,7 +270,7 @@ struct OpenActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("box")),
             rawInput: "open box"
         )
@@ -308,7 +308,7 @@ struct OpenActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("chest")),
             rawInput: "open chest"
         )

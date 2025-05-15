@@ -25,7 +25,7 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             directObject: .item(ItemID("cloak")),
             rawInput: "remove cloak"
         )
@@ -87,7 +87,7 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             directObject: .item(ItemID("cloak")),
             rawInput: "take off cloak"
         )
@@ -115,7 +115,7 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             directObject: .item(ItemID("cloak")),
             rawInput: "remove cloak"
         )
@@ -144,7 +144,7 @@ struct RemoveActionHandlerTests {
 
         // Command with nil directObject
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             rawInput: "remove"
         )
 
@@ -179,7 +179,7 @@ struct RemoveActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             directObject: .item(ItemID("amulet")),
             rawInput: "remove amulet"
         )

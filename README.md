@@ -67,7 +67,7 @@ struct OperaHouse: AreaContents {
     )
 
     func hookAction(_ engine: GameEngine, _ command: Command) async throws -> Bool {
-        guard command.verbID == "examine", let cloak = try await engine.item("cloak") else {
+        guard command.verbID == .examine, let cloak = try await engine.item("cloak") else {
             return false
         }
         let hookDetail = if cloak.parent == .item("hook") {

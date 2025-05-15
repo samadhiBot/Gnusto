@@ -26,7 +26,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine pebble"
         )
@@ -67,7 +67,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine locket"
         )
@@ -118,7 +118,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine statue"
         )
@@ -170,7 +170,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine hidden gem"
         )
@@ -217,7 +217,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine hidden gem"
         )
@@ -244,7 +244,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(itemID),
             rawInput: "examine ghost"
         )
@@ -315,7 +315,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .player,
             rawInput: "examine self"
         )
@@ -358,7 +358,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(item.id),
             rawInput: "examine mirror"
         )

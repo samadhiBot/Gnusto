@@ -41,7 +41,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
@@ -94,7 +94,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             indirectObject: .item(ItemID("key")),
             rawInput: "lock with key"
         ) // No direct object
@@ -132,7 +132,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             rawInput: "lock box"
         ) // No indirect object
@@ -176,7 +176,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
@@ -231,7 +231,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"
@@ -271,7 +271,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("pebble")),
             indirectObject: .item(ItemID("key")),
             rawInput: "lock pebble with key"
@@ -316,7 +316,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("wrongkey")),
             rawInput: "lock box with bent key"
@@ -364,7 +364,7 @@ struct LockActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .lock,
+            verb: .lock,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("key")),
             rawInput: "lock box with key"

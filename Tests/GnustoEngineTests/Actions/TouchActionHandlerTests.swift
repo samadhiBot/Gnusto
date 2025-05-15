@@ -25,7 +25,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("rock")),
             rawInput: "touch rock"
         )
@@ -59,7 +59,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("key")),
             rawInput: "touch key"
         )
@@ -86,7 +86,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             rawInput: "touch"
         )
 
@@ -121,7 +121,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("figurine")),
             rawInput: "touch figurine"
         )
@@ -163,7 +163,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("gem")),
             rawInput: "touch gem"
         )
@@ -202,7 +202,7 @@ struct TouchActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("book")),
             rawInput: "touch book"
         )
@@ -243,7 +243,7 @@ struct TouchActionHandlerTests {
         #expect(chest.attributes[.isOpen] == nil) // Verify closed
 
         let command = Command(
-            verbID: .touch,
+            verb: .touch,
             directObject: .item(ItemID("coin")),
             rawInput: "touch coin"
         )

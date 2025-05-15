@@ -33,7 +33,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -74,7 +74,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -117,7 +117,7 @@ struct GoActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "north"
         )
@@ -154,7 +154,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "go north"
         )
@@ -181,7 +181,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "go north"
         )
@@ -232,7 +232,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .north,
             rawInput: "go north"
         )
@@ -280,7 +280,7 @@ struct GoActionHandlerTests {
         #expect(await engine.gameState.globalState[conditionGlobalID] == false)
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             direction: .east,
             rawInput: "go east"
         )
@@ -335,7 +335,7 @@ struct GoActionHandlerTests {
         // Update the location in the game state directly for the test setup
 //        await engine.TEST_ONLY_updateLocation(foyer)
 
-        let command = Command(verbID: .go, direction: .east, rawInput: "go east")
+        let command = Command(verb: .go, direction: .east, rawInput: "go east")
 
         // Act
         await engine.execute(command: command)
@@ -358,7 +358,7 @@ struct GoActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             rawInput: "go"
         ) // No direction
 

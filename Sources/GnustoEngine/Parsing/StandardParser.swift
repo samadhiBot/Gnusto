@@ -43,7 +43,7 @@ public struct StandardParser: Parser {
             // Assume a default movement verb like 'go'
             // TODO: Make the default movement verb configurable or a constant
             let defaultGoVerbID = VerbID("go") // Placeholder
-            let command = Command(verbID: defaultGoVerbID, direction: direction, rawInput: input)
+            let command = Command(verb: defaultGoVerbID, direction: direction, rawInput: input)
             return .success(command)
         }
 
@@ -100,14 +100,14 @@ public struct StandardParser: Parser {
         }
 
         // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
-        var allPotentialRules: [(verbID: VerbID, rule: SyntaxRule)] = []
-        var verbIDsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
-        for verbID in matchedVerbIDs {
-            if let verbDef = vocabulary.verbDefinitions[verbID] {
+        var allPotentialRules: [(verb: VerbID, rule: SyntaxRule)] = []
+        var verbsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
+        for verb in matchedVerbIDs {
+            if let verbDef = vocabulary.verbDefinitions[verb] {
                 if !verbDef.syntax.isEmpty {
-                    verbIDsWithRules.insert(verbID)
+                    verbsWithRules.insert(verb)
                     for rule in verbDef.syntax {
-                        allPotentialRules.append((verbID: verbID, rule: rule))
+                        allPotentialRules.append((verb: verb, rule: rule))
                     }
                 }
             }
@@ -127,19 +127,19 @@ public struct StandardParser: Parser {
         // Pre-calculate input preposition once, as it's the same for all rules
         let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
 
-        for (verbID, rule) in allPotentialRules { // Iterate through all potential rules
+        for (verb, rule) in allPotentialRules { // Iterate through all potential rules
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
-                verbID: verbID, // <<< Pass the specific verbID for this rule
+                verb: verb, // <<< Pass the specific verb for this rule
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
             )
 
             switch matchResult {
-            case .success(let command): // Command already contains the correct verbID from matchRule
+            case .success(let command): // Command already contains the correct verb from matchRule
                 // Rule matched structurally. Now check prepositions.
                 if let requiredPrep = rule.requiredPreposition {
                     // Rule requires a specific preposition
@@ -147,13 +147,15 @@ public struct StandardParser: Parser {
                         // Input also has a preposition
                         if requiredPrep == inputPrep {
                             // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
-                            successfulParse = command // Command has the correct verbID
+                            successfulParse = command // Command has the correct verb
                             bestError = nil // Clear any previous error
                             break // Found the best possible match for this input
                         } else {
                             // PREPOSITIONS MISMATCH - Record error, continue
-                            // Use the specific verbID associated with this rule
-                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(verbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
+                            // Use the specific verb associated with this rule
+                            let mismatchError = ParseError.badGrammar(
+                                "Preposition mismatch for verb '\(verb)' (expected '\(requiredPrep)', found '\(inputPrep)')."
+                            )
                             if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
                                 bestError = mismatchError
                             }
@@ -161,8 +163,8 @@ public struct StandardParser: Parser {
                         }
                     } else {
                         // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
-                        // Use the specific verbID associated with this rule
-                        let missingPrepError = ParseError.badGrammar("Verb '\(verbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
+                        // Use the specific verb associated with this rule
+                        let missingPrepError = ParseError.badGrammar("Verb '\(verb)' requires preposition '\(requiredPrep)' which was missing.")
                         if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
                             bestError = missingPrepError
                         }
@@ -177,7 +179,7 @@ public struct StandardParser: Parser {
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
                     if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
-                        successfulParse = command // Command has the correct verbID
+                        successfulParse = command // Command has the correct verb
                         // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
                     }
                     // Continue searching for a potentially better match (e.g., one that uses the input preposition)
@@ -204,7 +206,7 @@ public struct StandardParser: Parser {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
                  // Pick the first matched verb ID as the canonical one (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
-                 let command = Command(verbID: firstMatchedID, rawInput: input)
+                 let command = Command(verb: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
                  // If we get here, rules existed, but none resulted in success or a recorded error.
@@ -303,7 +305,7 @@ public struct StandardParser: Parser {
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
-        verbID: VerbID,
+        verb: VerbID,
         _debugHook: (() -> Void)? = nil, // Add parameter for debug hook
         vocabulary: Vocabulary,
         gameState: GameState,
@@ -342,7 +344,11 @@ public struct StandardParser: Parser {
                 )
                 guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                    return .failure(
+                        .badGrammar(
+                            "Expected a direct object phrase for verb '\(verb)', but found \(context)."
+                        )
+                    )
                 }
                 directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -377,7 +383,7 @@ public struct StandardParser: Parser {
                  )
                  guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)', but found \(context)."))
                  }
                 indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -418,14 +424,14 @@ public struct StandardParser: Parser {
              if let actualNoun = nounToResolveDO {
                  resolvedDirectObjectResult = resolveObject(
                      noun: actualNoun,
-                     verb: verbID,
+                     verb: verb,
                      modifiers: modsToUseDO,
                      in: gameState,
                      using: vocabulary,
                      requiredConditions: rule.directObjectConditions
                  )
              } else {
-                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)'."))
+                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
              }
         } else {
              resolvedDirectObjectResult = .success(nil)
@@ -436,14 +442,14 @@ public struct StandardParser: Parser {
             if let actualNoun = nounToResolveIO {
                 resolvedIndirectObjectResult = resolveObject(
                     noun: actualNoun,
-                    verb: verbID,
+                    verb: verb,
                     modifiers: modsToUseIO,
                     in: gameState,
                     using: vocabulary,
                     requiredConditions: rule.indirectObjectConditions
                 )
             } else {
-                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)'."))
+                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
             }
         } else {
             resolvedIndirectObjectResult = .success(nil)
@@ -452,7 +458,7 @@ public struct StandardParser: Parser {
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
         case (.success(let doRef), .success(let ioRef)):
             let command = Command(
-                verbID: verbID,
+                verb: verb,
                 directObject: doRef,
                 directObjectModifiers: modsToUseDO,
                 indirectObject: ioRef,

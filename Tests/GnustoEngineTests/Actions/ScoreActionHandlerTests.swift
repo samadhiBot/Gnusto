@@ -22,7 +22,7 @@ struct ScoreActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .score,
+            verb: .score,
             rawInput: "score"
         )
 

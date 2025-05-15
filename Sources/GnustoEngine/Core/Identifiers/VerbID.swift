@@ -72,10 +72,16 @@ extension VerbID {
 
 #endif
 
-// MARK: - CustomDumpStringConvertible conformance
+// MARK: - Conformances
 
 extension VerbID: CustomDumpStringConvertible {
     public var customDumpDescription: String {
         ".\(rawValue)"
+    }
+}
+
+extension VerbID: CustomStringConvertible {
+    public var description: String {
+        rawValue
     }
 }

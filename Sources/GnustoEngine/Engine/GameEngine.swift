@@ -162,11 +162,11 @@ extension GameEngine {
                 return
             }
 
-            if command.verbID == .quit || shouldQuit { return }
+            if command.verb == .quit || shouldQuit { return }
 
             // Handle location description after movement or light change
             let shouldDescribe: Bool
-            switch command.verbID {
+            switch command.verb {
             case .go:
                 // Check if the destination room was visited before the movement
                 let exit = try command.direction.flatMap { direction in
@@ -185,7 +185,7 @@ extension GameEngine {
 
             await execute(command: command)
 
-            if command.verbID == .quit || shouldQuit { return }
+            if command.verb == .quit || shouldQuit { return }
 
             if shouldDescribe {
                 try await describeCurrentLocation()
@@ -272,7 +272,7 @@ extension GameEngine {
             "You can't put things on \(theThat(item))."
         case .toolMissing(let tool):
             "You need \(tool) for that."
-        case .unknownEntity(let entityRef):
+        case .unknownEntity:
             "You can't see any such thing."
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
@@ -569,30 +569,30 @@ extension GameEngine {
             // Retrieve verb definition to check requiresLight property
             // Note: Parser should ensure command.verbID exists in vocabulary
             // Correct: Look up the Verb definition directly
-            guard let verb = gameState.vocabulary.verbDefinitions[command.verbID] else {
+            guard let verb = gameState.vocabulary.verbDefinitions[command.verb] else {
                 // This case should ideally not be reached if parser validates verbs
                 logger.warning("""
                     💥 Internal Error: Unknown verb ID \
-                    '\(command.verbID.rawValue, privacy: .public)' reached execution. \
+                    '\(command.verb.rawValue, privacy: .public)' reached execution. \
                     If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
                     """)
-                await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
+                await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
                 return
             }
 
             // If the room is dark and the verb requires light (and isn't 'turn on'), report error.
-            if !isLit && verb.requiresLight && command.verbID != .turnOn {
+            if !isLit && verb.requiresLight && command.verb != .turnOn {
                 await report(.roomIsDark)
             } else {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
-                guard let verbHandler = actionHandlers[command.verbID] else {
+                guard let verbHandler = actionHandlers[command.verb] else {
                     // No handler registered for this verb (should match vocabulary definition)
                     logger.warning("""
                         💥 Internal Error: No ActionHandler registered for verb ID \
-                        '\(command.verbID.rawValue, privacy: .public)'.
+                        '\(command.verb.rawValue, privacy: .public)'.
                         """)
-                    await ioHandler.print("I don't know how to '\(command.verbID.rawValue)'.")
+                    await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
                     return
                 }
 

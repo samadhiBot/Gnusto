@@ -63,7 +63,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("openBox")),
             preposition: "in",
@@ -121,7 +121,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             indirectObject: .item(ItemID("openBox")),
             preposition: "in",
             rawInput: "put in open box"
@@ -158,7 +158,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             preposition: "in",
             rawInput: "put coin in"
@@ -203,7 +203,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("openBox")),
             preposition: "in",
@@ -249,7 +249,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("distantBox")),
             preposition: "in",
@@ -293,7 +293,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("statue")),
             preposition: "in",
@@ -337,7 +337,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -375,7 +375,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -422,7 +422,7 @@ struct InsertActionHandlerTests {
 
         // Try to put the bag into the box (which is inside the bag)
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("bag")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -478,7 +478,7 @@ struct InsertActionHandlerTests {
         #expect(initialLoad == 6)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("fullBox")),
             preposition: "in",
@@ -535,7 +535,7 @@ struct InsertActionHandlerTests {
         #expect(initialLoad == 5)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("exactBox")),
             preposition: "in",
@@ -597,7 +597,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -656,7 +656,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("box")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -709,7 +709,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -754,7 +754,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("rock")),
             preposition: "in",
@@ -801,7 +801,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -859,7 +859,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -910,7 +910,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -970,7 +970,7 @@ struct InsertActionHandlerTests {
         let initialContainerAttributes = initialOuterBox.attributes
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("outerBox")),
             preposition: "in",
@@ -1011,7 +1011,7 @@ struct InsertActionHandlerTests {
         let initialContainerAttributes = initialInnerBox.attributes
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("innerBox")),
             preposition: "in",
@@ -1059,7 +1059,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("bag")),
             indirectObject: .item(ItemID("bag")),
             preposition: "in",
@@ -1107,7 +1107,7 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("boxB")),
             indirectObject: .item(ItemID("boxA")),
             preposition: "in",
@@ -1168,7 +1168,7 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("boxC")),
             indirectObject: .item(ItemID("boxA")),
             preposition: "in",
@@ -1214,7 +1214,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [coin, box])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("openBox")),
             preposition: "in",
@@ -1250,7 +1250,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [coin, box])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("distantBox")),
             preposition: "in",
@@ -1283,7 +1283,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [coin, statue])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("statue")),
             preposition: "in",
@@ -1318,7 +1318,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [coin, box])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("coin")),
             indirectObject: .item(ItemID("closedBox")),
             preposition: "in",
@@ -1356,7 +1356,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [boulder, box])
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("boulder")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -1391,7 +1391,7 @@ struct InsertActionHandlerTests {
             ioHandler: await MockIOHandler()
         )
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("bag")),
             indirectObject: .item(ItemID("bag")),
             preposition: "in",
@@ -1441,7 +1441,7 @@ struct InsertActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("boxB")),
             indirectObject: .item(ItemID("boxA")),
             preposition: "in",
@@ -1483,7 +1483,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("trophy")),
             indirectObject: .item(ItemID("openBox")),
             preposition: "in",

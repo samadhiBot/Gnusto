@@ -20,7 +20,7 @@ struct WaitActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .wait,
+            verb: .wait,
             rawInput: "wait"
         )
 

@@ -32,7 +32,7 @@ struct DropActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             directObject: .item(ItemID("key")),
             rawInput: "drop key"
         )
@@ -74,7 +74,7 @@ struct DropActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             rawInput: "drop"
         ) // No direct object
 
@@ -109,7 +109,7 @@ struct DropActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             directObject: .item(ItemID("key")),
             rawInput: "drop key"
         )
@@ -159,7 +159,7 @@ struct DropActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             directObject: .item(ItemID("cloak")),
             rawInput: "drop cloak"
         )
@@ -208,7 +208,7 @@ struct DropActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             directObject: .item(ItemID("sword-in-stone")),
             rawInput: "drop sword"
         )

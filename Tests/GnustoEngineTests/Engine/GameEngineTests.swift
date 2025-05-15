@@ -155,7 +155,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let takeCommand = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
@@ -202,7 +202,7 @@ struct GameEngineTests {
         let processCalled = await mockTakeHandler.getProcessCalled()
         #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
-        #expect(commandReceived?.verbID == "take")
+        #expect(commandReceived?.verb == "take")
         #expect(commandReceived?.directObject == .item(ItemID("startItem")))
 
         // Check turn counter incremented
@@ -251,9 +251,9 @@ struct GameEngineTests {
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let lookCommand = Command(verbID: .look, rawInput: "look")
+        let lookCommand = Command(verb: .look, rawInput: "look")
         let takePebbleCommand = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
@@ -330,11 +330,11 @@ struct GameEngineTests {
         var mockParser = MockParser()
 
         let lookCommand = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
         let takePebbleCommand = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
@@ -375,9 +375,9 @@ struct GameEngineTests {
 
         // Verify commands received by handlers
         let lookCommandReceived = await mockLookHandler.getLastCommandReceived()
-        #expect(lookCommandReceived?.verbID == "look")
+        #expect(lookCommandReceived?.verb == "look")
         let takeCommandReceived = await mockTakeHandler.getLastCommandReceived()
-        #expect(takeCommandReceived?.verbID == "take")
+        #expect(takeCommandReceived?.verb == "take")
         #expect(takeCommandReceived?.directObject == .item(ItemID("startItem")))
 
         // Check turn counter reflects two successful commands
@@ -396,7 +396,7 @@ struct GameEngineTests {
     func testEngineExitsGracefullyOnQuitCommand() async throws {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let quitCommand = Command(verbID: .quit, rawInput: "quit")
+        let quitCommand = Command(verb: .quit, rawInput: "quit")
 
         // Configure parser
         mockParser.parseHandler = { input, _, _ in
@@ -503,12 +503,12 @@ struct GameEngineTests {
 
         // Configure the MockParser
         let takeCommand = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
         let inventoryCommand = Command(
-            verbID: .inventory,
+            verb: .inventory,
             rawInput: "inventory"
         )
         mockParser.parseHandler = { input, _, _ in
@@ -654,7 +654,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let activateCommand = Command(
-            verbID: VerbID("activate"),
+            verb: VerbID("activate"),
             directObject: .item(testItemID),
             rawInput: "activate lamp"
         )
@@ -860,7 +860,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom])
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             preposition: "xyzzy",
             rawInput: "go xyzzy"
         )
@@ -890,7 +890,7 @@ struct GameEngineTests {
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
 
         let command = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("startItem")),
             rawInput: "take pebble"
         )
@@ -920,7 +920,7 @@ struct GameEngineTests {
         #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("startItem")),
             rawInput: "wear pebble"
         )
@@ -955,7 +955,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("box")),
             preposition: "in",
@@ -985,7 +985,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(
-            verbID: .open,
+            verb: .open,
             directObject: .item(ItemID("rock")),
             rawInput: "open rock"
         )
@@ -1014,7 +1014,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(
-            verbID: .wear,
+            verb: .wear,
             directObject: .item(ItemID("rock")),
             rawInput: "wear rock"
         )
@@ -1055,7 +1055,7 @@ struct GameEngineTests {
         let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
         let command = Command(
-            verbID: .take,
+            verb: .take,
             directObject: .item(ItemID("shield")),
             rawInput: "take shield"
         )
@@ -1088,7 +1088,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: .insert,
+            verb: .insert,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("rock")),
             preposition: "in",
@@ -1123,7 +1123,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: .putOn,
+            verb: .putOn,
             directObject: .item(ItemID("key")),
             indirectObject: .item(ItemID("rock")),
             preposition: "on",
@@ -1153,7 +1153,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom])
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             directObject: .item("north"),
             direction: .north,
             rawInput: "go north"
@@ -1184,7 +1184,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [container])
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(container.id),
             rawInput: "close box"
         )
@@ -1223,7 +1223,7 @@ struct GameEngineTests {
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
         let command = Command(
-            verbID: .unlock,
+            verb: .unlock,
             directObject: .item(container.id),
             indirectObject: .item(key.id),
             preposition: "with",
@@ -1253,7 +1253,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(
-            verbID: .close,
+            verb: .close,
             directObject: .item(item.id),
             rawInput: "close book"
         )
@@ -1282,7 +1282,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(
-            verbID: .drop,
+            verb: .drop,
             directObject: .item(item.id),
             rawInput: "drop statue"
         )
@@ -1313,7 +1313,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom], items: [item])
 
         let command = Command(
-            verbID: .remove,
+            verb: .remove,
             directObject: .item(item.id),
             rawInput: "remove amulet"
         )
@@ -1341,7 +1341,7 @@ struct GameEngineTests {
         let game = MinimalGame(locations: [startRoom])
 
         let command = Command(
-            verbID: .go,
+            verb: .go,
             directObject: .item("up"),
             direction: .up,
             rawInput: "go up"
@@ -1377,7 +1377,7 @@ struct GameEngineTests {
         )
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item(item.id),
             rawInput: "examine shadow"
         )
@@ -1416,7 +1416,7 @@ struct GameEngineTests {
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
         let command = Command(
-            verbID: .unlock,
+            verb: .unlock,
             directObject: .item(container.id),
             indirectObject: .item(wrongKey.id),
             preposition: "with",
@@ -1488,7 +1488,7 @@ struct GameEngineTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
 
         // Create the command to trigger the mock handler
-        let testCommand = Command(verbID: testVerb, rawInput: "testapply")
+        let testCommand = Command(verb: testVerb, rawInput: "testapply")
 
         // Act: Execute the command
         await engine.execute(command: testCommand)

@@ -76,7 +76,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -137,7 +137,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -186,7 +186,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -238,7 +238,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -276,7 +276,7 @@ struct LookActionHandlerTests {
         let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -327,7 +327,7 @@ struct LookActionHandlerTests {
         }
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             rawInput: "look"
         )
 
@@ -382,7 +382,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("rock"),
             rawInput: "x rock"
         )
@@ -427,7 +427,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look,
+            verb: .look,
             directObject: .item("pebble"),
             rawInput: "l pebble"
         )
@@ -474,7 +474,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("stone"),
             rawInput: "x stone"
         )
@@ -540,7 +540,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("box"),
             rawInput: "x box"
         )
@@ -597,7 +597,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("box"),
             rawInput: "x box"
         )
@@ -655,7 +655,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("jar"),
             rawInput: "x jar"
         )
@@ -716,7 +716,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("table"),
             rawInput: "x table"
         )
@@ -745,7 +745,7 @@ struct LookActionHandlerTests {
     @Test("LOOK AT item not reachable fails")
     func testLookAtItemNotReachable() async throws {
         // Arrange: Item exists but is in another room
-        let item = Item(
+        let artifact = Item(
             id: "artifact",
             .name("glowing artifact"),
             .in(.location("otherRoom"))
@@ -763,7 +763,7 @@ struct LookActionHandlerTests {
         let game = MinimalGame(
             player: Player(in: .startRoom),
             locations: [room1, room2],
-            items: [item]
+            items: [artifact]
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -772,13 +772,13 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(try await engine.item("artifact") != nil) // Item exists
+        #expect(try await engine.item("artifact") == artifact)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .examine,
+            verb: .examine,
             directObject: .item("artifact"),
             rawInput: "x artifact"
         )
@@ -833,7 +833,7 @@ struct LookActionHandlerTests {
 
         // Command for LOOK AT (often parsed as EXAMINE with DO)
         let command = Command(
-            verbID: .look, // Could also be .examine depending on parser aliasing
+            verb: .look, // Could also be .examine depending on parser aliasing
             directObject: .item(itemID),
             rawInput: "look at desk"
         )
@@ -880,7 +880,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
-            verbID: .look, // or .examine
+            verb: .look, // or .examine
             directObject: .item(itemID),
             rawInput: "look at note"
         )
@@ -916,7 +916,7 @@ struct LookActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .look, // or .examine
+            verb: .look, // or .examine
             directObject: .item(ItemID("unicorn")),
             rawInput: "look at unicorn"
         )
@@ -941,7 +941,7 @@ struct LookActionHandlerTests {
         )
 
         let command = Command(
-            verbID: .look, // or .examine
+            verb: .look, // or .examine
             directObject: .item(ItemID("artifact")),
             rawInput: "look at artifact"
         )
