@@ -187,19 +187,32 @@ struct GameStateApplyTests {
 
     @Test("Apply Item Parent Change - Move from Player")
     func testApplyItemParentFromPlayer() throws {
-        var state = helper.createInitialState()
+        let newLocationID: LocationID = "anotherRoom"
+
+        var state = helper.createInitialState(
+            locations: [
+                Location(
+                    id: .startRoom,
+                    .name("Starting Room"),
+                    .description("A dark, dark room.")
+                ),
+                Location(
+                    id: newLocationID,
+                    .name("Another Room"),
+                    .description("A dark, dark room.")
+                )
+            ]
+        )
         let itemID: ItemID = "testItem"
         // Pre-move item to player
-        state.items[itemID]?.attributes[.parentEntity] = .parentEntity(.player)
+        try state.apply(
+            StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemParent,
+                newValue: .parentEntity(.player)
+            )
+        )
         #expect(state.items[itemID]?.parent == .player)
-        state.changeHistory = [] // Clear history
-
-        let newLocationID: LocationID = "anotherRoom"
-        state.locations[newLocationID] = Location(
-            id: newLocationID,
-            .name("Another Room"),
-            .description("A dark, dark room.")
-        ) // Ensure location exists
 
         let change = StateChange(
             entityID: .item(itemID),
@@ -1058,8 +1071,15 @@ struct GameStateApplyTests {
     func testApplyValidFlagClear() async throws {
         var gameState = await helper.createSampleGameState()
         let flagID: GlobalID = "testFlagInitiallyTrue"
-        gameState.globalState[flagID] = true // Pre-set the flag
-
+        // Set the flag using apply instead of direct assignment
+        try gameState.apply(
+            StateChange(
+                entityID: .global,
+                attributeKey: .setFlag(flagID),
+                oldValue: nil,
+                newValue: true
+            )
+        )
         // Initial state check
         #expect(gameState.globalState[flagID] == true)
 

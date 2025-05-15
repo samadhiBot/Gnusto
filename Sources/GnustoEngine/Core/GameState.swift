@@ -61,14 +61,11 @@ public struct GameState: Codable, Equatable, Sendable {
     }
 
     public init(
-        areas: [AreaContents.Type],
+        areas: AreaContents.Type...,
         player: Player,
         vocabulary: Vocabulary? = nil,
-        pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
-        activeDaemons: Set<DaemonID> = [],
-        globalState: [GlobalID: StateValue] = [:],
-        changeHistory: [StateChange] = []
+        activeDaemons: DaemonID...
     ) {
         var allItems: [Item] = []
         var allLocations: [Location] = []
@@ -100,11 +97,11 @@ public struct GameState: Codable, Equatable, Sendable {
             items: allItems,
             player: player,
             vocabulary: vocabulary,
-            pronouns: pronouns,
+            pronouns: [:],
             activeFuses: activeFuses,
-            activeDaemons: activeDaemons,
-            globalState: globalState,
-            changeHistory: changeHistory
+            activeDaemons: Set(activeDaemons),
+            globalState: [:],
+            changeHistory: []
         )
     }
 

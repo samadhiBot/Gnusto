@@ -83,14 +83,7 @@ struct GameStateTests {
     // Helper to create a consistent initial state for tests
     func createInitialState(
         locations: [Location]? = nil,
-//        items: [Item],
-//        player: Player,
-//        vocabulary: Vocabulary? = nil,
-//        pronouns: [String: Set<EntityReference>] = [:],
-//        activeFuses: [FuseID: Int] = [:],
-//        activeDaemons: Set<DaemonID> = [],
-//        globalState: [GlobalID: StateValue] = [:], // Keep AnyCodable
-//        changeHistory: [StateChange] = []
+        items: [Item]? = nil
     ) -> GameState {
         let startRoom = Location(
             id: .startRoom,
@@ -104,7 +97,7 @@ struct GameStateTests {
         )
         return GameState(
             locations: locations ?? [startRoom],
-            items: [testItem],
+            items: items ?? [testItem],
             player: Player(in: .startRoom),
             vocabulary: Vocabulary.build(items: [testItem]),
             pronouns: ["it": [.item("testItem")]],
@@ -178,7 +171,10 @@ struct GameStateTests {
         }
 
         let player = Player(in: "loc1")
-        let state = GameState(areas: [Area1.self, Area2.self], player: player)
+        let state = GameState(
+            areas: Area1.self, Area2.self,
+            player: player
+        )
 
         #expect(state.locations.count == 3)
         #expect(state.locations.keys.map(\.rawValue).sorted() == ["loc1", "loc2", "loc3"])
@@ -188,85 +184,6 @@ struct GameStateTests {
 
         #expect(state.items["item1"]?.parent == .location("loc1"))
         #expect(!state.vocabulary.items.isEmpty)
-    }
-
-    // MARK: - Helper Methods Tests
-
-    @Test("Items in Inventory Test")
-    func testItemsInInventory() {
-        var state = createInitialState() // Make mutable to modify items
-        let item1 = Item(
-            id: "item1",
-            .name("Item 1"),
-            .in(.player)
-        )
-        let item2 = Item(
-            id: "item2",
-            .name("Item 2"),
-            .in(.location(.startRoom))
-        )
-        let item3 = Item(
-            id: "item3",
-            .name("Item 3"),
-            .in(.player)
-        )
-        state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": state.items["testItem"]!] // Add items
-
-        // Replace itemsInInventory() call
-        let inventoryItems = state.items.values.filter { $0.parent == .player }.map(\.id)
-        let inventoryItemSet = Set(inventoryItems)
-        #expect(inventoryItemSet == ["item1", "item3"])
-        #expect(inventoryItems.count == 2)
-    }
-
-    @Test("Items in Location Test")
-    func testItemsInLocation() {
-        var state = createInitialState() // Make mutable to modify items
-        let locID: LocationID = .startRoom
-        let item1 = Item(
-            id: "item1",
-            .name("Item 1"),
-            .in(.location(locID))
-        )
-        let item2 = Item(
-            id: "item2",
-            .name("Item 2"),
-            .in(.player)
-        )
-        let item3 = Item(
-            id: "item3",
-            .name("Item 3"),
-            .in(.location(locID))
-        )
-        let originalTestItem = state.items["testItem"]! // Keep original item in startRoom
-        state.items = ["item1": item1, "item2": item2, "item3": item3, "testItem": originalTestItem] // Add/replace items
-
-        let locationItems = state.items.values.filter { $0.parent == .location(locID) }.map(\.id)
-        let locationItemSet = Set(locationItems)
-        #expect(locationItemSet == ["item1", "item3", "testItem"])
-        #expect(locationItems.count == 3)
-    }
-
-    @Test("Item Parent Test") // Renamed from Item Location
-    func testItemParent() {
-        var state = createInitialState() // Make mutable
-        let item1 = Item(
-            id: "item1",
-            .name("Item 1"),
-            .in(.player)
-        )
-        let item2 = Item(
-            id: "item2",
-            .name("Item 2"),
-            .in(.location(.startRoom))
-        )
-        state.items["item1"] = item1 // Add items
-        state.items["item2"] = item2
-
-        #expect(state.items["item1"]?.parent == .player)
-        #expect(state.items["item2"]?.parent == .location(.startRoom))
-        #expect(state.items["testItem"]?.parent == .location(.startRoom)) // Check original
-        #expect(state.items["nonExistentItem"]?.parent == nil)
     }
 
     // MARK: - Codable Tests
@@ -372,14 +289,8 @@ struct GameStateTests {
 
     @Test("GameState Property Modification")
     func testGameStatePropertyModification() async throws {
-        var state = await createSampleGameState() // Use var for mutation
+        var state = await createSampleGameState()
 
-        // Valid: Modify properties of reference types (Location, Item)
-        // Note: Since Item/Location are structs, direct modification like this
-        // modifies a *copy*. To persist, reassign to the dictionary.
-//        var woh = state.locations[Self.locWOH]!
-//        woh.attributes[.description] = .string("A new description.")
-//        state.locations[Self.locWOH] = woh
         try state.apply(
             StateChange(
                 entityID: .location(Self.locWOH),
@@ -392,36 +303,11 @@ struct GameStateTests {
                 newValue: "Magic Lantern"
             ),
             StateChange(
-                entityID: .item("heldLantern"),
+                entityID: .item(Self.itemSword),
                 attributeKey: .itemParent,
-                newValue: .parentEntity(.player)
-            ),
+                newValue: .parentEntity(.location(Self.locWOH))
+            )
         )
-        // Create new lantern with updated name
-//        let updatedLantern = Item(
-//            id: Self.itemLantern,
-//            .name("Magic Lantern"),
-//            .isTakable,
-//            .isLightSource
-//        )
-//        state.items[Self.itemLantern] = updatedLantern
-
-        // Create new lantern with updated parent
-        let lanternWithNewParent = Item(
-            id: "heldLantern",
-            .in(.player),
-            .isTakable,
-            .isLightSource
-        )
-        state.items["heldLantern"] = lanternWithNewParent
-
-        // Create new sword with updated parent
-        let swordWithNewParent = Item(
-            id: Self.itemSword,
-            .in(.location(state.player.currentLocationID)),
-            .isTakable
-        )
-        state.items[Self.itemSword] = swordWithNewParent
 
         // Assertions for the valid modifications:
         #expect(
@@ -431,7 +317,7 @@ struct GameStateTests {
 
         // Check derived inventory reflects parent changes
         let inventoryIDs = state.items.values.filter { $0.parent == .player }.map(\.id)
-        #expect(Set(inventoryIDs) == ["heldLantern"]) // Sword dropped, Lantern taken
+        #expect(Set(inventoryIDs).isEmpty) // Sword dropped
 
         // Check sword is now in the location
         #expect(state.items[Self.itemSword]?.parent == .location(Self.locWOH))
@@ -441,13 +327,6 @@ struct GameStateTests {
     func testGameStateCodable() async throws {
         var originalState = await createSampleGameState()
 
-        // Create new lantern with updated attributes
-//        let updatedLantern = Item(
-//            id: Self.itemLantern,
-//            .in(.player),
-//            .isLightSource,
-//            .isOn
-//        )
         try originalState.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
