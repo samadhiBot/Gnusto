@@ -3,93 +3,90 @@ import Foundation
 /// Handles the "EXAMINE" context.command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
 public struct ExamineActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object and it's an item
+        // 1. Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Examine what?")
         }
-        guard case .item(let targetItemID) = directObjectRef else {
-            // TODO: Consider if examining non-items (e.g., player, location) should be allowed
-            //       and how that would be handled here and in process().
-            //       For now, only items are examinable.
+        switch directObjectRef {
+        case .item(let targetItemID):
+            // 2. Check if item exists
+            guard (try? await context.engine.item(targetItemID)) != nil else {
+                throw ActionResponse.unknownEntity(directObjectRef)
+            }
+            // 3. Check reachability
+            guard await context.engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+        case .player:
+            // Allow examining self
+            return
+        default:
             throw ActionResponse.prerequisiteNotMet("You can only examine items.")
-        }
-
-        // 2. Check if item exists
-        guard (try? await context.engine.item(targetItemID)) != nil else {
-            throw ActionResponse.unknownEntity(directObjectRef) // Changed from unknownItem
-        }
-
-        // 3. Check reachability
-        guard await context.engine.playerCanReach(targetItemID) else {
-            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            // This path should ideally be caught by validate.
-            // If directObjectRef was .player or .location, and validate allowed it,
-            // process would need to handle those cases here.
-            return ActionResult("You can only examine items.") // Or a more generic error
+        guard let directObjectRef = context.command.directObject else {
+            return ActionResult("You can only examine items.")
         }
-
-        let targetItem = try await context.engine.item(targetItemID)
-
-        var stateChanges: [StateChange] = []
-
-        // Special case: examining 'self' should not record any state changes
-        if targetItem.id != "self" {
-            // --- State Change: Mark as Touched ---
-            if let update = await context.engine.flag(targetItem, with: .isTouched) {
-                stateChanges.append(update)
+        switch directObjectRef {
+        case .item(let targetItemID):
+            let targetItem = try await context.engine.item(targetItemID)
+            var stateChanges: [StateChange] = []
+            // Special case: examining 'self' as an item should not record any state changes
+            if targetItem.id != "self" {
+                // --- State Change: Mark as Touched ---
+                if let update = await context.engine.flag(targetItem, with: .isTouched) {
+                    stateChanges.append(update)
+                }
+                // --- State Change: Update pronouns ---
+                if let update = await context.engine.updatePronouns(to: targetItem) {
+                    stateChanges.append(update)
+                }
             }
-
-            // --- State Change: Update pronouns ---
-            if let update = await context.engine.updatePronouns(to: targetItem) {
-                stateChanges.append(update)
+            // --- Determine Message ---
+            let message: String
+            // Priority 1: Readable Text (Check dynamic value)
+            if targetItem.hasFlag(.isReadable),
+               let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
+               !readText.isEmpty
+            {
+                message = readText
             }
-        }
-
-        // --- Determine Message ---
-        let message: String
-
-        // Priority 1: Readable Text (Check dynamic value)
-        if targetItem.hasFlag(.isReadable),
-           let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
-           !readText.isEmpty
-        {
-            message = readText
-        }
-        // Priority 2: Container/Door Description
-        else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
-            message = try await describeContainerOrDoor(
-                targetItem: targetItem,
-                engine: context.engine
+            // Priority 2: Container/Door Description
+            else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
+                message = try await describeContainerOrDoor(
+                    targetItem: targetItem,
+                    engine: context.engine
+                )
+            }
+            // Priority 3: Surface Description
+            else if targetItem.hasFlag(.isSurface) {
+                message = await describeSurface(
+                    targetItem: targetItem,
+                    engine: context.engine
+                )
+            }
+            // Priority 4: Dynamic Long Description
+            else {
+                // Use the registry to generate the description using the item ID and key
+                message = await context.engine.generateDescription(
+                    for: targetItem.id,
+                    key: .description,
+                    engine: context.engine
+                )
+            }
+            // --- Create Result ---
+            return ActionResult(
+                message: message,
+                stateChanges: stateChanges
             )
+        case .player:
+            // Classic Zork response for EXAMINE SELF
+            return ActionResult("You are your usual self.")
+        default:
+            return ActionResult("You can only examine items.")
         }
-        // Priority 3: Surface Description
-        else if targetItem.hasFlag(.isSurface) {
-            message = await describeSurface(
-                targetItem: targetItem,
-                engine: context.engine
-            )
-        }
-        // Priority 4: Dynamic Long Description
-        else {
-            // Use the registry to generate the description using the item ID and key
-            message = await context.engine.generateDescription(
-                for: targetItem.id,
-                key: .description,
-                engine: context.engine
-            )
-        }
-
-        // --- Create Result ---
-        return ActionResult(
-            message: message,
-            stateChanges: stateChanges
-        )
     }
 
     // MARK: - Private Helpers (Adapted to return String)

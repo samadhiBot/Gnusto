@@ -26,7 +26,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: VerbID("examine"),
+            verbID: .examine,
             directObject: .item(itemID),
             rawInput: "examine pebble"
         )
@@ -66,7 +66,11 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine locket")
+        let command = Command(
+            verbID: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine locket"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -113,7 +117,11 @@ struct ExamineActionHandlerTests {
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine statue")
+        let command = Command(
+            verbID: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine statue"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -161,7 +169,11 @@ struct ExamineActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine hidden gem")
+        let command = Command(
+            verbID: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine hidden gem"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -204,7 +216,11 @@ struct ExamineActionHandlerTests {
         )
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine hidden gem")
+        let command = Command(
+            verbID: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine hidden gem"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -227,7 +243,11 @@ struct ExamineActionHandlerTests {
         let itemID: ItemID = "ghost"
         #expect(await engine.gameState.changeHistory.isEmpty)
 
-        let command = Command(verbID: VerbID("examine"), directObject: .item(itemID), rawInput: "examine ghost")
+        let command = Command(
+            verbID: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine ghost"
+        )
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
@@ -295,7 +315,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: VerbID("examine"),
+            verbID: .examine,
             directObject: .player,
             rawInput: "examine self"
         )
@@ -338,7 +358,7 @@ struct ExamineActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
-            verbID: VerbID("examine"),
+            verbID: .examine,
             directObject: .item(item.id),
             rawInput: "examine mirror"
         )
