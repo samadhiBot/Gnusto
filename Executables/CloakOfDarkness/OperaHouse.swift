@@ -199,7 +199,7 @@ extension OperaHouse {
     static func messageHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
         guard
             case .beforeTurn(let command) = event,
-            command.verb == .examine,
+            [.examine, .read].contains(command.verb),
             await engine.playerLocationID == .bar
         else {
             return nil
@@ -210,16 +210,25 @@ extension OperaHouse {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }
 
-        let disturbedCount = await engine.getStateValue(key: "disturbedCounter")?.toInt ?? 0
-        let finalMessage: String
-        if disturbedCount > 1 {
-            finalMessage = "The message simply reads: \"You lose.\""
-            await engine.requestQuit()
+        let disturbedCount = await engine.getStateValue(key: .barMessageDisturbances)?.toInt ?? 0
+        await engine.requestQuit()
+        if disturbedCount < 2 {
+            return ActionResult(
+                message: """
+                    The message, neatly marked in the sawdust, reads...
+                    
+                    "You win."
+                    """,
+                stateChanges: [await engine.scoreChange(by: 1)]
+            )
+
         } else {
-            finalMessage = "The message simply reads: \"You win.\""
-            await engine.requestQuit()
+            throw ActionResponse.custom("""
+                The message has been carelessly trampled, making it
+                difficult to read. You can just distinguish the words...
+                
+                "You lose."
+                """)
         }
-        // Throw error to display the message via engine reporting
-        throw ActionResponse.custom(finalMessage)
     }
 }
