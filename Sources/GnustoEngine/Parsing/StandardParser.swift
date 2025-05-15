@@ -1,9 +1,13 @@
 import Foundation
+import OSLog
 
 /// A standard implementation of the Parser protocol.
 /// Aims to replicate common ZIL parser behaviors.
 public struct StandardParser: Parser {
     public init() {}
+
+    /// A logger used for unhandled error warnings.
+    let logger = Logger(subsystem: "GnustoEngine", category: "StandardParser")
 
     /// Parses a raw input string into a structured `Command`.
     ///
@@ -652,7 +656,11 @@ public struct StandardParser: Parser {
         if resolvedAndScopedEntities.count > 1 {
             // Enhanced ambiguity message logic
             let itemEntities = resolvedAndScopedEntities.compactMap { ref -> Item? in
-                if case let .item(id) = ref { return gameState.items[id] } else { return nil }
+                if case let .item(id) = ref {
+                    gameState.items[id]
+                } else {
+                    nil
+                }
             }
             if !itemEntities.isEmpty && itemEntities.count == resolvedAndScopedEntities.count {
                 // All ambiguous are items
@@ -661,7 +669,11 @@ public struct StandardParser: Parser {
                 let adjectiveSets = itemEntities.map { Set($0.adjectives) }
                 let allSameAdjectives = adjectiveSets.dropFirst().allSatisfy { $0 == adjectiveSets.first }
                 if allSameName {
-                    if !allSameAdjectives {
+                    if allSameAdjectives {
+                        // All truly identical
+                        logger.error("💥 StandardParser cannot distinguish between \(itemEntities.count) identical items")
+                        return .failure(.ambiguity("Which \(baseName) do you mean?"))
+                    } else {
                         // List with adjectives
                         let descriptions: [String] = itemEntities.map { item in
                             if let adj = item.adjectives.sorted().first {
@@ -671,9 +683,6 @@ public struct StandardParser: Parser {
                             }
                         }
                         return .failure(.ambiguity("Which do you mean, \(descriptions.commaListing("or"))?"))
-                    } else {
-                        // All truly identical
-                        return .failure(.ambiguity("Which \(baseName) do you mean?"))
                     }
                 }
             }
