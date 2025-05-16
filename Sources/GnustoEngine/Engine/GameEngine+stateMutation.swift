@@ -8,13 +8,13 @@ extension GameEngine {
     /// - Parameter id: The `GlobalID` of the flag to set.
     public func setFlag(_ id: GlobalID) async {
         // Only apply if the flag isn't already set
-        if gameState.globalState[id] != true {
+        if global(id) != true {
             do {
                 try gameState.apply(
                     StateChange(
                         entityID: .global,
                         attributeKey: .setFlag(id),
-                        oldValue: gameState.globalState[id],
+                        oldValue: global(id),
                         newValue: true,
                     )
                 )
@@ -34,13 +34,13 @@ extension GameEngine {
     /// - Parameter id: The `GameStateID` of the flag to clear.
     public func clearFlag(_ id: GlobalID) async {
         // Only apply if the flag is currently set
-        if gameState.globalState[id] != false {
+        if global(id) != false {
             do {
                 try gameState.apply(
                     StateChange(
                         entityID: .global,
                         attributeKey: .clearFlag(id),
-                        oldValue: gameState.globalState[id],
+                        oldValue: global(id),
                         newValue: false
                     )
                 )
@@ -234,6 +234,6 @@ extension GameEngine {
     /// - Parameter id: The `GlobalID` to check.
     /// - Returns: `true` if the flag is present in the `GameState.flags` set, `false` otherwise.
     public func isFlagSet(_ id: GlobalID) -> Bool {
-        gameState.globalState[id] == true
+        global(id) == true
     }
 }

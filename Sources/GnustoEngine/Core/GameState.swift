@@ -119,15 +119,19 @@ public struct GameState: Codable, Equatable, Sendable {
     }
 
     // MARK: - State Mutation
-
-    public mutating func apply(_ changes: StateChange...) throws {
-        for change in changes {
-            try apply(change)
+    
+    /// <#Description#>
+    /// - Parameter changes: <#changes description#>
+    public mutating func apply(_ changes: StateChange?...) throws {
+        for stateChange in changes {
+            if let stateChange {
+                try apply(change: stateChange)
+            }
         }
     }
 
     /// Applies a `StateChange` to the game state, modifying the relevant property and recording the change.
-    private mutating func apply(_ change: StateChange) throws {
+    private mutating func apply(change: StateChange) throws {
         // --- Validation Phase ---
         try validateOldValue(for: change)
 

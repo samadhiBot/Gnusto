@@ -40,7 +40,7 @@ public struct ReadActionHandler: ActionHandler {
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
 
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(addTouchedFlag)
         }
 

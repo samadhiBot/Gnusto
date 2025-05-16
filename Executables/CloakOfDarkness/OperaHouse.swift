@@ -105,38 +105,22 @@ extension OperaHouse {
         else {
             return nil
         }
-        let disturbances = await engine.gameState.globalState[.barMessageDisturbances]?.toInt ?? 0
-
         return switch command.verb {
         case .go:
             if command.direction == .north {
                 nil
             } else {
-                ActionResult(
+                await ActionResult(
                     message: "Blundering around in the dark isn't a good idea!",
-                    stateChanges: [
-                        StateChange(
-                            entityID: .global,
-                            attributeKey: .globalState(key: .barMessageDisturbances),
-                            oldValue: .int(disturbances),
-                            newValue: .int(disturbances + 2)
-                        ),
-                    ]
+                    stateChange: engine.adjustGlobal(.barMessageDisturbances, by: 2)
                 )
             }
         case .look, .inventory:
             nil
         default:
-            ActionResult(
+            await ActionResult(
                 message: "In the dark? You could easily disturb something!",
-                stateChanges: [
-                    StateChange(
-                        entityID: .global,
-                        attributeKey: .globalState(key: .barMessageDisturbances),
-                        oldValue: .int(disturbances),
-                        newValue: .int(disturbances + 1)
-                    ),
-                ]
+                stateChange: engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
         }
     }
@@ -160,21 +144,22 @@ extension OperaHouse {
             }
 
         case .afterTurn(let command):
-            guard  await engine.playerLocationID == .cloakroom else { return nil }
-
+            guard await engine.playerLocationID == .cloakroom else {
+                return nil
+            }
             switch command.verb {
             case .drop, .putOn:
                 var stateChanges = [StateChange]()
                 if await engine.playerScore < 1 {
-                    stateChanges.append(await engine.scoreChange(by: 1))
+                    stateChanges.append(await engine.updatePlayerScore(by: 1))
                 }
-                if let lightenBar = try await engine.flag(engine.location(.bar), with: .isLit) {
+                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
                     stateChanges.append(lightenBar)
                 }
                 return ActionResult(stateChanges: stateChanges)
             case .take:
-                if let darkenBar = try await engine.flag(engine.location(.bar), remove: .isLit) {
-                    return ActionResult(stateChanges: [darkenBar])
+                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(.bar)) {
+                    return ActionResult(stateChange: darkenBar)
                 }
             default:
                 break
@@ -219,7 +204,7 @@ extension OperaHouse {
                     
                     "You win."
                     """,
-                stateChanges: [await engine.scoreChange(by: 1)]
+                stateChanges: [await engine.updatePlayerScore(by: 1)]
             )
 
         } else {

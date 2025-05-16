@@ -85,7 +85,7 @@ public struct TakeActionHandler: ActionHandler {
         stateChanges.append(update)
 
         // Change 2: Set `.isTouched` flag if not already set
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 

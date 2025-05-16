@@ -10,7 +10,7 @@ public struct ActionResult: Sendable {
     public let message: String?
 
     /// Any state changes that occurred.
-    public let stateChanges: [StateChange?]
+    public let stateChanges: [StateChange]
 
     /// Any side effects that need to be processed.
     public let sideEffects: [SideEffect]
@@ -23,18 +23,44 @@ public struct ActionResult: Sendable {
     ///   - sideEffects: Any side effects to be processed.
     public init(
         message: String? = nil,
-        stateChanges: [StateChange?] = [],
+        stateChanges: [StateChange] = [],
         sideEffects: [SideEffect] = []
     ) {
+        assert(
+            message != nil || !stateChanges.isEmpty || !sideEffects.isEmpty,
+            "ActionResults must contain at least one of message, stateChanges, or sideEffects"
+        )
         self.message = message
         self.stateChanges = stateChanges
         self.sideEffects = sideEffects
     }
     
+    /// Creates a new action result.
+    ///
+    /// - Parameters:
+    ///   - message: Any message to display to the player.
+    ///   - stateChange: A state change that occurred.
+    ///   - sideEffect: A side effect to be processed.
+    public init(
+        message: String? = nil,
+        stateChange: StateChange? = nil,
+        sideEffect: SideEffect? = nil
+    ) {
+        assert(
+            message != nil || stateChange != nil || sideEffect != nil,
+            "ActionResults must contain at least one of message, stateChanges, or sideEffects"
+        )
+        self.message = message
+        self.stateChanges = if let stateChange { [stateChange] } else { [] }
+        self.sideEffects = if let sideEffect { [sideEffect] } else { [] }
+    }
+
     /// Creates a new action result with no state changes or side effects.
     ///
     /// - Parameter message: A message to display to the player.
     public init(_ message: String) {
-        self = .init(message: message)
+        self.message = message
+        self.stateChanges = []
+        self.sideEffects = []
     }
 }

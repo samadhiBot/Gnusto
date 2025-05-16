@@ -38,12 +38,12 @@ public struct WearActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .worn (if not already worn)
-        if let update = await context.engine.flag(targetItem, with: .isWorn) {
+        if let update = await context.engine.setFlag(.isWorn, on: targetItem) {
             stateChanges.append(update)
         }
 
         // Change 2: Add .touched (if not already touched)
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 

@@ -32,22 +32,23 @@ public struct LookActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject else {
             // 1. Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                return ActionResult(
-                    message: "It is pitch black. You are likely to be eaten by a grue."
-                )
+                return ActionResult("It is pitch black. You are likely to be eaten by a grue.")
             }
 
-            // 2. Location is lit, proceed with description
-            await describeLocation(
-                try context.engine.playerLocation(),
-                engine: context.engine,
-                showVerbose: true,
-                stateSnapshot: context.stateSnapshot
+            await context.engine.ioHandler.print(
+                "--- \(try context.engine.playerLocation().name) ---",
+                style: .strong
             )
 
-            // LOOK itself doesn't change state or usually have a message beyond the description
-            // printed by the helper.
-            return ActionResult()
+            // 2. Location is lit, proceed with description
+            return ActionResult(
+                await locationDescription(
+                    try context.engine.playerLocation(),
+                    engine: context.engine,
+                    showVerbose: true,
+                    stateSnapshot: context.stateSnapshot
+                )
+            )
         }
 
         // EXAMINE [Object] - directObjectRef is non-nil here.
@@ -82,7 +83,7 @@ public struct LookActionHandler: ActionHandler {
         )
 
         // 3. Prepare state change (mark as touched)
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 
@@ -154,52 +155,37 @@ public struct LookActionHandler: ActionHandler {
     }
 
     /// Describes the current location in detail.
-    private func describeLocation(
+    private func locationDescription(
         _ location: Location,
         engine: GameEngine,
         showVerbose: Bool,
         stateSnapshot: GameState
-    ) async {
-        await engine.ioHandler.print("--- \(location.name) ---", style: .strong)
+    ) async -> String {
+        var description: [String] = [
+            await engine.generateDescription(
+                for: location.id,
+                key: .description,
+                engine: engine
+            )
+        ]
 
-        // Print long description (potentially dynamic)
-        let longDesc = await engine.generateDescription(
-            for: location.id,
-            key: .description,
-            engine: engine
-        )
-
-        await engine.ioHandler.print(longDesc)
-
-        // List visible items, passing the snapshot
-        await listVisibleItems(
-            in: location,
-            engine: engine,
-            showVerbose: showVerbose,
-            stateSnapshot: stateSnapshot
-        )
-    }
-
-    /// Lists items visible in the location.
-    private func listVisibleItems(
-        in location: Location,
-        engine: GameEngine,
-        showVerbose: Bool,
-        stateSnapshot: GameState // Add stateSnapshot parameter
-    ) async {
         // Use the correct ScopeResolver method
         let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: location.id)
 
         // Filter out the player if present in scope (shouldn't happen normally)
-        let itemIDsToDescribe = visibleItemIDs.filter { $0 != .player }
+        // let itemIDsToDescribe = visibleItemIDs.filter { $0 != .player }
 
-        guard !itemIDsToDescribe.isEmpty else { return } // Exit if no items to list
+        // guard !itemIDsToDescribe.isEmpty else { return } // Exit if no items to list
 
         // Original implementation using sentence format: - RESTORE THIS
-        let visibleItems = itemIDsToDescribe.compactMap { stateSnapshot.items[$0] }
+
+        let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] }
+
         if !visibleItems.isEmpty {
             let itemListing = visibleItems.listWithIndefiniteArticles
-            await engine.ioHandler.print("You can see \(itemListing) here.")
+            description.append("You can see \(itemListing) here.")
         }
+
+        return description.joined(separator: "\n")
     }
 }

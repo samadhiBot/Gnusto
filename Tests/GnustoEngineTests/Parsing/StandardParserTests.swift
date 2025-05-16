@@ -175,10 +175,10 @@ struct StandardParserTests {
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
-        self.vocabulary = .build(items: allItems)
+        vocabulary = .build(items: allItems)
 
         // 7. Build GameState using the new factory method
-        self.gameState = GameState(
+        gameState = GameState(
             locations: locations,
             items: allItems,
             player: player,
@@ -187,12 +187,12 @@ struct StandardParserTests {
 
         // --- Sanity Checks (Optional but Recommended) ---
         // Check if parents were set correctly
-        #expect(self.gameState.items["leaflet"]?.parent == .player)
-        #expect(self.gameState.items["sword"]?.parent == .location(roomID))
-        #expect(self.gameState.items["coin"]?.parent == .item("backpack"))
-        #expect(self.gameState.items["book"]?.parent == .item("table"))
-        #expect(self.gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
-        #expect(self.gameState.pronouns["it"] == [.item("box")])
+        #expect(gameState.items["leaflet"]?.parent == .player)
+        #expect(gameState.items["sword"]?.parent == .location(roomID))
+        #expect(gameState.items["coin"]?.parent == .item("backpack"))
+        #expect(gameState.items["book"]?.parent == .item("table"))
+        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
+        #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
     // --- Tests ---
@@ -552,10 +552,10 @@ struct StandardParserTests {
     func testPronounItNotSet() async throws {
         // Initialize game state without 'it'
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: [:] // Start with empty pronouns
         )
         let result = parser.parse(
@@ -570,10 +570,10 @@ struct StandardParserTests {
     func testPronounItRefersToOutOfScopeItem() async throws {
         // Initialize game state with 'it' set to lamp
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item(lampID)]] // Start with 'it' = lamp
         )
 
@@ -595,10 +595,10 @@ struct StandardParserTests {
     func testPronounItRefersToGenuinelyOutOfScopeItem() async throws {
         // Initialize game state with 'it' set to orb (out of scope)
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("orb")]] // Start with 'it' = orb
         )
         #expect(initState.items["orb"]?.parent == .nowhere)
@@ -615,10 +615,10 @@ struct StandardParserTests {
     func testPronounItInScope() async throws {
         // Initialize game state with 'it' set to sword (in room)
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("sword")]] // Start with 'it' = sword
         )
         // Input uses "examine"
@@ -636,10 +636,10 @@ struct StandardParserTests {
     func testPronounItOutOfScope() async throws {
         // Initialize game state with 'it' set to note (in closed chest)
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("note")]] // Start with 'it' = note
         )
         let result = parser.parse(input: "take it", vocabulary: vocabulary, gameState: initState)
@@ -650,10 +650,10 @@ struct StandardParserTests {
     func testPronounItWithModifiers() async throws {
         // Initialize game state with 'it' set to key
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("key")]] // Start with 'it' = key
         )
         let result = parser.parse(input: "take rusty it", vocabulary: vocabulary, gameState: initState)
@@ -664,10 +664,10 @@ struct StandardParserTests {
     func testPronounItAsIndirect() async throws {
         // Initialize game state with 'it' set to sword
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("sword")]] // Start with 'it' = sword
         )
         let result = parser.parse(input: "put leaflet on it", vocabulary: vocabulary, gameState: initState)
@@ -683,10 +683,10 @@ struct StandardParserTests {
     func testPronounThemMultipleInScope() async throws {
         // Initialize game state with 'them' set to key & leaflet (both held)
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["them": [.item("key"), .item("leaflet")]] // Start with 'them'
         )
         // Player holds key and leaflet (verified by initialItems setup)
@@ -712,10 +712,10 @@ struct StandardParserTests {
     func testPronounThemSingleInScope() async throws {
         // Initialize game state with 'them' set to key (held) & note (out of scope)
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
-            items: Array(self.gameState.items.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            locations: Array(gameState.locations.values),
+            items: Array(gameState.items.values),
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["them": [.item("key"), .item("note")]] // Start with 'them'
         )
         // Verify item locations
@@ -804,7 +804,7 @@ struct StandardParserTests {
     @Test("Direct Inventory Item Preferred Over Item In Container")
     func testDirectInventoryPreferredOverContainer() async throws {
         // Create a temporary state where 'key' is held and a temp key is in backpack
-        var itemsDict = self.gameState.items // Base items copy
+        var itemsDict = gameState.items // Base items copy
         let tempKeyInBackpack = Item(
             id: "tempKeyInBackpack",
             .name("key"),
@@ -827,11 +827,11 @@ struct StandardParserTests {
         itemsDict[tempKeyOnGround.id] = tempKeyOnGround
         itemsDict[permKey.id] = permKey
         let initState = GameState(
-            locations: Array(self.gameState.locations.values),
+            locations: Array(gameState.locations.values),
             items: Array(itemsDict.values), // Pass the modified copy's values
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
-            pronouns: self.gameState.pronouns // Use base pronouns
+            player: gameState.player,
+            vocabulary: vocabulary,
+            pronouns: gameState.pronouns // Use base pronouns
         )
 
         // Verify setup
@@ -937,14 +937,14 @@ struct StandardParserTests {
     func testNounNotInScope() async {
         // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
-        var itemsDict = self.gameState.items // Base items copy
+        var itemsDict = gameState.items // Base items copy
         itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
         let customState = GameState(
-            locations: Array(self.gameState.locations.values),
+            locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
-            pronouns: self.gameState.pronouns // Use base pronouns
+            player: gameState.player,
+            vocabulary: vocabulary,
+            pronouns: gameState.pronouns // Use base pronouns
         )
         #expect(customState.items[lampID]?.parent == .nowhere) // Verify setup
 
@@ -991,14 +991,14 @@ struct StandardParserTests {
     func testExtractNounModsMultipleNouns() async throws {
         // "put the small box key in lamp"
         // Setup: Make lamp a container for this test to pass resolution
-        var itemsDict = self.gameState.items // Base items copy
+        var itemsDict = gameState.items // Base items copy
         itemsDict["lantern"]?.attributes[.isContainer] = true
         let modifiedState = GameState(
-            locations: Array(self.gameState.locations.values),
+            locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
-            pronouns: self.gameState.pronouns // Use base pronouns
+            player: gameState.player,
+            vocabulary: vocabulary,
+            pronouns: gameState.pronouns // Use base pronouns
         )
 
         let result = parser.parse(
@@ -1043,13 +1043,13 @@ struct StandardParserTests {
     @Test("Extract Noun/Mods - Pronoun")
     func testExtractNounModsPronoun() async throws {
         // "drop it" - assumes 'it' refers to something held (e.g., the key)
-        var itemsDict = self.gameState.items // Base items copy
+        var itemsDict = gameState.items // Base items copy
         itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player) // Put key in inventory
         let modifiedState = GameState(
-            locations: Array(self.gameState.locations.values),
+            locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("key")]] // Set 'it' to key for this state
         )
 
@@ -1067,13 +1067,13 @@ struct StandardParserTests {
     @Test("Extract Noun/Mods - Pronoun With Noise")
     func testExtractNounModsPronounNoise() async throws {
         // "drop the it"
-        var itemsDict = self.gameState.items // Base items copy
+        var itemsDict = gameState.items // Base items copy
         itemsDict["key"]?.attributes[.parentEntity] = .parentEntity(.player)
         let modifiedState = GameState(
-            locations: Array(self.gameState.locations.values),
+            locations: Array(gameState.locations.values),
             items: Array(itemsDict.values),
-            player: self.gameState.player,
-            vocabulary: self.vocabulary,
+            player: gameState.player,
+            vocabulary: vocabulary,
             pronouns: ["it": [.item("key")]] // Set 'it' to key for this state
         )
 

@@ -36,7 +36,7 @@ public struct ExamineActionHandler: ActionHandler {
             // Special case: examining 'self' as an item should not record any state changes
             if targetItem.id != "self" {
                 // --- State Change: Mark as Touched ---
-                if let update = await context.engine.flag(targetItem, with: .isTouched) {
+                if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
                     stateChanges.append(update)
                 }
                 // --- State Change: Update pronouns ---

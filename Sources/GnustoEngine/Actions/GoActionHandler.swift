@@ -64,7 +64,7 @@ public struct GoActionHandler: ActionHandler {
         ]
 
         // Set isVisited flag for the new location if it hasn't been visited yet
-        if let update = await context.engine.flag(destination, with: .isVisited) {
+        if let update = await context.engine.setFlag(.isVisited, on: destination) {
             stateChanges.append(update)
         }
 

@@ -110,12 +110,12 @@ struct InsertActionHandler: ActionHandler {
         ))
 
         // Change 2: Mark item touched
-        if let update = await context.engine.flag(itemToInsert, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: itemToInsert) {
             stateChanges.append(update)
         }
 
         // Change 2: Mark container touched
-        if let update = await context.engine.flag(container, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: container) {
             stateChanges.append(update)
         }
 

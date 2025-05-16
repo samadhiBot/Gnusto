@@ -16,7 +16,7 @@ public actor GameEngine: Sendable {
     nonisolated internal let ioHandler: IOHandler
 
     /// The resolver for scope and visibility checks.
-    lazy var scopeResolver: ScopeResolver = ScopeResolver(engine: self)
+    lazy var scopeResolver = ScopeResolver(engine: self)
 
     /// The registry holding static game definitions (fuses, daemons, action overrides).
     public let definitionRegistry: DefinitionRegistry
@@ -92,7 +92,7 @@ extension GameEngine {
         do {
             let startingLocationID = playerLocationID
             let startingLoc = try location(startingLocationID)
-            if let addVisitedFlag = flag(startingLoc, with: .isVisited) {
+            if let addVisitedFlag = setFlag(.isVisited, on: startingLoc) {
                 try gameState.apply(addVisitedFlag)
             }
             try await describeCurrentLocation()
@@ -680,7 +680,6 @@ extension GameEngine {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.stateChanges {
-            guard let change else { continue }
             do {
                 try gameState.apply(change)
             } catch {

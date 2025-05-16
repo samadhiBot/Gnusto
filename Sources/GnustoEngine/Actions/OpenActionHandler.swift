@@ -46,11 +46,11 @@ public struct OpenActionHandler: ActionHandler {
 
         var stateChanges: [StateChange] = []
 
-        if let update = await context.engine.flag(targetItem, with: .isOpen) {
+        if let update = await context.engine.setFlag(.isOpen, on: targetItem) {
             stateChanges.append(update)
         }
 
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 

@@ -70,17 +70,17 @@ public struct LockActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Add .locked to target (if not already set)
-        if let update = await context.engine.flag(targetItem, with: .isLocked) {
+        if let update = await context.engine.setFlag(.isLocked, on: targetItem) {
             stateChanges.append(update)
         }
 
         // Change 2: Add .touched to target (if not already set)
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 
         // Change 3: Add .touched to key (if not already set)
-        if let update = await context.engine.flag(keyItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: keyItem) {
             stateChanges.append(update)
         }
 

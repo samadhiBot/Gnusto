@@ -79,12 +79,12 @@ struct PutOnActionHandler: ActionHandler {
         stateChanges.append(update)
 
         // Change 2: Mark item touched
-        if let update = await context.engine.flag(itemToPut, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: itemToPut) {
             stateChanges.append(update)
         }
 
         // Change 3: Mark surface touched
-        if let update = await context.engine.flag(surface, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: surface) {
             stateChanges.append(update)
         }
 

@@ -35,12 +35,12 @@ public struct RemoveActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set `.isWorn` to false
-        if let addTouchedFlag = await context.engine.flag(targetItem, remove: .isWorn) {
+        if let addTouchedFlag = await context.engine.clearFlag(.isWorn, on: targetItem) {
             stateChanges.append(addTouchedFlag)
         }
 
         // Change 2: Set `.isTouched` to true
-        if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(addTouchedFlag)
         }
 

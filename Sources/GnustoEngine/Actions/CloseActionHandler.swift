@@ -51,7 +51,7 @@ public struct CloseActionHandler: ActionHandler {
         // Handle "already closed" case detected (but not thrown) in validate
         guard try await context.engine.fetch(targetItem.id, .isOpen) else {
             return ActionResult(
-                message: "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
+                "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
             )
         }
 
@@ -59,12 +59,12 @@ public struct CloseActionHandler: ActionHandler {
         var stateChanges: [StateChange] = []
 
         // Change 1: Set dynamic property isOpen to false
-        if let update = await context.engine.flag(targetItem, remove: .isOpen) {
+        if let update = await context.engine.clearFlag(.isOpen, on: targetItem) {
             stateChanges.append(update)
         }
 
         // --- State Change: Mark as Touched ---
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 

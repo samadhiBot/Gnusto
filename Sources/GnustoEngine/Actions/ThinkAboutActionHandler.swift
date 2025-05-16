@@ -40,7 +40,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
         case .item(let targetItemID):
             let targetItem = try await context.engine.item(targetItemID)
             // Mark as touched if not already
-            if let addTouchedFlag = await context.engine.flag(targetItem, with: .isTouched) {
+            if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
                 stateChanges.append(addTouchedFlag)
             }
             // Update pronoun

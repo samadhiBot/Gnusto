@@ -50,7 +50,7 @@ public struct DropActionHandler: ActionHandler {
         stateChanges.append(update)
 
         // Change 2: Ensure `.isTouched` is true
-        if let update = await context.engine.flag(targetItem, with: .isTouched) {
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 
@@ -60,7 +60,7 @@ public struct DropActionHandler: ActionHandler {
         }
 
         // Change 4: Ensure `.isWorn` is false
-        if let update = await context.engine.flag(targetItem, remove: .isWorn) {
+        if let update = await context.engine.clearFlag(.isWorn, on: targetItem) {
             stateChanges.append(update)
         }
 
