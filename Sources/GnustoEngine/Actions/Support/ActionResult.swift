@@ -28,7 +28,7 @@ public struct ActionResult: Sendable {
     ) {
         assert(
             message != nil || !stateChanges.isEmpty || !sideEffects.isEmpty,
-            "ActionResults must contain at least one of message, stateChanges, or sideEffects"
+            "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
         self.stateChanges = stateChanges
@@ -48,7 +48,7 @@ public struct ActionResult: Sendable {
     ) {
         assert(
             message != nil || stateChange != nil || sideEffect != nil,
-            "ActionResults must contain at least one of message, stateChanges, or sideEffects"
+            "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
         self.stateChanges = if let stateChange { [stateChange] } else { [] }

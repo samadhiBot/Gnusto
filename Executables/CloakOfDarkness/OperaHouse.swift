@@ -129,7 +129,10 @@ extension OperaHouse {
 // MARK: - Object action handlers
 
 extension OperaHouse {
-    static func cloakHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+    static func cloakHandler(
+        _ engine: GameEngine,
+        _ event: ItemEvent
+    ) async throws -> ActionResult? {
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -168,7 +171,10 @@ extension OperaHouse {
         return nil
     }
 
-    static func hookHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+    static func hookHandler(
+        _ engine: GameEngine,
+        _ event: ItemEvent
+    ) async throws -> ActionResult? {
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
@@ -181,7 +187,10 @@ extension OperaHouse {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    static func messageHandler(_ engine: GameEngine, _ event: ItemEvent) async throws -> ActionResult? {
+    static func messageHandler(
+        _ engine: GameEngine,
+        _ event: ItemEvent
+    ) async throws -> ActionResult? {
         guard
             case .beforeTurn(let command) = event,
             [.examine, .read].contains(command.verb),

@@ -1,7 +1,5 @@
 // MARK: - State Query Helpers (Public API for Handlers/Hooks)
 
-
-
 extension GameEngine {
     /// Checks whether the specified location is currently lit.
     ///
