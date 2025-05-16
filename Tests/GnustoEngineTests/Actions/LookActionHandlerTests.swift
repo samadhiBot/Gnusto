@@ -88,6 +88,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
             — Bright Room —
+
             A brightly lit room.
             You can see a modern looking chair, a woven rug, and a wooden table here.
             """
@@ -149,6 +150,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
             — Test Room —
+
             A basic room.
             You can see an apple, a banana, an orange, and a pear here.
             """
@@ -250,6 +252,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Full formatted output (lit by player)
         expectNoDifference(output, """
             — Dark Room —
+
             A dark, damp room.
             You can see a wooden table here.
             """
@@ -288,6 +291,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Default description with title
         expectNoDifference(output, """
             — Plain Room —
+
             You are in a nondescript location.
             """
         )
@@ -339,6 +343,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Dynamic description with title
         expectNoDifference(output1, """
             — Magic Room —
+
             The room *sparkles* brightly via registry.
             """
         )
@@ -352,6 +357,7 @@ struct LookActionHandlerTests {
         // Corrected Expectation: Dynamic description with title
         expectNoDifference(output2, """
             — Magic Room —
+
             The room seems normal via registry.
             """
         )
@@ -491,7 +497,7 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(ItemID("stone"))])
+                newValue: .entityReferenceSet([.item("stone")])
             )
         ])
         #expect(await engine.gameState.changeHistory.count == 1)
@@ -917,7 +923,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verb: .look, // or .examine
-            directObject: .item(ItemID("unicorn")),
+            directObject: .item("unicorn"),
             rawInput: "look at unicorn"
         )
 
@@ -942,7 +948,7 @@ struct LookActionHandlerTests {
 
         let command = Command(
             verb: .look, // or .examine
-            directObject: .item(ItemID("artifact")),
+            directObject: .item("artifact"),
             rawInput: "look at artifact"
         )
 

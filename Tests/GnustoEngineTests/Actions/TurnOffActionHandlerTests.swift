@@ -37,7 +37,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -82,7 +82,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("book")),
+            directObject: .item("book"),
             rawInput: "turn off book"
         )
 
@@ -119,7 +119,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -158,7 +158,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -208,7 +208,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -252,7 +252,7 @@ struct TurnOffActionHandlerTests {
 
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -294,7 +294,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 
@@ -337,7 +337,7 @@ struct TurnOffActionHandlerTests {
         )
         let command = Command(
             verb: .turnOff,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn off lamp"
         )
 

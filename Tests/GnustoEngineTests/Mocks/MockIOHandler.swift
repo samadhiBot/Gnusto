@@ -20,11 +20,11 @@ final class MockIOHandler: IOHandler {
 
     // — Input Simulation —
     private var inputIndex = 0
-    private var inputQueue: [String?] = []
+    private var inputQueue: [String?]
 
     // — Initialization —
-    init(_ lines: String?...) {
-        inputQueue.append(contentsOf: lines)
+    init(_ commands: String?...) {
+        inputQueue = commands
     }
 
     // — Configuration Methods (for tests) —
@@ -55,17 +55,14 @@ final class MockIOHandler: IOHandler {
             )
         )
         // Optionally print to console during tests for debugging
-        // Swift.print("[MockIO] Print: \(text), Style: \(style), Newline: \(newline)")
     }
 
     func showStatusLine(roomName: String, score: Int, turns: Int) {
         recordedStatusLines.append((roomName: roomName, score: score, turns: turns))
-        // Swift.print("[MockIO] Status: \(roomName) Score: \(score) Turns: \(turns)")
     }
 
     func clearScreen() {
         clearScreenCallCount += 1
-        // Swift.print("[MockIO] ClearScreen")
     }
 
     func readLine(prompt: String) -> String? {
@@ -80,33 +77,20 @@ final class MockIOHandler: IOHandler {
 
         guard inputIndex < inputQueue.count else {
             // No more queued input, return nil (simulates EOF or error)
-            // Swift.print("[MockIO] ReadLine: No input queued, returning nil")
             return nil
         }
         let line = inputQueue[inputIndex]
         inputIndex += 1
-        // Swift.print("[MockIO] ReadLine: Returning '\(line ?? "nil")'")
         return line
     }
 
     func setup() {
         setupCallCount += 1
-        // Swift.print("[MockIO] Setup")
     }
 
     func teardown() {
         teardownCallCount += 1
-        // Swift.print("[MockIO] Teardown")
     }
-
-    // MARK: - Test Accessors
-
-    // Use async getters to access state safely from tests
-    func getRecordedOutput() async -> [OutputCall] { return recordedOutput }
-    func getRecordedStatusLines() async -> [(roomName: String, score: Int, turns: Int)] { return recordedStatusLines }
-    func getClearScreenCallCount() async -> Int { return clearScreenCallCount }
-    func getSetupCallCount() async -> Int { return setupCallCount }
-    func getTeardownCallCount() async -> Int { return teardownCallCount }
 
     func flush() async -> String {
         var commandIndex = 0
@@ -119,17 +103,20 @@ final class MockIOHandler: IOHandler {
                         actualTranscript += " \(command)\n"
                     }
                     commandIndex += 1
+                } else {
+                    actualTranscript += "\n"
                 }
-                actualTranscript += "\n"
             } else if call.style != .input {
                 actualTranscript += call.text
                 if call.newline {
-                    actualTranscript += "\n"
+                    actualTranscript += "\n\n"
                 }
             }
         }
 
         recordedOutput.removeAll()
-        return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+        return actualTranscript
+            .replacingOccurrences(of: "\n\n\n", with: "\n\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

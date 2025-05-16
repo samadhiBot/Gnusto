@@ -82,7 +82,7 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(
             verb: .turnOn,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn on lamp"
         )
 
@@ -127,7 +127,7 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(
             verb: .turnOn,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn on lamp"
         )
 
@@ -169,7 +169,7 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(
             verb: .turnOn,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn on lamp"
         )
 
@@ -211,7 +211,7 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(
             verb: .turnOn,
-            directObject: .item(ItemID("lamp")),
+            directObject: .item("lamp"),
             rawInput: "turn on lamp"
         )
 
@@ -258,7 +258,7 @@ struct TurnOnActionHandlerTests {
 
         let command = Command(
             verb: .turnOn,
-            directObject: .item(ItemID("radio")),
+            directObject: .item("radio"),
             rawInput: "turn on radio"
         )
 

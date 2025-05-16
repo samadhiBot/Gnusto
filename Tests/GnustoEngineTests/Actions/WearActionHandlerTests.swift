@@ -28,7 +28,7 @@ struct WearActionHandlerTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("cloak")),
+            directObject: .item("cloak"),
             rawInput: "wear cloak"
         )
         mockParser.parseHandler = { _, _, _ in .success(command) }
@@ -61,7 +61,7 @@ struct WearActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(ItemID("cloak"))])
+                newValue: .entityReferenceSet([.item("cloak")])
             )
         ]
         let finalHistory = await engine.gameState.changeHistory
@@ -79,7 +79,7 @@ struct WearActionHandlerTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("cloak")),
+            directObject: .item("cloak"),
             rawInput: "wear cloak"
         )
 
@@ -112,7 +112,7 @@ struct WearActionHandlerTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("rock")),
+            directObject: .item("rock"),
             rawInput: "wear rock"
         )
 
@@ -147,7 +147,7 @@ struct WearActionHandlerTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("cloak")),
+            directObject: .item("cloak"),
             rawInput: "wear cloak"
         )
 

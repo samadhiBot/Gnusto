@@ -26,7 +26,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("rock")),
+            directObject: .item("rock"),
             rawInput: "touch rock"
         )
 
@@ -60,7 +60,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("key")),
+            directObject: .item("key"),
             rawInput: "touch key"
         )
 
@@ -122,7 +122,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("figurine")),
+            directObject: .item("figurine"),
             rawInput: "touch figurine"
         )
 
@@ -164,7 +164,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("gem")),
+            directObject: .item("gem"),
             rawInput: "touch gem"
         )
 
@@ -203,7 +203,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("book")),
+            directObject: .item("book"),
             rawInput: "touch book"
         )
 
@@ -244,7 +244,7 @@ struct TouchActionHandlerTests {
 
         let command = Command(
             verb: .touch,
-            directObject: .item(ItemID("coin")),
+            directObject: .item("coin"),
             rawInput: "touch coin"
         )
 

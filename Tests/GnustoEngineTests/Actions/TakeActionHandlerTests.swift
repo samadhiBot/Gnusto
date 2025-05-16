@@ -112,7 +112,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("key")),
+            directObject: .item("key"),
             rawInput: "take key"
         )
 
@@ -126,7 +126,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true) // Use convenience accessor
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("key")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -158,7 +158,7 @@ struct TakeActionHandlerTests {
         let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("key")),
+            directObject: .item("key"),
             rawInput: "take key"
         )
 
@@ -201,7 +201,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("figurine")),
+            directObject: .item("figurine"),
             rawInput: "take figurine"
         )
 
@@ -240,7 +240,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("rock")),
+            directObject: .item("rock"),
             rawInput: "take rock"
         )
 
@@ -308,7 +308,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("gem")),
+            directObject: .item("gem"),
             rawInput: "take gem"
         )
 
@@ -325,7 +325,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = try await engine.item("box")
         #expect(finalContainerState.parent == .location(.startRoom))
         #expect(finalContainerState.hasFlag(.isOpen) == true) // Check flag
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("gem"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("gem")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -368,7 +368,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("coin")),
+            directObject: .item("coin"),
             rawInput: "take coin"
         )
 
@@ -385,7 +385,7 @@ struct TakeActionHandlerTests {
         let finalContainerState = try await engine.item("pouch")
         #expect(finalContainerState.parent == .player)
         #expect(finalContainerState.hasFlag(.isOpen) == true) // Check flag
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("coin"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("coin")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -430,7 +430,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("gem")),
+            directObject: .item("gem"),
             rawInput: "take gem"
         )
 
@@ -480,8 +480,8 @@ struct TakeActionHandlerTests {
         // Command targets the chip, but context is "from statue"
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("chip")),
-            indirectObject: .item(ItemID("statue")),
+            directObject: .item("chip"),
+            indirectObject: .item("statue"),
             // Specify source
             rawInput: "take chip from statue"
         )
@@ -523,7 +523,7 @@ struct TakeActionHandlerTests {
         )
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("heavy")),
+            directObject: .item("heavy"),
             rawInput: "take heavy"
         )
 
@@ -565,7 +565,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("cloak")),
+            directObject: .item("cloak"),
             rawInput: "take cloak"
         )
 
@@ -580,7 +580,7 @@ struct TakeActionHandlerTests {
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true)
         #expect(finalItemState.hasFlag(.isWorn) == false) // Not worn
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("cloak"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("cloak")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -683,7 +683,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("key")),
+            directObject: .item("key"),
             rawInput: "take key"
         )
 
@@ -696,7 +696,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player)
         #expect(finalItemState.hasFlag(.isTouched) == true) // Still touched
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("key")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -750,7 +750,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("key")),
+            directObject: .item("key"),
             rawInput: "take key"
         )
 
@@ -763,7 +763,7 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.parent == .player) // Should succeed
         #expect(finalItemState.hasFlag(.isTouched) == true)
-        #expect(await engine.getPronounReference(pronoun: "it") == [.item(ItemID("key"))])
+        #expect(await engine.getPronounReference(pronoun: "it") == [.item("key")])
 
         // Assert Output
         let output = await mockIO.flush()
@@ -810,7 +810,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("fly")),
+            directObject: .item("fly"),
             rawInput: "take fly"
         )
 
@@ -859,7 +859,7 @@ struct TakeActionHandlerTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("shield")),
+            directObject: .item("shield"),
             rawInput: "take shield"
         )
 

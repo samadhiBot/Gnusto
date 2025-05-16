@@ -16,7 +16,7 @@ extension GameEngine {
 
         // 2. If lit, get snapshot and print name
         let location = try location(playerLocationID)
-        let underscore = String(repeating: "─", count: location.name.count)
+        await ioHandler.print("--- \(location.name) ---")
 
         // 3. Generate and print the description using the DescriptionHandlerRegistry
         let description = await generateDescription(
@@ -24,12 +24,7 @@ extension GameEngine {
             key: .description,
             engine: self
         )
-
-        await ioHandler.print("""
-            \(location.name)
-            \(underscore)
-            \(description)
-            """, style: .strong)
+        await ioHandler.print(description)
 
         // 4. List visible items
         try await listItemsInLocation(locationID: playerLocationID)

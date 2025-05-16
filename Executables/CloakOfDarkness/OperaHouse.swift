@@ -209,7 +209,7 @@ extension OperaHouse {
             return ActionResult(
                 message: """
                     The message, neatly marked in the sawdust, reads...
-                    
+
                     "You win."
                     """,
                 stateChanges: [await engine.updatePlayerScore(by: 1)]
@@ -219,7 +219,7 @@ extension OperaHouse {
             throw ActionResponse.custom("""
                 The message has been carelessly trampled, making it
                 difficult to read. You can just distinguish the words...
-                
+
                 "You lose."
                 """)
         }

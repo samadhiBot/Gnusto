@@ -42,8 +42,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
-            indirectObject: .item(ItemID("key")),
+            directObject: .item("box"),
+            indirectObject: .item("key"),
             rawInput: "lock box with key"
         )
 
@@ -95,7 +95,7 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            indirectObject: .item(ItemID("key")),
+            indirectObject: .item("key"),
             rawInput: "lock with key"
         ) // No direct object
 
@@ -133,7 +133,7 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
+            directObject: .item("box"),
             rawInput: "lock box"
         ) // No indirect object
 
@@ -177,8 +177,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
-            indirectObject: .item(ItemID("key")),
+            directObject: .item("box"),
+            indirectObject: .item("key"),
             rawInput: "lock box with key"
         )
 
@@ -232,8 +232,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
-            indirectObject: .item(ItemID("key")),
+            directObject: .item("box"),
+            indirectObject: .item("key"),
             rawInput: "lock box with key"
         )
 
@@ -272,8 +272,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("pebble")),
-            indirectObject: .item(ItemID("key")),
+            directObject: .item("pebble"),
+            indirectObject: .item("key"),
             rawInput: "lock pebble with key"
         )
 
@@ -317,8 +317,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
-            indirectObject: .item(ItemID("wrongkey")),
+            directObject: .item("box"),
+            indirectObject: .item("wrongkey"),
             rawInput: "lock box with bent key"
         )
 
@@ -365,8 +365,8 @@ struct LockActionHandlerTests {
 
         let command = Command(
             verb: .lock,
-            directObject: .item(ItemID("box")),
-            indirectObject: .item(ItemID("key")),
+            directObject: .item("box"),
+            indirectObject: .item("key"),
             rawInput: "lock box with key"
         )
 

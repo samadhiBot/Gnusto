@@ -106,16 +106,15 @@ struct GameEngineTests {
 
             Welcome to the Minimal Game!
 
-            Void
-            ────
+            — Void —
+
             An empty void.
-            
+
             You can see a pebble here.
-            
+
             > xyzzy
-            
             I don’t know the verb ‘xyzzy’.
-            
+
             > quit
             """)
 
@@ -160,7 +159,7 @@ struct GameEngineTests {
             locations: [startRoom],
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [VerbID("take"): mockTakeHandler]
+                customActionHandlers: [.take: mockTakeHandler]
             )
         )
 
@@ -168,7 +167,7 @@ struct GameEngineTests {
         var mockParser = MockParser()
         let takeCommand = Command(
             verb: .take,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "take pebble"
         )
 
@@ -187,8 +186,6 @@ struct GameEngineTests {
 
         // Make pebble non-takable in this test's state
         #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
-        // Ensure room is lit for this test - Done via initializer now
-//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -203,19 +200,30 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Check that the specific action error message was printed
-        let output = await mockIO.recordedOutput
-        let expectedMessage = "You can’t take the pebble."
-        #expect(
-            output.contains { $0.text == expectedMessage },
-            "Expected action error message not found"
-        )
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a pebble here.
+
+            > take pebble
+            You can’t take the pebble.
+
+            > quit
+            """)
 
         // Verify the handler was called (optional but good practice)
         let processCalled = await mockTakeHandler.getProcessCalled()
         #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(commandReceived?.verb == "take")
-        #expect(commandReceived?.directObject == .item(ItemID("startItem")))
+            #expect(commandReceived?.directObject == .item("startItem"))
 
         // Check turn counter incremented
         let finalMoves = await engine.playerMoves
@@ -257,7 +265,7 @@ struct GameEngineTests {
             locations: [startRoom],
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [VerbID("look"): mockLookHandler]
+                customActionHandlers: [.look: mockLookHandler]
             )
         )
 
@@ -266,7 +274,7 @@ struct GameEngineTests {
         let lookCommand = Command(verb: .look, rawInput: "look")
         let takePebbleCommand = Command(
             verb: .take,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "take pebble"
         )
 
@@ -330,13 +338,11 @@ struct GameEngineTests {
             items: [pebble],
             definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
-                    VerbID("look"): mockLookHandler,
-                    VerbID("take"): mockTakeHandler
+                    .look: mockLookHandler,
+                    .take: mockTakeHandler
                 ]
             )
         )
-        // Ensure room is lit - Done via initializer now
-//        game.state.locations[.startRoom].attributes[.inherentlyLit] = true // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -347,7 +353,7 @@ struct GameEngineTests {
         )
         let takePebbleCommand = Command(
             verb: .take,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "take pebble"
         )
 
@@ -390,7 +396,7 @@ struct GameEngineTests {
         #expect(lookCommandReceived?.verb == "look")
         let takeCommandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(takeCommandReceived?.verb == "take")
-        #expect(takeCommandReceived?.directObject == .item(ItemID("startItem")))
+            #expect(takeCommandReceived?.directObject == .item("startItem"))
 
         // Check turn counter reflects two successful commands
         let finalMoves = await engine.playerMoves
@@ -466,12 +472,13 @@ struct GameEngineTests {
 
             Welcome to the Minimal Game!
 
-            Void
-            ────
-            An empty void.
-            You can see a pebble here.
-            >
+            — Void —
 
+            An empty void.
+
+            You can see a pebble here.
+
+            >
             Goodbye!
             """)
 
@@ -509,7 +516,7 @@ struct GameEngineTests {
             definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     // Only mock inventory
-                    VerbID("inventory"): mockInventoryHandler,
+                    .inventory: mockInventoryHandler,
                 ]
             )
         )
@@ -520,7 +527,7 @@ struct GameEngineTests {
         // Configure the MockParser
         let takeCommand = Command(
             verb: .take,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "take pebble"
         )
         let inventoryCommand = Command(
@@ -581,8 +588,26 @@ struct GameEngineTests {
         #expect(statuses[2].turns == 2)
 
          // Verify output included "Taken."
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a pebble here.
+
+            > take pebble
+            Taken.
+
+            > inventory
+            Mock action succeeded.
+
+            > quit
+            """)
     }
 
     @Test("Engine Records State Changes from Enhanced Handler")
@@ -662,7 +687,7 @@ struct GameEngineTests {
             definitionRegistry: DefinitionRegistry(
                 // Use customActionHandlers directly with the ActionHandler
                 customActionHandlers: [
-                    VerbID("activate"): mockEnhancedHandler // No bridge needed
+                    "activate": mockEnhancedHandler // No bridge needed
                 ]
             )
         )
@@ -670,7 +695,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let activateCommand = Command(
-            verb: VerbID("activate"),
+            verb: "activate",
             directObject: .item(testItemID),
             rawInput: "activate lamp"
         )
@@ -750,8 +775,23 @@ struct GameEngineTests {
         )
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Multiple changes applied." })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a brass lamp here.
+
+            > activate lamp
+            Multiple changes applied.
+
+            > quit
+            """)
     }
 
     // MARK: - Fuse & Daemon Tests
@@ -907,7 +947,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "take pebble"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -937,7 +977,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("startItem")),
+            directObject: .item("startItem"),
             rawInput: "wear pebble"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -972,8 +1012,8 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .insert,
-            directObject: .item(ItemID("key")),
-            indirectObject: .item(ItemID("box")),
+            directObject: .item("key"),
+            indirectObject: .item("box"),
             preposition: "in",
             rawInput: "put key in box"
         )
@@ -1002,7 +1042,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .open,
-            directObject: .item(ItemID("rock")),
+            directObject: .item("rock"),
             rawInput: "open rock"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1031,7 +1071,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .wear,
-            directObject: .item(ItemID("rock")),
+            directObject: .item("rock"),
             rawInput: "wear rock"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1072,7 +1112,7 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .take,
-            directObject: .item(ItemID("shield")),
+            directObject: .item("shield"),
             rawInput: "take shield"
         )
         let output = try await runCommandAndCaptureOutput(
@@ -1105,8 +1145,8 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .insert,
-            directObject: .item(ItemID("key")),
-            indirectObject: .item(ItemID("rock")),
+            directObject: .item("key"),
+            indirectObject: .item("rock"),
             preposition: "in",
             rawInput: "put key in rock"
         )
@@ -1140,8 +1180,8 @@ struct GameEngineTests {
 
         let command = Command(
             verb: .putOn,
-            directObject: .item(ItemID("key")),
-            indirectObject: .item(ItemID("rock")),
+            directObject: .item("key"),
+            indirectObject: .item("rock"),
             preposition: "on",
             rawInput: "put key on rock"
         )
@@ -1402,7 +1442,7 @@ struct GameEngineTests {
             commandInput: "examine shadow",
             commandToParse: command
         )
-        expectNoDifference(output, "It's too dark to do that.")
+        expectNoDifference(output, "It’s too dark to do that.")
     }
 
     @Test("ReportActionResponse: .wrongKey")
@@ -1637,6 +1677,6 @@ extension GameEngineTests {
                 break // Found the command's response
             }
         }
-        return commandOutput
+        return commandOutput.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }
