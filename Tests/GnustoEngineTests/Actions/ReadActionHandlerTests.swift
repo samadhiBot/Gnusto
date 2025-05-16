@@ -39,7 +39,7 @@ struct ReadActionHandlerTests {
         let finalItemState = try await engine.item("book")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "It reads: \"Beware the Grue!\"")
+        expectNoDifference(output, "It reads: “Beware the Grue!”")
     }
 
     @Test("Read item successfully (in lit room)")
@@ -281,7 +281,7 @@ struct ReadActionHandlerTests {
         let finalItemState = try await engine.item("paper")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There's nothing written on the blank paper.")
+        expectNoDifference(output, "There’s nothing written on the blank paper.")
     }
 
     @Test("Read lit item successfully in dark room")
@@ -402,7 +402,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output (Default message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There's nothing written on the blank note.")
+        expectNoDifference(output, "There’s nothing written on the blank note.")
 
         // Assert Final State
         let finalItemState = try await engine.item("note")
@@ -440,7 +440,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output (Default message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "There's nothing written on the stone tablet.")
+        expectNoDifference(output, "There’s nothing written on the stone tablet.")
 
         // Assert Final State
         let finalItemState = try await engine.item("tablet")
@@ -543,7 +543,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "It's too dark to do that.")
+        expectNoDifference(output, "It’s too dark to do that.")
     }
 
     @Test("Read item providing light in dark room")

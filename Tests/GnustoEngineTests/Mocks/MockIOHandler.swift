@@ -6,7 +6,7 @@ import Markdown
 /// A mock implementation of the `IOHandler` protocol for testing purposes.
 @MainActor
 final class MockIOHandler: IOHandler {
-    // --- Recorded Output ---
+    // — Recorded Output —
     struct OutputCall: Equatable, Sendable {
         let text: String
         let style: TextStyle
@@ -18,16 +18,16 @@ final class MockIOHandler: IOHandler {
     public private(set) var setupCallCount: Int = 0
     public private(set) var teardownCallCount: Int = 0
 
-    // --- Input Simulation ---
+    // — Input Simulation —
     private var inputIndex = 0
     private var inputQueue: [String?] = []
 
-    // --- Initialization ---
+    // — Initialization —
     init(_ lines: String?...) {
         inputQueue.append(contentsOf: lines)
     }
 
-    // --- Configuration Methods (for tests) ---
+    // — Configuration Methods (for tests) —
     /// Clears all recorded calls and resets input queue.
     func reset() {
         recordedOutput = []
@@ -44,14 +44,16 @@ final class MockIOHandler: IOHandler {
         inputQueue.append(contentsOf: lines)
     }
 
-    // --- IOHandler Conformance ---
+    // — IOHandler Conformance —
 
     func print(_ markdown: String, style: TextStyle, newline: Bool) {
-        let formatted = Document(parsing: markdown)
-            .format()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        let call = OutputCall(text: formatted, style: style, newline: newline)
-        recordedOutput.append(call)
+        recordedOutput.append(
+            OutputCall(
+                text: MarkdownParser.parse(markdown),
+                style: style,
+                newline: newline
+            )
+        )
         // Optionally print to console during tests for debugging
         // Swift.print("[MockIO] Print: \(text), Style: \(style), Newline: \(newline)")
     }
@@ -68,9 +70,14 @@ final class MockIOHandler: IOHandler {
 
     func readLine(prompt: String) -> String? {
         // Print the prompt using the print method so it can be recorded/verified if needed
-        self.print(prompt, style: .input, newline: false)
+        recordedOutput.append(
+            OutputCall(
+                text: prompt,
+                style: .input,
+                newline: false
+            )
+        )
 
-//        guard !inputQueue.isEmpty else {
         guard inputIndex < inputQueue.count else {
             // No more queued input, return nil (simulates EOF or error)
             // Swift.print("[MockIO] ReadLine: No input queued, returning nil")
@@ -106,17 +113,17 @@ final class MockIOHandler: IOHandler {
         var actualTranscript = ""
         for call in recordedOutput {
             if call.style == .input && call.text == "> " && !call.newline {
-                actualTranscript += "\n>"
+                actualTranscript += ">"
                 if commandIndex < inputQueue.count {
                     if let command = inputQueue[commandIndex] {
-                        actualTranscript += " \(command)"
+                        actualTranscript += " \(command)\n"
                     }
                     commandIndex += 1
                 }
-                actualTranscript += "\n" // Original newline logic
+                actualTranscript += "\n"
             } else if call.style != .input {
                 actualTranscript += call.text
-                if call.newline { // Original newline logic
+                if call.newline {
                     actualTranscript += "\n"
                 }
             }

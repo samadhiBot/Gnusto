@@ -6,7 +6,7 @@ import Foundation
 @Suite("Location Tests")
 struct LocationTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let defaultLocationID: LocationID = "defaultLoc"
     let defaultLocationName = "Room"
 
@@ -32,7 +32,7 @@ struct LocationTests {
         )
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Location Default Initialization")
     func testLocationDefaultInitialization() throws {

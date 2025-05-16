@@ -2,7 +2,7 @@ import Testing
 @testable import GnustoEngine
 
 struct StandardParserTests {
-    // --- Test Setup ---
+    // — Test Setup —
     let parser = StandardParser()
     let vocabulary: Vocabulary
     let gameState: GameState
@@ -150,7 +150,7 @@ struct StandardParserTests {
         //     // Example: Add back a verb if its specific syntax/conditions ARE needed for a test
         //     // and differ from the default (unlikely for most basic tests now).
         //     // Verb(id: "eat", syntax: [ SyntaxRule(pattern: [.verb, .directObject], directObjectConditions: []) ])
-        //     // NOTE: The test setup previously defined verbs like ’take', 'look', 'go', 'put', 'drop', 'eat'.
+        //     // NOTE: The test setup previously defined verbs like 'take', 'look', 'go', 'put', 'drop', 'eat'.
         //     // These are now provided by Vocabulary.defaultVerbs and should NOT be redefined here
         //     // unless a specific test requires overriding a default rule.
         // ]
@@ -185,7 +185,7 @@ struct StandardParserTests {
             pronouns: initialPronouns
         )
 
-        // --- Sanity Checks (Optional but Recommended) ---
+        // — Sanity Checks (Optional but Recommended) —
         // Check if parents were set correctly
         #expect(gameState.items["leaflet"]?.parent == .player)
         #expect(gameState.items["sword"]?.parent == .location(roomID))
@@ -195,7 +195,7 @@ struct StandardParserTests {
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Parse Empty Input")
     func testParseEmpty() async throws {
@@ -276,7 +276,13 @@ struct StandardParserTests {
         )
         // "get" (take) requires a DO according to its SyntaxRule.
         // Expect failure because no DO was provided.
-        #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb ’take'.")))
+        #expect(
+            result.isFailure(
+                matching: .badGrammar(
+                    "Expected a direct object phrase for verb 'take'."
+                )
+            )
+        )
     }
 
     @Test("Parse Verb + Direct Object (Ambiguous)")
@@ -473,7 +479,7 @@ struct StandardParserTests {
         #expect(command.indirectObject == nil)
     }
 
-    // --- Tests for Adjective Filtering ---
+    // — Tests for Adjective Filtering —
 
     @Test("Filter by Single Adjective")
     func testFilterSingleAdjective() async throws {
@@ -546,7 +552,7 @@ struct StandardParserTests {
         )
     }
 
-    // --- Tests for Pronoun Resolution ---
+    // — Tests for Pronoun Resolution —
 
     @Test("Pronoun 'it' Not Set")
     func testPronounItNotSet() async throws {
@@ -679,15 +685,15 @@ struct StandardParserTests {
     }
 
     // NEW Test for "them" resolving to multiple in-scope items
-    @Test("Pronoun ’them' Multiple In Scope")
+    @Test("Pronoun 'them' Multiple In Scope")
     func testPronounThemMultipleInScope() async throws {
-        // Initialize game state with ’them' set to key & leaflet (both held)
+        // Initialize game state with 'them' set to key & leaflet (both held)
         let initState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("leaflet")]] // Start with ’them'
+            pronouns: ["them": [.item("key"), .item("leaflet")]] // Start with 'them'
         )
         // Player holds key and leaflet (verified by initialItems setup)
         #expect(initState.items["key"]?.parent == .player)
@@ -701,22 +707,22 @@ struct StandardParserTests {
         #expect(
             result.isFailure(
                 matching: ParseError.ambiguousPronounReference(
-                    "Which ’them' do you mean: the key, or the leaflet?"
+                    "Which 'them' do you mean: the key or the leaflet?"
                 )
             )
         )
     }
 
     // NEW Test for "them" resolving to one in-scope item
-    @Test("Pronoun ’them' Single In Scope")
+    @Test("Pronoun 'them' Single In Scope")
     func testPronounThemSingleInScope() async throws {
-        // Initialize game state with ’them' set to key (held) & note (out of scope)
+        // Initialize game state with 'them' set to key (held) & note (out of scope)
         let initState = GameState(
             locations: Array(gameState.locations.values),
             items: Array(gameState.items.values),
             player: gameState.player,
             vocabulary: vocabulary,
-            pronouns: ["them": [.item("key"), .item("note")]] // Start with ’them'
+            pronouns: ["them": [.item("key"), .item("note")]] // Start with 'them'
         )
         // Verify item locations
         #expect(initState.items["key"]?.parent == .player)
@@ -734,7 +740,7 @@ struct StandardParserTests {
         #expect(command.directObject == .item("key")) // Successfully resolved to the only one in scope
     }
 
-    // --- Tests for Container Scope ---
+    // — Tests for Container Scope —
 
     @Test("Find Item in Open Inventory Container")
     func testFindItemInOpenInventoryContainer() async throws {
@@ -861,8 +867,8 @@ struct StandardParserTests {
         // No need to clean up temp state as it was local to the test
     }
 
-    // --- TODO: Add tests for Ambiguity Resolution (more complex) ---
-    // --- TODO: Add tests for other pronouns ("them", etc.) ---
+    // — TODO: Add tests for Ambiguity Resolution (more complex) —
+    // — TODO: Add tests for other pronouns ("them", etc.) —
 
     // MARK: - Tokenization and Noise Removal Tests
 

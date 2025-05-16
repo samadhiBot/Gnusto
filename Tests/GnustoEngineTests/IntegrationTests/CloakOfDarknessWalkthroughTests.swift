@@ -36,58 +36,60 @@ struct CloakOfDarknessWalkthroughTests {
 
         expectNoDifference(actualTranscript, """
             Cloak of Darkness
-
+            
             A basic IF demonstration.
-
-            Hurrying through the rainswept November night, you're glad to see the
-            bright lights of the Opera House. It's surprising that there aren’t more
-            people about but, hey, what do you expect in a cheap demo game...?
-
+            
+            
+            Hurrying through the rainswept November night, you’re glad to see the
+            bright lights of the Opera House. It’s surprising that there aren’t more
+            people about but, hey, what do you expect in a cheap demo game…?
+            
             Foyer of the Opera House
             ────────────────────────
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
-
+            
             > inventory
             You are carrying:
-              A velvet cloak
-
+            - A velvet cloak
+            
             > go west
             Cloakroom
             ─────────
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
+            
             You can see a small brass hook here.
-
+            
             > examine brass hook
-            It's just a small brass hook, screwed to the wall.
-
+            It’s just a small brass hook, screwed to the wall.
+            
             > hang the cloak on the brass hook
             You put the velvet cloak on the small brass hook.
-
+            
             > examine cloak
             A handsome cloak, of velvet trimmed with satin, and slightly
             spattered with raindrops. Its blackness is so deep that it
             almost seems to suck light from the room.
-
+            
             > examine hook
-            It's just a small brass hook, with a cloak hanging on it.
-
+            It’s just a small brass hook, with a cloak hanging on it.
+            
             > go east
-
             > go south
             Bar
             ───
             The bar, much rougher than you’d have guessed after the opulence
             of the foyer to the north, is completely empty. There seems to
             be some sort of message scrawled in the sawdust on the floor.
+            
             You can see a scrawled message here.
-
+            
             > read the message
-            The message, neatly marked in the sawdust, reads...
-
-            "You win."
+            The message, neatly marked in the sawdust, reads…
+            
+            “You win.”
             """)
     }
 
@@ -112,7 +114,7 @@ struct CloakOfDarknessWalkthroughTests {
         let actualTranscript = await mockIO.flush()
 
         expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
+            — Foyer of the Opera House —
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
@@ -155,7 +157,7 @@ struct CloakOfDarknessWalkthroughTests {
         let actualTranscript = await mockIO.flush()
 
         expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
+            — Foyer of the Opera House —
             You are standing in a spacious hall, splendidly decorated in red
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
@@ -199,7 +201,7 @@ struct CloakOfDarknessWalkthroughTests {
         let actualTranscript = await mockIO.flush()
 
         expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
+            — Foyer of the Opera House —
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > s
             It is pitch black. You are likely to be eaten by a grue.
@@ -237,10 +239,10 @@ struct CloakOfDarknessWalkthroughTests {
         let actualTranscript = await mockIO.flush()
 
         expectNoDifference(actualTranscript, """
-            --- Foyer of the Opera House ---
+            — Foyer of the Opera House —
             You are standing in a spacious hall, splendidly decorated in red and gold, which serves as the lobby of the opera house. The walls are adorned with portraits of famous singers, and the floor is covered with a thick crimson carpet. A grand staircase leads upwards, and there are doorways to the south and west.
             > w
-            --- Cloakroom ---
+            — Cloakroom —
             The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
             You can see:
               A hook
@@ -249,7 +251,7 @@ struct CloakOfDarknessWalkthroughTests {
             > hang cloak on hook
             You put the cloak on the hook.
             > look
-            --- Cloakroom ---
+            — Cloakroom —
             The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.
             You can see:
               A cloak

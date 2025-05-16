@@ -7,7 +7,7 @@ import Testing
 struct InsertActionHandlerTests {
     let handler = InsertActionHandler()
 
-    // --- Test Setup ---
+    // — Test Setup —
     let coin = Item(
         id: "coin",
         .name("gold coin"),
@@ -29,7 +29,7 @@ struct InsertActionHandlerTests {
         .isOpen,
     )
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Insert item successfully")
     func testInsertItemSuccessfully() async throws {
@@ -1192,7 +1192,7 @@ struct InsertActionHandlerTests {
         #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 
-    // --- Validation Tests (using handler.validate for focused error checks) ---
+    // — Validation Tests (using handler.validate for focused error checks) —
 
     @Test("Validation fails when item not held")
     func testValidationItemNotHeld() async throws {
@@ -1400,7 +1400,7 @@ struct InsertActionHandlerTests {
 
         // Act & Assert Error
         await #expect(
-            throws: ActionResponse.prerequisiteNotMet("You can’t put something inside itself.")
+            throws: ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
         ) { // Correct error type
             try await handler.validate(
                 context: ActionContext(
@@ -1438,7 +1438,11 @@ struct InsertActionHandlerTests {
         )
 
         let game = MinimalGame(items: [boxA, boxB])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(
+            game: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
         let command = Command(
             verb: .insert,
@@ -1449,10 +1453,17 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        let expectedMessage = "You can’t put the box B in the box A, because the box A is inside the box B!"
-        await #expect(throws: ActionResponse.prerequisiteNotMet(expectedMessage)) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet(
+                "You can't put the box B in the box A, because the box A is inside the box B!"
+            )
+        ) {
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: await engine.gameState)
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: await engine.gameState
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty)

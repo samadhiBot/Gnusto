@@ -5,7 +5,7 @@ import Foundation // For JSONEncoder/Decoder
 @Suite("Player Struct Tests")
 struct PlayerTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let startLocation: LocationID = "westOfHouse"
     let item1: ItemID = "lantern"
     let item2: ItemID = "leaflet"
@@ -14,7 +14,7 @@ struct PlayerTests {
         Player(in: startLocation)
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Player Default Initialization")
     func testPlayerDefaultInitialization() throws {

@@ -93,7 +93,7 @@ extension GameEngine {
     public func run() async {
         await ioHandler.setup()
         await ioHandler.print(constants.storyTitle, style: .strong)
-        await ioHandler.print("\n\(constants.introduction)\n")
+        await ioHandler.print(constants.introduction)
 
         do {
             let startingLocationID = playerLocationID

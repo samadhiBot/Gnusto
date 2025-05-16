@@ -605,7 +605,7 @@ public struct StandardParser: Parser {
                 return .failure(
                     .ambiguousPronounReference("""
                         Which '\(lowercasedNoun)' do you mean: \
-                        \(descriptions.joined(separator: ", or "))?
+                        \(descriptions.commaListing("or"))?
                         """)
                 )
             } else {

@@ -6,7 +6,7 @@ import Testing
 @Suite("PutOnActionHandler Tests")
 struct PutOnActionHandlerTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let book = Item(
         id: "book",
         .name("heavy book"),
@@ -19,7 +19,7 @@ struct PutOnActionHandlerTests {
         .isSurface
     )
 
-    // --- Helper ---
+    // — Helper —
     private func expectedPutOnChanges(
         itemToPutID: ItemID,
         surfaceID: ItemID,
@@ -72,7 +72,7 @@ struct PutOnActionHandlerTests {
         return changes
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Put item on surface successfully")
     func testPutOnItemSuccessfully() async throws {

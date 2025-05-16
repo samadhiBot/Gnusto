@@ -9,7 +9,7 @@ struct ActionResultTests {
 
     // MARK: - Initial Setup and Examples
 
-    // --- Simple Examples for Initialization Tests ---
+    // — Simple Examples for Initialization Tests —
     let simpleChange = StateChange(
         entityID: .item("lamp"),
         attributeKey: .itemAttribute(.isOn),
@@ -22,7 +22,7 @@ struct ActionResultTests {
         parameters: ["duration": .int(10)]
     )
 
-    // --- Examples for Merging/Applying Tests ---
+    // — Examples for Merging/Applying Tests —
     // Note: These are now instance properties. `testResult` uses them,
     // so it needs to be accessed within a test method or be computed.
     private let change1 = StateChange(
@@ -53,7 +53,7 @@ struct ActionResultTests {
         )
     }
 
-    // --- More Complex Examples for Apply/Validation ---
+    // — More Complex Examples for Apply/Validation —
     let turnOnLampChanges = [
         StateChange(
             entityID: .item("lamp"),
@@ -389,7 +389,7 @@ struct ActionResultTests {
     }
     */
 
-    // --- Test Setup for previous structure ---
+    // — Test Setup for previous structure —
 
     // These properties are kept for context but are now initialized differently
     // or within test functions.
@@ -407,7 +407,7 @@ struct ActionResultTests {
         ]
     )
 
-    // --- Tests from previous structure (adapted) ---
+    // — Tests from previous structure (adapted) —
 
     @Test("ActionResult Initialization - Previous Structure Style")
     func testInitializationFromPreviousStyle() {

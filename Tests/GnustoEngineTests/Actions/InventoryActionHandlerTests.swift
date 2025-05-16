@@ -10,13 +10,13 @@ struct InventoryActionHandlerTests {
         let game = MinimalGame(
             items: [
                 Item(
-                    id: "key",
+                    id: "brassKey",
                     .name("brass key"),
                     .in(.player)
                 ),
                 Item(
-                    id: "lamp",
-                    .name("brass lamp"),
+                    id: "antiqueLamp",
+                    .name("antique lamp"),
                     .in(.player)
                 ),
             ]
@@ -41,8 +41,8 @@ struct InventoryActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             You are carrying:
-              A brass key
-              A brass lamp
+            - An antique lamp
+            - A brass key
             """
         )
     }

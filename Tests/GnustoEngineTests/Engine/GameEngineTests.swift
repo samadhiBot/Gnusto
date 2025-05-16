@@ -49,10 +49,11 @@ struct GameEngineTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             Minimal Game
-            
+
             Welcome to the Minimal Game!
 
             It is pitch black. You are likely to be eaten by a grue.
+
             > quit
             """)
 
@@ -102,15 +103,19 @@ struct GameEngineTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             Minimal Game
-            
+
             Welcome to the Minimal Game!
-            
+
             Void
             ────
             An empty void.
+            
             You can see a pebble here.
+            
             > xyzzy
-            I don’t know the verb 'xyzzy'.
+            
+            I don’t know the verb ‘xyzzy’.
+            
             > quit
             """)
 
@@ -158,7 +163,6 @@ struct GameEngineTests {
                 customActionHandlers: [VerbID("take"): mockTakeHandler]
             )
         )
-//        game.state.items["startItem"].attributes[.isTakable] = nil // Removed direct state modification
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
@@ -459,9 +463,9 @@ struct GameEngineTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             Minimal Game
-            
+
             Welcome to the Minimal Game!
-            
+
             Void
             ────
             An empty void.

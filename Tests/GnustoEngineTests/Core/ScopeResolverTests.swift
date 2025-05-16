@@ -173,7 +173,7 @@ struct ScopeResolverTests {
         await #expect(resolver.isLocationLit(locationID: "badRoom") == false)
     }
 
-    // --- visibleItemsIn Tests ---
+    // — visibleItemsIn Tests —
 
     @Test("Visible items in inherently lit room")
     func testVisibleItemsInherentlyLit() async throws {

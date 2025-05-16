@@ -8,15 +8,8 @@ public struct ConsoleIOHandler: IOHandler {
 
     // --- Output Methods ---
 
-    public func print(
-        _ markdown: String,
-        style: TextStyle,
-        newline: Bool
-    ) {
-        Swift.print(
-            Document(parsing: markdown).format(),
-            terminator: newline ? "\n" : ""
-        )
+    public func print(_ markdown: String, style: TextStyle, newline: Bool) {
+        Swift.print(MarkdownParser.parse(markdown), terminator: newline ? "\n" : "")
         fflush(stdout)
     }
 

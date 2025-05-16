@@ -7,7 +7,7 @@ import Testing
 struct TakeActionHandlerTests {
     let handler = TakeActionHandler()
 
-    // Helper function to generate expected state changes for a successful ’take'
+    // Helper function to generate expected state changes for a successful 'take'
     private func expectedTakeChanges(
         itemID: ItemID,
         initialParent: ParentEntity,

@@ -5,7 +5,7 @@ import Foundation // For JSONEncoder/Decoder
 @Suite("Verb Struct Tests")
 struct VerbTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let verbIDTake: VerbID = "take"
     let synonymsTake: Set<String> = ["get", "pick up"]
 
@@ -19,7 +19,7 @@ struct VerbTests {
         Verb(id: verbIDLook)
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Verb Initialization with Synonyms")
     func testVerbInitializationWithSynonyms() throws {

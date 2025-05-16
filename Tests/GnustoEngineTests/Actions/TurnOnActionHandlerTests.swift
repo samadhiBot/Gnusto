@@ -174,7 +174,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can’t turn that on.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that on.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

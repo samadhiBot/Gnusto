@@ -87,7 +87,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
-            --- Bright Room ---
+            — Bright Room —
             A brightly lit room.
             You can see a modern looking chair, a woven rug, and a wooden table here.
             """
@@ -148,7 +148,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         // Corrected Expectation: Full formatted output
         expectNoDifference(output, """
-            --- Test Room ---
+            — Test Room —
             A basic room.
             You can see an apple, a banana, an orange, and a pear here.
             """
@@ -249,7 +249,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         // Corrected Expectation: Full formatted output (lit by player)
         expectNoDifference(output, """
-            --- Dark Room ---
+            — Dark Room —
             A dark, damp room.
             You can see a wooden table here.
             """
@@ -287,7 +287,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         // Corrected Expectation: Default description with title
         expectNoDifference(output, """
-            --- Plain Room ---
+            — Plain Room —
             You are in a nondescript location.
             """
         )
@@ -338,7 +338,7 @@ struct LookActionHandlerTests {
         let output1 = await mockIO.flush()
         // Corrected Expectation: Dynamic description with title
         expectNoDifference(output1, """
-            --- Magic Room ---
+            — Magic Room —
             The room *sparkles* brightly via registry.
             """
         )
@@ -351,13 +351,13 @@ struct LookActionHandlerTests {
         let output2 = await mockIO.flush()
         // Corrected Expectation: Dynamic description with title
         expectNoDifference(output2, """
-            --- Magic Room ---
+            — Magic Room —
             The room seems normal via registry.
             """
         )
     }
 
-    // --- LOOK AT / EXAMINE Tests ---
+    // — LOOK AT / EXAMINE Tests —
 
     @Test("LOOK AT item shows description and marks touched")
     func testLookAtItem() async throws {

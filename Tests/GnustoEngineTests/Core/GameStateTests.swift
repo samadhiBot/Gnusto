@@ -250,7 +250,7 @@ struct GameStateTests {
         #expect(state1.locations[.startRoom] == state2.locations[.startRoom])
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("GameState Initial Factory and Parent Setting")
     func testGameStateInitialFactory() async throws {

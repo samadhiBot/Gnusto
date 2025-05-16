@@ -6,7 +6,7 @@ import Foundation
 @Suite("Item Tests")
 struct ItemTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let defaultItemID: ItemID = "defaultItem"
     let defaultItemName = "thing"
 
@@ -39,7 +39,7 @@ struct ItemTests {
         )
     }
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Item Default Initialization")
     func testItemDefaultInitialization() throws {

@@ -4,7 +4,7 @@ import Testing
 @Suite("Command Struct Tests")
 struct CommandTests {
 
-    // --- Test Setup ---
+    // — Test Setup —
     let verbGo: VerbID = "go"
     let verbTake: VerbID = "take"
     let verbPut: VerbID = "put"
@@ -16,7 +16,7 @@ struct CommandTests {
     let modsBrass = ["brass"]
     let prepIn = "in"
 
-    // --- Tests ---
+    // — Tests —
 
     @Test("Command Initialization - Verb Only")
     func testCommandInitVerbOnly() throws {
