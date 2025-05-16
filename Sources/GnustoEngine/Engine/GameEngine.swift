@@ -18,6 +18,9 @@ public actor GameEngine: Sendable {
     /// The resolver for scope and visibility checks.
     lazy var scopeResolver = ScopeResolver(engine: self)
 
+    /// The game-wide constants (title, release, max score, etc).
+    public let constants: GameConstants
+
     /// The registry holding static game definitions (fuses, daemons, action overrides).
     public let definitionRegistry: DefinitionRegistry
 
@@ -66,6 +69,7 @@ public actor GameEngine: Sendable {
         parser: Parser,
         ioHandler: IOHandler
     ) async {
+        self.constants = game.constants
         self.gameState = game.state
         self.parser = parser
         self.ioHandler = ioHandler

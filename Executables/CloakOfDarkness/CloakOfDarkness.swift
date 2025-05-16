@@ -2,11 +2,24 @@ import GnustoEngine
 
 /// A Gnusto Engine port of Roger Firth's Cloak of Darkness.
 struct CloakOfDarkness: GameBlueprint {
+    var constants: GameConstants
     var definitionRegistry: DefinitionRegistry
     var dynamicAttributeRegistry: DynamicAttributeRegistry
     var state: GameState
 
     init() {
+        constants = GameConstants(
+            storyTitle: "Cloak of Darkness",
+            headline: "A basic IF demonstration.",
+            release: "0.3.0",
+            serial: "250516",
+            maximumScore: 2,
+            openingBanner: """
+                Hurrying through the rainswept November night, you're glad to see the
+                bright lights of the Opera House. It's surprising that there aren't more
+                people about but, hey, what do you expect in a cheap demo game...?
+                """
+        )
         definitionRegistry = DefinitionRegistry(
             itemActionHandlers: [
                 .cloak: OperaHouse.cloakHandler,

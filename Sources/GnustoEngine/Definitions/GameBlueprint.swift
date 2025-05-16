@@ -1,6 +1,9 @@
 import Foundation
 
 public protocol GameBlueprint: Sendable {
+    /// <#Description#>
+    var constants: GameConstants { get }
+
     /// The complete state of the world at the start of the game.
     var state: GameState { get }
 

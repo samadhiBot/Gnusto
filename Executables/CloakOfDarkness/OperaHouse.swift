@@ -63,7 +63,6 @@ struct OperaHouse: AreaContents {
         .exits([
             .north: Exit(destination: "foyer"),
         ])
-        // Note: Bar lighting is handled dynamically by hooks
     )
 
     let message = Item(
