@@ -129,7 +129,7 @@
 ////             try await engine.setDynamicItemValue(itemID: "testItem", key: "validatedProp", newValue: .int(0))
 ////        }
 ////
-////        // Verify value in GameState hasn't changed
+////        // Verify value in GameState hasn’t changed
 ////        let item = await engine.gameState.items["testItem"]
 ////        #expect(item.attributes["validatedProp"] == StateValue.int(1))
 ////

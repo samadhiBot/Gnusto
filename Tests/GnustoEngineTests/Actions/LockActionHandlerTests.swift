@@ -187,7 +187,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding the key.")
+        expectNoDifference(output, "You aren’t holding the key.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -242,7 +242,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -282,7 +282,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't lock the pebble.") // Uses ActionResponse.itemNotLockable message
+        expectNoDifference(output, "You can’t lock the pebble.") // Uses ActionResponse.itemNotLockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -327,7 +327,7 @@ struct LockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The bent key doesn't fit the box.")
+        expectNoDifference(output, "The bent key doesn’t fit the box.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -426,7 +426,7 @@ extension LockActionHandlerTests {
         }
 
         // Pronoun "it" is set to the target item
-        // Assuming "it" wasn't already referring to targetItemID or was nil.
+        // Assuming "it" wasn’t already referring to targetItemID or was nil.
         changes.append(
             StateChange(
                 entityID: .global,

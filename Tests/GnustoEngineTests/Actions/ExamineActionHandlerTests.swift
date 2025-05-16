@@ -177,7 +177,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let itemState = try await engine.item(itemID)
@@ -224,7 +224,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see the hidden gem.")
+        expectNoDifference(output, "You can’t see the hidden gem.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
         let itemState = try await engine.item(itemID)
@@ -251,7 +251,7 @@ struct ExamineActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -401,7 +401,7 @@ extension ExamineActionHandlerTests {
                 attributeKey: .pronounReference(pronoun: "it"),
                 // Old value might be nil or another item, for simplicity in test we assume nil or different
                 // A more robust test might capture the actual old pronoun state.
-                oldValue: nil, // Assuming it wasn't set or was different
+                oldValue: nil, // Assuming it wasn’t set or was different
                 newValue: .entityReferenceSet([.item(itemID)]) // Use .entityReferenceSet
             )
         )

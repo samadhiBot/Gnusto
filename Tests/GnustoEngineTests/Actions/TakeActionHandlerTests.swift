@@ -7,7 +7,7 @@ import Testing
 struct TakeActionHandlerTests {
     let handler = TakeActionHandler()
 
-    // Helper function to generate expected state changes for a successful 'take'
+    // Helper function to generate expected state changes for a successful ’take'
     private func expectedTakeChanges(
         itemID: ItemID,
         initialParent: ParentEntity,
@@ -182,7 +182,7 @@ struct TakeActionHandlerTests {
 
     @Test("Take item fails when not present in location")
     func testTakeItemFailsWhenNotPresent() async throws {
-        // Arrange: Create item that *won't* be added to location
+        // Arrange: Create item that *won’t* be added to location
         let nonexistentItem = Item(
             id: "figurine",
             .name("jade figurine"),
@@ -210,7 +210,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -249,7 +249,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't take the heavy rock.")
+        expectNoDifference(output, "You can’t take the heavy rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -440,7 +440,7 @@ struct TakeActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush() // Define output before using it
         // ScopeResolver will prevent seeing it, standard message
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -491,7 +491,7 @@ struct TakeActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't take things out of the stone statue.")
+        expectNoDifference(output, "You can’t take things out of the stone statue.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -703,7 +703,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Taken.")
 
         // Assert Change History
-        // Helper should only generate parent and pronoun changes as attributes didn't change
+        // Helper should only generate parent and pronoun changes as attributes didn’t change
         let expectedChanges = expectedTakeChanges(
             itemID: "key",
             initialParent: initialParent,

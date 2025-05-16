@@ -503,7 +503,7 @@ struct GameStateTests {
             Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
-        // Verify state hasn't changed unexpectedly
+        // Verify state hasn’t changed unexpectedly
         #expect(gameState.activeFuses == ["existingFuse": 5]) // Fuse should still be present
         #expect(gameState.changeHistory.isEmpty) // Apply should fail before adding to history
     }
@@ -631,12 +631,12 @@ struct GameStateTests {
             Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
-        // Verify the state hasn't changed
+        // Verify the state hasn’t changed
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.oldValue)
         #expect(state.changeHistory.isEmpty) // No change should be recorded
 
         // Now apply the correct change
-        try? state.apply(correctChange) // Use try? as we don't care about the error here
+        try? state.apply(correctChange) // Use try? as we don’t care about the error here
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }

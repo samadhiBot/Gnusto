@@ -40,7 +40,7 @@ struct CloakOfDarknessWalkthroughTests {
             A basic IF demonstration.
 
             Hurrying through the rainswept November night, you're glad to see the
-            bright lights of the Opera House. It's surprising that there aren't more
+            bright lights of the Opera House. It's surprising that there aren’t more
             people about but, hey, what do you expect in a cheap demo game...?
 
             Foyer of the Opera House
@@ -120,9 +120,9 @@ struct CloakOfDarknessWalkthroughTests {
 
             It is pitch black. You are likely to be eaten by a grue.
             > remove cloak
-            You can't see any 'cloak' here.
+            You can’t see any 'cloak' here.
             > drop cloak
-            You can't see any 'cloak' here.
+            You can’t see any 'cloak' here.
             > look
             It is pitch black. You are likely to be eaten by a grue.
             > x message
@@ -160,9 +160,9 @@ struct CloakOfDarknessWalkthroughTests {
             and gold, with glittering chandeliers overhead. The entrance from
             the street is to the north, and there are doorways south and west.
             > remove cloak
-            You can't see any 'cloak' here.
+            You can’t see any 'cloak' here.
             > drop cloak
-            You can't see any 'cloak' here.
+            You can’t see any 'cloak' here.
             > s
 
             It is pitch black. You are likely to be eaten by a grue.

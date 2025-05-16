@@ -1,5 +1,4 @@
 import Foundation
-import Markdown
 
 // MARK: - Item Descriptions
 
@@ -18,11 +17,14 @@ extension GameEngine {
         engine: GameEngine
     ) async -> String {
         let fetchedOrNil: String? = try? await engine.fetch(itemID, key)
-        if let actualDescription = fetchedOrNil {
-            return formatDescription(actualDescription)
+        return if let actualDescription = fetchedOrNil {
+            actualDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
-            let defaultDesc = await defaultItemDescription(for: itemID, key: key, engine: engine)
-            return formatDescription(defaultDesc)
+            await defaultItemDescription(
+                for: itemID,
+                key: key,
+                engine: engine
+            ).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 
@@ -73,15 +75,13 @@ extension GameEngine {
         engine: GameEngine
     ) async -> String {
         if let actualDescription = try? await engine.fetch(locationID, key) {
-            formatDescription(actualDescription)
+            actualDescription.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
-            formatDescription(
-                await defaultLocationDescription(
-                    for: locationID,
-                    key: key,
-                    engine: engine
-                )
-            )
+            await defaultLocationDescription(
+                for: locationID,
+                key: key,
+                engine: engine
+            ).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
 
@@ -101,16 +101,5 @@ extension GameEngine {
         default:
             return "It seems indescribable."
         }
-    }
-}
-
-// MARK: - Formatting
-
-extension GameEngine {
-    /// Formats a raw description string using Markdown.
-    private func formatDescription(_ rawMarkdown: String) -> String {
-        Document(parsing: rawMarkdown)
-            .format()
-            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

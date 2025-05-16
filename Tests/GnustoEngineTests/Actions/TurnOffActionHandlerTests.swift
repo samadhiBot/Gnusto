@@ -86,7 +86,7 @@ struct TurnOffActionHandlerTests {
             rawInput: "turn off book"
         )
 
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can’t turn that off.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -123,7 +123,7 @@ struct TurnOffActionHandlerTests {
             rawInput: "turn off lamp"
         )
 
-        // Expect internalEngineError when item ID doesn't exist in gameState
+        // Expect internalEngineError when item ID doesn’t exist in gameState
         await #expect(throws: ActionResponse.itemNotAccessible("lamp")) {
             try await handler.validate(
                 context: ActionContext(
@@ -299,7 +299,7 @@ struct TurnOffActionHandlerTests {
         )
 
         // Act & Assert: Expect error during validation
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that off.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can’t turn that off.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
@@ -347,7 +347,7 @@ struct TurnOffActionHandlerTests {
         // Assert: Check IOHandler output for the expected error message
         let output = await mockIO.flush()
         // The specific response message comes from GameEngine.report
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 
     @Test("Extinguish alias works correctly")

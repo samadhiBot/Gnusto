@@ -1,4 +1,5 @@
 import Foundation
+import Markdown
 
 /// A basic implementation of `IOHandler` that interacts with the standard console.
 @MainActor
@@ -7,11 +8,15 @@ public struct ConsoleIOHandler: IOHandler {
 
     // --- Output Methods ---
 
-    public func print(_ text: String, style: TextStyle, newline: Bool) {
-        // Basic implementation ignores style for now.
-        // Use Swift.print to avoid potential conflicts if extensions arise.
-        Swift.print(text, terminator: newline ? "\n" : "")
-        // Ensure output is immediately visible, especially relevant if buffering occurs.
+    public func print(
+        _ markdown: String,
+        style: TextStyle,
+        newline: Bool
+    ) {
+        Swift.print(
+            Document(parsing: markdown).format(),
+            terminator: newline ? "\n" : ""
+        )
         fflush(stdout)
     }
 

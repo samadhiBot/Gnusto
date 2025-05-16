@@ -107,7 +107,7 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        let game = MinimalGame() // Cloak doesn't exist here
+        let game = MinimalGame() // Cloak doesn’t exist here
         let engine = await GameEngine(
             game: game,
             parser: MockParser(),

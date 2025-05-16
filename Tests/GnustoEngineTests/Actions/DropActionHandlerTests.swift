@@ -123,7 +123,7 @@ struct DropActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding the brass key.")
+        expectNoDifference(output, "You aren’t holding the brass key.")
 
         // Assert Change History (Should be empty)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -218,7 +218,7 @@ struct DropActionHandlerTests {
 
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't drop the sword in stone.")
+        expectNoDifference(output, "You can’t drop the sword in stone.")
     }
 }
 

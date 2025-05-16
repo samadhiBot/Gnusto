@@ -215,7 +215,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding the gold coin.")
+        expectNoDifference(output, "You aren’t holding the gold coin.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -261,7 +261,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -305,7 +305,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things in the stone statue.")
+        expectNoDifference(output, "You can’t put things in the stone statue.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -387,7 +387,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something inside itself.")
+        expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -436,7 +436,7 @@ struct InsertActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(
             output,
-            "You can't put the bag in the box, because the box is inside the bag!"
+            "You can’t put the bag in the box, because the box is inside the bag!"
         )
 
         // Assert No State Change
@@ -490,7 +490,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The gold coin won't fit in the nearly full box.")
+        expectNoDifference(output, "The gold coin won’t fit in the nearly full box.")
 
         // Assert No State Change
         #expect(try await engine.item("coin").parent == .player) // Coin still held
@@ -668,7 +668,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something inside itself.")
+        expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -721,7 +721,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -766,7 +766,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things in the smooth rock.")
+        expectNoDifference(output, "You can’t put things in the smooth rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -871,7 +871,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The small key won't fit in the wooden box.")
+        expectNoDifference(output, "The small key won’t fit in the wooden box.")
 
         // Assert No State Change
         #expect(try await engine.item("key").parent == .player) // Key still held
@@ -922,7 +922,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The large key won't fit in the small box.")
+        expectNoDifference(output, "The large key won’t fit in the small box.")
 
         // Assert No State Change
         #expect(try await engine.item("key").parent == .player) // Key still held
@@ -1071,7 +1071,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something inside itself.")
+        expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true) // Use engine instance
@@ -1081,7 +1081,7 @@ struct InsertActionHandlerTests {
     func testInsertIntoIndirectSelfContainer() async throws {
         // Arrange: Player holds Box B (open container). Box A is inside Box B.
         // Command: Put Box B (itemToInsert) into Box A (containerItem).
-        // Expected Error: "You can't put Box B in Box A, because Box A is in Box B!"
+        // Expected Error: "You can’t put Box B in Box A, because Box A is in Box B!"
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
@@ -1119,7 +1119,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put the box B in the box A, because the box A is inside the box B!")
+        expectNoDifference(output, "You can’t put the box B in the box A, because the box A is inside the box B!")
 
         // Assert No State Change (Box A still in Box B, Box B still held)
         let finalBoxA = try await engine.item("boxA")
@@ -1134,7 +1134,7 @@ struct InsertActionHandlerTests {
         // Arrange: Player holds Box C (open container).
         // Box B is inside Box C. Box A is inside Box B.
         // Command: Put Box C (itemToInsert) into Box A (containerItem).
-        // Expected: "You can't put Box C in Box A, because Box A is in Box C!"
+        // Expected: "You can’t put Box C in Box A, because Box A is in Box C!"
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
@@ -1180,7 +1180,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put the box C in the box A, because the box A is inside the box C!")
+        expectNoDifference(output, "You can’t put the box C in the box A, because the box A is inside the box C!")
 
         // Assert No State Change
         let finalBoxA = try await engine.item("boxA")
@@ -1400,7 +1400,7 @@ struct InsertActionHandlerTests {
 
         // Act & Assert Error
         await #expect(
-            throws: ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
+            throws: ActionResponse.prerequisiteNotMet("You can’t put something inside itself.")
         ) { // Correct error type
             try await handler.validate(
                 context: ActionContext(
@@ -1417,7 +1417,7 @@ struct InsertActionHandlerTests {
     func testValidationInsertIntoIndirectSelf() async throws {
         // Arrange: Player holds Box B (open container). Box A is inside Box B.
         // Command: Put Box B (itemToInsert) into Box A (containerItem).
-        // Expected Error: "You can't put Box B in Box A, because Box A is in Box B!"
+        // Expected Error: "You can’t put Box B in Box A, because Box A is in Box B!"
 
         let boxA = Item( // This is containerItem (Y)
             id: "boxA",
@@ -1449,7 +1449,7 @@ struct InsertActionHandlerTests {
         )
 
         // Act & Assert Error
-        let expectedMessage = "You can't put the box B in the box A, because the box A is inside the box B!"
+        let expectedMessage = "You can’t put the box B in the box A, because the box A is inside the box B!"
         await #expect(throws: ActionResponse.prerequisiteNotMet(expectedMessage)) {
             try await handler.validate(
                 context: ActionContext(command: command, engine: engine, stateSnapshot: await engine.gameState)
@@ -1495,7 +1495,7 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things in the glass trophy.")
+        expectNoDifference(output, "You can’t put things in the glass trophy.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -1547,7 +1547,7 @@ extension InsertActionHandlerTests {
         }
 
         // 4. Pronoun "it" is set to the inserted item
-        // Assuming "it" wasn't already referring to itemToInsertID or was nil.
+        // Assuming "it" wasn’t already referring to itemToInsertID or was nil.
         // For more robust tests, capture existing pronoun state.
         changes.append(
             StateChange(

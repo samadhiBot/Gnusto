@@ -249,7 +249,7 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding the heavy book.")
+        expectNoDifference(output, "You aren’t holding the heavy book.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -302,7 +302,7 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -345,7 +345,7 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put things on the box.")
+        expectNoDifference(output, "You can’t put things on the box.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -383,7 +383,7 @@ struct PutOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't put something on itself.")
+        expectNoDifference(output, "You can’t put something on itself.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -430,7 +430,7 @@ struct PutOnActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         // Note: The error message uses "inside" due to the way the check works, might need refinement
-        expectNoDifference(output, "You can't put the table inside the silver tray like that.")
+        expectNoDifference(output, "You can’t put the table inside the silver tray like that.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)

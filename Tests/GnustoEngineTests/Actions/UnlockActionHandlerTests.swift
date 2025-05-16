@@ -190,7 +190,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You aren't holding the key.")
+        expectNoDifference(output, "You aren’t holding the key.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -246,7 +246,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -286,7 +286,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't unlock the pebble.") // Uses ActionResponse.itemNotUnlockable message
+        expectNoDifference(output, "You can’t unlock the pebble.") // Uses ActionResponse.itemNotUnlockable message
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -331,7 +331,7 @@ struct UnlockActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The bent key doesn't fit the box.")
+        expectNoDifference(output, "The bent key doesn’t fit the box.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)

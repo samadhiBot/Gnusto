@@ -7,21 +7,21 @@ struct VocabularyTests {
     @Test("Default verbSynonyms mapping is correct")
     func testDefaultVerbSynonyms() throws {
         // Arrange: Get the default vocabulary used by MinimalGame
-        // Note: We access defaultVerbs directly as MinimalGame isn't customizable here.
+        // Note: We access defaultVerbs directly as MinimalGame isn’t customizable here.
         let defaultGameVocabulary = Vocabulary.build()
         let synonyms = defaultGameVocabulary.verbSynonyms
         
         // --- Turn Off ---
-        #expect(synonyms["turn off"] == [.turnOff], "Primary 'turn off' should map to itself")
-        #expect(synonyms["extinguish"] == [.turnOff], "'extinguish' should map to 'turn off'")
-        #expect(synonyms["douse"] == [.turnOff], "'douse' should map to 'turn off'")
-        #expect(synonyms["switch off"] == [.turnOff], "'switch off' should map to 'turn off'")
-        #expect(synonyms["blow out"] == [.turnOff], "'blow out' should map to 'turn off'")
+        #expect(synonyms["turn off"] == [.turnOff], "Primary ’turn off' should map to itself")
+        #expect(synonyms["extinguish"] == [.turnOff], "'extinguish' should map to ’turn off'")
+        #expect(synonyms["douse"] == [.turnOff], "'douse' should map to ’turn off'")
+        #expect(synonyms["switch off"] == [.turnOff], "'switch off' should map to ’turn off'")
+        #expect(synonyms["blow out"] == [.turnOff], "'blow out' should map to ’turn off'")
         
         // --- Turn On ---
-        #expect(synonyms["turn on"] == [.turnOn], "Primary 'turn on' should map to itself")
-        #expect(synonyms["light"] == [.turnOn], "'light' should map to 'turn on'")
-        #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to 'turn on'")
+        #expect(synonyms["turn on"] == [.turnOn], "Primary ’turn on' should map to itself")
+        #expect(synonyms["light"] == [.turnOn], "'light' should map to ’turn on'")
+        #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to ’turn on'")
         
         // --- Other samples ---
         #expect(synonyms["look"] == [.look], "Primary 'look' should map to itself")

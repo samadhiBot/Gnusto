@@ -128,7 +128,7 @@ struct LocationTests {
             .isOutside: true,
         ])
 
-        location.attributes[.inherentlyLit] = false // Set back to false, don't remove the key
+        location.attributes[.inherentlyLit] = false // Set back to false, don’t remove the key
         #expect(!location.hasFlag(.inherentlyLit))
         #expect(location.hasFlag(.isOutside))
         #expect(location.attributes == [

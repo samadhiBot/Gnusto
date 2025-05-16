@@ -12,7 +12,7 @@ struct LookActionHandlerTests {
         itemID: ItemID,
         initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
-        // Only expect a change if .isTouched wasn't already true
+        // Only expect a change if .isTouched wasn’t already true
         guard initialAttributes[.isTouched] != true else { return [] }
 
         return [
@@ -457,7 +457,7 @@ struct LookActionHandlerTests {
             .name("chipped stone"),
             .description("A worn stone."),
             .in(.location(.startRoom)),
-            .firstDescription("This shouldn't appear."),
+            .firstDescription("This shouldn’t appear."),
             .isTouched
         )
         let initialAttributes = item.attributes
@@ -788,7 +788,7 @@ struct LookActionHandlerTests {
 
         // Assert Output (Error message)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert Final State (Item remains untouched and where it was)
         let finalItemState = try await engine.item("artifact")
@@ -924,7 +924,7 @@ struct LookActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -949,7 +949,7 @@ struct LookActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

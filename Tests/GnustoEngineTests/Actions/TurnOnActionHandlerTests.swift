@@ -142,7 +142,7 @@ struct TurnOnActionHandlerTests {
             )
         }
 
-        // Verify item state didn't change unexpectedly - should NOT be touched if validation fails
+        // Verify item state didn’t change unexpectedly - should NOT be touched if validation fails
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == true) // Should still be on
         #expect(finalItemState.hasFlag(.isTouched) == false) // Should NOT be touched
@@ -174,7 +174,7 @@ struct TurnOnActionHandlerTests {
         )
 
         // Act & Assert
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't turn that on.")) {
+        await #expect(throws: ActionResponse.prerequisiteNotMet("You can’t turn that on.")) {
             try await handler.validate(
                 context: ActionContext(
                     command: command,

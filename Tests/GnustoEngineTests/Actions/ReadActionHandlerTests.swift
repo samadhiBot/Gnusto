@@ -476,7 +476,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 
     @Test("Read non-readable item")
@@ -506,7 +506,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "The plain rock isn't something you can read.")
+        expectNoDifference(output, "The plain rock isn’t something you can read.")
     }
 
     @Test("Read item in dark room")
@@ -521,7 +521,7 @@ struct ReadActionHandlerTests {
             id: "scroll",
             .name("ancient scroll"),
             .in(.location(darkRoom.id)),
-            .readText("Can't read this."),
+            .readText("Can’t read this."),
             .isReadable
         )
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
@@ -740,9 +740,9 @@ struct ReadActionHandlerTests {
         // Act & Assert
         await engine.execute(command: command)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
-        // Also assert the item wasn't touched
+        // Also assert the item wasn’t touched
         let finalSecretState = try await engine.item("secret")
         #expect(finalSecretState.hasFlag(.isTouched) == false)
     }

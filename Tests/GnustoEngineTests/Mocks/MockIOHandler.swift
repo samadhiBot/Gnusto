@@ -1,10 +1,9 @@
 import Foundation
-import Testing
+import Markdown
 
 @testable import GnustoEngine
 
 /// A mock implementation of the `IOHandler` protocol for testing purposes.
-/// This actor runs on the dedicated IOActor.
 @MainActor
 final class MockIOHandler: IOHandler {
     // --- Recorded Output ---
@@ -47,16 +46,15 @@ final class MockIOHandler: IOHandler {
 
     // --- IOHandler Conformance ---
 
-    func print(_ text: String, style: TextStyle, newline: Bool) {
-        let call = OutputCall(text: text, style: style, newline: newline)
+    func print(_ markdown: String, style: TextStyle, newline: Bool) {
+        let formatted = Document(parsing: markdown)
+            .format()
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let call = OutputCall(text: formatted, style: style, newline: newline)
         recordedOutput.append(call)
         // Optionally print to console during tests for debugging
         // Swift.print("[MockIO] Print: \(text), Style: \(style), Newline: \(newline)")
     }
-
-    // Default implementations provided by protocol extension handle:
-    // func print(_ text: String)
-    // func print(_ text: String, style: TextStyle)
 
     func showStatusLine(roomName: String, score: Int, turns: Int) {
         recordedStatusLines.append((roomName: roomName, score: score, turns: turns))

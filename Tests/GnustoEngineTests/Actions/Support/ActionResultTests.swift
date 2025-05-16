@@ -88,9 +88,9 @@ struct ActionResultTests {
 
     @Test("ActionResult Initialization - Defaults")
     func testActionResultDefaultInitialization() {
-        let result = ActionResult("You can't do that.")
+        let result = ActionResult("You can’t do that.")
 
-        #expect(result.message == "You can't do that.")
+        #expect(result.message == "You can’t do that.")
         #expect(result.stateChanges.isEmpty == true)
         #expect(result.sideEffects.isEmpty == true)
     }

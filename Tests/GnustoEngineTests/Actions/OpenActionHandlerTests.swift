@@ -189,7 +189,7 @@ struct OpenActionHandlerTests {
             id: "box",
             .in(.nowhere),
             .isOpenable
-            // Don't need .isOpen here, it's not reachable anyway
+            // Don’t need .isOpen here, it's not reachable anyway
         )
         let game = MinimalGame(items: [box])
         let mockIO = await MockIOHandler()
@@ -207,7 +207,7 @@ struct OpenActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         // Updated expected message for inaccessible items
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
@@ -242,7 +242,7 @@ struct OpenActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't open the heavy rock.")
+        expectNoDifference(output, "You can’t open the heavy rock.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
