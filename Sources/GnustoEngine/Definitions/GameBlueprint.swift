@@ -1,7 +1,7 @@
 import Foundation
 
 public protocol GameBlueprint: Sendable {
-    /// <#Description#>
+    /// The core metadata constants for the game.
     var constants: GameConstants { get }
 
     /// The complete state of the world at the start of the game.

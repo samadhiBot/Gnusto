@@ -92,6 +92,8 @@ extension GameEngine {
     /// Starts and runs the main game loop.
     public func run() async {
         await ioHandler.setup()
+        await ioHandler.print(constants.storyTitle, style: .strong)
+        await ioHandler.print("\n\(constants.introduction)\n")
 
         do {
             let startingLocationID = playerLocationID

@@ -48,6 +48,10 @@ struct GameEngineTests {
         // Verify initial location description was printed
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            Minimal Game
+            
+            Welcome to the Minimal Game!
+
             It is pitch black. You are likely to be eaten by a grue.
             > quit
             """)
@@ -97,6 +101,10 @@ struct GameEngineTests {
         // Check that the specific error message was printed
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            Minimal Game
+            
+            Welcome to the Minimal Game!
+            
             Void
             ────
             An empty void.
@@ -450,6 +458,10 @@ struct GameEngineTests {
         // Verify initial output occurred (room desc, status, prompt)
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            Minimal Game
+            
+            Welcome to the Minimal Game!
+            
             Void
             ────
             An empty void.

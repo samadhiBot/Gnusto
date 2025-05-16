@@ -1,42 +1,31 @@
-/// A protocol defining the core metadata and player-facing constants for an interactive
-/// fiction game.
+/// Defines the core metadata constants for an interactive fiction game.
 public struct GameConstants: Sendable {
     /// The full title of the game (e.g., "ZORK I: The Great Underground Empire").
-    var storyTitle: String
+    let storyTitle: String
 
-    /// An optional subtitle or headline for the game.
-    var headline: String?
+    /// Any headline, subtitle or introductory text to display at the start of the game.
+    let introduction: String
 
-    /// The release version string (e.g., "Release 52").
-    var release: String
-
-    /// The serial number string (e.g., "871125").
-    var serial: String?
+    /// The release version string (e.g., "Release 42").
+    let release: String
 
     /// The maximum achievable score in the game.
-    var maximumScore: Int
+    let maximumScore: Int
 
     /// The default message shown when the player dies.
-    var deathMessage: String
-
-    /// An optional custom opening banner (multi-line), if the game wants to override the default.
-    var openingBanner: String?
+    let deathMessage: String
 
     public init(
         storyTitle: String,
-        headline: String? = nil,
+        introduction: String,
         release: String,
-        serial: String? = nil,
         maximumScore: Int,
-        deathMessage: String = "You have lost.",
-        openingBanner: String? = nil
+        deathMessage: String = "You have lost."
     ) {
         self.storyTitle = storyTitle
-        self.headline = headline
+        self.introduction = introduction
         self.release = release
-        self.serial = serial
         self.maximumScore = maximumScore
         self.deathMessage = deathMessage
-        self.openingBanner = openingBanner
     }
 }

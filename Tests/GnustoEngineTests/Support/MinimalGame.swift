@@ -1,6 +1,12 @@
 @testable import GnustoEngine
 
 struct MinimalGame: GameBlueprint {
+    let constants = GameConstants(
+        storyTitle: "Minimal Game",
+        introduction: "Welcome to the Minimal Game!",
+        release: "0.0.1",
+        maximumScore: 10
+    )
     var state: GameState
     var definitionRegistry: DefinitionRegistry
     var dynamicAttributeRegistry: DynamicAttributeRegistry
