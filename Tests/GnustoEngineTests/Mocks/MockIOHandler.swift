@@ -1,6 +1,7 @@
 import Foundation
-@testable import GnustoEngine
 import Testing
+
+@testable import GnustoEngine
 
 /// A mock implementation of the `IOHandler` protocol for testing purposes.
 /// This actor runs on the dedicated IOActor.
@@ -107,7 +108,7 @@ final class MockIOHandler: IOHandler {
         var actualTranscript = ""
         for call in recordedOutput {
             if call.style == .input && call.text == "> " && !call.newline {
-                actualTranscript += ">"
+                actualTranscript += "\n>"
                 if commandIndex < inputQueue.count {
                     if let command = inputQueue[commandIndex] {
                         actualTranscript += " \(command)"
