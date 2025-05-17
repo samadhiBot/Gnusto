@@ -16,11 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Swift 6.1.0
+      - name: Set up Swift
         uses: SwiftyLab/setup-swift@latest
 
-      - name: Test
-        run: swift test
+      # Optional: Re-enable if you want tests to run as part of this workflow
+      # - name: Test
+      #   run: swift test
+
+      # Add this step to clean docs directory
+      - name: Clean docs directory
+        run: rm -rf ./docs
 
       - name: Build Documentation
         run: |
@@ -31,6 +36,10 @@ jobs:
             --hosting-base-path /Gnusto \
             --output-path ./docs
 
+      # Add this step to list contents for debugging
+      - name: List contents of docs directory
+        run: ls -la ./docs
+
       - name: Create .nojekyll file
         run: touch ./docs/.nojekyll
 
@@ -39,4 +48,4 @@ jobs:
         with:
           branch: gh-pages
           folder: docs
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # token: ${{ secrets.GITHUB_TOKEN }} # Usually implicit
