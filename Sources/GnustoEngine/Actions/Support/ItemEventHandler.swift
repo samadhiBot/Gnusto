@@ -8,9 +8,22 @@ import Foundation
 /// - Returns: An `ActionResult` if the handler handled the action (potentially blocking default
 ///            behavior), `nil` otherwise. The result can include state changes and a message.
 /// - Throws: Allows handlers to throw errors if needed.
-public typealias ItemActionHandler = @Sendable (GameEngine, ItemEvent) async throws -> ActionResult?
 
-/// Represents the different events that can trigger an ItemActionHandler.
+
+
+
+/// An item event handler.
+public struct ItemEventHandler: Sendable {
+    let handle: @Sendable (GameEngine, ItemEvent) async throws -> ActionResult?
+
+    public init(
+        _ handler: @Sendable @escaping (GameEngine, ItemEvent) async throws -> ActionResult?
+    ) {
+        self.handle = handler
+    }
+}
+
+/// Represents the different events that can trigger an ItemEventHandler.
 public enum ItemEvent: Sendable {
     /// Called before processing the player's command for the turn.
     /// The handler can potentially prevent the default command execution by returning an `ActionResult`.

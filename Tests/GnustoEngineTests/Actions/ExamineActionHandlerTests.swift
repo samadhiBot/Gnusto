@@ -335,7 +335,7 @@ struct ExamineActionHandlerTests {
             .in(.player)
         )
         let definitionRegistry = DefinitionRegistry(
-            itemActionHandlers: [
+            itemEventHandlers: [
                 "magicMirror": { engine, command in
                     ActionResult("You see your reflection in the magic mirror.")
                 }

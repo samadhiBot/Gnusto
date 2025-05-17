@@ -1,6 +1,6 @@
 import GnustoEngine
 
-struct OperaHouse: AreaContents {
+struct OperaHouse: AreaBlueprint {
     // MARK: - Foyer of the Opera House
 
     let foyer = Location(
@@ -89,17 +89,12 @@ struct OperaHouse: AreaContents {
         .isWearable,
         .isWorn,
     )
-}
 
-// MARK: - Location action handlers
+    // MARK: - Location event handlers
 
-extension OperaHouse {
-    static func barHandler(
-        _ engine: GameEngine,
-        _ action: LocationEvent
-    ) async throws -> ActionResult? {
+    let barHandler = LocationEventHandler { engine, event in
         guard
-            case .beforeTurn(let command) = action,
+            case .beforeTurn(let command) = event,
             await engine.playerLocationIsLit() == false
         else {
             return nil
@@ -123,15 +118,10 @@ extension OperaHouse {
             )
         }
     }
-}
 
-// MARK: - Object action handlers
+    // MARK: - Item event handlers
 
-extension OperaHouse {
-    static func cloakHandler(
-        _ engine: GameEngine,
-        _ event: ItemEvent
-    ) async throws -> ActionResult? {
+    let cloakHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -170,10 +160,7 @@ extension OperaHouse {
         return nil
     }
 
-    static func hookHandler(
-        _ engine: GameEngine,
-        _ event: ItemEvent
-    ) async throws -> ActionResult? {
+    let hookHandler = ItemEventHandler { engine, event in
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
@@ -186,10 +173,7 @@ extension OperaHouse {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    static func messageHandler(
-        _ engine: GameEngine,
-        _ event: ItemEvent
-    ) async throws -> ActionResult? {
+    let messageHandler = ItemEventHandler { engine, event in
         guard
             case .beforeTurn(let command) = event,
             [.examine, .read].contains(command.verb),

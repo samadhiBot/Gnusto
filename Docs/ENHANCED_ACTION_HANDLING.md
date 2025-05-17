@@ -11,7 +11,7 @@ This document outlines the design for enhancing the existing Gnusto engine's act
 1. **Action Handling**
 
    - `ActionHandler` protocol with `perform(command:engine:)` method
-   - `ItemActionHandler` type for item-specific actions
+   - `ItemEventHandler` type for item-specific actions
    - Well-organized action handlers for common verbs
 
 2. **State Management**

@@ -497,10 +497,13 @@ extension GameEngine {
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = playerLocationID
-        if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
+        if let locationHandler = definitionRegistry.locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if let result = try await locationHandler(self, LocationEvent.beforeTurn(command)) {
+                if let result = try await locationHandler.handle(
+                    self,
+                    LocationEvent.beforeTurn(command)
+                ) {
                     // Room handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Room handler handled everything
@@ -519,11 +522,11 @@ extension GameEngine {
 
         // 1. Check Direct Object Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[doItemID]
+           let itemHandler = definitionRegistry.itemEventHandlers[doItemID]
         {
             do {
                 // Pass the engine and the event to the handler
-                if let result = try await itemHandler(self, .beforeTurn(command)) {
+                if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Object handler handled everything
@@ -539,10 +542,10 @@ extension GameEngine {
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
            case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[ioItemID]
+           let itemHandler = definitionRegistry.itemEventHandlers[ioItemID]
         {
             do {
-                if let result = try await itemHandler(self, .beforeTurn(command)) {
+                if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Object handler handled everything
@@ -639,10 +642,10 @@ extension GameEngine {
 
         // 1. Check Direct Object AfterTurn Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[doItemID]
+           let itemHandler = definitionRegistry.itemEventHandlers[doItemID]
         {
             do {
-                if let result = try await itemHandler(self, .afterTurn(command)),
+                if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in direct object afterTurn handler: \(error, privacy: .public)")
@@ -652,10 +655,10 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = definitionRegistry.itemActionHandlers[ioItemID]
+           let itemHandler = definitionRegistry.itemEventHandlers[ioItemID]
         {
             do {
-                if let result = try await itemHandler(self, .afterTurn(command)),
+                if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in indirect object afterTurn handler: \(error, privacy: .public)")
@@ -664,10 +667,13 @@ extension GameEngine {
         }
 
         // --- Room AfterTurn Hook ---
-        if let locationHandler = definitionRegistry.locationActionHandlers[currentLocationID] {
+        if let locationHandler = definitionRegistry.locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                if let result = try await locationHandler(self, LocationEvent.afterTurn(command)),
+                if let result = try await locationHandler.handle(
+                    self,
+                    LocationEvent.afterTurn(command)
+                ),
                    try await processActionResult(result) { return }
             } catch {
                 logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")

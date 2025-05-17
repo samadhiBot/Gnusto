@@ -22,7 +22,7 @@ struct SmellActionHandler: ActionHandler {
                 return ActionResult("You can't smell that.")
             }
             // If smelling a specific item, give a generic response.
-            // Specific items could be handled by ItemActionHandler or custom handlers.
+            // Specific items could be handled by ItemEventHandler or custom handlers.
             return ActionResult("That smells about average.")
         } else {
             return ActionResult("You smell nothing unusual.")

@@ -14,24 +14,24 @@ public struct DefinitionRegistry: Sendable {
     let customActionHandlers: [VerbID: ActionHandler]
 
     /// Handlers triggered when an action targets a specific item ID.
-    let itemActionHandlers: [ItemID: ItemActionHandler]
+    let itemEventHandlers: [ItemID: ItemEventHandler]
 
     /// Handlers triggered by events occurring within a specific location ID.
-    let locationActionHandlers: [LocationID: LocationActionHandler]
+    let locationEventHandlers: [LocationID: LocationEventHandler]
 
     /// Initializes the registry with definitions and handlers.
     /// - Parameters:
     ///   - fuseDefinitions: An array of `FuseDefinition`s.
     ///   - daemonDefinitions: An array of `DaemonDefinition`s.
     ///   - customActionHandlers: A dictionary of verb-specific custom action handlers.
-    ///   - itemActionHandlers: A dictionary of item-specific action handlers.
-    ///   - locationActionHandlers: A dictionary of location-specific action handlers.
+    ///   - itemEventHandlers: A dictionary of item-specific action handlers.
+    ///   - locationEventHandlers: A dictionary of location-specific action handlers.
     public init(
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
         customActionHandlers: [VerbID: ActionHandler] = [:],
-        itemActionHandlers: [ItemID: ItemActionHandler] = [:],
-        locationActionHandlers: [LocationID: LocationActionHandler] = [:]
+        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
+        locationEventHandlers: [LocationID: LocationEventHandler] = [:]
     ) {
         self.fuseDefinitions = Dictionary(
             uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
@@ -40,7 +40,7 @@ public struct DefinitionRegistry: Sendable {
             uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
         )
         self.customActionHandlers = customActionHandlers
-        self.itemActionHandlers = itemActionHandlers
-        self.locationActionHandlers = locationActionHandlers
+        self.itemEventHandlers = itemEventHandlers
+        self.locationEventHandlers = locationEventHandlers
     }
 }

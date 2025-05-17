@@ -134,8 +134,8 @@ struct GameStateTests {
 
     @Test("Initialization with Multiple Areas")
     func testInitWithAreas() {
-        // Define mock AreaContents with *instance* properties
-        struct Area1: AreaContents {
+        // Define mock AreaBlueprint with *instance* properties
+        struct Area1: AreaBlueprint {
             let loc1 = Location(
                 id: "loc1",
                 .name("Area 1 Room"),
@@ -147,7 +147,7 @@ struct GameStateTests {
                 .in(.location("loc1"))
             )
         }
-        struct Area2: AreaContents {
+        struct Area2: AreaBlueprint {
             let loc2 = Location(
                 id: "loc2",
                 .name("Area 2 Room"),

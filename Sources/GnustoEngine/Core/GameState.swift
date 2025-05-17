@@ -61,7 +61,7 @@ public struct GameState: Codable, Equatable, Sendable {
     }
 
     public init(
-        areas: AreaContents.Type...,
+        areas: AreaBlueprint.Type...,
         player: Player,
         vocabulary: Vocabulary? = nil,
         activeFuses: [FuseID: Int] = [:],
@@ -75,7 +75,7 @@ public struct GameState: Codable, Equatable, Sendable {
         for areaType in areas {
             for item in areaType.items {
                 assert(!knownItems.contains(item.id), """
-                    Duplicate ItemID '\(item.id)' found across multiple AreaContents \
+                    Duplicate ItemID '\(item.id)' found across multiple AreaBlueprint \
                     types (detected in \(areaType)).
                     """)
                 knownItems.insert(item.id)
@@ -84,7 +84,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
             for location in areaType.locations {
                 assert(!knownLocations.contains(location.id), """
-                    Duplicate LocationID '\(location.id)' found across multiple AreaContents \
+                    Duplicate LocationID '\(location.id)' found across multiple AreaBlueprint \
                     types (detected in \(areaType)).
                     """)
                 knownLocations.insert(location.id)

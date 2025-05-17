@@ -15,22 +15,14 @@ struct CloakOfDarkness: GameBlueprint {
         maximumScore: 2
     )
     let definitionRegistry: DefinitionRegistry
-    let dynamicAttributeRegistry: DynamicAttributeRegistry
     var state: GameState
 
     init() {
-        definitionRegistry = DefinitionRegistry(
-            itemActionHandlers: [
-                .cloak: OperaHouse.cloakHandler,
-                .hook: OperaHouse.hookHandler,
-                .message: OperaHouse.messageHandler,
-            ],
-            locationActionHandlers: [
-                .bar: OperaHouse.barHandler,
-            ]
+        self.definitionRegistry = DefinitionRegistry(
+            itemEventHandlers: OperaHouse.itemEventHandlers,
+            locationEventHandlers: OperaHouse.locationEventHandlers
         )
-        dynamicAttributeRegistry = DynamicAttributeRegistry()
-        state = GameState(
+        self.state = GameState(
             locations: OperaHouse.locations,
             items: OperaHouse.items,
             player: Player(in: "foyer"),

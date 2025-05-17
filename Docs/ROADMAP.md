@@ -4,7 +4,7 @@
 
 ### 1.1 Handler Registration Improvements
 
-- [ ] Implement reflection-based handler discovery for `ItemActionHandler` and `LocationActionHandler`
+- [ ] Implement reflection-based handler discovery for `ItemEventHandler` and `LocationActionHandler`
   - Allow handlers to be defined as static methods in the same struct as items/locations
   - Use naming conventions (e.g., `itemID_handler`) to automatically register handlers
   - Provide compile-time validation of handler signatures

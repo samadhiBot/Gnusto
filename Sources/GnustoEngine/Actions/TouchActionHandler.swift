@@ -34,7 +34,7 @@ public struct TouchActionHandler: ActionHandler {
             stateChanges.append(addTouchedFlag)
         }
 
-        // TODO: Allow item-specific touch actions via ItemActionHandler?
+        // TODO: Allow item-specific touch actions via ItemEventHandler?
 
         // --- Create Result ---
         return ActionResult(

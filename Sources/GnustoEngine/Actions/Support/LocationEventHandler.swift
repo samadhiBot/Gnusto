@@ -8,7 +8,15 @@ import Foundation
 /// - Returns: An `ActionResult` if the handler handled the action (potentially blocking default
 ///            behavior), `nil` otherwise. The result can include state changes and a message.
 /// - Throws: Allows handlers to throw errors if needed.
-public typealias LocationActionHandler = @Sendable (GameEngine, LocationEvent) async throws -> ActionResult?
+public struct LocationEventHandler: Sendable {
+    let handle: @Sendable (GameEngine, LocationEvent) async throws -> ActionResult?
+
+    public init(
+        _ handler: @Sendable @escaping (GameEngine, LocationEvent) async throws -> ActionResult?
+    ) {
+        self.handle = handler
+    }
+}
 
 /// Represents the different events that can trigger a RoomActionHandler.
 public enum LocationEvent: Sendable {

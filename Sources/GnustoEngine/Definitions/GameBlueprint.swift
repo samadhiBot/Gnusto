@@ -27,6 +27,14 @@ public protocol GameBlueprint: Sendable {
 // MARK: - Default implementations
 
 extension GameBlueprint {
+    public var definitionRegistry: DefinitionRegistry {
+        DefinitionRegistry()
+    }
+
+    public var dynamicAttributeRegistry: DynamicAttributeRegistry {
+        DynamicAttributeRegistry()
+    }
+
     public var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool {
         { _, _ in false }
     }
