@@ -28,7 +28,7 @@ jobs:
             generate-documentation --target GnustoEngine \
             --disable-indexing \
             --transform-for-static-hosting \
-            --hosting-base-path Gnusto \
+            --hosting-base-path /Gnusto \
             --output-path ./docs
 
       - name: Create .nojekyll file
