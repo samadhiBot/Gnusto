@@ -21,7 +21,7 @@ struct CloseActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -85,7 +85,7 @@ struct CloseActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -117,7 +117,7 @@ struct CloseActionHandlerTests {
         )
         let game = MinimalGame(items: [rock])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -152,7 +152,7 @@ struct CloseActionHandlerTests {
         )
         let game = MinimalGame(items: [box])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -180,7 +180,7 @@ struct CloseActionHandlerTests {
     func testCloseFailsWithNoObject() async throws {
         let game = MinimalGame()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )

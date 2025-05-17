@@ -22,7 +22,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -71,7 +71,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -120,7 +120,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -162,7 +162,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -204,7 +204,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -251,7 +251,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -295,7 +295,7 @@ struct TurnOnActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )

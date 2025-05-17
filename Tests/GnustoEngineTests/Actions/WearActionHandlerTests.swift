@@ -21,7 +21,7 @@ struct WearActionHandlerTests {
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -72,7 +72,7 @@ struct WearActionHandlerTests {
     func testWearItemNotHeld() async throws {
         let game = MinimalGame()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -105,7 +105,7 @@ struct WearActionHandlerTests {
         )
         let game = MinimalGame(items: [rock])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -140,7 +140,7 @@ struct WearActionHandlerTests {
         )
         let game = MinimalGame(items: [cloak])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -167,7 +167,7 @@ struct WearActionHandlerTests {
     func testWearNoObject() async throws {
         let game = MinimalGame()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )

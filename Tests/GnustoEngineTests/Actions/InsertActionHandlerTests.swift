@@ -56,7 +56,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -114,7 +114,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -151,7 +151,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -196,7 +196,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -242,7 +242,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -286,7 +286,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -330,7 +330,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -368,7 +368,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -414,7 +414,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -470,7 +470,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [coin, box, existingItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
         let itemsInside = await engine.items(in: .item("fullBox"))
@@ -527,7 +527,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [initialCoin, initialBox, existingItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Initial state check - Calculate manually
         let itemsInsideInitial = await engine.items(in: .item("exactBox"))
@@ -593,7 +593,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -651,7 +651,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room], items: [container])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -704,7 +704,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room1, room2], items: [itemToInsert, container])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -749,7 +749,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room], items: [itemToInsert, target])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -796,7 +796,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -854,7 +854,7 @@ struct InsertActionHandlerTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -905,7 +905,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(locations: [room], items: [itemToInsert, container])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
@@ -955,7 +955,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [outerBox, innerBox, coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
         return (engine, mockIO)
     }
 
@@ -1055,7 +1055,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [bag])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(
@@ -1104,7 +1104,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [boxA, boxB])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
             verb: .insert,
@@ -1165,7 +1165,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [boxA, boxB, boxC])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         let command = Command(
             verb: .insert,
@@ -1212,7 +1212,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
         )
         let game = MinimalGame(items: [coin, box])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1248,7 +1248,7 @@ struct InsertActionHandlerTests {
             .isOpen,
         )
         let game = MinimalGame(items: [coin, box])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1281,7 +1281,7 @@ struct InsertActionHandlerTests {
             .in(.location(.startRoom)),
         )
         let game = MinimalGame(items: [coin, statue])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1316,7 +1316,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
         )
         let game = MinimalGame(items: [coin, box])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1354,7 +1354,7 @@ struct InsertActionHandlerTests {
             .capacity(5)
         )
         let game = MinimalGame(items: [boulder, box])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("boulder"),
@@ -1386,7 +1386,7 @@ struct InsertActionHandlerTests {
         )
         let game = MinimalGame(items: [bag])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -1439,7 +1439,7 @@ struct InsertActionHandlerTests {
 
         let game = MinimalGame(items: [boxA, boxB])
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -1490,7 +1490,7 @@ struct InsertActionHandlerTests {
         let game = MinimalGame(items: [trophy, box])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
         #expect(await engine.gameState.changeHistory.isEmpty == true)
 
         let command = Command(

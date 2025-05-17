@@ -8,6 +8,9 @@ struct MinimalGame: GameBlueprint {
         maximumScore: 10
     )
     var state: GameState
+    var customActionHandlers: [VerbID: ActionHandler]
+    var itemEventHandlers: [ItemID: ItemEventHandler]
+    var locationEventHandlers: [LocationID: LocationEventHandler]
     var definitionRegistry: DefinitionRegistry
     var dynamicAttributeRegistry: DynamicAttributeRegistry
 
@@ -16,11 +19,17 @@ struct MinimalGame: GameBlueprint {
         locations: [Location]? = nil,
         items: [Item]? = nil,
         globalState: [GlobalID: StateValue]? = nil,
+        customActionHandlers: [VerbID: ActionHandler] = [:],
+        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
+        locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
+        self.customActionHandlers = customActionHandlers
         self.definitionRegistry = definitionRegistry
         self.dynamicAttributeRegistry = dynamicAttributeRegistry
+        self.itemEventHandlers = itemEventHandlers
+        self.locationEventHandlers = locationEventHandlers
 
         let gameLocations = locations ?? [
             Location(
@@ -48,7 +57,7 @@ struct MinimalGame: GameBlueprint {
 
         // Build vocabulary including verbs from custom handlers
         var customVerbs: [Verb] = []
-        for verbID in definitionRegistry.customActionHandlers.keys {
+        for verbID in customActionHandlers.keys {
             // Create a basic definition; requiresLight=false is a safe default for tests
             let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
             customVerbs.append(verbDef)

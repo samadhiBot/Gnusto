@@ -17,7 +17,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -58,7 +58,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -109,7 +109,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -163,7 +163,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -210,7 +210,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -236,7 +236,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -281,7 +281,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -308,7 +308,7 @@ struct ExamineActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -334,21 +334,18 @@ struct ExamineActionHandlerTests {
             .description("A dusty old mirror."),
             .in(.player)
         )
-        let definitionRegistry = DefinitionRegistry(
+        let game = MinimalGame(
+            items: [item],
             itemEventHandlers: [
-                "magicMirror": { engine, command in
+                "magicMirror": ItemEventHandler { engine, command in
                     ActionResult("You see your reflection in the magic mirror.")
                 }
             ]
         )
-        let game = MinimalGame(
-            items: [item],
-            definitionRegistry: definitionRegistry
-        )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )

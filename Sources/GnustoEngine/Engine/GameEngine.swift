@@ -30,6 +30,12 @@ public actor GameEngine: Sendable {
     /// Registered handlers for specific verb commands.
     private var actionHandlers = [VerbID: ActionHandler]()
 
+    /// Handlers triggered when an action targets a specific item ID.
+    var itemEventHandlers: [ItemID: ItemEventHandler]
+
+    /// Handlers triggered by events occurring within a specific location ID.
+    var locationEventHandlers: [LocationID: LocationEventHandler]
+
     /// A logger used for unhandled error warnings.
     let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
 
@@ -61,24 +67,26 @@ public actor GameEngine: Sendable {
     /// Creates a new `GameEngine` instance from a game definition.
     ///
     /// - Parameters:
-    ///   - game: The game definition.
+    ///   - blueprint: The game definition.
     ///   - parser: The command parser.
     ///   - ioHandler: The I/O handler for player interaction.
     public init(
-        game: GameBlueprint,
+        blueprint: GameBlueprint,
         parser: Parser,
         ioHandler: IOHandler
     ) async {
-        self.constants = game.constants
-        self.gameState = game.state
+        self.constants = blueprint.constants
+        self.gameState = blueprint.state
         self.parser = parser
         self.ioHandler = ioHandler
-        self.definitionRegistry = game.definitionRegistry
-        self.dynamicAttributeRegistry = game.dynamicAttributeRegistry
-        self.actionHandlers = game.definitionRegistry.customActionHandlers
+        self.definitionRegistry = blueprint.definitionRegistry
+        self.dynamicAttributeRegistry = blueprint.dynamicAttributeRegistry
+        self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
-        self.onEnterRoom = game.onEnterRoom
-        self.beforeTurn = game.beforeTurn
+        self.itemEventHandlers = blueprint.itemEventHandlers
+        self.locationEventHandlers = blueprint.locationEventHandlers
+        self.onEnterRoom = blueprint.onEnterRoom
+        self.beforeTurn = blueprint.beforeTurn
 
         #if DEBUG
         self.actionHandlers[.debug] = DebugActionHandler()
@@ -497,7 +505,7 @@ extension GameEngine {
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = playerLocationID
-        if let locationHandler = definitionRegistry.locationEventHandlers[currentLocationID] {
+        if let locationHandler = locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax
                 if let result = try await locationHandler.handle(
@@ -522,7 +530,7 @@ extension GameEngine {
 
         // 1. Check Direct Object Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = definitionRegistry.itemEventHandlers[doItemID]
+           let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 // Pass the engine and the event to the handler
@@ -542,7 +550,7 @@ extension GameEngine {
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
            case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = definitionRegistry.itemEventHandlers[ioItemID]
+           let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
@@ -642,7 +650,7 @@ extension GameEngine {
 
         // 1. Check Direct Object AfterTurn Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = definitionRegistry.itemEventHandlers[doItemID]
+           let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
@@ -655,7 +663,7 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = definitionRegistry.itemEventHandlers[ioItemID]
+           let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
@@ -667,7 +675,7 @@ extension GameEngine {
         }
 
         // --- Room AfterTurn Hook ---
-        if let locationHandler = definitionRegistry.locationEventHandlers[currentLocationID] {
+        if let locationHandler = locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
                 if let result = try await locationHandler.handle(

@@ -33,7 +33,7 @@
 //        )
 //
 //        return await GameEngine(
-//            game: blueprint,
+//            blueprint: blueprint,
 //            parser: MockParser(),
 //            ioHandler: ioHandler
 //        )
@@ -63,7 +63,7 @@
 //        )
 //        let mockIO = await MockIOHandler()
 //        let engine = await GameEngine(
-//            game: game,
+//            blueprint: game,
 //            parser: MockParser(),
 //            ioHandler: mockIO
 //        )

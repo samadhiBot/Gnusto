@@ -24,7 +24,7 @@ struct CloakOfDarknessWalkthroughTests {
             "read the message",
         )
         let engine = await GameEngine(
-            game: CloakOfDarkness(),
+            blueprint: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -117,7 +117,7 @@ struct CloakOfDarknessWalkthroughTests {
             "read the message",
         )
         let engine = await GameEngine(
-            game: CloakOfDarkness(),
+            blueprint: CloakOfDarkness(),
             parser: StandardParser(),
             ioHandler: mockIO
         )
