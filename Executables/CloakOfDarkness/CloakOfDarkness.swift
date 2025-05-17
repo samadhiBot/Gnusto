@@ -14,23 +14,20 @@ struct CloakOfDarkness: GameBlueprint {
         release: "0.0.3",
         maximumScore: 2
     )
-    let definitionRegistry: DefinitionRegistry
-    var state: GameState
+    
+    let definitionRegistry = DefinitionRegistry(
+        itemEventHandlers: OperaHouse.itemEventHandlers,
+        locationEventHandlers: OperaHouse.locationEventHandlers
+    )
 
-    init() {
-        self.definitionRegistry = DefinitionRegistry(
-            itemEventHandlers: OperaHouse.itemEventHandlers,
-            locationEventHandlers: OperaHouse.locationEventHandlers
-        )
-        self.state = GameState(
-            locations: OperaHouse.locations,
-            items: OperaHouse.items,
-            player: Player(in: "foyer"),
-            globalState: [
-                .barMessageDisturbances: 0
-            ]
-        )
-    }
+    var state = GameState(
+        locations: OperaHouse.locations,
+        items: OperaHouse.items,
+        player: Player(in: "foyer"),
+        globalState: [
+            .barMessageDisturbances: 0
+        ]
+    )
 }
 
 extension GlobalID {
