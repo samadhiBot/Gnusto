@@ -20,8 +20,8 @@ extension GameEngine {
                 )
             } catch {
                 logger.warning("""
-                    💥 Failed to apply .setFlag change for '\(id.rawValue, privacy: .public)': \
-                    \(error, privacy: .public)
+                    💥 Failed to apply .setFlag change for '\(id.rawValue)': \
+                    \(error)
                     """)
             }
         }
@@ -47,7 +47,7 @@ extension GameEngine {
             } catch {
                 logger.warning("""
                     💥 Failed to apply .clearFlag change for \
-                    '\(id.rawValue, privacy: .public)': \(error, privacy: .public)
+                    '\(id.rawValue)': \(error)
                     """)
             }
         }
@@ -74,8 +74,8 @@ extension GameEngine {
                 )
             } catch {
                 logger.warning("""
-                    💥 Failed to apply pronoun change for '\(pronoun, privacy: .public)': \
-                    \(error, privacy: .public)
+                    💥 Failed to apply pronoun change for '\(pronoun)': \
+                    \(error)
                     """)
             }
         }
@@ -105,8 +105,8 @@ extension GameEngine {
             }
 //             guard item(containerID) != nil else {
 //                 logger.warning("""
-//                    💥 Cannot move item '\(itemID.rawValue, privacy: .public)' into \
-//                    non-existent container '\(containerID.rawValue, privacy: .public)'.
+//                    💥 Cannot move item '\(itemID.rawValue)' into \
+//                    non-existent container '\(containerID.rawValue)'.
 //                    """)
 //                return
 //            }
@@ -129,8 +129,8 @@ extension GameEngine {
 //                )
 //            } catch {
 //                logger.warning("""
-//                    💥 Failed to apply item move for '\(itemID.rawValue, privacy: .public)': \
-//                    \(error, privacy: .public)
+//                    💥 Failed to apply item move for '\(itemID.rawValue)': \
+//                    \(error)
 //                    """)
 //            }
 //        }
@@ -167,7 +167,7 @@ extension GameEngine {
             } catch {
                 logger.warning("""
                     💥 Failed to apply player move to \
-                    '\(newLocationID.rawValue, privacy: .public)': \(error, privacy: .public)
+                    '\(newLocationID.rawValue)': \(error)
                     """)
             }
         }
@@ -223,7 +223,7 @@ extension GameEngine {
             } catch {
                 logger.warning("""
                     💥 Failed to apply game specific state change for key \
-                    '\(key.rawValue, privacy: .public)': \(error, privacy: .public)
+                    '\(key.rawValue)': \(error)
                     """)
             }
         }

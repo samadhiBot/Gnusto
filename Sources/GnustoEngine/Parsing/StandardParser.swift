@@ -1,5 +1,5 @@
 import Foundation
-import OSLog
+import Logging
 
 /// A standard implementation of the Parser protocol.
 /// Aims to replicate common ZIL parser behaviors.
@@ -7,7 +7,7 @@ public struct StandardParser: Parser {
     public init() {}
 
     /// A logger used for unhandled error warnings.
-    let logger = Logger(subsystem: "GnustoEngine", category: "StandardParser")
+    let logger = Logger(label: "com.samadhibot.Gnusto.StandardParser")
 
     /// Parses a raw input string into a structured `Command`.
     ///

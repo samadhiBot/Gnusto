@@ -1,5 +1,5 @@
 import Foundation
-import OSLog
+import Logging
 
 /// The main orchestrator for the interactive fiction game.
 /// This actor manages the game state, handles the game loop, interacts with the parser
@@ -37,7 +37,7 @@ public actor GameEngine: Sendable {
     var locationEventHandlers: [LocationID: LocationEventHandler]
 
     /// A logger used for unhandled error warnings.
-    let logger = Logger(subsystem: "GnustoEngine", category: "GameEngine")
+    let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
     /// The maximum line length for description formatting.
     /// TODO: Make this configurable via init or GameBlueprint?
@@ -111,7 +111,7 @@ extension GameEngine {
             }
             try await describeCurrentLocation()
         } catch {
-            logger.error("💥 \(error, privacy: .public)")
+            logger.error("💥 \(error)")
         }
 
         while !shouldQuit {
@@ -119,7 +119,7 @@ extension GameEngine {
             do {
                 try await processTurn()
             } catch {
-                logger.error("💥 \(error, privacy: .public)")
+                logger.error("💥 \(error)")
             }
         }
 
@@ -298,9 +298,9 @@ extension GameEngine {
         // Log detailed errors separately
         switch response {
         case .internalEngineError(let msg):
-            logger.error("💥 ActionResponse: Internal Engine Error: \(msg, privacy: .public)")
+            logger.error("💥 ActionResponse: Internal Engine Error: \(msg)")
         case .invalidValue(let msg):
-            logger.error("💥 ActionResponse: Invalid Value: \(msg, privacy: .public)")
+            logger.error("💥 ActionResponse: Invalid Value: \(msg)")
         case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
             // Construct the log string first
             let logDetail = """
@@ -309,7 +309,7 @@ extension GameEngine {
                     - Expected Old Value: \(String(describing: change.oldValue))
                     - Actual Old Value: \(String(describing: actualOldValue))
                 """
-            logger.error("💥 ActionResponse: \(logDetail, privacy: .public)")
+            logger.error("💥 ActionResponse: \(logDetail)")
         default:
             break // No detailed logging needed for other handled errors
         }
@@ -341,7 +341,7 @@ extension GameEngine {
         }
         await ioHandler.print(message)
         if case .internalError(let details) = parseError {
-            logger.error("💥 ParseError: \(details, privacy: .public)")
+            logger.error("💥 ParseError: \(details)")
         }
     }
 
@@ -519,7 +519,7 @@ extension GameEngine {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                logger.warning("💥 Error in room beforeTurn handler: \(error, privacy: .public)")
+                logger.warning("💥 Error in room beforeTurn handler: \(error)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -574,7 +574,7 @@ extension GameEngine {
             } else {
                 logger.warning("""
                     💥 An unexpected error occurred in an object handler: \
-                    \(response, privacy: .public)
+                    \(response)
                     """)
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
@@ -590,7 +590,7 @@ extension GameEngine {
                 // This case should ideally not be reached if parser validates verbs
                 logger.warning("""
                     💥 Internal Error: Unknown verb ID \
-                    '\(command.verb.rawValue, privacy: .public)' reached execution. \
+                    '\(command.verb.rawValue)' reached execution. \
                     If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
                     """)
@@ -607,7 +607,7 @@ extension GameEngine {
                     // No handler registered for this verb (should match vocabulary definition)
                     logger.warning("""
                         💥 Internal Error: No ActionHandler registered for verb ID \
-                        '\(command.verb.rawValue, privacy: .public)'.
+                        '\(command.verb.rawValue)'.
                         """)
                     await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
                     return
@@ -656,7 +656,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in direct object afterTurn handler: \(error, privacy: .public)")
+                logger.warning("💥 Error in direct object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -669,7 +669,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in indirect object afterTurn handler: \(error, privacy: .public)")
+                logger.warning("💥 Error in indirect object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -684,7 +684,7 @@ extension GameEngine {
                 ),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in room afterTurn handler: \(error, privacy: .public)")
+                logger.warning("💥 Error in room afterTurn handler: \(error)")
             }
             // Check if handler quit the game
             if shouldQuit { return }
@@ -705,8 +705,8 @@ extension GameEngine {
             } catch {
                 logger.error("""
                     💥 Failed to apply state change during processActionResult:
-                       - \(error, privacy: .public)
-                       - Change: \(String(describing: change), privacy: .public)
+                       - \(error)
+                       - Change: \(String(describing: change))
                     """)
                 throw error // Re-throw the error to be caught by execute()
             }
