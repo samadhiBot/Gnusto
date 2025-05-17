@@ -9,36 +9,24 @@ public struct ConsoleIOHandler: IOHandler {
     // --- Output Methods ---
 
     public func print(_ markdown: String, style: TextStyle, newline: Bool) {
-        Swift.print(MarkdownParser.parse(markdown), terminator: newline ? "\n" : "")
+        Swift.print(MarkdownParser.parse(markdown), terminator: newline ? "\n\n" : "")
         fflush(stdout)
     }
 
     public func showStatusLine(roomName: String, score: Int, turns: Int) {
-        let width = 70
-        let scoreCol = 40
+        let width = 64
+        let scoreCol = 42
 
-        // Truncate room name if too long
         let maxRoomLen = scoreCol - 2
-        let displayRoom = roomName.count > maxRoomLen
-        ? roomName.prefix(maxRoomLen - 1) + "…"
-        : roomName
-
+        let displayRoom = roomName.count > maxRoomLen ?
+                          roomName.prefix(maxRoomLen - 1) + "…" : roomName
         let scoreStr = "Score: \(score)"
         let turnsStr = "Turns: \(turns)"
+        let leftGap = displayRoom.padding(toLength: scoreCol, withPad: " ", startingAt: 0)
+        let rightPartLen = width - (leftGap.count + scoreStr.count)
+        let rightGap = String(repeating: " ", count: max(1, rightPartLen - turnsStr.count))
 
-        // Compose left part (room name, padded to scoreCol)
-        let leftPart = displayRoom.padding(toLength: scoreCol, withPad: " ", startingAt: 0)
-        // Compose right part (turns, right-aligned)
-        let rightPartLen = width - (leftPart.count + scoreStr.count)
-        let rightPart = String(repeating: " ", count: max(1, rightPartLen - turnsStr.count)) + turnsStr
-
-        // Final line
-        let line = leftPart + scoreStr + rightPart
-
-        // Separator
-        let separator = String(repeating: "─", count: width)
-
-        Swift.print("\n\(line)\n\(separator)")
+        Swift.print("❲ \(leftGap)\(scoreStr)\(rightGap)\(turnsStr) ❳")
         fflush(stdout)
     }
 

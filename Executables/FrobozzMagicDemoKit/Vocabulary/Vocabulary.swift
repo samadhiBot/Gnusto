@@ -1,5 +1,4 @@
 import GnustoEngine
-import Foundation // For print
 
 /// Defines the verbs used *specifically* by the Frobozz Magic Demo Kit game.
 /// Common verbs (look, go, inventory, quit, wait, etc.) are provided by the engine's default vocabulary.

@@ -7,5 +7,6 @@ enum MarkdownParser {
             .children
             .map { $0.format() }
             .joined(separator: "\n")
+            .replacing(/\n\n\n+/, with: "\n\n")
     }
 }
