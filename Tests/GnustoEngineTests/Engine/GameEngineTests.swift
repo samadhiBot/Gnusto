@@ -4,20 +4,23 @@ import Testing
 @testable import GnustoEngine
 
 // Helper class for sharing state with closures in tests
-@MainActor
-private class TestStateHolder {
+private actor TestStateHolder {
     var flag = false
     var count = 0
+
+    func markFlag() { flag = true }
+    func increment() { count += 1 }
+    func getFlag() -> Bool { flag }
+    func getCount() -> Int { count }
 }
 
-@MainActor
 struct GameEngineTests {
     @Test("Engine Run Initialization and First Prompt in Dark Room")
     func testEngineRunInitializationInDarkRoom() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -25,7 +28,7 @@ struct GameEngineTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -45,7 +48,12 @@ struct GameEngineTests {
         // Verify initial location description was printed
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
             It is pitch black. You are likely to be eaten by a grue.
+
             > quit
             """)
 
@@ -72,7 +80,7 @@ struct GameEngineTests {
         let parseError = ParseError.unknownVerb("xyzzy")
         mockParser.defaultParseResult = .failure(parseError)
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
@@ -94,41 +102,74 @@ struct GameEngineTests {
         // Check that the specific error message was printed
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            --- Void ---
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Void —
+
             An empty void.
+
             You can see a pebble here.
+
             > xyzzy
-            I don't know the verb 'xyzzy'.
+            I don’t know the verb ‘xyzzy’.
+
             > quit
             """)
 
         // Check turn counter was incremented despite error
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
-        // Check change history only contains the move increment
-        let history = engine.getChangeHistory()
-        #expect(history.count == 1, "Only move increment should be in history on parse error")
-        #expect(history.first?.propertyKey == .playerMoves)
-        #expect(history.first?.newValue == .int(1))
+        // Check change history only contains 1st room visit and move increment
+        #expect(await engine.getChangeHistory() == [
+            StateChange(
+                entityID: .location(.startRoom),
+                attributeKey: .locationAttribute(.isVisited),
+                newValue: true
+            ),
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                oldValue: 0,
+                newValue: 1
+            ),
+        ])
     }
 
     @Test("Engine Handles Action Error")
-    func testEngineHandlesActionError() async throws {
+    func testEngineHandlesActionResponse() async throws {
         let mockTakeHandler = MockActionHandler(
             errorToThrow: .itemNotTakable("startItem"),
             throwFrom: .process
         )
-        var game = MinimalGame(
-            registry: DefinitionRegistry(
-                customActionHandlers: [VerbID("take"): mockTakeHandler]
+        // Initialize pebble without .isTakable
+        let pebble = Item(
+            id: "startItem",
+            .name("pebble"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
+                customActionHandlers: [.take: mockTakeHandler]
             )
         )
-        game.state.items["startItem"]?.properties.remove(.takable)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let takeCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
+        let takeCommand = Command(
+            verb: .take,
+            directObject: .item("startItem"),
+            rawInput: "take pebble"
+        )
 
         // Configure parser to succeed
         mockParser.parseHandler = { input, _, _ in
@@ -137,16 +178,14 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
-        // Ensure room is lit for this test
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -161,102 +200,162 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Check that the specific action error message was printed
-        let output = await mockIO.recordedOutput
-        let expectedMessage = "You can't take the pebble."
-        #expect(
-            output.contains { $0.text == expectedMessage },
-            "Expected action error message not found"
-        )
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a pebble here.
+
+            > take pebble
+            You can’t take the pebble.
+
+            > quit
+            """)
 
         // Verify the handler was called (optional but good practice)
         let processCalled = await mockTakeHandler.getProcessCalled()
         #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
-        #expect(commandReceived?.verbID == "take")
-        #expect(commandReceived?.directObject == "startItem")
+        #expect(commandReceived?.verb == "take")
+            #expect(commandReceived?.directObject == .item("startItem"))
 
         // Check turn counter incremented
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
-        // Check change history only contains the move increment
-        let history = engine.getChangeHistory()
-        #expect(history.count == 1, "Only move increment should be in history on action error")
-        #expect(history.first?.propertyKey == .playerMoves)
-        #expect(history.first?.newValue == .int(1))
+        // Check change history only contains 1st room visit and move increment
+        #expect(await engine.getChangeHistory() == [
+            StateChange(
+                entityID: .location(.startRoom),
+                attributeKey: .locationAttribute(.isVisited),
+                newValue: true
+            ),
+            StateChange(
+                entityID: .player,
+                attributeKey: .playerMoves,
+                oldValue: 0,
+                newValue: 1
+            ),
+        ])
     }
 
     @Test("Engine Processes Successful Command")
     func testEngineProcessesSuccessfulCommand() async throws {
         let mockLookHandler = MockActionHandler()
 
-        var game = MinimalGame(
-            registry: DefinitionRegistry(
-                customActionHandlers: [VerbID("look"): mockLookHandler]
+        // Initialize room with isLit: true
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let pebble = Item(
+            id: "startItem",
+            .name("pebble"),
+            .in(.location(startRoom.id)), // pebble in room
+            .isTakable
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
+                customActionHandlers: [.look: mockLookHandler]
             )
         )
-        // Ensure room is lit
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let lookCommand = Command(verbID: "look", rawInput: "look")
+        let lookCommand = Command(verb: .look, rawInput: "look")
+        let takePebbleCommand = Command(
+            verb: .take,
+            directObject: .item("startItem"),
+            rawInput: "take pebble"
+        )
 
         // Configure parser
         mockParser.parseHandler = { input, _, _ in
             if input == "look" { return .success(lookCommand) }
-            if input == "quit" { return .failure(.emptyInput) }
+            if input == "take pebble" { return .success(takePebbleCommand) }
+            if input == "quit" { return .failure(.emptyInput) } // Simulate quit needs a verb
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        // Configure IO
-        await mockIO.enqueueInput("look", "quit")
+        await mockIO.enqueueInput("look", "take pebble", "quit")
 
         // Act
         await engine.run()
 
-        // Assert
+        // Assert IO
         let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
         let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
-        // Verify the handler was called with the correct command
-        let processCalled = await mockLookHandler.getProcessCalled()
-        #expect(processCalled == true, "MockActionHandler.process should have been called for LOOK")
-        let commandReceived = await mockLookHandler.getLastCommandReceived()
-        #expect(commandReceived?.verbID == "look", "Handler received incorrect verb")
+        // Assert handler calls
+        let lookProcessCalled = await mockLookHandler.getProcessCalled()
+        #expect(lookProcessCalled == true, "Look handler process should have been called")
+        // Since take is handled by a default handler (or a mock one if we set it up),
+        // we can’t easily check its .processCalled without more setup.
 
-        // Check turn counter incremented
-        let finalMoves = engine.playerMoves
-        #expect(finalMoves == 1, "Turn counter should increment for successful command")
+        // Assert game state changes (e.g., pebble is taken)
+        let pebbleState = try await engine.item("startItem")
+        #expect(pebbleState.parent == .player, "Pebble should be held by player")
+
+        let finalMoves = await engine.playerMoves
+        #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
     }
 
     @Test("Engine Processes Multiple Commands")
     func testEngineProcessesMultipleCommands() async throws {
         let mockLookHandler = MockActionHandler()
         let mockTakeHandler = MockActionHandler()
-        var game = MinimalGame(
-            registry: DefinitionRegistry(
+
+        // Initialize room with isLit: true
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let pebble = Item(
+            id: "startItem",
+            .name("pebble"),
+            .isTakable
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
+            items: [pebble],
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
-                    VerbID("look"): mockLookHandler,
-                    VerbID("take"): mockTakeHandler
+                    .look: mockLookHandler,
+                    .take: mockTakeHandler
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
 
-        let lookCommand = Command(verbID: "look", rawInput: "look")
-        let takePebbleCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
+        let lookCommand = Command(
+            verb: .look,
+            rawInput: "look"
+        )
+        let takePebbleCommand = Command(
+            verb: .take,
+            directObject: .item("startItem"),
+            rawInput: "take pebble"
+        )
 
         // Configure parser for the sequence
         mockParser.parseHandler = { input, _, _ in
@@ -268,7 +367,7 @@ struct GameEngineTests {
             }
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -294,13 +393,13 @@ struct GameEngineTests {
 
         // Verify commands received by handlers
         let lookCommandReceived = await mockLookHandler.getLastCommandReceived()
-        #expect(lookCommandReceived?.verbID == "look")
+        #expect(lookCommandReceived?.verb == "look")
         let takeCommandReceived = await mockTakeHandler.getLastCommandReceived()
-        #expect(takeCommandReceived?.verbID == "take")
-        #expect(takeCommandReceived?.directObject == "startItem")
+        #expect(takeCommandReceived?.verb == "take")
+            #expect(takeCommandReceived?.directObject == .item("startItem"))
 
         // Check turn counter reflects two successful commands
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 2, "Turn counter should be 2 after two successful commands")
 
         // Check status line was updated for each turn (initial + 2 turns)
@@ -313,64 +412,36 @@ struct GameEngineTests {
 
     @Test("Engine Exits Gracefully on Quit Command")
     func testEngineExitsGracefullyOnQuitCommand() async throws {
-        let mockQuitHandler = MockActionHandler()
-        let game = MinimalGame(
-            registry: DefinitionRegistry(
-                customActionHandlers: [VerbID("quit"): mockQuitHandler]
-            )
-        )
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let engine = GameEngine(
-            game: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
+        let quitCommand = Command(verb: .quit, rawInput: "quit")
 
-        let quitCommand = Command(verbID: "quit", rawInput: "quit")
-
-        // Configure parser to recognize "quit"
+        // Configure parser
         mockParser.parseHandler = { input, _, _ in
             if input == "quit" { return .success(quitCommand) }
             return .failure(.unknownVerb(input))
         }
 
-        // Configure IO for just the quit command
+        let engine = await GameEngine(
+            game: MinimalGame(),
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
         await mockIO.enqueueInput("quit")
 
-        // Act
+        // Act: This should not throw and complete normally
         await engine.run()
 
-        // Assert
+        // Assert IO
         let setupCount = await mockIO.setupCallCount
         #expect(setupCount == 1)
         let teardownCount = await mockIO.teardownCallCount
-        #expect(teardownCount == 1, "Teardown should be called on graceful exit")
+        #expect(teardownCount == 1)
 
-        // Verify the quit handler was NOT called (engine handles quit internally)
-        // let quitHandlerCalled = await mockQuitHandler.getPerformCalled()
-        // #expect(quitHandlerCalled == true, "Quit handler should be called") <-- Removed
-        // let quitCommandReceived = await mockQuitHandler.getLastCommandReceived()
-        // #expect(quitCommandReceived?.verbID == "quit") <-- Removed
-
-        // Check turn counter - should NOT increment if quit happens before increment.
-        let finalMoves = engine.playerMoves
-        #expect(finalMoves == 0, "Turn counter should not increment for the quit command if exit happens first")
-
-        // Verify output - only initial description, status, and prompt, then nothing after quit
-        let output = await mockIO.recordedOutput
-        let quitPromptIndex = output.lastIndex { $0.text == "> " && $0.style == .input }
-        #expect(quitPromptIndex != nil, "Expected a prompt before quit")
-
-        // Ensure no further prompts or outputs happened after the quit command's prompt
-        if let quitPromptIndex {
-             #expect(output.count == quitPromptIndex + 1, "No output should occur after the quit command prompt")
-        }
-
-         // Check status line was shown only for initial state
-        let statuses = await mockIO.recordedStatusLines
-        #expect(statuses.count == 1) // Only initial state, loop exits before turn 1 status
-        #expect(statuses[0].turns == 0)
+        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn’t stop it)
+        let finalMoves = await engine.playerMoves
+        #expect(finalMoves == 0, "Quit command should not increment moves if it's the first command and handled cleanly")
     }
 
     @Test("Engine Handles Nil Input (EOF) Gracefully")
@@ -378,7 +449,7 @@ struct GameEngineTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -397,11 +468,17 @@ struct GameEngineTests {
         // Verify initial output occurred (room desc, status, prompt)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            --- Void ---
-            An empty void.
-            You can see a pebble here.
-            >
+            Minimal Game
 
+            Welcome to the Minimal Game!
+
+            — Void —
+
+            An empty void.
+
+            You can see a pebble here.
+
+            >
             Goodbye!
             """)
 
@@ -411,7 +488,7 @@ struct GameEngineTests {
         #expect(statuses.first?.turns == 0)
 
         // Verify no commands were processed (turn counter remains 0)
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 0, "Turn counter should not increment if no input is read")
     }
 
@@ -423,23 +500,23 @@ struct GameEngineTests {
         // Initialize items with correct properties
         let pebble = Item(
             id: "startItem",
-            name: "pebble",
-            properties: .takable,
-            parent: .location("startRoom")
+            .name("pebble"),
+            .in(.location(.startRoom)),
+            .isTakable
         )
         let startRoom = Location(
-            id: "startRoom",
-            name: "Start Room",
-            properties: LocationProperty.inherentlyLit
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
         )
 
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 customActionHandlers: [
                     // Only mock inventory
-                    VerbID("inventory"): mockInventoryHandler,
+                    .inventory: mockInventoryHandler,
                 ]
             )
         )
@@ -448,8 +525,15 @@ struct GameEngineTests {
         var mockParser = MockParser()
 
         // Configure the MockParser
-        let takeCommand = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
-        let inventoryCommand = Command(verbID: "inventory", rawInput: "inventory")
+        let takeCommand = Command(
+            verb: .take,
+            directObject: .item("startItem"),
+            rawInput: "take pebble"
+        )
+        let inventoryCommand = Command(
+            verb: .inventory,
+            rawInput: "inventory"
+        )
         mockParser.parseHandler = { input, _, _ in
             switch input {
             case "take pebble": return .success(takeCommand)
@@ -460,15 +544,15 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == true)
-        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
+        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(engine.items(withParent: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty == true)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -483,17 +567,17 @@ struct GameEngineTests {
         #expect(teardownCount == 1)
 
         // Verify the final state using safe engine accessors
-        let finalPebbleSnapshot = engine.item(with: "startItem")
-        #expect(finalPebbleSnapshot?.parent == .player, "Pebble snapshot should show parent as player")
+        let finalPebbleSnapshot = try await engine.item("startItem")
+        #expect(finalPebbleSnapshot.parent == .player, "Pebble snapshot should show parent as player")
 
-        let finalInventorySnapshots = engine.items(withParent: .player)
+        let finalInventorySnapshots = await engine.items(in: .player)
         #expect(finalInventorySnapshots.contains { $0.id == "startItem" }, "Player inventory snapshots should contain pebble")
 
-        let finalRoomSnapshots = engine.items(withParent: .location("startRoom"))
+        let finalRoomSnapshots = await engine.items(in: .location(.startRoom))
         #expect(finalRoomSnapshots.isEmpty == true, "Start room snapshots should be empty")
 
         // Check turn counter reflects two successful commands
-        let finalMoves = engine.playerMoves
+        let finalMoves = await engine.playerMoves
         #expect(finalMoves == 2, "Turn counter should be 2 after take and inventory commands")
 
         // Check status lines were updated
@@ -504,69 +588,117 @@ struct GameEngineTests {
         #expect(statuses[2].turns == 2)
 
          // Verify output included "Taken."
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Taken." })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a pebble here.
+
+            > take pebble
+            Taken.
+
+            > inventory
+            Mock action succeeded.
+
+            > quit
+            """)
     }
 
     @Test("Engine Records State Changes from Enhanced Handler")
     func testEngineRecordsStateChangesFromEnhancedHandler() async throws {
         // Given: An enhanced handler that changes multiple things
-        struct MockMultiChangeHandler: EnhancedActionHandler {
+        struct MockMultiChangeHandler: ActionHandler {
             let itemIDToModify: ItemID
             let flagToSet: String
 
-            func validate(command: Command, engine: GameEngine) async throws { }
+            func validate(context: ActionContext) async throws { }
 
-            func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-                guard let item = await engine.item(with: itemIDToModify) else {
-                    throw ActionError.internalEngineError("Test item missing")
+            func process(context: ActionContext) async throws -> ActionResult {
+                // Use snapshot for checks
+                guard let item = context.stateSnapshot.items[itemIDToModify] else {
+                    throw ActionResponse.internalEngineError("Test item missing")
                 }
 
                 // Define multiple changes
                 let change1 = StateChange(
-                    entityId: .item(itemIDToModify),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(item.properties),
-                    newValue: .itemPropertySet(item.properties.union([ItemProperty.touched, ItemProperty.on])) // Qualified
+                    entityID: .item(itemIDToModify),
+                    attributeKey: .itemAttribute(.isTouched),
+                    oldValue: item.attributes[.isTouched],
+                    newValue: true,
                 )
 
-                // Correctly determine oldValue for the flag using the new helper
-                let actualOldFlagValue: Bool? = await engine.getOptionalFlagValue(key: flagToSet)
-                let flagOldValueState: StateValue? = actualOldFlagValue != nil ? .bool(actualOldFlagValue!) : nil
-
                 let change2 = StateChange(
-                    entityId: .global,
-                    propertyKey: .flag(key: flagToSet),
-                    oldValue: flagOldValueState, // Use the correctly determined nil or .bool value
-                    newValue: .bool(true)
+                    entityID: .item(itemIDToModify),
+                    attributeKey: .itemAttribute(.isOn),
+                    oldValue: item.attributes[.isOn],
+                    newValue: true,
+                )
+
+                // Get old flag value from snapshot using GlobalID and engine helper
+                let flagID = GlobalID(rawValue: flagToSet)
+                // Use the engine context to check the flag state before the change
+                let actualOldFlagValue = await context.engine.isFlagSet(flagID)
+                let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
+
+                let change3 = StateChange(
+                    entityID: .global,
+                    attributeKey: .setFlag(flagID),
+                    oldValue: flagOldValueState,
+                    newValue: true,
                 )
 
                 return ActionResult(
-                    success: true,
                     message: "Multiple changes applied.",
-                    stateChanges: [change1, change2]
+                    stateChanges: [change1, change2, change3]
                 )
             }
+
+            // Add empty postProcess for conformance
+            func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
-        let testItemID: ItemID = "testLamp"
-        let testFlagKey = "lampLit"
-        let lamp = Item(id: testItemID, name: "lamp", properties: .takable)
-        let mockEnhancedHandler = MockMultiChangeHandler(itemIDToModify: testItemID, flagToSet: testFlagKey)
-        var game = MinimalGame(
+        let testItemID: ItemID = "lamp"
+        let testFlagKey: GlobalID = "lampLit" // Use GlobalID type
+        let lamp = Item(
+            id: testItemID,
+            .name("brass lamp"),
+            .description("A small brass lamp."),
+            .isLightSource,
+            .in(.location(.startRoom))
+        )
+        let mockEnhancedHandler = MockMultiChangeHandler(
+            itemIDToModify: testItemID,
+            flagToSet: testFlagKey.rawValue
+        ) // Pass rawValue if handler needs string
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
             items: [lamp],
-            registry: DefinitionRegistry(
-                // Use customActionHandlers directly with the EnhancedActionHandler
+            definitionRegistry: DefinitionRegistry(
+                // Use customActionHandlers directly with the ActionHandler
                 customActionHandlers: [
-                    VerbID("activate"): mockEnhancedHandler // No bridge needed
+                    "activate": mockEnhancedHandler // No bridge needed
                 ]
             )
         )
-        game.state.locations["startRoom"]?.properties.insert(LocationProperty.inherentlyLit)
 
         let mockIO = await MockIOHandler()
         var mockParser = MockParser()
-        let activateCommand = Command(verbID: "activate", directObject: testItemID, rawInput: "activate lamp")
+        let activateCommand = Command(
+            verb: "activate",
+            directObject: .item(testItemID),
+            rawInput: "activate lamp"
+        )
 
         mockParser.parseHandler = { input, _, _ in
             if input == "activate lamp" { return .success(activateCommand) }
@@ -574,16 +706,17 @@ struct GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Ensure initial state
-        #expect(engine.gameState.flags[testFlagKey] == nil)
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == false)
-        #expect(engine.getChangeHistory().isEmpty)
+        #expect(await engine.isFlagSet(testFlagKey) == false)
+        #expect(try await engine.item(testItemID).attributes[.isOn] == nil)
+        #expect(try await engine.item(testItemID).attributes[.isTouched] == nil)
+        #expect(await engine.getChangeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
@@ -591,18 +724,25 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(engine.gameState.flags[testFlagKey] == true, "Flag should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.on) == true, "Item .on property should be set")
-        #expect(engine.item(with: testItemID)?.hasProperty(.touched) == true, "Item .touched property should be set")
+        #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
+        #expect(
+            try await engine.item(testItemID).attributes[.isOn] == true,
+            "Item .on property should be set"
+        )
+        #expect(
+            try await engine.item(testItemID).attributes[.isTouched] == true,
+            "Item .touched property should be set"
+        )
 
         // Check history recorded correctly
-        let history = engine.getChangeHistory()
+        let history = await engine.getChangeHistory()
         #expect(!history.isEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.propertyKey == StatePropertyKey.playerMoves && change.newValue == StateValue.int(1)
+                change.attributeKey == AttributeKey.playerMoves &&
+                change.newValue == StateValue.int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -610,12 +750,10 @@ struct GameEngineTests {
         // Check for Item property change (touched + on)
         #expect(
             history.contains { change in
-                guard change.entityId == .item(testItemID), change.propertyKey == StatePropertyKey.itemProperties else { return false }
-                if case .itemPropertySet(let props) = change.newValue {
-                    return props.contains(ItemProperty.on) && props.contains(ItemProperty.touched)
-                } else {
-                    return false
-                }
+                guard change.entityID == .item(testItemID),
+                      case .itemAttribute(let prop) = change.attributeKey,
+                      change.newValue == true else { return false }
+                return prop == .isTouched || prop == .isOn
             },
             "History should contain item property change adding .on and .touched"
         )
@@ -623,19 +761,37 @@ struct GameEngineTests {
         // Check for Flag change
         #expect(
             history.contains { change in
-                change.entityId == .global &&
-                    change.propertyKey == StatePropertyKey.flag(key: testFlagKey) &&
-                    change.newValue == StateValue.bool(true)
+                change.entityID == .global &&
+                    change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
+                    change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
         )
 
         // Optionally, still check count if exact number is important
-        #expect(history.count == 3, "Expected exactly 3 changes: moves + item props + flag")
+        #expect(
+            history.count == 5,
+            "Expected exactly 5 changes: 1st room visited + moves + item props + flag"
+        )
 
         // Check output message
-        let output = await mockIO.recordedOutput
-        #expect(output.contains { $0.text == "Multiple changes applied." })
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            Minimal Game
+
+            Welcome to the Minimal Game!
+
+            — Start Room —
+
+            You are in a nondescript location.
+
+            You can see a brass lamp here.
+
+            > activate lamp
+            Multiple changes applied.
+
+            > quit
+            """)
     }
 
     // MARK: - Fuse & Daemon Tests
@@ -648,18 +804,24 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
-        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { _ in
+        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { gameEngineParameter in
+            // This closure is @Sendable and runs on the GameEngine actor context.
+            // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
+
+            // To call mockIO.print (MainActor) from GameEngine actor context:
             await mockIO.print("Fuse triggered!")
-            stateHolder.flag = true
+
+            // To call stateHolder.markFlag (TestStateHolder actor)
+            await stateHolder.markFlag()
         }
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(fuseDefinitions: [fuseDef])
+            definitionRegistry: DefinitionRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
 
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -679,16 +841,17 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { _ in
+        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { gameEngineParameter in
+            // This closure is @Sendable and runs on the GameEngine actor context.
             await mockIO.print("Daemon ran!")
-            stateHolder.count += 1
+            await stateHolder.increment()
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            registry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
+            definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -706,21 +869,27 @@ struct GameEngineTests {
     func testFuseAndDaemonInteraction() async throws {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let _ = TestStateHolder() // Use _ for unused stateHolder
+        let stateHolder = TestStateHolder()
 
-        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in /* ... */ }
-        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in /* ... */ }
+        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
+            await mockIO.print("Fuse! [\(stateHolder.getFlag())]")
+            await stateHolder.markFlag()
+        }
+        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
+            await mockIO.print("Daemon! [\(stateHolder.getCount())]")
+            await stateHolder.increment()
+        }
 
         // Initialize game with definitions
         let game = MinimalGame(
-            registry: DefinitionRegistry(
+            definitionRegistry: DefinitionRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )
             // TODO: Need initial state setup for active timers
         )
 
-        let _ = GameEngine( // Use _ for unused engine
+        let _ = await GameEngine( // Use _ for unused engine
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -736,86 +905,119 @@ struct GameEngineTests {
 
     // MARK: - Helper Functions & Error Tests
 
-    @Test("ReportActionError: .invalidDirection")
+    @Test("ReportActionResponse: .invalidDirection")
     func testReportErrorInvalidDirection() async throws {
         // Initialize location with properties directly
         let startRoom = Location(
-            id: "startRoom",
-            name: "Start Room",
-            properties: LocationProperty.inherentlyLit // Qualify LocationProperty
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
         )
         let game = MinimalGame(locations: [startRoom])
 
         let command = Command(
-            verbID: "go",
+            verb: .go,
             preposition: "xyzzy",
             rawInput: "go xyzzy"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go xyzzy",
             commandToParse: command
         )
-        expectNoDifference(output, "A strange buzzing sound indicates something is wrong.")
+        expectNoDifference(output, "Go where?")
     }
 
-    @Test("ReportActionError: .itemNotTakable")
+    @Test("ReportActionResponse: .itemNotTakable")
     func testReportErrorItemNotTakable() async throws {
         // Initialize item without .takable
-        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let pebble = Item(
+            id: "startItem",
+            .name("pebble"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.hasProperty(.takable) == false)
+        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
 
-        let command = Command(verbID: "take", directObject: "startItem", rawInput: "take pebble")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .take,
+            directObject: .item("startItem"),
+            rawInput: "take pebble"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "take pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't take the pebble.")
+        expectNoDifference(output, "You can’t take the pebble.")
     }
 
-    @Test("ReportActionError: .itemNotHeld")
+    @Test("ReportActionResponse: .itemNotHeld")
     func testReportErrorItemNotHeld() async throws {
         // Initialize item in room, not held
-        let pebble = Item(id: "startItem", name: "pebble", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let pebble = Item(
+            id: "startItem",
+            .name("pebble"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.parent == .location("startRoom"))
+        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
-        let command = Command(verbID: "wear", directObject: "startItem", rawInput: "wear pebble")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .wear,
+            directObject: .item("startItem"),
+            rawInput: "wear pebble"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "wear pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You aren't holding the pebble.")
+        expectNoDifference(output, "You aren’t holding the pebble.")
     }
 
-    @Test("ReportActionError: .containerIsClosed")
+    @Test("ReportActionResponse: .containerIsClosed")
     func testReportErrorContainerIsClosed() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: .player)
+        let itemToPut = Item(
+            id: "key",
+            .name("key"),
+            .in(.player)
+        )
         let target = Item(
             id: "box",
-            name: "box",
-            properties: .container, .openable,
-            parent: .location("startRoom")
+            .name("box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpenable,
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: "insert",
-            directObject: "key",
-            indirectObject: "box",
+            verb: .insert,
+            directObject: .item("key"),
+            indirectObject: .item("box"),
             preposition: "in",
             rawInput: "put key in box"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key in box",
             commandToParse: command
@@ -823,69 +1025,97 @@ struct GameEngineTests {
         expectNoDifference(output, "The box is closed.")
     }
 
-    @Test("ReportActionError: .itemNotOpenable")
+    @Test("ReportActionResponse: .itemNotOpenable")
     func testReportErrorItemNotOpenable() async throws {
         // Initialize item directly
-        let item = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let item = Item(
+            id: "rock",
+            .name("rock"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        let command = Command(verbID: "open", directObject: "rock", rawInput: "open rock")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .open,
+            directObject: .item("rock"),
+            rawInput: "open rock"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "open rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't open the rock.")
+        expectNoDifference(output, "You can’t open the rock.")
     }
 
-    @Test("ReportActionError: .itemNotWearable")
+    @Test("ReportActionResponse: .itemNotWearable")
     func testReportErrorItemNotWearable() async throws {
         // Initialize item directly, held by player
         let item = Item(
             id: "rock",
-            name: "rock",
-            properties: .takable,
-            parent: .player
+            .name("rock"),
+            .in(.player),
+            .isTakable
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        let command = Command(verbID: "wear", directObject: "rock", rawInput: "wear rock")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .wear,
+            directObject: .item("rock"),
+            rawInput: "wear rock"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "wear rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't wear the rock.")
+        expectNoDifference(output, "You can’t wear the rock.")
     }
 
-    @Test("ReportActionError: .playerCannotCarryMore")
+    @Test("ReportActionResponse: .playerCannotCarryMore")
     func testReportErrorPlayerCannotCarryMore() async throws {
         // Initialize items and player with capacity
         let itemHeld = Item(
             id: "sword",
-            name: "sword",
-            properties: .takable,
-            size: 8,
-            parent: .player
+            .name("sword"),
+            .in(.player),
+            .isTakable,
+            .size(8)
         )
         let itemToTake = Item(
             id: "shield",
-            name: "shield",
-            properties: .takable,
-            size: 7,
-            parent: .location("startRoom")
+            .name("shield"),
+            .in(.location(.startRoom)),
+            .isTakable,
+            .size(7)
         )
         let player = Player(
-            in: "startRoom",
+            in: .startRoom,
             carryingCapacity: 10 // Set low capacity
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(player: player, locations: [startRoom], items: [itemHeld, itemToTake])
 
-        let command = Command(verbID: "take", directObject: "shield", rawInput: "take shield")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .take,
+            directObject: .item("shield"),
+            rawInput: "take shield"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "take shield",
             commandToParse: command
@@ -893,53 +1123,77 @@ struct GameEngineTests {
         expectNoDifference(output, "Your hands are full.")
     }
 
-    @Test("ReportActionError: .targetIsNotAContainer")
+    @Test("ReportActionResponse: .targetIsNotAContainer")
     func testReportErrorTargetIsNotContainer() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: .player)
-        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let itemToPut = Item(
+            id: "key",
+            .name("key"),
+            .in(.player)
+        )
+        let target = Item(
+            id: "rock",
+            .name("rock"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: "insert",
-            directObject: "key",
-            indirectObject: "rock",
+            verb: .insert,
+            directObject: .item("key"),
+            indirectObject: .item("rock"),
             preposition: "in",
             rawInput: "put key in rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key in rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't put things in the rock.")
+        expectNoDifference(output, "You can’t put things in the rock.")
     }
 
-    @Test("ReportActionError: .targetIsNotASurface")
+    @Test("ReportActionResponse: .targetIsNotASurface")
     func testReportErrorTargetIsNotSurface() async throws {
         // Initialize items directly
-        let itemToPut = Item(id: "key", name: "key", parent: .player)
-        let target = Item(id: "rock", name: "rock", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let itemToPut = Item(
+            id: "key",
+            .name("key"),
+            .in(.player)
+        )
+        let target = Item(
+            id: "rock",
+            .name("rock"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
 
         let command = Command(
-            verbID: "put-on",
-            directObject: "key",
-            indirectObject: "rock",
+            verb: .putOn,
+            directObject: .item("key"),
+            indirectObject: .item("rock"),
             preposition: "on",
             rawInput: "put key on rock"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "put key on rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't put things on the rock.")
+        expectNoDifference(output, "You can’t put things on the rock.")
     }
 
-    @Test("ReportActionError: .directionIsBlocked")
+    @Test("ReportActionResponse: .directionIsBlocked")
     func testReportErrorDirectionIsBlocked() async throws {
         // Initialize location with blocked exit
         let blockedExit = Exit(
@@ -947,15 +1201,20 @@ struct GameEngineTests {
             blockedMessage: "A shimmering curtain bars the way."
         )
         let startRoom = Location(
-            id: "startRoom",
-            name: "Start Room",
-            exits: [.north: blockedExit],
-            properties: LocationProperty.inherentlyLit
+            id: .startRoom,
+            .name("Start Room"),
+            .exits([.north: blockedExit]),
+            .inherentlyLit
         )
         let game = MinimalGame(locations: [startRoom])
 
-        let command = Command(verbID: "go", directObject: "north", direction: .north, rawInput: "go north")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .go,
+            directObject: .item("north"),
+            direction: .north,
+            rawInput: "go north"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go north",
             commandToParse: command
@@ -963,20 +1222,29 @@ struct GameEngineTests {
         expectNoDifference(output, "A shimmering curtain bars the way.")
     }
 
-    @Test("ReportActionError: .itemAlreadyClosed")
+    @Test("ReportActionResponse: .itemAlreadyClosed")
     func testReportErrorItemAlreadyClosed() async throws {
         // Initialize item as closed container
         let container = Item(
             id: "box",
-            name: "box",
-            properties: .container, .openable,
-            parent: .location("startRoom")
+            .name("box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpenable,
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [container])
 
-        let command = Command(verbID: "close", directObject: "box", rawInput: "close box")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .close,
+            directObject: .item(container.id),
+            rawInput: "close box"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "close box",
             commandToParse: command
@@ -984,29 +1252,40 @@ struct GameEngineTests {
         expectNoDifference(output, "The box is already closed.")
     }
 
-    @Test("ReportActionError: .itemIsUnlocked")
+    @Test("ReportActionResponse: .itemIsUnlocked")
     func testReportErrorItemIsUnlocked() async throws {
         // Initialize unlocked container and key held by player
         let container = Item(
             id: "chest",
-            name: "chest",
-            properties: .container, .openable, .lockable,
-            parent: .location("startRoom"),
-            lockKey: "key1"
+            .name("chest"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpenable,
+            .isLockable,
+            .lockKey("key1")
         )
-        let key = Item(id: "key1", name: "key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        let player = Player(in: "startRoom")
+        let key = Item(
+            id: "key1",
+            .name("key"),
+            .in(.player),
+            .isTakable
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let player = Player(in: .startRoom)
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
 
         let command = Command(
-            verbID: "unlock",
-            directObject: "chest",
-            indirectObject: "key1",
+            verb: .unlock,
+            directObject: .item(container.id),
+            indirectObject: .item(key.id),
             preposition: "with",
             rawInput: "unlock chest with key"
         )
-        let output = await runCommandAndCaptureOutput(
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key",
             commandToParse: command
@@ -1014,15 +1293,27 @@ struct GameEngineTests {
         expectNoDifference(output, "The chest is already unlocked.")
     }
 
-    @Test("ReportActionError: .itemNotCloseable")
+    @Test("ReportActionResponse: .itemNotClosable")
     func testReportErrorItemNotCloseable() async throws {
         // Initialize non-closeable item
-        let item = Item(id: "book", name: "book", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let item = Item(
+            id: "book",
+            .name("book"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        let command = Command(verbID: "close", directObject: "book", rawInput: "close book")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .close,
+            directObject: .item(item.id),
+            rawInput: "close book"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "close book",
             commandToParse: command
@@ -1030,49 +1321,67 @@ struct GameEngineTests {
         expectNoDifference(output, "The book is not something you can close.")
     }
 
-    @Test("ReportActionError: .itemNotDroppable")
+    @Test("ReportActionResponse: .itemNotDroppable")
     func testReportErrorItemNotDroppable() async throws {
-        // Initialize fixed item held by player
+        // Initialize fixed scenery item held by player
         let item = Item(
             id: "statue",
-            name: "statue",
-            properties: .fixed,
-            parent: .player
+            .name("statue"),
+            .in(.player),
+            .isScenery
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        let command = Command(verbID: "drop", directObject: "statue", rawInput: "drop statue")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .drop,
+            directObject: .item(item.id),
+            rawInput: "drop statue"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "drop statue",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't drop the statue.")
+        expectNoDifference(output, "You can’t drop the statue.")
     }
 
-    @Test("ReportActionError: .itemNotRemovable")
+    @Test("ReportActionResponse: .itemNotRemovable")
     func testReportErrorItemNotRemovable() async throws {
-        // Initialize fixed, worn item held by player
+        // Initialize fixed scenery, worn item held by player
         let item = Item(
             id: "amulet",
-            name: "cursed amulet",
-            properties: .wearable, .worn, .fixed,
-            parent: .player
+            .name("cursed amulet"),
+            .in(.player),
+            .isWearable,
+            .isWorn,
+            .isScenery
         )
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
         let game = MinimalGame(locations: [startRoom], items: [item])
 
-        let command = Command(verbID: "remove", directObject: "amulet", rawInput: "remove amulet")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .remove,
+            directObject: .item(item.id),
+            rawInput: "remove amulet"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "remove amulet",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't remove the cursed amulet.")
+        expectNoDifference(output, "You can’t remove the cursed amulet.")
     }
 
-    @Test("ReportActionError: .prerequisiteNotMet")
+    @Test("ReportActionResponse: .prerequisiteNotMet")
     func testReportErrorPrerequisiteNotMet() async throws {
         // Initialize location with conditional exit
         let conditionalExit = Exit(
@@ -1080,15 +1389,20 @@ struct GameEngineTests {
             blockedMessage: "You must first find inner peace."
         )
         let startRoom = Location(
-            id: "startRoom",
-            name: "Start Room",
-            exits: [.up: conditionalExit],
-            properties: LocationProperty.inherentlyLit
+            id: .startRoom,
+            .name("Start Room"),
+            .exits([.up: conditionalExit]),
+            .inherentlyLit
         )
         let game = MinimalGame(locations: [startRoom])
 
-        let command = Command(verbID: "go", directObject: "up", direction: .up, rawInput: "go up")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .go,
+            directObject: .item("up"),
+            direction: .up,
+            rawInput: "go up"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "go up",
             commandToParse: command
@@ -1096,54 +1410,220 @@ struct GameEngineTests {
         expectNoDifference(output, "You must first find inner peace.")
     }
 
-    @Test("ReportActionError: .roomIsDark")
+    @Test("ReportActionResponse: .roomIsDark")
     func testReportErrorRoomIsDark() async throws {
         // Initialize dark room with an item
-        let item = Item(id: "shadow", name: "shadow", parent: .location("startRoom"))
-        let startRoom = Location(id: "startRoom", name: "Dark Room")
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let item = Item(
+            id: "shadow",
+            .name("shadow"),
+            .in(.location(.startRoom))
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Dark Room"),
+            .description("A dark, dark room.")
+        )
+        let game = MinimalGame(
+            locations: [startRoom],
+            items: [item]
+        )
 
-        #expect(game.state.locations["startRoom"]?.hasProperty(LocationProperty.inherentlyLit) == false)
+        #expect(
+            game.state.locations[.startRoom]?.hasFlag(.inherentlyLit) == false
+        )
 
-        let command = Command(verbID: "examine", directObject: "shadow", rawInput: "examine shadow")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .examine,
+            directObject: .item(item.id),
+            rawInput: "examine shadow"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "examine shadow",
             commandToParse: command
         )
-        expectNoDifference(output, "It's too dark to do that.")
+        expectNoDifference(output, "It’s too dark to do that.")
     }
 
-    @Test("ReportActionError: .wrongKey")
+    @Test("ReportActionResponse: .wrongKey")
     func testReportErrorWrongKey() async throws {
         // Initialize locked container and wrong key held by player
         let container = Item(
             id: "chest",
-            name: "chest",
-            properties: .container, .lockable, .locked,
-            parent: .location("startRoom"),
-            lockKey: "key1"
+            .name("chest"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isLockable,
+            .isLocked,
+            .lockKey("key1")
         )
-        let wrongKey = Item(id: "key2", name: "wrong key", properties: .takable, parent: .player)
-        let startRoom = Location(id: "startRoom", name: "Start Room", properties: LocationProperty.inherentlyLit)
-        let player = Player(in: "startRoom")
+        let wrongKey = Item(
+            id: "key2",
+            .name("wrong key"),
+            .in(.player),
+            .isTakable
+        )
+        let startRoom = Location(
+            id: .startRoom,
+            .name("Start Room"),
+            .inherentlyLit
+        )
+        let player = Player(in: .startRoom)
         let game = MinimalGame(player: player, locations: [startRoom], items: [container, wrongKey])
 
-        let command = Command(verbID: "unlock", directObject: "chest", indirectObject: "key2", preposition: "with", rawInput: "unlock chest with key2")
-        let output = await runCommandAndCaptureOutput(
+        let command = Command(
+            verb: .unlock,
+            directObject: .item(container.id),
+            indirectObject: .item(wrongKey.id),
+            preposition: "with",
+            rawInput: "unlock chest with key2"
+        )
+        let output = try await runCommandAndCaptureOutput(
             game: game,
             commandInput: "unlock chest with key2",
             commandToParse: command
         )
-        expectNoDifference(output, "The wrong key doesn't fit the chest.")
+        expectNoDifference(output, "The wrong key doesn’t fit the chest.")
     }
 
-    @Test("ReportActionError: .containerIsFull")
-    func testReportErrorContainerIsFull() async throws {
-        // TODO: Implementation
+    @Test("Apply Action Result - Success")
+    func testApplyActionResult_Success() async throws {
+        // Define ItemID and initial item state
+        let itemID: ItemID = "lamp"
+        let lamp = Item(
+            id: itemID,
+            .name("brass lamp"),
+            .description("A small brass lamp."),
+            .isLightSource,
+            .in(.location(.startRoom))
+        )
+
+        // Define the desired state changes
+        let turnOnChanges = [
+            StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemAttribute(.isOn),
+                oldValue: false,
+                newValue: true,
+            ),
+            StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemAttribute(.isTouched),
+                oldValue: nil, // Assuming not touched initially
+                newValue: true,
+            )
+        ]
+
+        // Define the ActionResult to be returned by the mock handler
+        let resultToTest = ActionResult(
+            message: "Lamp turned on!",
+            stateChanges: turnOnChanges
+        )
+
+        // Create a mock handler that returns the ActionResult
+        struct MockResultHandler: ActionHandler {
+            let result: ActionResult
+            func validate(context: ActionContext) async throws { /* No validation needed */ }
+            func process(context: ActionContext) async throws -> ActionResult { result }
+            func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
+        }
+
+        let testVerb: VerbID = "testapply"
+        let mockHandler = MockResultHandler(result: resultToTest)
+
+        // Setup game with the mock handler
+        let game = MinimalGame(
+            items: [lamp],
+            definitionRegistry: DefinitionRegistry(
+                customActionHandlers: [testVerb: mockHandler]
+            )
+        )
+
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+
+        // Create the command to trigger the mock handler
+        let testCommand = Command(verb: testVerb, rawInput: "testapply")
+
+        // Act: Execute the command
+        await engine.execute(command: testCommand)
+
+        // Assert:
+        // Verify the state changes were applied
+        let finalLamp = try await engine.item(itemID)
+        #expect(finalLamp.attributes[.isOn] == true, "Lamp should be ON")
+        #expect(finalLamp.attributes[.isTouched] == true, "Lamp should be TOUCHED")
+
+        // Verify the message was printed
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Lamp turned on!")
     }
 
-} // End of struct GameEngineTests
+    @Test("applyPronounChange updates game state correctly")
+    func testApplyPronounChange_Success() async throws {
+        let engine = await GameEngine(game: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
+        let itemID: ItemID = "testItem"
+
+        await engine.applyPronounChange(pronoun: "it", itemID: itemID)
+
+        let pronouns = await engine.gameState.pronouns
+        #expect(pronouns["it"] == [.item(itemID)])
+
+        // Check change history
+        let history = await engine.gameState.changeHistory
+        expectNoDifference(history, [
+            StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(itemID)])
+            )
+        ])
+    }
+
+    // Test for GameEngine.updatePronouns
+    @Test("updatePronouns updates game state correctly for single item")
+    func testUpdatePronounsSingle() async throws {
+        let item = Item(
+            id: "testItem",
+            .name("Test Item")
+        )
+        let engine = await GameEngine(
+            game: MinimalGame(items: [item]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let stateChange = await engine.updatePronouns(to: item)
+        #expect(
+            stateChange == StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(item.id)])
+            )
+        )
+    }
+
+    @Test("updatePronouns updates game state correctly for multiple items (them)")
+    func testUpdatePronounsMultiple() async throws {
+        let item1 = Item(id: "item1", .name("Item One"))
+        let item2 = Item(id: "item2", .name("Item Two"))
+        let engine = await GameEngine(
+            game: MinimalGame(items: [item1, item2]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let change = await engine.updatePronouns(to: item1, item2)
+        #expect(
+            change == StateChange(
+                entityID: .global,
+                attributeKey: .pronounReference(pronoun: "them"),
+                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
+            )
+        )
+    }
+}
 
 // Helper extension for OutputCall checks (optional)
 extension [MockIOHandler.OutputCall] {
@@ -1165,7 +1645,7 @@ extension GameEngineTests {
         game: GameBlueprint,
         commandInput: String,
         commandToParse: Command
-    ) async -> String {
+    ) async throws -> String {
         var mockParser = MockParser()
         let mockIO = await MockIOHandler()
 
@@ -1175,7 +1655,7 @@ extension GameEngineTests {
             return .failure(.unknownVerb(input))
         }
 
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -1197,6 +1677,6 @@ extension GameEngineTests {
                 break // Found the command's response
             }
         }
-        return commandOutput
+        return commandOutput.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

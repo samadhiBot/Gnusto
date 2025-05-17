@@ -4,12 +4,9 @@ import Foundation
 ///
 /// Fuses are timed events that trigger an action after a specific number of game turns.
 /// This definition provides the blueprint for creating runtime `Fuse` instances.
-public struct FuseDefinition: Identifiable, Equatable, Hashable {
+public struct FuseDefinition: Identifiable, Equatable, Hashable, Sendable {
     /// The unique identifier for this fuse definition.
-    public typealias ID = Fuse.ID
-
-    /// The unique identifier for this fuse definition.
-    public let id: ID // Changed from String to Fuse.ID
+    public let id: FuseID
 
     /// The initial number of turns before the fuse triggers.
     public let initialTurns: Int
@@ -18,19 +15,18 @@ public struct FuseDefinition: Identifiable, Equatable, Hashable {
     ///
     /// This closure is executed within the context of the `GameEngine`'s actor.
     /// It receives the `GameEngine` instance, allowing it to interact with the game state and IO.
-    @MainActor public let action: @Sendable (_ engine: GameEngine) async -> Void // Added @MainActor
+    public let action: @Sendable (_ engine: GameEngine) async -> Void // Added @MainActor
 
     /// Initializes a new fuse definition.
     ///
     /// - Parameters:
-    ///   - id: The unique identifier for the fuse. Must match a corresponding `Fuse.ID`.
+    ///   - id: The unique identifier for the fuse. Must match a corresponding `FuseID`.
     ///   - initialTurns: The number of turns the fuse lasts. Must be positive.
     ///   - action: The closure to execute when the fuse triggers. Must run on MainActor.
-    @MainActor // Ensure init is on MainActor due to action
     public init(
-        id: ID, // Changed from String to Fuse.ID
+        id: FuseID,
         initialTurns: Int,
-        action: @escaping @Sendable @MainActor (GameEngine) async -> Void // Added @MainActor
+        action: @escaping @Sendable (GameEngine) async -> Void
     ) {
         precondition(initialTurns > 0, "FuseDefinition must have a positive initial duration.")
         self.id = id
@@ -41,10 +37,7 @@ public struct FuseDefinition: Identifiable, Equatable, Hashable {
     // MARK: - Equatable Conformance
 
     public static func == (lhs: FuseDefinition, rhs: FuseDefinition) -> Bool {
-        lhs.id == rhs.id &&
-            lhs.initialTurns == rhs.initialTurns
-        // Note: Closures are not directly comparable for equality.
-        // Equality is based on id and initialTurns only.
+        lhs.id == rhs.id && lhs.initialTurns == rhs.initialTurns
     }
 
     // MARK: - Hashable Conformance

@@ -1,81 +1,68 @@
 import Foundation
 
-/// Handles the "OPEN" command.
-public struct OpenActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.prerequisiteNotMet("Open what?")
+/// Handles the "OPEN" context.command.
+public struct OpenActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Open what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only open items.")
         }
 
         // 2. Check if item exists and is accessible using ScopeResolver
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // If snapshot is nil, it implies item doesn't exist in current state.
-            // ScopeResolver checks typically operate on existing items.
-            // Let's use the standard not accessible error.
-            throw ActionError.itemNotAccessible(targetItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // Use ScopeResolver to determine reachability
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        guard await context.engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check if item is openable
-        guard targetItem.hasProperty(.openable) else {
-            throw ActionError.itemNotOpenable(targetItemID)
+        guard targetItem.hasFlag(.isOpenable) else {
+            throw ActionResponse.itemNotOpenable(targetItemID)
         }
 
-        // 4. Check if already open
-        guard !targetItem.hasProperty(.open) else {
-            throw ActionError.itemAlreadyOpen(targetItemID)
-        }
-
-        // 5. Check if locked
-        if targetItem.hasProperty(.locked) {
-            throw ActionError.itemIsLocked(targetItemID)
+        // 4. Check if locked
+        if targetItem.hasFlag(.isLocked) {
+            throw ActionResponse.itemIsLocked(targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            // Should be caught by validate, but defensive check.
-            throw ActionError.internalEngineError("Open command reached process without direct object.")
-        }
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // Should be caught by validate.
-            throw ActionError.internalEngineError("Open command target item disappeared between validate and process.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            // Should not be reached if validate is correct.
+            throw ActionResponse.internalEngineError("Open: directObject was not an item in process.")
         }
 
-        // Calculate the new properties
-        var newProperties = targetItem.properties
-        newProperties.insert(.open)
-        newProperties.insert(.touched)
+        let targetItem = try await context.engine.item(targetItemID)
 
-        // Create the state change
-        let stateChange = StateChange(
-            entityId: .item(targetItemID),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(targetItem.properties), // Record old state
-            newValue: .itemPropertySet(newProperties)
-        )
+        // Check if already open
+        if try await context.engine.fetch(targetItem.id, .isOpen) {
+            throw ActionResponse.itemAlreadyOpen(targetItemID)
+        }
+
+        var stateChanges: [StateChange] = []
+
+        if let update = await context.engine.setFlag(.isOpen, on: targetItem) {
+            stateChanges.append(update)
+        }
+
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
+        }
+
+        // Update pronoun
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
 
         // Prepare the result
         return ActionResult(
-            success: true,
             message: "You open the \(targetItem.name).",
-            stateChanges: [stateChange],
-            sideEffects: []
+            stateChanges: stateChanges
         )
     }
 
@@ -83,4 +70,4 @@ public struct OpenActionHandler: EnhancedActionHandler {
     // Engine's execute method handles applying the stateChanges.
 }
 
-// TODO: Add/verify ActionError cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked
+// TODO: Add/verify ActionResponse cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked

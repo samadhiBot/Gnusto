@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("ScoreActionHandler Tests")
 struct ScoreActionHandlerTests {
     let handler = ScoreActionHandler()
@@ -12,17 +11,20 @@ struct ScoreActionHandlerTests {
     func testScorePerformsSuccessfully() async throws {
         // Arrange
         // Set up initial player state
-        let initialPlayer = Player(in: "startRoom", moves: 10, score: 42)
+        let initialPlayer = Player(in: .startRoom, moves: 10, score: 42)
         let game = MinimalGame(player: initialPlayer)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "score", rawInput: "score")
+        let command = Command(
+            verb: .score,
+            rawInput: "score"
+        )
 
         // Act
         // Call perform(), which uses the default implementation
@@ -36,6 +38,6 @@ struct ScoreActionHandlerTests {
         expectNoDifference(output, expectedMessage)
 
         // Verify no state changes were recorded
-        #expect(engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty == true)
     }
 }

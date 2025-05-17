@@ -1,11 +1,12 @@
+import Foundation
+
 /// Represents a side effect of an action (e.g., starting a fuse, running a daemon).
 public struct SideEffect: Sendable, Equatable {
     /// The type of side effect.
     public let type: SideEffectType
 
-    /// The target of the effect (often an ItemID, but could be LocationID, etc.).
-    /// Using ItemID for now.
-    public let targetId: ItemID
+    /// The entity targeted by or associated with the effect.
+    public let targetID: EntityID
 
     /// Any additional parameters specific to the side effect type.
     public let parameters: [String: StateValue]
@@ -13,15 +14,15 @@ public struct SideEffect: Sendable, Equatable {
     /// Creates a new side effect record.
     /// - Parameters:
     ///   - type: The type of side effect.
-    ///   - targetId: The ID of the object targeted by the side effect.
+    ///   - targetID: The EntityID targeted by or associated with the side effect.
     ///   - parameters: Additional data required for the side effect.
     public init(
         type: SideEffectType,
-        targetId: ItemID,
+        targetID: EntityID,
         parameters: [String: StateValue] = [:]
     ) {
         self.type = type
-        self.targetId = targetId
+        self.targetID = targetID
         self.parameters = parameters
     }
 }

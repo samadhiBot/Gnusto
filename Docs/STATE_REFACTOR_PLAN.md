@@ -10,10 +10,10 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
 
 - [x] **Generalize `StateChange` Identifier:**
   - [x] Define `EntityID` enum (`.item(ItemID)`, `.location(LocationID)`, `.player`, `.global`) in `ActionResult.swift`.
-  - [x] Update `StateChange` struct to use `entityId: EntityID` instead of `objectId: ItemID`.
-  - [x] Review and update `StatePropertyKey` enum cases to align with `EntityID` (e.g., ensure keys clearly map to item, location, player, or global state). Add missing keys like `.locationExits` if needed, along with corresponding `StateValue` cases.
+  - [x] Update `StateChange` struct to use `entityID: EntityID` instead of `objectId: ItemID`.
+  - [x] Review and update `StatePropertyKey` enum cases to align with `EntityID` (e.g., ensure keys clearly map to item, location, player, or global state). Add missing keys like `.exits` if needed, along with corresponding `StateValue` cases.
 - [x] **Implement `GameState.apply(_:)`:**
-  - [x] Add `public private(set)` access control to core state properties in `GameState` (`items`, `locations`, `flags`, `player`, `activeFuses`, `activeDaemons`, `pronouns`, `gameSpecificState`, `changeHistory`).
+  - [x] Add `public private(set)` access control to core state properties in `GameState` (`items`, `locations`, `flags`, `player`, `activeFuses`, `activeDaemons`, `pronouns`, `globalState`, `changeHistory`).
   - [x] Create a `public mutating func apply(_ change: StateChange) throws` method within `GameState`.
   - [x] Move the `switch change.propertyKey` logic from `GameEngine.applyStateChange` into `GameState.apply`.
   - [x] Ensure `GameState.apply` validates `change.oldValue` against the current state before applying the mutation.
@@ -26,7 +26,7 @@ This document outlines the phased plan to refactor the Gnusto Engine's state man
     - Construct the appropriate `StateChange` object (using `EntityID`, `StatePropertyKey`, `oldValue`, `newValue`).
     - Call `try gameState.apply(change)` instead of performing direct mutation.
   - [x] Create ergonomic helper methods in `GameEngine` (e.g., `applyFlagChange`, `applyScoreUpdate`, `applyItemMove`) that encapsulate `StateChange` creation and the call to `gameState.apply` for common mutations needed by game logic (daemons, fuses, handlers).
-  - [x] Ensure `GameEngine.execute` correctly calls `gameState.apply(change)` for changes originating from `EnhancedActionHandler` `ActionResult`s (confirming the current implementation which looks correct).
+  - [x] Ensure `GameEngine.execute` correctly calls `gameState.apply(change)` for changes originating from `ActionHandler` `ActionResult`s (confirming the current implementation which looks correct).
 - [x] **Testing:**
   - [x] Add comprehensive unit tests for `GameState.apply` covering all `StatePropertyKey` cases, including `oldValue` validation.
   - [x] Update/add integration tests to ensure actions and engine operations correctly modify state and update `changeHistory` via the new mechanism.

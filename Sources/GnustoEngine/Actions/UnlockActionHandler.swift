@@ -1,120 +1,99 @@
 import Foundation
 
-/// Handles the "UNLOCK <DO> WITH <IO>" command.
-public struct UnlockActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Validate command structure: Need DO and IO
-        guard command.directObject != nil else {
-            throw ActionError.prerequisiteNotMet("Unlock what?")
+/// Handles the "UNLOCK <DO> WITH <IO>" context.command.
+public struct UnlockActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Validate command structure: Need DO and IO, both must be items
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Unlock what?")
         }
-        guard command.indirectObject != nil else {
-            throw ActionError.prerequisiteNotMet("Unlock it with what?")
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only unlock items.")
         }
 
-        // Safely unwrap IDs after checks
-        let targetItemID = command.directObject!
-        let keyItemID = command.indirectObject!
+        guard let indirectObjectRef = context.command.indirectObject else {
+            throw ActionResponse.prerequisiteNotMet("Unlock it with what?")
+        }
+        guard case .item(let keyItemID) = indirectObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only use an item as a key.")
+        }
 
         // 2. Get item snapshots
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
-        }
-        guard let keyItem = await engine.item(with: keyItemID) else {
-            throw ActionError.itemNotAccessible(keyItemID)
-        }
+        let targetItem = try await context.engine.item(targetItemID)
+        let keyItem = try await context.engine.item(keyItemID)
 
         // 3. Check reachability
         guard keyItem.parent == .player else {
-            throw ActionError.itemNotHeld(keyItemID)
+            throw ActionResponse.itemNotHeld(keyItemID)
         }
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+
+        guard await context.engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 4. Check item properties
-        guard targetItem.hasProperty(.lockable) else {
-            throw ActionError.itemNotUnlockable(targetItemID)
+        guard targetItem.hasFlag(.isLockable) else {
+            throw ActionResponse.itemNotUnlockable(targetItemID)
         }
-        guard targetItem.hasProperty(.locked) else {
-            // Target is already unlocked. Don't throw, let process handle the message.
-            return
+
+        guard targetItem.hasFlag(.isLocked) else {
+            throw ActionResponse.prerequisiteNotMet("The \(targetItem.name) is already unlocked.")
         }
 
         // 5. Check if it's the correct key
-        guard targetItem.lockKey == keyItemID else {
-            throw ActionError.wrongKey(keyID: keyItemID, lockID: targetItemID)
+        guard targetItem.attributes[.lockKey] == .itemID(keyItemID) else {
+            throw ActionResponse.wrongKey(keyID: keyItemID, lockID: targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        // IDs are guaranteed non-nil by validate
-        let targetItemID = command.directObject!
-        let keyItemID = command.indirectObject!
+    public func process(context: ActionContext) async throws -> ActionResult {
+        // Direct and Indirect objects are guaranteed to be items by validate.
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Unlock: Direct object not an item in process.")
+        }
+        guard let indirectObjectRef = context.command.indirectObject,
+              case .item(let keyItemID) = indirectObjectRef else {
+            throw ActionResponse.internalEngineError("Unlock: Indirect object not an item in process.")
+        }
 
         // Get snapshots (existence guaranteed by validate)
-        guard let targetItem = await engine.item(with: targetItemID),
-              let keyItem = await engine.item(with: keyItemID) else
-        {
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for UNLOCK.")
-        }
+        let targetItem = try await context.engine.item(targetItemID)
+        let keyItem = try await context.engine.item(keyItemID)
 
-        // Handle case: Already unlocked (detected in validate)
-        if !targetItem.hasProperty(.locked) {
-            // Manually construct definite article message
-            return ActionResult(success: false, message: "The \(targetItem.name) is already unlocked.")
-        }
+//        // Handle case: Already unlocked (detected in validate)
+//        if !targetItem.hasFlag(.isLocked) {
+//            // Manually construct definite article message
+//            return ActionResult()
+//        }
 
         // --- Unlock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
-        // Change 1: Remove .locked from target
-        let oldTargetProps = targetItem.properties
-        var newTargetProps = oldTargetProps
-        newTargetProps.remove(.locked)
-        newTargetProps.insert(.touched) // Also mark target touched
-
-        if oldTargetProps != newTargetProps {
-            let targetPropsChange = StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldTargetProps),
-                newValue: .itemPropertySet(newTargetProps)
-            )
-            stateChanges.append(targetPropsChange)
+        // Change 1: Remove .locked from target (if currently locked)
+        if let update = await context.engine.clearFlag(.isLocked, on: targetItem) {
+            stateChanges.append(update)
         }
 
-        // Change 2: Add .touched to key (if needed)
-        let oldKeyProps = keyItem.properties
-        if !oldKeyProps.contains(.touched) {
-            var newKeyProps = oldKeyProps
-            newKeyProps.insert(.touched)
-            let keyPropsChange = StateChange(
-                entityId: .item(keyItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldKeyProps),
-                newValue: .itemPropertySet(newKeyProps)
-            )
-            stateChanges.append(keyPropsChange)
+        // Change 2: Add .touched to target (if not already set)
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
+        }
+
+        // Change 3: Add .touched to key (if not already set)
+        if let update = await context.engine.setFlag(.isTouched, on: keyItem) {
+            stateChanges.append(update)
+        }
+
+        // Change 3: Update pronouns
+        if let update = await context.engine.updatePronouns(to: targetItem, keyItem) {
+            stateChanges.append(update)
         }
 
         // --- Prepare Result ---
         // Manually construct definite article message
-        let message = "The \(targetItem.name) is now unlocked."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "The \(targetItem.name) is now unlocked.",
             stateChanges: stateChanges
         )
     }

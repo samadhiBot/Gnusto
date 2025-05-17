@@ -1,27 +1,18 @@
 import Foundation
 
-/// Handles the "DROP" command and its synonyms (e.g., "PUT DOWN").
-public struct DropActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.prerequisiteNotMet("Drop what?")
+/// Handles the "DROP" context.command and its synonyms (e.g., "PUT DOWN").
+public struct DropActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Drop what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only drop items.")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // If parser resolved it, but it's gone, treat as inaccessible/not held.
-            // For DROP, the more specific error is relevant.
-            throw ActionError.itemNotHeld(targetItemID) // Or should this be itemNotAccessible?
-        }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // 3. Check if player is holding the item
         guard targetItem.parent == .player else {
@@ -29,70 +20,53 @@ public struct DropActionHandler: EnhancedActionHandler {
             return
         }
 
-        // 4. Check if item is droppable (not fixed)
-        if targetItem.hasProperty(.fixed) {
-            throw ActionError.itemNotDroppable(targetItemID)
+        // 4. Check if item is droppable (not fixed scenery)
+        if targetItem.hasFlag(.isScenery) {
+            throw ActionResponse.itemNotDroppable(targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("Drop command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            // This should ideally be caught by validate.
+            // Consider what message is best if this is ever reached.
+            return ActionResult("You can only drop items.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // Should be caught by validate.
-            throw ActionError.internalEngineError("Drop command target item disappeared between validate and process.")
-        }
+
+        let targetItem = try await context.engine.item(targetItemID)
 
         // Handle "not holding" case detected (but not thrown) in validate
         if targetItem.parent != .player {
-            return ActionResult(success: false, message: "You aren't holding the \(targetItem.name).")
+            return ActionResult("You aren't holding the \(targetItem.name).")
         }
 
         // --- Calculate State Changes ---
-        let currentLocationID = await engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         var stateChanges: [StateChange] = []
 
         // Change 1: Parent
-        let parentChange = StateChange(
-            entityId: .item(targetItemID),
-            propertyKey: .itemParent,
-            oldValue: .parentEntity(.player),
-            newValue: .parentEntity(.location(currentLocationID))
-        )
-        stateChanges.append(parentChange)
+        let update = await context.engine.move(targetItem, to: .location(currentLocationID))
+        stateChanges.append(update)
 
-        // Change 2: Properties (add .touched, remove .worn)
-        let oldProperties = targetItem.properties
-        var newProperties = oldProperties
-        newProperties.insert(.touched) // Ensure it's marked touched
-        newProperties.remove(.worn)   // No longer worn if dropped
-
-        if oldProperties != newProperties {
-            let propertiesChange = StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
-            )
-            stateChanges.append(propertiesChange)
+        // Change 2: Ensure `.isTouched` is true
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
         }
 
-        // Dropping usually doesn't affect pronouns unless maybe it was the last thing referred to?
-        // For simplicity, let's not change pronouns on drop for now.
-        // We could potentially clear the pronoun if it referred *only* to the dropped item.
+        // Change 3: Update pronoun
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
 
-        // --- Prepare Result ---
+        // Change 4: Ensure `.isWorn` is false
+        if let update = await context.engine.clearFlag(.isWorn, on: targetItem) {
+            stateChanges.append(update)
+        }
+
         return ActionResult(
-            success: true,
-            message: "Dropped.", // Zork 1 message
-            stateChanges: stateChanges,
-            sideEffects: []
+            message: "Dropped.",
+            stateChanges: stateChanges
         )
     }
-
-    // Rely on default postProcess to print the message.
 }

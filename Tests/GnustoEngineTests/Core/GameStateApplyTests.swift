@@ -1,9 +1,9 @@
+import CustomDump
 import Foundation
 import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("GameState.apply Tests")
 struct GameStateApplyTests {
     // Use the helper from the main struct
@@ -15,26 +15,28 @@ struct GameStateApplyTests {
     func testApplyValidItemPropertyChange() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialItem = gameState.items[GameStateTests.itemLantern]
-        #expect(initialItem != nil)
-        let oldProperties = initialItem!.properties
-        var newProperties = oldProperties
-        newProperties.insert(.on) // Add .on property
+        let itemID = GameStateTests.itemLantern
+        guard let initialItem = gameState.items[itemID] else {
+            Issue.record("Test setup failure: Lantern item not found.")
+            return
+        }
+        let attributeID: AttributeID = .isOn // Assume AttributeID.isOn exists
+        let oldAttributeValue = initialItem.attributes[attributeID]
+        let newAttributeValue: StateValue = true
 
         let change = StateChange(
-            entityId: .item(GameStateTests.itemLantern),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(oldProperties),
-            newValue: .itemPropertySet(newProperties)
+            entityID: .item(itemID),
+            attributeKey: .itemAttribute(attributeID), // Use new key
+            oldValue: oldAttributeValue, // Use actual or .absent
+            newValue: newAttributeValue // Use direct StateValue
         )
 
         // When
         try gameState.apply(change)
 
         // Then
-        let finalItem = gameState.items[GameStateTests.itemLantern]
-        #expect(finalItem?.properties == newProperties, "Item properties should be updated")
-        #expect(finalItem?.hasProperty(.on) == true)
+        let finalItem = gameState.items[itemID]
+        #expect(finalItem?.attributes[attributeID] == newAttributeValue, "Item attribute should be updated")
 
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
@@ -44,46 +46,49 @@ struct GameStateApplyTests {
     func testApplyInvalidItemPropertyChangeOldValue() async throws {
         // Given
         var gameState = await helper.createSampleGameState()
-        let initialItem = gameState.items[GameStateTests.itemLantern]
-        #expect(initialItem != nil)
-        let actualOldProperties = initialItem!.properties
-        let incorrectOldProperties: Set<ItemProperty> = [.fixed] // Incorrect old value
-        var newProperties = actualOldProperties
-        newProperties.insert(.on)
+        let itemID = GameStateTests.itemLantern
+        guard let initialItem = gameState.items[itemID] else {
+            Issue.record("Test setup failure: Lantern item not found.")
+            return
+        }
+        let attributeID: AttributeID = .isOn
+        let actualOldValue = initialItem.attributes[attributeID]
+        // Ensure incorrectOldValue is different from actualOldValue
+        let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true
+        let newValue: StateValue = true
 
         let change = StateChange(
-            entityId: .item(GameStateTests.itemLantern),
-            propertyKey: .itemProperties,
-            oldValue: .itemPropertySet(incorrectOldProperties), // Use incorrect old value
-            newValue: .itemPropertySet(newProperties)
+            entityID: .item(itemID),
+            attributeKey: .itemAttribute(attributeID), // Use new key
+            oldValue: incorrectOldValue, // Use incorrect old value
+            newValue: newValue // Use direct StateValue
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
 
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state was not changed
-        let finalItem = gameState.items[GameStateTests.itemLantern]
+        let finalItem = gameState.items[itemID]
         #expect(
-            finalItem?.properties == actualOldProperties,
-            "Item properties should not be updated on error"
+            finalItem?.attributes[attributeID] == actualOldValue,
+            "Item attribute should not be updated on error"
         )
-        #expect(finalItem?.hasProperty(.on) == false)
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
     }
 
@@ -99,8 +104,8 @@ struct GameStateApplyTests {
         let newParent: ParentEntity = .player
 
         let change = StateChange(
-            entityId: .item(itemToMove),
-            propertyKey: .itemParent,
+            entityID: .item(itemToMove),
+            attributeKey: .itemParent,
             oldValue: .parentEntity(.nowhere), // Correct old value
             newValue: .parentEntity(newParent)
         )
@@ -113,7 +118,7 @@ struct GameStateApplyTests {
         #expect(finalItem?.parent == newParent, "Item parent should be updated")
         #expect(gameState.changeHistory.count == 1, "Change history should contain one entry")
         #expect(gameState.changeHistory.first == change, "Change history should contain the applied change")
-        let inventoryItemsAfterMove = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItemsAfterMove = gameState.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItemsAfterMove.contains(itemToMove), "Item should now be in inventory")
     }
 
@@ -128,36 +133,36 @@ struct GameStateApplyTests {
         let newParent: ParentEntity = .player
 
         let change = StateChange(
-            entityId: .item(itemToMove),
-            propertyKey: .itemParent,
+            entityID: .item(itemToMove),
+            attributeKey: .itemParent,
             oldValue: .parentEntity(incorrectOldParent), // Incorrect old value
             newValue: .parentEntity(newParent)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
 
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state was not changed
         let finalItem = gameState.items[itemToMove]
         #expect(finalItem?.parent == actualOldParent, "Item parent should not be updated on error")
         #expect(gameState.changeHistory.isEmpty, "Change history should be empty on error")
-        let inventoryItemsAfterError = gameState.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItemsAfterError = gameState.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItemsAfterError.contains(itemToMove) == false, "Item should not be in inventory")
     }
 
@@ -166,35 +171,52 @@ struct GameStateApplyTests {
         var state = helper.createInitialState()
         let itemID: ItemID = "testItem"
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemParent,
-            oldValue: .parentEntity(.location("startRoom")),
+            entityID: .item(itemID),
+            attributeKey: .itemParent,
+            oldValue: .parentEntity(.location(.startRoom)),
             newValue: .parentEntity(.player)
         )
 
         try state.apply(change)
 
         #expect(state.items[itemID]?.parent == .player)
-        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(inventoryItems.contains(itemID))
         #expect(state.changeHistory.last == change)
     }
 
     @Test("Apply Item Parent Change - Move from Player")
     func testApplyItemParentFromPlayer() throws {
-        var state = helper.createInitialState()
+        let newLocationID: LocationID = "anotherRoom"
+
+        var state = helper.createInitialState(
+            locations: [
+                Location(
+                    id: .startRoom,
+                    .name("Starting Room"),
+                    .description("A dark, dark room.")
+                ),
+                Location(
+                    id: newLocationID,
+                    .name("Another Room"),
+                    .description("A dark, dark room.")
+                )
+            ]
+        )
         let itemID: ItemID = "testItem"
         // Pre-move item to player
-        state.items[itemID]?.parent = .player
+        try state.apply(
+            StateChange(
+                entityID: .item(itemID),
+                attributeKey: .itemParent,
+                newValue: .parentEntity(.player)
+            )
+        )
         #expect(state.items[itemID]?.parent == .player)
-        state.changeHistory = [] // Clear history
-
-        let newLocationID: LocationID = "anotherRoom"
-        state.locations[newLocationID] = Location(id: newLocationID, name: "Another Room") // Ensure location exists
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemParent,
+            entityID: .item(itemID),
+            attributeKey: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.location(newLocationID))
         )
@@ -202,7 +224,7 @@ struct GameStateApplyTests {
         try state.apply(change)
 
         #expect(state.items[itemID]?.parent == .location(newLocationID))
-        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map { $0.id }
+        let inventoryItems = state.items.values.filter { $0.parent == ParentEntity.player }.map(\.id)
         #expect(!inventoryItems.contains(itemID))
         #expect(state.changeHistory.last == change)
     }
@@ -218,8 +240,8 @@ struct GameStateApplyTests {
         let newSize = initialSize + 5
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemSize,
+            entityID: .item(itemID),
+            attributeKey: .itemSize,
             oldValue: .int(initialSize),
             newValue: .int(newSize)
         )
@@ -242,28 +264,28 @@ struct GameStateApplyTests {
         let newSize = actualOldSize + 5
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemSize,
+            entityID: .item(itemID),
+            attributeKey: .itemSize,
             oldValue: .int(incorrectOldSize),
             newValue: .int(newSize)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -282,8 +304,8 @@ struct GameStateApplyTests {
         let newCapacity = initialCapacity + 10
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemCapacity,
+            entityID: .item(itemID),
+            attributeKey: .itemCapacity,
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -306,28 +328,28 @@ struct GameStateApplyTests {
         let newCapacity = actualOldCapacity + 10
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemCapacity,
+            entityID: .item(itemID),
+            attributeKey: .itemCapacity,
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -346,8 +368,8 @@ struct GameStateApplyTests {
         let newName = "Magic Brass Lantern"
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemName,
+            entityID: .item(itemID),
+            attributeKey: .itemName,
             oldValue: .string(initialName),
             newValue: .string(newName)
         )
@@ -370,28 +392,28 @@ struct GameStateApplyTests {
         let newName = "Magic Brass Lantern"
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemName,
+            entityID: .item(itemID),
+            attributeKey: .itemName,
             oldValue: .string(incorrectOldName),
             newValue: .string(newName)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -410,8 +432,8 @@ struct GameStateApplyTests {
         let newAdjectives: Set<String> = ["brass", "magic"]
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemAdjectives,
+            entityID: .item(itemID),
+            attributeKey: .itemAdjectives,
             oldValue: .stringSet(initialAdjectives),
             newValue: .stringSet(newAdjectives)
         )
@@ -434,28 +456,28 @@ struct GameStateApplyTests {
         let newAdjectives: Set<String> = ["brass", "magic"]
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemAdjectives,
+            entityID: .item(itemID),
+            attributeKey: .itemAdjectives,
             oldValue: .stringSet(incorrectOldAdjectives),
             newValue: .stringSet(newAdjectives)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -474,8 +496,8 @@ struct GameStateApplyTests {
         let newSynonyms: Set<String> = ["light", "lamp"]
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemSynonyms,
+            entityID: .item(itemID),
+            attributeKey: .itemSynonyms,
             oldValue: .stringSet(initialSynonyms),
             newValue: .stringSet(newSynonyms)
         )
@@ -498,28 +520,28 @@ struct GameStateApplyTests {
         let newSynonyms: Set<String> = ["light", "lamp"]
 
         let change = StateChange(
-            entityId: .item(itemID),
-            propertyKey: .itemSynonyms,
+            entityID: .item(itemID),
+            attributeKey: .itemSynonyms,
             oldValue: .stringSet(incorrectOldSynonyms),
             newValue: .stringSet(newSynonyms)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -534,21 +556,27 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let initialProperties = gameState.locations[locationID]?.properties ?? []
-        let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
+        guard let initialLocation = gameState.locations[locationID] else {
+            Issue.record("Test setup failure: WOH location not found.")
+            return
+        }
+        // Let's change the .isLit attribute (assuming it exists)
+        let attributeID: AttributeID = .isLit
+        let oldAttributeValue = initialLocation.attributes[attributeID]
+        let newAttributeValue: StateValue = true
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet(initialProperties),
-            newValue: .locationPropertySet(newProperties)
+            entityID: .location(locationID),
+            attributeKey: .locationAttribute(attributeID), // Use new key
+            oldValue: oldAttributeValue,
+            newValue: newAttributeValue
         )
 
         // When
         try gameState.apply(change)
 
         // Then
-        #expect(gameState.locations[locationID]?.properties == newProperties)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == newAttributeValue)
         #expect(gameState.changeHistory.last == change)
     }
 
@@ -557,37 +585,44 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
-        let actualOldProperties = gameState.locations[locationID]?.properties ?? []
-        let incorrectOldProperties: Set<LocationProperty> = [.sacred] // Incorrect
-        let newProperties: Set<LocationProperty> = [.visited, .inherentlyLit]
+        guard let initialLocation = gameState.locations[locationID] else {
+            Issue.record("Test setup failure: WOH location not found.")
+            return
+        }
+        // Let's try to change the .isLit attribute
+        let attributeID: AttributeID = .isLit
+        let actualOldValue = initialLocation.attributes[attributeID]
+        // Ensure incorrectOldValue is different
+        let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true
+        let newValue: StateValue = true
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationProperties,
-            oldValue: .locationPropertySet(incorrectOldProperties),
-            newValue: .locationPropertySet(newProperties)
+            entityID: .location(locationID),
+            attributeKey: .locationAttribute(attributeID), // Use new key
+            oldValue: incorrectOldValue, // Incorrect old value
+            newValue: newValue
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
-        #expect(gameState.locations[locationID]?.properties == actualOldProperties)
+        #expect(gameState.locations[locationID]?.attributes[attributeID] == actualOldValue)
         #expect(gameState.changeHistory.isEmpty)
     }
 
@@ -602,8 +637,8 @@ struct GameStateApplyTests {
         let newName = "West End of White House"
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationName,
+            entityID: .location(locationID),
+            attributeKey: .locationName,
             oldValue: .string(initialName),
             newValue: .string(newName)
         )
@@ -626,28 +661,28 @@ struct GameStateApplyTests {
         let newName = "West End of White House"
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationName,
+            entityID: .location(locationID),
+            attributeKey: .locationName,
             oldValue: .string(incorrectOldName),
             newValue: .string(newName)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -667,10 +702,10 @@ struct GameStateApplyTests {
         newExits[.south] = Exit(destination: GameStateTests.locClearing)
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationExits,
-            oldValue: .locationExits(initialExits),
-            newValue: .locationExits(newExits)
+            entityID: .location(locationID),
+            attributeKey: .exits,
+            oldValue: .exits(initialExits),
+            newValue: .exits(newExits)
         )
 
         // When
@@ -692,28 +727,28 @@ struct GameStateApplyTests {
         newExits[.south] = Exit(destination: GameStateTests.locClearing)
 
         let change = StateChange(
-            entityId: .location(locationID),
-            propertyKey: .locationExits,
-            oldValue: .locationExits(incorrectOldExits),
-            newValue: .locationExits(newExits)
+            entityID: .location(locationID),
+            attributeKey: .exits,
+            oldValue: .exits(incorrectOldExits),
+            newValue: .exits(newExits)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -731,8 +766,8 @@ struct GameStateApplyTests {
         let newScore = initialScore + 10
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerScore,
+            entityID: .player,
+            attributeKey: .playerScore,
             oldValue: .int(initialScore),
             newValue: .int(newScore)
         )
@@ -754,28 +789,28 @@ struct GameStateApplyTests {
         let newScore = actualOldScore + 10
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerScore,
+            entityID: .player,
+            attributeKey: .playerScore,
             oldValue: .int(incorrectOldScore),
             newValue: .int(newScore)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -793,8 +828,8 @@ struct GameStateApplyTests {
         let newMoves = initialMoves + 1
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerMoves,
+            entityID: .player,
+            attributeKey: .playerMoves,
             oldValue: .int(initialMoves),
             newValue: .int(newMoves)
         )
@@ -816,28 +851,28 @@ struct GameStateApplyTests {
         let newMoves = actualOldMoves + 1
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerMoves,
+            entityID: .player,
+            attributeKey: .playerMoves,
             oldValue: .int(incorrectOldMoves),
             newValue: .int(newMoves)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -855,8 +890,8 @@ struct GameStateApplyTests {
         let newCapacity = initialCapacity + 50
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerInventoryLimit, // Corrected key
+            entityID: .player,
+            attributeKey: .playerInventoryLimit, // Corrected key
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -878,28 +913,28 @@ struct GameStateApplyTests {
         let newCapacity = actualOldCapacity + 50
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerInventoryLimit, // Corrected key
+            entityID: .player,
+            attributeKey: .playerInventoryLimit, // Corrected key
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -918,8 +953,8 @@ struct GameStateApplyTests {
         #expect(gameState.locations[newLocation] != nil, "Target location must exist")
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerLocation,
+            entityID: .player,
+            attributeKey: .playerLocation,
             oldValue: .locationID(initialLocation),
             newValue: .locationID(newLocation)
         )
@@ -941,28 +976,28 @@ struct GameStateApplyTests {
         let newLocation = GameStateTests.locNorth
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerLocation,
+            entityID: .player,
+            attributeKey: .playerLocation,
             oldValue: .locationID(incorrectOldLocation),
             newValue: .locationID(newLocation)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -979,27 +1014,27 @@ struct GameStateApplyTests {
         #expect(gameState.locations[invalidNewLocation] == nil, "Target location must not exist")
 
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerLocation,
+            entityID: .player,
+            attributeKey: .playerLocation,
             oldValue: .locationID(initialLocation),
             newValue: .locationID(invalidNewLocation)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
-            if case .internalEngineError = actionError { } else {
-                Issue.record("Expected .internalEngineError case, got \(actionError)")
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
+            if case .internalEngineError = actionResponse { } else {
+                Issue.record("Expected .internalEngineError case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1009,126 +1044,101 @@ struct GameStateApplyTests {
 
     // MARK: - Global Flag Tests
 
-    @Test("Apply valid global flag change (add new)")
-    func testApplyValidGlobalFlagChangeAddNew() async throws {
-        // Given
+    @Test("Apply valid flag change (set true)")
+    func testApplyValidFlagSet() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "newFlag"
-        #expect(gameState.flags[flagKey] == nil)
+        let flagID: GlobalID = "testFlag"
+
+        // Initial state check
+        #expect(gameState.globalState[flagID] == nil)
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: nil, // Expecting nil for a new flag
-            newValue: .bool(true)
+            entityID: .global,
+            attributeKey: .setFlag(flagID),
+            oldValue: nil,
+            newValue: true,
         )
 
-        // When
         try gameState.apply(change)
 
-        // Then
-        #expect(gameState.flags[flagKey] == true)
-        #expect(gameState.changeHistory.last == change)
+        // Assert final state
+        #expect(gameState.globalState[flagID] == true)
+        #expect(gameState.changeHistory.count == 1)
+        #expect(gameState.changeHistory.first == change)
     }
 
-    @Test("Apply valid global flag change (modify existing)")
-    func testApplyValidGlobalFlagChangeModify() async throws {
-        // Given
+    @Test("Apply valid flag change (set false)")
+    func testApplyValidFlagClear() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "gameStarted" // Exists in sample state
-        let initialValue = gameState.flags[flagKey]
-        #expect(initialValue == true)
-
-        let change = StateChange(
-            entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(initialValue!), // Correct old value
-            newValue: .bool(false)
+        let flagID: GlobalID = "testFlagInitiallyTrue"
+        // Set the flag using apply instead of direct assignment
+        let setFlag = StateChange(
+            entityID: .global,
+            attributeKey: .setFlag(flagID),
+            oldValue: nil,
+            newValue: true
         )
+        try gameState.apply(setFlag)
+        #expect(gameState.globalState[flagID] == true)
 
-        // When
-        try gameState.apply(change)
+        let clearFlag = StateChange(
+            entityID: .global,
+            attributeKey: .clearFlag(flagID),
+            oldValue: true, // Expecting it was true
+            newValue: false
+        )
+        try gameState.apply(clearFlag)
+        #expect(gameState.globalState[flagID] == false)
 
-        // Then
-        #expect(gameState.flags[flagKey] == false)
-        #expect(gameState.changeHistory.last == change)
+        #expect(gameState.changeHistory == [setFlag, clearFlag])
     }
 
-    @Test("Apply global flag change with invalid oldValue (existing flag)")
-    func testApplyInvalidGlobalFlagChangeOldValueExisting() async throws {
-        // Given
+    @Test("Apply flag change with invalid old value fails")
+    func testApplyFlagChangeInvalidOldValue() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "gameStarted"
-        let actualOldValue = gameState.flags[flagKey]
+
+        let actualOldValue = gameState.globalState["gameStarted"]
         #expect(actualOldValue == true)
-        let incorrectOldValue = false // Incorrect
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(incorrectOldValue),
-            newValue: .bool(false)
+            entityID: .global,
+            attributeKey: .clearFlag("gameStarted"),
+            oldValue: false, // INCORRECT
+            newValue: false
         )
 
-        // When & Then
-        var thrownError: Error? = nil
         do {
             try gameState.apply(change)
-            Issue.record("Expected apply to throw an error, but it succeeded.")
+            Issue.record("Expected validation error to be thrown")
+        } catch ActionResponse.stateValidationFailed(let failedChange, let reportedActualValue) {
+            expectNoDifference(failedChange, change)
+            #expect(reportedActualValue == true) // actual value was false
         } catch {
-            thrownError = error
-        }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
-            // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
-            }
-        } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Threw unexpected error type: \(error)")
         }
 
-        // Verify state unchanged
-        #expect(gameState.flags[flagKey] == actualOldValue)
+        // Assert state unchanged
         #expect(gameState.changeHistory.isEmpty)
     }
 
-    @Test("Apply global flag change with invalid oldValue (new flag)")
-    func testApplyInvalidGlobalFlagChangeOldValueNew() async throws {
-        // Given
+    @Test("Apply flag change with nil old value succeeds")
+    func testApplyFlagChangeNilOldValue() async throws {
         var gameState = await helper.createSampleGameState()
-        let flagKey = "newFlag"
-        #expect(gameState.flags[flagKey] == nil)
-        let incorrectOldValue = true // Should expect nil
+        let flagID: GlobalID = "testFlag"
+        #expect(gameState.globalState[flagID] == nil)
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .flag(key: flagKey),
-            oldValue: .bool(incorrectOldValue),
-            newValue: .bool(true)
+            entityID: .global,
+            attributeKey: .setFlag(flagID),
+            oldValue: nil, // No validation expected
+            newValue: true
         )
 
-        // When & Then
-        var thrownError: Error? = nil
-        do {
-            try gameState.apply(change)
-            Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
-        }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
-            // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
-            }
-        } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
-        }
+        try gameState.apply(change)
 
-        // Verify state unchanged
-        #expect(gameState.flags[flagKey] == nil)
-        #expect(gameState.changeHistory.isEmpty)
+        // Assert final state
+        #expect(gameState.globalState[flagID] == true)
+        #expect(gameState.changeHistory.count == 1)
     }
 
     // MARK: - Pronoun Reference Tests
@@ -1138,15 +1148,15 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let pronoun = "it"
-        let initialValue = gameState.pronouns[pronoun]
-        #expect(initialValue == [GameStateTests.itemMailbox])
-        let newValue: Set<ItemID> = [GameStateTests.itemLantern]
+        let initialValue: Set<EntityReference> = [.item(GameStateTests.itemMailbox)]
+        #expect(gameState.pronouns[pronoun] == initialValue)
+        let newValue: Set<EntityReference> = [.item(GameStateTests.itemLantern)]
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .pronounReference(pronoun: pronoun),
-            oldValue: .itemIDSet(initialValue!), // Correct old value
-            newValue: .itemIDSet(newValue)
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: pronoun),
+            oldValue: .entityReferenceSet(initialValue), // Correct old value
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When
@@ -1163,13 +1173,16 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let pronoun = "them"
         #expect(gameState.pronouns[pronoun] == nil)
-        let newValue: Set<ItemID> = [GameStateTests.itemSword, GameStateTests.itemLeaflet]
+        let newValue: Set<EntityReference> = [
+            .item(GameStateTests.itemSword),
+            .item(GameStateTests.itemLeaflet)
+        ]
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .pronounReference(pronoun: pronoun),
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: pronoun),
             oldValue: nil, // Expecting nil
-            newValue: .itemIDSet(newValue)
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When
@@ -1185,34 +1198,34 @@ struct GameStateApplyTests {
         // Given
         var gameState = await helper.createSampleGameState()
         let pronoun = "it"
-        let actualOldValue = gameState.pronouns[pronoun]
-        #expect(actualOldValue == [GameStateTests.itemMailbox])
-        let incorrectOldValue: Set<ItemID> = [GameStateTests.itemSword] // Incorrect
-        let newValue: Set<ItemID> = [GameStateTests.itemLantern]
+        let actualOldValue: Set<EntityReference> = [.item(GameStateTests.itemMailbox)]
+        #expect(gameState.pronouns[pronoun] == actualOldValue)
+        let incorrectOldValue: Set<EntityReference> = [.item(GameStateTests.itemSword)] // Incorrect
+        let newValue: Set<EntityReference> = [.item(GameStateTests.itemLantern)]
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .pronounReference(pronoun: pronoun),
-            oldValue: .itemIDSet(incorrectOldValue),
-            newValue: .itemIDSet(newValue)
+            entityID: .global,
+            attributeKey: .pronounReference(pronoun: pronoun),
+            oldValue: .entityReferenceSet(incorrectOldValue),
+            newValue: .entityReferenceSet(newValue)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1231,8 +1244,8 @@ struct GameStateApplyTests {
         #expect(gameState.activeFuses[fuseID] == nil)
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            entityID: .global,
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             // No oldValue for add
             newValue: .int(initialTurns)
         )
@@ -1253,8 +1266,8 @@ struct GameStateApplyTests {
         let initialTurns = 5
         // Pre-populate using apply
         let setupChange = StateChange(
-            entityId: .global,
-            propertyKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            entityID: .global,
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
@@ -1262,8 +1275,8 @@ struct GameStateApplyTests {
 
         let newInitialTurns = 20 // New turns value for the 'add'
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .addActiveFuse(fuseId: fuseID, initialTurns: newInitialTurns),
+            entityID: .global,
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: newInitialTurns),
             // No oldValue for add (even when overwriting)
             newValue: .int(newInitialTurns)
         )
@@ -1284,16 +1297,16 @@ struct GameStateApplyTests {
         let initialTurns = 5
         // Pre-populate using apply
         let setupChange = StateChange(
-            entityId: .global,
-            propertyKey: .addActiveFuse(fuseId: fuseID, initialTurns: initialTurns),
+            entityID: .global,
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
         #expect(gameState.activeFuses[fuseID] == initialTurns)
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .removeActiveFuse(fuseId: fuseID),
+            entityID: .global,
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(initialTurns), // Expecting the current value
             newValue: .int(0) // Per convention for remove
         )
@@ -1314,36 +1327,36 @@ struct GameStateApplyTests {
         let actualTurns = 5
         // Pre-populate using apply
         let setupChange = StateChange(
-            entityId: .global,
-            propertyKey: .addActiveFuse(fuseId: fuseID, initialTurns: actualTurns),
+            entityID: .global,
+            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: actualTurns),
             newValue: .int(actualTurns)
         )
         try gameState.apply(setupChange)
         let incorrectOldTurns = 10 // Incorrect
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .removeActiveFuse(fuseId: fuseID),
+            entityID: .global,
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(incorrectOldTurns),
             newValue: .int(0)
         )
 
         // When & Then
-        var thrownError: Error? = nil
+        var thrownResponse: Error? = nil
         do {
             try gameState.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch {
-            thrownError = error
+        } catch let response {
+            thrownResponse = response
         }
-        #expect(thrownError != nil, "An error should have been thrown.")
-        if let actionError = thrownError as? ActionError {
+        #expect(thrownResponse != nil, "An error should have been thrown.")
+        if let actionResponse = thrownResponse as? ActionResponse {
             // Check only the error case, not the associated message
-            if case .stateValidationFailed = actionError { } else {
-                Issue.record("Expected .stateValidationFailed case, got \(actionError)")
+            if case .stateValidationFailed = actionResponse { } else {
+                Issue.record("Expected .stateValidationFailed case, got \(actionResponse)")
             }
         } else {
-            Issue.record("Thrown error was not an ActionError: \(thrownError?.localizedDescription ?? "nil")")
+            Issue.record("Thrown error was not an ActionResponse: \(thrownResponse?.localizedDescription ?? "nil")")
         }
 
         // Verify state unchanged
@@ -1359,8 +1372,8 @@ struct GameStateApplyTests {
         #expect(gameState.activeFuses[fuseID] == nil)
 
         let change = StateChange(
-            entityId: .global,
-            propertyKey: .removeActiveFuse(fuseId: fuseID),
+            entityID: .global,
+            attributeKey: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Correctly expecting nil
             newValue: .int(0)
         )
@@ -1381,8 +1394,8 @@ struct GameStateApplyTests {
         let originalLimit = state.player.carryingCapacity
         let newLimit = originalLimit + 50
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerInventoryLimit, // Already correct
+            entityID: .player,
+            attributeKey: .playerInventoryLimit, // Already correct
             oldValue: .int(originalLimit),
             newValue: .int(newLimit)
         )
@@ -1400,22 +1413,22 @@ struct GameStateApplyTests {
         let wrongOldLimit = state.player.carryingCapacity + 10
         let newLimit = state.player.carryingCapacity + 50
         let change = StateChange(
-            entityId: .player,
-            propertyKey: .playerInventoryLimit, // Already correct
+            entityID: .player,
+            attributeKey: .playerInventoryLimit, // Already correct
             oldValue: .int(wrongOldLimit), // Incorrect oldValue
             newValue: .int(newLimit)
         )
 
-        #expect(throws: ActionError.self) {
+        #expect(throws: ActionResponse.self) {
             try state.apply(change)
         }
         do {
             try state.apply(change)
             Issue.record("Expected apply to throw an error, but it succeeded.")
-        } catch let error as ActionError {
-            #expect(error == ActionError.stateValidationFailed(change: change, actualOldValue: .int(state.player.carryingCapacity)))
+        } catch let error as ActionResponse {
+            #expect(error == ActionResponse.stateValidationFailed(change: change, actualOldValue: .int(state.player.carryingCapacity)))
         } catch {
-            Issue.record("Thrown error was not an ActionError: \(error)")
+            Issue.record("Thrown error was not an ActionResponse: \(error)")
         }
         #expect(state.changeHistory.isEmpty)
     }

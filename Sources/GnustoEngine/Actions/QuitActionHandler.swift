@@ -1,21 +1,18 @@
 import Foundation
 
 /// Action handler for the QUIT verb.
-struct QuitActionHandler: EnhancedActionHandler {
+struct QuitActionHandler: ActionHandler {
 
-    // MARK: - EnhancedActionHandler Methods
+    // MARK: - ActionHandler Methods
 
-    func validate(command: Command, engine: GameEngine) async throws {
+    func validate(context: ActionContext) async throws {
         // No validation needed for QUIT.
     }
 
-    func process(command: Command, engine: GameEngine) async throws -> ActionResult {
+    func process(context: ActionContext) async throws -> ActionResult {
         // TODO: Implement confirmation? ("Are you sure you want to quit?")
-        await engine.requestQuit()
+        await context.engine.requestQuit()
 
-        return ActionResult(
-            success: true,
-            message: "Goodbye!"
-        )
+        return ActionResult("Goodbye!")
     }
 }

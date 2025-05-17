@@ -13,6 +13,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["brass": ["lantern", "hook"], "rusty": ["knife"]]`
     public var adjectives: [String: Set<ItemID>]
 
+    /// Maps known location names to the LocationID they refer to.
+    public var locationNames: [String: LocationID]
+
     /// A set of "noise" words to be ignored by the parser (articles, punctuation, etc.).
     /// Example: `["a", "an", "the", ".", ","]`
     public var noiseWords: Set<String>
@@ -52,6 +55,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.verbDefinitions = [:] // Initialize new dictionary
         self.items = [:]
         self.adjectives = [:]
+        self.locationNames = [:] // Initialize new property
         self.noiseWords = Vocabulary.defaultNoiseWords
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
@@ -63,6 +67,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         verbDefinitions: [VerbID: Verb] = [:], // Use verbDefinitions
         items: [String: Set<ItemID>] = [:],
         adjectives: [String: Set<ItemID>] = [:],
+        locationNames: [String: LocationID] = [:], // Added parameter
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
@@ -71,6 +76,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
         self.adjectives = adjectives
+        self.locationNames = locationNames // Assign new property
         self.directions = directions
         self.noiseWords = noiseWords
         self.prepositions = prepositions
@@ -81,83 +87,121 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
     /// Default set of common English noise words.
     public static let defaultNoiseWords: Set<String> = [
-        "a", "an", "and", "the", "some", "this", "that", "those", "these",
-        ".", ",", "!", "?", ";", ":", "'", "\"", "(", ")"
-        // Removed: "at", "in", "on", "to", "of", "with" - These are important prepositions/directions
-        // Note: "on" and "off" are NOT noise words here as they are significant particles.
+        "!",
+        "'",
+        "(",
+        ")",
+        ",",
+        ".",
+        ":",
+        ";",
+        "?",
+        "\"",
+        "a",
+        "an",
+        "and",
+        "some",
+        "that",
+        "the",
+        "these",
+        "this",
+        "those",
     ]
 
     /// Default set of common English prepositions.
     public static let defaultPrepositions: Set<String> = [
-        "in", "on", "under", "into", "onto", "through", "behind", "over", "with", "about", "for", "from", "to", "up", "down" // Added up/down
-        // Note: Some might also be noise words, parser needs to handle context.
+        "about",
+        "behind",
+        "down",
+        "for",
+        "from",
+        "in",
+        "into",
+        "on",
+        "onto",
+        "over",
+        "through",
+        "to",
+        "under",
+        "up",
+        "with",
     ]
 
     /// Default set of common English pronouns.
     public static let defaultPronouns: Set<String> = [
-        "it", "them"
+        "it",
+        "them"
     ]
 
     /// Default verbs common to most IF games.
-    @MainActor public static let defaultVerbs: [Verb] = [
+    public static let defaultVerbs: [Verb] = [
         // Core Actions
+
         Verb(
-            id: "look",
-            synonyms: ["l"],
+            id: .look,
+            synonyms: "l",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject) // Added rule for look <item>
+                SyntaxRule(.verb, .directObject)
             ],
-            requiresLight: false // LOOK works in the dark (prints dark message)
+            requiresLight: false
         ),
+
         Verb(
-            id: "examine",
-            synonyms: ["x", "inspect"],
+            id: .examine,
+            synonyms: "x", "inspect",
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: true // EXAMINE requires light
-        ), // Examine needs DO
-        Verb(
-            id: "inventory",
-            synonyms: ["i"],
-            syntax: [SyntaxRule(.verb)],
-            requiresLight: false // Inventory check works in the dark
+            requiresLight: true
         ),
+
         Verb(
-            id: "quit",
-            synonyms: ["q"],
+            id: .inventory,
+            synonyms: "i",
             syntax: [SyntaxRule(.verb)],
-            requiresLight: false // Quitting works in the dark
+            requiresLight: false
         ),
+
         Verb(
-            id: "score",
+            id: .quit,
+            synonyms: "q",
             syntax: [SyntaxRule(.verb)],
-            requiresLight: false // Checking score works in the dark
+            requiresLight: false
         ),
+
         Verb(
-            id: "wait",
-            synonyms: ["z"],
+            id: .score,
             syntax: [SyntaxRule(.verb)],
-            requiresLight: false // Waiting works in the dark
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .wait,
+            synonyms: "z",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
         ),
 
         // Movement
-        Verb(
-            id: "go",
-            synonyms: ["move", "walk", "run", "proceed"],
-            syntax: [SyntaxRule(.verb, .direction)],
-            requiresLight: false // Movement attempt works in dark (might fail)
-        ), // Default takes direction
         // Note: Single directions (N, S, E, W...) handled separately by StandardParser
 
-        // Common Interactions
         Verb(
-            id: "take",
-            synonyms: ["get", "grab", "pick"],
+            id: .go,
+            synonyms: "move", "walk", "run", "proceed",
+            syntax: [SyntaxRule(.verb, .direction)],
+            requiresLight: false
+        ),
+
+        // Common Interactions
+
+        Verb(
+            id: .take,
+            synonyms: "get", "grab", "pick",
             syntax: [SyntaxRule(.verb, .directObject)]
         ),
+
         Verb(
-            id: "insert",
-            synonyms: ["put", "place"],
+            id: .insert,
+            synonyms: "put", "place",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
@@ -170,9 +214,10 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             ],
             requiresLight: true
         ),
+
         Verb(
-            id: "put-on",
-            synonyms: ["put", "place", "set"],
+            id: .putOn,
+            synonyms: "hang", "put", "place", "set",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
@@ -185,125 +230,134 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             ],
             requiresLight: true
         ),
-        Verb(
-            id: "drop",
-            synonyms: ["discard"],
-            syntax: [SyntaxRule(.verb, .directObject)]
-        ), // Simple drop syntax
-        Verb(
-            id: "open",
-            syntax: [SyntaxRule(.verb, .directObject)]
-        ),
-        Verb(
-            id: "close",
-            synonyms: ["shut"],
-            syntax: [SyntaxRule(.verb, .directObject)]
-        ),
-        Verb(
-            id: "read",
-            syntax: [SyntaxRule(.verb, .directObject)]
-        ),
-        Verb(
-            id: "wear",
-            synonyms: ["don", "put on"],
-            // Added "put on"
-            syntax: [SyntaxRule(.verb, .directObject)]
-        ),
-        Verb(
-            id: "remove",
-            synonyms: ["take off", "doff"],
-            // Added "doff"
-            syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: false // ADDED: Removing items works in the dark
-        ), // For worn items
 
-        // --- Restore Combined Turn On/Off Verbs ---
         Verb(
-            id: "turn on",
-            synonyms: ["light", "switch on"],
+            id: .drop,
+            synonyms: "discard",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+        Verb(
+            id: .open,
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+
+        Verb(
+            id: .close,
+            synonyms: "shut",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+
+        Verb(
+            id: .read,
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+
+        Verb(
+            id: .wear,
+            synonyms: "don", "put on",
+            syntax: [SyntaxRule(.verb, .directObject)]
+        ),
+
+        Verb(
+            id: .remove,
+            synonyms: "take off", "doff",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .turnOn,
+            synonyms: "light", "switch on", "turn on",
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: true
         ),
+
         Verb(
-            id: "turn off",
-            synonyms: ["extinguish", "douse", "switch off", "blow out"],
+            id: .turnOff,
+            synonyms: "extinguish", "douse", "switch off", "blow out", "turn off",
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: true
         ),
-        // --- REMOVED Separate Verbs for Testing ---
-        // Verb(id: "extinguish", ...)
-        // Verb(id: "blow out", ...)
-        // Verb(id: "switch off", ...)
 
         // Sensory / Non-committal
+
         Verb(
-            id: "smell",
-            synonyms: ["sniff"],
+            id: .smell,
+            synonyms: "sniff",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
             ],
-            requiresLight: false // Smelling works in the dark
-        ), // Smell or Smell X
+            requiresLight: false
+        ),
+
         Verb(
-            id: "listen",
+            id: .listen,
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .particle("to"), .directObject) // listen to <item>
+                SyntaxRule(.verb, .particle("to"), .directObject)
             ],
-            requiresLight: false // Listening works in the dark
+            requiresLight: false
         ),
+
         Verb(
-            id: "taste",
+            id: .taste,
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: true // Tasting requires light (to see what you're tasting)
+            requiresLight: true
         ),
+
         Verb(
-            id: "touch",
-            synonyms: ["feel"],
+            id: .touch,
+            synonyms: "feel",
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: true // Touching likely requires seeing the item
+            requiresLight: true
         ),
 
         // Think About (from Cloak of Darkness)
+
         Verb(
-            id: "think-about", // Use hyphenated ID for consistency
-            synonyms: ["contemplate", "think about"], // Add synonym from CoD and the multi-word phrase itself
+            id: .thinkAbout,
+            synonyms: "contemplate", "think about",
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: false // Thinking works in the dark
+            requiresLight: false
         ),
 
         // Meta
         Verb(
-            id: "help",
+            id: .help,
             syntax: [SyntaxRule(.verb)],
             requiresLight: false
         ),
+
         Verb(
-            id: "save",
+            id: .save,
             syntax: [SyntaxRule(.verb)],
             requiresLight: false
         ),
+
         Verb(
-            id: "restore",
-            synonyms:["load"],
+            id: .restore,
+            synonyms: "load",
             syntax: [SyntaxRule(.verb)],
             requiresLight: false
         ),
+
         Verb(
-            id: "verbose",
+            id: .verbose,
             syntax: [SyntaxRule(.verb)],
             requiresLight: false
         ),
+
         Verb(
-            id: "brief",
+            id: .brief,
             syntax: [SyntaxRule(.verb)],
             requiresLight: false
-        ), // Often used for description detail
+        ),
 
         // Lock/Unlock Verbs
+
         Verb(
-            id: "lock",
+            id: .lock,
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
@@ -311,8 +365,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 )
             ]
         ),
+
         Verb(
-            id: "unlock",
+            id: .unlock,
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
@@ -350,15 +405,28 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         }
     }
 
+    /// Adds a location and its name to the vocabulary.
+    /// - Parameter location: The `Location` object to add.
+    public mutating func add(location: Location) {
+        let locationID = location.id
+        let lowercasedName = location.name.lowercased()
+        let lowercasedID = locationID.rawValue.lowercased()
+
+        self.locationNames[lowercasedName] = locationID
+        self.locationNames[lowercasedID] = locationID
+    }
+
     /// Builds a basic vocabulary from arrays of items and verbs, including standard directions
     /// and optionally including default verbs.
     /// - Parameters:
     ///   - items: An array of `Item` objects specific to the game.
+    ///   - locations: An array of `Location` objects specific to the game.
     ///   - verbs: An array of `Verb` objects specific to the game (can override defaults).
     ///   - useDefaultVerbs: If true, includes the `Vocabulary.defaultVerbs`.
     /// - Returns: A populated `Vocabulary` instance.
-    @MainActor public static func build(
-        items: [Item],
+    public static func build(
+        items: [Item] = [],
+        locations: [Location] = [],
         verbs: [Verb] = [],
         useDefaultVerbs: Bool = true
     ) -> Vocabulary {
@@ -371,9 +439,24 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             }
         }
 
+        #if DEBUG
+        vocab.add(
+            verb: Verb(
+                id: .debug,
+                synonyms: "db",
+                syntax: [SyntaxRule(.verb, .directObject)],
+                requiresLight: false
+            )
+        )
+        #endif
+
         // Add game-specific items
         for item in items {
             vocab.add(item: item)
+        }
+        // Add game-specific locations
+        for location in locations {
+            vocab.add(location: location)
         }
         // Add game-specific verbs (allowing overrides of defaults)
         for verb in verbs {
@@ -401,8 +484,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             "southwest": .southwest, "sw": .southwest,
             "up": .up, "u": .up,
             "down": .down, "d": .down,
-            "in": .in, // Note: 'in' is already a preposition, parser needs to handle ambiguity
-            "out": .out
+            "in": .inside,
+            "out": .outside
             // Add LAND? Might conflict with "land verb"
         ]
     }
@@ -418,6 +501,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case verbDefinitions // Updated key
         case items
         case adjectives
+        case locationNames // Added coding key
         case noiseWords
         case prepositions
         case pronouns
@@ -431,6 +515,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         verbDefinitions = try container.decodeIfPresent([VerbID: Verb].self, forKey: .verbDefinitions) ?? [:]
         items = try container.decode([String: Set<ItemID>].self, forKey: .items)
         adjectives = try container.decode([String: Set<ItemID>].self, forKey: .adjectives)
+        locationNames = try container.decodeIfPresent([String: LocationID].self, forKey: .locationNames) ?? [:] // Decode new property
         noiseWords = try container.decode(Set<String>.self, forKey: .noiseWords)
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
@@ -442,6 +527,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(verbDefinitions, forKey: .verbDefinitions)
         try container.encode(items, forKey: .items)
         try container.encode(adjectives, forKey: .adjectives)
+        try container.encode(locationNames, forKey: .locationNames) // Encode new property
         try container.encode(noiseWords, forKey: .noiseWords)
         try container.encode(prepositions, forKey: .prepositions)
         try container.encode(pronouns, forKey: .pronouns)

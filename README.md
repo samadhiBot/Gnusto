@@ -1,6 +1,96 @@
-# Gnusto Engine
+![Gnusto Interactive Fiction Engine Hero Graphic](Docs/Images/gnusto-heading.png)
 
-A modern Swift implementation of an Interactive Fiction (IF) engine, designed to be powerful, flexible, and maintainable. The engine is built with a focus on clean, efficient, and well-structured code, adhering to SOLID principles and modern Swift practices.
+# Gnusto: A Modern Interactive Fiction Engine
+
+Gnusto is a powerful, flexible framework for creating interactive fiction games. Drawing inspiration from the classic Infocom games, it provides a modern Swift-based toolkit that makes building rich, dynamic text adventures easy and enjoyable.
+
+## For Game Creators
+
+### Why Gnusto?
+
+- **Modern Development Experience:** Write clean, maintainable code with Swift's modern features and safety guarantees
+- **Cross-Platform:** Deploy your game anywhere - macOS, iOS, Linux, Windows, and Android
+- **Powerful Yet Approachable:** Start with simple text adventures and scale up to complex, dynamic worlds
+- **Battle-Tested Patterns:** Leverage proven design patterns from the golden age of interactive fiction
+- **Focus on Storytelling:** Spend less time on engine mechanics, more time crafting your narrative
+
+### Key Features for Creators
+
+- **Dynamic Content:** Create living, breathing worlds with state-driven descriptions and behaviors
+- **Rich Action System:** Support complex player interactions with a flexible action pipeline
+- **Smart Parser:** Natural language understanding with support for complex commands and object references
+- **State Management:** Track game progress, handle timed events, and manage complex game states
+- **Extensible Architecture:** Add custom behaviors and game mechanics without fighting the engine
+
+### Quick Start for Creators
+
+1. **Install Gnusto:** Add it to your Swift project
+2. **Define Your World:** Create locations and items
+3. **Add Descriptions:** Write static text or dynamic handlers
+4. **Define Actions:** Specify how objects interact
+5. **Run Your Game:** Deploy to any supported platform
+
+### Example Code
+
+```swift
+struct OperaHouse: AreaContents {
+    let foyer = Location(
+        id: "foyer",
+        .name("Foyer of the Opera House"),
+        .description("""
+                You are standing in a spacious hall, splendidly decorated in red
+                and gold, with glittering chandeliers overhead. The entrance from
+                the street is to the north, and there are doorways south and west.
+                """),
+        .exits([
+            .south: Exit(destination: "bar"),
+            .west: Exit(destination: "cloakroom"),
+            .north: Exit(
+                destination: "street",
+                blockedMessage: """
+                    You've only just arrived, and besides, the weather outside
+                    seems to be getting worse.
+                    """
+            )
+        ]),
+        .inherentlyLit
+    )
+
+    let cloak = Item(
+        id: "cloak",
+        .name("velvet cloak"),
+        .description("A handsome velvet cloak, of exquisite quality."),
+        .in(.player),
+        .isTakable,
+        .isWearable,
+        .isWorn,
+    )
+
+    func hookAction(_ engine: GameEngine, _ command: Command) async throws -> Bool {
+        guard command.verbID == .examine, let cloak = try await engine.item("cloak") else {
+            return false
+        }
+        let hookDetail = if cloak.parent == .item("hook") {
+            "with a cloak hanging on it"
+        } else {
+            "screwed to the wall"
+        }
+        throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
+    }
+}
+```
+
+### Ready to Start?
+
+Check out our example games and documentation:
+
+- [Cloak of Darkness](Executables/CloakOfDarkness): A complete, playable example
+- [Frobozz Magic Demo Kit](Executables/FrobozzMagicDemoKit): Templates and patterns
+- [Documentation](Docs/): Detailed guides and API reference
+
+---
+
+## For Engine Developers
 
 ## Project Structure
 
@@ -9,87 +99,158 @@ The project is organized into two main directories:
 - **Sources/GnustoEngine:** Contains the core engine code.
 - **Executables:** Contains example games and demos built using the engine.
 
-## Core Engine Features
+## Core Concepts
 
-### Item System
+### Game World Model
 
-The `Item` class represents interactable objects within the game world. Key features include:
+- **Entities:** The game world is defined by `Location` and `Item` objects, each with:
 
-- **Properties:** Items can have a set of `ItemProperty` values defining their characteristics.
-- **Descriptions:** Items have `description`, `firstDescription`, and `subsequentDescription` for static text.
-- **Synonyms and Adjectives:** Items can have synonyms and adjectives for flexible command parsing.
-- **Size and Capacity:** Items have a `size` and `capacity` for inventory management.
+  - Static definition data (ID, name, vocabulary words)
+  - Dynamic state via `[AttributeID: StateValue]` dictionary (`attributes`)
+  - Optional description handlers for dynamic text generation
+  - Optional action handlers to override default behavior
 
-### Action Handling
+- **State Management:**
 
-- **Current State:** Basic action handling is in place, with plans to enhance it for more dynamic behavior.
-- **Future Goals:** Implement `before` and `after` routines for action validation and side effects, as outlined in the ROADMAP.
+  - Centralized in `GameState`, mutated via `StateChange` objects
+  - All state changes are tracked and validated
+  - Supports custom state on items and locations
+  - Handles fuses (timed events) and daemons (background processes)
 
-### Dynamic Content
+- **Action System:**
+  - Player input parsed into `Command` objects
+  - `ActionHandler`s process commands via a pipeline:
+    1. `validate`: Check if action can be performed
+    2. `process`: Execute the action and return results
+    3. `postProcess`: Handle side effects
+  - Returns `ActionResult` with success status, message, and state changes
 
-- **Current State:** Descriptions are static strings.
-- **Future Goals:** Implement dynamic descriptions based on game state, using either closure-based or handler-based approaches.
+### Core Features
 
-### Custom State Management
+#### Item System
 
-- **Current State:** Limited to boolean properties via `Item.properties`.
-- **Future Goals:** Extend support for custom, mutable state on items and locations.
+The `Item` class represents interactable objects with:
 
-### Parser
+- **Properties:** Configurable via `ItemProperty` values
+- **Descriptions:** Support for static and dynamic text
+- **Vocabulary:** Synonyms and adjectives for flexible parsing
+- **Inventory:** Size and capacity management
+- **State:** Custom attributes and flags
 
-- **Current State:** Basic command parsing with synonyms and adjectives.
-- **Future Goals:** Enhance parser to handle custom grammar and advanced noun phrase parsing.
+#### Location System
 
-## Development Conventions
+The `Location` class defines game areas with:
 
-- **Code Style:** Alphabetize properties, functions, enum cases, etc., unless another ordering is more logical.
-- **Testing:** Use `Swift Testing` over `XCTest` unless working on a legacy project.
-- **Documentation:** Include clear inline documentation for all types, functions, properties, and enumeration cases.
-- **Project Organization:** Organize projects in a logical hierarchy of folders and files, with a dedicated file for each type of any complexity or importance.
+- **Exits:** Connections to other locations
+- **Contents:** Items present in the location
+- **State:** Custom attributes and flags
+- **Action Handlers:** Location-specific behavior
+
+#### Parser
+
+The `StandardParser` implements a ZIL-inspired command parser:
+
+- **Tokenization:** Splits input into significant words
+- **Verb Matching:** Supports multi-word verbs and synonyms
+- **Object Resolution:** Handles pronouns, adjectives, and scope
+- **Grammar Rules:** Configurable syntax patterns
+- **Error Handling:** Detailed parsing error messages
+
+## Development Standards
+
+### Code Organization
+
+- **Logical Grouping:** Properties, initializers, computed properties, public functions, private functions
+- **Alphabetization:** Within logical groups, unless a different order is more natural
+- **File Structure:** One type per file, with nested types kept in parent file unless large/complex
+- **Documentation:** Clear `///` documentation for public APIs, minimal `//` comments for non-obvious code
+
+### Testing
+
+- **Framework:** `Swift Testing` for new code
+- **Coverage:** 80-90% test coverage in pull requests
+- **Organization:** Tests mirror source structure
+- **Documentation:** Test cases clearly describe behavior
+
+### Documentation
+
+- **API Documentation:** `///` comments for all public types, functions, properties
+- **Design Documents:** Markdown files in `Docs/` directory
+- **Examples:** Example games demonstrating engine features
+- **References:** Historical IF source code for research
 
 ## Example Games
 
 ### Cloak of Darkness
 
-A simple demonstration of Interactive Fiction, showcasing the engine's capabilities. The game features:
+A simple demonstration of Interactive Fiction, showcasing the engine's capabilities:
 
-- Three rooms: Foyer, Bar, and Cloakroom.
-- Three objects: Hook, Cloak, and Message.
-- Dynamic descriptions and action handling based on game state.
+- Three rooms: Foyer, Bar, and Cloakroom
+- Three objects: Hook, Cloak, and Message
+- Dynamic descriptions and action handling
+- Light/dark mechanics
+- Score tracking
 
 ### Frobozz Magic Demo Kit
 
-A demo kit showcasing the engine's features and providing a template for new games.
+A comprehensive demo kit providing:
 
-## Next Steps
-
-Refer to the [ROADMAP.md](Docs/ROADMAP.md) for detailed information on the next major phase of development, focusing on dynamic content and action handling.
+- Template for new games
+- Example implementations of common IF patterns
+- Documentation of engine features
+- Best practices for game development
 
 ## Getting Started
 
-1. Clone the repository.
-2. Open the project in Xcode.
-3. Build and run the example games in the `Executables` directory.
+1. Clone the repository
+2. Open the project in Xcode
+3. Build and run the example games in `Executables/`
 
 ### Reference Materials
 
-The project includes a script to fetch reference materials from historical Infocom source code repositories. These materials are used for research and development purposes, helping to understand the design patterns and implementation details of classic interactive fiction games.
-
-To fetch the reference materials:
+The project includes historical IF source code for research:
 
 ```bash
 ./Scripts/fetch_infocom_sources.sh
 ```
 
-This script will:
+This script fetches:
 
-- Clone the source repositories for "A Mind Forever Voyaging", "Hitchhikers Guide to the Galaxy", and "Zork 1"
-- Extract only the relevant source files (`.zil`, `.md`, and `.txt`)
-- Place them in the `Docs/References/` directory
-- Clean up temporary files
+- "A Mind Forever Voyaging"
+- "Hitchhikers Guide to the Galaxy"
+- "Zork 1"
 
-Note: The reference materials are not tracked in git (except for "Cloak of Darkness"). Run this script whenever you need to update or access the reference materials.
+Note: Reference materials (except "Cloak of Darkness") are not tracked in git.
 
 ## Contributing
 
-Contributions are welcome! Please ensure your code adheres to the project's conventions and includes appropriate tests and documentation.
+Contributions are welcome! Please:
+
+1. Follow the development standards
+2. Include appropriate tests
+3. Document your changes
+4. Reference the [ROADMAP.md](Docs/ROADMAP.md) for planned features
+
+## License
+
+MIT License
+
+Copyright (c) 2025 Chris Sessions
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

@@ -1,7 +1,6 @@
 import Foundation // For print
 import GnustoEngine
 
-@MainActor
 enum Components {
     /// Functionality related to the Brass Lantern item.
     enum Lantern {
@@ -24,7 +23,7 @@ enum Components {
             /// ID for the low battery warning fuse
             static let lowBatteryWarningFuseID: FuseID = "lanternLowBatteryWarning"
 
-            /// Key for the battery life in gameSpecificState
+            /// Key for the battery life in globalState
             static let batteryLifeKey = "lanternBatteryLife"
 
             /// Flag for pending messages
@@ -42,7 +41,7 @@ enum Components {
             initialBatteryLife: Int = Constants.defaultBatteryLife
         ) async {
             // Make sure the lantern exists using item(with:) for safety
-            guard await engine.item(with: Constants.itemID) != nil else {
+            guard await engine.item(Constants.itemID) != nil else {
                 // Use Swift.print for simple logging in demo/examples
                 Swift.print("Cannot setup lantern timer: lantern item '\(Constants.itemID)' not found")
                 return
@@ -55,8 +54,8 @@ enum Components {
             /*
             // TODO: Move Weather initialization to Weather component
             // Set initial weather
-            if state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] == nil {
-                 state.gameSpecificState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
+            if state.globalState?[Components.Weather.Constants.weatherStateKey] == nil {
+                 state.globalState?[Components.Weather.Constants.weatherStateKey] = AnyCodable("sunny")
             }
             */
 
@@ -67,7 +66,7 @@ enum Components {
             /*
             // TODO: Move Weather daemon registration to Weather component
             // Register the weather daemon (Remove isDaemonRegistered check)
-            let _ = engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
+            let _ = await engine.registerDaemon(id: Components.Weather.Constants.weatherDaemonID)
             */
         }
 
@@ -81,11 +80,11 @@ enum Components {
                 frequency: 1 // Run every turn
             ) { engine in
                 // Closure runs every turn to update lantern battery
-                let batteryLifeValue = engine.getStateValue(key: Constants.batteryLifeKey)?.value as? Int
+                let batteryLifeValue = await engine.getStateValue(key: Constants.batteryLifeKey)?.value as? Int
                     ?? Constants.defaultBatteryLife
 
                 // Check lantern state directly via snapshot to avoid direct gameState access
-                guard let lantern = engine.item(with: Constants.itemID) else {
+                guard let lantern = try await engine.item(Constants.itemID) else {
                     Swift.print("Warning: Lantern item '\(Constants.itemID)' not found in game state for daemon.")
                     return
                 }
@@ -103,7 +102,7 @@ enum Components {
                 switch newBatteryLife {
                 case Constants.lowBatteryThreshold:
                     // When we hit the threshold, add a fuse for the final warning
-                    let _ = engine.addFuse(id: Constants.lowBatteryWarningFuseID)
+                    let _ = await engine.addFuse(id: Constants.lowBatteryWarningFuseID)
 
                     // Store message to be displayed on next turn
                     engine.updateGameSpecificState(
@@ -132,7 +131,7 @@ enum Components {
 
         /// Creates a fuse definition for the lantern's low battery warning.
         /// - Returns: A `FuseDefinition` that will trigger a final warning before the lantern dies
-        @MainActor static func createLanternWarningFuse() -> FuseDefinition {
+        static func createLanternWarningFuse() -> FuseDefinition {
             FuseDefinition(
                 id: Constants.lowBatteryWarningFuseID,
                 initialTurns: Constants.lowBatteryThreshold / 2

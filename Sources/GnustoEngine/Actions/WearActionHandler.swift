@@ -1,80 +1,60 @@
 import Foundation
 
-/// Handles the "WEAR" command and its synonyms (e.g., "DON").
-public struct WearActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.prerequisiteNotMet("Wear what?")
+/// Handles the "WEAR" context.command and its synonyms (e.g., "DON").
+public struct WearActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Wear what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only wear items.")
         }
 
         // 2. Check if the item exists and is held by the player
-        guard let targetItem = await engine.item(with: targetItemID),
-              targetItem.parent == .player else
-        {
-            throw ActionError.itemNotHeld(targetItemID)
+        let targetItem = try await context.engine.item(targetItemID)
+
+        guard await context.engine.playerIsHolding(targetItemID) else {
+            throw ActionResponse.itemNotHeld(targetItemID)
         }
 
         // 3. Check if the (held) item is wearable
-        guard targetItem.hasProperty(.wearable) else {
-            throw ActionError.itemNotWearable(targetItemID)
+        guard targetItem.hasFlag(.isWearable) else {
+            throw ActionResponse.itemNotWearable(targetItemID)
         }
 
         // 4. Check if already worn
-        guard !targetItem.hasProperty(.worn) else {
-            throw ActionError.itemIsAlreadyWorn(targetItemID)
+        guard !targetItem.hasFlag(.isWorn) else {
+            throw ActionResponse.itemIsAlreadyWorn(targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        // IDs and validation guaranteed by validate()
-        let targetItemID = command.directObject!
-        guard let itemSnapshot = await engine.item(with: targetItemID) else {
-            // Should not happen if validate passed
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for WEAR.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Wear: directObject was not an item in process.")
         }
-
+        let targetItem = try await context.engine.item(targetItemID)
         var stateChanges: [StateChange] = []
 
-        // Calculate property changes: Add .worn and .touched
-        let oldProps = itemSnapshot.properties
-        var newProps = oldProps
-        newProps.insert(.worn)
-        newProps.insert(.touched) // Wearing implies touching
+        // Change 1: Add .worn (if not already worn)
+        if let update = await context.engine.setFlag(.isWorn, on: targetItem) {
+            stateChanges.append(update)
+        }
 
-        if oldProps != newProps {
-            stateChanges.append(StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProps),
-                newValue: .itemPropertySet(newProps)
-            ))
+        // Change 2: Add .touched (if not already touched)
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
         }
 
         // Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([targetItemID])
-        ))
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
 
         // --- Prepare Result ---
-        let message = "You put on the \(itemSnapshot.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You put on the \(targetItem.name).",
             stateChanges: stateChanges
         )
     }

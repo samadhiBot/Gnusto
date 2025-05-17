@@ -1,70 +1,64 @@
 import Foundation
 
 /// Action handler for the THINK ABOUT verb (based on Cloak of Darkness).
-public struct ThinkAboutActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
-    public func validate(command: Command, engine: GameEngine) async throws {
+public struct ThinkAboutActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.customResponse("Think about what?")
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.custom("Think about what?")
         }
 
-        // 2. Skip further checks if thinking about self (PLAYER)
-        if targetItemID.rawValue == "player" { return }
-
-        // 3. Check if item exists
-        guard await engine.item(with: targetItemID) != nil else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
-        }
-
-        // 4. Check reachability
-        let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
-        guard isReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        switch directObjectRef {
+        case .player:
+            return // Thinking about self is always valid.
+        case .item(let targetItemID):
+            // 2. Check if item exists
+            let _ = try await context.engine.item(targetItemID) // Will throw if not found
+            // 3. Check reachability
+            guard await context.engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+        case .location(_):
+            // For now, only allow thinking about items or the player.
+            // TODO: Consider if thinking about locations should have a custom response.
+            throw ActionResponse.prerequisiteNotMet("You can only think about items or yourself.")
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            // Should be caught by validate
-            throw ActionError.internalEngineError("THINK ABOUT command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject else {
+            // Should be caught by validate.
+            throw ActionResponse.internalEngineError("ThinkAbout: directObject was nil in process.")
         }
 
         let message: String
         var stateChanges: [StateChange] = []
 
-        // Handle thinking about player
-        if targetItemID.rawValue == "player" {
+        switch directObjectRef {
+        case .player:
             message = "Yes, yes, you're very important."
-        } else {
-            // Handle thinking about an item
-            guard let targetItem = await engine.item(with: targetItemID) else {
-                 // Should be caught by validate
-                throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
-            }
-
+        case .item(let targetItemID):
+            let targetItem = try await context.engine.item(targetItemID)
             // Mark as touched if not already
-            if !targetItem.hasProperty(.touched) {
-                let change = StateChange(
-                    entityId: .item(targetItemID),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(targetItem.properties),
-                    newValue: .itemPropertySet(targetItem.properties.union([.touched]))
-                )
-                stateChanges.append(change)
+            if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
+                stateChanges.append(addTouchedFlag)
             }
-
-            // Set the standard message
-            message = "You contemplate the \(targetItem.name) for a bit, but nothing fruitful comes to mind."
+            // Update pronoun
+            if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
+                stateChanges.append(updatePronoun)
+            }
+            message = """
+                You contemplate the \(targetItem.name) for a bit, \
+                but nothing fruitful comes to mind.
+                """
+        case .location(_):
+            // Should be caught by validate if we decide not to support thinking about locations.
+            // If supported, a custom message would go here.
+            message = "You ponder the location, but it remains stubbornly locational."
         }
 
         // Create result
         return ActionResult(
-            success: true,
             message: message,
             stateChanges: stateChanges
         )

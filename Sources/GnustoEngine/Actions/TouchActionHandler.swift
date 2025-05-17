@@ -1,85 +1,43 @@
 import Foundation
 
-/// Handles the "TOUCH" command and its synonyms (e.g., "FEEL", "RUB", "PAT").
-public struct TouchActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
-    public func validate(command: Command, engine: GameEngine) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.customResponse("Touch what?")
+/// Handles the "TOUCH" context.command and its synonyms (e.g., "FEEL", "RUB", "PAT").
+public struct TouchActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.custom("Touch what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only touch items.")
         }
 
-        // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            throw ActionError.internalEngineError("Parser resolved item ID '\(targetItemID)' which does not exist.")
-        }
+        // 2. Check if item exists (engine.item() will throw if not found)
+        let _ = try await context.engine.item(targetItemID)
 
         // 3. Check reachability
-        // Inline check as ScopeResolver doesn't have this specific logic yet.
-        let currentLocationID = await engine.gameState.player.currentLocationID
-        let itemParent = targetItem.parent
-        var isReachable = false
-        switch itemParent {
-        case .location(let locID):
-            isReachable = (locID == currentLocationID)
-        case .item(let parentItemID):
-            guard let parentItem = await engine.item(with: parentItemID) else {
-                throw ActionError.internalEngineError("Item \(targetItemID) references non-existent parent item \(parentItemID).")
-            }
-            let parentParent = parentItem.parent
-            let isParentItemInReach = (parentParent == .location(currentLocationID) || parentParent == .player)
-            if isParentItemInReach {
-                if parentItem.hasProperty(.surface) {
-                    isReachable = true
-                } else if parentItem.hasProperty(.container) {
-                    guard parentItem.hasProperty(.open) else {
-                        throw ActionError.prerequisiteNotMet("The \(parentItem.name) is closed.")
-                    }
-                    isReachable = true
-                }
-            }
-        case .player:
-            isReachable = true
-        case .nowhere:
-            isReachable = false
-        }
-        guard isReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        guard await context.engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("TOUCH command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("Touch: directObject was not an item in process.")
         }
+        let targetItem = try await context.engine.item(targetItemID)
 
         // --- State Change: Mark as Touched ---
         var stateChanges: [StateChange] = []
-        // Get snapshot again to ensure properties are current
-        if let targetItem = await engine.item(with: targetItemID) {
-            let initialProperties = targetItem.properties // Use initial state
-            if !initialProperties.contains(.touched) {
-                stateChanges.append(StateChange(
-                    entityId: .item(targetItemID),
-                    propertyKey: .itemProperties,
-                    oldValue: .itemPropertySet(initialProperties),
-                    newValue: .itemPropertySet(initialProperties.union([.touched]))
-                ))
-            }
-        } else {
-            // Should not happen if validate passed
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process for TOUCH.")
+
+        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(addTouchedFlag)
         }
 
-        // TODO: Allow item-specific touch actions via ObjectActionHandler?
+        // TODO: Allow item-specific touch actions via ItemActionHandler?
 
         // --- Create Result ---
         return ActionResult(
-            success: true,
             message: "You feel nothing special.",
             stateChanges: stateChanges
         )

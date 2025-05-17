@@ -1,6 +1,5 @@
 import GnustoEngine
 
-@MainActor
 extension Components {
     /// Functionality related to the Iron Door puzzle.
     enum IronDoorPuzzle {

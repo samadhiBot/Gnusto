@@ -30,7 +30,11 @@ let package = Package(
         .target(
             name: "GnustoEngine",
             dependencies: [
+                .product(name: "CustomDump", package: "swift-custom-dump"),
                 .product(name: "Markdown", package: "swift-markdown"),
+            ],
+            swiftSettings: [
+                .define("DEBUG", .when(configuration: .debug))
             ]
         ),
         .executableTarget(

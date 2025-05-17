@@ -1,76 +1,73 @@
 import Testing
 @testable import GnustoEngine
 
-@MainActor
 @Suite("ScopeResolver Tests")
 struct ScopeResolverTests {
-    let testLocationID = Location.ID("startRoom")
-
     @Test("Location is lit if inherentlyLit property is present")
     func testIsLitInherentlyLit() async throws {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if not inherentlyLit and no light source")
     func testIsLitDarkNoSource() async throws {
-        let game = MinimalGame()
+        let darkRoom = Location(id: .startRoom)
+        let game = MinimalGame(locations: [darkRoom])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        engine.gameState.locations["startRoom"]?.properties.remove(.inherentlyLit)
-
-        #expect(resolver.isLocationLit(locationID: "startRoom") == false)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == false)
     }
 
     @Test("Location is lit if player holds active light source")
     func testIsLitPlayerActiveLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            .in(.player),
+            .isLightSource,
+            .isOn,
+            .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if player holds inactive light source")
     func testIsLitPlayerInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .takable,
-            parent: .player
+            .in(.player),
+            .isLightSource,
+            .isTakable
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -79,49 +76,48 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
+        await #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
 
     @Test("Location is lit if active light source is in room")
     func testIsLitRoomActiveLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .on,
-            parent: .location("startRoom")
+            .in(.location(.startRoom)),
+            .isLightSource,
+            .isOn
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if inactive light source is in room")
     func testIsLitRoomInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource,
-            parent: .location(darkRoom.id)
+            .in(.location(darkRoom.id)),
+            .isLightSource
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -130,35 +126,36 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
+        await #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
     }
 
     @Test("Location is lit if inherentlyLit and player holds active light (inherentlyLit takes precedence)")
     func testIsLitInherentlyLitWithPlayerLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            .in(.player),
+            .isLightSource,
+            .isOn,
+            .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "startRoom") == true)
+        await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
     }
 
     @Test("Location is dark if location ID does not exist")
@@ -166,42 +163,40 @@ struct ScopeResolverTests {
         let game = MinimalGame(locations: [])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        #expect(resolver.isLocationLit(locationID: "badRoom") == false)
+        await #expect(resolver.isLocationLit(locationID: "badRoom") == false)
     }
 
-    // --- visibleItemsIn Tests ---
+    // — visibleItemsIn Tests —
 
     @Test("Visible items in inherently lit room")
     func testVisibleItemsInherentlyLit() async throws {
         let visibleItem = Item(
             id: "key",
-            name: "key",
-            parent: .location("startRoom")
+            .in(.location(.startRoom))
         )
         let invisibleItem = Item(
             id: "dust",
-            name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            .in(.location(.startRoom)),
+            .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -211,14 +206,14 @@ struct ScopeResolverTests {
         // Explicitly create a dark room
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
             // No .inherentlyLit property
         )
         let item = Item(
             id: "key",
-            name: "key",
-            parent: .location(darkRoom.id) // Place item in the dark room
+            .in(.location(darkRoom.id)),
+            .isInvisible
         )
         let player = Player(in: darkRoom.id)
 
@@ -230,17 +225,17 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
         // No need to modify state after initialization
-        // game.state.locations["startRoom"]?.properties.remove(.inherentlyLit)
+        // game.state.locations[.startRoom].attributes.remove(.inherentlyLit)
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
+        let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
     }
 
@@ -248,32 +243,31 @@ struct ScopeResolverTests {
     func testVisibleItemsPlayerLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .on, .takable,
-            parent: .player
+            .in(.player),
+            .isLightSource,
+            .isOn,
+            .isTakable
         )
         let visibleItem = Item(
             id: "key",
-            name: "key",
-            parent: .location("startRoom")
+            .in(.location(.startRoom))
         )
         let invisibleItem = Item(
             id: "dust",
-            name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            .in(.location(.startRoom)),
+            .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -282,32 +276,30 @@ struct ScopeResolverTests {
     func testVisibleItemsRoomLight() async throws {
         let activeLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource, .on,
-            parent: .location("startRoom")
+            .in(.location(.startRoom)),
+            .isLightSource,
+            .isOn
         )
         let visibleItem = Item(
             id: "key",
-            name: "key",
-            parent: .location("startRoom")
-        )
+            .in(.location(.startRoom))
+)
         let invisibleItem = Item(
             id: "dust",
-            name: "dust",
-            properties: .invisible,
-            parent: .location("startRoom")
+            .in(.location(.startRoom)),
+            .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: "startRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
         #expect(Set(visibleIDs) == Set([activeLamp.id, visibleItem.id]))
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
@@ -317,14 +309,14 @@ struct ScopeResolverTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: "badRoom")
+        let visibleIDs = await resolver.visibleItemsIn(locationID: "badRoom")
         #expect(visibleIDs.isEmpty)
     }
 
@@ -332,52 +324,53 @@ struct ScopeResolverTests {
 
     let baseBox = Item(
         id: "box",
-        name: "box",
-        properties: .container,
-        parent: .player
+        .in(.player),
+        .isContainer
     )
     let baseOpenBox = Item(
         id: "openBox",
-        name: "open box",
-        properties: .container, .open,
-        parent: .player
+        .name("open box"),
+        .in(.player),
+        .isContainer,
+        .isOpen
     )
     let baseClosedBox = Item(
         id: "closedBox",
-        name: "closed box",
-        properties: .container,
-        parent: .player
+        .name("closed box"),
+        .in(.player),
+        .isContainer
     )
     let baseTransparentBox = Item(
         id: "transBox",
-        name: "transparent box",
-        properties: .container, .transparent,
-        parent: .player
+        .name("transparent box"),
+        .in(.player),
+        .isContainer,
+        .isTransparent
     )
     let baseItemInBox = Item(
         id: "itemInBox",
-        name: "item in box"
+        .in(.nowhere)
     )
 
     @Test("Reachable includes inventory")
     func testReachableInventory() async throws {
         let inventoryItem = Item(
             id: "invItem",
-            name: "Inventory Item",
-            properties: .takable,
-            parent: .player
+            .name("Inventory Item"),
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [inventoryItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable.contains(inventoryItem.id))
     }
 
@@ -385,20 +378,20 @@ struct ScopeResolverTests {
     func testReachableVisibleLitRoom() async throws {
         let locationItem = Item(
             id: "locItem",
-            name: "Location Item",
-            parent: .location("startRoom")
+            .name("Location Item"),
+            .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [locationItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable.contains(locationItem.id))
     }
 
@@ -406,13 +399,14 @@ struct ScopeResolverTests {
     func testReachableDarkRoom() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let locationItem = Item(
             id: "locItem",
-            name: "Location Item",
-            parent: .location(darkRoom.id)
+            .name("Location Item"),
+            .in(.location(darkRoom.id)),
+            .isInvisible
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -421,14 +415,14 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(!reachable.contains(locationItem.id))
     }
 
@@ -436,26 +430,27 @@ struct ScopeResolverTests {
     func testReachableOpenContainerInventory() async throws {
         let openBox = Item(
             id: "openBox",
-            name: "open box",
-            properties: .container, .open,
-            parent: .player
+            .name("open box"),
+            .in(.player),
+            .isContainer,
+            .isOpen
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(openBox.id)
+            .name("item in box"),
+            .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
     }
 
@@ -463,26 +458,26 @@ struct ScopeResolverTests {
     func testReachableClosedContainerInventory() async throws {
         let closedBox = Item(
             id: "closedBox",
-            name: "closed box",
-            properties: .container,
-            parent: .player
+            .name("closed box"),
+            .in(.player),
+            .isContainer
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(closedBox.id)
+            .name("item in box"),
+            .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
         #expect(!reachable.contains(itemInBox.id))
         #expect(reachable.count == 1)
@@ -492,26 +487,27 @@ struct ScopeResolverTests {
     func testReachableTransparentContainerInventory() async throws {
         let transparentBox = Item(
             id: "transBox",
-            name: "transparent box",
-            properties: .container, .transparent,
-            parent: .player
+            .name("transparent box"),
+            .in(.player),
+            .isContainer,
+            .isTransparent
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(transparentBox.id)
+            .name("item in box"),
+            .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
     }
 
@@ -519,26 +515,27 @@ struct ScopeResolverTests {
     func testReachableOpenContainerLitRoom() async throws {
         let openBox = Item(
             id: "openBox",
-            name: "open box",
-            properties: .container, .open,
-            parent: .location("startRoom")
+            .name("open box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(openBox.id)
+            .name("item in box"),
+            .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable == Set([openBox.id, itemInBox.id]))
     }
 
@@ -546,26 +543,26 @@ struct ScopeResolverTests {
     func testReachableClosedContainerLitRoom() async throws {
         let closedBox = Item(
             id: "closedBox",
-            name: "closed box",
-            properties: .container,
-            parent: .location("startRoom")
+            .name("closed box"),
+            .in(.location(.startRoom)),
+            .isContainer
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(closedBox.id)
+            .name("item in box"),
+            .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable.contains(closedBox.id))
         #expect(!reachable.contains(itemInBox.id))
         #expect(reachable.count == 1)
@@ -575,26 +572,27 @@ struct ScopeResolverTests {
     func testReachableTransparentContainerLitRoom() async throws {
         let transparentBox = Item(
             id: "transBox",
-            name: "transparent box",
-            properties: .container, .transparent,
-            parent: .location("startRoom")
+            .name("transparent box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isTransparent
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(transparentBox.id)
+            .name("item in box"),
+            .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable == Set([transparentBox.id, itemInBox.id]))
     }
 
@@ -602,19 +600,20 @@ struct ScopeResolverTests {
     func testReachableContainerDarkRoom() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let openBox = Item(
             id: "openBox",
-            name: "open box",
-            properties: .container, .open,
-            parent: .location(darkRoom.id)
+            .name("open box"),
+            .in(.location(darkRoom.id)),
+            .isContainer,
+            .isOpen
         )
         let itemInBox = Item(
             id: "itemInBox",
-            name: "item in box",
-            parent: .item(openBox.id)
+            .name("item in box"),
+            .in(.item(openBox.id))
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -623,14 +622,14 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let reachable = resolver.itemsReachableByPlayer()
+        let reachable = await resolver.itemsReachableByPlayer()
         #expect(reachable.isEmpty) // Neither box nor item inside should be reachable in dark
     }
 
@@ -638,19 +637,18 @@ struct ScopeResolverTests {
     func testVisibleItemsRoomInactiveLight() async throws {
         let darkRoom = Location(
             id: "darkRoom",
-            name: "Pitch Black Room",
-            longDescription: "It's dark."
+            .name("Pitch Black Room"),
+            .description("It's dark.")
         )
         let inactiveLamp = Item(
             id: "lamp",
-            name: "lamp",
-            properties: .lightSource,
-            parent: .location(darkRoom.id)
+            .in(.location(darkRoom.id)),
+            .isLightSource
         )
         let item = Item(
             id: "key",
-            name: "key",
-            parent: .location(darkRoom.id)
+            .in(.location(darkRoom.id)),
+            .isInvisible
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
@@ -659,14 +657,14 @@ struct ScopeResolverTests {
         )
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        let resolver = engine.scopeResolver
+        let resolver = await engine.scopeResolver
 
-        let visibleIDs = resolver.visibleItemsIn(locationID: darkRoom.id)
+        let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
     }
 }

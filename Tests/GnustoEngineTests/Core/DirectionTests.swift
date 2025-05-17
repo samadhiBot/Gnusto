@@ -6,18 +6,18 @@ struct DirectionTests {
 
     @Test("Direction Raw Values")
     func testDirectionRawValues() throws {
-        #expect(Direction.north.rawValue == "north")
-        #expect(Direction.south.rawValue == "south")
+        #expect(Direction.down.rawValue == "down")
         #expect(Direction.east.rawValue == "east")
-        #expect(Direction.west.rawValue == "west")
+        #expect(Direction.inside.rawValue == "in")
+        #expect(Direction.north.rawValue == "north")
         #expect(Direction.northeast.rawValue == "northeast")
         #expect(Direction.northwest.rawValue == "northwest")
+        #expect(Direction.outside.rawValue == "out")
+        #expect(Direction.south.rawValue == "south")
         #expect(Direction.southeast.rawValue == "southeast")
         #expect(Direction.southwest.rawValue == "southwest")
         #expect(Direction.up.rawValue == "up")
-        #expect(Direction.down.rawValue == "down")
-        #expect(Direction.in.rawValue == "in")
-        #expect(Direction.out.rawValue == "out")
+        #expect(Direction.west.rawValue == "west")
     }
 
     @Test("Direction CaseIterable")
@@ -25,7 +25,7 @@ struct DirectionTests {
         #expect(Direction.allCases.count == 12)
         // Check a few key cases are present
         #expect(Direction.allCases.contains(.north))
-        #expect(Direction.allCases.contains(.in))
+        #expect(Direction.allCases.contains(.inside))
         #expect(Direction.allCases.contains(.southeast))
     }
 

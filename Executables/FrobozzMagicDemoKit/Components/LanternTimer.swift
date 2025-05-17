@@ -26,7 +26,7 @@ public enum LanternConstants {
     /// ID for the low battery warning fuse
     public static let lowBatteryWarningFuseID: FuseID = "lanternLowBatteryWarning"
 
-    /// Key for the battery life in gameSpecificState
+    /// Key for the battery life in globalState
     public static let batteryLifeKey = "lanternBatteryLife"
 }
 
@@ -34,7 +34,6 @@ public enum LanternConstants {
 
 /// Creates a daemon definition for the lantern timer.
 /// - Returns: A `DaemonDefinition` that tracks the lantern's battery consumption
-@MainActor
 public func createLanternTimerDaemon() -> DaemonDefinition {
     return DaemonDefinition(
         id: LanternConstants.timerDaemonID,
@@ -43,7 +42,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
         // Closure runs every turn to update lantern battery
 
         // Precondition: Lantern exists in the game
-        guard let lantern = engine.item(with: LanternConstants.lanternID) else {
+        guard let lantern = try await engine.item(LanternConstants.lanternID) else {
             print("Warning: Lantern item \(LanternConstants.lanternID) not found in game state")
             return
         }
@@ -55,7 +54,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
         // Get current battery life from game state
         // Default to defaultBatteryLife if not set
-        let batteryLifeValue = engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
+        let batteryLifeValue = await engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
             ?? LanternConstants.defaultBatteryLife
 
         // Decrement battery life by 1
@@ -68,7 +67,7 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
         switch newBatteryLife {
         case LanternConstants.lowBatteryThreshold:
             // When we hit the threshold, add a fuse for the final warning
-            let _ = engine.addFuse(id: LanternConstants.lowBatteryWarningFuseID)
+            let _ = await engine.addFuse(id: LanternConstants.lowBatteryWarningFuseID)
             await engine.output("Your lantern is getting dim.", style: .strong)
 
         case 0:
@@ -91,7 +90,6 @@ public func createLanternTimerDaemon() -> DaemonDefinition {
 
 /// Creates a fuse definition for the lantern's low battery warning.
 /// - Returns: A `FuseDefinition` that will trigger a final warning before the lantern dies
-@MainActor
 public func createLanternWarningFuse() -> FuseDefinition {
     return FuseDefinition(
         id: LanternConstants.lowBatteryWarningFuseID,
@@ -109,14 +107,13 @@ public func createLanternWarningFuse() -> FuseDefinition {
 ///   - engine: The game engine instance
 ///   - initialBatteryLife: Optional custom initial battery life (defaults to LanternConstants.defaultBatteryLife)
 /// - Returns: True if setup was successful
-@MainActor
 @discardableResult
 public func setupLanternTimer(
     engine: GameEngine,
     initialBatteryLife: Int = LanternConstants.defaultBatteryLife
 ) -> Bool {
     // Make sure the lantern exists
-    guard engine.item(with: LanternConstants.lanternID) != nil else {
+    guard engine.item(LanternConstants.lanternID) != nil else {
         print("Cannot setup lantern timer: lantern item \(LanternConstants.lanternID) not found")
         return false
     }
@@ -133,7 +130,6 @@ public func setupLanternTimer(
 /// Gets the current battery life of the lantern.
 /// - Parameter engine: The game engine instance
 /// - Returns: The remaining battery life in turns, or nil if not set
-@MainActor
 public func getLanternBatteryLife(engine: GameEngine) -> Int? {
     return engine.getStateValue(key: LanternConstants.batteryLifeKey)?.value as? Int
 }
@@ -142,7 +138,6 @@ public func getLanternBatteryLife(engine: GameEngine) -> Int? {
 /// - Parameters:
 ///   - engine: The game engine instance
 ///   - amount: The amount to set the battery life to (defaults to full charge)
-@MainActor
 public func rechargeLantern(
     engine: GameEngine,
     amount: Int = LanternConstants.defaultBatteryLife

@@ -1,17 +1,19 @@
+import CustomDump
+
 /// Represents the possible types of values that can be tracked in state changes.
 /// Ensures values are both Codable and Sendable.
-public enum StateValue: Codable, Sendable, Equatable {
+public enum StateValue: Codable, Sendable, Hashable {
     case bool(Bool)
     case int(Int)
     case itemID(ItemID)
     case itemIDSet(Set<ItemID>)
-    case itemPropertySet(Set<ItemProperty>)
-    case locationExits([Direction: Exit])
+    case entityReferenceSet(Set<EntityReference>?)
+    case exits([Direction: Exit])
     case locationID(LocationID)
-    case locationPropertySet(Set<LocationProperty>)
     case parentEntity(ParentEntity)
     case string(String)
     case stringSet(Set<String>)
+    case undefined
 }
 
 // MARK: - Public casting helpers
@@ -39,12 +41,6 @@ extension StateValue {
         underlyingValue as? Set<ItemID>
     }
 
-    /// Returns the `StateValue` underlying value as a `Set<ItemProperty>`, or `nil` if the
-    /// type does not match.
-    public var toItemProperties: Set<ItemProperty>? {
-        underlyingValue as? Set<ItemProperty>
-    }
-
     /// Returns the `StateValue` underlying value as a `[Direction: Exit]`, or `nil` if the
     /// type does not match.
     public var toLocationExits: [Direction: Exit]? {
@@ -55,12 +51,6 @@ extension StateValue {
     /// not match.
     public var toLocationID: LocationID? {
         underlyingValue as? LocationID
-    }
-
-    /// Returns the `StateValue` underlying value as a `Set<LocationProperty>`, or `nil` if
-    /// the type does not match.
-    public var toLocationProperties: Set<LocationProperty>? {
-        underlyingValue as? Set<LocationProperty>
     }
 
     /// Returns the `StateValue` underlying value as a `ParentEntity`, or `nil` if the type
@@ -80,6 +70,12 @@ extension StateValue {
     public var toStrings: Set<String>? {
         underlyingValue as? Set<String>
     }
+
+    /// Returns the `StateValue` underlying value as a `Set<EntityReference>`, or `nil` if the type
+    /// does not match.
+    public var toEntityReferenceSet: Set<EntityReference>? {
+        underlyingValue as? Set<EntityReference>
+    }
 }
 
 // MARK: - Private helpers
@@ -92,13 +88,74 @@ extension StateValue {
         case .int(let value): value
         case .itemID(let value): value
         case .itemIDSet(let value): value
-        case .itemPropertySet(let value): value
-        case .locationExits(let value): value
+        case .entityReferenceSet(let value): value as Any
+        case .exits(let value): value
         case .locationID(let value): value
-        case .locationPropertySet(let value): value
         case .parentEntity(let value): value
         case .string(let value): value
         case .stringSet(let value): value
+        case .undefined: "⚠️ undefined ⚠️"
+        }
+    }
+}
+
+// MARK: - Conformances
+
+extension StateValue: ExpressibleByArrayLiteral {
+    public typealias ArrayLiteralElement = String
+
+    public init(arrayLiteral elements: ArrayLiteralElement...) {
+        self = .stringSet(Set(elements))
+    }
+}
+
+extension StateValue: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: BooleanLiteralType) {
+        self = .bool(value)
+    }
+}
+
+extension StateValue: ExpressibleByIntegerLiteral {
+    public init(integerLiteral value: IntegerLiteralType) {
+        self = .int(value)
+    }
+}
+
+extension StateValue: ExpressibleByStringLiteral {
+    public init(stringLiteral value: String) {
+        self = .string(value)
+    }
+}
+
+// MARK: - CustomDumpStringConvertible conformance
+
+extension StateValue: CustomDumpStringConvertible {
+    public var customDumpDescription: String {
+        switch self {
+        case .bool(let bool):
+            "\(bool)"
+        case .int(let int):
+            "\(int)"
+        case .itemID(let itemID):
+            ".\(itemID)"
+        case .itemIDSet(let itemIDSet):
+            itemIDSet.map(\.customDumpDescription).joined(separator: ", ")
+        case .entityReferenceSet(let entityReferenceSet):
+            entityReferenceSet?.map(\.customDumpDescription).joined(separator: ", ") ?? "[]"
+        case .exits(let exits):
+            exits.map {
+                "\n\($0.customDumpDescription): \($1.customDumpDescription)"
+            }.joined().indent()
+        case .locationID(let locationID):
+            ".\(locationID)"
+        case .parentEntity(let parentEntity):
+            parentEntity.customDumpDescription
+        case .string(let string):
+            string.multiline
+        case .stringSet(let stringSet):
+            stringSet.map { "'\($0)'" }.joined(separator: ", ")
+        case .undefined:
+            ".undefined"
         }
     }
 }

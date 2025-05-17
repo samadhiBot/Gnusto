@@ -1,109 +1,117 @@
 import Foundation
 
-/// Handles the "EXAMINE" command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
-public struct ExamineActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler Methods
-
-    public func validate(command: Command, engine: GameEngine) async throws {
+/// Handles the "EXAMINE" context.command and its synonyms (e.g., "LOOK AT", "DESCRIBE").
+public struct ExamineActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.customResponse("Examine what?")
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.custom("Examine what?")
         }
-
-        // 2. Check if item exists
-        guard await engine.item(with: targetItemID) != nil else {
-            throw ActionError.internalEngineError("Parser resolved non-existent item ID '\(targetItemID)'.")
-        }
-
-        // 3. Check reachability
-        let isReachable = await engine.scopeResolver.itemsReachableByPlayer().contains(targetItemID)
-        guard isReachable else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        switch directObjectRef {
+        case .item(let targetItemID):
+            // 2. Check if item exists
+            guard (try? await context.engine.item(targetItemID)) != nil else {
+                throw ActionResponse.unknownEntity(directObjectRef)
+            }
+            // 3. Check reachability
+            guard await context.engine.playerCanReach(targetItemID) else {
+                throw ActionResponse.itemNotAccessible(targetItemID)
+            }
+        case .player:
+            // Allow examining self
+            return
+        default:
+            throw ActionResponse.prerequisiteNotMet("You can only examine items.")
         }
     }
 
-    public func process(command: Command, engine: GameEngine) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            throw ActionError.internalEngineError("Examine command reached process without direct object.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject else {
+            return ActionResult("You can only examine items.")
         }
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            throw ActionError.internalEngineError("Target item '\(targetItemID)' disappeared between validate and process.")
-        }
-
-        // --- State Change: Mark as Touched ---
-        var stateChanges: [StateChange] = []
-        let initialProperties = targetItem.properties // Use initial state
-        if !initialProperties.contains(.touched) {
-            stateChanges.append(StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(initialProperties),
-                newValue: .itemPropertySet(initialProperties.union([.touched]))
-            ))
-        }
-
-        // --- Determine Message ---
-        let message: String
-
-        // Priority 1: Readable Text
-        if targetItem.hasProperty(.readable), let text = targetItem.readableText, !text.isEmpty {
-            message = text
-        }
-        // Priority 2: Container/Door Description
-        else if targetItem.hasProperty(.container) || targetItem.hasProperty(.door) {
-            message = await describeContainerOrDoor(targetItem: targetItem, engine: engine)
-        }
-        // Priority 3: Surface Description
-        else if targetItem.hasProperty(.surface) {
-            message = await describeSurface(targetItem: targetItem, engine: engine)
-        }
-        // Priority 4: Dynamic Long Description
-        else if let descriptionHandler = targetItem.longDescription {
-            message = await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: engine
+        switch directObjectRef {
+        case .item(let targetItemID):
+            let targetItem = try await context.engine.item(targetItemID)
+            var stateChanges: [StateChange] = []
+            // Special case: examining 'self' as an item should not record any state changes
+            if targetItem.id != "self" {
+                // --- State Change: Mark as Touched ---
+                if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+                    stateChanges.append(update)
+                }
+                // --- State Change: Update pronouns ---
+                if let update = await context.engine.updatePronouns(to: targetItem) {
+                    stateChanges.append(update)
+                }
+            }
+            // --- Determine Message ---
+            let message: String
+            // Priority 1: Readable Text (Check dynamic value)
+            if targetItem.hasFlag(.isReadable),
+               let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
+               !readText.isEmpty
+            {
+                message = readText
+            }
+            // Priority 2: Container/Door Description
+            else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
+                message = try await describeContainerOrDoor(
+                    targetItem: targetItem,
+                    engine: context.engine
+                )
+            }
+            // Priority 3: Surface Description
+            else if targetItem.hasFlag(.isSurface) {
+                message = await describeSurface(
+                    targetItem: targetItem,
+                    engine: context.engine
+                )
+            }
+            // Priority 4: Dynamic Long Description
+            else {
+                // Use the registry to generate the description using the item ID and key
+                message = await context.engine.generateDescription(
+                    for: targetItem.id,
+                    key: .description,
+                    engine: context.engine
+                )
+            }
+            // --- Create Result ---
+            return ActionResult(
+                message: message,
+                stateChanges: stateChanges
             )
+        case .player:
+            // Classic Zork response for EXAMINE SELF
+            return ActionResult("You are your usual self.")
+        default:
+            return ActionResult("You can only examine items.")
         }
-        // Fallback: Default Message
-        else {
-            message = "There's nothing special about the \(targetItem.name)."
-        }
-
-        // --- Create Result ---
-        return ActionResult(
-            success: true,
-            message: message,
-            stateChanges: stateChanges
-        )
     }
 
     // MARK: - Private Helpers (Adapted to return String)
 
     /// Helper function to generate description for containers or doors.
-    private func describeContainerOrDoor(targetItem: Item, engine: GameEngine) async -> String {
+    private func describeContainerOrDoor(
+        targetItem: Item,
+        engine: GameEngine
+    ) async throws -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, if available
-        if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: engine
-            )
-            descriptionParts.append(baseDescription)
-        } else {
-            descriptionParts.append("You examine the \(targetItem.name).")
-        }
+        // Start with the item's main description, using the registry with ID and key
+        let baseDescription = await engine.generateDescription(
+            for: targetItem.id,
+            key: .description,
+            engine: engine
+        )
+        descriptionParts.append(baseDescription)
 
-        let isOpen = targetItem.hasProperty(.open)
-        let isTransparent = targetItem.hasProperty(.transparent)
+        // Check dynamic property for open state
+        let isOpen: Bool = try await engine.fetch(targetItem.id, .isOpen)
+        let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {
-            let contents = await engine.items(withParent: .item(targetItem.id))
+            let contents = await engine.items(in: .item(targetItem.id))
             if contents.isEmpty {
                 descriptionParts.append("The \(targetItem.name) is empty.")
             } else {
@@ -120,20 +128,16 @@ public struct ExamineActionHandler: EnhancedActionHandler {
     private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
         var descriptionParts: [String] = []
 
-        // Start with the item's main description, if available
-        if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: engine
-            )
-            descriptionParts.append(baseDescription)
-        } else {
-            descriptionParts.append("You examine the \(targetItem.name).")
-        }
+        // Start with the item's main description, using the registry with ID and key
+        let baseDescription = await engine.generateDescription(
+            for: targetItem.id,
+            key: .description,
+            engine: engine
+        )
+        descriptionParts.append(baseDescription)
 
         // List items on the surface
-        let contents = await engine.items(withParent: .item(targetItem.id))
+        let contents = await engine.items(in: .item(targetItem.id))
         if !contents.isEmpty {
             let itemNames = contents.listWithIndefiniteArticles
             descriptionParts.append(

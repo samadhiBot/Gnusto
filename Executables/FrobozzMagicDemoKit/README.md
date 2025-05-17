@@ -49,7 +49,7 @@ Item(
     synonyms: "lamp", "light",
     description: "A sturdy brass lantern, useful for exploring dark places.",
     properties: .takable, .lightSource,
-    parent: .location("startRoom")
+    .in(.location(.startRoom))
 )
 ```
 
@@ -62,7 +62,7 @@ The Demo Kit demonstrates how to implement custom behavior for specific game eve
 private static func onEnterRoom(engine: GameEngine, locationID: LocationID) async {
     if locationID == "treasureRoom" {
         let flag = "visited_treasure_room"
-        let hasVisited = engine.getCurrentGameState().flags[flag] ?? false
+        let hasVisited = await engine.getCurrentGameState().flags[flag] ?? false
 
         if !hasVisited {
             // First-time discovery behavior

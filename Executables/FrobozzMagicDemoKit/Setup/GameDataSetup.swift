@@ -1,7 +1,6 @@
 import GnustoEngine
 
 /// Handles the creation of initial game state and registry.
-@MainActor
 enum GameDataSetup {
     /// Creates the initial game state and registry with all necessary game data.
     /// - Returns: A tuple containing the initial `GameState` and `GameDefinitionRegistry`.
@@ -16,7 +15,7 @@ enum GameDataSetup {
         let verbs = VocabularySetup.verbs // Assuming verbs are defined here
 
         // Create player
-        let player = Player(in: "startRoom") // Start room ID
+        let player = Player(in: .startRoom) // Start room ID
 
         // Build vocabulary
         let vocabulary = Vocabulary.build(items: items, verbs: verbs)
@@ -30,7 +29,7 @@ enum GameDataSetup {
         )
 
         // --- Define Object Action Handlers ---
-        let objectActionHandlers: [ItemID: ObjectActionHandler] = [
+        let itemActionHandlers: [ItemID: ItemActionHandler] = [
             // Handle OPEN/CLOSE/EXAMINE for Iron Door
             "ironDoor": { engine, command in
                 switch command.verbID {
@@ -49,7 +48,7 @@ enum GameDataSetup {
                     )
                     return false // Allow default message
                 case "examine":
-                    let item = engine.item(with: "ironDoor") // We know the ID
+                    let item = try await engine.item("ironDoor") // We know the ID
                     let isLocked = item?.hasProperty(.locked) ?? true
                     let isOpen = item?.hasProperty(.open) ?? false
 
@@ -72,9 +71,9 @@ enum GameDataSetup {
                 case "examine":
                     guard let itemID = command.directObject else { return false } // Should have DO for examine
                     // Access game specific state directly via engine helper
-                    let item = engine.item(with: itemID)
+                    let item = try await engine.item(itemID)
                     // Use getStateValue to get the value safely
-                    if let batteryLife = engine.getStateValue(key: Components.Lantern.Constants.batteryLifeKey)?.value as? Int {
+                    if let batteryLife = await engine.getStateValue(key: Components.Lantern.Constants.batteryLifeKey)?.value as? Int {
                         let status = item?.hasProperty(.on) == true ? "lit" : "unlit"
                         await engine.output(
                             """
@@ -135,7 +134,7 @@ enum GameDataSetup {
                 Components.Lantern.createLanternTimerDaemon(),
                 Components.Weather.createWeatherDaemon()
             ],
-            objectActionHandlers: objectActionHandlers // Pass handlers
+            itemActionHandlers: itemActionHandlers // Pass handlers
         )
 
         return (initialState, registry)

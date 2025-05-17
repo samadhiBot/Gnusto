@@ -1,27 +1,32 @@
 import Foundation
+import Markdown
 
 /// A basic implementation of `IOHandler` that interacts with the standard console.
-@IOActor
+@MainActor
 public struct ConsoleIOHandler: IOHandler {
-
     public init() {}
 
     // --- Output Methods ---
 
-    public func print(_ text: String, style: TextStyle, newline: Bool) {
-        // Basic implementation ignores style for now.
-        // Use Swift.print to avoid potential conflicts if extensions arise.
-        Swift.print(text, terminator: newline ? "\n" : "")
-        // Ensure output is immediately visible, especially relevant if buffering occurs.
+    public func print(_ markdown: String, style: TextStyle, newline: Bool) {
+        Swift.print(MarkdownParser.parse(markdown), terminator: newline ? "\n\n" : "")
         fflush(stdout)
     }
 
     public func showStatusLine(roomName: String, score: Int, turns: Int) {
-        // Simple single-line status. A more sophisticated handler
-        // might use terminal manipulation (like ncurses) to keep it fixed.
-        let status = "[ \(roomName)  Score: \(score)  Turns: \(turns) ]"
-        // Print a newline above status line for separation
-        Swift.print("\n" + status)
+        let width = 64
+        let scoreCol = 42
+
+        let maxRoomLen = scoreCol - 2
+        let displayRoom = roomName.count > maxRoomLen ?
+                          roomName.prefix(maxRoomLen - 1) + "…" : roomName
+        let scoreStr = "Score: \(score)"
+        let turnsStr = "Turns: \(turns)"
+        let leftGap = displayRoom.padding(toLength: scoreCol, withPad: " ", startingAt: 0)
+        let rightPartLen = width - (leftGap.count + scoreStr.count)
+        let rightGap = String(repeating: " ", count: max(1, rightPartLen - turnsStr.count))
+
+        Swift.print("❲ \(leftGap)\(scoreStr)\(rightGap)\(turnsStr) ❳")
         fflush(stdout)
     }
 

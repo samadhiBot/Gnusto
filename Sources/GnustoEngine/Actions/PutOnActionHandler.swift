@@ -1,128 +1,101 @@
 import Foundation
 
 /// Handles the "PUT [item] ON [surface]" action.
-@MainActor
-struct PutOnActionHandler: EnhancedActionHandler {
+struct PutOnActionHandler: ActionHandler {
 
-    func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Validate Direct and Indirect Objects
-        guard let itemToPutID = command.directObject else {
-            throw ActionError.prerequisiteNotMet("Put what?") // Changed from Insert
+    func validate(context: ActionContext) async throws {
+        // 1. Validate Direct and Indirect Objects - both must be items
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Put what?")
         }
-        guard let surfaceID = command.indirectObject else {
-            let itemName = engine.item(with: itemToPutID)?.name ?? "item"
-            throw ActionError.prerequisiteNotMet("Put the \(itemName) on what?") // Changed from Insert
+        guard case .item(let itemToPutID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only put items on things.")
         }
 
-        // 2. Get Item Snapshots
-        guard let itemToPut = engine.item(with: itemToPutID) else {
-            throw ActionError.itemNotAccessible(itemToPutID)
+        guard let indirectObjectRef = context.command.indirectObject else {
+            let itemToPut = try await context.engine.item(itemToPutID) // Fetch for name
+            throw ActionResponse.prerequisiteNotMet("Put the \(itemToPut.name) on what?")
         }
-        guard let surfaceItem = engine.item(with: surfaceID) else {
-            throw ActionError.itemNotAccessible(surfaceID)
+        guard case .item(let surfaceID) = indirectObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can only put things on items (that are surfaces).")
         }
+
+        // 2. Get Items (existence should be implicitly validated by parser/scope or engine.item() will throw)
+        let itemToPut = try await context.engine.item(itemToPutID)
+        let surfaceItem = try await context.engine.item(surfaceID)
 
         // 3. Perform Basic Checks
-        guard itemToPut.parent == .player else {
-            throw ActionError.itemNotHeld(itemToPutID)
+        guard await context.engine.playerIsHolding(itemToPutID) else {
+            throw ActionResponse.itemNotHeld(itemToPutID)
         }
-        let reachableItems = engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(surfaceID) else {
-             throw ActionError.itemNotAccessible(surfaceID)
+
+        guard await context.engine.playerCanReach(surfaceID) else {
+             throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
         // Prevent putting item onto itself
         if itemToPutID == surfaceID {
-             throw ActionError.prerequisiteNotMet("You can't put something on itself.")
+             throw ActionResponse.prerequisiteNotMet("You can't put something on itself.")
         }
+
         // Recursive check: is the target surface inside the item we are putting?
         var currentParent = surfaceItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToPutID {
                 // Slightly awkward message, but covers the case
-                throw ActionError.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
+                throw ActionResponse.prerequisiteNotMet("You can't put the \(surfaceItem.name) inside the \(itemToPut.name) like that.")
             }
-            guard let parentItem = engine.item(with: parentItemID) else { break }
+            let parentItem = try await context.engine.item(parentItemID)
             currentParent = parentItem.parent
         }
 
         // 4. Target Checks (Specific to PUT ON)
-        guard surfaceItem.hasProperty(.surface) else {
-            throw ActionError.targetIsNotASurface(surfaceID)
+        guard surfaceItem.hasFlag(.isSurface) else {
+            throw ActionResponse.targetIsNotASurface(surfaceID)
         }
         // TODO: Add surface capacity/volume checks?
     }
 
-    func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        // IDs guaranteed non-nil by validate
-        let itemToPutID = command.directObject!
-        let surfaceID = command.indirectObject!
+    func process(context: ActionContext) async throws -> ActionResult {
+        // Direct and Indirect objects are guaranteed to be items by validate.
+        guard let directObjectRef = context.command.directObject,
+              case .item(let itemToPutID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("PutOn: Direct object not an item in process.")
+        }
+        guard let indirectObjectRef = context.command.indirectObject,
+              case .item(let surfaceID) = indirectObjectRef else {
+            throw ActionResponse.internalEngineError("PutOn: Indirect object not an item in process.")
+        }
 
         // Get snapshots (existence guaranteed by validate)
-        guard let itemToPutSnapshot = engine.item(with: itemToPutID),
-              let surfaceSnapshot = engine.item(with: surfaceID) else
-        {
-            throw ActionError.internalEngineError("Item snapshot disappeared between validate and process for PUT ON.")
-        }
+        let itemToPut = try await context.engine.item(itemToPutID)
+        let surface = try await context.engine.item(surfaceID)
 
         // --- Put Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
         // Change 1: Update item parent
-        let oldParent = itemToPutSnapshot.parent // Should be .player
-        let newParent: ParentEntity = .item(surfaceID)
-        stateChanges.append(StateChange(
-            entityId: .item(itemToPutID),
-            propertyKey: .itemParent,
-            oldValue: .parentEntity(oldParent),
-            newValue: .parentEntity(newParent)
-        ))
+        let update = await context.engine.move(itemToPut, to: .item(surface.id))
+        stateChanges.append(update)
 
         // Change 2: Mark item touched
-        let oldItemProps = itemToPutSnapshot.properties
-        if !oldItemProps.contains(.touched) {
-            var newItemProps = oldItemProps
-            newItemProps.insert(.touched)
-            stateChanges.append(StateChange(
-                entityId: .item(itemToPutID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldItemProps),
-                newValue: .itemPropertySet(newItemProps)
-            ))
+        if let update = await context.engine.setFlag(.isTouched, on: itemToPut) {
+            stateChanges.append(update)
         }
 
         // Change 3: Mark surface touched
-        let oldSurfaceProps = surfaceSnapshot.properties
-        if !oldSurfaceProps.contains(.touched) {
-            var newSurfaceProps = oldSurfaceProps
-            newSurfaceProps.insert(.touched)
-            stateChanges.append(StateChange(
-                entityId: .item(surfaceID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldSurfaceProps),
-                newValue: .itemPropertySet(newSurfaceProps)
-            ))
+        if let update = await context.engine.setFlag(.isTouched, on: surface) {
+            stateChanges.append(update)
         }
 
         // Change 4: Update pronoun "it"
-        stateChanges.append(StateChange(
-            entityId: .global,
-            propertyKey: .pronounReference(pronoun: "it"),
-            oldValue: nil,
-            newValue: .itemIDSet([itemToPutID])
-        ))
+        if let update = await context.engine.updatePronouns(to: itemToPut) {
+            stateChanges.append(update)
+        }
 
         // --- Prepare Result ---
-        let message = "You put the \(itemToPutSnapshot.name) on the \(surfaceSnapshot.name)."
         return ActionResult(
-            success: true,
-            message: message,
+            message: "You put the \(itemToPut.name) on the \(surface.name).",
             stateChanges: stateChanges
         )
     }

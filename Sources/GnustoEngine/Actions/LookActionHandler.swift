@@ -1,95 +1,100 @@
 import Foundation
 
-/// Handles the "LOOK" command and its synonyms (e.g., "L", "EXAMINE").
-public struct LookActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // LOOK (no object) always validates
-        guard let targetItemID = command.directObject else {
+/// Handles the "LOOK" context.command and its synonyms (e.g., "L", "EXAMINE").
+public struct LookActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // LOOK (no direct object) always validates.
+        guard let directObjectRef = context.command.directObject else {
             return
         }
 
-        // EXAMINE [Object] - Ensure item exists and is reachable
-        guard let _ = await engine.item(with: targetItemID) else {
-            // Should not happen if parser resolved correctly, but safety first.
-            // Or perhaps the item *just* disappeared.
-            throw ActionError.itemNotAccessible(targetItemID)
+        // If a direct object is present, it must be an item for LOOK/EXAMINE.
+        guard case .item(let targetItemID) = directObjectRef else {
+            // TODO: Consider if LOOK/EXAMINE should support .player or .location directly.
+            // For now, only items are supported when a direct object is specified.
+            throw ActionResponse.prerequisiteNotMet("You can only look at items this way.")
+        }
+
+        // EXAMINE [Item] - Ensure item exists and is reachable
+        guard (try? await context.engine.item(targetItemID)) != nil else {
+            throw ActionResponse.unknownEntity(directObjectRef) // Was unknownItem
         }
 
         // Check reachability using ScopeResolver
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer() // Returns Set<ItemID>
-        guard reachableItems.contains(targetItemID) else {
+        guard await context.engine.playerCanReach(targetItemID) else {
             // Use a standard message even if item technically exists elsewhere
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        // LOOK (no object)
-        guard let targetItemID = command.directObject else {
-            // Generate and print the location description directly.
-            // Since this bypasses the normal ActionResult message printing,
-            // return an empty success result with an empty message.
-            // TODO: Refactor describeCurrentLocation to *return* the string
-            //       so it fits the ActionResult pattern better.
-            await engine.describeCurrentLocation()
-            return ActionResult(success: true, message: "") // Message already printed
-        }
+    public func process(context: ActionContext) async throws -> ActionResult {
+        // LOOK (no direct object)
+        guard let directObjectRef = context.command.directObject else {
+            // 1. Check for darkness FIRST
+            guard await context.engine.playerLocationIsLit() else {
+                return ActionResult("It is pitch black. You are likely to be eaten by a grue.")
+            }
 
-        // EXAMINE [Object]
-        // Validation ensures item exists and is reachable
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // This should not happen due to validation, but guard defensively.
-            throw ActionError.internalEngineError("Item \(targetItemID) disappeared between validate and process.")
-        }
-
-        // 1. Get base description
-        var descriptionLines: [String] = []
-        if let descriptionHandler = targetItem.longDescription {
-            let baseDescription = await engine.descriptionHandlerRegistry.generateDescription(
-                for: targetItem,
-                using: descriptionHandler,
-                engine: engine
+            await context.engine.ioHandler.print(
+                "--- \(try context.engine.playerLocation().name) ---",
+                style: .strong
             )
-            descriptionLines.append(baseDescription)
-        } else {
-            descriptionLines.append("You see nothing special about the \(targetItem.name).")
+
+            // 2. Location is lit, proceed with description
+            return ActionResult(
+                await locationDescription(
+                    try context.engine.playerLocation(),
+                    engine: context.engine,
+                    showVerbose: true,
+                    stateSnapshot: context.stateSnapshot
+                )
+            )
         }
+
+        // EXAMINE [Object] - directObjectRef is non-nil here.
+        // Validate ensures it's an .item, so we can extract targetItemID.
+        guard case .item(let targetItemID) = directObjectRef else {
+            // This should not be reached if validate is correct.
+            throw ActionResponse.internalEngineError("Look: directObject was not an item in process.")
+        }
+
+        // Validation ensures item exists and is reachable
+        let targetItem = try await context.engine.item(targetItemID)
+
+        var stateChanges: [StateChange] = []
+
+        // 1. Get base description using the registry
+        var descriptionLines: [String] = []
+        let baseDescription = await context.engine.generateDescription(
+            for: targetItem.id, // Use item ID
+            key: .description, // Specify the key
+            engine: context.engine
+        )
+        descriptionLines.append(baseDescription)
 
         // 2. Add container/surface contents
-        // Pass the Item (ReadOnlyItem) to the helper
-        descriptionLines.append(contentsOf: await describeContents(of: targetItem, engine: engine))
+        // Pass the Item to the helper
+        descriptionLines.append(
+            contentsOf: await describeContents(
+                of: targetItem,
+                engine: context.engine,
+                stateSnapshot: context.stateSnapshot
+            )
+        )
 
         // 3. Prepare state change (mark as touched)
-        var stateChanges: [StateChange] = []
-        if !targetItem.hasProperty(.touched) {
-            let oldProperties = targetItem.properties
-            var newProperties = oldProperties
-            newProperties.insert(.touched)
-            let propertiesChange = StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
-            )
-            stateChanges.append(propertiesChange)
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
         }
 
-        // 4. Combine description lines and return result
-        let finalMessage = descriptionLines.joined(separator: "\n")
+        // 4: Update pronoun
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
+
+        // 5. Combine description lines and return result
         return ActionResult(
-            success: true,
-            message: finalMessage,
+            message: descriptionLines.joined(separator: "\n"),
             stateChanges: stateChanges
         )
     }
@@ -99,24 +104,31 @@ public struct LookActionHandler: EnhancedActionHandler {
     // MARK: - Helper Functions
 
     /// Generates description lines for the contents of a container or surface.
-    /// Accepts a Item (ReadOnlyItem).
-    private func describeContents(of item: Item, engine: GameEngine) async -> [String] {
+    /// Accepts an Item and uses the GameState snapshot for consistency.
+    private func describeContents(
+        of item: Item,
+        engine: GameEngine,
+        stateSnapshot: GameState
+    ) async -> [String] {
         var lines: [String] = []
+        let itemID = item.id
 
         // Container contents
-        if item.hasProperty(.container) {
-            let isOpen = item.hasProperty(.open)
-            let isTransparent = item.hasProperty(.transparent)
+        if item.hasFlag(.isContainer) {
+            // Check current state (open/closed)
+            let isOpen = item.hasFlag(.isOpen)
+            let isTransparent = item.hasFlag(.isTransparent)
 
             if isOpen || isTransparent {
-                // Get snapshots of items *inside* the container
-                let contents = await engine.items(withParent: .item(item.id))
+                // Get items *inside* the container from the snapshot
+                let contents = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
                 if contents.isEmpty {
                     lines.append("The \(item.name) is empty.")
                 } else {
-                    lines.append("The \(item.name) contains:")
-                    // TODO: Proper sentence construction with articles/grouping
-                    lines.append(contentsOf: contents.map { "  A \($0.name)" }.sorted())
+                    lines.append(
+                        // Use engine helper for formatting list
+                        "The \(item.name) contains \(contents.listWithIndefiniteArticles)."
+                    )
                 }
             } else {
                 // Closed and not transparent
@@ -124,16 +136,56 @@ public struct LookActionHandler: EnhancedActionHandler {
             }
         }
 
-        // Surface contents
-        if item.hasProperty(.surface) {
-            // Get snapshots of items *on* the surface
-            let itemsOnSurface = await engine.items(withParent: .item(item.id))
+        // Surface contents - Check flag on item definition
+        if item.hasFlag(.isSurface) { // Use flag()
+            // Get items *on* the surface from the snapshot
+            let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
+            // Filter out the item itself if it somehow lists itself (e.g., bug)
+            let itemsToDescribe = itemsOnSurface.filter { $0.id != itemID }
             if !itemsOnSurface.isEmpty {
-                let itemNames = itemsOnSurface.listWithIndefiniteArticles
-                lines.append("On the \(item.name) is \(itemNames).")
+                // Use engine helper for formatting
+                let isAre = itemsToDescribe.count == 1 ? "is" : "are"
+                lines.append(
+                    "On the \(item.name) \(isAre) \(itemsToDescribe.listWithIndefiniteArticles)."
+                )
             }
             // No message needed if surface is empty
         }
         return lines
+    }
+
+    /// Describes the current location in detail.
+    private func locationDescription(
+        _ location: Location,
+        engine: GameEngine,
+        showVerbose: Bool,
+        stateSnapshot: GameState
+    ) async -> String {
+        var description: [String] = [
+            await engine.generateDescription(
+                for: location.id,
+                key: .description,
+                engine: engine
+            )
+        ]
+
+        // Use the correct ScopeResolver method
+        let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: location.id)
+
+        // Filter out the player if present in scope (shouldn't happen normally)
+        // let itemIDsToDescribe = visibleItemIDs.filter { $0 != .player }
+
+        // guard !itemIDsToDescribe.isEmpty else { return } // Exit if no items to list
+
+        // Original implementation using sentence format: - RESTORE THIS
+
+        let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] }
+
+        if !visibleItems.isEmpty {
+            let itemListing = visibleItems.listWithIndefiniteArticles
+            description.append("You can see \(itemListing) here.")
+        }
+
+        return description.joined(separator: "\n")
     }
 }

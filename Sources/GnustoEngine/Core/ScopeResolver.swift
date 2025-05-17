@@ -2,9 +2,7 @@ import Foundation
 
 /// Determines visibility and reachability of items and locations based on game state,
 /// primarily considering light conditions.
-@MainActor // Isolate to MainActor
 public struct ScopeResolver: Sendable {
-
     /// Reference to the GameEngine to access state safely.
     private unowned let engine: GameEngine
 
@@ -14,35 +12,34 @@ public struct ScopeResolver: Sendable {
     }
 
     /// Checks if the specified location is currently lit.
+    /// 
     /// A location is lit if it has the `.inherentlyLit` property, or if the player
     /// (or perhaps an NPC in the same location) is carrying an active light source
     /// (`.lightSource` and `.on` properties).
     ///
-    /// - Parameters:
-    ///   - locationID: The ID of the location to check.
+    /// - Parameter locationID: The unique identifier of the location to check.
     /// - Returns: `true` if the location is lit, `false` otherwise.
-    public func isLocationLit(locationID: LocationID) -> Bool {
-        let gameState = engine.gameState
+    public func isLocationLit(locationID: LocationID) async -> Bool {
+        let gameState = await engine.gameState
         guard let location = gameState.locations[locationID] else {
             // Location not found, cannot determine lit status. Defaulting to dark.
-            // Consider logging a warning here if appropriate for the engine's design.
             return false
         }
 
         // 1. Check if the location is inherently lit.
-        if location.hasProperty(.inherentlyLit) {
+        if location.hasFlag(.inherentlyLit) {
             return true
         }
 
         // 2. Check if the location has the dynamic .isLit flag set (e.g., by hooks).
-        if location.hasProperty(.isLit) {
+        if location.hasFlag(.isLit) {
             return true
         }
 
         // 3. Check if the player is carrying an active light source.
         let playerInventory = gameState.items.values.filter { $0.parent == .player }
         let playerHasActiveLight = playerInventory.contains { item in
-            item.hasProperty(.lightSource) && item.hasProperty(.on)
+            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
         }
         if playerHasActiveLight {
             return true
@@ -51,7 +48,7 @@ public struct ScopeResolver: Sendable {
         // 4. Check if there is an active light source directly in the location.
         let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
         let locationHasActiveLight = itemsInLocation.contains { item in
-            item.hasProperty(.lightSource) && item.hasProperty(.on)
+            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
         }
         if locationHasActiveLight {
             return true
@@ -61,72 +58,17 @@ public struct ScopeResolver: Sendable {
         return false
     }
 
-    /// Checks if the specified location would be lit given a hypothetical change
-    /// to a single item's properties.
-    /// Used by handlers to predict darkness after an action.
-    ///
-    /// - Parameters:
-    ///   - locationID: The ID of the location to check.
-    ///   - changedItemID: The ID of the item whose properties are hypothetically changed.
-    ///   - newItemProperties: The hypothetical set of properties for the changed item.
-    /// - Returns: `true` if the location would be lit, `false` otherwise.
-    public func isLocationLitAfterSimulatedChange(
-        locationID: LocationID,
-        changedItemID: ItemID,
-        newItemProperties: Set<ItemProperty>
-    ) -> Bool {
-        // Access current game state
-        let gameState = engine.gameState
-        guard let location = gameState.locations[locationID] else {
-            return false // Location not found
-        }
-
-        // 1. Check inherent lit property.
-        if location.hasProperty(.inherentlyLit) { return true }
-        // 2. Check dynamic .isLit flag.
-        if location.hasProperty(.isLit) { return true }
-
-        // 3. Check player inventory
-        let playerInventory = gameState.items.values.filter { $0.parent == .player }
-        for item in playerInventory {
-            let isLightSource = item.hasProperty(.lightSource)
-            let isOn: Bool
-            if item.id == changedItemID {
-                isOn = newItemProperties.contains(.on) // Use hypothetical state
-            } else {
-                isOn = item.hasProperty(.on) // Use actual state
-            }
-            if isLightSource && isOn { return true }
-        }
-
-        // 4. Check items in location
-        let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
-        for item in itemsInLocation {
-            let isLightSource = item.hasProperty(.lightSource)
-            let isOn: Bool
-            if item.id == changedItemID {
-                isOn = newItemProperties.contains(.on) // Use hypothetical state
-            } else {
-                isOn = item.hasProperty(.on) // Use actual state
-            }
-            if isLightSource && isOn { return true }
-        }
-
-        // 5. Otherwise, the location would be dark.
-        return false
-    }
-
     /// Determines which items are directly visible within a given location.
     /// Considers light conditions and item properties (e.g., `.invisible`).
     /// Does not include contents of containers unless they are transparent.
     ///
     /// - Parameters:
-    ///   - locationID: The ID of the location.
+    ///   - locationID: The unique identifier of the location.
     /// - Returns: An array of IDs for items visible in the location.
-    public func visibleItemsIn(locationID: LocationID) -> [ItemID] {
-        let gameState = engine.gameState
+    public func visibleItemsIn(locationID: LocationID) async -> [ItemID] {
+        let gameState = await engine.gameState
         // 1. Check if the location is lit.
-        guard isLocationLit(locationID: locationID) else {
+        guard await isLocationLit(locationID: locationID) else {
             // If not lit, nothing is visible.
             return []
         }
@@ -138,7 +80,7 @@ public struct ScopeResolver: Sendable {
 
         // 3. Filter out items with the .invisible property.
         let visibleItems = itemsDirectlyInLocation.filter { item in
-            !item.hasProperty(.invisible)
+            !item.hasFlag(.isInvisible)
         }
 
         // 4. Return the IDs of the visible items.
@@ -146,21 +88,24 @@ public struct ScopeResolver: Sendable {
     }
 
     /// Determines all items currently reachable by the player.
-    /// This includes items in their inventory, items visible in the current location,
-    /// and the contents of open or transparent containers that are themselves reachable.
+    ///
+    /// This includes items in their inventory, items visible in the current location, and the
+    /// contents of open or transparent containers that are themselves reachable.
     ///
     /// - Returns: A Set of IDs for items reachable by the player.
-    public func itemsReachableByPlayer() -> Set<ItemID> {
-        let gameState = engine.gameState
+    public func itemsReachableByPlayer() async -> Set<ItemID> {
+        let gameState = await engine.gameState
         var reachableItems = Set<ItemID>()
         var processedContainers = Set<ItemID>() // Prevent infinite loops with nested containers
 
         // Add initially reachable items (inventory)
         let inventoryItems = gameState.items.values.filter { $0.parent == .player }
-        reachableItems.formUnion(inventoryItems.map { $0.id })
+        reachableItems.formUnion(inventoryItems.map(\.id))
 
         // Add initially reachable items (visible in location)
-        let visibleLocationItems = self.visibleItemsIn(locationID: gameState.player.currentLocationID)
+        let visibleLocationItems = await self.visibleItemsIn(
+            locationID: gameState.player.currentLocationID
+        )
         reachableItems.formUnion(visibleLocationItems)
 
         // Now, process containers and surfaces among the currently reachable items
@@ -171,12 +116,15 @@ public struct ScopeResolver: Sendable {
             guard let currentItem = gameState.items[currentItemID] else { continue }
 
             // A) Check if it's an accessible container
-            if currentItem.hasProperty(.container) && !processedContainers.contains(currentItem.id) {
+            if currentItem.hasFlag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
-                if currentItem.hasProperty(.open) || currentItem.hasProperty(.transparent) {
+                // Check dynamic property for open state
+                let isOpen: Bool = (try? await engine.fetch(currentItem.id, .isOpen)) ?? false
+                let isTransparent = currentItem.hasFlag(.isTransparent)
+                if isOpen || isTransparent {
                     // Find items directly inside this container
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
-                    let insideIDs = itemsInside.map { $0.id }
+                    let insideIDs = itemsInside.map(\.id)
 
                     // Add newly found items to reachable set
                     let newlyReachable = Set(insideIDs).subtracting(reachableItems)
@@ -188,10 +136,10 @@ public struct ScopeResolver: Sendable {
             }
 
             // B) Check if it's a surface
-            if currentItem.hasProperty(.surface) {
+            if currentItem.hasFlag(.isSurface) {
                 // Find items directly on this surface
                 let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
-                let onSurfaceIDs = itemsOnSurface.map { $0.id }
+                let onSurfaceIDs = itemsOnSurface.map(\.id)
 
                 // Add newly found items to reachable set
                 let newlyReachable = Set(onSurfaceIDs).subtracting(reachableItems)

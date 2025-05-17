@@ -11,26 +11,24 @@ alwaysApply: true
 // Wrong:
 let cloakroom = Location(
     id: "cloakroom",
-    name: "Cloakroom",
-    description: "The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east.",
-    exits: [
-        .east: Exit(destination: "foyer")
-    ]
+    .name("Cloakroom"),
+    .description("The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east."),
+    .exits([.east: Exit(destination: "foyer")])
 )
 
 // Right:
 let cloakroom = Location(
     id: "cloakroom",
-    name: "Cloakroom",
+    .name("Cloakroom"),
     // 💡 Break up long text before the 100th column
-    description: """
-        The walls of this small room were clearly once lined with hooks, though now only one \
+    .description("""
+        The walls of this small room were clearly once lined with hooks, though now only one
         remains. The exit is a door to the east.
-        """,
-    exits: [
+        """),
+    .exits([
         // 💡 Use trailing commas in lists
         .east: Exit(destination: "foyer"),
-    ]
+    ])
 )
 ```
 

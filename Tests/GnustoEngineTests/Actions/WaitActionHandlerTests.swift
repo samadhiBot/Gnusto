@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("WaitActionHandler Tests")
 struct WaitActionHandlerTests {
     let handler = WaitActionHandler()
@@ -14,13 +13,16 @@ struct WaitActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "wait", rawInput: "wait")
+        let command = Command(
+            verb: .wait,
+            rawInput: "wait"
+        )
 
         // Act
         // We call perform(), which uses the default implementation
@@ -34,7 +36,7 @@ struct WaitActionHandlerTests {
     }
 
     // Removed testWaitProcessReturnsCorrectResult due to Sendable complexities
-    // with returning ActionResult from the non-Sendable EnhancedActionHandler protocol.
+    // with returning ActionResult from the non-Sendable ActionHandler protocol.
     // The perform test adequately covers the behavior for this simple handler.
 
     // @Test("Wait process returns correct ActionResult")

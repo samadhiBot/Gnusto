@@ -1,96 +1,86 @@
 import Foundation
 
-/// Handles the "CLOSE" command.
-public struct CloseActionHandler: EnhancedActionHandler {
-
-    public init() {}
-
-    // MARK: - EnhancedActionHandler
-
-    public func validate(
-        command: Command,
-        engine: GameEngine
-    ) async throws {
-        // 1. Ensure we have a direct object
-        guard let targetItemID = command.directObject else {
-            throw ActionError.prerequisiteNotMet("Close what?")
+/// Handles the "CLOSE" context.command.
+public struct CloseActionHandler: ActionHandler {
+    public func validate(context: ActionContext) async throws {
+        // 1. Ensure we have a direct object and it's an item
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Close what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            // TODO: Consider a more specific message if the entity is known.
+            throw ActionResponse.prerequisiteNotMet("You can't close that.")
         }
 
         // 2. Check if item exists
-        guard let targetItem = await engine.item(with: targetItemID) else {
+        guard let targetItem = try? await context.engine.item(targetItemID) else {
             // Standard approach: If parser resolved it, but it's gone, treat as inaccessible.
-            throw ActionError.itemNotAccessible(targetItemID)
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         // 3. Check reachability using ScopeResolver
-        let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
-        guard reachableItems.contains(targetItemID) else {
-            throw ActionError.itemNotAccessible(targetItemID)
+        guard await context.engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check if item is closeable (using .openable for symmetry)
-        guard targetItem.hasProperty(.openable) else {
-            throw ActionError.itemNotCloseable(targetItemID)
+        // 4. Check if item is closable (using .openable for symmetry)
+        guard targetItem.hasFlag(.isOpenable) else {
+            throw ActionResponse.itemNotClosable(targetItemID)
         }
 
-        // 5. Check if already closed
-        guard targetItem.hasProperty(.open) else {
-            // Don't throw, let process handle the specific message
+        // 5. Check if already closed (using dynamic property)
+        guard try await context.engine.fetch(targetItemID, .isOpen) else {
+            // Let process handle the specific message "That's already closed."
             return
         }
 
         // Note: Closing doesn't usually depend on locked status.
     }
 
-    public func process(
-        command: Command,
-        engine: GameEngine
-    ) async throws -> ActionResult {
-        guard let targetItemID = command.directObject else {
-            // Should be caught by validate, but defensive check.
-            throw ActionError.internalEngineError("Close command reached process without direct object.")
-        }
-        guard let targetItem = await engine.item(with: targetItemID) else {
-            // Should be caught by validate.
-            throw ActionError.internalEngineError("Close command target item disappeared between validate and process.")
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard
+            let directObjectRef = context.command.directObject,
+            case .item(let targetItemID) = directObjectRef
+        else {
+            // This case should ideally be caught by the validate function.
+            return ActionResult("You can't close that.")
         }
 
+        let targetItem = try await context.engine.item(targetItemID)
+
         // Handle "already closed" case detected (but not thrown) in validate
-        if !targetItem.hasProperty(.open) {
-            return ActionResult(success: false, message: "The \(targetItem.name) is already closed.")
+        guard try await context.engine.fetch(targetItem.id, .isOpen) else {
+            return ActionResult(
+                "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
+            )
         }
 
         // --- Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
-        // Change 1: Properties (remove .open, add .touched)
-        let oldProperties = targetItem.properties
-        var newProperties = oldProperties
-        newProperties.remove(.open) // Remove the open flag
-        newProperties.insert(.touched) // Mark as touched
-
-        if oldProperties != newProperties {
-            let propertiesChange = StateChange(
-                entityId: .item(targetItemID),
-                propertyKey: .itemProperties,
-                oldValue: .itemPropertySet(oldProperties),
-                newValue: .itemPropertySet(newProperties)
-            )
-            stateChanges.append(propertiesChange)
+        // Change 1: Set dynamic property isOpen to false
+        if let update = await context.engine.clearFlag(.isOpen, on: targetItem) {
+            stateChanges.append(update)
         }
 
-        // Closing doesn't usually affect pronouns like taking does.
+        // --- State Change: Mark as Touched ---
+        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(update)
+        }
+
+        // --- State Change: Update pronouns ---
+        if let update = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(update)
+        }
 
         // --- Prepare Result ---
         return ActionResult(
-            success: true,
-            message: "You close the \(targetItem.name).", // Use plain name
-            stateChanges: stateChanges,
-            sideEffects: []
+            message: "Closed.", // Standard Zork message
+            stateChanges: stateChanges
         )
     }
 
     // Rely on default postProcess to print the message.
 }
 
-// TODO: Add/verify ActionError cases: .itemNotCloseable, .itemAlreadyClosed
+// TODO: Add/verify ActionResponse cases: .itemNotClosable, .itemAlreadyClosed

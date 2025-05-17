@@ -1,7 +1,7 @@
 import GnustoEngine
 
 /// Defines locations and items found within the forest region.
-@MainActor enum ForestRegion {
+enum ForestRegion {
     /// Locations within the forest.
     static let locations: [Location] = [
         outside,
@@ -22,28 +22,28 @@ extension ForestRegion {
     static let outside = Location(
         id: "outside",
         name: "Forest Path",
-        longDescription: """
+        description: """
                 A winding path leads through a dense forest. To the north, you can see \
                 the entrance to a cave. A small stream flows to the west.
                 """,
         exits: [
-            .north: Exit(destination: "startRoom"), // Exit to CaveRegion
+            .north: Exit(destination: .startRoom), // Exit to CaveRegion
             .west: Exit(destination: "streamBank"),
         ],
-        properties: .inherentlyLit, .outside
+        isLit: true, .outside
     )
 
     static let streamBank = Location(
         id: "streamBank",
         name: "Stream Bank",
-        longDescription: """
+        description: """
                 You stand beside a clear, bubbling stream. The water flows from north to south, \
                 disappearing into thick undergrowth. The forest path is to the east.
                 """,
         exits: [
             .east: Exit(destination: "outside"),
         ],
-        properties: .inherentlyLit, .outside
+        isLit: true, .outside
     )
 }
 
@@ -55,7 +55,7 @@ extension ForestRegion {
         id: "rustyKey",
         name: "key",
         adjectives: "rusty", "iron",
-        longDescription: "An old, rusty iron key. It looks heavy and ornate.",
+        description: "An old, rusty iron key. It looks heavy and ornate.",
         properties: .takable,
         parent: .location("streamBank") // Key is found here
     )
@@ -66,7 +66,7 @@ extension ForestRegion {
         name: "water",
         adjectives: "clear", "cold",
         synonyms: "stream", "liquid",
-        longDescription: "Clear, cold water that looks refreshing.",
+        description: "Clear, cold water that looks refreshing.",
         properties: .ndesc, // Use .ndesc instead of .scenery
         parent: .location("streamBank")
     )

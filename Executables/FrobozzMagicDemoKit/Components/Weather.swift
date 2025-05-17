@@ -1,6 +1,5 @@
 import GnustoEngine
 
-@MainActor
 extension Components {
     /// Functionality related to weather simulation.
     enum Weather {
@@ -11,7 +10,7 @@ extension Components {
             /// ID for the weather daemon
             static let weatherDaemonID: DaemonID = "weatherDaemon"
 
-            /// Key for weather state in gameSpecificState
+            /// Key for weather state in globalState
             static let weatherStateKey = "weatherState"
         }
 
@@ -24,12 +23,12 @@ extension Components {
                 frequency: 10 // Change every 10 turns
             ) { engine in
                 // Only affects outdoor locations
-                let locationID = engine.gameState.player.currentLocationID
-                let location = engine.location(with: locationID)
+                let locationID = await engine.playerLocationID
+                let location = await engine.location(locationID)
 
                 // Randomly change the weather
                 let weatherStates = ["sunny", "cloudy", "rainy"]
-                let currentWeather = engine.getStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
+                let currentWeather = await engine.getStateValue(key: Constants.weatherStateKey)?.value as? String ?? "sunny"
 
                 // Choose a different weather state
                 var newWeather = currentWeather
@@ -41,7 +40,7 @@ extension Components {
                 engine.updateGameSpecificState(key: Constants.weatherStateKey, value: AnyCodable(newWeather))
 
                 // Show weather change message if player is outside
-                if location?.properties.contains(.outside) == true {
+                if location.attributes.contains(.outside) == true {
                     var message = ""
                     switch newWeather {
                     case "sunny":
@@ -71,8 +70,7 @@ extension Components {
 
         /// Initializes the weather system: sets initial state and registers the daemon.
         /// - Parameter engine: The game engine instance.
-        @MainActor
-        static func setupWeather(engine: GameEngine) async {
+                static func setupWeather(engine: GameEngine) async {
             // Set initial weather state using updateGameSpecificState
             // It safely handles nil dictionary and existing keys
             // Needs await for MainActor isolated call
@@ -82,7 +80,7 @@ extension Components {
 
             // Register the weather daemon
             // Needs await for MainActor isolated call
-            let _ = engine.registerDaemon(id: Constants.weatherDaemonID)
+            let _ = await engine.registerDaemon(id: Constants.weatherDaemonID)
         }
     }
 }

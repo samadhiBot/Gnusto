@@ -1,12 +1,12 @@
 import Foundation
+import Markdown
+
 @testable import GnustoEngine
-import Testing
 
 /// A mock implementation of the `IOHandler` protocol for testing purposes.
-/// This actor runs on the dedicated IOActor.
-@IOActor
+@MainActor
 final class MockIOHandler: IOHandler {
-    // --- Recorded Output ---
+    // — Recorded Output —
     struct OutputCall: Equatable, Sendable {
         let text: String
         let style: TextStyle
@@ -18,16 +18,16 @@ final class MockIOHandler: IOHandler {
     public private(set) var setupCallCount: Int = 0
     public private(set) var teardownCallCount: Int = 0
 
-    // --- Input Simulation ---
+    // — Input Simulation —
     private var inputIndex = 0
-    private var inputQueue: [String?] = []
+    private var inputQueue: [String?]
 
-    // --- Initialization ---
-    init(_ lines: String?...) {
-        inputQueue.append(contentsOf: lines)
+    // — Initialization —
+    init(_ commands: String?...) {
+        inputQueue = commands
     }
 
-    // --- Configuration Methods (for tests) ---
+    // — Configuration Methods (for tests) —
     /// Clears all recorded calls and resets input queue.
     func reset() {
         recordedOutput = []
@@ -44,63 +44,53 @@ final class MockIOHandler: IOHandler {
         inputQueue.append(contentsOf: lines)
     }
 
-    // --- IOHandler Conformance ---
+    // — IOHandler Conformance —
 
-    func print(_ text: String, style: TextStyle, newline: Bool) {
-        let call = OutputCall(text: text, style: style, newline: newline)
-        recordedOutput.append(call)
+    func print(_ markdown: String, style: TextStyle, newline: Bool) {
+        recordedOutput.append(
+            OutputCall(
+                text: MarkdownParser.parse(markdown),
+                style: style,
+                newline: newline
+            )
+        )
         // Optionally print to console during tests for debugging
-        // Swift.print("[MockIO] Print: \(text), Style: \(style), Newline: \(newline)")
     }
-
-    // Default implementations provided by protocol extension handle:
-    // func print(_ text: String)
-    // func print(_ text: String, style: TextStyle)
 
     func showStatusLine(roomName: String, score: Int, turns: Int) {
         recordedStatusLines.append((roomName: roomName, score: score, turns: turns))
-        // Swift.print("[MockIO] Status: \(roomName) Score: \(score) Turns: \(turns)")
     }
 
     func clearScreen() {
         clearScreenCallCount += 1
-        // Swift.print("[MockIO] ClearScreen")
     }
 
     func readLine(prompt: String) -> String? {
         // Print the prompt using the print method so it can be recorded/verified if needed
-        self.print(prompt, style: .input, newline: false)
+        recordedOutput.append(
+            OutputCall(
+                text: prompt,
+                style: .input,
+                newline: false
+            )
+        )
 
-//        guard !inputQueue.isEmpty else {
         guard inputIndex < inputQueue.count else {
             // No more queued input, return nil (simulates EOF or error)
-            // Swift.print("[MockIO] ReadLine: No input queued, returning nil")
             return nil
         }
         let line = inputQueue[inputIndex]
         inputIndex += 1
-        // Swift.print("[MockIO] ReadLine: Returning '\(line ?? "nil")'")
         return line
     }
 
     func setup() {
         setupCallCount += 1
-        // Swift.print("[MockIO] Setup")
     }
 
     func teardown() {
         teardownCallCount += 1
-        // Swift.print("[MockIO] Teardown")
     }
-
-    // MARK: - Test Accessors
-
-    // Use async getters to access state safely from tests
-    func getRecordedOutput() async -> [OutputCall] { return recordedOutput }
-    func getRecordedStatusLines() async -> [(roomName: String, score: Int, turns: Int)] { return recordedStatusLines }
-    func getClearScreenCallCount() async -> Int { return clearScreenCallCount }
-    func getSetupCallCount() async -> Int { return setupCallCount }
-    func getTeardownCallCount() async -> Int { return teardownCallCount }
 
     func flush() async -> String {
         var commandIndex = 0
@@ -110,20 +100,23 @@ final class MockIOHandler: IOHandler {
                 actualTranscript += ">"
                 if commandIndex < inputQueue.count {
                     if let command = inputQueue[commandIndex] {
-                        actualTranscript += " \(command)"
+                        actualTranscript += " \(command)\n"
                     }
                     commandIndex += 1
+                } else {
+                    actualTranscript += "\n"
                 }
-                actualTranscript += "\n" // Original newline logic
             } else if call.style != .input {
                 actualTranscript += call.text
-                if call.newline { // Original newline logic
-                    actualTranscript += "\n"
+                if call.newline {
+                    actualTranscript += "\n\n"
                 }
             }
         }
 
         recordedOutput.removeAll()
-        return actualTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+        return actualTranscript
+            .replacingOccurrences(of: "\n\n\n", with: "\n\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

@@ -1,8 +1,14 @@
 import Foundation
+import OSLog
 
 /// A standard implementation of the Parser protocol.
 /// Aims to replicate common ZIL parser behaviors.
 public struct StandardParser: Parser {
+    public init() {}
+
+    /// A logger used for unhandled error warnings.
+    let logger = Logger(subsystem: "GnustoEngine", category: "StandardParser")
+
     /// Parses a raw input string into a structured `Command`.
     ///
     /// Follows a ZIL-inspired process:
@@ -37,7 +43,7 @@ public struct StandardParser: Parser {
             // Assume a default movement verb like 'go'
             // TODO: Make the default movement verb configurable or a constant
             let defaultGoVerbID = VerbID("go") // Placeholder
-            let command = Command(verbID: defaultGoVerbID, direction: direction, rawInput: input)
+            let command = Command(verb: defaultGoVerbID, direction: direction, rawInput: input)
             return .success(command)
         }
 
@@ -94,14 +100,14 @@ public struct StandardParser: Parser {
         }
 
         // ***** REVISED: Fetch rules for ALL matched VerbIDs *****
-        var allPotentialRules: [(verbID: VerbID, rule: SyntaxRule)] = []
-        var verbIDsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
-        for verbID in matchedVerbIDs {
-            if let verbDef = vocabulary.verbDefinitions[verbID] {
+        var allPotentialRules: [(verb: VerbID, rule: SyntaxRule)] = []
+        var verbsWithRules: Set<VerbID> = [] // Track which verbs actually have rules
+        for verb in matchedVerbIDs {
+            if let verbDef = vocabulary.verbDefinitions[verb] {
                 if !verbDef.syntax.isEmpty {
-                    verbIDsWithRules.insert(verbID)
+                    verbsWithRules.insert(verb)
                     for rule in verbDef.syntax {
-                        allPotentialRules.append((verbID: verbID, rule: rule))
+                        allPotentialRules.append((verb: verb, rule: rule))
                     }
                 }
             }
@@ -121,19 +127,19 @@ public struct StandardParser: Parser {
         // Pre-calculate input preposition once, as it's the same for all rules
         let inputPreposition = findInputPreposition(tokens: significantTokens, startIndex: verbStartIndex + verbTokenCount, vocabulary: vocabulary)
 
-        for (verbID, rule) in allPotentialRules { // Iterate through all potential rules
+        for (verb, rule) in allPotentialRules { // Iterate through all potential rules
             let matchResult = matchRule(
                 rule: rule,
                 tokens: significantTokens,
                 verbStartIndex: verbStartIndex,
-                verbID: verbID, // <<< Pass the specific verbID for this rule
+                verb: verb, // <<< Pass the specific verb for this rule
                 vocabulary: vocabulary,
                 gameState: gameState,
                 originalInput: input
             )
 
             switch matchResult {
-            case .success(let command): // Command already contains the correct verbID from matchRule
+            case .success(let command): // Command already contains the correct verb from matchRule
                 // Rule matched structurally. Now check prepositions.
                 if let requiredPrep = rule.requiredPreposition {
                     // Rule requires a specific preposition
@@ -141,13 +147,15 @@ public struct StandardParser: Parser {
                         // Input also has a preposition
                         if requiredPrep == inputPrep {
                             // PREPOSITIONS MATCH - DEFINITIVE SUCCESS
-                            successfulParse = command // Command has the correct verbID
+                            successfulParse = command // Command has the correct verb
                             bestError = nil // Clear any previous error
                             break // Found the best possible match for this input
                         } else {
                             // PREPOSITIONS MISMATCH - Record error, continue
-                            // Use the specific verbID associated with this rule
-                            let mismatchError = ParseError.badGrammar("Preposition mismatch for verb '\(verbID.rawValue)' (expected '\(requiredPrep)', found '\(inputPrep)').")
+                            // Use the specific verb associated with this rule
+                            let mismatchError = ParseError.badGrammar(
+                                "Preposition mismatch for verb '\(verb)' (expected '\(requiredPrep)', found '\(inputPrep)')."
+                            )
                             if bestError == nil || shouldReplaceError(existing: bestError!, new: mismatchError) {
                                 bestError = mismatchError
                             }
@@ -155,8 +163,8 @@ public struct StandardParser: Parser {
                         }
                     } else {
                         // RULE REQUIRES PREP, INPUT HAS NONE - Record error, continue
-                        // Use the specific verbID associated with this rule
-                        let missingPrepError = ParseError.badGrammar("Verb '\(verbID.rawValue)' requires preposition '\(requiredPrep)' which was missing.")
+                        // Use the specific verb associated with this rule
+                        let missingPrepError = ParseError.badGrammar("Verb '\(verb)' requires preposition '\(requiredPrep)' which was missing.")
                         if bestError == nil || shouldReplaceError(existing: bestError!, new: missingPrepError) {
                             bestError = missingPrepError
                         }
@@ -171,7 +179,7 @@ public struct StandardParser: Parser {
                     // However, for simplicity now, let's consider it a success unless we find a better one later.
                     // TODO: Refine logic if ZIL treats extra prepositions differently (e.g., as errors).
                     if successfulParse == nil { // Only take this if we don't have a preposition-matched success yet
-                        successfulParse = command // Command has the correct verbID
+                        successfulParse = command // Command has the correct verb
                         // Don't clear bestError here, a later rule might still be better or produce a higher-priority error
                     }
                     // Continue searching for a potentially better match (e.g., one that uses the input preposition)
@@ -198,7 +206,7 @@ public struct StandardParser: Parser {
                  // Input was just a verb phrase matching one or more verbs, none of which had rules.
                  // Pick the first matched verb ID as the canonical one (arbitrary choice).
                  let firstMatchedID = matchedVerbIDs.first!
-                 let command = Command(verbID: firstMatchedID, rawInput: input)
+                 let command = Command(verb: firstMatchedID, rawInput: input)
                  return .success(command)
              } else {
                  // If we get here, rules existed, but none resulted in success or a recorded error.
@@ -269,7 +277,7 @@ public struct StandardParser: Parser {
     }
 
     /// Splits the input string into lowercase tokens.
-    internal func tokenize(input: String) -> [String] {
+    func tokenize(input: String) -> [String] {
         // Simple whitespace and punctuation separation, converts to lowercase.
         // ZIL tokenization was more complex (e.g., dictionary separators).
 
@@ -283,7 +291,7 @@ public struct StandardParser: Parser {
     }
 
     /// Filters out noise words from a token list.
-    internal func removeNoise(
+    func removeNoise(
         tokens: [String],
         noiseWords: Set<String>
     ) -> [String] {
@@ -297,7 +305,7 @@ public struct StandardParser: Parser {
         rule: SyntaxRule,
         tokens: [String],
         verbStartIndex: Int,
-        verbID: VerbID,
+        verb: VerbID,
         _debugHook: (() -> Void)? = nil, // Add parameter for debug hook
         vocabulary: Vocabulary,
         gameState: GameState,
@@ -336,7 +344,11 @@ public struct StandardParser: Parser {
                 )
                 guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                    return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                    return .failure(
+                        .badGrammar(
+                            "Expected a direct object phrase for verb '\(verb)', but found \(context)."
+                        )
+                    )
                 }
                 directObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -371,7 +383,7 @@ public struct StandardParser: Parser {
                  )
                  guard phraseEndIndex > tokenCursor else {
                     let context = (tokenCursor < tokens.count) ? "'\(tokens[tokenCursor])'" : "end of input"
-                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)', but found \(context)."))
+                     return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)', but found \(context)."))
                  }
                 indirectObjectPhraseTokens = Array(tokens[tokenCursor..<phraseEndIndex])
                 tokenCursor = phraseEndIndex
@@ -407,49 +419,49 @@ public struct StandardParser: Parser {
         let nounToResolveIO = ioNounExtracted ?? indirectObjectPhraseTokens.last
         let modsToUseIO = (ioNounExtracted != nil) ? ioModsExtracted : Array(indirectObjectPhraseTokens.dropLast())
 
-        let resolvedDirectObjectResult: Result<ItemID?, ParseError>
+        let resolvedDirectObjectResult: Result<EntityReference?, ParseError>
         if rule.pattern.contains(.directObject) {
              if let actualNoun = nounToResolveDO {
                  resolvedDirectObjectResult = resolveObject(
                      noun: actualNoun,
+                     verb: verb,
                      modifiers: modsToUseDO,
-                     isPronoun: vocabulary.isPronoun(actualNoun),
                      in: gameState,
                      using: vocabulary,
                      requiredConditions: rule.directObjectConditions
                  )
              } else {
-                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verbID.rawValue)'."))
+                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
              }
         } else {
              resolvedDirectObjectResult = .success(nil)
         }
 
-        let resolvedIndirectObjectResult: Result<ItemID?, ParseError>
+        let resolvedIndirectObjectResult: Result<EntityReference?, ParseError>
         if rule.pattern.contains(.indirectObject) {
             if let actualNoun = nounToResolveIO {
                 resolvedIndirectObjectResult = resolveObject(
                     noun: actualNoun,
+                    verb: verb,
                     modifiers: modsToUseIO,
-                    isPronoun: vocabulary.isPronoun(actualNoun),
                     in: gameState,
                     using: vocabulary,
                     requiredConditions: rule.indirectObjectConditions
                 )
             } else {
-                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verbID.rawValue)'."))
+                return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
             }
         } else {
             resolvedIndirectObjectResult = .success(nil)
         }
 
         switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
-        case (.success(let doID), .success(let ioID)):
+        case (.success(let doRef), .success(let ioRef)):
             let command = Command(
-                verbID: verbID,
-                directObject: doID,
+                verb: verb,
+                directObject: doRef,
                 directObjectModifiers: modsToUseDO,
-                indirectObject: ioID,
+                indirectObject: ioRef,
                 indirectObjectModifiers: modsToUseIO,
                 preposition: matchedPreposition,
                 direction: matchedDirection,
@@ -472,11 +484,14 @@ public struct StandardParser: Parser {
         let significantPhrase = phrase.filter { !vocabulary.noiseWords.contains($0) }
         guard !significantPhrase.isEmpty else { return (nil, []) }
 
+        let playerAliases: Set<String> = ["me", "self", "myself"]
         var knownNounIndices: [Int] = []
         for (index, word) in significantPhrase.enumerated() {
             let isItemNoun = vocabulary.items.keys.contains(word)
-            let isPronoun = (vocabulary.pronouns.contains(word))
-            if isItemNoun || isPronoun {
+            let isLocationNoun = vocabulary.locationNames.keys.contains(word)
+            let isPlayerAlias = playerAliases.contains(word)
+            let isPronoun = vocabulary.pronouns.contains(word)
+            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun {
                 knownNounIndices.append(index)
             }
         }
@@ -484,6 +499,8 @@ public struct StandardParser: Parser {
         guard let lastNounIndex = knownNounIndices.last else {
             let potentialMods = significantPhrase.filter { word in
                 !vocabulary.items.keys.contains(word) &&
+                !vocabulary.locationNames.keys.contains(word) &&
+                !playerAliases.contains(word) &&
                 !vocabulary.verbSynonyms.keys.contains(word) &&
                 !vocabulary.prepositions.contains(word) &&
                 !vocabulary.directions.keys.contains(word)
@@ -510,69 +527,225 @@ public struct StandardParser: Parser {
 
     // MARK: - Object Resolution Helpers
 
-    /// Resolves a noun phrase (noun + modifiers) to a specific ItemID within the game context.
-    /// Incorporates checking required conditions based on the SyntaxRule.
-    internal func resolveObject(
+    /// Resolves a noun phrase (noun + modifiers) to a specific EntityReference within the game context.
+    func resolveObject(
         noun: String,
+        verb: VerbID,
         modifiers: [String],
-        isPronoun: Bool,
         in gameState: GameState,
         using vocabulary: Vocabulary,
         requiredConditions: ObjectCondition
-    ) -> Result<ItemID?, ParseError> {
-        if isPronoun {
+    ) -> Result<EntityReference?, ParseError> {
+        let lowercasedNoun = noun.lowercased()
+        let playerAliases: Set<String> = ["me", "self", "myself"]
+
+        // 1. Handle Player Aliases
+        if playerAliases.contains(lowercasedNoun) {
             guard modifiers.isEmpty else {
-                return .failure(.badGrammar("Pronouns like '\(noun)' usually cannot be modified."))
+                return .failure(
+                    .badGrammar("""
+                        Player reference '\(lowercasedNoun)' cannot be modified by \
+                        '\(modifiers.joined(separator: " "))'.
+                        """)
+                )
             }
-            guard let referredIDs = gameState.pronouns[noun] else {
-                return .failure(.pronounNotSet(pronoun: noun))
+            return .success(.player)
+        }
+
+        // 2. Handle Pronouns
+        if vocabulary.pronouns.contains(lowercasedNoun) {
+            guard modifiers.isEmpty else {
+                return .failure(
+                    .badGrammar(
+                        "Pronouns like '\(lowercasedNoun)' usually cannot be modified."
+                    )
+                )
             }
-            guard !referredIDs.isEmpty else {
-                 return .failure(.pronounNotSet(pronoun: noun))
+            // gameState.pronouns now stores Set<EntityReference>?
+            guard
+                let referredEntityRefs = gameState.pronouns[lowercasedNoun],
+                !referredEntityRefs.isEmpty
+            else {
+                return .failure(.pronounNotSet(pronoun: lowercasedNoun))
             }
-            let candidatesInScope = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
-            let resolvedIDsInScope = referredIDs.filter { candidatesInScope.keys.contains($0) }
-            if resolvedIDsInScope.isEmpty {
-                return .failure(.pronounRefersToOutOfScopeItem(pronoun: noun))
-            } else if resolvedIDsInScope.count > 1 {
-                 return .failure(.ambiguousPronounReference("Which one of \"\(noun)\" do you mean?"))
+
+            var resolvedPronounCandidates: [EntityReference] = []
+
+            for ref in referredEntityRefs {
+                switch ref {
+                case .item(let itemID):
+                    // Check scope for this specific itemID
+                    let itemCandidates = gatherCandidates(
+                        in: gameState,
+                        requiredConditions: requiredConditions
+                    )
+                    if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                        // Modifiers (adjectives) usually don't apply to pronouns directly,
+                        // but if they did, this is where they'd be checked against the item's adjectives.
+                        // For now, if the pronoun refers to an item and that item is in scope, consider it a match.
+                        resolvedPronounCandidates.append(ref)
+                    }
+                case .location(let locID):
+                    // Location scope: A named location is generally considered in scope if it exists.
+                    if gameState.locations[locID] != nil {
+                        resolvedPronounCandidates.append(ref)
+                    }
+                case .player: // Pronoun referring to player
+                    resolvedPronounCandidates.append(ref)
+                }
+            }
+
+            if resolvedPronounCandidates.isEmpty {
+                return .failure(.pronounRefersToOutOfScopeItem(pronoun: lowercasedNoun))
+            } else if resolvedPronounCandidates.count > 1 {
+                // Build a more generic ambiguity message if pronouns can refer to non-items.
+                let descriptions = resolvedPronounCandidates.map {
+                    entityRefToString($0, gameState: gameState)
+                }
+                return .failure(
+                    .ambiguousPronounReference("""
+                        Which '\(lowercasedNoun)' do you mean: \
+                        \(descriptions.commaListing("or"))?
+                        """)
+                )
             } else {
-                return .success(resolvedIDsInScope.first!)
+                return .success(resolvedPronounCandidates.first!)
             }
         }
 
-        guard let potentialItemIDs = vocabulary.items[noun] else {
+        // 3. Noun Resolution (Items and Locations)
+        var potentialEntities: [EntityReference] = []
+
+        // Check for items
+        if let itemIDs = vocabulary.items[lowercasedNoun] {
+            for itemID in itemIDs {
+                potentialEntities.append(.item(itemID))
+            }
+        }
+
+        // Check for locations
+        if let locationID = vocabulary.locationNames[lowercasedNoun] {
+            potentialEntities.append(.location(locationID))
+        }
+
+        guard !potentialEntities.isEmpty else {
             return .failure(.unknownNoun(noun))
         }
 
-        let candidatesMatchingScopeAndConditions = gatherCandidates(in: gameState, requiredConditions: requiredConditions)
-        let relevantCandidateIDs = potentialItemIDs.filter { candidatesMatchingScopeAndConditions.keys.contains($0) }
+        // 4. Scope, Conditions, Modifiers, and Disambiguation
+        var resolvedAndScopedEntities: [EntityReference] = []
 
-        guard !relevantCandidateIDs.isEmpty else {
-             return .failure(.itemNotInScope(noun: noun))
+        for entityRef in potentialEntities {
+            switch entityRef {
+            case .item(let itemID):
+                // Debug returns success on first ID match
+                if verb == .debug, itemID.rawValue == noun { return .success(entityRef) }
+
+                // Use existing item-centric scoping and filtering
+                let itemCandidates = gatherCandidates(
+                    in: gameState,
+                    requiredConditions: requiredConditions
+                )
+                if itemCandidates.keys.contains(itemID) { // Check if item is in the general candidate pool
+                    // Pass the specific item's snapshot for modifier checking
+                    if let item = gameState.items[itemID] {
+                        if filterCandidates(item: item, modifiers: modifiers) {
+                            resolvedAndScopedEntities.append(.item(itemID))
+                        } else if !modifiers.isEmpty {
+                            // Modifier mismatch, but item was in scope. Do not add, let error be handled later if no other match.
+                        }
+                    } else {
+                        // This case should ideally not be reached if itemID came from vocabulary.items
+                        // and gameState.items is consistent. Perhaps a warning or error here?
+                        // For now, if item is nil, it won't be added.
+                    }
+                }
+            case .location(let locationID):
+                // Debug returns success on first ID match
+                if verb == .debug, locationID.rawValue == noun { return .success(entityRef) }
+
+                // Location scope: A named location is generally considered in scope.
+                // Conditions for locations are less common in ObjectCondition but could be checked.
+                guard modifiers.isEmpty else {
+                    // Locations typically aren't modified by adjectives in the same way items are.
+                    // Consider this a parse error for now or decide to ignore modifiers for locations.
+                    // Returning nothing here, will lead to .modifierMismatch if no item matches.
+                    continue // Skip this candidate if modifiers are present
+                }
+                // TODO: Add check for location-specific requiredConditions if they become a concept.
+                // For now, if it's a location reference, it's valid if named.
+                if let _ = gameState.locations[locationID] { // Verify location actually exists in current game state
+                    resolvedAndScopedEntities.append(.location(locationID))
+                }
+
+            case .player: // Should have been handled by player alias check, but defensive
+                if modifiers.isEmpty {
+                    resolvedAndScopedEntities.append(.player)
+                }
+            }
         }
 
-        if modifiers.isEmpty {
-            if relevantCandidateIDs.count > 1 {
-                return .failure(.ambiguity("Which \(noun) do you mean?"))
-            } else {
-                return .success(relevantCandidateIDs.first!)
+        if resolvedAndScopedEntities.isEmpty {
+            // If we had potential entities but none survived scoping/modifiers
+            if !potentialEntities.isEmpty && !modifiers.isEmpty {
+                 return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
             }
-        } else {
-            let matchingIDs = filterCandidates(ids: relevantCandidateIDs, modifiers: modifiers, candidates: candidatesMatchingScopeAndConditions)
-
-            if matchingIDs.isEmpty {
-                return .failure(.modifierMismatch(noun: noun, modifiers: modifiers))
-            } else if matchingIDs.count > 1 {
-                return .failure(.ambiguity("Which \(modifiers.joined(separator: " ")) \(noun) do you mean?"))
-            } else {
-                return .success(matchingIDs.first!)
-            }
+            return .failure(.itemNotInScope(noun: noun)) // Or a more generic EntityNotInScope
         }
+
+        if resolvedAndScopedEntities.count > 1 {
+            // Enhanced ambiguity message logic
+            let itemEntities = resolvedAndScopedEntities.compactMap { ref -> Item? in
+                if case let .item(id) = ref {
+                    gameState.items[id]
+                } else {
+                    nil
+                }
+            }
+            if !itemEntities.isEmpty && itemEntities.count == resolvedAndScopedEntities.count {
+                // All ambiguous are items
+                let baseName = itemEntities.first?.name ?? "item"
+                let allSameName = itemEntities.allSatisfy { $0.name == baseName }
+                let adjectiveSets = itemEntities.map { Set($0.adjectives) }
+                let allSameAdjectives = adjectiveSets.dropFirst().allSatisfy { $0 == adjectiveSets.first }
+                if allSameName {
+                    if allSameAdjectives {
+                        // All truly identical
+                        logger.error("""
+                            💥 StandardParser cannot distinguish between \
+                            \(itemEntities.count) identical items
+                            """)
+                        return .failure(.ambiguity("Which \(baseName) do you mean?"))
+                    } else {
+                        // List with adjectives
+                        let descriptions: [String] = itemEntities.map { item in
+                            if let adj = item.adjectives.sorted().first {
+                                "the \(adj) \(item.name)"
+                            } else {
+                                "the \(item.name)"
+                            }
+                        }
+                        return .failure(
+                            .ambiguity(
+                                "Which do you mean, \(descriptions.commaListing("or"))?"
+                            )
+                        )
+                    }
+                }
+            }
+            // Fallback: original logic
+            let descriptions = resolvedAndScopedEntities.map {
+                entityRefToString($0, gameState: gameState)
+            }
+            return .failure(.ambiguity("Which do you mean: \(descriptions.commaListing("or"))?"))
+        }
+
+        return .success(resolvedAndScopedEntities.first!)
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.
-    internal func gatherCandidates(
+    /// NOTE: This function remains item-centric for now. It's used by `resolveObject` for item candidates.
+    func gatherCandidates(
         in gameState: GameState,
         requiredConditions: ObjectCondition
     ) -> [ItemID: Item] {
@@ -587,8 +760,8 @@ public struct StandardParser: Parser {
         let mustBeContainer = requiredConditions.contains(.container)
 
         func checkItemConditions(_ item: Item) -> Bool {
-            if mustBePerson && !item.hasProperty(.person) { return false }
-            if mustBeContainer && !item.hasProperty(.container) { return false }
+            if mustBePerson && !item.hasFlag(.isPerson) { return false }
+            if mustBeContainer && !item.hasFlag(.isContainer) { return false }
             return true
         }
 
@@ -601,18 +774,20 @@ public struct StandardParser: Parser {
                     if mustBeHeld { meetsScopeCondition = (item.parent == .player) }
                     else if mustBeOnGround { meetsScopeCondition = (item.parent == .location(currentLocationID)) }
                     else if mustBeInRoom {
-                        let isGlobal = gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false
+                        let isGlobal = gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false
                         meetsScopeCondition = (item.parent == .location(currentLocationID) || isGlobal)
                     }
                     else {
                          if item.parent == .player || item.parent == .location(currentLocationID) { meetsScopeCondition = true }
                          else if case .item(let containerID) = item.parent {
                              if let container = allItems[containerID],
-                                (container.parent == .player || container.parent == .location(currentLocationID)),
-                                (container.hasProperty(.container) && container.hasProperty(.open)) || container.hasProperty(.surface) {
-                                 meetsScopeCondition = true
+                                (container.parent == .player || container.parent == .location(currentLocationID)) {
+                                 let isContainerOpen = container.attributes[.isOpen]?.toBool ?? false
+                                 if (container.hasFlag(.isContainer) && isContainerOpen) || container.hasFlag(.isSurface) {
+                                     meetsScopeCondition = true
+                                 }
                              }
-                         } else if gameState.locations[currentLocationID]?.globals.contains(item.id) ?? false {
+                         } else if gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false {
                               meetsScopeCondition = true
                          }
                     }
@@ -622,7 +797,8 @@ public struct StandardParser: Parser {
                     }
                 }
 
-                if (item.hasProperty(.container) && item.hasProperty(.open)) || item.hasProperty(.surface) {
+                let isContainerOpen = item.attributes[.isOpen]?.toBool ?? false
+                if (item.hasFlag(.isContainer) && isContainerOpen) || item.hasFlag(.isSurface) {
                      gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
                 }
             }
@@ -632,10 +808,10 @@ public struct StandardParser: Parser {
         gatherRecursive(parentEntity: .location(currentLocationID))
 
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
-             if let location = gameState.locations[currentLocationID] {
-                for itemID in location.globals {
+            if let location = gameState.locations[currentLocationID] {
+                for itemID in location.localGlobals {
                     if let globalItem = allItems[itemID], checkItemConditions(globalItem) {
-                         candidates[itemID] = globalItem
+                        candidates[itemID] = globalItem
                     }
                 }
             }
@@ -645,27 +821,34 @@ public struct StandardParser: Parser {
     }
 
     /// Filters a set of candidate ItemIDs based on a list of required modifiers (adjectives).
-    internal func filterCandidates(
-        ids: Set<ItemID>,
-        modifiers: [String],
-        candidates: [ItemID: Item]
-    ) -> Set<ItemID> {
+    func filterCandidates(
+        item: Item,
+        modifiers: [String]
+    ) -> Bool {
         guard !modifiers.isEmpty else {
-            return ids
+            return true // No modifiers, the item is a valid match by default
         }
 
         let lowercasedModifiers = Set(modifiers.map { $0.lowercased() })
-
-        return ids.filter { itemID in
-            guard let item = candidates[itemID] else { return false }
-            return lowercasedModifiers.isSubset(of: Set(item.adjectives.map { $0.lowercased() }))
-        }
+        return lowercasedModifiers.isSubset(of: Set(item.adjectives.map { $0.lowercased() }))
     }
 
-    // Add public initializer if needed (structs get internal one by default)
-    public init() {}
-
     // MARK: - Private Helpers (New/Modified for Syntax Matching)
+
+    /// Helper to convert an EntityReference to a descriptive string for ambiguity messages.
+    private func entityRefToString(
+        _ reference: EntityReference,
+        gameState: GameState
+    ) -> String {
+        switch reference {
+        case .item(let id):
+            "the \(gameState.items[id]?.name ?? id.rawValue)"
+        case .location(let id):
+            "the \(gameState.locations[id]?.name ?? id.rawValue)"
+        case .player:
+            "yourself"
+        }
+    }
 
     /// Finds the range of tokens corresponding to a noun phrase within the token list,
     /// starting from a given index.
@@ -733,7 +916,7 @@ public struct StandardParser: Parser {
 
 // Helper to access failure value easily (avoids force unwrap)
 // Moved to file scope
-private extension Result where Success == ItemID?, Failure == ParseError {
+private extension Result where Success == EntityReference?, Failure == ParseError {
     var failureValue: Failure? {
         guard case .failure(let error) = self else { return nil }
         return error

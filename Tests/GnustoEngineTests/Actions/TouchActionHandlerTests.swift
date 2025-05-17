@@ -3,7 +3,6 @@ import Testing
 
 @testable import GnustoEngine
 
-@MainActor
 @Suite("TouchActionHandler Tests")
 struct TouchActionHandlerTests {
     let handler = TouchActionHandler()
@@ -13,26 +12,30 @@ struct TouchActionHandlerTests {
         // Arrange
         let rock = Item(
             id: "rock",
-            name: "smooth rock",
-            parent: .player
+            .name("smooth rock"),
+            .in(.player)
         ) // Not necessarily takable
         let game = MinimalGame(items: [rock])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "rock", rawInput: "touch rock")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("rock"),
+            rawInput: "touch rock"
+        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "rock")
-        #expect(finalItemState?.hasProperty(.touched) == true, "Item should gain .touched property")
+        let finalItemState = try await engine.item("rock")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -42,27 +45,31 @@ struct TouchActionHandlerTests {
         // Arrange
         let key = Item(
             id: "key",
-            name: "brass key",
-            properties: .takable,
-            parent: .player
+            .name("brass key"),
+            .in(.player),
+            .isTakable
         )
         let game = MinimalGame(items: [key])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "key", rawInput: "touch key")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("key"),
+            rawInput: "touch key"
+        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "key")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = try await engine.item("key")
+        #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -72,17 +79,26 @@ struct TouchActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", rawInput: "touch")
+        let command = Command(
+            verb: .touch,
+            rawInput: "touch"
+        )
 
         // Act & Assert
-        await #expect(throws: ActionError.customResponse("Touch what?")) {
-            try await handler.validate(command: command, engine: engine)
+        await #expect(throws: ActionResponse.custom("Touch what?")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
         let output = await mockIO.flush()
         #expect(output.isEmpty)
@@ -92,23 +108,33 @@ struct TouchActionHandlerTests {
     func testTouchFailsItemNotAccessible() async throws {
         let figurine = Item(
             id: "figurine",
-            name: "jade figurine",
-            parent: .nowhere
+            .name("jade figurine"),
+            .in(.nowhere)
         )
         let game = MinimalGame(items: [figurine])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "figurine", rawInput: "touch figurine")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("figurine"),
+            rawInput: "touch figurine"
+        )
 
         // Act & Assert
-        await #expect(throws: ActionError.itemNotAccessible("figurine")) {
-            try await handler.validate(command: command, engine: engine)
+        await #expect(throws: ActionResponse.itemNotAccessible("figurine")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 
@@ -117,32 +143,37 @@ struct TouchActionHandlerTests {
         // Arrange
         let box = Item(
             id: "box",
-            name: "wooden box",
-            properties: .container, .open,
-            parent: .location("startRoom")
+            .name("wooden box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
         )
         let gem = Item(
             id: "gem",
-            name: "ruby gem",
-            parent: .item(box.id)
+            .name("ruby gem"),
+            .in(.item("box"))
         )
         let game = MinimalGame(items: [box, gem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "gem", rawInput: "touch gem")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("gem"),
+            rawInput: "touch gem"
+        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "gem")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = try await engine.item("gem")
+        #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -152,32 +183,36 @@ struct TouchActionHandlerTests {
         // Arrange
         let table = Item(
             id: "table",
-            name: "wooden table",
-            properties: .surface,
-            parent: .location("startRoom")
+            .name("wooden table"),
+            .in(.location(.startRoom)),
+            .isSurface
         )
         let book = Item(
             id: "book",
-            name: "dusty book",
-            parent: .item(table.id)
+            .name("dusty book"),
+            .in(.item("table"))
         )
         let game = MinimalGame(items: [table, book])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        let command = Command(verbID: "touch", directObject: "book", rawInput: "touch book")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("book"),
+            rawInput: "touch book"
+        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert
-        let finalItemState = engine.item(with: "book")
-        #expect(finalItemState?.hasProperty(.touched) == true)
+        let finalItemState = try await engine.item("book")
+        #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
         expectNoDifference(output, "You feel nothing special.")
     }
@@ -187,31 +222,41 @@ struct TouchActionHandlerTests {
         // Arrange
         let chest = Item(
             id: "chest",
-            name: "locked chest",
-            properties: .container, // Closed by default
-            parent: .location("startRoom")
+            .name("locked chest"),
+            .in(.location(.startRoom)),
+            .isContainer // Closed by default
         )
         let coin = Item(
             id: "coin",
-            name: "gold coin",
-            parent: .item(chest.id)
+            .name("gold coin"),
+            .in(.item("chest"))
         )
         let game = MinimalGame(items: [chest, coin])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             game: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
-        #expect(chest.hasProperty(.open) == false) // Verify closed
+        #expect(chest.attributes[.isOpen] == nil) // Verify closed
 
-        let command = Command(verbID: "touch", directObject: "coin", rawInput: "touch coin")
+        let command = Command(
+            verb: .touch,
+            directObject: .item("coin"),
+            rawInput: "touch coin"
+        )
 
         // Act & Assert
-        await #expect(throws: ActionError.prerequisiteNotMet("The locked chest is closed.")) {
-            try await handler.validate(command: command, engine: engine)
+        await #expect(throws: ActionResponse.itemNotAccessible("coin")) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
         }
     }
 }

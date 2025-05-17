@@ -29,7 +29,7 @@ Based on the analysis of the Inform 6 "Cloak of Darkness" source, the next major
 
 4. **Custom State on Objects**
 
-   - **Current State:** Limited to boolean properties via `Item.properties`.
+   - **Current State:** Limited to boolean properties via `Item.attributes`.
    - **Desired State:** Support for custom, mutable state (e.g., counters, strings) on items and locations.
    - **Example:** The `message` object tracks disturbance via an integer `number` property.
 
@@ -73,7 +73,8 @@ This phase represents a significant step forward in making the Gnusto engine as 
 
 **Next Steps:**
 
-- [ ] Begin with a detailed design document for the action handling system.
-- [ ] Implement a proof of concept for dynamic descriptions using the handler pattern.
-- [ ] Gradually introduce support for custom state and enhanced parsing.
-- [ ] Test and iterate based on feedback from the development community.
+- [x] Begin with a detailed design document for the action handling system.
+- [x] Implement a proof of concept for dynamic descriptions using the handler pattern.
+- [x] Gradually introduce support for custom state and enhanced parsing.
+- [x] Test and iterate based on feedback from the development community.
+- [ ] Conditional exits
