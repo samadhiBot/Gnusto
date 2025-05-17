@@ -14,8 +14,8 @@ struct CloakOfDarkness: GameBlueprint {
         release: "0.0.3",
         maximumScore: 2
     )
-    var definitionRegistry: DefinitionRegistry
-    var dynamicAttributeRegistry: DynamicAttributeRegistry
+    let definitionRegistry: DefinitionRegistry
+    let dynamicAttributeRegistry: DynamicAttributeRegistry
     var state: GameState
 
     init() {
