@@ -5,7 +5,7 @@ import Foundation
 ///
 /// This verb allows examining the internal state of game objects, locations, or players.
 /// It's primarily intended for development and debugging purposes.
-public final class DebugActionHandler: ActionHandler {
+public struct DebugActionHandler: ActionHandler {
     public init() {}
 
     public func validate(context: ActionContext) async throws {

@@ -15,10 +15,10 @@ fetch_repo() {
     git clone "$repo_url" "$TMP_DIR/$target_dir"
 
     # Create target directory if it doesn't exist
-    mkdir -p "Docs/References/$target_dir"
+    mkdir -p "References/$target_dir"
 
     # Copy only .zil, .md, and .txt files
-    find "$TMP_DIR/$target_dir" -type f \( -name "*.zil" -o -name "*.md" -o -name "*.txt" \) -exec cp {} "Docs/References/$target_dir/" \;
+    find "$TMP_DIR/$target_dir" -type f \( -name "*.zil" -o -name "*.md" -o -name "*.txt" \) -exec cp {} "References/$target_dir/" \;
 
     echo "Processed $target_dir"
 }

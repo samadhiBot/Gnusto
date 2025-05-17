@@ -57,7 +57,7 @@ extension AreaBlueprint {
             guard label.hasSuffix(handlerSuffix), label.count > handlerSuffix.count else {
                 assertionFailure(
                     """
-                    ItemEventHandler property '\(label)' in \(Self.self) does not follow the \ 
+                    ItemEventHandler property '\(label)' in \(Self.self) does not follow the \
                     expected naming convention '{itemID}\(handlerSuffix)'. It will be skipped.
                     """
                 )
@@ -121,7 +121,7 @@ extension AreaBlueprint {
             guard label.hasSuffix(handlerSuffix), label.count > handlerSuffix.count else {
                 assertionFailure(
                     """
-                    LocationEventHandler property '\(label)' in \(Self.self) does not follow the \ 
+                    LocationEventHandler property '\(label)' in \(Self.self) does not follow the \
                     expected naming convention '{itemID}\(handlerSuffix)'. It will be skipped.
                     """
                 )
