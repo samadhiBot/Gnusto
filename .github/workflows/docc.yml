@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - area-blueprint
+permissions:
+  contents: write
 
 jobs:
   build-and-deploy-docs:
