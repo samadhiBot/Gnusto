@@ -1,8 +1,21 @@
-/// Represents conditions that a noun phrase must meet to match a syntax pattern.
-/// Using an OptionSet allows combining multiple conditions.
+/// Represents conditions that a noun phrase (representing a direct or indirect object)
+/// must meet to successfully match a `SyntaxRule` during command parsing.
+///
+/// `ObjectCondition` is an `OptionSet`, allowing multiple conditions to be combined.
+/// For example, a rule might require an object to be both `.held` by the player
+/// and be a `.container`.
+///
+/// These conditions are typically checked by the parser after it tentatively identifies
+/// an item based on the player's input. If the conditions are not met, that syntax
+/// rule will not match, and the parser may try other rules or report a `ParseError`.
 public struct ObjectCondition: OptionSet, Sendable {
     public let rawValue: Int
 
+    /// Creates an `ObjectCondition` with the given raw integer value.
+    ///
+    /// This initializer is primarily used by the `OptionSet` protocol itself.
+    /// You typically create conditions using the static members like `.held` or `.inRoom`,
+    /// or by combining them (e.g., `[.held, .container]`).
     public init(rawValue: Int) {
         self.rawValue = rawValue
     }

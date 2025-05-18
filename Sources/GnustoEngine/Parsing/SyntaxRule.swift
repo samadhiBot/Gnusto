@@ -1,17 +1,39 @@
 import Foundation
 
-/// Represents a specific syntax pattern for a verb.
+/// Defines a specific grammatical pattern or syntax that a player's command can match
+/// for a particular verb.
+///
+/// The `StandardParser` uses a collection of `SyntaxRule`s, typically associated with
+/// each `VerbDefinition` in the `Vocabulary`, to interpret player input. Each rule
+/// describes an expected sequence of token types (`SyntaxTokenType`), along with optional
+/// conditions (`ObjectCondition`) for any direct or indirect objects, and a specific
+/// required preposition if the pattern includes one.
+///
+/// For example, a "TAKE" verb might have rules like:
+/// - `SyntaxRule(.verb, .directObject)` for "TAKE APPLE"
+/// - `SyntaxRule(.verb, .directObject, .preposition, .indirectObject)` for "PUT APPLE IN BAG",
+///   with `requiredPreposition: "in"`.
+///
+/// Game developers typically define these rules implicitly when creating `VerbDefinition`s
+/// using convenience initializers, or explicitly if more control over the grammar is needed.
 public struct SyntaxRule: Sendable, Equatable, Codable {
-    /// The sequence of expected token types in the pattern.
+    /// The sequence of `SyntaxTokenType`s that define the grammatical structure of this rule.
+    /// For example, `[.verb, .directObject]` or `[.verb, .directObject, .preposition, .indirectObject]`.
     public let pattern: [SyntaxTokenType]
 
-    /// Conditions required for the direct object, if present in the pattern.
+    /// A set of `ObjectCondition`s that the direct object (if specified by `.directObject`
+    /// in the `pattern`) must satisfy for this rule to match. For instance, it might
+    /// need to be `.held` by the player or be a `.container`.
     public let directObjectConditions: ObjectCondition
 
-    /// Conditions required for the indirect object, if present in the pattern.
+    /// A set of `ObjectCondition`s that the indirect object (if specified by `.indirectObject`
+    /// in the `pattern`) must satisfy. Similar to `directObjectConditions`.
     public let indirectObjectConditions: ObjectCondition
 
-    /// The specific preposition expected, if the pattern includes `.preposition`.
+    /// If the `pattern` includes `.preposition`, this property specifies the exact
+    /// preposition string (e.g., "in", "on", "with") that must be present in the player's
+    /// input for this rule to match. It is `nil` if no specific preposition is required
+    /// or if the pattern doesn't include `.preposition`.
     public let requiredPreposition: String? // Store the string, not PrepositionID
 
     // Explicit Codable conformance
@@ -43,10 +65,26 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
         try container.encodeIfPresent(requiredPreposition, forKey: .requiredPreposition)
     }
 
+    /// Creates a `SyntaxRule` with the given sequence of `SyntaxTokenType`s and default
+    /// (empty) conditions for objects, and no required preposition.
+    ///
+    /// This is a convenience initializer for simple patterns.
+    /// Example: `SyntaxRule(.verb, .directObject)`
+    ///
+    /// - Parameter pattern: A variadic list of `SyntaxTokenType`s defining the rule's structure.
     public init(_ pattern: SyntaxTokenType...) {
         self = .init(pattern: pattern)
     }
 
+    /// Creates a `SyntaxRule` with a specific pattern and optional conditions for objects
+    /// and a required preposition.
+    ///
+    /// - Parameters:
+    ///   - pattern: An array of `SyntaxTokenType`s defining the rule's structure.
+    ///   - directObjectConditions: Conditions the direct object must meet. Defaults to `.none`.
+    ///   - indirectObjectConditions: Conditions the indirect object must meet. Defaults to `.none`.
+    ///   - requiredPreposition: The specific preposition string required if the pattern
+    ///                        includes `.preposition`. Defaults to `nil`.
     public init(
         pattern: [SyntaxTokenType],
         directObjectConditions: ObjectCondition = .none,
@@ -68,13 +106,29 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
     }
 }
 
-/// Represents the type of element expected at a position in a SyntaxRule pattern.
+/// Represents the type of a token expected at a specific position within a `SyntaxRule`'s pattern.
+///
+/// Each case defines a category of word or phrase the parser looks for when trying to match
+/// player input against a known grammatical structure.
 public enum SyntaxTokenType: Sendable, Equatable, Codable {
+    /// Expects the main verb of the command (e.g., "TAKE", "GO", "LOOK").
+    /// This is typically the first significant token matched by the parser.
     case verb
+    /// Expects a noun phrase that will be identified as the direct object of the verb
+    /// (e.g., the "APPLE" in "TAKE APPLE").
     case directObject
+    /// Expects a noun phrase that will be identified as the indirect object of the verb
+    /// (e.g., the "BAG" in "PUT APPLE IN BAG").
     case indirectObject
+    /// Expects a preposition (e.g., "IN", "ON", "WITH"). If the `SyntaxRule` has a
+    /// `requiredPreposition`, this token must match that specific preposition. Otherwise,
+    /// it can match any preposition known in the game's `Vocabulary`.
     case preposition // Matches any known preposition unless SyntaxRule specifies one
+    /// Expects a word indicating a direction of movement (e.g., "NORTH", "UP", "WEST").
     case direction   // Matches a known direction word (e.g., "north", "n")
+    /// Expects a specific particle word that is part of a phrasal verb or special command
+    /// syntax (e.g., the "ON" in "TURN LIGHT ON", or "ABOUT" in "THINK ABOUT TOPIC").
+    /// The associated `String` value is the exact particle word expected.
     case particle(String) // Matches a specific particle word (e.g., "on", "off")
 
     // Manual Equatable for associated value
