@@ -1,29 +1,60 @@
 import Foundation
 import Logging
 
-/// A standard implementation of the Parser protocol.
-/// Aims to replicate common ZIL parser behaviors.
+/// A standard, ZIL-inspired implementation of the `Parser` protocol.
+///
+/// The `StandardParser` is designed to understand player input in a way that emulates
+/// the behavior of classic text-adventure parsers, particularly those from Infocom's
+/// Z-machine Implementation Language (ZIL).
+///
+/// Its primary role is to take a raw input string from the player and transform it into a
+/// structured `Command` object that the `GameEngine` can then execute. If it cannot
+/// understand the input, it returns a descriptive `ParseError`.
+///
+/// Key steps in its parsing process include:
+/// 1.  **Tokenization:** Breaking the input string into individual words or tokens.
+/// 2.  **Noise Word Removal:** Filtering out common, grammatically necessary but semantically
+///     unimportant words (e.g., "the", "a", "to") based on the game's `Vocabulary`.
+/// 3.  **Verb Identification:** Recognizing the primary action word (verb), potentially
+///     handling multi-word verb synonyms (e.g., "pick up").
+/// 4.  **Syntax Rule Matching:** Comparing the sequence of significant tokens against known
+///     `SyntaxRule`s associated with the identified verb. Each rule defines a valid
+///     grammatical pattern (e.g., VERB-DIRECT_OBJECT, VERB-DIRECT_OBJECT-PREPOSITION-INDIRECT_OBJECT).
+/// 5.  **Object Resolution:** Identifying the direct and indirect objects mentioned in the input.
+///     This involves looking up nouns in the `Vocabulary`, considering their context within
+///     the `GameState` (e.g., what items are in scope, what pronouns like "it" refer to),
+///     applying `ObjectCondition`s from the matched syntax rule, and resolving ambiguities.
+///
+/// Game developers typically do not need to interact with `StandardParser` methods other
+/// than potentially instantiating it. The `GameEngine` uses a `Parser` instance (like
+/// `StandardParser`) to process player input as part of the main game loop.
 public struct StandardParser: Parser {
     public init() {}
 
-    /// A logger used for unhandled error warnings.
+    /// A logger used for internal parser messages, primarily for debugging.
     let logger = Logger(label: "com.samadhibot.Gnusto.StandardParser")
 
-    /// Parses a raw input string into a structured `Command`.
+    /// Parses a raw input string from the player into a structured `Command` or a `ParseError`.
     ///
-    /// Follows a ZIL-inspired process:
-    /// 1. Tokenize input.
-    /// 2. Filter noise words.
-    /// 3. Identify verb.
-    /// 4. Identify noun phrases (direct/indirect objects, prepositions).
-    /// 5. Resolve objects using game state and vocabulary.
-    /// 6. Construct Command or return ParseError.
+    /// This method implements the core parsing logic described in the `StandardParser` overview.
+    /// It attempts to understand the player's intent by matching their input against the
+    /// game's vocabulary and syntax rules.
     ///
     /// - Parameters:
-    ///   - input: The raw string entered by the player.
-    ///   - vocabulary: The game's vocabulary, used to identify known words.
-    ///   - gameState: The current state of the game, used for context.
-    /// - Returns: A `Result` containing either a successfully parsed `Command` or a `ParseError`.
+    ///   - input: The raw string as entered by the player (e.g., "take brass lantern").
+    ///   - vocabulary: The `Vocabulary` for the current game, containing all known words
+    ///                 (verbs, nouns, adjectives, prepositions, noise words, directions)
+    ///                 and verb syntax rules.
+    ///   - gameState: The current `GameState`, providing context for object resolution (e.g.,
+    ///                player inventory, item locations, current pronoun meanings, items in scope).
+    /// - Returns: A `Result` which is either:
+    ///   - `.success(Command)`: If parsing was successful, containing a structured `Command`
+    ///     object ready for the `GameEngine` to execute. The `Command` includes the identified
+    ///     `VerbID`, resolved `EntityReference`s for direct/indirect objects, any modifiers,
+    ///     preposition, and direction.
+    ///   - `.failure(ParseError)`: If parsing failed, containing a `ParseError` case that
+    ///     describes why the input could not be understood (e.g., `.unknownVerb`,
+    ///     `.itemNotInScope`, `.badGrammar`, `.ambiguity`).
     public func parse(
         input: String,
         vocabulary: Vocabulary,
