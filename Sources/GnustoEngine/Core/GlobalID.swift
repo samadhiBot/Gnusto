@@ -1,9 +1,16 @@
 import Foundation
 
-/// A type-safe key for accessing game-specific state values stored in `GameState.globalState`.
+/// A type-safe key for accessing game-specific global variables or flags stored in
+/// `GameState.globalState`.
 ///
-/// Using a dedicated type instead of raw strings helps prevent typos and improves code clarity
-/// when dealing with global or miscellaneous state information not directly tied to items or locations.
+/// `GlobalID`s provide a structured way to manage global state that isn't directly tied to
+/// specific items or locations. This can include:
+/// - Boolean flags indicating story progression (e.g., `GlobalID("metTheKing")`).
+/// - Numeric counters for game-wide events (e.g., `GlobalID("dragonsSlain")`).
+/// - Configuration settings or miscellaneous state values.
+///
+/// Using `GlobalID` instead of raw strings helps prevent typos and improves code clarity.
+/// It is `Codable` for game state persistence and `ExpressibleByStringLiteral` for ease of use.
 public struct GlobalID: RawRepresentable, Hashable, Codable, Sendable {
     public let rawValue: String
 

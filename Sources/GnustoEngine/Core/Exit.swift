@@ -1,17 +1,27 @@
 import CustomDump
 import Foundation
 
-/// Represents a connection from one location to another in a specific direction.
+/// Represents a one-way connection from one `Location` to another in a specific `Direction`.
+///
+/// `Exit` objects are stored in a `Location`'s `exits` dictionary, mapping a `Direction`
+/// (e.g., `.north`, `.east`) to the `Exit` that defines the path in that direction.
+/// An exit can be a simple passage or can be associated with a door (`doorID`)
+/// that might be open, closed, or locked, affecting traversal.
 public struct Exit: Codable, Hashable, Sendable {
-    /// The unique identifier of the location this exit leads to.
+    /// The `LocationID` of the location this exit leads to.
     public var destinationID: LocationID
 
-    /// An optional message printed when movement is attempted but fails due to this exit
-    /// being blocked. If nil, a default message like "The way is blocked." might be used.
+    /// An optional custom message to be displayed if the player attempts to use this exit
+    /// but is prevented from doing so (e.g., because an associated door is closed and locked,
+    /// or some other game condition blocks passage).
+    /// If `nil`, the `GameEngine` or `ActionHandler` might use a default message.
     public var blockedMessage: String? = nil
 
-    /// An optional door identifier, used to represent a door or similar barrier that can be
-    /// opened, closed, and locked.
+    /// An optional `ItemID` that identifies an `Item` acting as a door or barrier for this exit.
+    ///
+    /// If `doorID` is set, the state of the corresponding `Item` (e.g., whether it's open,
+    /// closed, locked) will typically determine if the player can pass through this exit.
+    /// The `GoActionHandler` often uses this to check door states.
     public let doorID: ItemID?
 
     // --- Initialization ---
