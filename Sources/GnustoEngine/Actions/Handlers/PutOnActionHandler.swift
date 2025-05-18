@@ -62,7 +62,17 @@ public struct PutOnActionHandler: ActionHandler {
         var currentParent = surfaceItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToPutID {
-                throw ActionResponse.prerequisiteNotMet("You can't put the \(itemToPut.name) inside the \(surfaceItem.name) that way.")
+                let preposition = if itemToPut.hasFlag(.isContainer) {
+                    "inside"
+                } else if itemToPut.hasFlag(.isSurface) {
+                    "on"
+                } else {
+                    "in"
+                }
+                throw ActionResponse.prerequisiteNotMet("""
+                    You can't put the \(itemToPut.name) on the \(surfaceItem.name) because \
+                    the \(surfaceItem.name) is \(preposition) the \(itemToPut.name).
+                    """)
             }
             let parentItem = try await context.engine.item(parentItemID)
             currentParent = parentItem.parent

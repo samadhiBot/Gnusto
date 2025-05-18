@@ -428,9 +428,10 @@ struct PutOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        let output = await mockIO.flush()
-        // Note: The error message uses "inside" due to the way the check works, might need refinement
-        expectNoDifference(output, "You can’t put the table inside the silver tray like that.")
+        #expect(
+            await mockIO.flush() ==
+            "You can’t put the silver tray on the table because the table is on the silver tray."
+        )
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty == true)
