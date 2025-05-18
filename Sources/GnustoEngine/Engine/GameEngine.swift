@@ -1,75 +1,121 @@
 import Foundation
 import Logging
 
-/// The main orchestrator for the interactive fiction game.
-/// This actor manages the game state, handles the game loop, interacts with the parser
-/// and IO handler, and executes player commands using registered ActionHandlers.
+/// The main orchestrator for an interactive fiction game, responsible for managing
+/// the game's state, running the primary game loop, and coordinating interactions
+/// between the player (via an `IOHandler`), the command `Parser`, and the various
+/// game logic handlers (`ActionHandler`, `ItemEventHandler`, `LocationEventHandler`).
+///
+/// As a Swift `actor`, `GameEngine` ensures safe access to the mutable `gameState`
+/// from concurrent contexts, which is crucial for modern Swift concurrency.
+///
+/// Game developers typically interact with the `GameEngine` instance provided
+/// within custom game logic closures (like those in `GameBlueprint` or event handlers).
+/// Through this instance, developers can:
+/// - Query the current `GameState` (e.g., find items, check locations).
+/// - Initiate changes to the `GameState` by creating `StateChange` objects or using
+///   convenience mutation methods.
+/// - Access game-wide `GameConstants`.
+/// - Trigger output to the player via the `IOHandler`.
 public actor GameEngine: Sendable {
-    /// The current state of the game world.
+    /// The current, mutable state of the entire game world.
+    ///
+    /// This `GameState` object holds all information about locations, items, the player,
+    /// active timers, and global variables. While action handlers and game hooks can
+    /// read from this state directly (often via engine helper methods), modifications
+    /// should be done by applying `StateChange` objects through the engine to ensure
+    /// consistency and proper tracking.
     public internal(set) var gameState: GameState
 
-    /// The parser responsible for understanding player input.
+    /// The parser responsible for interpreting raw player input strings into
+    /// structured `Command` objects that the engine can understand and execute.
+    /// This is primarily used internally by the engine during the game loop.
     private let parser: Parser
 
-    /// The handler for input and output operations.
-    /// Use a nonisolated let for the IOHandler; calls to it must be await ioHandler.method().
+    /// The handler for all input and output operations, such as reading player commands
+    /// and displaying game text. Game developers usually don't interact with this
+    /// directly from handlers, as the engine provides higher-level methods for output
+    /// (e.g., via `ActionResult.message`).
     nonisolated internal let ioHandler: IOHandler
 
-    /// The resolver for scope and visibility checks.
+    /// A utility to determine what items and locations are currently perceivable or
+    /// interactable by the player, considering factors like light, containment, and reach.
+    /// Game developers might use methods on the engine that internally leverage this resolver
+    /// (e.g., `playerCanReach(_:)`).
     lazy var scopeResolver = ScopeResolver(engine: self)
 
-    /// The game-wide constants (title, release, max score, etc).
+    /// The game-specific constants, such as title, introduction, and maximum score,
+    /// derived from the `GameBlueprint`.
     public let constants: GameConstants
 
-    /// The registry holding static game definitions (fuses, daemons, action overrides).
+    /// The registry holding definitions for timed events (`FuseDefinition`)
+    /// and background processes (`DaemonDefinition`) provided by the `GameBlueprint`.
+    /// The engine uses this to manage these time-based game mechanics.
     public let definitionRegistry: DefinitionRegistry
 
-    /// The registry for dynamic attribute computation and validation logic.
+    /// The registry for custom logic that dynamically computes or validates item and
+    /// location attributes, provided by the `GameBlueprint`.
+    /// Developers can also register new handlers directly via engine methods like
+    /// `registerItemCompute(key:handler:)`.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
-    /// Registered handlers for specific verb commands.
+    /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
+    /// These are a combination of default engine handlers and custom handlers provided
+    /// by the `GameBlueprint`.
     private var actionHandlers = [VerbID: ActionHandler]()
 
-    /// Handlers triggered when an action targets a specific item ID.
+    /// Custom event handlers for specific items, triggered by events like `beforeTurn`
+    /// or `afterTurn`, provided by the `GameBlueprint`.
     var itemEventHandlers: [ItemID: ItemEventHandler]
 
-    /// Handlers triggered by events occurring within a specific location ID.
+    /// Custom event handlers for specific locations, triggered by events like `onEnter`,
+    /// `beforeTurn`, or `afterTurn`, provided by the `GameBlueprint`.
     var locationEventHandlers: [LocationID: LocationEventHandler]
 
-    /// A logger used for unhandled error warnings.
+    /// Internal logger for engine messages and warnings.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
-    /// The maximum line length for description formatting.
-    /// TODO: Make this configurable via init or GameBlueprint?
+    /// The maximum line length used for formatting descriptions.
+    /// (Currently internal, may become configurable).
     private let maximumDescriptionLength: Int = 100
 
-    /// Flag to control the main game loop.
+    /// Internal flag to control the main game loop's continuation.
+    /// Game developers can call `requestQuit()` to set this.
     var shouldQuit: Bool = false
 
     // MARK: - Custom Game Hooks (Closures)
 
-    /// Custom logic called after the player successfully enters a new location.
+    /// A closure, provided by the `GameBlueprint`, that is called after the player
+    /// successfully enters a new location.
     ///
-    /// The closure receives the engine and the ID of the location entered. It can modify the
-    /// game state (e.g., change location properties based on player state). The closure returns
-    /// `true` if the hook handled the situation, and no further action is required.
+    /// Use this to implement custom logic that should occur upon entering a room,
+    /// such as triggering events, updating state, or describing unique features.
+    /// The closure receives the `GameEngine` instance and the `LocationID` of the entered room.
+    /// Return `true` if your hook fully handles the event (e.g., prints its own description)
+    /// and the engine should not perform default processing for entering the room.
     public var onEnterRoom: (@Sendable (GameEngine, LocationID) async -> Bool)?
 
-    /// Custom logic called at the very start of each turn, before command processing.
+    /// A closure, provided by the `GameBlueprint`, that is called at the very start of
+    /// each turn, before the player's `Command` is processed.
     ///
-    /// The closure receives the engine and the command. It can modify game state or print messages
-    /// based on the current state. The closure returns `true` if the hook handled the command,
-    /// and no further action is required.
+    /// Use this for per-turn logic like weather changes, NPC actions, or checking
+    /// time-sensitive conditions. The closure receives the `GameEngine` instance and the
+    /// current `Command`.
+    /// Return `true` if your hook fully handles the command or pre-turn phase, and no
+    /// further engine processing for the command should occur.
     public var beforeTurn: (@Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
-    /// Creates a new `GameEngine` instance from a game definition.
+    /// Creates a new `GameEngine` instance, configured by a `GameBlueprint`.
+    ///
+    /// This is typically called once at the start of the game to set up the engine
+    /// with all game-specific data and logic.
     ///
     /// - Parameters:
-    ///   - blueprint: The game definition.
-    ///   - parser: The command parser.
-    ///   - ioHandler: The I/O handler for player interaction.
+    ///   - blueprint: The `GameBlueprint` containing all game definitions and initial state.
+    ///   - parser: The `Parser` to be used for understanding player input.
+    ///   - ioHandler: The `IOHandler` for interacting with the player.
     public init(
         blueprint: GameBlueprint,
         parser: Parser,
@@ -98,6 +144,19 @@ public actor GameEngine: Sendable {
 
 extension GameEngine {
     /// Starts and runs the main game loop.
+    ///
+    /// This method initiates the game: it sets up the I/O handler, displays initial
+    /// game information (title, introduction), describes the starting location, and then
+    /// enters a loop to process player turns. Each turn involves:
+    ///   - Showing the status line.
+    ///   - Processing timed events (fuses and daemons via `tickClock()`).
+    ///   - Reading and parsing player input.
+    ///   - Executing the parsed command (including `beforeTurn` hooks, item/location event
+    ///     handlers, and the main `ActionHandler` for the verb).
+    ///
+    /// The loop continues until `shouldQuit` becomes `true` (e.g., via `requestQuit()`
+    /// or a "quit" command). Game developers typically don't call this method directly;
+    /// it's the entry point for running the game.
     public func run() async {
         await ioHandler.setup()
         await ioHandler.print(constants.storyTitle, style: .strong)
@@ -124,7 +183,6 @@ extension GameEngine {
         }
 
         await ioHandler.teardown()
-
     }
 
     // MARK: Private helpers
@@ -211,6 +269,9 @@ extension GameEngine {
     }
 
     /// Reports user-friendly messages for action responses to the player.
+    /// This method is used internally by the engine to translate `ActionResponse`
+    /// enum cases (often returned by `ActionHandler` validation or processing steps)
+    /// into textual feedback for the player.
     private func report(_ response: ActionResponse) async {
         // Determine the user-facing message
         let message = switch response {
@@ -316,6 +377,8 @@ extension GameEngine {
     }
 
     /// Reports a parsing error to the player.
+    /// This method is used internally by the engine to translate `ParseError` enum cases
+    /// into textual feedback for the player when input cannot be understood.
     private func report(parseError: ParseError) async {
         let message = switch parseError {
         case .emptyInput:
@@ -345,7 +408,9 @@ extension GameEngine {
         }
     }
 
-    /// Displays the status line.
+    /// Displays the status line (e.g., current location, score, and turn count)
+    /// to the player via the `IOHandler`.
+    /// This is called automatically at the start of each turn.
     private func showStatus() async {
         guard let currentLocation = gameState.locations[playerLocationID] else { return }
         await ioHandler.showStatusLine(
@@ -405,7 +470,13 @@ extension GameEngine {
 // MARK: - Clock Tick Logic
 
 extension GameEngine {
-    /// Processes fuses and daemons for the current turn.
+    /// Processes all active fuses (timed events) and daemons (recurring actions)
+    /// for the current game turn.
+    ///
+    /// This method is called automatically by the engine at the start of each turn.
+    /// It updates fuse counters, executes expired fuse actions, and runs daemon actions
+    /// based on their defined frequency. Game developers typically don't call this
+    /// method directly; they define fuses and daemons in the `GameBlueprint`.
     private func tickClock() async {
         let currentTurn = gameState.player.moves
 
@@ -497,8 +568,18 @@ extension GameEngine {
 // MARK: - Command Execution
 
 extension GameEngine {
-    /// Looks up and executes the appropriate ActionHandler for the given command.
-    /// - Parameter command: The command to execute.
+    /// Looks up and executes the appropriate `ActionHandler` for the given command.
+    ///
+    /// This is the core of command processing. It involves several steps:
+    ///   - Invoking `beforeTurn` hooks for the current location and specific items.
+    ///   - If not handled by a hook, checking for darkness if the verb requires light.
+    ///   - Executing the `validate`, `process`, and `postProcess` steps of the relevant
+    ///     `ActionHandler` for the command's verb.
+    ///   - Processing the `ActionResult` (applying state changes, printing messages).
+    ///   - Invoking `afterTurn` hooks for items and the location.
+    ///
+    /// Game developers typically don't call this directly; it's part of the internal
+    /// game loop (`processTurn`).
     func execute(command: Command) async {
         var actionHandled = false
         var actionResponse: Error? = nil // To store error from object handlers
@@ -693,8 +774,14 @@ extension GameEngine {
 
     /// Processes the result of an action, applying state changes and printing the message.
     ///
-    /// - Parameter result: The `ActionResult` returned by an `ActionHandler`.
-    /// - Returns: Whether the action result emitted a message.
+    /// This internal helper is called after an `ActionHandler` (or an event handler that
+    /// returns an `ActionResult`) has processed a command or event. It applies any
+    /// `StateChange`s specified in the `ActionResult` to the `gameState` and prints
+    /// the `ActionResult.message` to the player via the `IOHandler`.
+    ///
+    /// - Parameter result: The `ActionResult` returned by an action or event handler.
+    /// - Returns: `true` if the `ActionResult` contained a message that was printed,
+    ///   `false` otherwise.
     /// - Throws: Re-throws errors encountered during state application.
     private func processActionResult(_ result: ActionResult) async throws -> Bool {
         // 1. Apply State Changes
