@@ -7,7 +7,7 @@ import Foundation
 /// an `ItemEvent` as input. This closure can then execute arbitrary game logic and
 /// optionally return an `ActionResult` to influence or override the default game flow.
 ///
-/// Item event handlers are typically registered with the `DefinitionRegistry` to associate
+/// Item event handlers are typically registered with the `TimeRegistry` to associate
 /// them with specific items.
 public struct ItemEventHandler: Sendable {
     /// The closure that implements the custom event handling logic.

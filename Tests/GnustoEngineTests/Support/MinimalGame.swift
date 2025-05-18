@@ -11,7 +11,7 @@ struct MinimalGame: GameBlueprint {
     var customActionHandlers: [VerbID: ActionHandler]
     var itemEventHandlers: [ItemID: ItemEventHandler]
     var locationEventHandlers: [LocationID: LocationEventHandler]
-    var definitionRegistry: DefinitionRegistry
+    var timeRegistry: TimeRegistry
     var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     init(
@@ -22,11 +22,11 @@ struct MinimalGame: GameBlueprint {
         customActionHandlers: [VerbID: ActionHandler] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
-        definitionRegistry: DefinitionRegistry = DefinitionRegistry(),
+        timeRegistry: TimeRegistry = TimeRegistry(),
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
         self.customActionHandlers = customActionHandlers
-        self.definitionRegistry = definitionRegistry
+        self.timeRegistry = timeRegistry
         self.dynamicAttributeRegistry = dynamicAttributeRegistry
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers

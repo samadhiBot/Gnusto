@@ -57,7 +57,7 @@ public actor GameEngine: Sendable {
     /// The registry holding definitions for timed events (`FuseDefinition`)
     /// and background processes (`DaemonDefinition`) provided by the `GameBlueprint`.
     /// The engine uses this to manage these time-based game mechanics during `tickClock()`.
-    public let definitionRegistry: DefinitionRegistry
+    public let timeRegistry: TimeRegistry
 
     /// The registry for custom logic that dynamically computes or validates item and
     /// location attributes. This is initialized from the `GameBlueprint` and can be
@@ -145,7 +145,7 @@ public actor GameEngine: Sendable {
         self.gameState = blueprint.state
         self.parser = parser
         self.ioHandler = ioHandler
-        self.definitionRegistry = blueprint.definitionRegistry
+        self.timeRegistry = blueprint.timeRegistry
         self.dynamicAttributeRegistry = blueprint.dynamicAttributeRegistry
         self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
@@ -521,13 +521,13 @@ extension GameEngine {
     /// 1. **Fuses**: Iterates through all `activeFuses` in `gameState`.
     ///    - Decrements the turn counter for each active fuse.
     ///    - If a fuse's counter reaches zero or less:
-    ///        - Retrieves the corresponding `FuseDefinition` from the `definitionRegistry`.
+    ///        - Retrieves the corresponding `FuseDefinition` from the `timeRegistry`.
     ///        - Executes the fuse's `action` closure, passing the `GameEngine` instance.
     ///        - Removes the fuse from `activeFuses` in `gameState`.
     ///        - If the fuse's `repeats` flag is `true`, it reactivates the fuse by adding it
     ///          back to `activeFuses` with its `initialTurns` count.
     /// 2. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
-    ///    - Retrieves the corresponding `DaemonDefinition` from the `definitionRegistry`.
+    ///    - Retrieves the corresponding `DaemonDefinition` from the `timeRegistry`.
     ///    - Executes the daemon's `action` closure, passing the `GameEngine` instance.
     ///
     /// Fuse and daemon actions can modify game state, print messages (by returning an `ActionResult`
@@ -564,7 +564,7 @@ extension GameEngine {
             }
 
             if newTurns <= 0 {
-                guard let definition = definitionRegistry.fuseDefinitions[fuseID] else {
+                guard let definition = timeRegistry.fuseDefinitions[fuseID] else {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
                         entityID: .global,
@@ -605,7 +605,7 @@ extension GameEngine {
         // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
-            guard let definition = definitionRegistry.daemonDefinitions[daemonID] else {
+            guard let definition = timeRegistry.daemonDefinitions[daemonID] else {
                 print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }

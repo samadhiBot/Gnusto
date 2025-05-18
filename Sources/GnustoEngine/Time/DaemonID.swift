@@ -3,7 +3,7 @@ import Foundation
 /// A type-safe, unique identifier for a `DaemonDefinition` and its active instance
 /// within the game state.
 ///
-/// `DaemonID`s are used to register daemon behaviors in the `DefinitionRegistry`
+/// `DaemonID`s are used to register daemon behaviors in the `TimeRegistry`
 /// and to track active daemons in `GameState`.
 public struct DaemonID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String

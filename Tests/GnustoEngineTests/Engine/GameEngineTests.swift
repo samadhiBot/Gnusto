@@ -807,7 +807,7 @@ struct GameEngineTests {
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(fuseDefinitions: [fuseDef])
+            timeRegistry: TimeRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
 
@@ -838,7 +838,7 @@ struct GameEngineTests {
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
+            timeRegistry: TimeRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
         let _ = await GameEngine( // Use _ for unused engine
@@ -872,7 +872,7 @@ struct GameEngineTests {
 
         // Initialize game with definitions
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(
+            timeRegistry: TimeRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )

@@ -7,7 +7,7 @@ import Foundation
 /// and a `LocationEvent` as input. This closure can then execute arbitrary game logic
 /// and optionally return an `ActionResult` to influence or override the default game flow.
 ///
-/// Location event handlers are typically registered with the `DefinitionRegistry` to associate
+/// Location event handlers are typically registered with the `TimeRegistry` to associate
 /// them with specific locations.
 public struct LocationEventHandler: Sendable {
     /// The closure that implements the custom event handling logic.

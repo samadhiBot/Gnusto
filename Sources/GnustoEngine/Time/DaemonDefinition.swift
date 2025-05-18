@@ -9,7 +9,7 @@ import Foundation
 /// to gradually dim, or check if a certain game condition triggers a special event.
 ///
 /// You create `DaemonDefinition` instances and register them with the
-/// `DefinitionRegistry` when setting up your game (typically in `GameBlueprint`).
+/// `TimeRegistry` when setting up your game (typically in `GameBlueprint`).
 /// The `GameEngine` then manages active daemons, calling their `action` closures at
 /// the appropriate turns based on their `frequency`.
 public struct DaemonDefinition: Identifiable, Sendable {

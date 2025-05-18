@@ -3,7 +3,7 @@ import Foundation
 /// A type-safe, unique identifier for a `FuseDefinition` and its active instance
 /// (timer) within the game state.
 ///
-/// `FuseID`s are used to register fuse behaviors (timed events) in the `DefinitionRegistry`
+/// `FuseID`s are used to register fuse behaviors (timed events) in the `TimeRegistry`
 /// and to track active fuses and their remaining turns in `GameState`.
 public struct FuseID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String

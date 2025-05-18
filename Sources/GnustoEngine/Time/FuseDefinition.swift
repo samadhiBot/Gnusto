@@ -8,7 +8,7 @@ import Foundation
 /// after a set number of turns, or a magical spell might wear off after a duration.
 ///
 /// You create `FuseDefinition` instances and register them with the
-/// `DefinitionRegistry` when setting up your game (typically in `GameBlueprint`).
+/// `TimeRegistry` when setting up your game (typically in `GameBlueprint`).
 /// To start a timed event, you would then use a game command or side effect to activate
 /// the fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.
 /// When the turn counter for an active fuse reaches zero, its `action` is executed.

@@ -90,8 +90,8 @@ public protocol GameBlueprint: Sendable {
     /// after a set number of turns, while daemons run their action every turn they
     /// are active.
     ///
-    /// The default implementation provides an empty `DefinitionRegistry`.
-    var definitionRegistry: DefinitionRegistry { get }
+    /// The default implementation provides an empty `TimeRegistry`.
+    var timeRegistry: TimeRegistry { get }
 
     /// The registry containing handlers for dynamically computing or validating
     /// item and location attributes.
@@ -127,8 +127,8 @@ extension GameBlueprint {
         { _, _ in false }
     }
 
-    public var definitionRegistry: DefinitionRegistry {
-        DefinitionRegistry()
+    public var timeRegistry: TimeRegistry {
+        TimeRegistry()
     }
 
     public var dynamicAttributeRegistry: DynamicAttributeRegistry {

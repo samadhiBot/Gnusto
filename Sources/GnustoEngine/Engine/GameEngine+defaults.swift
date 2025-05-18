@@ -2,7 +2,7 @@
 
 extension GameEngine {
     /// Default action handlers provided by the engine.
-    /// Games can override these via the `DefinitionRegistry`.
+    /// Games can override these via the `TimeRegistry`.
     static var defaultActionHandlers: [VerbID: ActionHandler] {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction
