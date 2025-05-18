@@ -59,25 +59,30 @@ public struct ActionContext: Sendable {
     }
 }
 
-/// A protocol for objects capable of generating or augmenting an `ActionContext`
-/// for a given command.
+/// A protocol for objects that can generate or augment an `ActionContext` with
+/// additional game-specific information before an action is handled.
 ///
-/// While the `GameEngine` provides a basic `ActionContext`, some games or complex actions
-/// might require additional, specific context. Implementations of this protocol can be used
-/// to gather this extra information and add it to the `contextData` field of an
-/// `ActionContext` before it is passed to an `ActionHandler`.
+/// The `GameEngine` provides a foundational `ActionContext`. If your game's actions
+/// require more detailed or dynamically calculated context (e.g., the mood of an NPC,
+/// the result of a recent mini-game), you can implement this protocol.
 ///
-/// (Note: The current `getContext` method signature seems to take an existing context
-/// and return a new one. This might be intended for chaining context providers or augmenting
-/// an initial context provided by the engine.)
+/// An `ActionContextProvider` takes the initial `ActionContext` (which includes the
+/// `Command`, `GameEngine` reference, and `GameState` snapshot) and can return
+/// a new or modified `ActionContext`, typically by adding custom data to its
+/// `contextData` dictionary. This enriched context is then passed to the
+/// relevant `ActionHandler`.
 public protocol ActionContextProvider: Sendable {
-    /// Creates or augments context information relevant to the specified command and existing context.
+    /// Generates or augments an `ActionContext` with additional information.
     ///
-    /// - Parameters:
-    ///   - command: The `Command` being executed (available via `context.command`).
-    ///   - engine: The `GameEngine` instance (available via `context.engine`).
-    ///   - context: The current `ActionContext` which may be augmented or used to create a new one.
-    /// - Returns: An `ActionContext` instance, potentially enriched with more data.
-    /// - Throws: An error if context generation or augmentation fails.
-        func getContext(for context: ActionContext) async throws -> ActionContext
+    /// Implement this method to gather any extra data your game needs for a specific
+    /// action and incorporate it into the `ActionContext`. You can use the provided
+    /// `context` to access the current `Command`, `GameEngine`, and `GameState` snapshot.
+    ///
+    /// - Parameter context: The initial `ActionContext` provided by the engine.
+    ///   This context contains the `command` being processed, a reference to the
+    ///   `engine`, and a `stateSnapshot`.
+    /// - Returns: An `ActionContext`, which may be the original context augmented with
+    ///   new `contextData`, or an entirely new `ActionContext` instance if necessary.
+    /// - Throws: An error if the required contextual information cannot be generated.
+    func getContext(for context: ActionContext) async throws -> ActionContext
 }
