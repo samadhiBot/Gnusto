@@ -5,6 +5,12 @@ import Foundation
 /// Implement this protocol to specify all the essential elements for your game,
 /// including initial world state, game-specific constants, custom behaviors, and event handlers.
 /// The `GameEngine` uses this blueprint to initialize and run the game.
+///
+/// For organizing game content (locations, items, and their specific event handlers),
+/// consider using types that conform to `AreaBlueprint`. The definitions from these
+/// area blueprints can then be aggregated and provided to the relevant properties of
+/// your `GameBlueprint` implementation (e.g., `state`, `itemEventHandlers`,
+/// `locationEventHandlers`).
 public protocol GameBlueprint: Sendable {
     /// The core metadata constants for the game.
     ///

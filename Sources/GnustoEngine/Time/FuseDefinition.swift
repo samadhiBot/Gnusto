@@ -7,12 +7,12 @@ import Foundation
 /// For example, a fuse might be lit on a stick of dynamite, causing an explosion
 /// after a set number of turns, or a magical spell might wear off after a duration.
 ///
-/// You create `Fuse` instances (which act as definitions) and register them with the
+/// You create `FuseDefinition` instances and register them with the
 /// `DefinitionRegistry` when setting up your game (typically in `GameBlueprint`).
 /// To start a timed event, you would then use a game command or side effect to activate
 /// the fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.
 /// When the turn counter for an active fuse reaches zero, its `action` is executed.
-public struct Fuse: Identifiable, Sendable {
+public struct FuseDefinition: Identifiable, Sendable {
 
     /// A unique identifier for the fuse definition.
     public typealias ID = FuseID
@@ -58,14 +58,14 @@ public struct Fuse: Identifiable, Sendable {
 }
 
 // Basic Equatable and Hashable conformance based on ID
-extension Fuse: Equatable {
-    public static func == (lhs: Fuse, rhs: Fuse) -> Bool {
-        lhs.id == rhs.id
+extension FuseDefinition: Equatable {
+    public static func == (lhs: FuseDefinition, rhs: FuseDefinition) -> Bool {
+        lhs.id == rhs.id // Equality based on ID only
     }
 }
 
-extension Fuse: Hashable {
+extension FuseDefinition: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(id)
+        hasher.combine(id) // Hashing based on ID only
     }
 }

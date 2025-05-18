@@ -8,11 +8,11 @@ import Foundation
 /// command. For example, a daemon might make an NPC wander, cause a light source
 /// to gradually dim, or check if a certain game condition triggers a special event.
 ///
-/// You create `Daemon` instances (which act as definitions) and register them with the
+/// You create `DaemonDefinition` instances and register them with the
 /// `DefinitionRegistry` when setting up your game (typically in `GameBlueprint`).
 /// The `GameEngine` then manages active daemons, calling their `action` closures at
 /// the appropriate turns based on their `frequency`.
-public struct Daemon: Identifiable, Sendable {
+public struct DaemonDefinition: Identifiable, Sendable {
 
     /// A unique identifier for the daemon definition.
     public typealias ID = DaemonID
@@ -49,13 +49,13 @@ public struct Daemon: Identifiable, Sendable {
 }
 
 // Basic Equatable and Hashable conformance based on ID
-extension Daemon: Equatable {
-    public static func == (lhs: Daemon, rhs: Daemon) -> Bool {
+extension DaemonDefinition: Equatable {
+    public static func == (lhs: DaemonDefinition, rhs: DaemonDefinition) -> Bool {
         lhs.id == rhs.id
     }
 }
 
-extension Daemon: Hashable {
+extension DaemonDefinition: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
