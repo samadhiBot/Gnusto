@@ -1,13 +1,5 @@
 import Foundation
 
-/// Type alias for a closure that handles room-specific actions based on game events.
-///
-/// - Parameters:
-///   - engine: The `GameEngine` instance.
-///   - message: The `LocationEvent` indicating the event type.
-/// - Returns: An `ActionResult` if the handler handled the action (potentially blocking default
-///            behavior), `nil` otherwise. The result can include state changes and a message.
-/// - Throws: Allows handlers to throw errors if needed.
 public struct LocationEventHandler: Sendable {
     let handle: @Sendable (GameEngine, LocationEvent) async throws -> ActionResult?
 

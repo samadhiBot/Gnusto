@@ -1,17 +1,5 @@
 import Foundation
 
-/// Type alias for a closure that handles object-specific actions.
-///
-/// - Parameters:
-///   - engine: The `GameEngine` instance.
-///   - event: The `ItemEvent` indicating the event type.
-/// - Returns: An `ActionResult` if the handler handled the action (potentially blocking default
-///            behavior), `nil` otherwise. The result can include state changes and a message.
-/// - Throws: Allows handlers to throw errors if needed.
-
-
-
-
 /// An item event handler.
 public struct ItemEventHandler: Sendable {
     let handle: @Sendable (GameEngine, ItemEvent) async throws -> ActionResult?
