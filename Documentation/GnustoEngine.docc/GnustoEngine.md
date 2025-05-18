@@ -1,4 +1,4 @@
-# `GnustoEngine`
+# ``GnustoEngine``
 
 ## A Modern Interactive Fiction Engine
 
