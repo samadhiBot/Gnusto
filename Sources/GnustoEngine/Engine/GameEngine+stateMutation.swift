@@ -89,62 +89,53 @@ extension GameEngine {
 
     /// Moves an item to a new parent entity (e.g., a location, the player, or a container item).
     ///
-    /// This method validates the move (e.g., checks if a container item exists and has capacity)
-    /// and then creates and applies the `StateChange` to update the item's parent.
+    /// This method first attempts to validate the move. Validation includes:
+    /// - Ensuring the target item exists.
+    /// - If the new parent is a location, ensuring that location exists.
+    /// - If the new parent is another item (a container):
+    ///   - Ensuring the container item exists.
+    ///   - Checking if the item to be moved can fit into the container based on the item's
+    ///     `size` and the container's `capacity` and current load. (Note: Current capacity
+    ///     check logic is basic and may need to be more robust, considering total load.)
+    ///
+    /// If validation passes and the new parent is different from the old parent, this method
+    /// creates (using the `move` factory) and applies the `StateChange` to update the item's parent.
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item to move.
     ///   - newParent: The `ParentEntity` representing the new container or location.
-    /// - Throws: An `ActionResponse` if the move is invalid (e.g., `itemTooLargeForContainer`,
-    ///           or if the target location/container doesn't exist).
+    /// - Throws: An `ActionResponse` if the item or target parent does not exist, or if the move
+    ///           is invalid (e.g., `itemTooLargeForContainer`).
     public func applyItemMove(itemID: ItemID, newParent: ParentEntity) async throws {
         let moveItem = try item(itemID)
         let oldParent = moveItem.parent
 
-        guard newParent != oldParent else { return }
+        guard newParent != oldParent else { return } // No change needed if parents are the same.
 
-        // Check if destination is valid (e.g., Location exists)
+        // Validate the new parent and conditions for moving.
         if case .location(let locationID) = newParent {
-            let _ = try location(locationID)
+            _ = try location(locationID) // Ensures the location exists.
         } else if case .item(let containerID) = newParent {
-            let container = try item(containerID)
-            guard container.capacity > moveItem.size else {
+            let container = try item(containerID) // Ensures the container item exists.
+
+            // TODO: Enhance capacity check to consider the container's current load accurately.
+            // The current check is basic: `container.capacity > moveItem.size`
+            // A more robust check would be:
+            // `(currentLoadOfContainer + moveItem.size) <= container.capacity`
+            // where `currentLoadOfContainer` is the sum of sizes of items already in the container.
+            // A capacity of -1 typically means infinite capacity.
+            guard container.capacity == -1 || container.capacity >= moveItem.size else { // Basic check for now
                 throw ActionResponse.itemTooLargeForContainer(
                     item: itemID,
                     container: containerID
                 )
             }
-//             guard item(containerID) != nil else {
-//                 logger.warning("""
-//                    💥 Cannot move item '\(itemID.rawValue)' into \
-//                    non-existent container '\(containerID.rawValue)'.
-//                    """)
-//                return
-//            }
-            // TODO: Add container capacity check?
         }
 
+        // If validation passed, apply the state change.
         try gameState.apply(
-            move(moveItem, to: newParent)
+            move(moveItem, to: newParent) // Uses the StateChange factory `move`
         )
-
-//        if oldParent != newParent {
-//            do {
-//                try gameState.apply(
-//                    StateChange(
-//                        entityID: .item(itemID),
-//                        attributeKey: .itemParent,
-//                        oldValue: .parentEntity(oldParent),
-//                        newValue: .parentEntity(newParent)
-//                    )
-//                )
-//            } catch {
-//                logger.warning("""
-//                    💥 Failed to apply item move for '\(itemID.rawValue)': \
-//                    \(error)
-//                    """)
-//            }
-//        }
     }
 
     /// Moves the player to a new location.

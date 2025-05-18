@@ -6,25 +6,30 @@ import Logging
 /// between the player (via an `IOHandler`), the command `Parser`, and the various
 /// game logic handlers (`ActionHandler`, `ItemEventHandler`, `LocationEventHandler`).
 ///
-/// As a Swift `actor`, `GameEngine` ensures safe access to the mutable `gameState`
+/// As a Swift `actor`, `GameEngine` ensures thread-safe access to the mutable `gameState`
 /// from concurrent contexts, which is crucial for modern Swift concurrency.
 ///
 /// Game developers typically interact with the `GameEngine` instance provided
-/// within custom game logic closures (like those in `GameBlueprint` or event handlers).
-/// Through this instance, developers can:
-/// - Query the current `GameState` (e.g., find items, check locations).
-/// - Initiate changes to the `GameState` by creating `StateChange` objects or using
-///   convenience mutation methods.
+/// within custom game logic closures (like those in `GameBlueprint` or event handlers)
+/// or within `ActionHandler` implementations. Through this instance, developers can:
+/// - Query the current `GameState` (e.g., find items, check locations) using the
+///   various accessor methods and properties available in `GameEngine` extensions
+///   (e.g., `GameEngine+stateQuery.swift`, `GameEngine+playerQuery.swift`).
+/// - Initiate changes to the `GameState` by creating `StateChange` objects (often via
+///   factory methods in `GameEngine+stateChanges.swift`) and then applying them,
+///   or by using higher-level convenience mutation methods (e.g., in
+///   `GameEngine+stateMutation.swift`).
 /// - Access game-wide `GameConstants`.
-/// - Trigger output to the player via the `IOHandler`.
+/// - Trigger output to the player (usually by returning an `ActionResult` with a message).
 public actor GameEngine: Sendable {
     /// The current, mutable state of the entire game world.
     ///
     /// This `GameState` object holds all information about locations, items, the player,
-    /// active timers, and global variables. While action handlers and game hooks can
-    /// read from this state directly (often via engine helper methods), modifications
-    /// should be done by applying `StateChange` objects through the engine to ensure
-    /// consistency and proper tracking.
+    /// active timers (fuses and daemons), pronouns, and global variables. While action
+    /// handlers and game hooks can read from this state (often via engine helper methods),
+    /// all modifications **must** be done by applying `StateChange` objects through the
+    /// engine (e.g., `gameState.apply(someChange)`) to ensure consistency, proper
+    /// validation (if registered), and tracking of changes in `gameState.changeHistory`.
     public internal(set) var gameState: GameState
 
     /// The parser responsible for interpreting raw player input strings into
@@ -33,89 +38,104 @@ public actor GameEngine: Sendable {
     private let parser: Parser
 
     /// The handler for all input and output operations, such as reading player commands
-    /// and displaying game text. Game developers usually don't interact with this
-    /// directly from handlers, as the engine provides higher-level methods for output
-    /// (e.g., via `ActionResult.message`).
+    /// and displaying game text. Game developers usually do not interact with this
+    /// directly from handlers, as the engine provides higher-level mechanisms for output
+    /// (e.g., the `message` property of an `ActionResult`, or by throwing an
+    /// `ActionResponse` which the engine translates to a player-facing message).
     nonisolated internal let ioHandler: IOHandler
 
     /// A utility to determine what items and locations are currently perceivable or
     /// interactable by the player, considering factors like light, containment, and reach.
-    /// Game developers might use methods on the engine that internally leverage this resolver
-    /// (e.g., `playerCanReach(_:)`).
+    /// This is used internally by various engine methods (e.g., `playerCanReach(_:)`)
+    /// to resolve scope.
     lazy var scopeResolver = ScopeResolver(engine: self)
 
     /// The game-specific constants, such as title, introduction, and maximum score,
-    /// derived from the `GameBlueprint`.
+    /// derived from the `GameBlueprint` used to initialize the engine.
     public let constants: GameConstants
 
     /// The registry holding definitions for timed events (`FuseDefinition`)
     /// and background processes (`DaemonDefinition`) provided by the `GameBlueprint`.
-    /// The engine uses this to manage these time-based game mechanics.
+    /// The engine uses this to manage these time-based game mechanics during `tickClock()`.
     public let definitionRegistry: DefinitionRegistry
 
     /// The registry for custom logic that dynamically computes or validates item and
-    /// location attributes, provided by the `GameBlueprint`.
-    /// Developers can also register new handlers directly via engine methods like
-    /// `registerItemCompute(key:handler:)`.
+    /// location attributes. This is initialized from the `GameBlueprint` and can be
+    /// further modified by game developers using methods like `registerItemCompute(key:handler:)`.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
     /// These are a combination of default engine handlers and custom handlers provided
-    /// by the `GameBlueprint`.
+    /// by the `GameBlueprint`, with custom handlers taking precedence.
     private var actionHandlers = [VerbID: ActionHandler]()
 
     /// Custom event handlers for specific items, triggered by events like `beforeTurn`
-    /// or `afterTurn`, provided by the `GameBlueprint`.
+    /// or `afterTurn`. These are provided by the `GameBlueprint` and are processed by the
+    /// engine during the `execute(command:)` phase.
     var itemEventHandlers: [ItemID: ItemEventHandler]
 
     /// Custom event handlers for specific locations, triggered by events like `onEnter`,
-    /// `beforeTurn`, or `afterTurn`, provided by the `GameBlueprint`.
+    /// `beforeTurn`, or `afterTurn`. These are provided by the `GameBlueprint` and are processed
+    /// by the engine, for example, during `applyPlayerMove(to:)` or `execute(command:)`.
     var locationEventHandlers: [LocationID: LocationEventHandler]
 
-    /// Internal logger for engine messages and warnings.
+    /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
-    /// The maximum line length used for formatting descriptions.
-    /// (Currently internal, may become configurable).
-    private let maximumDescriptionLength: Int = 100
+    /// The maximum line length used for formatting some descriptions by the `IOHandler`.
+    /// This is primarily an internal detail but might influence how game developers structure
+    /// very long descriptive texts if they want to avoid automatic wrapping.
+    private let maximumDescriptionLength: Int = 100 // TODO: Make this configurable via GameConstants?
 
     /// Internal flag to control the main game loop's continuation.
-    /// Game developers can call `requestQuit()` to set this.
+    /// Game developers can call `requestQuit()` to set this flag to `true`,
+    /// causing the game to end after the current turn completes.
     var shouldQuit: Bool = false
 
     // MARK: - Custom Game Hooks (Closures)
 
     /// A closure, provided by the `GameBlueprint`, that is called after the player
-    /// successfully enters a new location.
+    /// successfully moves to a new location (e.g., after a successful "GO" command).
     ///
-    /// Use this to implement custom logic that should occur upon entering a room,
-    /// such as triggering events, updating state, or describing unique features.
-    /// The closure receives the `GameEngine` instance and the `LocationID` of the entered room.
-    /// Return `true` if your hook fully handles the event (e.g., prints its own description)
-    /// and the engine should not perform default processing for entering the room.
+    /// Use this to implement custom logic that should occur immediately upon entering a room,
+    /// such as triggering special events, updating state based on the new location, or
+    /// providing unique descriptive text that overrides the default room description behavior.
+    /// The closure receives the `GameEngine` instance and the `LocationID` of the room just entered.
+    ///
+    /// - Returns: Return `true` if your hook fully handles all necessary actions (including any
+    ///   output to the player like describing the room) and the engine should **not** perform its
+    ///   default processing for entering the room (which typically includes calling
+    ///   `describeCurrentLocation()`). Return `false` or `nil` if the engine should proceed
+    ///   with its default behavior after the hook completes.
     public var onEnterRoom: (@Sendable (GameEngine, LocationID) async -> Bool)?
 
     /// A closure, provided by the `GameBlueprint`, that is called at the very start of
-    /// each turn, before the player's `Command` is processed.
+    /// each turn, before the player's `Command` is parsed or processed further by event handlers
+    /// or action handlers.
     ///
-    /// Use this for per-turn logic like weather changes, NPC actions, or checking
-    /// time-sensitive conditions. The closure receives the `GameEngine` instance and the
-    /// current `Command`.
-    /// Return `true` if your hook fully handles the command or pre-turn phase, and no
-    /// further engine processing for the command should occur.
+    /// This is a critical hook for implementing per-turn global logic such as weather changes,
+    /// ambient effects, time-passing events not tied to fuses/daemons, or proactive NPC behaviors.
+    /// The closure receives the `GameEngine` instance and the raw `Command` object (which might
+    /// still be in a preliminary state if parsing hasn't fully completed).
+    ///
+    /// - Returns: Return `true` if your hook fully handles the turn or command, and no further
+    ///   engine processing for this turn/command should occur (the engine will skip to the next
+    ///   turn). Return `false` or `nil` if the engine should proceed with its normal turn
+    ///   processing after the hook completes.
     public var beforeTurn: (@Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
-    /// Creates a new `GameEngine` instance, configured by a `GameBlueprint`.
+    /// Creates a new `GameEngine` instance, configured by a `GameBlueprint` and ready to run a game.
     ///
-    /// This is typically called once at the start of the game to set up the engine
-    /// with all game-specific data and logic.
+    /// This is typically called once at the start of the game application to set up the engine
+    /// with all game-specific data (initial state, constants, definitions) and logic (custom handlers, hooks).
     ///
     /// - Parameters:
-    ///   - blueprint: The `GameBlueprint` containing all game definitions and initial state.
-    ///   - parser: The `Parser` to be used for understanding player input.
-    ///   - ioHandler: The `IOHandler` for interacting with the player.
+    ///   - blueprint: The `GameBlueprint` containing all game definitions, initial state,
+    ///                custom handlers, and hooks.
+    ///   - parser: The `Parser` instance to be used for understanding player input.
+    ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     public init(
         blueprint: GameBlueprint,
         parser: Parser,
@@ -145,18 +165,19 @@ public actor GameEngine: Sendable {
 extension GameEngine {
     /// Starts and runs the main game loop.
     ///
-    /// This method initiates the game: it sets up the I/O handler, displays initial
-    /// game information (title, introduction), describes the starting location, and then
-    /// enters a loop to process player turns. Each turn involves:
-    ///   - Showing the status line.
-    ///   - Processing timed events (fuses and daemons via `tickClock()`).
-    ///   - Reading and parsing player input.
-    ///   - Executing the parsed command (including `beforeTurn` hooks, item/location event
-    ///     handlers, and the main `ActionHandler` for the verb).
+    /// This method is the primary entry point for beginning and playing the game.
+    /// It performs the following sequence:
+    /// 1. Sets up the `IOHandler` (e.g., preparing the console or UI).
+    /// 2. Prints the game's title and introduction message (from `GameConstants`).
+    /// 3. Marks the player's starting location as visited and describes it.
+    /// 4. Enters the main turn-based loop, which continues until `shouldQuit` becomes `true`.
+    ///    Each iteration of the loop involves:
+    ///    a. Displaying the status line (current location, score, moves) via `showStatus()`.
+    ///    b. Processing a single player turn via `processTurn()`.
+    /// 5. After the loop terminates (e.g., player quits), performs teardown for the `IOHandler`.
     ///
-    /// The loop continues until `shouldQuit` becomes `true` (e.g., via `requestQuit()`
-    /// or a "quit" command). Game developers typically don't call this method directly;
-    /// it's the entry point for running the game.
+    /// Game developers typically do not call this method directly after initialization;
+    /// it is intended to be the engine's top-level execution flow.
     public func run() async {
         await ioHandler.setup()
         await ioHandler.print(constants.storyTitle, style: .strong)
@@ -187,7 +208,26 @@ extension GameEngine {
 
     // MARK: Private helpers
 
-    /// Processes a single turn of the game.
+    /// Processes a single turn of the game, including clock ticks, player input, parsing, and command execution.
+    ///
+    /// This method orchestrates the core sequence of events within a single game turn:
+    /// 1. Advances game time by calling `tickClock()`, which processes active fuses and daemons.
+    ///    If `tickClock()` sets `shouldQuit` (e.g., a fuse ends the game), the turn ends.
+    /// 2. Prompts the player for input via the `IOHandler`.
+    ///    If input is `nil` (e.g., EOF) or explicitly "quit", `shouldQuit` is set, and the turn ends.
+    /// 3. Parses the player's input string into a structured `Command` using the `parser`.
+    /// 4. Increments the player's move counter in `gameState`.
+    /// 5. If parsing is successful:
+    ///    a. Executes the `beforeTurn` game hook, if defined. If the hook returns `true`
+    ///       or sets `shouldQuit`, the turn ends.
+    ///    b. If the command is to quit or `shouldQuit` is set, the turn ends.
+    ///    c. Calls `execute(command:)` to process the command through event and action handlers.
+    ///    d. If the command was a movement command (`.go`) to an unvisited room, or a command
+    ///       that changed the light state (e.g., `.turnOn`, `.turnOff` a light source), it then
+    ///       calls `describeCurrentLocation()`.
+    /// 6. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
+    ///
+    /// Errors during turn processing are logged.
     private func processTurn() async throws {
         // --- Tick the Clock (Fuses & Daemons) ---
         await tickClock()
@@ -268,10 +308,13 @@ extension GameEngine {
         }
     }
 
-    /// Reports user-friendly messages for action responses to the player.
-    /// This method is used internally by the engine to translate `ActionResponse`
-    /// enum cases (often returned by `ActionHandler` validation or processing steps)
-    /// into textual feedback for the player.
+    /// Reports user-friendly messages for action responses (errors or simple feedback)
+    /// to the player. This method is used internally by the engine to translate
+    /// `ActionResponse` enum cases, often thrown or returned by `ActionHandler`
+    /// validation or processing steps, into textual feedback for the player.
+    ///
+    /// It also logs more detailed information for certain critical errors like
+    /// `.internalEngineError` or `.stateValidationFailed`.
     private func report(_ response: ActionResponse) async {
         // Determine the user-facing message
         let message = switch response {
@@ -378,7 +421,8 @@ extension GameEngine {
 
     /// Reports a parsing error to the player.
     /// This method is used internally by the engine to translate `ParseError` enum cases
-    /// into textual feedback for the player when input cannot be understood.
+    /// into textual feedback for the player when their input cannot be understood.
+    /// For `.internalError` cases, it also logs detailed information.
     private func report(parseError: ParseError) async {
         let message = switch parseError {
         case .emptyInput:
@@ -410,7 +454,7 @@ extension GameEngine {
 
     /// Displays the status line (e.g., current location, score, and turn count)
     /// to the player via the `IOHandler`.
-    /// This is called automatically at the start of each turn.
+    /// This is called automatically at the start of each turn before `processTurn()`.
     private func showStatus() async {
         guard let currentLocation = gameState.locations[playerLocationID] else { return }
         await ioHandler.showStatusLine(
@@ -470,14 +514,26 @@ extension GameEngine {
 // MARK: - Clock Tick Logic
 
 extension GameEngine {
-    /// Processes all active fuses (timed events) and daemons (recurring actions)
-    /// for the current game turn.
+    /// Advances the game clock by one tick, processing all active fuses and daemons.
     ///
-    /// This method is called automatically by the engine at the start of each turn.
-    /// It updates fuse counters, executes expired fuse actions, and runs daemon actions
-    /// based on their defined frequency. Game developers typically don't call this
-    /// method directly; they define fuses and daemons in the `GameBlueprint`.
-    private func tickClock() async {
+    /// This method is called automatically at the beginning of each player turn by `processTurn()`.
+    /// It performs the following actions:
+    /// 1. **Fuses**: Iterates through all `activeFuses` in `gameState`.
+    ///    - Decrements the turn counter for each active fuse.
+    ///    - If a fuse's counter reaches zero or less:
+    ///        - Retrieves the corresponding `FuseDefinition` from the `definitionRegistry`.
+    ///        - Executes the fuse's `action` closure, passing the `GameEngine` instance.
+    ///        - Removes the fuse from `activeFuses` in `gameState`.
+    ///        - If the fuse's `repeats` flag is `true`, it reactivates the fuse by adding it
+    ///          back to `activeFuses` with its `initialTurns` count.
+    /// 2. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
+    ///    - Retrieves the corresponding `DaemonDefinition` from the `definitionRegistry`.
+    ///    - Executes the daemon's `action` closure, passing the `GameEngine` instance.
+    ///
+    /// Fuse and daemon actions can modify game state, print messages (by returning an `ActionResult`
+    /// that the engine then processes), or even set `shouldQuit` to end the game.
+    /// Errors during fuse/daemon definition lookup or action execution are logged.
+    func tickClock() async {
         let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
@@ -568,19 +624,37 @@ extension GameEngine {
 // MARK: - Command Execution
 
 extension GameEngine {
-    /// Looks up and executes the appropriate `ActionHandler` for the given command.
+    /// Executes a parsed game command, orchestrating calls to event handlers and action handlers.
     ///
-    /// This is the core of command processing. It involves several steps:
-    ///   - Invoking `beforeTurn` hooks for the current location and specific items.
-    ///   - If not handled by a hook, checking for darkness if the verb requires light.
-    ///   - Executing the `validate`, `process`, and `postProcess` steps of the relevant
-    ///     `ActionHandler` for the command's verb.
-    ///   - Processing the `ActionResult` (applying state changes, printing messages).
-    ///   - Invoking `afterTurn` hooks for items and the location.
+    /// This is a central method in processing player actions. It performs the following sequence:
+    /// 1. **Item `beforeTurn` Events**: For every item in the player's current location or
+    ///    inventory that has an `ItemEventHandler` registered for `.beforeTurn`,
+    ///    executes that handler. If any handler returns `true` (indicating it fully handled
+    ///    the command or turn) or sets `shouldQuit`, further processing of the command stops.
+    /// 2. **Location `beforeTurn` Events**: If the player's current location has a
+    ///    `LocationEventHandler` registered for `.beforeTurn`, executes it. If it returns `true`
+    ///    or sets `shouldQuit`, further processing stops.
+    /// 3. **Main Action Handling**: If the command was not fully handled by `beforeTurn` events:
+    ///    a. Retrieves the appropriate `ActionHandler` for the command's verb from the
+    ///       engine's `actionHandlers` registry.
+    ///    b. If a handler is found:
+    ///        i. Calls the handler's `validate(context:)` method. If validation throws an
+    ///           `ActionResponse`, reports it and stops.
+    ///       ii. Calls the handler's `process(context:)` method. This typically returns an
+    ///           `ActionResult` containing state changes and a message.
+    ///      iii. Applies any `StateChange`s from the `ActionResult` to `gameState`.
+    ///       iv. Prints the `ActionResult.message` to the player.
+    ///        v. Calls the handler's `postProcess(context:result:)` method for any final actions.
+    ///       vi. Processes any `SideEffect`s from the `ActionResult`.
+    ///    c. If no `ActionHandler` is found for the verb, reports an `ActionResponse.unknownVerb` error.
+    /// 4. **Item `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` item event handlers.
+    /// 5. **Location `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` location event handlers.
     ///
-    /// Game developers typically don't call this directly; it's part of the internal
-    /// game loop (`processTurn`).
-    func execute(command: Command) async {
+    /// Any `ActionResponse` errors thrown during this process are caught and reported to the player.
+    /// Other errors are logged.
+    ///
+    /// - Parameter command: The `Command` object to execute.
+    public func execute(command: Command) async {
         var actionHandled = false
         var actionResponse: Error? = nil // To store error from object handlers
 
