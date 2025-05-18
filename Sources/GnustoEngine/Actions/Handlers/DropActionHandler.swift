@@ -1,7 +1,22 @@
 import Foundation
 
-/// Handles the "DROP" context.command and its synonyms (e.g., "PUT DOWN").
+/// Handles the "DROP" command and its synonyms (e.g., "PUT DOWN"), allowing the player
+/// to release an item they are currently holding into their current location.
 public struct DropActionHandler: ActionHandler {
+    /// Validates the "DROP" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified (the player must indicate *what* to drop).
+    /// 2. The direct object refers to an existing item.
+    /// 3. The item is not flagged as `.isScenery` (fixed, non-droppable items).
+    ///
+    /// Note: It explicitly *does not* throw an error if the player isn't holding the item;
+    /// this case is handled gracefully in the `process` method with a specific message.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided or if it's
+    ///           not an item, or `ActionResponse.itemNotDroppable` if the item is scenery.
+    ///           Can also throw errors from `context.engine.item()` if the item doesn't exist.
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
@@ -26,6 +41,23 @@ public struct DropActionHandler: ActionHandler {
         }
     }
 
+    /// Processes the "DROP" command.
+    ///
+    /// Assuming basic validation has passed, this action performs the following:
+    /// 1. Retrieves the target item.
+    /// 2. Checks if the player is actually holding the item. If not, a message like
+    ///    "You aren't holding the [item name]." is returned.
+    /// 3. If the player is holding the item:
+    ///    a. Creates a `StateChange` to move the item from the player's inventory to the
+    ///       current location.
+    ///    b. Ensures the `.isTouched` flag is set on the item.
+    ///    c. Updates pronouns to refer to the dropped item.
+    ///    d. Ensures the `.isWorn` flag is cleared from the item (as dropping implies removing).
+    ///    e. Returns a confirmation message, typically "Dropped."
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
+    /// - Throws: Can throw errors from `context.engine.item()` if the item doesn't exist.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
               case .item(let targetItemID) = directObjectRef else {

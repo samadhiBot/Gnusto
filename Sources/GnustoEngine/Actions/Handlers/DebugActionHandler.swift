@@ -1,13 +1,26 @@
 import CustomDump
 import Foundation
 
-/// Action handler for the DEBUG verb.
+/// Handles the "DEBUG" command, providing a way for game developers to inspect the
+/// internal state of game entities during development and testing.
 ///
-/// This verb allows examining the internal state of game objects, locations, or players.
-/// It's primarily intended for development and debugging purposes.
+/// The DEBUG command requires a direct object (e.g., "DEBUG LANTERN", "DEBUG SELF",
+/// "DEBUG WEST_OF_HOUSE"). It outputs a detailed, developer-friendly representation
+/// of the specified item, location, or the player object using the `swift-custom-dump` library.
+///
+/// > Note: This handler is a development tool, and is only available in DEBUG game builds.
 public struct DebugActionHandler: ActionHandler {
     public init() {}
 
+    /// Validates the "DEBUG" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified.
+    /// 2. The direct object refers to an existing entity (item, location, or player).
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided,
+    ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
@@ -27,6 +40,17 @@ public struct DebugActionHandler: ActionHandler {
         }
     }
 
+    /// Processes the "DEBUG" command.
+    ///
+    /// Assuming validation has passed, this action retrieves the specified entity
+    /// (item, location, or player) from the `GameState` snapshot and uses `customDump`
+    /// to generate a string representation of its properties and values.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing the detailed dump of the target entity.
+    /// - Throws: `ActionResponse.prerequisiteNotMet` if no direct object is provided (though
+    ///           this should ideally be caught by `validate`), or `ActionResponse.unknownEntity`
+    ///           if the entity does not exist in the snapshot.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object.")

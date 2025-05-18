@@ -1,21 +1,22 @@
 import Foundation
 
-/// Action handler for the WAIT verb.
+/// Handles the "WAIT" command, allowing the player to pass a turn without performing
+/// any specific action other than advancing game time.
 struct WaitActionHandler: ActionHandler {
-
-    // Removed original perform method
-    // func perform(context: ActionContext) async throws {
-    //     await context.engine.output("Time passes.")
-    //     // Waiting usually just consumes a turn, no further state change needed here.
-    // }
-
-    // Implement the required process method
+    /// Processes the "WAIT" command.
+    ///
+    /// This action always succeeds and results in a generic message indicating that time
+    /// has passed. It does not directly cause any state changes or side effects beyond
+    /// advancing the game turn, which is handled by the `GameEngine`.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing the message "Time passes."
     func process(context: ActionContext) async throws -> ActionResult {
         // Waiting is always successful and produces a standard message.
         // It doesn't change state or cause side effects directly.
         ActionResult("Time passes.")
     }
 
-    // We rely on the default implementations for validate() and postProcess().
+    // Default implementations for validate() and postProcess() are used.
     // The default postProcess will print the message from the ActionResult.
 }

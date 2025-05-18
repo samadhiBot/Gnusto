@@ -1,8 +1,34 @@
 import Foundation
 
-/// Handles the "INSERT [item] INTO/IN [container]" action.
-struct InsertActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
+/// Handles the "INSERT <direct object> INTO/IN <indirect object>" command, allowing the player
+/// to place an item they are holding into an open container item.
+public struct InsertActionHandler: ActionHandler {
+    /// Validates the "INSERT ... INTO/IN" command.
+    ///
+    /// This method ensures that:
+    /// 1. Both a direct object (the item to insert) and an indirect object (the container)
+    ///    are specified and are valid items.
+    /// 2. The player is currently holding the direct object item.
+    /// 3. The direct object item is not scenery (fixed, unmovable items).
+    /// 4. The player can reach the indirect object (container) item.
+    /// 5. The direct object is not the same as the indirect object (cannot insert an item into itself).
+    /// 6. The indirect object (container) is not currently inside the direct object (prevents
+    ///    circular placement).
+    /// 7. The indirect object (container) has the `.isContainer` flag set.
+    /// 8. The indirect object (container) is currently open (has the `.isOpen` dynamic property set to true).
+    /// 9. The direct object item can fit into the container, based on the item's `size` and the
+    ///    container's `capacity` and current load (if capacity is limited, i.e., >= 0).
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
+    ///           `prerequisiteNotMet` (for missing objects, wrong item types, self-insertion, circular placement),
+    ///           `itemNotHeld` (if item to insert is not held),
+    ///           `targetIsNotAContainer` (if direct object is scenery or indirect object is not a container),
+    ///           `itemNotAccessible` (if container cannot be reached),
+    ///           `containerIsClosed` (if container is not open),
+    ///           `itemTooLargeForContainer` (if item won't fit).
+    ///           Can also throw errors from `context.engine` calls (e.g., `item()`, `fetch()`).
+    public func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Insert what?")
@@ -12,6 +38,7 @@ struct InsertActionHandler: ActionHandler {
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
+            // Fetch item name for a more informative message if indirect object is missing.
             let itemName = (try? await context.engine.item(itemToInsertID))?.name ?? itemToInsertID.rawValue
             throw ActionResponse.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
         }
@@ -79,7 +106,21 @@ struct InsertActionHandler: ActionHandler {
         }
     }
 
-    func process(context: ActionContext) async throws -> ActionResult {
+    /// Processes the "INSERT ... INTO/IN" command.
+    ///
+    /// Assuming validation has passed, this action performs the following:
+    /// 1. Retrieves the item to be inserted and the container item.
+    /// 2. Moves the item to be inserted so its parent becomes the container item.
+    /// 3. Ensures the `.isTouched` flag is set on both the item being inserted and the container.
+    /// 4. Updates pronouns to refer to the item that was inserted.
+    /// 5. Returns an `ActionResult` with a confirmation message (e.g., "You put the jewel in the box.")
+    ///    and the state changes.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing the message and relevant state changes.
+    /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
+    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
+    public func process(context: ActionContext) async throws -> ActionResult {
         // Direct and Indirect objects are guaranteed to be items by validate.
         guard let directObjectRef = context.command.directObject,
               case .item(let itemToInsertID) = directObjectRef else {

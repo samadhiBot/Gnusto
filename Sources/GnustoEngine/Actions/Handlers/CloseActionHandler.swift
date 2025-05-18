@@ -1,14 +1,29 @@
 import Foundation
 
-/// Handles the "CLOSE" context.command.
+/// Handles the "CLOSE" command, allowing the player to close an item that is openable
+/// and currently open.
 public struct CloseActionHandler: ActionHandler {
+    /// Validates the "CLOSE" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified (the player must indicate *what* to close).
+    /// 2. The direct object refers to an existing item.
+    /// 3. The player can reach the specified item.
+    /// 4. The item has the `.isOpenable` flag set (indicating it can be opened and closed).
+    ///
+    /// Note: It explicitly *does not* throw an error if the item is already closed;
+    /// this case is handled gracefully in the `process` method with a specific message.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
+    ///           `prerequisiteNotMet`, `itemNotAccessible`, `itemNotClosable`.
+    ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Close what?")
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            // TODO: Consider a more specific message if the entity is known.
             throw ActionResponse.prerequisiteNotMet("You can't close that.")
         }
 
@@ -37,6 +52,21 @@ public struct CloseActionHandler: ActionHandler {
         // Note: Closing doesn't usually depend on locked status.
     }
 
+    /// Processes the "CLOSE" command.
+    ///
+    /// Assuming basic validation has passed, this action performs the following:
+    /// 1. Retrieves the target item.
+    /// 2. Checks if the item is already closed (by fetching its `.isOpen` dynamic property).
+    ///    If so, a message "[Item] is already closed." is returned.
+    /// 3. If the item is open:
+    ///    a. Creates a `StateChange` to clear the `.isOpen` flag on the item.
+    ///    b. Ensures the `.isTouched` flag is set on the item.
+    ///    c. Updates pronouns to refer to the item.
+    ///    d. Returns a confirmation message, typically "Closed."
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
+    /// - Throws: Errors from `context.engine.item()` or `context.engine.fetch()`.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard
             let directObjectRef = context.command.directObject,

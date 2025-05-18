@@ -1,8 +1,24 @@
 import Foundation
 
-/// Handles the "TURN OFF" action for items, primarily light sources.
-struct TurnOffActionHandler: ActionHandler {
-    func validate(context: ActionContext) async throws {
+/// Handles the "TURN OFF" command, allowing the player to deactivate items that are
+/// considered devices (e.g., light sources).
+public struct TurnOffActionHandler: ActionHandler {
+    /// Validates the "TURN OFF" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified (the player must indicate *what* to turn off).
+    /// 2. The direct object refers to an existing item.
+    /// 3. The player can reach the specified item.
+    /// 4. The item has the `.isDevice` flag set (indicating it can be turned on/off).
+    /// 5. The item is not already off (i.e., it currently has the `.isOn` flag).
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
+    ///           `custom` (for "Turn off what?" or "It's already off."),
+    ///           `prerequisiteNotMet` (if not an item or not a device),
+    ///           `itemNotAccessible`.
+    ///           Can also throw errors from `context.engine.item()`.
+    public func validate(context: ActionContext) async throws {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Turn off what?")
@@ -30,7 +46,25 @@ struct TurnOffActionHandler: ActionHandler {
         }
     }
 
-    func process(context: ActionContext) async throws -> ActionResult {
+    /// Processes the "TURN OFF" command.
+    ///
+    /// Assuming basic validation has passed (the item is a reachable device and is currently on),
+    /// this action performs the following:
+    /// 1. Retrieves the target item.
+    /// 2. Ensures the `.isTouched` flag is set on the item.
+    /// 3. Clears the `.isOn` flag on the item.
+    /// 4. Constructs a message confirming the action (e.g., "The flashlight is now off.").
+    /// 5. If the turned-off item was a light source and the current location becomes dark as a result
+    ///    (i.e., the location is not inherently lit and no other active light sources are present),
+    ///    appends the classic "It is now pitch black. You are likely to be eaten by a grue." message.
+    /// 6. Returns an `ActionResult` with the constructed message and the state changes.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing the message and relevant state changes.
+    /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item (this should
+    ///           be caught by `validate`), or errors from `context.engine` calls (e.g., fetching items
+    ///           or player location).
+    public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
               case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.internalEngineError("TurnOff: directObject was not an item in process.")

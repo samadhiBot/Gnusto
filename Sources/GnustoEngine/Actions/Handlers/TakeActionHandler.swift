@@ -1,7 +1,30 @@
 import Foundation
 
-/// Handles the "TAKE" context.command and its synonyms (e.g., "GET").
+/// Handles the "TAKE" command and its synonyms (e.g., "GET"), allowing the player to pick up
+/// an item and add it to their inventory.
 public struct TakeActionHandler: ActionHandler {
+    /// Validates the "TAKE" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified (the player must indicate *what* to take).
+    /// 2. The direct object refers to an existing item.
+    /// 3. If the item is inside another item, that parent item must be a container or surface.
+    ///    It prevents taking items from non-container/non-surface parents.
+    /// 4. If the item is inside a container, and that container is closed and not transparent,
+    ///    and the target item hasn't been touched (implying player knows it's there), an error
+    ///    for a closed container or general inaccessibility is thrown.
+    /// 5. The player can reach the item (general reachability check).
+    /// 6. The item has the `.isTakable` flag set.
+    /// 7. The player has enough carrying capacity for the item.
+    ///
+    /// Note: It explicitly *does not* throw an error if the player already has the item;
+    /// this case is handled gracefully in the `process` method with a specific message.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
+    ///           `prerequisiteNotMet`, `unknownEntity`, `itemNotAccessible`, `itemNotTakable`,
+    ///           `containerIsClosed`, or `playerCannotCarryMore`.
+    ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
@@ -64,6 +87,22 @@ public struct TakeActionHandler: ActionHandler {
         }
     }
 
+    /// Processes the "TAKE" command.
+    ///
+    /// Assuming basic validation has passed, this action performs the following:
+    /// 1. Retrieves the target item.
+    /// 2. Checks if the player already has the item. If so, a message "You already have that."
+    ///    is returned.
+    /// 3. If the player does not have the item:
+    ///    a. Creates a `StateChange` to move the item to the player's inventory (`.player` parent).
+    ///    b. Ensures the `.isTouched` flag is set on the item.
+    ///    c. Updates pronouns to refer to the taken item.
+    ///    d. Returns a confirmation message, typically "Taken."
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
+    /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item (should be
+    ///           caught by validate), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
               case .item(let targetItemID) = directObjectRef else {

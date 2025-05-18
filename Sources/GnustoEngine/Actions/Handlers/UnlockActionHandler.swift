@@ -1,7 +1,27 @@
 import Foundation
 
-/// Handles the "UNLOCK <DO> WITH <IO>" context.command.
+/// Handles the "UNLOCK <direct object> WITH <indirect object>" command, allowing the player
+/// to unlock a lockable item using a key.
 public struct UnlockActionHandler: ActionHandler {
+    /// Validates the "UNLOCK" command.
+    ///
+    /// This method ensures that:
+    /// 1. Both a direct object (the item to unlock) and an indirect object (the key)
+    ///    are specified and are valid items.
+    /// 2. The key item is currently held by the player.
+    /// 3. The player can reach the item to be unlocked.
+    /// 4. The target item has the `.isLockable` flag set.
+    /// 5. The target item currently has the `.isLocked` flag set (it's not already unlocked).
+    /// 6. The key item matches the `.lockKey` attribute of the target item.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
+    ///           `prerequisiteNotMet` (for missing objects, wrong item types, or already unlocked),
+    ///           `itemNotHeld` (if key is not held),
+    ///           `itemNotAccessible` (if target cannot be reached),
+    ///           `itemNotUnlockable` (if target is not lockable),
+    ///           `wrongKey` (if the key doesn't match).
+    ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
@@ -46,6 +66,21 @@ public struct UnlockActionHandler: ActionHandler {
         }
     }
 
+    /// Processes the "UNLOCK" command.
+    ///
+    /// Assuming validation has passed (correct key, lockable and locked item, etc.),
+    /// this action performs the following:
+    /// 1. Retrieves the target item and the key item.
+    /// 2. Clears the `.isLocked` flag on the target item.
+    /// 3. Ensures the `.isTouched` flag is set on both the target item and the key item.
+    /// 4. Updates pronouns to refer to the target item and the key.
+    /// 5. Returns an `ActionResult` with a confirmation message (e.g., "The wooden door is now unlocked.")
+    ///    and the state changes.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` containing the message and relevant state changes.
+    /// - Throws: `ActionResponse.internalEngineError` if direct or indirect objects are not items
+    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
         // Direct and Indirect objects are guaranteed to be items by validate.
         guard let directObjectRef = context.command.directObject,
@@ -61,31 +96,28 @@ public struct UnlockActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
         let keyItem = try await context.engine.item(keyItemID)
 
-//        // Handle case: Already unlocked (detected in validate)
-//        if !targetItem.hasFlag(.isLocked) {
-//            // Manually construct definite article message
-//            return ActionResult()
-//        }
+        // Validation ensures the item was locked, so no need to check again here.
 
         // --- Unlock Successful: Calculate State Changes ---
         var stateChanges: [StateChange] = []
 
-        // Change 1: Remove .locked from target (if currently locked)
+        // Change 1: Clear `.isLocked` flag from target item.
+        // Validation ensures the item was locked, so an update should always occur.
         if let update = await context.engine.clearFlag(.isLocked, on: targetItem) {
             stateChanges.append(update)
         }
 
-        // Change 2: Add .touched to target (if not already set)
+        // Change 2: Ensure `.isTouched` flag is set on target item.
         if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(update)
         }
 
-        // Change 3: Add .touched to key (if not already set)
+        // Change 3: Ensure `.isTouched` flag is set on key item.
         if let update = await context.engine.setFlag(.isTouched, on: keyItem) {
             stateChanges.append(update)
         }
 
-        // Change 3: Update pronouns
+        // Change 4: Update pronouns to refer to the target and key.
         if let update = await context.engine.updatePronouns(to: targetItem, keyItem) {
             stateChanges.append(update)
         }
