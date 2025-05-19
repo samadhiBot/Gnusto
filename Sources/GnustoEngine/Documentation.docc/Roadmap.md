@@ -4,11 +4,11 @@
 
 ### 1.1 Handler Registration Improvements
 
-- [ ] Implement reflection-based handler discovery for `ItemEventHandler` and `LocationActionHandler`
+- [x] Implement reflection-based handler discovery for `ItemEventHandler` and `LocationActionHandler`
   - Allow handlers to be defined as static methods in the same struct as items/locations
-  - Use naming conventions (e.g., `itemID_handler`) to automatically register handlers
+  - Use naming conventions (e.g., `{itemID}Handler`) to automatically register handlers
   - Provide compile-time validation of handler signatures
-- [ ] Add builder-style API for handler registration
+- [ ] SPIKE: Add builder-style API for handler registration
   - Support fluent chaining of handler registrations
   - Enable type-safe handler composition
   - Allow conditional handler registration
@@ -19,7 +19,7 @@
   - Add helpers for common state change patterns
   - Support batch state changes
   - Add validation helpers
-- [ ] Implement state change composition
+- [ ] SPIKE: Implement state change composition
   - Allow combining multiple state changes
   - Support conditional state changes
   - Add rollback capabilities
@@ -30,7 +30,7 @@
   - Support dynamic exit conditions
   - Allow exit-specific messages
   - Enable exit state tracking
-- [ ] Add builder API for exit definition
+- [ ] SPIKE: Add builder API for exit definition
   - Support fluent exit configuration
   - Enable conditional exit composition
   - Add validation helpers
@@ -50,11 +50,11 @@
 
 ### 2.1 API Documentation
 
-- [ ] Create comprehensive API documentation
+- [x] Create comprehensive API documentation
   - Document all public interfaces
   - Add usage examples
   - Include best practices
-- [ ] Add inline documentation
+- [x] Add inline documentation
   - Document all public methods
   - Add parameter descriptions
   - Include return value documentation
@@ -87,46 +87,24 @@
 
 ### 2.4 Tooling
 
-- [ ] Add development tools
+- [ ] SPIKE: Add development tools
   - Game state visualizer
   - Action handler debugger
   - Performance profiler
-- [ ] Create templates
+- [ ] SPIKE: Create templates
   - Project templates
   - Handler templates
   - Test templates
 
 ## Phase 3: Engine Enhancements
 
-### 3.1 Performance Optimization
+### 3.1 Extensibility
 
-- [ ] Profile and optimize core systems
-  - Action handler pipeline
-  - State change application
-  - Parser performance
-- [ ] Add caching mechanisms
-  - State change caching
-  - Handler result caching
-  - Parser result caching
-
-### 3.2 Error Handling
-
-- [ ] Improve error system
-  - More specific error types
-  - Better error messages
-  - Error recovery options
-- [ ] Add debugging support
-  - Detailed error logging
-  - State inspection
-  - Handler tracing
-
-### 3.3 Extensibility
-
-- [ ] Design plugin system
+- [ ] SPIKE: Design plugin system
   - Custom action handlers
   - State change processors
   - Parser extensions
-- [ ] Add middleware support
+- [ ] SPIKE: Add middleware support
   - Action preprocessing
   - State change validation
   - Result postprocessing
@@ -145,13 +123,7 @@
    - Reduced complexity
    - Better maintainability
 
-3. **Performance**
-
-   - Faster action processing
-   - Reduced memory usage
-   - Better scalability
-
-4. **Documentation**
+3. **Documentation**
    - Complete API coverage
    - Clear examples
    - Up-to-date guides
