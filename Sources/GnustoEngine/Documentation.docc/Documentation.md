@@ -41,7 +41,7 @@ struct OperaHouse: AreaBlueprint {
             though now only one remains. The exit is a door to the east.
             """),
         .exits([
-            .east: Exit(destination: "foyer"),
+            .east: .to(.foyer),
         ]),
         .inherentlyLit
     )

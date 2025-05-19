@@ -12,10 +12,10 @@ struct OperaHouse: AreaBlueprint {
                 the street is to the north, and there are doorways south and west.
                 """),
         .exits([
-            .south: Exit(destination: "bar"),
-            .west: Exit(destination: .cloakroom),
+            .south: .to(.bar),
+            .west: .to(.cloakroom),
             .north: Exit(
-                destination: "street",
+                destination: .street,
                 blockedMessage: """
                     You've only just arrived, and besides, the weather outside
                     seems to be getting worse.
@@ -35,7 +35,7 @@ struct OperaHouse: AreaBlueprint {
             though now only one remains. The exit is a door to the east.
             """),
         .exits([
-            .east: Exit(destination: "foyer"),
+            .east: .to(.foyer),
         ]),
         .inherentlyLit
     )
@@ -61,7 +61,7 @@ struct OperaHouse: AreaBlueprint {
             be some sort of message scrawled in the sawdust on the floor.
             """),
         .exits([
-            .north: Exit(destination: "foyer"),
+            .north: .to(.foyer),
         ])
     )
 

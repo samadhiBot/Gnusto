@@ -16,12 +16,8 @@ struct CloakOfDarkness: GameBlueprint {
     )
 
     var state = GameState(
-        locations: OperaHouse.locations,
-        items: OperaHouse.items,
-        player: Player(in: "foyer"),
-        globalState: [
-            .barMessageDisturbances: 0
-        ]
+        areas: OperaHouse.self,
+        player: Player(in: .foyer)
     )
 
     let itemEventHandlers = OperaHouse.itemEventHandlers
@@ -43,4 +39,5 @@ extension LocationID {
     static let bar = LocationID("bar")
     static let cloakroom = LocationID("cloakroom")
     static let foyer = LocationID("foyer")
+    static let street = LocationID("street")
 }

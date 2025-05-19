@@ -61,21 +61,23 @@ public struct DebugActionHandler: ActionHandler {
         switch directObjectRef {
         case .player:
             customDump(context.stateSnapshot.player, to: &target)
-            return ActionResult(target)
 
         case .item(let itemID):
             guard let item = context.stateSnapshot.items[itemID] else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             customDump(item, to: &target)
-            return ActionResult(target)
 
         case .location(let locationID):
             guard let location = context.stateSnapshot.locations[locationID] else {
                 throw ActionResponse.unknownEntity(directObjectRef)
             }
             customDump(location, to: &target)
-            return ActionResult(target)
         }
+        return ActionResult("""
+            ```
+            \(target)
+            ```
+            """)
     }
 }

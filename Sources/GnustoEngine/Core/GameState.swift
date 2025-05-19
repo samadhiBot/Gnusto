@@ -79,7 +79,7 @@ public struct GameState: Codable, Equatable, Sendable {
         pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
         activeDaemons: Set<DaemonID> = [],
-        globalState: [GlobalID: StateValue] = [:], // Keep AnyCodable
+        globalState: [GlobalID: StateValue] = [:],
         changeHistory: [StateChange] = []
     ) {
         self.items = Dictionary(uniqueKeysWithValues: items.map { ($0.id, $0) })
@@ -115,7 +115,8 @@ public struct GameState: Codable, Equatable, Sendable {
         player: Player,
         vocabulary: Vocabulary? = nil,
         activeFuses: [FuseID: Int] = [:],
-        activeDaemons: DaemonID...
+        activeDaemons: DaemonID...,
+        globalState: [GlobalID: StateValue] = [:]
     ) {
         var allItems: [Item] = []
         var allLocations: [Location] = []

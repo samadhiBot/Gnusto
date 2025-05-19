@@ -24,7 +24,17 @@ public struct Exit: Codable, Hashable, Sendable {
     /// The `GoActionHandler` often uses this to check door states.
     public let doorID: ItemID?
 
-    // --- Initialization ---
+    /// Creates a new exit to another location, optionally with a custom blocked message
+    /// and/or an associated door item.
+    ///
+    /// - Parameters:
+    ///   - destination: The `LocationID` this exit leads to.
+    ///   - blockedMessage: An optional custom message to display if the player cannot
+    ///     use this exit (e.g., due to a closed door or other obstruction). If `nil`,
+    ///     the engine will use a default message.
+    ///   - doorID: An optional `ItemID` for an item that acts as a door or barrier
+    ///     for this exit. If set, the state of this item (e.g., open/closed/locked)
+    ///     will typically determine if the player can pass through.
     public init(
         destination: LocationID,
         blockedMessage: String? = nil,
@@ -33,6 +43,25 @@ public struct Exit: Codable, Hashable, Sendable {
         self.destinationID = destination
         self.blockedMessage = blockedMessage
         self.doorID = doorID
+    }
+
+    /// A convenience factory method for creating a simple exit to another location.
+    ///
+    /// This is a shorthand for `Exit(destination: destination)` when you don't need
+    /// a custom blocked message or door.
+    ///
+    /// Example:
+    /// ```swift
+    /// .exits([
+    ///     .north: .to("garden"),
+    ///     .east: .to("kitchen")
+    /// ])
+    /// ```
+    ///
+    /// - Parameter destination: The `LocationID` this exit leads to.
+    /// - Returns: A new `Exit` instance with the specified destination.
+    public static func to(_ destination: LocationID) -> Exit {
+        .init(destination: destination)
     }
 
     // TODO: Consider adding properties for:
