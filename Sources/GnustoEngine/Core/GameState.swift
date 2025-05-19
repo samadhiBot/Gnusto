@@ -151,7 +151,7 @@ public struct GameState: Codable, Equatable, Sendable {
             pronouns: [:],
             activeFuses: activeFuses,
             activeDaemons: Set(activeDaemons),
-            globalState: [:],
+            globalState: globalState,
             changeHistory: []
         )
     }

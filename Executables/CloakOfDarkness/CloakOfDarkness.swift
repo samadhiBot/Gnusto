@@ -17,7 +17,10 @@ struct CloakOfDarkness: GameBlueprint {
 
     var state = GameState(
         areas: OperaHouse.self,
-        player: Player(in: .foyer)
+        player: Player(in: .foyer),
+        globalState: [
+            .barMessageDisturbances: 0
+        ]
     )
 
     let itemEventHandlers = OperaHouse.itemEventHandlers
