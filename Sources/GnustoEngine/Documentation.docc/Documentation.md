@@ -2,6 +2,8 @@
 
 ## A Modern Interactive Fiction Engine
 
+![Gnusto Interactive Fiction Engine](gnusto-heading.png)
+
 Welcome to the Gnusto Interactive Fiction Engine! Gnusto is a powerful and flexible Swift-based
 framework designed to help you create rich, dynamic text adventure games. Inspired by the
 classic Infocom masterpieces, Gnusto provides a modern toolkit that simplifies the development
@@ -19,7 +21,7 @@ and the rules that govern their interactions.
 
 The foundation of your game is built from `Location`s and `Item`s.
 
-#### `Location`s: Crafting Your Spaces
+#### Locations: Crafting Your Spaces
 
 A `Location` represents a distinct place or room that the player can visit. You define
 a location with a unique ID, a name, a textual description that sets the scene for the
@@ -32,16 +34,16 @@ import GnustoEngine
 
 // In your game's AreaBlueprint (e.g., OperaHouse.swift)
 let cloakroom = Location(
-    id: "cloakroom", // A unique identifier for this location
-    .name("Cloakroom"), // The name displayed to the player
-    .description(\"\"\"
-        The walls of this small room were clearly once lined with hooks,
-        though now only one remains. The exit is a door to the east.
-        \"\"\"), // What the player sees when they enter or look around
-    .exits([
-        .east: Exit(destination: "foyer") // Defines an exit to the east leading to "foyer"
-    ]),
-    .setFlag(.isInherentlyLit) // This location is always lit
+id: "cloakroom", // A unique identifier for this location
+.name("Cloakroom"), // The name displayed to the player
+.description(\"\"\"
+The walls of this small room were clearly once lined with hooks,
+though now only one remains. The exit is a door to the east.
+\"\"\"), // What the player sees when they enter or look around
+.exits([
+.east: Exit(destination: "foyer") // Defines an exit to the east leading to "foyer"
+]),
+.setFlag(.isInherentlyLit) // This location is always lit
 )
 ```
 
@@ -55,7 +57,7 @@ In this example:
 - `.setFlag(.isInherentlyLit)`: This `LocationAttribute` indicates the room is lit
   by default, without needing a light source.
 
-#### `Item`s: Populating Your World
+#### Items: Populating Your World
 
 `Item`s are the objects, characters, or other entities the player can interact with.
 Like locations, items have an ID, a name, a description, and various attributes that
@@ -67,23 +69,23 @@ Let's add a hook to our cloakroom and a cloak for the player:
 // Continuing in your AreaBlueprint
 
 let hook = Item(
-    id: "hook", // Unique ItemID
-    .name("small brass hook"),
-    .adjectives("small", "brass"), // Words the parser can use to identify the hook
-    .synonyms("peg"),              // Alternative nouns for the hook
-    .in(.location("cloakroom")),   // The hook starts in the "cloakroom"
-    .setFlag(.isScenery)           // Indicates it's part of the background, likely not takable
+id: "hook", // Unique ItemID
+.name("small brass hook"),
+.adjectives("small", "brass"), // Words the parser can use to identify the hook
+.synonyms("peg"),              // Alternative nouns for the hook
+.in(.location("cloakroom")),   // The hook starts in the "cloakroom"
+.setFlag(.isScenery)           // Indicates it's part of the background, likely not takable
 )
 
 let cloak = Item(
-    id: "cloak",
-    .name("velvet cloak"),
-    .description("A handsome velvet cloak, of exquisite quality."),
-    .adjectives("handsome", "dark", "black", "velvet"),
-    .in(.player), // The cloak starts in the player's possession
-    .setFlag(.isTakable),
-    .setFlag(.isWearable)
-    // .setFlag(.isWorn) // If the player starts wearing it
+id: "cloak",
+.name("velvet cloak"),
+.description("A handsome velvet cloak, of exquisite quality."),
+.adjectives("handsome", "dark", "black", "velvet"),
+.in(.player), // The cloak starts in the player's possession
+.setFlag(.isTakable),
+.setFlag(.isWearable)
+// .setFlag(.isWorn) // If the player starts wearing it
 )
 ```
 
