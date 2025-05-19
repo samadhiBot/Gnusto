@@ -19,7 +19,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -53,7 +53,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -80,7 +80,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -115,7 +115,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -157,7 +157,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -196,7 +196,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -235,7 +235,7 @@ struct TouchActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )

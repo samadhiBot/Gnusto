@@ -30,7 +30,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -75,7 +75,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -112,7 +112,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -152,7 +152,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -198,7 +198,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -245,7 +245,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -288,7 +288,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -331,7 +331,7 @@ struct TurnOffActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -376,7 +376,7 @@ struct TurnOffActionHandlerTests {
         // Use the real parser to test alias resolution
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser,
             ioHandler: mockIO
         )
@@ -432,7 +432,7 @@ struct TurnOffActionHandlerTests {
         // Use the real parser to test alias resolution
         let parser = StandardParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: parser, // Use StandardParser
             ioHandler: mockIO
         )

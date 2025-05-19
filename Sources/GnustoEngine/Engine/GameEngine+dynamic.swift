@@ -1,9 +1,21 @@
 import Foundation
-import OSLog
 
 // MARK: - Dynamic Attribute Accessors
 
 extension GameEngine {
+    /// Fetches the boolean value of a dynamic or static attribute for a given item.
+    ///
+    /// This method first checks if a dynamic computation handler is registered for the
+    /// specified `AttributeID` in the `dynamicAttributeRegistry`. If so, it executes
+    /// the handler to get the value. Otherwise, it retrieves the statically stored value
+    /// from the item's attributes.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item whose attribute is to be fetched.
+    ///   - key: The `AttributeID` of the boolean attribute.
+    /// - Returns: The boolean value of the attribute.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
+    ///           or if the item does not exist. Returns `false` if the attribute is not set.
     public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Bool {
         let value = await getDynamicItemValue(itemID: itemID, key: key)
         switch value {
@@ -19,6 +31,17 @@ extension GameEngine {
         }
     }
 
+    /// Fetches the integer value of a dynamic or static attribute for a given item.
+    ///
+    /// Similar to the boolean `fetch`, this retrieves an integer value, checking for
+    /// dynamic computation handlers first.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item.
+    ///   - key: The `AttributeID` of the integer attribute.
+    /// - Returns: The integer value of the attribute.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute is not an integer, does not exist,
+    ///           or the item does not exist.
     public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Int {
         let value = await getDynamicItemValue(itemID: itemID, key: key)
         switch value {
@@ -32,6 +55,17 @@ extension GameEngine {
         }
     }
 
+    /// Fetches the string value of a dynamic or static attribute for a given item.
+    ///
+    /// Similar to other `fetch` methods, this retrieves a string value, checking for
+    /// dynamic computation handlers first. This is often used for dynamic descriptions.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item.
+    ///   - key: The `AttributeID` of the string attribute (e.g., `.description`).
+    /// - Returns: The string value of the attribute.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
+    ///           or the item does not exist.
     public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> String {
         let value = await getDynamicItemValue(itemID: itemID, key: key)
         switch value {
@@ -45,6 +79,17 @@ extension GameEngine {
         }
     }
 
+    /// Fetches the string value of a dynamic or static attribute for a given location.
+    ///
+    /// Works like the item-specific `fetch` for strings, but targets a location attribute.
+    /// Useful for dynamic location descriptions.
+    ///
+    /// - Parameters:
+    ///   - locationID: The `LocationID` of the location.
+    ///   - key: The `AttributeID` of the string attribute.
+    /// - Returns: The string value of the attribute.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
+    ///           or the location does not exist.
     public func fetch(_ locationID: LocationID, _ key: AttributeID) async throws -> String {
         let value = await getDynamicLocationValue(locationID: locationID, key: key)
         switch value {

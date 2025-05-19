@@ -1,0 +1,40 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  documentation:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Swift 6.1
+        uses: SwiftyLab/setup-swift@latest
+
+      - name: Clean docs directory
+        run: rm -rf ./docs
+
+      - name: Build Documentation
+        run: |
+          swift package --allow-writing-to-directory ./docs \
+            generate-documentation --target GnustoEngine \
+            --disable-indexing \
+            --transform-for-static-hosting \
+            --hosting-base-path /Gnusto \
+            --output-path ./docs
+
+      - name: Create .nojekyll file
+        run: touch ./docs/.nojekyll
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: docs

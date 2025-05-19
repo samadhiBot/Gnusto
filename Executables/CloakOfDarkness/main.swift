@@ -1,7 +1,7 @@
 import GnustoEngine
 
 let engine = await GameEngine(
-    game: CloakOfDarkness(),
+    blueprint: CloakOfDarkness(),
     parser: StandardParser(),
     ioHandler: ConsoleIOHandler()
 )

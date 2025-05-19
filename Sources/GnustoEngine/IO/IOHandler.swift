@@ -1,5 +1,16 @@
 import Foundation
 
+/// Defines the interface for all input and output operations within the Gnusto game engine.
+///
+/// The `IOHandler` protocol abstracts the means by which the game communicates with
+/// the player. This allows different frontends (e.g., a simple console, a graphical UI,
+/// or even a networked client) to be used with the same core game logic.
+///
+/// Game developers typically do not implement this protocol directly unless creating a custom
+/// frontend for their game. The engine will be initialized with a concrete `IOHandler`
+/// (like `ConsoleIOHandler`) which manages the actual I/O operations.
+///
+/// All methods of an `IOHandler` are expected to be called on the main actor.
 @MainActor
 public protocol IOHandler: Sendable {
 
@@ -12,12 +23,6 @@ public protocol IOHandler: Sendable {
     ///   - style: A hint for the desired text style (implementation specific).
     ///   - newline: Whether to append a newline character after the text (defaults to true).
     func print(_ markdown: String, style: TextStyle, newline: Bool)
-
-    /// A convenience function to print normal text with a newline.
-    func print(_ markdown: String)
-
-    /// A convenience function to print styled text with a newline.
-    func print(_ markdown: String, style: TextStyle)
 
     /// Displays the top status line (typically Room Name and Score/Turns).
     ///
@@ -53,10 +58,12 @@ public protocol IOHandler: Sendable {
 
 // Default implementations for convenience print methods
 public extension IOHandler {
+    /// Prints a Markdown string to the output using the `.normal` style and appends a newline.
     func print(_ markdown: String) {
         self.print(markdown, style: .normal, newline: true)
     }
 
+    /// Prints a Markdown string to the output using the specified `style` and appends a newline.
     func print(_ markdown: String, style: TextStyle) {
         self.print(markdown, style: style, newline: true)
     }

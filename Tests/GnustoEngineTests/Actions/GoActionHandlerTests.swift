@@ -27,7 +27,7 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -68,7 +68,7 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -111,7 +111,7 @@ struct GoActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -151,7 +151,7 @@ struct GoActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(
             verb: .go,
@@ -178,7 +178,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
             verb: .go,
@@ -229,7 +229,7 @@ struct GoActionHandlerTests {
             items: [vaultDoor]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
             verb: .go,
@@ -271,7 +271,7 @@ struct GoActionHandlerTests {
             globalState: [conditionGlobalID: false]
         )
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -315,7 +315,7 @@ struct GoActionHandlerTests {
             isLit: true
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden]) // Pass initial foyer
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Set the condition flag to true by applying a state change
         let change = StateChange(
@@ -355,7 +355,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
             verb: .go,

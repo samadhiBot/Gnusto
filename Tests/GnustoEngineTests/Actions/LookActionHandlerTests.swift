@@ -69,7 +69,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -131,7 +131,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -181,7 +181,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -233,7 +233,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -276,7 +276,7 @@ struct LookActionHandlerTests {
             locations: [litRoom]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         let command = Command(
             verb: .look,
@@ -320,7 +320,7 @@ struct LookActionHandlerTests {
         )
 
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // Register dynamic compute handler for the location's long description
         await engine.registerLocationCompute(key: .description) { location, gameState in
@@ -380,7 +380,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -425,7 +425,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -472,7 +472,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -538,7 +538,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -594,7 +594,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -651,7 +651,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -714,7 +714,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -774,7 +774,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -829,7 +829,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -877,7 +877,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -916,7 +916,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -941,7 +941,7 @@ struct LookActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )

@@ -17,7 +17,7 @@ extension GameEngine {
         switch effect.type {
         case .startFuse:
             let fuseID = try effect.targetID.fuseID()
-            guard let definition = definitionRegistry.fuseDefinitions[fuseID] else {
+            guard let definition = timeRegistry.fuseDefinitions[fuseID] else {
                 throw ActionResponse.internalEngineError("""
                     No FuseDefinition found for fuse ID '\(effect.targetID)' \
                     in startFuse side effect.
@@ -48,7 +48,7 @@ extension GameEngine {
 
         case .runDaemon:
             let daemonID = try effect.targetID.daemonID()
-            guard definitionRegistry.daemonDefinitions[daemonID] != nil else {
+            guard timeRegistry.daemonDefinitions[daemonID] != nil else {
                 throw ActionResponse.internalEngineError("""
                     No DaemonDefinition found for daemon ID '\(daemonID)' \
                     in runDaemon side effect.

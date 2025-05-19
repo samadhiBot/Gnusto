@@ -1,0 +1,19 @@
+name: Tests
+
+on:
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Swift 6.1
+        uses: SwiftyLab/setup-swift@latest
+
+      - name: Test
+        run: swift test

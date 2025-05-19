@@ -14,31 +14,18 @@ struct CloakOfDarkness: GameBlueprint {
         release: "0.0.3",
         maximumScore: 2
     )
-    var definitionRegistry: DefinitionRegistry
-    var dynamicAttributeRegistry: DynamicAttributeRegistry
-    var state: GameState
 
-    init() {
-        definitionRegistry = DefinitionRegistry(
-            itemActionHandlers: [
-                .cloak: OperaHouse.cloakHandler,
-                .hook: OperaHouse.hookHandler,
-                .message: OperaHouse.messageHandler,
-            ],
-            locationActionHandlers: [
-                .bar: OperaHouse.barHandler,
-            ]
-        )
-        dynamicAttributeRegistry = DynamicAttributeRegistry()
-        state = GameState(
-            locations: OperaHouse.locations,
-            items: OperaHouse.items,
-            player: Player(in: "foyer"),
-            globalState: [
-                .barMessageDisturbances: 0
-            ]
-        )
-    }
+    var state = GameState(
+        areas: OperaHouse.self,
+        player: Player(in: .foyer),
+        globalState: [
+            .barMessageDisturbances: 0
+        ]
+    )
+
+    let itemEventHandlers = OperaHouse.itemEventHandlers
+
+    let locationEventHandlers = OperaHouse.locationEventHandlers
 }
 
 extension GlobalID {
@@ -55,4 +42,5 @@ extension LocationID {
     static let bar = LocationID("bar")
     static let cloakroom = LocationID("cloakroom")
     static let foyer = LocationID("foyer")
+    static let street = LocationID("street")
 }

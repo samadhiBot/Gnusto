@@ -29,7 +29,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -81,7 +81,7 @@ struct GameEngineTests {
         mockParser.defaultParseResult = .failure(parseError)
 
         let engine = await GameEngine(
-            game: MinimalGame(),
+            blueprint: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -158,9 +158,7 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [.take: mockTakeHandler]
-            )
+            customActionHandlers: [.take: mockTakeHandler]
         )
 
         let mockIO = await MockIOHandler()
@@ -179,7 +177,7 @@ struct GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -264,9 +262,7 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [.look: mockLookHandler]
-            )
+            customActionHandlers: [.look: mockLookHandler]
         )
 
         let mockIO = await MockIOHandler()
@@ -287,7 +283,7 @@ struct GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -336,12 +332,10 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [
-                    .look: mockLookHandler,
-                    .take: mockTakeHandler
-                ]
-            )
+            customActionHandlers: [
+                .look: mockLookHandler,
+                .take: mockTakeHandler
+            ]
         )
 
         let mockIO = await MockIOHandler()
@@ -368,7 +362,7 @@ struct GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -423,7 +417,7 @@ struct GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: MinimalGame(),
+            blueprint: MinimalGame(),
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -450,7 +444,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -513,12 +507,10 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [pebble],
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [
-                    // Only mock inventory
-                    .inventory: mockInventoryHandler,
-                ]
-            )
+            customActionHandlers: [
+                // Only mock inventory
+                .inventory: mockInventoryHandler,
+            ]
         )
 
         let mockIO = await MockIOHandler()
@@ -548,7 +540,7 @@ struct GameEngineTests {
         #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -684,12 +676,10 @@ struct GameEngineTests {
         let game = MinimalGame(
             locations: [startRoom],
             items: [lamp],
-            definitionRegistry: DefinitionRegistry(
-                // Use customActionHandlers directly with the ActionHandler
-                customActionHandlers: [
-                    "activate": mockEnhancedHandler // No bridge needed
-                ]
-            )
+            // Use customActionHandlers directly with the ActionHandler
+            customActionHandlers: [
+                "activate": mockEnhancedHandler // No bridge needed
+            ]
         )
 
         let mockIO = await MockIOHandler()
@@ -707,7 +697,7 @@ struct GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -817,12 +807,12 @@ struct GameEngineTests {
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(fuseDefinitions: [fuseDef])
+            timeRegistry: TimeRegistry(fuseDefinitions: [fuseDef])
             // TODO: Need initial state setup for activeFuses
         )
 
         let _ = await GameEngine( // Use _ for unused engine
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -848,11 +838,11 @@ struct GameEngineTests {
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(daemonDefinitions: [testDaemonDef])
+            timeRegistry: TimeRegistry(daemonDefinitions: [testDaemonDef])
             // TODO: Need initial state setup for activeDaemons
         )
         let _ = await GameEngine( // Use _ for unused engine
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -882,7 +872,7 @@ struct GameEngineTests {
 
         // Initialize game with definitions
         let game = MinimalGame(
-            definitionRegistry: DefinitionRegistry(
+            timeRegistry: TimeRegistry(
                 fuseDefinitions: [testFuse],
                 daemonDefinitions: [testDaemon]
             )
@@ -890,7 +880,7 @@ struct GameEngineTests {
         )
 
         let _ = await GameEngine( // Use _ for unused engine
-            game: game,
+            blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
@@ -921,7 +911,7 @@ struct GameEngineTests {
             rawInput: "go xyzzy"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "go xyzzy",
             commandToParse: command
         )
@@ -951,7 +941,7 @@ struct GameEngineTests {
             rawInput: "take pebble"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "take pebble",
             commandToParse: command
         )
@@ -981,7 +971,7 @@ struct GameEngineTests {
             rawInput: "wear pebble"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "wear pebble",
             commandToParse: command
         )
@@ -1018,7 +1008,7 @@ struct GameEngineTests {
             rawInput: "put key in box"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "put key in box",
             commandToParse: command
         )
@@ -1046,7 +1036,7 @@ struct GameEngineTests {
             rawInput: "open rock"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "open rock",
             commandToParse: command
         )
@@ -1075,7 +1065,7 @@ struct GameEngineTests {
             rawInput: "wear rock"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "wear rock",
             commandToParse: command
         )
@@ -1116,7 +1106,7 @@ struct GameEngineTests {
             rawInput: "take shield"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "take shield",
             commandToParse: command
         )
@@ -1151,7 +1141,7 @@ struct GameEngineTests {
             rawInput: "put key in rock"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "put key in rock",
             commandToParse: command
         )
@@ -1186,7 +1176,7 @@ struct GameEngineTests {
             rawInput: "put key on rock"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "put key on rock",
             commandToParse: command
         )
@@ -1215,7 +1205,7 @@ struct GameEngineTests {
             rawInput: "go north"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "go north",
             commandToParse: command
         )
@@ -1245,7 +1235,7 @@ struct GameEngineTests {
             rawInput: "close box"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "close box",
             commandToParse: command
         )
@@ -1286,7 +1276,7 @@ struct GameEngineTests {
             rawInput: "unlock chest with key"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "unlock chest with key",
             commandToParse: command
         )
@@ -1314,7 +1304,7 @@ struct GameEngineTests {
             rawInput: "close book"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "close book",
             commandToParse: command
         )
@@ -1343,7 +1333,7 @@ struct GameEngineTests {
             rawInput: "drop statue"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "drop statue",
             commandToParse: command
         )
@@ -1374,7 +1364,7 @@ struct GameEngineTests {
             rawInput: "remove amulet"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "remove amulet",
             commandToParse: command
         )
@@ -1403,7 +1393,7 @@ struct GameEngineTests {
             rawInput: "go up"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "go up",
             commandToParse: command
         )
@@ -1438,7 +1428,7 @@ struct GameEngineTests {
             rawInput: "examine shadow"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "examine shadow",
             commandToParse: command
         )
@@ -1479,7 +1469,7 @@ struct GameEngineTests {
             rawInput: "unlock chest with key2"
         )
         let output = try await runCommandAndCaptureOutput(
-            game: game,
+            blueprint: game,
             commandInput: "unlock chest with key2",
             commandToParse: command
         )
@@ -1534,14 +1524,12 @@ struct GameEngineTests {
         // Setup game with the mock handler
         let game = MinimalGame(
             items: [lamp],
-            definitionRegistry: DefinitionRegistry(
-                customActionHandlers: [testVerb: mockHandler]
-            )
+            customActionHandlers: [testVerb: mockHandler]
         )
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = await GameEngine(game: game, parser: mockParser, ioHandler: mockIO)
+        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
         // Create the command to trigger the mock handler
         let testCommand = Command(verb: testVerb, rawInput: "testapply")
@@ -1562,7 +1550,7 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let engine = await GameEngine(game: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
+        let engine = await GameEngine(blueprint: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
         let itemID: ItemID = "testItem"
 
         await engine.applyPronounChange(pronoun: "it", itemID: itemID)
@@ -1589,7 +1577,7 @@ struct GameEngineTests {
             .name("Test Item")
         )
         let engine = await GameEngine(
-            game: MinimalGame(items: [item]),
+            blueprint: MinimalGame(items: [item]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -1609,7 +1597,7 @@ struct GameEngineTests {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let engine = await GameEngine(
-            game: MinimalGame(items: [item1, item2]),
+            blueprint: MinimalGame(items: [item1, item2]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
         )
@@ -1642,7 +1630,7 @@ extension [MockIOHandler.OutputCall] {
 extension GameEngineTests {
     /// Helper to run the engine for one command and capture output.
     private func runCommandAndCaptureOutput(
-        game: GameBlueprint,
+        blueprint: GameBlueprint,
         commandInput: String,
         commandToParse: Command
     ) async throws -> String {
@@ -1656,7 +1644,7 @@ extension GameEngineTests {
         }
 
         let engine = await GameEngine(
-            game: game,
+            blueprint: blueprint,
             parser: mockParser,
             ioHandler: mockIO
         )

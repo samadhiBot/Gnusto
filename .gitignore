@@ -37,7 +37,7 @@ playground.xcworkspace
 *~
 
 # Documentation
-Docs/References/*
-!Docs/References/Cloak of Darkness/
+References/*
+!References/Cloak of Darkness/
 
 .vscode
