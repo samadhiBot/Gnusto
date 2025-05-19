@@ -4,26 +4,20 @@ on:
   push:
     branches:
       - main
-      - area-blueprint
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy-docs:
+  documentation:
     runs-on: macos-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Swift
+      - name: Set up Swift 6.1
         uses: SwiftyLab/setup-swift@latest
 
-      # Optional: Re-enable if you want tests to run as part of this workflow
-      # - name: Test
-      #   run: swift test
-
-      # Add this step to clean docs directory
       - name: Clean docs directory
         run: rm -rf ./docs
 
@@ -36,10 +30,6 @@ jobs:
             --hosting-base-path /Gnusto \
             --output-path ./docs
 
-      # Add this step to list contents for debugging
-      - name: List contents of docs directory
-        run: ls -la ./docs
-
       - name: Create .nojekyll file
         run: touch ./docs/.nojekyll
 
@@ -48,4 +38,3 @@ jobs:
         with:
           branch: gh-pages
           folder: docs
-          # token: ${{ secrets.GITHUB_TOKEN }} # Usually implicit
