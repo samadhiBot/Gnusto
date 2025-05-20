@@ -129,3 +129,22 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
 This outline will serve as a blueprint for developing the `FrobozzMagicDemoKit`, ensuring we thoroughly test and exemplify the Gnusto Engine's power and flexibility.
 
 ## Running the Demo Kit
+
+Todo
+
+## Demo Game Design
+
+### Puzzle and Story Design
+
+We should design at least a few puzzles/locations/items that showcase:
+
+- Room and item events that trigger before/after turns or on entry.
+- Items and locations with dynamic, state-dependent descriptions.
+- Actions that demonstrate precondition checks and varying outcomes.
+- Timed puzzles or background events (e.g., a lantern dimming, a guard's patrol, a spell wearing off).
+- Custom verbs and parser disambiguation.
+- Scoring and state tracking (e.g., tracking which puzzles are solved, treasures found).
+
+### Teaching Moment
+
+Each core feature should be easy to point to in the demo, so users can see how the engine supports it (and how to do it themselves).
