@@ -115,7 +115,7 @@ public struct GameState: Codable, Equatable, Sendable {
         player: Player,
         vocabulary: Vocabulary? = nil,
         activeFuses: [FuseID: Int] = [:],
-        activeDaemons: DaemonID...,
+        activeDaemons: [DaemonID] = [],
         globalState: [GlobalID: StateValue] = [:]
     ) {
         var allItems: [Item] = []
