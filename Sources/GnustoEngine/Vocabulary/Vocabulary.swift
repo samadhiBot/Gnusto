@@ -181,6 +181,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             requiresLight: false
         ),
 
+        Verb(
+            id: .xyzzy,
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
         // Movement
         // Note: Single directions (N, S, E, W...) handled separately by StandardParser
 

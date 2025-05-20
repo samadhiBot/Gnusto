@@ -60,6 +60,7 @@ extension VerbID {
     public static let score = VerbID("score")
     public static let verbose = VerbID("verbose")
     public static let wait = VerbID("wait")
+    public static let xyzzy = VerbID("xyzzy")
 }
 
 #if DEBUG

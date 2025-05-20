@@ -37,7 +37,8 @@ extension GameEngine {
 //            .save: SaveActionHandler(),
             .score: ScoreActionHandler(),
 //            .verbose: VerboseActionHandler(),
-            .wait: WaitActionHandler()
+            .wait: WaitActionHandler(),
+            .xyzzy: XyzzyActionHandler()
         ]
 
     #if DEBUG
