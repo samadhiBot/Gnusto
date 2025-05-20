@@ -24,21 +24,21 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
 
 - **Locations (`Location`)**:
   - Defining locations with unique IDs, names, and detailed descriptions.
-  - Implementing static descriptions and dynamic descriptions (potentially using `DescriptionHandler`).
+  - Implementing static descriptions and dynamic descriptions (e.g., through custom logic or event handlers).
   - Utilizing `LocationProperty` (e.g., `.light`, `.outside`, `.waterSource`).
   - Configuring exits:
     - Standard directional exits (`.north`, `.south`, etc.).
     - Conditional exits (e.g., requiring an item or a specific game state).
     - Hidden or initially unavailable exits.
   - Managing "globals": items consistently present or accessible within a location.
-  - Demonstrating room-specific action overrides using `RoomActionHandler`.
+  - Demonstrating room-specific event handling (e.g., `LocationEvent.beforeTurn`, `LocationEvent.onEnter`) using `LocationEventHandler` (configured in `GameBlueprint`).
 - **Items (`Item`)**:
   - Defining items with unique IDs, names, adjectives, and synonyms for robust parsing.
   - Crafting descriptive text for items, including static and dynamic descriptions.
   - Assigning `ItemProperty` flags (e.g., `.takable`, `.container`, `.wearable`, `.lightSource`, `.readable`, `.food`, `.weapon`).
   - Specifying initial item placement (`ParentEntity`): in a location, inside a container, carried by the player, or `.nowhere`.
   - Defining and using item attributes (e.g., `size`, `capacity`, `strength`, `charges`).
-  - Implementing item-specific action overrides using `ObjectActionHandler`.
+  - Implementing item-specific event handling (e.g., `ItemEvent.beforeTurn`, `ItemEvent.afterTurn`) using `ItemEventHandler` (configured in `GameBlueprint`).
 - **Game State (`GameState`)**:
   - Tracking and modifying player status (current location, score, turn count, health/status effects).
   - Managing the player's inventory.
@@ -58,7 +58,7 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
   - Demonstrating the parser's disambiguation logic when noun phrases are ambiguous.
   - Providing clear error messages for unrecognized words or unparsable grammar.
 
-### 3. Action Processing (`ActionHandler`, `EnhancedActionHandler`, `GameEngine`)
+### 3. Action Processing (`ActionHandler`, `GameEngine`)
 
 - **Standard Actions**:
   - Implementing and showcasing a suite of common actions:
@@ -67,12 +67,11 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
     - Inventory: `INVENTORY`, `I`.
     - Interaction: `ATTACK GRUE`, `USE ROPE ON HOOK`, `GIVE WATER TO MAN`.
     - Sensory: `LOOK`, `LISTEN`.
-- **Enhanced Actions (`EnhancedActionHandler`)**:
-  - Demonstrating actions with pre-conditions (e.g., needing a key to open a lock).
-  - Showing how actions return an `ActionResult` to signal success, failure, or specific outcomes, and how these modify `GameState`.
-- **Custom Actions**:
-  - Defining new game-specific verbs and their corresponding `ActionHandler` or `EnhancedActionHandler` implementations.
-  - Overriding default action behaviors for specific items or locations via `DefinitionRegistry` (`ObjectActionHandler`, `RoomActionHandler`).
+
+**Action Results**:
+
+- Demonstrating how `ActionHandler` methods (`validate`, `process`) can enforce pre-conditions.
+- Showing how the `process` method returns an `ActionResult` to signal success, failure, or specific outcomes, and how these can lead to `StateChange`s applied to `GameState`.
 
 ### 4. Scope, Visibility, and Interaction (`ScopeResolver`)
 
@@ -102,13 +101,17 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
 - **List Formatting**:
   - Presenting lists of items or visible objects in a readable format (e.g., "You can see a rusty key, a worn map, and a curious glint in the corner.").
 
-### 7. Game Customization and Extensibility (`DefinitionRegistry`, `DescriptionHandlerRegistry`)
+### 7. Game Customization and Extensibility (`GameBlueprint`, `TimeRegistry`)
 
-- **Definition Registry (`DefinitionRegistry`)**:
-  - Registering custom `FuseDefinition`s and `DaemonDefinition`s for unique timed events.
-  - Registering game-specific `ObjectActionHandler`s and `RoomActionHandler`s to tailor interactions.
-- **Description Handler Registry (`DescriptionHandlerRegistry`)**:
-  - Implementing and registering custom `DescriptionHandler`s to provide dynamic, state-dependent descriptions for items and locations.
+- **GameBlueprint**:
+  - The primary way to customize a game.
+  - Registering custom `ActionHandler` implementations for new verbs.
+  - Providing game-specific `ItemEventHandler` and `LocationEventHandler` instances to tailor interactions with specific entities.
+  - Supplying the game's `Vocabulary`.
+  - Configuring the `TimeRegistry` with `FuseDefinition`s and `DaemonDefinition`s.
+  - Providing `DynamicAttributeProvider`s for complex, stateful item/location properties.
+- **TimeRegistry (via `GameBlueprint`)**:
+  - Registering custom `FuseDefinition`s (for timed, one-off events) and `DaemonDefinition`s (for recurring background processes).
 
 ### 8. Advanced Gameplay Mechanics (Illustrative Examples)
 
