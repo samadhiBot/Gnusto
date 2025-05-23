@@ -25,9 +25,8 @@ extension GameEngine {
         key: AttributeID,
         engine: GameEngine
     ) async -> String {
-        let fetchedOrNil: String? = try? await engine.fetch(itemID, key)
-        return if let actualDescription = fetchedOrNil {
-            actualDescription.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let description: String = try? await engine.fetch(itemID, key) {
+            description.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
             await defaultItemDescription(
                 for: itemID,

@@ -38,6 +38,6 @@ struct ScoreActionHandlerTests {
         expectNoDifference(output, expectedMessage)
 
         // Verify no state changes were recorded
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

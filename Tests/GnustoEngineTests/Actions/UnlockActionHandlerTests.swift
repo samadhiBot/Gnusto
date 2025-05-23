@@ -39,7 +39,7 @@ struct UnlockActionHandlerTests {
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true)
         let initialKeySnapshot = try await engine.item("key")
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -92,7 +92,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -108,7 +108,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "Unlock what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails with no indirect object")
@@ -131,7 +131,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -147,7 +147,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "Unlock it with what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails when key not held")
@@ -176,7 +176,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -193,7 +193,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "You aren’t holding the key.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails when target not reachable")
@@ -232,7 +232,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -249,7 +249,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails when target not lockable/unlockable")
@@ -272,7 +272,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -289,7 +289,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "You can’t unlock the pebble.") // Uses ActionResponse.itemNotUnlockable message
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails with wrong key")
@@ -317,7 +317,7 @@ struct UnlockActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -334,7 +334,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The bent key doesn’t fit the box.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Unlock fails when already unlocked")
@@ -362,7 +362,7 @@ struct UnlockActionHandlerTests {
         )
         let initialBoxSnapshot = try await engine.item("box")
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .unlock,
@@ -379,7 +379,7 @@ struct UnlockActionHandlerTests {
         expectNoDifference(output, "The box is already unlocked.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }
 

@@ -219,36 +219,36 @@ extension GameEngine {
         gameState.globalState[key]
     }
 
-    /// Applies a change to a game-specific global variable in `gameState.globalState`.
-    ///
-    /// If the new value is different from the current value, this method creates and
-    /// applies the necessary `StateChange`.
-    ///
-    /// - Parameters:
-    ///   - key: The `GlobalID` for the global variable.
-    ///   - value: The new `StateValue` to set.
-    public func applyGameSpecificStateChange(key: GlobalID, value: StateValue) async {
-        let oldValue = gameState.globalState[key] // Read using GameStateKey
-
-        // Only apply if the value is changing
-        if value != oldValue {
-            do {
-                try gameState.apply(
-                    StateChange(
-                        entityID: .global,
-                        attributeKey: .globalState(key: key), // Use GameStateKey
-                        oldValue: oldValue, // Pass the existing StateValue? as oldValue
-                        newValue: value
-                    )
-                )
-            } catch {
-                logger.warning("""
-                    💥 Failed to apply game specific state change for key \
-                    '\(key.rawValue)': \(error)
-                    """)
-            }
-        }
-    }
+//    /// Applies a change to a game-specific global variable in `gameState.globalState`.
+//    ///
+//    /// If the new value is different from the current value, this method creates and
+//    /// applies the necessary `StateChange`.
+//    ///
+//    /// - Parameters:
+//    ///   - key: The `GlobalID` for the global variable.
+//    ///   - value: The new `StateValue` to set.
+//    public func applyGameSpecificStateChange(key: GlobalID, value: StateValue) async {
+//        let oldValue = gameState.globalState[key] // Read using GameStateKey
+//
+//        // Only apply if the value is changing
+//        if value != oldValue {
+//            do {
+//                try gameState.apply(
+//                    StateChange(
+//                        entityID: .global,
+//                        attributeKey: .globalState(key: key), // Use GameStateKey
+//                        oldValue: oldValue, // Pass the existing StateValue? as oldValue
+//                        newValue: value
+//                    )
+//                )
+//            } catch {
+//                logger.warning("""
+//                    💥 Failed to apply game specific state change for key \
+//                    '\(key.rawValue)': \(error)
+//                    """)
+//            }
+//        }
+//    }
 
     /// Checks if a specific global flag is currently set to `true`.
     ///

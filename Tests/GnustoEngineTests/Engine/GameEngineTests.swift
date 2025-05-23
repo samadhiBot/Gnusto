@@ -544,7 +544,7 @@ struct GameEngineTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.items(in: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -602,14 +602,14 @@ struct GameEngineTests {
             """)
     }
 
-    @Test("Engine Records State Changes from Enhanced Handler")
-    func testEngineRecordsStateChangesFromEnhancedHandler() async throws {
-        // Given: An enhanced handler that changes multiple things
+    @Test("Engine Records State Changes from Action Handler")
+    func testEngineRecordsStateChangesFromActionHandler() async throws {
+        // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
             let itemIDToModify: ItemID
             let flagToSet: String
 
-            func validate(context: ActionContext) async throws { }
+//            func validate(context: ActionContext) async throws { }
 
             func process(context: ActionContext) async throws -> ActionResult {
                 // Use snapshot for checks
@@ -652,7 +652,7 @@ struct GameEngineTests {
             }
 
             // Add empty postProcess for conformance
-            func postProcess(context: ActionContext, result: ActionResult) async throws { }
+//            func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
         let testItemID: ItemID = "lamp"
@@ -664,7 +664,7 @@ struct GameEngineTests {
             .isLightSource,
             .in(.location(.startRoom))
         )
-        let mockEnhancedHandler = MockMultiChangeHandler(
+        let mockActionHandler = MockMultiChangeHandler(
             itemIDToModify: testItemID,
             flagToSet: testFlagKey.rawValue
         ) // Pass rawValue if handler needs string
@@ -678,7 +678,7 @@ struct GameEngineTests {
             items: [lamp],
             // Use customActionHandlers directly with the ActionHandler
             customActionHandlers: [
-                "activate": mockEnhancedHandler // No bridge needed
+                "activate": mockActionHandler // No bridge needed
             ]
         )
 
@@ -1550,13 +1550,19 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let engine = await GameEngine(blueprint: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
-        let itemID: ItemID = "testItem"
+        let engine = await GameEngine(
+            blueprint: MinimalGame(),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
-        await engine.applyPronounChange(pronoun: "it", itemID: itemID)
+        let startItem = try await engine.item(.startItem)
+        let change = await engine.updatePronouns(to: startItem)
+//        await engine.applyGameSpecificStateChange(key: <#T##GlobalID#>, value: <#T##StateValue#>)
+        try await engine.gameState.apply(change)
 
         let pronouns = await engine.gameState.pronouns
-        #expect(pronouns["it"] == [.item(itemID)])
+        #expect(pronouns["it"] == [.item(startItem.id)])
 
         // Check change history
         let history = await engine.gameState.changeHistory

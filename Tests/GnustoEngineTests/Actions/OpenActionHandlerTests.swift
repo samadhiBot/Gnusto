@@ -72,7 +72,7 @@ struct OpenActionHandlerTests {
         let initialBoxState = try await engine.item("box")
         #expect(!initialBoxState.hasFlag(.isOpen), "Box should start closed")
         #expect(!initialBoxState.hasFlag(.isTouched), "Box should start untouched")
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .open,
@@ -127,7 +127,7 @@ struct OpenActionHandlerTests {
         let initialBoxState = try await engine.item("box")
         #expect(!initialBoxState.hasFlag(.isOpen), "Box should start closed")
         #expect(initialBoxState.hasFlag(.isTouched), "Box should start touched")
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .open,
@@ -179,7 +179,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "Open what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Open fails item not accessible")
@@ -210,7 +210,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Open fails item not openable")
@@ -245,7 +245,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "You can’t open the heavy rock.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Open fails item already open")
@@ -283,7 +283,7 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "The wooden box is already open.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Open fails item is locked")
@@ -321,6 +321,6 @@ struct OpenActionHandlerTests {
         expectNoDifference(output, "The iron chest is locked.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }

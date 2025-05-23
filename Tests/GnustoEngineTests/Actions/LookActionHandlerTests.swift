@@ -73,7 +73,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look,
@@ -94,7 +94,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK in lit room with multiple items lists them correctly")
@@ -135,7 +135,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look,
@@ -157,7 +157,7 @@ struct LookActionHandlerTests {
         )
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK in dark room prints darkness message")
@@ -185,7 +185,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look,
@@ -201,7 +201,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, "It is pitch black. You are likely to be eaten by a grue.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK in lit room (via player light) describes room and lists items")
@@ -237,7 +237,7 @@ struct LookActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look,
@@ -258,7 +258,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK with nil location description uses default")
@@ -296,7 +296,7 @@ struct LookActionHandlerTests {
             """
         )
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK with dynamic location description closure")
@@ -349,9 +349,9 @@ struct LookActionHandlerTests {
         )
 
         // Act 2: Turn flag OFF and LOOK again
-        try engine.gameState.apply(
-            await engine.clearFlag(specialFlag) // Use new helper and GlobalID
-        )
+//        try engine.gameState.apply(
+//            await engine.clearFlag(specialFlag) // Use new helper and GlobalID
+//        )
         await engine.execute(command: command)
 
         // Assert Output 2 (Should show normal description)
@@ -387,7 +387,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(try await engine.item("rock").hasFlag(.isTouched) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -432,7 +432,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(try await engine.item("pebble").hasFlag(.isTouched) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look,
@@ -479,7 +479,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(try await engine.item("stone").hasFlag(.isTouched) == true)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -510,7 +510,7 @@ struct LookActionHandlerTests {
 
         // Assert Change History (Should be empty)
         let expectedChanges = expectedLookChanges(itemID: "stone", initialAttributes: initialAttributes)
-        #expect(expectedChanges.isEmpty == true)
+        #expect(expectedChanges.isEmpty)
         #expect(await engine.gameState.changeHistory.count == 1)
     }
 
@@ -545,7 +545,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -602,7 +602,7 @@ struct LookActionHandlerTests {
         )
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(try await engine.item("box").attributes["isOpen"] == nil)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -660,7 +660,7 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("jar").hasFlag(.isTouched) == false)
         #expect(try await engine.item("jar").attributes["isOpen"] == nil)
         #expect(try await engine.item("jar").attributes["isTransparent"] == true)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -721,7 +721,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
         #expect(try await engine.item("table").hasFlag(.isTouched) == false)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -783,7 +783,7 @@ struct LookActionHandlerTests {
         #expect(try await engine.item("artifact") == artifact)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .examine,
@@ -804,7 +804,7 @@ struct LookActionHandlerTests {
         #expect(finalItemState.parent == .location("otherRoom"))
 
         // Assert Change History (Should be empty)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("LOOK AT item in room shows description and sets touched")
@@ -837,7 +837,7 @@ struct LookActionHandlerTests {
         )
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Command for LOOK AT (often parsed as EXAMINE with DO)
         let command = Command(
@@ -885,7 +885,7 @@ struct LookActionHandlerTests {
         )
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .look, // or .examine

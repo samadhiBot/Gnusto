@@ -91,8 +91,8 @@ struct ActionResultTests {
         let result = ActionResult("You can’t do that.")
 
         #expect(result.message == "You can’t do that.")
-        #expect(result.stateChanges.isEmpty == true)
-        #expect(result.sideEffects.isEmpty == true)
+        #expect(result.stateChanges.isEmpty)
+        #expect(result.sideEffects.isEmpty)
     }
 
     @Test("StateChange Initialization - Full")
@@ -178,7 +178,7 @@ struct ActionResultTests {
 
         #expect(effect.type == .stopDaemon)
         #expect(effect.targetID == .daemon("clock"))
-        #expect(effect.parameters.isEmpty == true)
+        #expect(effect.parameters.isEmpty)
     }
 
     // MARK: - Codable Conformance Tests

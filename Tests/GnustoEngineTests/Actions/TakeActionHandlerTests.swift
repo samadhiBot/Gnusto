@@ -117,7 +117,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -163,7 +163,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -177,7 +177,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You already have that.")
 
         // Assert Change History (Should be empty)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Take item fails when not present in location")
@@ -213,10 +213,10 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check that the player is still holding nothing
-        #expect(await engine.items(in: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty)
     }
 
     @Test("Take item fails when not takable")
@@ -252,7 +252,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can’t take the heavy rock.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = try await engine.item("rock")
@@ -279,7 +279,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Take what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Take item successfully from open container in room")
@@ -313,7 +313,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -373,7 +373,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -443,7 +443,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = try await engine.item("gem")
@@ -494,7 +494,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "You can’t take things out of the stone statue.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = try await engine.item("chip")
@@ -535,7 +535,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Your hands are full.") // Check standard message
 
         // Assert no state changes occurred
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert item is still in the room
         #expect(try await engine.item("heavy").parent == .location(.startRoom))
@@ -570,7 +570,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -629,7 +629,7 @@ struct TakeActionHandlerTests {
         )
 
         // Initial state check
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act: Use engine.execute for full pipeline
         await engine.execute(command: command)
@@ -687,7 +687,7 @@ struct TakeActionHandlerTests {
             rawInput: "take key"
         )
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
         await engine.execute(command: command)
@@ -754,7 +754,7 @@ struct TakeActionHandlerTests {
             rawInput: "take key"
         )
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
         await engine.execute(command: command)
@@ -814,7 +814,7 @@ struct TakeActionHandlerTests {
             rawInput: "take fly"
         )
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
         #expect(try await engine.item("jar").hasFlag(.isOpen) == false) // Verify closed
         #expect(try await engine.item("jar").hasFlag(.isTransparent) == true) // Verify transparent
 
@@ -826,7 +826,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "The glass jar is closed.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = try await engine.item("fly")
@@ -871,7 +871,7 @@ struct TakeActionHandlerTests {
         expectNoDifference(output, "Your hands are full.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Assert: Check item parent DID NOT change
         let finalItemState = try await engine.item("shield")

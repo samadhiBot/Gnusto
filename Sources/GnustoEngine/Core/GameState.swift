@@ -191,7 +191,7 @@ public struct GameState: Codable, Equatable, Sendable {
     /// - Parameter changes: A variadic list of optional `StateChange` objects to apply.
     /// - Throws: `ActionResponse.internalEngineError` or `ActionResponse.stateValidationFailed`
     ///   if any change is invalid, cannot be applied, or fails validation against its expected old value.
-    public mutating func apply(_ changes: StateChange?...) throws {
+    mutating func apply(_ changes: StateChange?...) throws {
         for stateChange in changes {
             if let stateChange {
                 try apply(change: stateChange)

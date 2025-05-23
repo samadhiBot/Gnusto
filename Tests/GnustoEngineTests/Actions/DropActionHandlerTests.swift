@@ -29,7 +29,7 @@ struct DropActionHandlerTests {
         let finalLocation = await engine.playerLocationID
 
         #expect(try await engine.item("key").parent == .player) // Verify setup
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .drop,
@@ -106,7 +106,7 @@ struct DropActionHandlerTests {
         )
 
         #expect(try await engine.item("key").parent == .location(.startRoom))
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .drop,
@@ -126,7 +126,7 @@ struct DropActionHandlerTests {
         expectNoDifference(output, "You aren’t holding the brass key.")
 
         // Assert Change History (Should be empty)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Drop worn item successfully removes worn property")
@@ -156,7 +156,7 @@ struct DropActionHandlerTests {
 
         #expect(try await engine.item("cloak").parent == .player)
         #expect(try await engine.item("cloak").hasFlag(.isWorn) == true) // Qualified
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .drop,

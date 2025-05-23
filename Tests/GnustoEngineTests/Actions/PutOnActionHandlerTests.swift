@@ -100,7 +100,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -156,7 +156,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -173,7 +173,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "Put what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails with no indirect object")
@@ -192,7 +192,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -209,7 +209,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "Put the book on what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails when item not held")
@@ -234,7 +234,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -252,7 +252,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You aren’t holding the heavy book.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails when target not reachable")
@@ -287,7 +287,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -305,7 +305,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails when target not a surface")
@@ -330,7 +330,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -348,7 +348,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can’t put things on the box.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails self-insertion")
@@ -368,7 +368,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .putOn,
@@ -386,7 +386,7 @@ struct PutOnActionHandlerTests {
         expectNoDifference(output, "You can’t put something on itself.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("PutOn fails recursive insertion")
@@ -413,7 +413,7 @@ struct PutOnActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Try to put the tray onto the table (which is on the tray)
         let command = Command(
@@ -434,7 +434,7 @@ struct PutOnActionHandlerTests {
         )
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     // TODO: Add capacity check test when implemented

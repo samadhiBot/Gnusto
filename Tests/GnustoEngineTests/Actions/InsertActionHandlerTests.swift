@@ -60,7 +60,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -118,7 +118,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -135,7 +135,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "Insert what?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails with no indirect object")
@@ -155,7 +155,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -172,7 +172,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "Where do you want to insert the gold coin?")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when item not held")
@@ -200,7 +200,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -218,7 +218,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You aren’t holding the gold coin.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when target not reachable")
@@ -246,7 +246,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -264,7 +264,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when target not a container")
@@ -290,7 +290,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -308,7 +308,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put things in the stone statue.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when container closed")
@@ -334,7 +334,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -352,7 +352,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The wooden box is closed.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails self-insertion")
@@ -372,7 +372,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -390,7 +390,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails recursive insertion")
@@ -418,7 +418,7 @@ struct InsertActionHandlerTests {
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Try to put the bag into the box (which is inside the bag)
         let command = Command(
@@ -440,7 +440,7 @@ struct InsertActionHandlerTests {
         )
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert fails when container is full")
@@ -494,7 +494,7 @@ struct InsertActionHandlerTests {
 
         // Assert No State Change
         #expect(try await engine.item("coin").parent == .player) // Coin still held
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert succeeds when container has exact space")
@@ -594,7 +594,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -653,7 +653,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -671,7 +671,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert into item not in reach")
@@ -706,7 +706,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -724,7 +724,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t see any such thing.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert into target not a container")
@@ -751,7 +751,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -769,7 +769,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put things in the smooth rock.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert into closed container")
@@ -798,7 +798,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -816,7 +816,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "The wooden box is closed.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert into container that is full")
@@ -856,7 +856,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -875,7 +875,7 @@ struct InsertActionHandlerTests {
 
         // Assert No State Change
         #expect(try await engine.item("key").parent == .player) // Key still held
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert item too large for container")
@@ -907,7 +907,7 @@ struct InsertActionHandlerTests {
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
 
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -926,7 +926,7 @@ struct InsertActionHandlerTests {
 
         // Assert No State Change
         #expect(try await engine.item("key").parent == .player) // Key still held
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     // Helper to setup game state for nested container tests
@@ -1056,7 +1056,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO) // Initialize engine
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -1074,7 +1074,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put something inside itself.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true) // Use engine instance
+        #expect(await engine.gameState.changeHistory.isEmpty) // Use engine instance
     }
 
     @Test("Insert into nested container that contains itself indirectly (A in B, put B in A)")
@@ -1126,7 +1126,7 @@ struct InsertActionHandlerTests {
         #expect(finalBoxA.parent == .item("boxB"))
         let finalBoxB = try await engine.item("boxB")
         #expect(finalBoxB.parent == .player)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Insert into deeply nested container that contains itself indirectly")
@@ -1189,7 +1189,7 @@ struct InsertActionHandlerTests {
         #expect(finalBoxB.parent == .item("boxC"))
         let finalBoxC = try await engine.item("boxC")
         #expect(finalBoxC.parent == .player)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     // — Validation Tests (using handler.validate for focused error checks) —
@@ -1491,7 +1491,7 @@ struct InsertActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
             verb: .insert,
@@ -1509,7 +1509,7 @@ struct InsertActionHandlerTests {
         expectNoDifference(output, "You can’t put things in the glass trophy.")
 
         // Assert No State Change
-        #expect(await engine.gameState.changeHistory.isEmpty == true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
     }
 }
 

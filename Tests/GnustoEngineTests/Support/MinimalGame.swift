@@ -41,7 +41,7 @@ struct MinimalGame: GameBlueprint {
         ]
         let gameItems = items ?? [
             Item(
-                id: "startItem",
+                id: .startItem,
                 .name("pebble"),
                 .in(.location(.startRoom)),
                 .isTakable
@@ -72,6 +72,10 @@ struct MinimalGame: GameBlueprint {
             globalState: globalState ?? [:]
         )
     }
+}
+
+extension ItemID {
+    static let startItem: ItemID = "startItem"
 }
 
 extension LocationID {
