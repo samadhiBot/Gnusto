@@ -2,7 +2,7 @@
 
 ## Design Philosophy
 
-The `FrobozzMagicDemoKit` class (the heart of the Demo Kit) demonstrates:
+The `FrobozzMagicDemoKit` struct (the heart of the Demo Kit) demonstrates:
 
 1.  Setting up a complete game with the engine (some assembly required)
 2.  Defining magical game content (locations, items, verbs)

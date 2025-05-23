@@ -100,6 +100,22 @@ extension GameEngine {
             newValue: .parentEntity(newParent)
         )
     }
+    
+    /// <#Description#>
+    /// - Parameter globalID: <#globalID description#>
+    /// - Returns: <#description#>
+    public func setFlag(_ globalID: GlobalID) -> StateChange? {
+        if global(globalID) == true {
+            return nil
+        } else {
+            return StateChange(
+                entityID: .global,
+                attributeKey: .setFlag(globalID),
+                oldValue: global(globalID),
+                newValue: true,
+            )
+        }
+    }
 
     /// Builds a `StateChange` to set a boolean attribute (flag) on an item to `true`.
     ///

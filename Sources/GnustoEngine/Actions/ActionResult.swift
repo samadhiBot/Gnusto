@@ -35,16 +35,16 @@ public struct ActionResult: Sendable {
     ///   - sideEffects: An array of `SideEffect`s to be triggered.
     public init(
         message: String? = nil,
-        stateChanges: [StateChange] = [],
-        sideEffects: [SideEffect] = []
+        stateChanges: [StateChange?] = [],
+        sideEffects: [SideEffect?] = []
     ) {
         assert(
             message != nil || !stateChanges.isEmpty || !sideEffects.isEmpty,
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
-        self.stateChanges = stateChanges
-        self.sideEffects = sideEffects
+        self.stateChanges = stateChanges.compactMap(\.self)
+        self.sideEffects = sideEffects.compactMap(\.self)
     }
 
     /// Creates a new `ActionResult` with optional single state change and side effect.
