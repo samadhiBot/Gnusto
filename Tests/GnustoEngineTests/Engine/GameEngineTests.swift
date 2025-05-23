@@ -731,8 +731,8 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attributeKey == AttributeKey.playerMoves &&
-                change.newValue == StateValue.int(1)
+                change.attributeKey == .playerMoves &&
+                change.newValue == .int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -752,7 +752,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityID == .global &&
-                    change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
+                    change.attributeKey == .setFlag(testFlagKey) &&
                     change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"

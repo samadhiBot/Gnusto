@@ -109,18 +109,18 @@ struct FrobozzMagicDemoKit: GameBlueprint {
 //        }
 //    }
 
-    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
-        { engine, command in
-            // Check for the classic parser confusion with "gnusto"
-            if command.rawInput.lowercased().contains("gnusto") &&
-               command.verb == .unknown {
-                await engine.ioHandler.print("What do you want to gnusto?")
-                return true // Command handled
-            }
-
-            return false
-        }
-    }
+//    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
+//        { engine, command in
+//            // Check for the classic parser confusion with "gnusto"
+//            if command.rawInput.lowercased().contains("gnusto") &&
+//               command.verb == .unknown {
+//                await engine.ioHandler.print("What do you want to gnusto?")
+//                return true // Command handled
+//            }
+//
+//            return false
+//        }
+//    }
 }
 
 // MARK: - Supporting Types

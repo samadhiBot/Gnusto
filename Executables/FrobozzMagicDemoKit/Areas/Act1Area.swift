@@ -32,9 +32,6 @@ struct Act1Area: AreaBlueprint {
             Your cozy cottage sits comfortably beside the winding country road. A cheerful garden
             surrounds the house, with vegetables and herbs growing in neat rows. To the east, a
             magical stone bridge spans the creek that separates your property from the road.
-
-            The basket of food you've prepared sits ready by the door, filled with fresh offerings
-            for your neighbor Berzio.
             """),
         .exits([
             .east: Exit(destination: .stoneBridge)
@@ -126,9 +123,10 @@ struct Act1Area: AreaBlueprint {
             A sturdy wicker basket with a gingham cloth lining. It's the perfect size for
             carrying food offerings to neighbors. The basket feels comfortably familiar in your hands.
             """),
-        .in(.player), // Player starts carrying it
+        .in(.location(.yourHouse)),
         .capacity(5),
         .isContainer,
+        .isOpenable,
         .isTakable
     )
 
@@ -186,7 +184,7 @@ struct Act1Area: AreaBlueprint {
             liquid has a lovely fruity aroma, and condensation beads on the outside of the glass
             from the cool temperature.
             """),
-        .in(.player), // Player starts carrying this too
+        .in(.location(.yourHouse)),
         .isTakable,
         .isWearable, // Can be balanced on head!
         .size(3)
@@ -209,6 +207,48 @@ struct Act1Area: AreaBlueprint {
 
     // MARK: - Event Handlers (Simplified for now)
 
+    /// Prevents leaving your house without food for Berzio.
+    let yourHouseHandler = LocationEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+            case .go:
+//                engine.playerInventory
+                let basket = try await engine.item(.basket)
+                let lemonade = try await engine.item(.lemonade)
+                return switch (basket.parent, lemonade.parent) {
+                case (.player, .player):
+                    nil
+                case (.player, _):
+                    ActionResult("""
+                        You're halfway out the door when you remember the glass jug of blackberry lemonade sitting inside. Berzio does get terribly absorbed in his work — sometimes for days at a time — and the lemonade is just as important as the food. Your neighbors have always included something to drink with their weekly offerings. After all, even brilliant thaumaturges need proper hydration.
+                        """)
+                case (_, .player):
+                    ActionResult("""
+                        You pause at your doorstep, the jug of blackberry lemonade in hand. What else did you need to bring? Oh right. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside — carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
+                        """)
+                default:
+                    ActionResult("""
+                        You pause at your doorstep, empty-handed. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside — carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
+                        """)
+                }
+
+            default:
+                return nil
+            }
+//        case .onEnter:
+//            let basket = try await engine.item(.basket)
+//            let lemonade = try await engine.item(.lemonade)
+//
+//            let baseDescription = """
+//                    Hi
+//                    """
+
+        default:
+            return nil
+        }
+    }
+
     /// Simple bridge message when entering
     let stoneBridgeHandler = LocationEventHandler { engine, event in
         // TODO: Add bridge wobbling description once we have access to output methods
@@ -229,14 +269,14 @@ struct Act1Area: AreaBlueprint {
 
     /// Gate puzzle logic (simplified)
     let berziosGateHandler = LocationEventHandler { engine, event in
-        switch event {
-        case .beforeTurn(let command):
-            <#code#>
-        case .afterTurn(let command):
-            <#code#>
-        case .onEnter:
-            <#code#>
-        }
+//        switch event {
+//        case .beforeTurn(let command):
+//            <#code#>
+//        case .afterTurn(let command):
+//            <#code#>
+//        case .onEnter:
+//            <#code#>
+//        }
         // This is where Gnusto escapes!
         guard await engine.isFlagSet(.gnustoEscaped) != true else {
             return nil

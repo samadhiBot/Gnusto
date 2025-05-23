@@ -121,7 +121,7 @@ struct ActionResultTests {
         #expect(change.entityID == .player)
         #expect(change.attributeKey == .playerScore)
         #expect(change.oldValue == nil)
-        #expect(change.newValue == StateValue.int(10))
+        #expect(change.newValue == .int(10))
     }
 
     @Test("StateChange Initialization - Set Flag")
@@ -133,7 +133,7 @@ struct ActionResultTests {
             newValue: true
         )
 
-        #expect(change.attributeKey == AttributeKey.setFlag("lightsOut"))
+        #expect(change.attributeKey == .setFlag("lightsOut"))
         #expect(change.newValue == true)
         #expect(change.oldValue == false)
     }
@@ -147,8 +147,8 @@ struct ActionResultTests {
             newValue: .int(6)
         )
 
-        #expect(change.attributeKey == AttributeKey.globalState(key: "puzzleCounter"))
-        #expect(change.newValue == StateValue.int(6))
+        #expect(change.attributeKey == .globalState(key: "puzzleCounter"))
+        #expect(change.newValue == .int(6))
     }
 
     @Test("SideEffect Initialization - Full")

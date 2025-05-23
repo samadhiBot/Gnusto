@@ -1,5 +1,4 @@
 import Foundation
-import Markdown
 
 /// A basic implementation of `IOHandler` that interacts with the standard console
 /// (standard input and standard output).

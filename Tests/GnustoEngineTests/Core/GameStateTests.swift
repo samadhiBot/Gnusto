@@ -529,7 +529,7 @@ struct GameStateTests {
         try? state.apply(change)
 
         #expect(change.entityID == EntityID.location("testLoc"))
-        #expect(change.attributeKey == AttributeKey.locationAttribute(AttributeID.isLit))
+        #expect(change.attributeKey == .locationAttribute(AttributeID.isLit))
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
