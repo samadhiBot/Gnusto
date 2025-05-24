@@ -2,11 +2,11 @@ import Foundation
 import Markdown
 
 enum MarkdownParser {
-    static let columns: Int = 64
+    static let defaultColumnWidth: Int = 64
 
     static func parse(
         _ markdown: String,
-        columns: Int = columns
+        columns: Int = defaultColumnWidth
     ) -> String {
         Document(parsing: markdown)
             .children
@@ -23,5 +23,6 @@ enum MarkdownParser {
             .joined(separator: "\n")
             .replacing(/\n\n\n+/, with: "\n\n")
             .replacing(/:\n\n-/, with: ":\n-")
+            .replacing(/(?m)[ \t]+$/, with: "")
     }
 }
