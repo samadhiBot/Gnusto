@@ -224,11 +224,11 @@ struct StandardParserTests {
     @Test("Parse Unknown Verb")
     func testParseUnknownVerb() async throws {
         let result = parser.parse(
-            input: "xyzzy",
+            input: "umbuggen",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: ParseError.unknownVerb("xyzzy")))
+        #expect(result.isFailure(matching: ParseError.unknownVerb("umbuggen")))
 
         let resultWithNoise = parser.parse(
             input: "the jump the",
@@ -1026,13 +1026,13 @@ struct StandardParserTests {
 
     @Test("Extract Noun/Mods - Only Unknown Word")
     func testExtractNounModsOnlyUnknown() async throws {
-        // "look xyzzy" - Should now parse with look verb and attempt resolution
+        // "look umbuggen" - Should now parse with look verb and attempt resolution
         let result = parser.parse(
-            input: "look xyzzy",
+            input: "look umbuggen",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: .unknownNoun("xyzzy")))
+        #expect(result.isFailure(matching: .unknownNoun("umbuggen")))
     }
 
     @Test("Extract Noun/Mods - Only Modifier")

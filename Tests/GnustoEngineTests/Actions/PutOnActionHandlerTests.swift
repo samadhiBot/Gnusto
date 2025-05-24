@@ -428,10 +428,11 @@ struct PutOnActionHandlerTests {
         await engine.execute(command: command)
 
         // Assert Output
-        #expect(
-            await mockIO.flush() ==
-            "You can’t put the silver tray on the table because the table is on the silver tray."
-        )
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You can’t put the silver tray on the table because the table is
+            on the silver tray.
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

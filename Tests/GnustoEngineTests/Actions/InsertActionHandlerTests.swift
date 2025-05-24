@@ -434,10 +434,10 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "You can’t put the bag in the box, because the box is inside the bag!"
-        )
+        expectNoDifference(output, """
+            You can’t put the bag in the box, because the box is inside the
+            bag!
+            """)
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -1119,7 +1119,10 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t put the box B in the box A, because the box A is inside the box B!")
+        expectNoDifference(output, """
+            You can’t put the box B in the box A, because the box A is
+            inside the box B!
+            """)
 
         // Assert No State Change (Box A still in Box B, Box B still held)
         let finalBoxA = try await engine.item("boxA")
@@ -1180,7 +1183,10 @@ struct InsertActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t put the box C in the box A, because the box A is inside the box C!")
+        expectNoDifference(output, """
+            You can’t put the box C in the box A, because the box A is
+            inside the box C!
+            """)
 
         // Assert No State Change
         let finalBoxA = try await engine.item("boxA")

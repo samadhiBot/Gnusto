@@ -45,8 +45,8 @@ struct TurnOffActionHandlerTests {
 
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            The lamp is now off.
-            It is now pitch black. You are likely to be eaten by a grue.
+            The lamp is now off. It is now pitch black. You are likely to
+            be eaten by a grue.
             """)
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
@@ -219,11 +219,10 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        let expectedOutput = """
-            The brass lantern is now off.
-            It is now pitch black. You are likely to be eaten by a grue.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, """
+            The brass lantern is now off. It is now pitch black. You are
+            likely to be eaten by a grue.
+            """)
 
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(finallyLit == false)
@@ -399,11 +398,10 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        let expectedOutput = """
-            The brass lantern is now off.
-            It is now pitch black. You are likely to be eaten by a grue.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, """
+            The brass lantern is now off. It is now pitch black. You are
+            likely to be eaten by a grue.
+            """)
     }
 
     @Test("Blow Out alias works correctly")
@@ -451,10 +449,9 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        let expectedOutput = """
-            The brass lantern is now off.
-            It is now pitch black. You are likely to be eaten by a grue.
-            """
-        expectNoDifference(output, expectedOutput)
+        expectNoDifference(output, """
+            The brass lantern is now off. It is now pitch black. You are
+            likely to be eaten by a grue.
+            """)
     }
 }

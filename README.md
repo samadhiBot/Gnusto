@@ -1,4 +1,4 @@
-![Gnusto Interactive Fiction Engine Hero Graphic](Docs/Images/gnusto-heading.png)
+![Gnusto Interactive Fiction Engine Hero Graphic](Sources/GnustoEngine/Documentation.docc/Resources/gnusto-heading.png)
 
 # Gnusto: A Modern Interactive Fiction Engine
 

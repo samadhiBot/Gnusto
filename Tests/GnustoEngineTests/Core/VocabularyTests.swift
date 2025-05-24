@@ -29,10 +29,10 @@ struct VocabularyTests {
         #expect(synonyms["examine"] == [.examine], "Primary 'examine' should map to itself")
         #expect(synonyms["x"] == [.examine], "'x' should map to 'examine'")
         #expect(synonyms["inspect"] == [.examine], "'inspect' should map to 'examine'")
-        
+
         // — Check non-existent mapping —
-        #expect(synonyms["xyzzy"] == nil, "'xyzzy' should not exist in synonyms")
+        #expect(synonyms["3733t"] == nil, "'3733t' should not exist in synonyms")
     }
-    
+
     // TODO: Add tests for item/adjective mapping if needed
 }

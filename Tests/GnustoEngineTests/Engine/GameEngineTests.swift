@@ -1556,21 +1556,31 @@ struct GameEngineTests {
             ioHandler: await MockIOHandler()
         )
 
-        let startItem = try await engine.item(.startItem)
-        let change = await engine.updatePronouns(to: startItem)
-//        await engine.applyGameSpecificStateChange(key: <#T##GlobalID#>, value: <#T##StateValue#>)
-        try await engine.gameState.apply(change)
+        // Create the command to trigger the mock handler
+        let testCommand = Command(
+            verb: .examine,
+            directObject: .item(.startItem),
+            rawInput: "examine the pebble"
+        )
+
+        // Act: Execute the command
+        await engine.execute(command: testCommand)
 
         let pronouns = await engine.gameState.pronouns
-        #expect(pronouns["it"] == [.item(startItem.id)])
+        #expect(pronouns["it"] == [.item(.startItem)])
 
         // Check change history
         let history = await engine.gameState.changeHistory
         expectNoDifference(history, [
             StateChange(
+                entityID: .item(.startItem),
+                attributeKey: .itemAttribute(.isTouched),
+                newValue: true
+            ),
+            StateChange(
                 entityID: .global,
                 attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(itemID)])
+                newValue: .entityReferenceSet([.item(.startItem)])
             )
         ])
     }

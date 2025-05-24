@@ -29,7 +29,7 @@ public struct InventoryActionHandler: ActionHandler {
         } else {
             // 3. List Items
             let itemList = inventoryItems.sorted().map {
-                "  - \($0.withIndefiniteArticle.capitalizedFirst)"
+                "- \($0.withIndefiniteArticle.capitalizedFirst)"
             }.joined(separator: "\n")
             return ActionResult(
                 """

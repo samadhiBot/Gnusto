@@ -89,8 +89,8 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Bright Room —
 
-            A brightly lit room.
-            You can see a modern looking chair, a woven rug, and a wooden table here.
+            A brightly lit room. You can see a modern looking chair, a
+            woven rug, and a wooden table here.
             """
         )
         // Assert No State Change
@@ -151,8 +151,8 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Test Room —
 
-            A basic room.
-            You can see an apple, a banana, an orange, and a pear here.
+            A basic room. You can see an apple, a banana, an orange, and a
+            pear here.
             """
         )
 
@@ -253,8 +253,7 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Dark Room —
 
-            A dark, damp room.
-            You can see a wooden table here.
+            A dark, damp room. You can see a wooden table here.
             """
         )
         // Assert No State Change
@@ -320,7 +319,11 @@ struct LookActionHandlerTests {
         )
 
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         // Register dynamic compute handler for the location's long description
         await engine.registerLocationCompute(key: .description) { location, gameState in
@@ -558,10 +561,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents)
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "On its lid is a rough carving of a skull. The wooden box contains a gold coin."
-        )
+        expectNoDifference(output, """
+            On its lid is a rough carving of a skull. The wooden box
+            contains a gold coin.
+            """)
 
         // Assert Final State (Container marked touched)
         let finalItemState = try await engine.item("box")
@@ -615,10 +618,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Closed Message)
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "On its lid is a rough carving of a skull. The wooden box is closed."
-        )
+        expectNoDifference(output, """
+            On its lid is a rough carving of a skull. The wooden box is
+            closed.
+            """)
 
         // Assert Final State (Container marked touched)
         let finalItemState = try await engine.item("box")
@@ -673,10 +676,10 @@ struct LookActionHandlerTests {
 
         // Assert Output (Description + Contents because transparent)
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "An old canning jar, probably from the 1940s. The glass jar contains a dead fly."
-        )
+        expectNoDifference(output, """
+            An old canning jar, probably from the 1940s. The glass jar
+            contains a dead fly.
+            """)
 
         // Assert Final State (Container marked touched)
         let finalItemState = try await engine.item("jar")
@@ -735,8 +738,8 @@ struct LookActionHandlerTests {
         // Assert Output (Description + Surface Contents)
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            A shabby wooden table, worn from years of use. \
-            On the kitchen table is a dusty book and a lit candle.
+            A shabby wooden table, worn from years of use. On the kitchen
+            table is a dusty book and a lit candle.
             """
         )
 
