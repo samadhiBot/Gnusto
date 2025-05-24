@@ -78,37 +78,6 @@ struct FrobozzMagicDemoKit: GameBlueprint {
 
     // MARK: - Game Hooks
 
-//    var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool {
-//        { engine, locationID in
-//            // Special handling for key story moments
-//            switch locationID.rawValue {
-//            case "berziosGate":
-//                // This is where Gnusto escapes!
-//                let gnustoEscaped = await engine.isFlagSet(.gnustoEscaped)
-//                if !gnustoEscaped {
-//                    await engine.setFlag(.gnustoEscaped)
-//
-//                    // Move Gnusto from nowhere to the gate area
-//                    try? await engine.move(<#T##item: Item##Item#>, to: <#T##ParentEntity#>)
-//                        .moveItem("gnustoDog", to: .location("berziosGate"))
-//
-//                    await engine.ioHandler.print("""
-//
-//                        But before you can take a step into Berzio's garden, his little dog Gnusto
-//                        slips out, dashing between your ankles and into the lane. Overjoyed to have
-//                        company, she skitters about wriggling this way and that.
-//                        """)
-//
-//                    return false // Let normal room description proceed
-//                }
-//                return false
-//
-//            default:
-//                return false
-//            }
-//        }
-//    }
-
 //    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
 //        { engine, command in
 //            // Check for the classic parser confusion with "gnusto"

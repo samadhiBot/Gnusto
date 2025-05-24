@@ -24,6 +24,9 @@ public protocol GameBlueprint: Sendable {
     /// This `GameState` instance defines all locations, items (and their properties),
     /// the initial player state, active timers (fuses and daemons), and any global
     /// variables at the moment the game begins.
+    ///
+    /// > Important: This property **only** defomes the state at the game's outset. Any later
+    ///   mutations occur on a separate copy maintained by the ``GameEngine`` actor.
     var state: GameState { get }
 
     /// Optional closures to provide custom action handlers for specific verbs,
@@ -54,19 +57,6 @@ public protocol GameBlueprint: Sendable {
     ///
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }
-
-    /// Called when the player successfully enters a new location.
-    ///
-    /// Implement this closure to perform custom actions or checks immediately after the player
-    /// moves into a different location. The closure receives the `GameEngine` instance
-    /// and the `LocationID` of the newly entered location.
-    ///
-    /// - Returns: Return `true` if your handler fully manages the situation and no
-    ///   further default engine processing for entering the room (like describing it)
-    ///   should occur. Return `false` to allow normal engine processing to continue.
-    ///
-    /// The default implementation always returns `false`.
-    var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool { get }
 
     /// Called at the beginning of each turn, before the player's command is processed.
     ///
@@ -117,10 +107,6 @@ extension GameBlueprint {
 
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
         [:]
-    }
-
-    public var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool {
-        { _, _ in false }
     }
 
     public var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
