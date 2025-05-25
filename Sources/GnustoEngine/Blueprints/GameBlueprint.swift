@@ -58,20 +58,6 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }
 
-    /// Called at the beginning of each turn, before the player's command is processed.
-    ///
-    /// Implement this closure to execute game logic that needs to run every turn
-    /// before the main command handling occurs. This could include weather changes,
-    /// NPC actions, or checking for time-sensitive conditions. The closure receives
-    /// the `GameEngine` instance and the parsed `Command` for the current turn.
-    ///
-    /// - Returns: Return `true` if your handler fully manages the command (or the turn's
-    ///   pre-processing) and no further engine processing for the command should occur.
-    ///   Return `false` to allow normal command processing to continue.
-    ///
-    /// The default implementation always returns `false`.
-    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool { get }
-
     /// The registry containing definitions for timed events (fuses) and background
     /// processes (daemons).
     ///
@@ -107,10 +93,6 @@ extension GameBlueprint {
 
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
         [:]
-    }
-
-    public var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
-        { _, _ in false }
     }
 
     public var timeRegistry: TimeRegistry {

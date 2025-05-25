@@ -82,47 +82,10 @@ public actor GameEngine: Sendable {
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
-    /// The maximum line length used for formatting some descriptions by the `IOHandler`.
-    /// This is primarily an internal detail but might influence how game developers structure
-    /// very long descriptive texts if they want to avoid automatic wrapping.
-    private let maximumDescriptionLength: Int = 100 // TODO: Make this configurable via GameConstants?
-
     /// Internal flag to control the main game loop's continuation.
     /// Game developers can call `requestQuit()` to set this flag to `true`,
     /// causing the game to end after the current turn completes.
     var shouldQuit: Bool = false
-
-    // MARK: - Custom Game Hooks (Closures)
-
-    /// A closure, provided by the `GameBlueprint`, that is called after the player
-    /// successfully moves to a new location (e.g., after a successful "GO" command).
-    ///
-    /// Use this to implement custom logic that should occur immediately upon entering a room,
-    /// such as triggering special events, updating state based on the new location, or
-    /// providing unique descriptive text that overrides the default room description behavior.
-    /// The closure receives the `GameEngine` instance and the `LocationID` of the room just entered.
-    ///
-    /// - Returns: Return `true` if your hook fully handles all necessary actions (including any
-    ///   output to the player like describing the room) and the engine should **not** perform its
-    ///   default processing for entering the room (which typically includes calling
-    ///   `describeCurrentLocation()`). Return `false` or `nil` if the engine should proceed
-    ///   with its default behavior after the hook completes.
-    public var onEnterRoom: (@Sendable (GameEngine, LocationID) async -> Bool)?
-
-    /// A closure, provided by the `GameBlueprint`, that is called at the very start of
-    /// each turn, before the player's `Command` is parsed or processed further by event handlers
-    /// or action handlers.
-    ///
-    /// This is a critical hook for implementing per-turn global logic such as weather changes,
-    /// ambient effects, time-passing events not tied to fuses/daemons, or proactive NPC behaviors.
-    /// The closure receives the `GameEngine` instance and the raw `Command` object (which might
-    /// still be in a preliminary state if parsing hasn't fully completed).
-    ///
-    /// - Returns: Return `true` if your hook fully handles the turn or command, and no further
-    ///   engine processing for this turn/command should occur (the engine will skip to the next
-    ///   turn). Return `false` or `nil` if the engine should proceed with its normal turn
-    ///   processing after the hook completes.
-    public var beforeTurn: (@Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
@@ -151,8 +114,6 @@ public actor GameEngine: Sendable {
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.itemEventHandlers = blueprint.itemEventHandlers
         self.locationEventHandlers = blueprint.locationEventHandlers
-        self.onEnterRoom = blueprint.onEnterRoom
-        self.beforeTurn = blueprint.beforeTurn
 
         #if DEBUG
         self.actionHandlers[.debug] = DebugActionHandler()
@@ -218,11 +179,9 @@ extension GameEngine {
     /// 3. Parses the player's input string into a structured `Command` using the `parser`.
     /// 4. Increments the player's move counter in `gameState`.
     /// 5. If parsing is successful:
-    ///    a. Executes the `beforeTurn` game hook, if defined. If the hook returns `true`
-    ///       or sets `shouldQuit`, the turn ends.
-    ///    b. If the command is to quit or `shouldQuit` is set, the turn ends.
-    ///    c. Calls `execute(command:)` to process the command through event and action handlers.
-    ///    d. If the command was a movement command (`.go`) to an unvisited room, or a command
+    ///    a. If the command is to quit or `shouldQuit` is set, the turn ends.
+    ///    b. Calls `execute(command:)` to process the command through event and action handlers.
+    ///    c. If the command was a movement command (`.go`) to an unvisited room, or a command
     ///       that changed the light state (e.g., `.turnOn`, `.turnOff` a light source), it then
     ///       calls `describeCurrentLocation()`.
     /// 6. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
@@ -269,11 +228,6 @@ extension GameEngine {
         // 3. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
-            // --- Custom Hook: Before Turn ---
-            if await beforeTurn?(self, command) == true || shouldQuit {
-                return
-            }
-
             if command.verb == .quit || shouldQuit { return }
 
             // Handle location description after movement or light change

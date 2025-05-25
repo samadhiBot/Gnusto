@@ -313,7 +313,7 @@ struct LookActionHandlerTests {
 
         // MinimalGame takes flags as variadic arguments
         let game = MinimalGame(
-            player: Player(in: "dynamicRoom"),
+            player: Player(in: dynamicRoom.id),
             locations: [dynamicRoom],
             globalState: [specialFlag: true]
         )
@@ -325,7 +325,7 @@ struct LookActionHandlerTests {
             ioHandler: mockIO
         )
 
-        // Register dynamic compute handler for the location's long description
+        // Register dynamic compute handler for the location's description
         await engine.registerLocationCompute(key: .description) { location, gameState in
             let isFlagOn = gameState.globalState[specialFlag] == true
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
