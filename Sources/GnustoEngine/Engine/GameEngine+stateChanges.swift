@@ -239,3 +239,193 @@ extension GameEngine {
         )
     }
 }
+
+// MARK: - Dynamic Attribute StateChange factories
+
+extension GameEngine {
+    /// Creates a `StateChange` to set a dynamic attribute on an item.
+    ///
+    /// This method creates a `StateChange` that respects the action pipeline and will trigger
+    /// dynamic validation handlers when applied. It only creates a change if the new value
+    /// differs from the current value.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - item: The `Item` instance to modify.
+    ///   - value: The new `StateValue` for the attribute.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
+    public func setItemAttribute(
+        _ attributeID: AttributeID,
+        on item: Item,
+        to value: StateValue
+    ) -> StateChange? {
+        let currentValue = item.attributes[attributeID]
+        guard currentValue != value else { return nil }
+        
+        return StateChange(
+            entityID: .item(item.id),
+            attributeKey: .itemAttribute(attributeID),
+            oldValue: currentValue,
+            newValue: value
+        )
+    }
+    
+    /// Creates a `StateChange` to set a dynamic attribute on a location.
+    ///
+    /// This method creates a `StateChange` that respects the action pipeline and will trigger
+    /// dynamic validation handlers when applied. It only creates a change if the new value
+    /// differs from the current value.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - location: The `Location` instance to modify.
+    ///   - value: The new `StateValue` for the attribute.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
+    public func setLocationAttribute(
+        _ attributeID: AttributeID,
+        on location: Location,
+        to value: StateValue
+    ) -> StateChange? {
+        let currentValue = location.attributes[attributeID]
+        guard currentValue != value else { return nil }
+        
+        return StateChange(
+            entityID: .location(location.id),
+            attributeKey: .locationAttribute(attributeID),
+            oldValue: currentValue,
+            newValue: value
+        )
+    }
+    
+    // MARK: - Convenience builders for common dynamic attributes
+    
+    /// Creates a `StateChange` to set an item's description.
+    ///
+    /// This is a convenience method for the common pattern of dynamically changing
+    /// item descriptions based on game state, similar to ZIL's `PUTP` operations.
+    ///
+    /// - Parameters:
+    ///   - item: The `Item` instance to modify.
+    ///   - description: The new description text.
+    /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
+    public func setDescription(on item: Item, to description: String) -> StateChange? {
+        setItemAttribute(.description, on: item, to: .string(description))
+    }
+    
+    /// Creates a `StateChange` to set a location's description.
+    ///
+    /// This is a convenience method for the common pattern of dynamically changing
+    /// location descriptions based on game state, similar to ZIL's `PUTP` operations.
+    ///
+    /// - Parameters:
+    ///   - location: The `Location` instance to modify.
+    ///   - description: The new description text.
+    /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
+    public func setDescription(on location: Location, to description: String) -> StateChange? {
+        setLocationAttribute(.description, on: location, to: .string(description))
+    }
+    
+    /// Creates a `StateChange` to set a boolean flag attribute on an item.
+    ///
+    /// This is a convenience method for the common pattern of setting boolean flags,
+    /// similar to ZIL's `FSET` and `FCLEAR` operations, but for dynamic attributes.
+    ///
+    /// - Parameters:
+    ///   - flag: The name of the flag attribute to set.
+    ///   - item: The `Item` instance to modify.
+    ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
+    /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
+    public func setItemFlag(
+        _ flag: String,
+        on item: Item,
+        to value: Bool
+    ) -> StateChange? {
+        setItemAttribute(AttributeID(flag), on: item, to: .bool(value))
+    }
+    
+    /// Creates a `StateChange` to set a boolean flag attribute on a location.
+    ///
+    /// This is a convenience method for the common pattern of setting boolean flags on locations,
+    /// similar to ZIL's `FSET` and `FCLEAR` operations, but for dynamic attributes.
+    ///
+    /// - Parameters:
+    ///   - flag: The name of the flag attribute to set.
+    ///   - location: The `Location` instance to modify.
+    ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
+    /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
+    public func setLocationFlag(
+        _ flag: String,
+        on location: Location,
+        to value: Bool
+    ) -> StateChange? {
+        setLocationAttribute(AttributeID(flag), on: location, to: .bool(value))
+    }
+    
+    /// Creates a `StateChange` to set an integer attribute on an item.
+    ///
+    /// This is a convenience method for setting numeric attributes on items.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - item: The `Item` instance to modify.
+    ///   - value: The integer value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    public func setItemInt(
+        _ attributeID: AttributeID,
+        on item: Item,
+        to value: Int
+    ) -> StateChange? {
+        setItemAttribute(attributeID, on: item, to: .int(value))
+    }
+    
+    /// Creates a `StateChange` to set an integer attribute on a location.
+    ///
+    /// This is a convenience method for setting numeric attributes on locations.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - location: The `Location` instance to modify.
+    ///   - value: The integer value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    public func setLocationInt(
+        _ attributeID: AttributeID,
+        on location: Location,
+        to value: Int
+    ) -> StateChange? {
+        setLocationAttribute(attributeID, on: location, to: .int(value))
+    }
+    
+    /// Creates a `StateChange` to set a string attribute on an item.
+    ///
+    /// This is a convenience method for setting string attributes on items.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - item: The `Item` instance to modify.
+    ///   - value: The string value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    public func setItemString(
+        _ attributeID: AttributeID,
+        on item: Item,
+        to value: String
+    ) -> StateChange? {
+        setItemAttribute(attributeID, on: item, to: .string(value))
+    }
+    
+    /// Creates a `StateChange` to set a string attribute on a location.
+    ///
+    /// This is a convenience method for setting string attributes on locations.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - location: The `Location` instance to modify.
+    ///   - value: The string value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    public func setLocationString(
+        _ attributeID: AttributeID,
+        on location: Location,
+        to value: String
+    ) -> StateChange? {
+        setLocationAttribute(attributeID, on: location, to: .string(value))
+    }
+}

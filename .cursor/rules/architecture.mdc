@@ -37,6 +37,10 @@ Defines the interface for turning raw player input strings into structured `Comm
 
 Centralizes logic for determining what the player can see and interact with based on location, light, container state, etc. [ScopeResolver.swift](mdc:Sources/GnustoEngine/Core/ScopeResolver.swift)
 
+## StateChange
+
+The fundamental mechanism for all game state mutations. `StateChange` objects describe proposed modifications to the game world (e.g., moving items, setting flags, updating scores) without immediately applying them. This pattern preserves the action pipeline by ensuring all state changes flow through proper validation, event handlers, and sequencing. Factory methods in `GameEngine+stateChanges.swift` provide convenient builders for common state changes. [StateChange.swift](mdc:Sources/GnustoEngine/Actions/StateChange.swift)
+
 ## TimeRegistry
 
 A repository for game-specific timed event definitions (`FuseDefinition`, `DaemonDefinition`). The `GameEngine` consults this registry (defined in `DefinitionRegistry.swift`) for fuse and daemon behaviors. It's typically configured via the `GameBlueprint`. [DefinitionRegistry.swift](mdc:Sources/GnustoEngine/Time/DefinitionRegistry.swift)

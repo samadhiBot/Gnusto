@@ -816,7 +816,7 @@ extension GameEngine {
         // Errors during apply will propagate up.
         for change in result.stateChanges {
             do {
-                try gameState.apply(change)
+                try await applyWithDynamicValidation(change)
             } catch {
                 logger.error("""
                     💥 Failed to apply state change during processActionResult:
@@ -836,6 +836,67 @@ extension GameEngine {
         }
 
         // TODO: Handle SideEffects if they are added to ActionResult?
+    }
+    
+    /// Applies a `StateChange` with dynamic validation, respecting the action pipeline.
+    ///
+    /// This method performs dynamic validation using the `DynamicAttributeRegistry` before
+    /// applying the change to the game state. This ensures that dynamic validation handlers
+    /// are respected even when state changes are applied directly.
+    ///
+    /// - Parameter change: The `StateChange` to validate and apply.
+    /// - Throws: `ActionResponse.invalidValue` if dynamic validation fails, or re-throws
+    ///           any errors from `GameState.apply()`.
+    private func applyWithDynamicValidation(_ change: StateChange) async throws {
+        // Perform dynamic validation for item and location attributes
+        switch change.attributeKey {
+        case .itemAttribute(let key):
+            guard case .item(let itemID) = change.entityID else {
+                throw ActionResponse.internalEngineError(
+                    "Invalid entity ID for itemAttribute: expected .item"
+                )
+            }
+            
+            let isValid = try await validateStateValue(
+                itemID: itemID,
+                key: key,
+                newValue: change.newValue
+            )
+            
+            if !isValid {
+                throw ActionResponse.invalidValue("""
+                    Dynamic validation failed for item attribute '\(key.rawValue)' \
+                    on \(itemID.rawValue): \(change.newValue)
+                    """)
+            }
+            
+        case .locationAttribute(let key):
+            guard case .location(let locationID) = change.entityID else {
+                throw ActionResponse.internalEngineError(
+                    "Invalid entity ID for locationAttribute: expected .location"
+                )
+            }
+            
+            let isValid = try await validateStateValue(
+                locationID: locationID,
+                key: key,
+                newValue: change.newValue
+            )
+            
+            if !isValid {
+                throw ActionResponse.invalidValue("""
+                    Dynamic validation failed for location attribute '\(key.rawValue)' \
+                    on \(locationID.rawValue): \(change.newValue)
+                    """)
+            }
+            
+        default:
+            // No dynamic validation needed for other attribute types
+            break
+        }
+        
+        // Apply the change to the game state
+        try gameState.apply(change)
     }
 }
 
@@ -863,8 +924,8 @@ extension GameEngine {
     ///
     /// - Parameter change: The `StateChange` to apply to the game state.
     /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
-    func apply(_ change: StateChange) throws {
-        try gameState.apply(change)
+    func apply(_ change: StateChange) async throws {
+        try await applyWithDynamicValidation(change)
     }
 }
 

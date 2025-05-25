@@ -16,8 +16,14 @@ extension GameEngine {
     /// - Returns: The boolean value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
     ///           or if the item does not exist. Returns `false` if the attribute is not set.
-    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Bool {
-        let value = await getDynamicItemValue(itemID: itemID, key: key)
+    public func fetch(
+        _ itemID: ItemID,
+        _ key: AttributeID
+    ) async throws -> Bool {
+        let value = await fetchStateValue(
+            itemID: itemID,
+            key: key
+        )
         switch value {
         case .bool(let boolValue):
             return boolValue
@@ -42,8 +48,14 @@ extension GameEngine {
     /// - Returns: The integer value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not an integer, does not exist,
     ///           or the item does not exist.
-    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> Int {
-        let value = await getDynamicItemValue(itemID: itemID, key: key)
+    public func fetch(
+        _ itemID: ItemID,
+        _ key: AttributeID
+    ) async throws -> Int {
+        let value = await fetchStateValue(
+            itemID: itemID,
+            key: key
+        )
         switch value {
         case .int(let intValue):
             return intValue
@@ -66,8 +78,14 @@ extension GameEngine {
     /// - Returns: The string value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
     ///           or the item does not exist.
-    public func fetch(_ itemID: ItemID, _ key: AttributeID) async throws -> String {
-        let value = await getDynamicItemValue(itemID: itemID, key: key)
+    public func fetch(
+        _ itemID: ItemID,
+        _ key: AttributeID
+    ) async throws -> String {
+        let value = await fetchStateValue(
+            itemID: itemID,
+            key: key
+        )
         switch value {
         case .string(let stringValue):
             return stringValue
@@ -90,8 +108,14 @@ extension GameEngine {
     /// - Returns: The string value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
     ///           or the location does not exist.
-    public func fetch(_ locationID: LocationID, _ key: AttributeID) async throws -> String {
-        let value = await getDynamicLocationValue(locationID: locationID, key: key)
+    public func fetch(
+        _ locationID: LocationID,
+        _ key: AttributeID
+    ) async throws -> String {
+        let value = await fetchStateValue(
+            locationID: locationID,
+            key: key
+        )
         switch value {
         case .string(let stringValue):
             return stringValue
@@ -104,6 +128,64 @@ extension GameEngine {
     }
 }
 
+// MARK: - Dynamic Attribute Validation (Internal)
+
+extension GameEngine {
+    /// Validates a proposed value for an item attribute using the dynamic attribute registry.
+    /// This is called internally when `StateChange`s are applied to ensure dynamic validation
+    /// handlers are respected.
+    ///
+    /// - Parameters:
+    ///   - itemID: The unique identifier of the item.
+    ///   - key: The `AttributeID` of the attribute being validated.
+    ///   - newValue: The proposed new `StateValue`.
+    /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
+    /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
+    func validateStateValue(
+        itemID: ItemID,
+        key: AttributeID,
+        newValue: StateValue
+    ) async throws -> Bool {
+        guard let item = gameState.items[itemID] else {
+            return false // Item doesn't exist
+        }
+
+        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: itemID, attributeKey: key) {
+            return try await validateHandler(item, newValue)
+        } else {
+            return true // No validator registered, allow the change
+        }
+    }
+
+    /// Validates a proposed value for a location attribute using the dynamic attribute registry.
+    /// This is called internally when `StateChange`s are applied to ensure dynamic validation
+    /// handlers are respected.
+    ///
+    /// - Parameters:
+    ///   - locationID: The unique identifier of the location.
+    ///   - key: The `AttributeID` of the attribute being validated.
+    ///   - newValue: The proposed new `StateValue`.
+    /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
+    /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
+    func validateStateValue(
+        locationID: LocationID,
+        key: AttributeID,
+        newValue: StateValue
+    ) async throws -> Bool {
+        guard let location = gameState.locations[locationID] else {
+            return false // Location doesn't exist
+        }
+
+        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: locationID, attributeKey: key) {
+            return try await validateHandler(location, newValue)
+        } else {
+            return true // No validator registered, allow the change
+        }
+    }
+}
+
+// MARK: - Private Dynamic Attribute Helpers
+
 extension GameEngine {
     /// Retrieves the current value of a potentially dynamic item property.
     /// Checks the `DynamicAttributeRegistry` for a compute handler first.
@@ -113,7 +195,10 @@ extension GameEngine {
     ///   - itemID: The unique identifier of the item.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
-    private func getDynamicItemValue(itemID: ItemID, key: AttributeID) async -> StateValue? {
+    private func fetchStateValue(
+        itemID: ItemID,
+        key: AttributeID
+    ) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
@@ -141,13 +226,16 @@ extension GameEngine {
     }
 
     /// Retrieves the current value of a potentially dynamic location property.
-    /// (Implementation mirrors getDynamicItemValue)
+    /// (Implementation mirrors fetchStateValue)
     ///
     /// - Parameters:
     ///   - locationID: The unique identifier of the location.
     ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
-    private func getDynamicLocationValue(locationID: LocationID, key: AttributeID) async -> StateValue? {
+    private func fetchStateValue(
+        locationID: LocationID,
+        key: AttributeID
+    ) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
             logger.warning("""
                 💥 Attempted to get dynamic value '\(key.rawValue)' \
@@ -156,7 +244,10 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: locationID, attributeKey: key) {
+        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(
+            for: locationID,
+            attributeKey: key
+        ) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
@@ -168,96 +259,6 @@ extension GameEngine {
             }
         } else {
             return location.attributes[key]
-        }
-    }
-
-    /// Sets the value of an item property, performing validation via the `DynamicAttributeRegistry` if applicable.
-    /// Creates and applies the appropriate `StateChange` if validation passes.
-    ///
-    /// - Parameters:
-    ///   - itemID: The unique identifier of the item to modify.
-    ///   - key: The `AttributeID` of the value to set.
-    ///   - newValue: The new `StateValue`.
-    /// - Throws: An `ActionResponse` if the item doesn't exist, validation fails, or state application fails.
-    private func setDynamicItemValue(itemID: ItemID, key: AttributeID, newValue: StateValue) async throws {
-        guard let item = gameState.items[itemID] else {
-            throw ActionResponse.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent item: \(itemID.rawValue)")
-        }
-
-        // Check registry for validate handler
-        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: itemID, attributeKey: key) {
-            do {
-                let isValid = try await validateHandler(item, newValue)
-                if !isValid {
-                    // Use a generic invalid value error, or could the handler throw a more specific one?
-                    // For now, use invalidValue.
-                    throw ActionResponse.invalidValue("Validation failed for dynamic item value '\(key.rawValue)' on \(itemID.rawValue): \(newValue)")
-                }
-            } catch {
-                // If validator throws, propagate the error
-                logger.error("""
-                    💥 Error validating dynamic value '\(key.rawValue)' \
-                    for item \(itemID.rawValue): \(error)
-                    """)
-                throw error
-            }
-        }
-
-        // Validation passed (or no validator), proceed with StateChange
-        let oldValue = item.attributes[key]
-
-        // Only apply if value is actually changing
-        if oldValue != newValue {
-            try gameState.apply(
-                StateChange(
-                    entityID: .item(itemID),
-                    attributeKey: .itemAttribute(key),
-                    oldValue: oldValue,
-                    newValue: newValue
-                )
-            )
-        }
-    }
-
-    /// Sets the value of a location property, performing validation.
-    /// (Implementation mirrors setDynamicItemValue)
-    ///
-    /// - Parameters:
-    ///   - locationID: The unique identifier of the location to modify.
-    ///   - key: The `AttributeID` of the value to set.
-    ///   - newValue: The new `StateValue`.
-    /// - Throws: An `ActionResponse` if the location doesn't exist, validation fails, or state application fails.
-    private func setDynamicLocationValue(locationID: LocationID, key: AttributeID, newValue: StateValue) async throws {
-        guard let location = gameState.locations[locationID] else {
-            throw ActionResponse.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
-        }
-
-        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: locationID, attributeKey: key) {
-            do {
-                let isValid = try await validateHandler(location, newValue)
-                if !isValid {
-                    throw ActionResponse.invalidValue("Validation failed for dynamic location value '\(key.rawValue)' on \(locationID.rawValue): \(newValue)")
-                }
-            } catch {
-                logger.error("""
-                    💥 Error validating dynamic value '\(key.rawValue)' \
-                    for location \(locationID.rawValue): \(error)
-                    """)
-                throw error
-            }
-        }
-
-        let oldValue = location.attributes[key]
-
-        if oldValue != newValue {
-            try gameState.apply(
-                StateChange(
-                    entityID: .location(locationID),
-                    attributeKey: .locationAttribute(key), // Use the new key
-                    oldValue: oldValue,
-                    newValue: newValue
-                )
-            )
         }
     }
 }
