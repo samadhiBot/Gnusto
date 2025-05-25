@@ -123,7 +123,7 @@ extension GameEngine {
         }
 
         // Check registry for compute handler
-        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: itemID, attributeKey: key) {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
@@ -156,7 +156,7 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: key) {
+        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(for: locationID, attributeKey: key) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
@@ -185,7 +185,7 @@ extension GameEngine {
         }
 
         // Check registry for validate handler
-        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: itemID, attributeKey: key) {
             do {
                 let isValid = try await validateHandler(item, newValue)
                 if !isValid {
@@ -232,7 +232,7 @@ extension GameEngine {
             throw ActionResponse.internalEngineError("Attempted to set dynamic value '\(key.rawValue)' for non-existent location: \(locationID.rawValue)")
         }
 
-        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: key) {
+        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: locationID, attributeKey: key) {
             do {
                 let isValid = try await validateHandler(location, newValue)
                 if !isValid {

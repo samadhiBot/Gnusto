@@ -12,7 +12,7 @@ struct LookActionHandlerTests {
         itemID: ItemID,
         initialAttributes: [AttributeID: StateValue]
     ) -> [StateChange] {
-        // Only expect a change if .isTouched wasn’t already true
+        // Only expect a change if .isTouched wasn't already true
         guard initialAttributes[.isTouched] != true else { return [] }
 
         return [
@@ -226,7 +226,7 @@ struct LookActionHandlerTests {
         )
 
         let game = MinimalGame(
-            player: Player(in: "darkRoom"),
+            player: Player(in: darkRoom.id),
             locations: [darkRoom],
             items: [activeLamp, item1]
         )
@@ -326,7 +326,10 @@ struct LookActionHandlerTests {
         )
 
         // Register dynamic compute handler for the location's description
-        await engine.registerLocationCompute(key: .description) { location, gameState in
+        await engine.registerLocationCompute(
+            locationID: dynamicRoom.id,
+            attributeKey: .description
+        ) { location, gameState in
             let isFlagOn = gameState.globalState[specialFlag] == true
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
                                   "The room seems normal via registry."
@@ -352,9 +355,14 @@ struct LookActionHandlerTests {
         )
 
         // Act 2: Turn flag OFF and LOOK again
-//        try engine.gameState.apply(
-//            await engine.clearFlag(specialFlag) // Use new helper and GlobalID
-//        )
+        try await engine.apply(
+            StateChange(
+                entityID: .global,
+                attributeKey: .globalState(key: specialFlag),
+                oldValue: .bool(true),
+                newValue: .bool(false)
+            )
+        )
         await engine.execute(command: command)
 
         // Assert Output 2 (Should show normal description)
@@ -468,7 +476,7 @@ struct LookActionHandlerTests {
             .name("chipped stone"),
             .description("A worn stone."),
             .in(.location(.startRoom)),
-            .firstDescription("This shouldn’t appear."),
+            .firstDescription("This shouldn't appear."),
             .isTouched
         )
         let initialAttributes = item.attributes
