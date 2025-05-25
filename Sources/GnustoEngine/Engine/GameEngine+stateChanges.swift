@@ -254,7 +254,7 @@ extension GameEngine {
     ///   - item: The `Item` instance to modify.
     ///   - value: The new `StateValue` for the attribute.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
-    public func setItemAttribute(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on item: Item,
         to value: StateValue
@@ -281,7 +281,7 @@ extension GameEngine {
     ///   - location: The `Location` instance to modify.
     ///   - value: The new `StateValue` for the attribute.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
-    public func setLocationAttribute(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on location: Location,
         to value: StateValue
@@ -309,7 +309,7 @@ extension GameEngine {
     ///   - description: The new description text.
     /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
     public func setDescription(on item: Item, to description: String) -> StateChange? {
-        setItemAttribute(.description, on: item, to: .string(description))
+        setAttribute(.description, on: item, to: .string(description))
     }
     
     /// Creates a `StateChange` to set a location's description.
@@ -322,7 +322,7 @@ extension GameEngine {
     ///   - description: The new description text.
     /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
     public func setDescription(on location: Location, to description: String) -> StateChange? {
-        setLocationAttribute(.description, on: location, to: .string(description))
+        setAttribute(.description, on: location, to: .string(description))
     }
     
     /// Creates a `StateChange` to set a boolean flag attribute on an item.
@@ -335,12 +335,12 @@ extension GameEngine {
     ///   - item: The `Item` instance to modify.
     ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
-    public func setItemFlag(
-        _ flag: String,
+    public func setAttribute(
+        _ flag: AttributeID,
         on item: Item,
         to value: Bool
     ) -> StateChange? {
-        setItemAttribute(AttributeID(flag), on: item, to: .bool(value))
+        setAttribute(flag, on: item, to: .bool(value))
     }
     
     /// Creates a `StateChange` to set a boolean flag attribute on a location.
@@ -353,12 +353,12 @@ extension GameEngine {
     ///   - location: The `Location` instance to modify.
     ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
-    public func setLocationFlag(
-        _ flag: String,
+    public func setAttribute(
+        _ flag: AttributeID,
         on location: Location,
         to value: Bool
     ) -> StateChange? {
-        setLocationAttribute(AttributeID(flag), on: location, to: .bool(value))
+        setAttribute(flag, on: location, to: .bool(value))
     }
     
     /// Creates a `StateChange` to set an integer attribute on an item.
@@ -370,12 +370,12 @@ extension GameEngine {
     ///   - item: The `Item` instance to modify.
     ///   - value: The integer value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
-    public func setItemInt(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on item: Item,
         to value: Int
     ) -> StateChange? {
-        setItemAttribute(attributeID, on: item, to: .int(value))
+        setAttribute(attributeID, on: item, to: .int(value))
     }
     
     /// Creates a `StateChange` to set an integer attribute on a location.
@@ -387,12 +387,12 @@ extension GameEngine {
     ///   - location: The `Location` instance to modify.
     ///   - value: The integer value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
-    public func setLocationInt(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on location: Location,
         to value: Int
     ) -> StateChange? {
-        setLocationAttribute(attributeID, on: location, to: .int(value))
+        setAttribute(attributeID, on: location, to: .int(value))
     }
     
     /// Creates a `StateChange` to set a string attribute on an item.
@@ -404,12 +404,12 @@ extension GameEngine {
     ///   - item: The `Item` instance to modify.
     ///   - value: The string value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
-    public func setItemString(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on item: Item,
         to value: String
     ) -> StateChange? {
-        setItemAttribute(attributeID, on: item, to: .string(value))
+        setAttribute(attributeID, on: item, to: .string(value))
     }
     
     /// Creates a `StateChange` to set a string attribute on a location.
@@ -421,11 +421,11 @@ extension GameEngine {
     ///   - location: The `Location` instance to modify.
     ///   - value: The string value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
-    public func setLocationString(
+    public func setAttribute(
         _ attributeID: AttributeID,
         on location: Location,
         to value: String
     ) -> StateChange? {
-        setLocationAttribute(attributeID, on: location, to: .string(value))
+        setAttribute(attributeID, on: location, to: .string(value))
     }
 }

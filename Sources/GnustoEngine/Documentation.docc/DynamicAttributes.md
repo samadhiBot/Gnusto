@@ -31,7 +31,7 @@ let temperature: String = try await engine.fetch("cave", "temperature")
 ```swift
 // Create StateChange using builders
 let item = try engine.item("sword")
-if let change = await engine.setItemAttribute("sharpness", on: item, to: .int(8)) {
+if let change = await engine.setAttribute("sharpness", on: item, to: .int(8)) {
     // Apply through the pipeline (usually in an ActionHandler)
     return ActionResult(stateChanges: [change], message: "The sword gleams with sharpness.")
 }
@@ -41,7 +41,7 @@ if let change = await engine.setDescription(on: item, to: "A gleaming blade") {
     return ActionResult(stateChanges: [change])
 }
 
-if let change = await engine.setItemFlag("isOpen", on: door, to: true) {
+if let change = await engine.setAttribute("isOpen", on: door, to: true) {
     return ActionResult(stateChanges: [change], message: "The door swings open.")
 }
 ```
@@ -111,8 +111,8 @@ The engine provides convenient builders for creating `StateChange` objects that 
 
 ```swift
 // Set any StateValue on items or locations
-let change = await engine.setItemAttribute("customProp", on: item, to: .string("value"))
-let change = await engine.setLocationAttribute("temperature", on: location, to: .int(72))
+let change = await engine.setAttribute("customProp", on: item, to: .string("value"))
+let change = await engine.setAttribute("temperature", on: location, to: .int(72))
 ```
 
 ### Convenience Builders
@@ -120,10 +120,10 @@ let change = await engine.setLocationAttribute("temperature", on: location, to: 
 ```swift
 // Common patterns have dedicated builders
 let change = await engine.setDescription(on: item, to: "A new description")
-let change = await engine.setItemFlag("isOpen", on: door, to: true)
-let change = await engine.setLocationFlag("isLit", on: room, to: false)
-let change = await engine.setItemInt("damage", on: weapon, to: 15)
-let change = await engine.setItemString("material", on: armor, to: "steel")
+let change = await engine.setAttribute("isOpen", on: door, to: true)
+let change = await engine.setAttribute("isLit", on: room, to: false)
+let change = await engine.setAttribute("damage", on: weapon, to: 15)
+let change = await engine.setAttribute("material", on: armor, to: "steel")
 ```
 
 ### Using StateChanges in Action Handlers
@@ -139,7 +139,7 @@ struct OpenActionHandler: ActionHandler {
         }
         
         // Create state change using builder
-        guard let change = await context.engine.setItemFlag("isOpen", on: item, to: true) else {
+        guard let change = await context.engine.setAttribute("isOpen", on: item, to: true) else {
             throw ActionResponse.itemAlreadyOpen(item)
         }
         
@@ -160,7 +160,7 @@ The dynamic attribute system enables classic interactive fiction patterns:
 
 ```swift
 // Similar to ZIL's FSET/FCLEAR for OPENBIT
-if let change = await engine.setItemFlag("isOpen", on: chest, to: true) {
+if let change = await engine.setAttribute("isOpen", on: chest, to: true) {
     return ActionResult(stateChanges: [change], message: "The chest creaks open.")
 }
 ```
@@ -186,9 +186,9 @@ if let change = await engine.setDescription(on: troll, to: newDescription) {
 ```swift
 // Complex state changes with validation
 let changes = [
-    await engine.setItemFlag("unconscious", on: troll, to: true),
-    await engine.setItemFlag("fighting", on: troll, to: false),
-    await engine.setItemFlag("isVisible", on: axe, to: true)
+    await engine.setAttribute("unconscious", on: troll, to: true),
+    await engine.setAttribute("fighting", on: troll, to: false),
+    await engine.setAttribute("isVisible", on: axe, to: true)
 ].compactMap { $0 }
 
 return ActionResult(
