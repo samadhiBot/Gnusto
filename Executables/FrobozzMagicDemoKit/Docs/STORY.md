@@ -136,7 +136,7 @@ let butterSoftening = FuseDefinition(id: "butterSoftening", initialTurns: 20) { 
     await engine.ioHandler.print("The butter is becoming dangerously soft in the warm sun!")
     let change = StateChange(
         entityId: .item("butterCrock"),
-        attributeKey: .hasAttribute("melted"),
+        attributeID: .hasAttribute("melted"),
         newValue: .bool(true)
     )
     try engine.applyStateChange(change)
@@ -193,7 +193,7 @@ struct FillOutActionHandler: ActionHandler {
             stateChanges: [
                 StateChange(
                     entityId: .item("bureaucraticForm"),
-                    attributeKey: .hasAttribute("progress"),
+                    attributeID: .hasAttribute("progress"),
                     newValue: .int(currentProgress + 1)
                 )
             ]
@@ -342,9 +342,9 @@ struct CastActionHandler: ActionHandler {
                 discovered something remarkable.
                 """,
             stateChanges: [
-                StateChange(entityId: .item(scrollID), attributeKey: .removeFromGame, newValue: .bool(true)),
-                StateChange(entityId: .item(notebook.id), attributeKey: .addSpell(spellType), newValue: .int(transferPotency)),
-                StateChange(entityId: .global, attributeKey: .setFlag("discoveredSpellTransfer"), newValue: .bool(true))
+                StateChange(entityId: .item(scrollID), attributeID: .removeFromGame, newValue: .bool(true)),
+                StateChange(entityId: .item(notebook.id), attributeID: .addSpell(spellType), newValue: .int(transferPotency)),
+                StateChange(entityId: .global, attributeID: .setFlag("discoveredSpellTransfer"), newValue: .bool(true))
             ],
             sideEffects: [
                 SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])
@@ -366,7 +366,7 @@ struct ExperimentActionHandler: ActionHandler {
 
 ```swift
 // Register dynamic spell potency calculation
-dynamicAttributeRegistry.registerItemCompute(key: "spellPotency") { item, gameState in
+dynamicAttributeRegistry.registerItemCompute(attributeID: "spellPotency") { item, gameState in
     let baseIngredients = ["butter", "preserves", "lemonade"]
     let hasAllIngredients = baseIngredients.allSatisfy { ingredient in
         item.hasAttribute("\(ingredient)Stained")
@@ -382,7 +382,7 @@ dynamicAttributeRegistry.registerItemCompute(key: "spellPotency") { item, gameSt
 }
 
 // Validate spell transfer attempts
-dynamicAttributeRegistry.registerItemValidate(key: "canReceiveSpell") { item, newValue in
+dynamicAttributeRegistry.registerItemValidate(attributeID: "canReceiveSpell") { item, newValue in
     guard item.hasProperty(.paper) else { return false }
 
     let isImpregnated = item.hasAttribute("butterStained") &&

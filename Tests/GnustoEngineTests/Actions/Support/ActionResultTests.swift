@@ -12,7 +12,7 @@ struct ActionResultTests {
     // — Simple Examples for Initialization Tests —
     let simpleChange = StateChange(
         entityID: .item("lamp"),
-        attributeKey: .itemAttribute(.isOn),
+        attributeID: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
@@ -27,19 +27,19 @@ struct ActionResultTests {
     // so it needs to be accessed within a test method or be computed.
     private let change1 = StateChange(
         entityID: .item("lamp"),
-        attributeKey: .itemAttribute(.isOn),
+        attributeID: .itemAttribute(.isOn),
         oldValue: false,
         newValue: true
     )
     private let change2 = StateChange(
         entityID: .item("lamp"),
-        attributeKey: .itemAttribute(.isTouched),
+        attributeID: .itemAttribute(.isTouched),
         oldValue: false,
         newValue: true
     )
     private let change3 = StateChange(
         entityID: .location("cave"),
-        attributeKey: .locationAttribute(.isVisited), // Corrected: .isVisited
+        attributeID: .locationAttribute(.isVisited), // Corrected: .isVisited
         oldValue: false,
         newValue: true
     )
@@ -57,13 +57,13 @@ struct ActionResultTests {
     let turnOnLampChanges = [
         StateChange(
             entityID: .item("lamp"),
-            attributeKey: .itemAttribute(.isOn),
+            attributeID: .itemAttribute(.isOn),
             oldValue: false,
             newValue: true
         ),
         StateChange( // Mark cave visited when lamp is turned on (example)
             entityID: .location("cave"),
-            attributeKey: .locationAttribute(.isVisited),
+            attributeID: .locationAttribute(.isVisited),
             oldValue: false,
             newValue: true
         )
@@ -99,13 +99,13 @@ struct ActionResultTests {
     func testStateChangeInitializationFull() {
         let change = StateChange(
             entityID: .item("door"),
-            attributeKey: .itemAttribute(.isOpen),
+            attributeID: .itemAttribute(.isOpen),
             oldValue: false,
             newValue: true
         )
 
         #expect(change.entityID == .item("door"))
-        #expect(change.attributeKey == .itemAttribute(.isOpen))
+        #expect(change.attributeID == .itemAttribute(.isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
     }
@@ -114,12 +114,12 @@ struct ActionResultTests {
     func testStateChangeInitializationWithoutOldValue() {
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attributeID: .playerScore,
             newValue: .int(10)
         )
 
         #expect(change.entityID == .player)
-        #expect(change.attributeKey == .playerScore)
+        #expect(change.attributeID == .playerScore)
         #expect(change.oldValue == nil)
         #expect(change.newValue == .int(10))
     }
@@ -128,12 +128,12 @@ struct ActionResultTests {
     func testStateChangeInitializationSetFlag() {
         let change = StateChange(
             entityID: .global,
-            attributeKey: .setFlag("lightsOut"),
+            attributeID: .setFlag("lightsOut"),
             oldValue: false,
             newValue: true
         )
 
-        #expect(change.attributeKey == .setFlag("lightsOut"))
+        #expect(change.attributeID == .setFlag("lightsOut"))
         #expect(change.newValue == true)
         #expect(change.oldValue == false)
     }
@@ -142,12 +142,12 @@ struct ActionResultTests {
     func testStateChangeInitializationGameSpecific() {
         let change = StateChange(
             entityID: .global,
-            attributeKey: .globalState(key: "puzzleCounter"),
+            attributeID: .globalState(attributeID: "puzzleCounter"),
             oldValue: .int(5),
             newValue: .int(6)
         )
 
-        #expect(change.attributeKey == .globalState(key: "puzzleCounter"))
+        #expect(change.attributeID == .globalState(attributeID: "puzzleCounter"))
         #expect(change.newValue == .int(6))
     }
 
@@ -206,8 +206,8 @@ struct ActionResultTests {
         }
     }
 
-    @Test("StateattributeKey Codable Conformance")
-    func testStateattributeKeyCodable() throws {
+    @Test("StateattributeID Codable Conformance")
+    func testStateattributeIDCodable() throws {
         let encoder = JSONEncoder()
         let decoder = JSONDecoder()
 
@@ -221,7 +221,7 @@ struct ActionResultTests {
             .playerScore,
             .playerLocation,
             .setFlag("testFlag"),
-            .globalState(key: "testCounter")
+            .globalState(attributeID: "testCounter")
         ]
 
         for key in keys {
@@ -236,13 +236,13 @@ struct ActionResultTests {
     // Helper to create a simple item change for testing ActionResult merging
     private func createTestItemChange(
         id: ItemID,
-        key: AttributeID,
+        attributeID: AttributeID,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
         StateChange(
             entityID: .item(id),
-            attributeKey: .itemAttribute(key),
+            attributeID: .itemAttribute(attributeID),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -251,13 +251,13 @@ struct ActionResultTests {
     // Helper to create a simple location change for testing ActionResult merging
     private func createTestLocationChange(
         id: LocationID,
-        key: AttributeID,
+        attributeID: AttributeID,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
         StateChange(
             entityID: .location(id),
-            attributeKey: .locationAttribute(key),
+            attributeID: .locationAttribute(attributeID),
             oldValue: oldValue,
             newValue: newValue
         )
@@ -265,11 +265,16 @@ struct ActionResultTests {
 
     // Helper to create a simple global change
     private func createGlobalChange(
-        key: AttributeKey,
+        attributeID: AttributeKey,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
-        StateChange(entityID: .global, attributeKey: key, oldValue: oldValue, newValue: newValue)
+        StateChange(
+            entityID: .global,
+            attributeID: attributeID,
+            oldValue: oldValue,
+            newValue: newValue
+        )
     }
 
     // Corrected SideEffect initialization:

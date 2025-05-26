@@ -32,7 +32,7 @@ struct PutOnActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .item(itemToPutID),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 oldValue: .parentEntity(.player),
                 newValue: .parentEntity(.item(surfaceID))
             )
@@ -43,7 +43,7 @@ struct PutOnActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemToPutID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                         newValue: true,
                 )
             )
@@ -54,7 +54,7 @@ struct PutOnActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(surfaceID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                         newValue: true,
                 )
             )
@@ -64,7 +64,7 @@ struct PutOnActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global, // Pronoun is global
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(itemToPutID)])
             )
         )

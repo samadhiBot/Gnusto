@@ -187,7 +187,7 @@ struct OperaHouse: AreaBlueprint {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }
 
-        let disturbedCount = await engine.getStateValue(key: .barMessageDisturbances)?.toInt ?? 0
+        let disturbedCount = await engine.global(.barMessageDisturbances) ?? 0
         await engine.requestQuit()
         if disturbedCount < 2 {
             return ActionResult(

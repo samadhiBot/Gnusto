@@ -1533,7 +1533,7 @@ extension InsertActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .item(itemToInsertID),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 oldValue: .parentEntity(initialParent),
                 newValue: .parentEntity(.item(containerID))
             )
@@ -1544,7 +1544,7 @@ extension InsertActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemToInsertID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                     oldValue: initialItemAttributes[.isTouched],
                     newValue: true
                 )
@@ -1556,7 +1556,7 @@ extension InsertActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(containerID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                     oldValue: initialContainerAttributes[.isTouched],
                     newValue: true
                 )
@@ -1569,7 +1569,7 @@ extension InsertActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 oldValue: nil, // Simplified for test
                 newValue: .entityReferenceSet([.item(itemToInsertID)])
             )

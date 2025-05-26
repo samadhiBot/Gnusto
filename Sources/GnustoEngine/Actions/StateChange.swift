@@ -17,16 +17,16 @@ public struct StateChange: Codable, Sendable {
 
     /// The specific characteristic or property of the `entityID` that is being modified
     /// (e.g., `.itemParent`, `.playerScore`, `.setFlag`).
-    public let attributeKey: AttributeKey
+    public let attributeID: AttributeKey
 
-    /// The expected value of the `attributeKey` for the `entityID` *before* this change is applied.
+    /// The expected value of the `attributeID` for the `entityID` *before* this change is applied.
     /// This property is optional. If provided, the `GameEngine` uses it to ensure that the game
     /// state hasn't been unexpectedly altered by another process between the time this change
     /// was created and when it's applied. This helps prevent race conditions or unintended
     /// consequences.
     public let oldValue: StateValue?
 
-    /// The new, intended value for the `attributeKey` of the `entityID` *after* this change
+    /// The new, intended value for the `attributeID` of the `entityID` *after* this change
     /// is applied.
     public let newValue: StateValue
 
@@ -42,19 +42,19 @@ public struct StateChange: Codable, Sendable {
     ///
     /// - Parameters:
     ///   - entityID: The `EntityID` of the game entity to be modified.
-    ///   - attributeKey: The `AttributeKey` identifying the specific property to change.
+    ///   - attributeID: The `AttributeKey` identifying the specific property to change.
     ///   - oldValue: Optional. The expected current value of the attribute before the change.
     ///               If provided, the `GameEngine` will validate this against the actual current
     ///               state before applying the change.
     ///   - newValue: The `StateValue` that the attribute should be set to.
     public init(
         entityID: EntityID,
-        attributeKey: AttributeKey,
+        attributeID: AttributeKey,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) {
         self.entityID = entityID
-        self.attributeKey = attributeKey
+        self.attributeID = attributeID
         self.oldValue = oldValue
         self.newValue = newValue
         self.created = .now
@@ -78,12 +78,12 @@ extension StateChange: Equatable {
     /// Determines if two `StateChange` objects are equal based on their core properties.
     ///
     /// Two `StateChange` instances are considered equal if they target the same `entityID`
-    /// and `attributeKey`, and have the same `oldValue` and `newValue`.
+    /// and `attributeID`, and have the same `oldValue` and `newValue`.
     /// The `created` timestamp is not considered in this comparison.
     /// - Returns: `true` if the core properties of `lhs` and `rhs` are identical; otherwise, `false`.
     public static func == (lhs: StateChange, rhs: StateChange) -> Bool {
         lhs.entityID == rhs.entityID
-        && lhs.attributeKey == rhs.attributeKey
+        && lhs.attributeID == rhs.attributeID
         && lhs.oldValue == rhs.oldValue
         && lhs.newValue == rhs.newValue
     }

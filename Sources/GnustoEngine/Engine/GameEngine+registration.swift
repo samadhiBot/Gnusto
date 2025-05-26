@@ -16,14 +16,14 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the specific item whose attribute will be computed.
-    ///   - attributeKey: The `AttributeID` of the attribute whose value will be computed.
+    ///   - attributeID: The `AttributeID` of the attribute whose value will be computed.
     ///   - handler: The closure that computes the attribute's value.
     public func registerItemCompute(
         itemID: ItemID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.ItemComputeHandler
     ) {
-        dynamicAttributeRegistry.registerItemCompute(itemID: itemID, attributeKey: attributeKey, handler: handler)
+        dynamicAttributeRegistry.registerItemCompute(itemID: itemID, attributeID: attributeID, handler: handler)
     }
 
     /// Registers a validation handler for a specific item's attribute.
@@ -41,14 +41,14 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the specific item whose attribute changes will be validated.
-    ///   - attributeKey: The `AttributeID` of the attribute whose changes will be validated.
+    ///   - attributeID: The `AttributeID` of the attribute whose changes will be validated.
     ///   - handler: The closure that validates a proposed new value for the attribute.
     public func registerItemValidate(
         itemID: ItemID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.ItemValidateHandler
     ) {
-        dynamicAttributeRegistry.registerItemValidate(itemID: itemID, attributeKey: attributeKey, handler: handler)
+        dynamicAttributeRegistry.registerItemValidate(itemID: itemID, attributeID: attributeID, handler: handler)
     }
 
     // MARK: - Registration Methods (Locations)
@@ -68,14 +68,14 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The `LocationID` of the specific location whose attribute will be computed.
-    ///   - attributeKey: The `AttributeID` of the attribute whose value will be computed.
+    ///   - attributeID: The `AttributeID` of the attribute whose value will be computed.
     ///   - handler: The closure that computes the attribute's value.
     public func registerLocationCompute(
         locationID: LocationID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.LocationComputeHandler
     ) {
-        dynamicAttributeRegistry.registerLocationCompute(locationID: locationID, attributeKey: attributeKey, handler: handler)
+        dynamicAttributeRegistry.registerLocationCompute(locationID: locationID, attributeID: attributeID, handler: handler)
     }
 
     /// Registers a validation handler for a specific location's attribute.
@@ -93,13 +93,13 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The `LocationID` of the specific location whose attribute changes will be validated.
-    ///   - attributeKey: The `AttributeID` of the attribute whose changes will be validated.
+    ///   - attributeID: The `AttributeID` of the attribute whose changes will be validated.
     ///   - handler: The closure that validates a proposed new value for the attribute.
     public func registerLocationValidate(
         locationID: LocationID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.LocationValidateHandler
     ) {
-        dynamicAttributeRegistry.registerLocationValidate(locationID: locationID, attributeKey: attributeKey, handler: handler)
+        dynamicAttributeRegistry.registerLocationValidate(locationID: locationID, attributeID: attributeID, handler: handler)
     }
 }

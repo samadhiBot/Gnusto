@@ -18,7 +18,7 @@ extension GameEngine {
         if let currentValue: Int = global(globalID) {
             StateChange(
                 entityID: .global,
-                attributeKey: .globalState(key: globalID),
+                attributeID: .globalState(attributeID: globalID),
                 oldValue: .int(currentValue),
                 newValue: .int(currentValue + amount)
             )
@@ -33,7 +33,7 @@ extension GameEngine {
         } else {
             StateChange(
                 entityID: .global,
-                attributeKey: .clearFlag(globalID),
+                attributeID: .clearFlag(globalID),
                 oldValue: global(globalID),
                 newValue: false
             )
@@ -46,7 +46,7 @@ extension GameEngine {
         } else {
             return StateChange(
                 entityID: .global,
-                attributeKey: .setFlag(globalID),
+                attributeID: .setFlag(globalID),
                 oldValue: global(globalID),
                 newValue: true,
             )
@@ -58,7 +58,7 @@ extension GameEngine {
     ///
     /// The method determines the appropriate pronoun string ("it" for a single non-plural item,
     /// "them" for multiple items or a single plural item). It then creates a `StateChange` where:
-    /// - `attributeKey` is `.pronounReference(pronoun: <determined_pronoun_string>)`
+    /// - `attributeID` is `.pronounReference(pronoun: <determined_pronoun_string>)`
     /// - `newValue` is a `.entityReferenceSet` containing `EntityReference`s for the provided items.
     /// - `oldValue` is the previous set of `EntityReference`s for that pronoun, if any.
     ///
@@ -81,7 +81,7 @@ extension GameEngine {
 
         return StateChange(
             entityID: .global,
-            attributeKey: .pronounReference(pronoun: pronoun),
+            attributeID: .pronounReference(pronoun: pronoun),
             oldValue: oldEntityReferences.map { .entityReferenceSet($0) },
             newValue: .entityReferenceSet(newEntityReferences)
         )
@@ -109,7 +109,7 @@ extension GameEngine {
         } else {
             StateChange(
                 entityID: .item(item.id),
-                attributeKey: .itemAttribute(attributeID),
+                attributeID: .itemAttribute(attributeID),
                 oldValue: item.attributes[attributeID],
                 newValue: false,
             )
@@ -132,7 +132,7 @@ extension GameEngine {
     public func move(_ item: Item, to newParent: ParentEntity) -> StateChange {
         StateChange(
             entityID: .item(item.id),
-            attributeKey: .itemParent,
+            attributeID: .itemParent,
             oldValue: .parentEntity(item.parent),
             newValue: .parentEntity(newParent)
         )
@@ -155,7 +155,7 @@ extension GameEngine {
         } else {
             StateChange(
                 entityID: .item(item.id),
-                attributeKey: .itemAttribute(attributeID),
+                attributeID: .itemAttribute(attributeID),
                 oldValue: item.attributes[attributeID],
                 newValue: true,
             )
@@ -185,7 +185,7 @@ extension GameEngine {
         } else {
             StateChange(
                 entityID: .location(location.id),
-                attributeKey: .locationAttribute(attributeID),
+                attributeID: .locationAttribute(attributeID),
                 oldValue: location.attributes[attributeID],
                 newValue: false,
             )
@@ -210,7 +210,7 @@ extension GameEngine {
         } else {
             StateChange(
                 entityID: .location(location.id),
-                attributeKey: .locationAttribute(attributeID),
+                attributeID: .locationAttribute(attributeID),
                 oldValue: location.attributes[attributeID],
                 newValue: true,
             )
@@ -233,7 +233,7 @@ extension GameEngine {
     public func updatePlayerScore(by delta: Int) -> StateChange {
         StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attributeID: .playerScore,
             oldValue: .int(playerScore),
             newValue: .int(playerScore + delta)
         )
@@ -264,7 +264,7 @@ extension GameEngine {
         
         return StateChange(
             entityID: .item(item.id),
-            attributeKey: .itemAttribute(attributeID),
+            attributeID: .itemAttribute(attributeID),
             oldValue: currentValue,
             newValue: value
         )
@@ -291,7 +291,7 @@ extension GameEngine {
         
         return StateChange(
             entityID: .location(location.id),
-            attributeKey: .locationAttribute(attributeID),
+            attributeID: .locationAttribute(attributeID),
             oldValue: currentValue,
             newValue: value
         )

@@ -3,6 +3,15 @@ import Foundation
 // MARK: - Global state getters
 
 extension GameEngine {
+    /// Retrieves the current set of entity references (usually items) that a specific
+    /// pronoun (e.g., "it", "them") refers to.
+    ///
+    /// - Parameter pronoun: The pronoun string (e.g., "it", "them").
+    /// - Returns: A set of `EntityReference` objects, or `nil` if the pronoun is not currently set.
+    public func getPronounReference(pronoun: String) -> Set<EntityReference>? {
+        gameState.pronouns[pronoun.lowercased()]
+    }
+
     /// Retrieves the boolean value of a global variable from `gameState.globalState`.
     ///
     /// - Parameter globalID: The `GlobalID` of the global variable.
@@ -33,4 +42,15 @@ extension GameEngine {
     public func global(_ int: GlobalID) -> Int? {
         gameState.globalState[int]?.toInt
     }
+
+    /// Checks if a specific global flag is currently set to `true`.
+    ///
+    /// This is a convenience accessor for global boolean flags.
+    ///
+    /// - Parameter id: The `GlobalID` of the flag to check.
+    /// - Returns: `true` if the flag is set to `true`, `false` otherwise (including if not set).
+    public func isFlagSet(_ id: GlobalID) -> Bool {
+        global(id) == true
+    }
+
 }

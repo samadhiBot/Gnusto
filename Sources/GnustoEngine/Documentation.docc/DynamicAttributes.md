@@ -16,12 +16,12 @@ Use the fetch methods to read dynamic or static attributes:
 
 ```swift
 // Fetch typed values
-let sharpness: Int = try await engine.fetch("sword", "sharpness")
-let description: String = try await engine.fetch("sword", .description)
-let isOpen: Bool = try await engine.fetch("door", "isOpen")
+let sharpness: Int = try await engine.attribute("sharpness", of .sword)
+let description: String = try await engine.attribute(.description, of .sword)
+let isOpen: Bool = try await engine.attribute(.isOpen, of .door)
 
 // Fetch location attributes
-let temperature: String = try await engine.fetch("cave", "temperature")
+let temperature: String = try await engine.attribute("temperature", of .cave)
 ```
 
 ### Setting Attributes (Respecting the Pipeline)
@@ -54,7 +54,7 @@ Validation handlers allow you to enforce rules when attributes are changed, simi
 
 ```swift
 // Register a validation handler for a specific item and attribute
-engine.registerItemValidate(itemID: "door", attributeKey: "isOpen") { item, newValue in
+engine.registerItemValidate(itemID: "door", attributeID: "isOpen") { item, newValue in
     guard case .bool(let isOpening) = newValue else { return false }
     
     // Can only open if not locked
@@ -72,7 +72,7 @@ Inspired by Zork's troll combat system:
 
 ```swift
 // Ensure troll state consistency when fighting status changes
-engine.registerItemValidate(itemID: "troll", attributeKey: "fighting") { item, newValue in
+engine.registerItemValidate(itemID: "troll", attributeID: "fighting") { item, newValue in
     guard case .bool(let isFighting) = newValue else { return false }
     
     // If troll stops fighting, it must be unconscious or disarmed
@@ -90,7 +90,7 @@ engine.registerItemValidate(itemID: "troll", attributeKey: "fighting") { item, n
 Validation handlers can throw specific errors for better user feedback:
 
 ```swift
-engine.registerItemValidate(itemID: "magicSword", attributeKey: "enchantmentLevel") { item, newValue in
+engine.registerItemValidate(itemID: "magicSword", attributeID: "enchantmentLevel") { item, newValue in
     guard case .int(let level) = newValue else {
         throw ActionResponse.prerequisiteNotMet("Enchantment level must be a number")
     }

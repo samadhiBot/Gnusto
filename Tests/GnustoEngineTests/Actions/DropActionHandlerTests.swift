@@ -237,7 +237,7 @@ extension DropActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 oldValue: .parentEntity(initialParent),
                 newValue: .parentEntity(.location(newLocation))
             )
@@ -248,7 +248,7 @@ extension DropActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                         newValue: true,
                 )
             )
@@ -258,7 +258,7 @@ extension DropActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(itemID)])
             )
         )
@@ -268,7 +268,7 @@ extension DropActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isWorn),
+                    attributeID: .itemAttribute(.isWorn),
                     oldValue: true,
                     newValue: false
                 )

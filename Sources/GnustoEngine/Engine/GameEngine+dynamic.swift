@@ -11,18 +11,18 @@ extension GameEngine {
     /// from the item's attributes.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the boolean attribute.
     ///   - itemID: The `ItemID` of the item whose attribute is to be fetched.
-    ///   - key: The `AttributeID` of the boolean attribute.
     /// - Returns: The boolean value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
     ///           or if the item does not exist. Returns `false` if the attribute is not set.
-    public func fetch(
-        _ itemID: ItemID,
-        _ key: AttributeID
+    public func attribute(
+        _ attributeID: AttributeID,
+        of itemID: ItemID
     ) async throws -> Bool {
         let value = await fetchStateValue(
             itemID: itemID,
-            key: key
+            attributeID: attributeID
         )
         switch value {
         case .bool(let boolValue):
@@ -31,7 +31,7 @@ extension GameEngine {
             return false
         default:
             throw ActionResponse.invalidValue("""
-                Cannot fetch boolean value for \(itemID.rawValue).\(key.rawValue): \
+                Cannot fetch boolean value for \(itemID.rawValue).\(attributeID.rawValue): \
                 \(value ?? .undefined)
                 """)
         }
@@ -43,25 +43,25 @@ extension GameEngine {
     /// dynamic computation handlers first.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the integer attribute.
     ///   - itemID: The `ItemID` of the item.
-    ///   - key: The `AttributeID` of the integer attribute.
     /// - Returns: The integer value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not an integer, does not exist,
     ///           or the item does not exist.
-    public func fetch(
-        _ itemID: ItemID,
-        _ key: AttributeID
+    public func attribute(
+        _ attributeID: AttributeID,
+        of itemID: ItemID
     ) async throws -> Int {
         let value = await fetchStateValue(
             itemID: itemID,
-            key: key
+            attributeID: attributeID
         )
         switch value {
         case .int(let intValue):
             return intValue
         default:
             throw ActionResponse.invalidValue("""
-                Cannot fetch integer value for \(itemID.rawValue).\(key.rawValue): \
+                Cannot fetch integer value for \(itemID.rawValue).\(attributeID.rawValue): \
                 \(value ?? .undefined)
                 """)
         }
@@ -73,25 +73,25 @@ extension GameEngine {
     /// dynamic computation handlers first. This is often used for dynamic descriptions.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the string attribute (e.g., `.description`).
     ///   - itemID: The `ItemID` of the item.
-    ///   - key: The `AttributeID` of the string attribute (e.g., `.description`).
     /// - Returns: The string value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
     ///           or the item does not exist.
-    public func fetch(
-        _ itemID: ItemID,
-        _ key: AttributeID
+    public func attribute(
+        _ attributeID: AttributeID,
+        of itemID: ItemID
     ) async throws -> String {
         let value = await fetchStateValue(
             itemID: itemID,
-            key: key
+            attributeID: attributeID
         )
         switch value {
         case .string(let stringValue):
             return stringValue
         default:
             throw ActionResponse.invalidValue("""
-                Cannot fetch string value for \(itemID.rawValue).\(key.rawValue): \
+                Cannot fetch string value for \(itemID.rawValue).\(attributeID.rawValue): \
                 \(value ?? .undefined)
                 """)
         }
@@ -103,25 +103,25 @@ extension GameEngine {
     /// Useful for dynamic location descriptions.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the string attribute.
     ///   - locationID: The `LocationID` of the location.
-    ///   - key: The `AttributeID` of the string attribute.
     /// - Returns: The string value of the attribute.
     /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
     ///           or the location does not exist.
-    public func fetch(
-        _ locationID: LocationID,
-        _ key: AttributeID
+    public func attribute(
+        _ attributeID: AttributeID,
+        of locationID: LocationID
     ) async throws -> String {
         let value = await fetchStateValue(
             locationID: locationID,
-            key: key
+            attributeID: attributeID
         )
         switch value {
         case .string(let stringValue):
             return stringValue
         default:
             throw ActionResponse.invalidValue("""
-                Cannot fetch string value for \(locationID.rawValue).\(key.rawValue): \
+                Cannot fetch string value for \(locationID.rawValue).\(attributeID.rawValue): \
                 \(value ?? .undefined)
                 """)
         }
@@ -136,24 +136,27 @@ extension GameEngine {
     /// handlers are respected.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute being validated.
     ///   - itemID: The unique identifier of the item.
-    ///   - key: The `AttributeID` of the attribute being validated.
     ///   - newValue: The proposed new `StateValue`.
     /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
     /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
     func validateStateValue(
         itemID: ItemID,
-        key: AttributeID,
+        attributeID: AttributeID,
         newValue: StateValue
     ) async throws -> Bool {
         guard let item = gameState.items[itemID] else {
             return false // Item doesn't exist
         }
 
-        if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(for: itemID, attributeKey: key) {
-            return try await validateHandler(item, newValue)
+        return if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(
+            for: itemID,
+            attributeID: attributeID
+        ) {
+            try await validateHandler(item, newValue)
         } else {
-            return true // No validator registered, allow the change
+            true // No validator registered, allow the change
         }
     }
 
@@ -162,24 +165,27 @@ extension GameEngine {
     /// handlers are respected.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute being validated.
     ///   - locationID: The unique identifier of the location.
-    ///   - key: The `AttributeID` of the attribute being validated.
     ///   - newValue: The proposed new `StateValue`.
     /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
     /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
     func validateStateValue(
         locationID: LocationID,
-        key: AttributeID,
+        attributeID: AttributeID,
         newValue: StateValue
     ) async throws -> Bool {
         guard let location = gameState.locations[locationID] else {
             return false // Location doesn't exist
         }
 
-        if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(for: locationID, attributeKey: key) {
-            return try await validateHandler(location, newValue)
+        return if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(
+            for: locationID,
+            attributeID: attributeID
+        ) {
+            try await validateHandler(location, newValue)
         } else {
-            return true // No validator registered, allow the change
+            true // No validator registered, allow the change
         }
     }
 }
@@ -192,28 +198,31 @@ extension GameEngine {
     /// If no handler exists, returns the value stored in the item's `attributes`.
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the desired value.
     ///   - itemID: The unique identifier of the item.
-    ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
     private func fetchStateValue(
         itemID: ItemID,
-        key: AttributeID
+        attributeID: AttributeID
     ) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
             logger.warning("""
-                💥 Attempted to get dynamic value '\(key.rawValue)' for non-existent item: \
+                💥 Attempted to get dynamic value '\(attributeID.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
                 """)
             return nil
         }
 
         // Check registry for compute handler
-        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(for: itemID, attributeKey: key) {
+        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(
+            for: itemID,
+            attributeID: attributeID
+        ) {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
                 logger.error("""
-                    💥 Error computing dynamic value '\(key.rawValue)' \
+                    💥 Error computing dynamic value '\(attributeID.rawValue)' \
                     for item \(itemID.rawValue): \(error)
                     """)
                 // Fall through to return stored value or nil? Or return nil on error? Let's return nil.
@@ -221,7 +230,7 @@ extension GameEngine {
             }
         } else {
             // No compute handler, return stored value
-            return item.attributes[key]
+            return item.attributes[attributeID]
         }
     }
 
@@ -229,16 +238,16 @@ extension GameEngine {
     /// (Implementation mirrors fetchStateValue)
     ///
     /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the desired value.
     ///   - locationID: The unique identifier of the location.
-    ///   - key: The `AttributeID` of the desired value.
     /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
     private func fetchStateValue(
         locationID: LocationID,
-        key: AttributeID
+        attributeID: AttributeID
     ) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
             logger.warning("""
-                💥 Attempted to get dynamic value '\(key.rawValue)' \
+                💥 Attempted to get dynamic value '\(attributeID.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
                 """)
             return nil
@@ -246,19 +255,19 @@ extension GameEngine {
 
         if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(
             for: locationID,
-            attributeKey: key
+            attributeID: attributeID
         ) {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
                 logger.error("""
-                    💥 Error computing dynamic value '\(key.rawValue)' \
+                    💥 Error computing dynamic value '\(attributeID.rawValue)' \
                     for location \(locationID.rawValue): \(error)
                     """)
                 return nil
             }
         } else {
-            return location.attributes[key]
+            return location.attributes[attributeID]
         }
     }
 }

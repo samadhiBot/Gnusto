@@ -90,7 +90,7 @@ public struct GoActionHandler: ActionHandler {
         var stateChanges: [StateChange] = [
             StateChange(
                 entityID: .player,
-                attributeKey: .playerLocation,
+                attributeID: .playerLocation,
                 oldValue: .locationID(currentLocation.id),
                 newValue: .locationID(exit.destinationID)
             )

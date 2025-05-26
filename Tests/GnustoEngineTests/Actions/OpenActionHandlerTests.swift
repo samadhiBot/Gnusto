@@ -16,7 +16,7 @@ struct OpenActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isOpen),
+                attributeID: .itemAttribute(.isOpen),
                 oldValue: initialAttributes?[.isOpen], // Check initial state
                 newValue: true,
             )
@@ -27,7 +27,7 @@ struct OpenActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                     oldValue: initialAttributes?[.isTouched],
                     newValue: true,
                 )
@@ -38,7 +38,7 @@ struct OpenActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 oldValue: nil, // Assume no prior "it" for simplicity
                 newValue: .entityReferenceSet([.item(itemID)])
             )

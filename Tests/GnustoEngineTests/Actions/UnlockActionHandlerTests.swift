@@ -398,7 +398,7 @@ extension UnlockActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isLocked),
+                    attributeID: .itemAttribute(.isLocked),
                     oldValue: true,
                     newValue: false
                 )
@@ -410,7 +410,7 @@ extension UnlockActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(targetItemID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                         newValue: true,
                 )
             )
@@ -421,7 +421,7 @@ extension UnlockActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(keyItemID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                         newValue: true,
                 )
             )
@@ -430,7 +430,7 @@ extension UnlockActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "them"),
+                attributeID: .pronounReference(pronoun: "them"),
                 oldValue: nil,
                 // Simplified for test
                 newValue: .entityReferenceSet([

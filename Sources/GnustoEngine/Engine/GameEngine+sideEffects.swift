@@ -26,7 +26,7 @@ extension GameEngine {
             let initialTurns = effect.parameters["turns"]?.toInt ?? definition.initialTurns
             let addChange = StateChange(
                 entityID: .global,
-                attributeKey: .addActiveFuse(
+                attributeID: .addActiveFuse(
                     fuseID: definition.id,
                     initialTurns: initialTurns
                 ),
@@ -40,7 +40,7 @@ extension GameEngine {
             let oldTurns = gameState.activeFuses[fuseID]
             let removeChange = StateChange(
                 entityID: .global,
-                attributeKey: .removeActiveFuse(fuseID: fuseID),
+                attributeID: .removeActiveFuse(fuseID: fuseID),
                 oldValue: oldTurns.map { StateValue.int($0) },
                 newValue: .int(0)
             )
@@ -58,7 +58,7 @@ extension GameEngine {
                 try gameState.apply(
                     StateChange(
                         entityID: .global,
-                        attributeKey: .addActiveDaemon(daemonID: daemonID),
+                        attributeID: .addActiveDaemon(daemonID: daemonID),
                         oldValue: false,
                         newValue: true
                     )
@@ -71,7 +71,7 @@ extension GameEngine {
                 try gameState.apply(
                     StateChange(
                         entityID: .global,
-                        attributeKey: .removeActiveDaemon(daemonID: daemonID),
+                        attributeID: .removeActiveDaemon(daemonID: daemonID),
                         oldValue: true,
                         newValue: false
                     )

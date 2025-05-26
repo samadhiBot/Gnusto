@@ -86,7 +86,7 @@ public struct InsertActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
-        guard try await context.engine.fetch(containerID, .isOpen) else {
+        guard try await context.engine.attribute(.isOpen, of: containerID) else {
             throw ActionResponse.containerIsClosed(containerID)
         }
 
@@ -145,7 +145,7 @@ public struct InsertActionHandler: ActionHandler {
         let newParent: ParentEntity = .item(containerID)
         stateChanges.append(StateChange(
             entityID: .item(itemToInsertID),
-            attributeKey: .itemParent,
+            attributeID: .itemParent,
             oldValue: .parentEntity(oldParent),
             newValue: .parentEntity(newParent)
         ))

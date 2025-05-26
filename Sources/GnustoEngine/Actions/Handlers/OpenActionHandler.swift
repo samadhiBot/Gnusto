@@ -79,7 +79,7 @@ public struct OpenActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Check if already open
-        if try await context.engine.fetch(targetItem.id, .isOpen) {
+        if try await context.engine.attribute(.isOpen, of: targetItem.id) {
             throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 

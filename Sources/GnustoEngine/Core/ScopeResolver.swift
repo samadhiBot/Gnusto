@@ -119,7 +119,9 @@ public struct ScopeResolver: Sendable {
             if currentItem.hasFlag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
                 // Check dynamic property for open state
-                let isOpen: Bool = (try? await engine.fetch(currentItem.id, .isOpen)) ?? false
+                let isOpen: Bool = (
+                    try? await engine.attribute(.isOpen, of: currentItem.id)
+                ) ?? false
                 let isTransparent = currentItem.hasFlag(.isTransparent)
                 if isOpen || isTransparent {
                     // Find items directly inside this container

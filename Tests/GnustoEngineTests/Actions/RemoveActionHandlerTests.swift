@@ -52,18 +52,18 @@ struct RemoveActionHandlerTests {
         let expectedChanges = [
             StateChange(
                 entityID: .item("cloak"),
-                attributeKey: .itemAttribute(.isWorn),
+                attributeID: .itemAttribute(.isWorn),
                 oldValue: true,
                 newValue: false
             ),
             StateChange(
                 entityID: .item("cloak"),
-                attributeKey: .itemAttribute(.isTouched),
+                attributeID: .itemAttribute(.isTouched),
                 newValue: true
             ),
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item("cloak")])
             )
         ]

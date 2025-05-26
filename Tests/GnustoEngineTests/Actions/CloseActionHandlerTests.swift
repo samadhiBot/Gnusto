@@ -54,18 +54,18 @@ struct CloseActionHandlerTests {
         expectNoDifference(changeHistory, [
             StateChange(
                 entityID: .item(box.id),
-                attributeKey: .itemAttribute(.isOpen),
+                attributeID: .itemAttribute(.isOpen),
                 oldValue: true, // Assume it was open before closing
                 newValue: false
             ),
             StateChange(
                 entityID: .item(box.id),
-                attributeKey: .itemAttribute(.isTouched),
+                attributeID: .itemAttribute(.isTouched),
                 newValue: true,
             ),
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(box.id)])
             ),
         ])

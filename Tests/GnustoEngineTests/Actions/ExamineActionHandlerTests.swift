@@ -382,7 +382,7 @@ extension ExamineActionHandlerTests {
             changes.append(
                 StateChange(
                     entityID: .item(itemID),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                     oldValue: nil,
                     newValue: true
                 )
@@ -395,7 +395,7 @@ extension ExamineActionHandlerTests {
         changes.append(
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 // Old value might be nil or another item, for simplicity in test we assume nil or different
                 // A more robust test might capture the actual old pronoun state.
                 oldValue: nil, // Assuming it wasn’t set or was different

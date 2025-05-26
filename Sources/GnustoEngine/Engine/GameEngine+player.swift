@@ -3,6 +3,17 @@ import Foundation
 // MARK: - Player State Accessors
 
 extension GameEngine {
+    /// Checks if the player can carry a given item based on its size and the player's
+    /// current inventory weight and carrying capacity.
+    ///
+    /// - Parameter item: The `Item` to check.
+    /// - Returns: `true` if the player has enough capacity to carry the item, `false` otherwise.
+    public func playerCanCarry(_ item: Item) -> Bool {
+        let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
+        let capacity = gameState.player.carryingCapacity
+        return (currentWeight + item.size) <= capacity
+    }
+
     /// Checks whether the player can currently reach (interact with) a specific item.
     ///
     /// This determination is made by the `ScopeResolver`, considering factors like
@@ -39,6 +50,11 @@ extension GameEngine {
         try location(playerLocationID)
     }
 
+    /// Returns the `LocationID` of the player's current location.
+    public var playerLocationID: LocationID {
+        gameState.player.currentLocationID
+    }
+
     /// Checks whether the player's current location is lit.
     ///
     /// See `isLocationLit(at:)` for details on how lighting is determined.
@@ -48,29 +64,13 @@ extension GameEngine {
         await isLocationLit(at: playerLocationID)
     }
 
-    /// Returns the `LocationID` of the player's current location.
-    public var playerLocationID: LocationID {
-        gameState.player.currentLocationID
-    }
-
-    /// The player's current score.
-    public var playerScore: Int {
-        gameState.player.score
-    }
-
     /// The number of game turns the player has taken so far.
     public var playerMoves: Int {
         gameState.player.moves
     }
 
-    /// Checks if the player can carry a given item based on its size and the player's
-    /// current inventory weight and carrying capacity.
-    ///
-    /// - Parameter item: The `Item` to check.
-    /// - Returns: `true` if the player has enough capacity to carry the item, `false` otherwise.
-    public func playerCanCarry(_ item: Item) -> Bool {
-        let currentWeight = gameState.player.currentInventoryWeight(allItems: gameState.items)
-        let capacity = gameState.player.carryingCapacity
-        return (currentWeight + item.size) <= capacity
+    /// The player's current score.
+    public var playerScore: Int {
+        gameState.player.score
     }
 }

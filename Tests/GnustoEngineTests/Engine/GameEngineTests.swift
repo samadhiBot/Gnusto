@@ -123,15 +123,15 @@ struct GameEngineTests {
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.getChangeHistory() == [
+        #expect(await engine.changeHistory() == [
             StateChange(
                 entityID: .location(.startRoom),
-                attributeKey: .locationAttribute(.isVisited),
+                attributeID: .locationAttribute(.isVisited),
                 newValue: true
             ),
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attributeID: .playerMoves,
                 oldValue: 0,
                 newValue: 1
             ),
@@ -228,15 +228,15 @@ struct GameEngineTests {
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.getChangeHistory() == [
+        #expect(await engine.changeHistory() == [
             StateChange(
                 entityID: .location(.startRoom),
-                attributeKey: .locationAttribute(.isVisited),
+                attributeID: .locationAttribute(.isVisited),
                 newValue: true
             ),
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attributeID: .playerMoves,
                 oldValue: 0,
                 newValue: 1
             ),
@@ -620,14 +620,14 @@ struct GameEngineTests {
                 // Define multiple changes
                 let change1 = StateChange(
                     entityID: .item(itemIDToModify),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attributeID: .itemAttribute(.isTouched),
                     oldValue: item.attributes[.isTouched],
                     newValue: true,
                 )
 
                 let change2 = StateChange(
                     entityID: .item(itemIDToModify),
-                    attributeKey: .itemAttribute(.isOn),
+                    attributeID: .itemAttribute(.isOn),
                     oldValue: item.attributes[.isOn],
                     newValue: true,
                 )
@@ -640,7 +640,7 @@ struct GameEngineTests {
 
                 let change3 = StateChange(
                     entityID: .global,
-                    attributeKey: .setFlag(flagID),
+                    attributeID: .setFlag(flagID),
                     oldValue: flagOldValueState,
                     newValue: true,
                 )
@@ -706,7 +706,7 @@ struct GameEngineTests {
         #expect(await engine.isFlagSet(testFlagKey) == false)
         #expect(try await engine.item(testItemID).attributes[.isOn] == nil)
         #expect(try await engine.item(testItemID).attributes[.isTouched] == nil)
-        #expect(await engine.getChangeHistory().isEmpty)
+        #expect(await engine.changeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
@@ -725,13 +725,13 @@ struct GameEngineTests {
         )
 
         // Check history recorded correctly
-        let history = await engine.getChangeHistory()
+        let history = await engine.changeHistory()
         #expect(!history.isEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attributeKey == .playerMoves &&
+                change.attributeID == .playerMoves &&
                 change.newValue == .int(1)
             },
             "History should contain playerMoves increment to 1"
@@ -741,7 +741,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityID == .item(testItemID),
-                      case .itemAttribute(let prop) = change.attributeKey,
+                      case .itemAttribute(let prop) = change.attributeID,
                       change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
             },
@@ -752,7 +752,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityID == .global &&
-                    change.attributeKey == .setFlag(testFlagKey) &&
+                    change.attributeID == .setFlag(testFlagKey) &&
                     change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
@@ -1492,13 +1492,13 @@ struct GameEngineTests {
         let turnOnChanges = [
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isOn),
+                attributeID: .itemAttribute(.isOn),
                 oldValue: false,
                 newValue: true,
             ),
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isTouched),
+                attributeID: .itemAttribute(.isTouched),
                 oldValue: nil, // Assuming not touched initially
                 newValue: true,
             )
@@ -1574,12 +1574,12 @@ struct GameEngineTests {
         expectNoDifference(history, [
             StateChange(
                 entityID: .item(.startItem),
-                attributeKey: .itemAttribute(.isTouched),
+                attributeID: .itemAttribute(.isTouched),
                 newValue: true
             ),
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(.startItem)])
             )
         ])
@@ -1602,7 +1602,7 @@ struct GameEngineTests {
         #expect(
             stateChange == StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(item.id)])
             )
         )
@@ -1622,7 +1622,7 @@ struct GameEngineTests {
         #expect(
             change == StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "them"),
+                attributeID: .pronounReference(pronoun: "them"),
                 newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
             )
         )

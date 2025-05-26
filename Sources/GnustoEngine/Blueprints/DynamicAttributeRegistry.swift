@@ -30,13 +30,13 @@ import Foundation
 ///
 /// ```swift
 /// // Register dynamic description for a specific magic sword
-/// registry.registerItemCompute(itemID: "magicSword", attributeKey: "description") { item, gameState in
+/// registry.registerItemCompute(itemID: "magicSword", attributeID: "description") { item, gameState in
 ///     let enchantmentLevel = item.attributes["enchantmentLevel"]?.toInt ?? 0
 ///     return .string("A \(enchantmentLevel > 5 ? "brilliantly glowing" : "faintly shimmering") sword.")
 /// }
 ///
 /// // Register dynamic mood for a specific NPC
-/// registry.registerItemCompute(itemID: "villageElder", attributeKey: "mood") { item, gameState in
+/// registry.registerItemCompute(itemID: "villageElder", attributeID: "mood") { item, gameState in
 ///     let playerReputation = gameState.globalState["playerReputation"]?.toInt ?? 0
 ///     return .string(playerReputation > 50 ? "friendly" : "suspicious")
 /// }
@@ -130,17 +130,17 @@ public struct DynamicAttributeRegistry: Sendable {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the specific item to register the compute handler for.
-    ///   - attributeKey: The `AttributeID` of the attribute to register the compute handler for.
+    ///   - attributeID: The `AttributeID` of the attribute to register the compute handler for.
     ///   - handler: The `ItemComputeHandler` closure to execute for computing the attribute's value.
     public mutating func registerItemCompute(
         itemID: ItemID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping ItemComputeHandler
     ) {
         if itemComputeHandlers[itemID] == nil {
             itemComputeHandlers[itemID] = [:]
         }
-        itemComputeHandlers[itemID]![attributeKey] = handler
+        itemComputeHandlers[itemID]![attributeID] = handler
     }
 
     /// Registers a validation handler for a specific item's attribute.
@@ -152,17 +152,17 @@ public struct DynamicAttributeRegistry: Sendable {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the specific item to register the validation handler for.
-    ///   - attributeKey: The `AttributeID` of the attribute to register the validation handler for.
+    ///   - attributeID: The `AttributeID` of the attribute to register the validation handler for.
     ///   - handler: The `ItemValidateHandler` closure to execute for validating new values.
     public mutating func registerItemValidate(
         itemID: ItemID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping ItemValidateHandler
     ) {
         if itemValidateHandlers[itemID] == nil {
             itemValidateHandlers[itemID] = [:]
         }
-        itemValidateHandlers[itemID]![attributeKey] = handler
+        itemValidateHandlers[itemID]![attributeID] = handler
     }
 
     // MARK: - Registration Methods (Locations)
@@ -175,17 +175,17 @@ public struct DynamicAttributeRegistry: Sendable {
     ///
     /// - Parameters:
     ///   - locationID: The `LocationID` of the specific location to register the compute handler for.
-    ///   - attributeKey: The `AttributeID` of the attribute to register the compute handler for.
+    ///   - attributeID: The `AttributeID` of the attribute to register the compute handler for.
     ///   - handler: The `LocationComputeHandler` closure to execute for computing the attribute's value.
     public mutating func registerLocationCompute(
         locationID: LocationID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping LocationComputeHandler
     ) {
         if locationComputeHandlers[locationID] == nil {
             locationComputeHandlers[locationID] = [:]
         }
-        locationComputeHandlers[locationID]![attributeKey] = handler
+        locationComputeHandlers[locationID]![attributeID] = handler
     }
 
     /// Registers a validation handler for a specific location's attribute.
@@ -197,17 +197,17 @@ public struct DynamicAttributeRegistry: Sendable {
     ///
     /// - Parameters:
     ///   - locationID: The `LocationID` of the specific location to register the validation handler for.
-    ///   - attributeKey: The `AttributeID` of the attribute to register the validation handler for.
+    ///   - attributeID: The `AttributeID` of the attribute to register the validation handler for.
     ///   - handler: The `LocationValidateHandler` closure to execute for validating new values.
     public mutating func registerLocationValidate(
         locationID: LocationID,
-        attributeKey: AttributeID,
+        attributeID: AttributeID,
         handler: @escaping LocationValidateHandler
     ) {
         if locationValidateHandlers[locationID] == nil {
             locationValidateHandlers[locationID] = [:]
         }
-        locationValidateHandlers[locationID]![attributeKey] = handler
+        locationValidateHandlers[locationID]![attributeID] = handler
     }
 
     // MARK: - Retrieval Methods (Internal Access)
@@ -215,36 +215,36 @@ public struct DynamicAttributeRegistry: Sendable {
     /// Retrieves the compute handler for a specific item's attribute, if one exists.
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item to look up.
-    ///   - attributeKey: The `AttributeID` of the attribute to look up.
+    ///   - attributeID: The `AttributeID` of the attribute to look up.
     /// - Returns: The registered compute handler, or `nil` if none exists.
-    func itemComputeHandler(for itemID: ItemID, attributeKey: AttributeID) -> ItemComputeHandler? {
-        itemComputeHandlers[itemID]?[attributeKey]
+    func itemComputeHandler(for itemID: ItemID, attributeID: AttributeID) -> ItemComputeHandler? {
+        itemComputeHandlers[itemID]?[attributeID]
     }
 
     /// Retrieves the validate handler for a specific item's attribute, if one exists.
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item to look up.
-    ///   - attributeKey: The `AttributeID` of the attribute to look up.
+    ///   - attributeID: The `AttributeID` of the attribute to look up.
     /// - Returns: The registered validate handler, or `nil` if none exists.
-    func itemValidateHandler(for itemID: ItemID, attributeKey: AttributeID) -> ItemValidateHandler? {
-        itemValidateHandlers[itemID]?[attributeKey]
+    func itemValidateHandler(for itemID: ItemID, attributeID: AttributeID) -> ItemValidateHandler? {
+        itemValidateHandlers[itemID]?[attributeID]
     }
 
     /// Retrieves the compute handler for a specific location's attribute, if one exists.
     /// - Parameters:
     ///   - locationID: The `LocationID` of the location to look up.
-    ///   - attributeKey: The `AttributeID` of the attribute to look up.
+    ///   - attributeID: The `AttributeID` of the attribute to look up.
     /// - Returns: The registered compute handler, or `nil` if none exists.
-    func locationComputeHandler(for locationID: LocationID, attributeKey: AttributeID) -> LocationComputeHandler? {
-        locationComputeHandlers[locationID]?[attributeKey]
+    func locationComputeHandler(for locationID: LocationID, attributeID: AttributeID) -> LocationComputeHandler? {
+        locationComputeHandlers[locationID]?[attributeID]
     }
 
     /// Retrieves the validate handler for a specific location's attribute, if one exists.
     /// - Parameters:
     ///   - locationID: The `LocationID` of the location to look up.
-    ///   - attributeKey: The `AttributeID` of the attribute to look up.
+    ///   - attributeID: The `AttributeID` of the attribute to look up.
     /// - Returns: The registered validate handler, or `nil` if none exists.
-    func locationValidateHandler(for locationID: LocationID, attributeKey: AttributeID) -> LocationValidateHandler? {
-        locationValidateHandlers[locationID]?[attributeKey]
+    func locationValidateHandler(for locationID: LocationID, attributeID: AttributeID) -> LocationValidateHandler? {
+        locationValidateHandlers[locationID]?[attributeID]
     }
 }

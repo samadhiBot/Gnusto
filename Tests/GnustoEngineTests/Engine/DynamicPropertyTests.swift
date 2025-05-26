@@ -40,7 +40,7 @@ struct DynamicPropertyTests {
         }
 
         // Get initial value
-        let initialValue: Int = try await engine.fetch("testItem", "simpleProp")
+        let initialValue: Int = try await engine.attribute("simpleProp", of: "testItem")
         #expect(initialValue == 10)
 
         // Set new value
@@ -54,7 +54,7 @@ struct DynamicPropertyTests {
         #expect(finalItem?.attributes["simpleProp"] == StateValue.int(20))
 
         // Verify getting the value again works
-        let finalValue: Int = try await engine.fetch("testItem", "simpleProp")
+        let finalValue: Int = try await engine.attribute("simpleProp", of: "testItem")
         #expect(finalValue == 20)
     }
 
@@ -63,7 +63,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Item Value - Success")
     func testSetValidatedItemValueSuccess() async throws {
         var registry = DynamicAttributeRegistry()
-        registry.registerItemValidate(itemID: "testItem", attributeKey: "validatedProp") { item, newValue in
+        registry.registerItemValidate(itemID: "testItem", attributeID: "validatedProp") { item, newValue in
             // Example: Only allow positive integers
             guard case .int(let intValue) = newValue else { return false }
             return intValue > 0
@@ -106,7 +106,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Item Value - Failure")
     func testSetValidatedItemValueFailure() async throws {
         var registry = DynamicAttributeRegistry()
-        registry.registerItemValidate(itemID: "testItem", attributeKey: "validatedProp") { item, newValue in
+        registry.registerItemValidate(itemID: "testItem", attributeID: "validatedProp") { item, newValue in
             guard case .int(let intValue) = newValue else { return false }
             return intValue > 0
         }
@@ -165,7 +165,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Location Value - Success")
     func testSetValidatedLocationValueSuccess() async throws {
         var registry = DynamicAttributeRegistry()
-        registry.registerLocationValidate(locationID: "testLocation", attributeKey: "lightLevel") { location, newValue in
+        registry.registerLocationValidate(locationID: "testLocation", attributeID: "lightLevel") { location, newValue in
             // Example: Only allow light levels between 0 and 10
             guard case .int(let lightLevel) = newValue else { return false }
             return lightLevel >= 0 && lightLevel <= 10
@@ -201,7 +201,7 @@ struct DynamicPropertyTests {
     @Test("Set Validated Location Value - Failure")
     func testSetValidatedLocationValueFailure() async throws {
         var registry = DynamicAttributeRegistry()
-        registry.registerLocationValidate(locationID: "testLocation", attributeKey: "lightLevel") { location, newValue in
+        registry.registerLocationValidate(locationID: "testLocation", attributeID: "lightLevel") { location, newValue in
             guard case .int(let lightLevel) = newValue else { return false }
             return lightLevel >= 0 && lightLevel <= 10
         }
@@ -464,7 +464,7 @@ struct DynamicPropertyTests {
         var registry = DynamicAttributeRegistry()
         
         // Complex validation: Troll can only stop fighting if unconscious OR doesn't have weapon
-        registry.registerItemValidate(itemID: "troll", attributeKey: "fighting") { item, newValue in
+        registry.registerItemValidate(itemID: "troll", attributeID: "fighting") { item, newValue in
             guard case .bool(let fighting) = newValue else { return false }
             
             // If trying to set fighting to false, check conditions
@@ -543,7 +543,7 @@ struct DynamicPropertyTests {
     @Test("Validation Handler Throws Custom Error")
     func testValidationHandlerThrowsCustomError() async throws {
         var registry = DynamicAttributeRegistry()
-        registry.registerItemValidate(itemID: "testItem", attributeKey: "restrictedProp") { item, newValue in
+        registry.registerItemValidate(itemID: "testItem", attributeID: "restrictedProp") { item, newValue in
             // Throw specific errors for different invalid cases
             switch newValue {
             case .int:

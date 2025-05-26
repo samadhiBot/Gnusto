@@ -18,12 +18,12 @@ struct LookActionHandlerTests {
         return [
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isTouched),
+                attributeID: .itemAttribute(.isTouched),
                 newValue: true,
             ),
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(itemID)])
             )
         ]
@@ -328,7 +328,7 @@ struct LookActionHandlerTests {
         // Register dynamic compute handler for the location's description
         await engine.registerLocationCompute(
             locationID: dynamicRoom.id,
-            attributeKey: .description
+            attributeID: .description
         ) { location, gameState in
             let isFlagOn = gameState.globalState[specialFlag] == true
             let text = isFlagOn ? "The room *sparkles* brightly via registry." :
@@ -358,7 +358,7 @@ struct LookActionHandlerTests {
         try await engine.apply(
             StateChange(
                 entityID: .global,
-                attributeKey: .globalState(key: specialFlag),
+                attributeID: .globalState(attributeID: specialFlag),
                 oldValue: .bool(true),
                 newValue: .bool(false)
             )
@@ -509,7 +509,7 @@ struct LookActionHandlerTests {
         #expect(await engine.gameState.changeHistory == [
             StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attributeID: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item("stone")])
             )
         ])

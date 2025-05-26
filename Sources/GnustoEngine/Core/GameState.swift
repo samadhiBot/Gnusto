@@ -205,7 +205,7 @@ public struct GameState: Codable, Equatable, Sendable {
         try validateOldValue(for: change)
 
         // --- Mutation Phase ---
-        switch change.attributeKey {
+        switch change.attributeID {
 
         // MARK: Item Properties
 
@@ -497,7 +497,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // Determine the actual current value based on the property key.
         let actualCurrentValue: StateValue?
-        switch change.attributeKey {
+        switch change.attributeID {
         // Item Properties
         case .itemAdjectives:
             guard case .item(let itemID) = change.entityID else {

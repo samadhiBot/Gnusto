@@ -98,7 +98,7 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     /// A generic key for storing or retrieving a custom, game-defined global state value.
     /// `GlobalID` is a unique identifier you define for various global data points that
     /// don't fit the simple flag model. The associated value can be of any `Codable` type.
-    case globalState(key: GlobalID)
+    case globalState(attributeID: GlobalID)
 
     /// The `EntityReference` (e.g., an item, location, or the player) that a given
     /// pronoun (like "it", "them") currently refers to. This is managed by the parser

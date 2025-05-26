@@ -192,7 +192,7 @@ struct GameStateTests {
     func testGameStateBasicCodable() throws {
         var originalState = createInitialState() // Make mutable for change history
         // Add some history for encoding
-        let change1 = StateChange(entityID: .player, attributeKey: .playerScore, newValue: .int(10))
+        let change1 = StateChange(entityID: .player, attributeID: .playerScore, newValue: .int(10))
         try originalState.apply(change1)
 
         let encoder = JSONEncoder()
@@ -215,7 +215,7 @@ struct GameStateTests {
         #expect(state1 == state2)
 
         // Modify state3 slightly
-        let change = StateChange(entityID: .player, attributeKey: .playerScore, newValue: .int(5))
+        let change = StateChange(entityID: .player, attributeID: .playerScore, newValue: .int(5))
         try state3.apply(change)
 
         #expect(state1 != state3)
@@ -231,7 +231,7 @@ struct GameStateTests {
         // Modify state1
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attributeID: .playerScore,
             newValue: .int(10)
         )
         try state1.apply(change)
@@ -294,17 +294,17 @@ struct GameStateTests {
         try state.apply(
             StateChange(
                 entityID: .location(Self.locWOH),
-                attributeKey: .locationAttribute(.description),
+                attributeID: .locationAttribute(.description),
                 newValue: "A new description."
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemName,
+                attributeID: .itemName,
                 newValue: "Magic Lantern"
             ),
             StateChange(
                 entityID: .item(Self.itemSword),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 newValue: .parentEntity(.location(Self.locWOH))
             )
         )
@@ -330,12 +330,12 @@ struct GameStateTests {
         try originalState.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 newValue: .parentEntity(.player)
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemAttribute(.isOn),
+                attributeID: .itemAttribute(.isOn),
                 newValue: true
             )
         )
@@ -388,7 +388,7 @@ struct GameStateTests {
         try state2.apply(
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attributeID: .playerMoves,
                 newValue: 5
             )
         )
@@ -404,12 +404,12 @@ struct GameStateTests {
         try state2.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemName,
+                attributeID: .itemName,
                 newValue: "Shiny Lantern"
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemParent,
+                attributeID: .itemParent,
                 newValue: .parentEntity(.player)
             ),
         )
@@ -458,7 +458,7 @@ struct GameStateTests {
         // When: Applying a change to remove the non-existent fuse with oldValue: nil
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: fuseID),
+            attributeID: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Explicitly stating we expect it to be nil (non-existent)
             newValue: .int(0) // newValue is often ignored for removals
         )
@@ -482,7 +482,7 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: "existingFuse"),
+            attributeID: .removeActiveFuse(fuseID: "existingFuse"),
             oldValue: .int(1), // Providing the wrong oldValue
             newValue: .int(0) // newValue is ignored for remove
         )
@@ -522,14 +522,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.isLit),
+            attributeID: .locationAttribute(.isLit),
             oldValue: state.locations["testLoc"]?.attributes[.isLit],
             newValue: true
         )
         try? state.apply(change)
 
         #expect(change.entityID == EntityID.location("testLoc"))
-        #expect(change.attributeKey == .locationAttribute(AttributeID.isLit))
+        #expect(change.attributeID == .locationAttribute(AttributeID.isLit))
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
@@ -552,7 +552,7 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.inherentlyLit),
+            attributeID: .locationAttribute(.inherentlyLit),
             oldValue: true,
             newValue: false
         )
@@ -577,14 +577,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.description),
+            attributeID: .locationAttribute(.description),
             oldValue: .string("Original Desc"),
             newValue: .string("Updated Desc")
         )
         try? state.apply(change)
 
         #expect(change.entityID == .location("testLoc"))
-        #expect(change.attributeKey == .locationAttribute(.description))
+        #expect(change.attributeID == .locationAttribute(.description))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
@@ -607,13 +607,13 @@ struct GameStateTests {
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
             entityID: .location(.startRoom),
-            attributeKey: .locationAttribute(.description),
+            attributeID: .locationAttribute(.description),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
             entityID: .location(.startRoom),
-            attributeKey: .locationAttribute(.description),
+            attributeID: .locationAttribute(.description),
             oldValue: state.locations[.startRoom]?.attributes[.description],
             newValue: .string("New Description")
         )

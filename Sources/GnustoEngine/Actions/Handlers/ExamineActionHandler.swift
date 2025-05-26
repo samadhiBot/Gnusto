@@ -80,7 +80,7 @@ public struct ExamineActionHandler: ActionHandler {
             let message: String
             // Priority 1: Readable Text (Check dynamic value)
             if targetItem.hasFlag(.isReadable),
-               let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
+               let readText: String = try? await context.engine.attribute(.readText, of: targetItem.id),
                !readText.isEmpty
             {
                 message = readText
@@ -104,7 +104,7 @@ public struct ExamineActionHandler: ActionHandler {
                 // Use the registry to generate the description using the item ID and key
                 message = await context.engine.generateDescription(
                     for: targetItem.id,
-                    key: .description,
+                    attributeID: .description,
                     engine: context.engine
                 )
             }
@@ -142,13 +142,13 @@ public struct ExamineActionHandler: ActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.generateDescription(
             for: targetItem.id,
-            key: .description,
+            attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)
 
         // Check dynamic property for open state
-        let isOpen: Bool = try await engine.fetch(targetItem.id, .isOpen)
+        let isOpen: Bool = try await engine.attribute(.isOpen, of: targetItem.id)
         let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {
@@ -180,7 +180,7 @@ public struct ExamineActionHandler: ActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.generateDescription(
             for: targetItem.id,
-            key: .description,
+            attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)

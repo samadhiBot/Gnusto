@@ -61,7 +61,7 @@ public actor GameEngine: Sendable {
 
     /// The registry for custom logic that dynamically computes or validates item and
     /// location attributes. This is initialized from the `GameBlueprint` and can be
-    /// further modified by game developers using methods like `registerItemCompute(key:handler:)`.
+    /// further modified by game developers using methods like `registerItemCompute(attributeID:handler:)`.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
@@ -167,6 +167,15 @@ extension GameEngine {
         await ioHandler.teardown()
     }
 
+    /// Signals the engine to stop the main game loop and end the game after the
+    /// current turn has been fully processed.
+    ///
+    /// This is the standard way to programmatically quit the game from within an
+    /// action handler or game hook.
+    public func requestQuit() {
+        self.shouldQuit = true
+    }
+
     // MARK: Private helpers
 
     /// Processes a single turn of the game, including clock ticks, player input, parsing, and command execution.
@@ -219,7 +228,7 @@ extension GameEngine {
         try gameState.apply(
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attributeID: .playerMoves,
                 oldValue: .int(moves),
                 newValue: .int(moves + 1)
             )
@@ -507,7 +516,7 @@ extension GameEngine {
 
             let updateChange = StateChange(
                 entityID: .global,
-                attributeKey: .updateFuseTurns(fuseID: fuseID),
+                attributeID: .updateFuseTurns(fuseID: fuseID),
                 oldValue: .int(currentTurns),
                 newValue: .int(newTurns)
             )
@@ -522,7 +531,7 @@ extension GameEngine {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
                         entityID: .global,
-                        attributeKey: .removeActiveFuse(fuseID: fuseID),
+                        attributeID: .removeActiveFuse(fuseID: fuseID),
                         oldValue: .int(newTurns),
                         newValue: .int(0)
                     )
@@ -537,7 +546,7 @@ extension GameEngine {
 
                 let removeChange = StateChange(
                     entityID: .global,
-                    attributeKey: .removeActiveFuse(fuseID: fuseID),
+                    attributeID: .removeActiveFuse(fuseID: fuseID),
                     oldValue: .int(newTurns),
                     newValue: .int(0)
                 )
@@ -849,7 +858,7 @@ extension GameEngine {
     ///           any errors from `GameState.apply()`.
     private func applyWithDynamicValidation(_ change: StateChange) async throws {
         // Perform dynamic validation for item and location attributes
-        switch change.attributeKey {
+        switch change.attributeID {
         case .itemAttribute(let key):
             guard case .item(let itemID) = change.entityID else {
                 throw ActionResponse.internalEngineError(
@@ -859,7 +868,7 @@ extension GameEngine {
             
             let isValid = try await validateStateValue(
                 itemID: itemID,
-                key: key,
+                attributeID: key,
                 newValue: change.newValue
             )
             
@@ -879,7 +888,7 @@ extension GameEngine {
             
             let isValid = try await validateStateValue(
                 locationID: locationID,
-                key: key,
+                attributeID: key,
                 newValue: change.newValue
             )
             
@@ -897,6 +906,56 @@ extension GameEngine {
         
         // Apply the change to the game state
         try gameState.apply(change)
+    }
+}
+
+// MARK: - Default Handlers
+
+extension GameEngine {
+    /// Default action handlers provided by the engine.
+    /// Games can override these via the `TimeRegistry`.
+    static var defaultActionHandlers: [VerbID: ActionHandler] {
+        var handlers: [VerbID: ActionHandler] = [
+            // Movement & World Interaction
+            .close: CloseActionHandler(),
+            .drop: DropActionHandler(),
+            .examine: ExamineActionHandler(),
+            .go: GoActionHandler(),
+            .insert: InsertActionHandler(),
+            .inventory: InventoryActionHandler(),
+            .listen: ListenActionHandler(),
+            .lock: LockActionHandler(),
+            .look: LookActionHandler(),
+            .open: OpenActionHandler(),
+            .putOn: PutOnActionHandler(),
+            .read: ReadActionHandler(),
+            .remove: RemoveActionHandler(),
+            .smell: SmellActionHandler(),
+            .take: TakeActionHandler(),
+            .taste: TasteActionHandler(),
+            .thinkAbout: ThinkAboutActionHandler(),
+            .touch: TouchActionHandler(),
+            .turnOff: TurnOffActionHandler(),
+            .turnOn: TurnOnActionHandler(),
+            .unlock: UnlockActionHandler(),
+            .wear: WearActionHandler(),
+
+            // Meta Actions
+//            .brief: BriefActionHandler(),
+//            .help: HelpActionHandler(),
+            .quit: QuitActionHandler(),
+//            .restore: RestoreActionHandler(),
+//            .save: SaveActionHandler(),
+            .score: ScoreActionHandler(),
+//            .verbose: VerboseActionHandler(),
+            .wait: WaitActionHandler(),
+            .xyzzy: XyzzyActionHandler()
+        ]
+
+    #if DEBUG
+        handlers[.debug] = DebugActionHandler()
+    #endif
+        return handlers
     }
 }
 
@@ -926,6 +985,17 @@ extension GameEngine {
     /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
     func apply(_ change: StateChange) async throws {
         try await applyWithDynamicValidation(change)
+    }
+
+    /// Retrieves the complete history of all `StateChange`s applied to the `gameState`
+    /// since the game started or the state was last loaded.
+    ///
+    /// This can be useful for debugging or advanced game mechanics that need to inspect
+    /// past state transitions.
+    ///
+    /// - Returns: An array of `StateChange` objects, in the order they were applied.
+    func changeHistory() -> [StateChange] {
+        gameState.changeHistory
     }
 }
 
