@@ -3,6 +3,36 @@ import Foundation
 // MARK: - Location Descriptions
 
 extension GameEngine {
+    /// Fetches the string value of a dynamic or static attribute for a given location.
+    ///
+    /// Works like the item-specific `fetch` for strings, but targets a location attribute.
+    /// Useful for dynamic location descriptions.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the string attribute.
+    ///   - locationID: The `LocationID` of the location.
+    /// - Returns: The string value of the attribute.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
+    ///           or the location does not exist.
+    public func attribute(
+        _ attributeID: AttributeID,
+        of locationID: LocationID
+    ) async throws -> String {
+        let value = await fetchStateValue(
+            locationID: locationID,
+            attributeID: attributeID
+        )
+        switch value {
+        case .string(let stringValue):
+            return stringValue
+        default:
+            throw ActionResponse.invalidValue("""
+                Cannot fetch string value for \(locationID.rawValue).\(attributeID.rawValue): \
+                \(value ?? .undefined)
+                """)
+        }
+    }
+
     /// Generates a formatted description string for a specific location attribute, typically
     /// its main description.
     ///
@@ -102,6 +132,35 @@ extension GameEngine {
         // 4. List visible items
         try await listItemsInLocation(locationID: playerLocationID)
     }
+
+    /// Validates a proposed value for a location attribute using the dynamic attribute registry.
+    /// This is called internally when `StateChange`s are applied to ensure dynamic validation
+    /// handlers are respected.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute being validated.
+    ///   - locationID: The unique identifier of the location.
+    ///   - newValue: The proposed new `StateValue`.
+    /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
+    /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
+    func validateStateValue(
+        locationID: LocationID,
+        attributeID: AttributeID,
+        newValue: StateValue
+    ) async throws -> Bool {
+        guard let location = gameState.locations[locationID] else {
+            return false // Location doesn't exist
+        }
+
+        return if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(
+            for: locationID,
+            attributeID: attributeID
+        ) {
+            try await validateHandler(location, newValue)
+        } else {
+            true // No validator registered, allow the change
+        }
+    }
 }
 
 // MARK: - Private helpers
@@ -123,6 +182,43 @@ extension GameEngine {
             return "A location."
         default:
             return "It seems indescribable."
+        }
+    }
+
+    /// Retrieves the current value of a potentially dynamic location property.
+    /// (Implementation mirrors fetchStateValue)
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the desired value.
+    ///   - locationID: The unique identifier of the location.
+    /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
+    private func fetchStateValue(
+        locationID: LocationID,
+        attributeID: AttributeID
+    ) async -> StateValue? {
+        guard let location = gameState.locations[locationID] else {
+            logger.warning("""
+                💥 Attempted to get dynamic value '\(attributeID.rawValue)' \
+                for non-existent location: \(locationID.rawValue)
+                """)
+            return nil
+        }
+
+        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(
+            for: locationID,
+            attributeID: attributeID
+        ) {
+            do {
+                return try await computeHandler(location, gameState)
+            } catch {
+                logger.error("""
+                    💥 Error computing dynamic value '\(attributeID.rawValue)' \
+                    for location \(locationID.rawValue): \(error)
+                    """)
+                return nil
+            }
+        } else {
+            return location.attributes[attributeID]
         }
     }
 
