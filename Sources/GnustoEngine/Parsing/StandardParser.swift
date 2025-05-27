@@ -477,60 +477,117 @@ public struct StandardParser: Parser {
         let nounToResolveIO = ioNounExtracted ?? indirectObjectPhraseTokens.last
         let modsToUseIO = (ioNounExtracted != nil) ? ioModsExtracted : Array(indirectObjectPhraseTokens.dropLast())
 
-        let resolvedDirectObjectResult: Result<EntityReference?, ParseError>
+        // Handle direct object resolution (including ALL)
+        var resolvedDirectObjects: [EntityReference] = []
+        var isAllCommandDO = false
+        
         if rule.pattern.contains(.directObject) {
-             if let actualNoun = nounToResolveDO {
-                 resolvedDirectObjectResult = resolveObject(
-                     noun: actualNoun,
-                     verb: verb,
-                     modifiers: modsToUseDO,
-                     in: gameState,
-                     using: vocabulary,
-                     requiredConditions: rule.directObjectConditions
-                 )
-             } else {
-                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
-             }
-        } else {
-             resolvedDirectObjectResult = .success(nil)
+            if let actualNoun = nounToResolveDO {
+                let lowercasedNoun = actualNoun.lowercased()
+                
+                // Check if this is an ALL command and the rule allows multiple objects
+                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                   rule.directObjectConditions.contains(.allowsMultiple) {
+                    isAllCommandDO = true
+                    let allObjectsResult = resolveAllObjects(
+                        verb: verb,
+                        modifiers: modsToUseDO,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.directObjectConditions
+                    )
+                    switch allObjectsResult {
+                    case .success(let objects):
+                        resolvedDirectObjects = objects
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                } else {
+                    // Regular single object resolution
+                    let singleObjectResult = resolveObject(
+                        noun: actualNoun,
+                        verb: verb,
+                        modifiers: modsToUseDO,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.directObjectConditions
+                    )
+                    switch singleObjectResult {
+                    case .success(let objectRef):
+                        if let ref = objectRef {
+                            resolvedDirectObjects = [ref]
+                        }
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                }
+            } else {
+                return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
+            }
         }
 
-        let resolvedIndirectObjectResult: Result<EntityReference?, ParseError>
+        // Handle indirect object resolution (including ALL)
+        var resolvedIndirectObjects: [EntityReference] = []
+        var isAllCommandIO = false
+        
         if rule.pattern.contains(.indirectObject) {
             if let actualNoun = nounToResolveIO {
-                resolvedIndirectObjectResult = resolveObject(
-                    noun: actualNoun,
-                    verb: verb,
-                    modifiers: modsToUseIO,
-                    in: gameState,
-                    using: vocabulary,
-                    requiredConditions: rule.indirectObjectConditions
-                )
+                let lowercasedNoun = actualNoun.lowercased()
+                
+                // Check if this is an ALL command and the rule allows multiple objects
+                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                   rule.indirectObjectConditions.contains(.allowsMultiple) {
+                    isAllCommandIO = true
+                    let allObjectsResult = resolveAllObjects(
+                        verb: verb,
+                        modifiers: modsToUseIO,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.indirectObjectConditions
+                    )
+                    switch allObjectsResult {
+                    case .success(let objects):
+                        resolvedIndirectObjects = objects
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                } else {
+                    // Regular single object resolution
+                    let singleObjectResult = resolveObject(
+                        noun: actualNoun,
+                        verb: verb,
+                        modifiers: modsToUseIO,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.indirectObjectConditions
+                    )
+                    switch singleObjectResult {
+                    case .success(let objectRef):
+                        if let ref = objectRef {
+                            resolvedIndirectObjects = [ref]
+                        }
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                }
             } else {
                 return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
             }
-        } else {
-            resolvedIndirectObjectResult = .success(nil)
         }
 
-        switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
-        case (.success(let doRef), .success(let ioRef)):
-            let command = Command(
-                verb: verb,
-                directObject: doRef,
-                directObjectModifiers: modsToUseDO,
-                indirectObject: ioRef,
-                indirectObjectModifiers: modsToUseIO,
-                preposition: matchedPreposition,
-                direction: matchedDirection,
-                rawInput: originalInput
-            )
-            return .success(command)
-        case (.failure(let error), _):
-            return .failure(error)
-        case (_, .failure(let error)):
-            return .failure(error)
-        }
+        // Create command with multiple object support
+        let command = Command(
+            verb: verb,
+            directObjects: resolvedDirectObjects,
+            directObjectModifiers: modsToUseDO,
+            indirectObjects: resolvedIndirectObjects,
+            indirectObjectModifiers: modsToUseIO,
+            isAllCommand: isAllCommandDO || isAllCommandIO,
+            preposition: matchedPreposition,
+            direction: matchedDirection,
+            rawInput: originalInput
+        )
+        return .success(command)
     }
 
     /// Extracts the likely noun and preceding modifiers from a phrase.
@@ -799,6 +856,79 @@ public struct StandardParser: Parser {
         }
 
         return .success(resolvedAndScopedEntities.first!)
+    }
+
+    /// Resolves ALL keywords to multiple objects based on verb and conditions.
+    func resolveAllObjects(
+        verb: VerbID,
+        modifiers: [String],
+        in gameState: GameState,
+        using vocabulary: Vocabulary,
+        requiredConditions: ObjectCondition
+    ) -> Result<[EntityReference], ParseError> {
+        // Get all candidates that match the required conditions
+        let itemCandidates = gatherCandidates(
+            in: gameState,
+            requiredConditions: requiredConditions
+        )
+        
+        // Filter candidates based on verb-specific criteria
+        var validItems: [Item] = []
+        
+        for item in itemCandidates.values {
+            // Apply verb-specific filtering (similar to Zork's TAKEBIT, etc.)
+            var isValidForVerb = false
+            
+            switch verb {
+            case .take:
+                // For TAKE ALL, only include takable items not already held
+                isValidForVerb = item.hasFlag(.isTakable) && item.parent != .player
+            case .drop:
+                // For DROP ALL, only include items currently held by player
+                isValidForVerb = item.parent == .player
+            case .examine:
+                // For EXAMINE ALL, include all visible items
+                isValidForVerb = true
+            default:
+                // For other verbs, include all items (let action handler decide)
+                isValidForVerb = true
+            }
+            
+            if isValidForVerb {
+                // Apply modifier filtering if any modifiers are specified
+                if filterCandidates(item: item, modifiers: modifiers) {
+                    validItems.append(item)
+                }
+            }
+        }
+        
+        // Sort items for consistent ordering (by name, then by ID)
+        validItems.sort { lhs, rhs in
+            if lhs.name != rhs.name {
+                return lhs.name < rhs.name
+            }
+            return lhs.id.rawValue < rhs.id.rawValue
+        }
+        
+        guard !validItems.isEmpty else {
+            // Return appropriate error based on context
+            if modifiers.isEmpty {
+                            switch verb {
+            case .take:
+                return .failure(.itemNotInScope(noun: "There is nothing here to take."))
+            case .drop:
+                return .failure(.itemNotInScope(noun: "You aren't carrying anything."))
+            default:
+                return .failure(.itemNotInScope(noun: "There is nothing here."))
+            }
+            } else {
+                return .failure(.modifierMismatch(noun: "all", modifiers: modifiers))
+            }
+        }
+        
+        // Convert to EntityReferences
+        let entityRefs = validItems.map { EntityReference.item($0.id) }
+        return .success(entityRefs)
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.

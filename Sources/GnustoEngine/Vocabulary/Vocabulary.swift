@@ -30,6 +30,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["north": .north, "n": .north, "up": .up]`
     public var directions: [String: Direction]
 
+    /// Special keywords that receive special parser treatment.
+    /// These are not treated as regular nouns but trigger special parsing logic.
+    /// Example: `["all", "everything", "each"]`
+    public var specialKeywords: Set<String>
+
     /// Computed property to get the verb synonym mapping needed by the parser.
     /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
     public var verbSynonyms: [String: Set<VerbID>] {
@@ -60,6 +65,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
         self.directions = [:]
+        self.specialKeywords = Vocabulary.defaultSpecialKeywords
     }
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
@@ -71,7 +77,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
-        pronouns: Set<String> = Vocabulary.defaultPronouns
+        pronouns: Set<String> = Vocabulary.defaultPronouns,
+        specialKeywords: Set<String> = Vocabulary.defaultSpecialKeywords
     ) {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
@@ -81,6 +88,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.noiseWords = noiseWords
         self.prepositions = prepositions
         self.pronouns = pronouns
+        self.specialKeywords = specialKeywords
     }
 
     // MARK: - Default Definitions
@@ -131,6 +139,14 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     public static let defaultPronouns: Set<String> = [
         "it",
         "them"
+    ]
+
+    /// Default set of special keywords that receive special parser treatment.
+    /// These words trigger special parsing logic rather than being treated as regular nouns.
+    public static let defaultSpecialKeywords: Set<String> = [
+        "all",
+        "everything",
+        "each"
     ]
 
     /// Default verbs common to most IF games.
@@ -202,7 +218,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .take,
             synonyms: "get", "grab", "pick",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
 
         Verb(
@@ -240,7 +261,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .drop,
             synonyms: "discard",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
         Verb(
             id: .open,
@@ -512,6 +538,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case prepositions
         case pronouns
         case directions
+        case specialKeywords
         // Removed verbs, syntaxRules
     }
 
@@ -526,6 +553,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
         directions = try container.decode([String: Direction].self, forKey: .directions)
+        specialKeywords = try container.decode(Set<String>.self, forKey: .specialKeywords)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -538,5 +566,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(prepositions, forKey: .prepositions)
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(directions, forKey: .directions)
+        try container.encode(specialKeywords, forKey: .specialKeywords)
     }
 }
