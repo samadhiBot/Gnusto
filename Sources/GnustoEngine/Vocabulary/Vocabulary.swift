@@ -179,7 +179,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .examine,
             synonyms: "x", "inspect",
-            syntax: [SyntaxRule(.verb, .directObject)],
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
             requiresLight: true
         ),
 
@@ -245,10 +250,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "in"
                 ),
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "into"
                 ),
             ],
@@ -261,10 +268,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "on"
                 ),
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "onto"
                 ),
             ],
@@ -281,6 +290,32 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 )
             ]
         ),
+
+        Verb(
+            id: .give,
+            synonyms: "donate", "offer", "feed", "hand",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
+                    requiredPreposition: "to"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .push,
+            synonyms: "press", "shove",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
+            requiresLight: true
+        ),
+
         Verb(
             id: .open,
             syntax: [SyntaxRule(.verb, .directObject)]

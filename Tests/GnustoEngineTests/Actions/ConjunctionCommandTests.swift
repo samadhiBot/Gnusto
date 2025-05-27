@@ -165,9 +165,9 @@ struct ConjunctionCommandTests {
         )
         let parser = StandardParser()
         
-        // Act: Try to parse "examine sword and lantern" (EXAMINE doesn't support multiple objects)
+        // Act: Try to parse "open sword and lantern" (OPEN doesn't support multiple objects)
         let result = parser.parse(
-            input: "examine sword and lantern",
+            input: "open sword and lantern",
             vocabulary: vocabulary,
             gameState: gameState
         )
