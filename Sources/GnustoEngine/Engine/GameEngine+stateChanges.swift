@@ -103,16 +103,10 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true` or the item is `nil`.
     public func clearFlag(_ attributeID: AttributeID, on item: Item?) -> StateChange? {
-        guard let item else { return nil }
-        return if item.attributes[attributeID] != true {
-            nil
+        if let item, item.attributes[attributeID] == true {
+            setAttribute(attributeID, on: item, to: false)
         } else {
-            StateChange(
-                entityID: .item(item.id),
-                attributeID: .itemAttribute(attributeID),
-                oldValue: item.attributes[attributeID],
-                newValue: false,
-            )
+            nil
         }
     }
 
@@ -138,6 +132,33 @@ extension GameEngine {
         )
     }
 
+    /// Creates a `StateChange` to set a dynamic attribute on an item.
+    ///
+    /// This method creates a `StateChange` that respects the action pipeline and will trigger
+    /// dynamic validation handlers when applied. It only creates a change if the new value
+    /// differs from the current value.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - item: The `Item` instance to modify.
+    ///   - value: The new `StateValue` for the attribute.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on item: Item,
+        to value: StateValue
+    ) -> StateChange? {
+        let currentValue = item.attributes[attributeID]
+        guard currentValue != value else { return nil }
+
+        return StateChange(
+            entityID: .item(item.id),
+            attributeID: .itemAttribute(attributeID),
+            oldValue: currentValue,
+            newValue: value
+        )
+    }
+
     /// Builds a `StateChange` to set a boolean attribute (flag) on an item to `true`.
     ///
     /// If the flag is already set to `true` on the item, this method returns `nil`
@@ -149,16 +170,10 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true` or the item is `nil`.
     public func setFlag(_ attributeID: AttributeID, on item: Item?) -> StateChange? {
-        guard let item else { return nil }
-        return if item.attributes[attributeID] == true {
-            nil
+        if let item {
+            setAttribute(attributeID, on: item, to: true)
         } else {
-            StateChange(
-                entityID: .item(item.id),
-                attributeID: .itemAttribute(attributeID),
-                oldValue: item.attributes[attributeID],
-                newValue: true,
-            )
+            nil
         }
     }
 }
@@ -243,33 +258,7 @@ extension GameEngine {
 // MARK: - Dynamic Attribute StateChange factories
 
 extension GameEngine {
-    /// Creates a `StateChange` to set a dynamic attribute on an item.
-    ///
-    /// This method creates a `StateChange` that respects the action pipeline and will trigger
-    /// dynamic validation handlers when applied. It only creates a change if the new value
-    /// differs from the current value.
-    ///
-    /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the attribute to set.
-    ///   - item: The `Item` instance to modify.
-    ///   - value: The new `StateValue` for the attribute.
-    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
-    public func setAttribute(
-        _ attributeID: AttributeID,
-        on item: Item,
-        to value: StateValue
-    ) -> StateChange? {
-        let currentValue = item.attributes[attributeID]
-        guard currentValue != value else { return nil }
-        
-        return StateChange(
-            entityID: .item(item.id),
-            attributeID: .itemAttribute(attributeID),
-            oldValue: currentValue,
-            newValue: value
-        )
-    }
-    
+
     /// Creates a `StateChange` to set a dynamic attribute on a location.
     ///
     /// This method creates a `StateChange` that respects the action pipeline and will trigger
