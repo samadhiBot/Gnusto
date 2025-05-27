@@ -203,18 +203,14 @@ public struct TakeActionHandler: ActionHandler {
         }
         
         // Generate appropriate message
-        let message: String
-        if context.command.isAllCommand {
+        let message = if context.command.isAllCommand {
             if takenItems.isEmpty {
-                message = "There is nothing here to take."
-            } else if takenItems.count == 1 {
-                message = "\(takenItems[0].name): Taken."
+                "There is nothing here to take."
             } else {
-                let itemNames = takenItems.map { $0.name }
-                message = "\(itemNames.joined(separator: ", ")): Taken."
+                "You take \(takenItems.listWithDefiniteArticles)."
             }
         } else {
-            message = "Taken."
+            "Taken."
         }
         
         return ActionResult(

@@ -1,5 +1,7 @@
-import Testing
+import CustomDump
 import Foundation
+import Testing
+
 @testable import GnustoEngine
 
 /// Tests for commands with conjunctions like "DROP SWORD AND LANTERN"
@@ -85,7 +87,7 @@ struct ConjunctionCommandTests {
         
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("sword, lantern: Dropped."))
+        expectNoDifference(output, "You drop the lantern and the sword.")
     }
     
     @Test("DROP SWORD, LANTERN AND BOOK drops all three items")
@@ -115,7 +117,8 @@ struct ConjunctionCommandTests {
         
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("sword, lantern, book: Dropped."))
+        expectNoDifference(output, "You drop the book, the lantern, and the sword.")
+
     }
     
     // MARK: - TAKE Conjunction Tests
@@ -145,7 +148,7 @@ struct ConjunctionCommandTests {
         
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("coin, gem: Taken."))
+        expectNoDifference(output, "You take the coin and the gem.")
     }
     
     // MARK: - Error Handling Tests

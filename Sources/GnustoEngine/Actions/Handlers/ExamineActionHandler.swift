@@ -149,7 +149,7 @@ public struct ExamineActionHandler: ActionHandler {
                     
                     // For multiple objects, prefix with item name
                     if context.command.isAllCommand || context.command.directObjects.count > 1 {
-                        messages.append("\(targetItem.name): \(message)")
+                        messages.append("- \(targetItem.name.capitalizedFirst): \(message)")
                     } else {
                         messages.append(message)
                     }
@@ -164,7 +164,7 @@ public struct ExamineActionHandler: ActionHandler {
             case .player:
                 // Classic Zork response for EXAMINE SELF
                 if context.command.isAllCommand || context.command.directObjects.count > 1 {
-                    messages.append("yourself: You are your usual self.")
+                    messages.append("- Yourself: You are your usual self.")
                 } else {
                     messages.append("You are your usual self.")
                 }
@@ -183,10 +183,10 @@ public struct ExamineActionHandler: ActionHandler {
             if examinedItems.isEmpty && messages.isEmpty {
                 finalMessage = "There is nothing here to examine."
             } else {
-                finalMessage = messages.joined(separator: "\n\n")
+                finalMessage = messages.joined(separator: "\n")
             }
         } else {
-            finalMessage = messages.joined(separator: "\n\n")
+            finalMessage = messages.joined(separator: "\n")
         }
         
         return ActionResult(

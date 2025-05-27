@@ -58,7 +58,7 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("gold coin, brass key, brass lamp: Taken."))
+        expectNoDifference(output, "You take the gold coin, the brass key, and the brass lamp.")
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
@@ -148,7 +148,7 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("gold coin, brass key: Taken."))
+        expectNoDifference(output, "You take the gold coin and the brass key.")
     }
 
     @Test("TAKE ALL with capacity limit")
@@ -203,7 +203,7 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("gold coin, brass key: Taken."))
+        expectNoDifference(output, "You take the gold coin and the brass key.")
     }
 
     @Test("DROP ALL with multiple held items")
@@ -257,10 +257,11 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("gold coin, brass key, brass lamp: Dropped."))
+        expectNoDifference(output, "You drop the gold coin, the brass key, and the brass lamp.")
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
+        #expect(await engine.getPronounReference(pronoun: "them") == [.item("lamp")])
     }
 
     @Test("DROP ALL with no held items")
@@ -318,7 +319,7 @@ struct AllCommandTests {
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "brass key: Taken.")
+        #expect(output == "You take the brass key.")
 
         // Assert: Item is taken
         let finalKeyState = try await engine.item("key")
@@ -353,7 +354,7 @@ struct AllCommandTests {
 
         // Assert: Singular message format
         let output = await mockIO.flush()
-        #expect(output == "brass key: Dropped.")
+        #expect(output == "You drop the brass key.")
 
         // Assert: Item is dropped
         let finalKeyState = try await engine.item("key")
@@ -403,6 +404,6 @@ struct AllCommandTests {
 
         // Assert: Message only mentions newly taken item
         let output = await mockIO.flush()
-        #expect(output == "brass key: Taken.")
+        #expect(output == "You take the brass key.")
     }
 } 

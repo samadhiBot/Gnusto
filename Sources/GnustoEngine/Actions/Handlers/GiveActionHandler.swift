@@ -154,14 +154,10 @@ public struct GiveActionHandler: ActionHandler {
         }
         
         // Generate appropriate message
-        let message: String
-        if givenItems.isEmpty {
-            message = context.command.isAllCommand ? "You have nothing to give." : "You don't have that."
-        } else if givenItems.count == 1 {
-            message = "You give the \(givenItems[0].name) to the \(recipient.name)."
+        let message = if givenItems.isEmpty {
+            context.command.isAllCommand ? "You have nothing to give." : "You don't have that."
         } else {
-            let itemNames = givenItems.map { $0.name }
-            message = "You give \(itemNames.commaListing("and")) to the \(recipient.name)."
+            "You give \(givenItems.listWithDefiniteArticles) to the \(recipient.name)."
         }
         
         return ActionResult(

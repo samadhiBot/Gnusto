@@ -10,8 +10,18 @@ struct MultipleObjectTests {
     
     @Test("EXAMINE ALL works correctly")
     func testExamineAll() async throws {
-        let sword = Item(id: "sword", .name("sword"), .in(.location(.startRoom)), .description("A sharp blade."))
-        let lantern = Item(id: "lantern", .name("lantern"), .in(.location(.startRoom)), .description("A bright light."))
+        let sword = Item(
+            id: "sword",
+            .name("sword"),
+            .in(.location(.startRoom)),
+            .description("A sharp blade.")
+        )
+        let lantern = Item(
+            id: "lantern",
+            .name("lantern"),
+            .in(.location(.startRoom)),
+            .description("A bright light.")
+        )
         
         let game = MinimalGame(items: [sword, lantern])
         let mockIO = await MockIOHandler()
@@ -29,14 +39,26 @@ struct MultipleObjectTests {
         
         // Assert: Should examine both items
         let output = await mockIO.flush()
-        #expect(output.contains("sword: A sharp blade."))
-        #expect(output.contains("lantern: A bright light."))
+        expectNoDifference(output, """
+            - Sword: A sharp blade.
+            - Lantern: A bright light.
+            """)
     }
     
     @Test("EXAMINE SWORD AND LANTERN works correctly")
     func testExamineSwordAndLantern() async throws {
-        let sword = Item(id: "sword", .name("sword"), .in(.location(.startRoom)), .description("A sharp blade."))
-        let lantern = Item(id: "lantern", .name("lantern"), .in(.location(.startRoom)), .description("A bright light."))
+        let sword = Item(
+            id: "sword",
+            .name("sword"),
+            .in(.location(.startRoom)),
+            .description("A sharp blade.")
+        )
+        let lantern = Item(
+            id: "lantern",
+            .name("lantern"),
+            .in(.location(.startRoom)),
+            .description("A bright light.")
+        )
         
         let game = MinimalGame(items: [sword, lantern])
         let mockIO = await MockIOHandler()
@@ -54,17 +76,32 @@ struct MultipleObjectTests {
         
         // Assert: Should examine both items
         let output = await mockIO.flush()
-        #expect(output.contains("sword: A sharp blade."))
-        #expect(output.contains("lantern: A bright light."))
+        expectNoDifference(output, """
+            - Sword: A sharp blade.
+            - Lantern: A bright light.
+            """)
     }
     
     // MARK: - GIVE Multiple Objects Tests
     
     @Test("GIVE ALL TO MERCHANT works correctly")
     func testGiveAllToMerchant() async throws {
-        let coin = Item(id: "coin", .name("coin"), .in(.player))
-        let gem = Item(id: "gem", .name("gem"), .in(.player))
-        let merchant = Item(id: "merchant", .name("merchant"), .in(.location(.startRoom)), .isCharacter)
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .in(.player)
+        )
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .in(.player)
+        )
+        let merchant = Item(
+            id: "merchant",
+            .name("merchant"),
+            .in(.location(.startRoom)),
+            .isCharacter
+        )
         
         let game = MinimalGame(items: [coin, gem, merchant])
         let mockIO = await MockIOHandler()
@@ -83,8 +120,8 @@ struct MultipleObjectTests {
         
         // Assert: Should give both items
         let output = await mockIO.flush()
-        #expect(output.contains("You give coin and gem to the merchant."))
-        
+        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
@@ -94,9 +131,22 @@ struct MultipleObjectTests {
     
     @Test("GIVE COIN AND GEM TO MERCHANT works correctly")
     func testGiveCoinAndGemToMerchant() async throws {
-        let coin = Item(id: "coin", .name("coin"), .in(.player))
-        let gem = Item(id: "gem", .name("gem"), .in(.player))
-        let merchant = Item(id: "merchant", .name("merchant"), .in(.location(.startRoom)), .isCharacter)
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .in(.player)
+        )
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .in(.player)
+        )
+        let merchant = Item(
+            id: "merchant",
+            .name("merchant"),
+            .in(.location(.startRoom)),
+            .isCharacter
+        )
         
         let game = MinimalGame(items: [coin, gem, merchant])
         let mockIO = await MockIOHandler()
@@ -115,8 +165,8 @@ struct MultipleObjectTests {
         
         // Assert: Should give both items
         let output = await mockIO.flush()
-        #expect(output.contains("You give coin and gem to the merchant."))
-        
+        expectNoDifference(output, "You give the coin and the gem to the merchant.")
+
         // Verify items moved to merchant
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
@@ -128,9 +178,23 @@ struct MultipleObjectTests {
     
     @Test("PUT ALL IN BOX works correctly")
     func testPutAllInBox() async throws {
-        let coin = Item(id: "coin", .name("coin"), .in(.player))
-        let gem = Item(id: "gem", .name("gem"), .in(.player))
-        let box = Item(id: "box", .name("box"), .in(.location(.startRoom)), .isContainer, .isOpen)
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .in(.player)
+        )
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .in(.player)
+        )
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
+        )
         
         let game = MinimalGame(items: [coin, gem, box])
         let mockIO = await MockIOHandler()
@@ -149,7 +213,7 @@ struct MultipleObjectTests {
         
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        #expect(output.contains("You put coin and gem in the box."))
+        expectNoDifference(output, "You put the coin and the gem in the box.")
         
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
@@ -160,9 +224,23 @@ struct MultipleObjectTests {
     
     @Test("PUT COIN AND GEM IN BOX works correctly")
     func testPutCoinAndGemInBox() async throws {
-        let coin = Item(id: "coin", .name("coin"), .in(.player))
-        let gem = Item(id: "gem", .name("gem"), .in(.player))
-        let box = Item(id: "box", .name("box"), .in(.location(.startRoom)), .isContainer, .isOpen)
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .in(.player)
+        )
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .in(.player)
+        )
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
+        )
         
         let game = MinimalGame(items: [coin, gem, box])
         let mockIO = await MockIOHandler()
@@ -181,8 +259,8 @@ struct MultipleObjectTests {
         
         // Assert: Should put both items in box
         let output = await mockIO.flush()
-        #expect(output.contains("You put coin and gem in the box."))
-        
+        expectNoDifference(output, "You put the coin and the gem in the box.")
+
         // Verify items moved to box
         let updatedCoin = try await engine.item("coin")
         let updatedGem = try await engine.item("gem")
@@ -194,8 +272,16 @@ struct MultipleObjectTests {
     
     @Test("PUSH ALL works correctly")
     func testPushAll() async throws {
-        let button = Item(id: "button", .name("button"), .in(.location(.startRoom)))
-        let lever = Item(id: "lever", .name("lever"), .in(.location(.startRoom)))
+        let button = Item(
+            id: "button",
+            .name("button"),
+            .in(.location(.startRoom))
+        )
+        let lever = Item(
+            id: "lever",
+            .name("lever"),
+            .in(.location(.startRoom))
+        )
         
         let game = MinimalGame(items: [button, lever])
         let mockIO = await MockIOHandler()
@@ -213,13 +299,21 @@ struct MultipleObjectTests {
         
         // Assert: Should push both items
         let output = await mockIO.flush()
-        #expect(output.contains("You push button and lever. Nothing happens."))
+        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
     }
     
     @Test("PUSH BUTTON AND LEVER works correctly")
     func testPushButtonAndLever() async throws {
-        let button = Item(id: "button", .name("button"), .in(.location(.startRoom)))
-        let lever = Item(id: "lever", .name("lever"), .in(.location(.startRoom)))
+        let button = Item(
+            id: "button",
+            .name("button"),
+            .in(.location(.startRoom))
+        )
+        let lever = Item(
+            id: "lever",
+            .name("lever"),
+            .in(.location(.startRoom))
+        )
         
         let game = MinimalGame(items: [button, lever])
         let mockIO = await MockIOHandler()
@@ -237,15 +331,23 @@ struct MultipleObjectTests {
         
         // Assert: Should push both items
         let output = await mockIO.flush()
-        #expect(output.contains("You push button and lever. Nothing happens."))
+        expectNoDifference(output, "You push the button and the lever. Nothing happens.")
     }
     
     // MARK: - Error Handling Tests
     
     @Test("Multiple objects with unsupported verb fails gracefully")
     func testMultipleObjectsWithUnsupportedVerb() async throws {
-        let sword = Item(id: "sword", .name("sword"), .in(.location(.startRoom)))
-        let lantern = Item(id: "lantern", .name("lantern"), .in(.location(.startRoom)))
+        let sword = Item(
+            id: "sword",
+            .name("sword"),
+            .in(.location(.startRoom))
+        )
+        let lantern = Item(
+            id: "lantern",
+            .name("lantern"),
+            .in(.location(.startRoom))
+        )
         
         let game = MinimalGame(items: [sword, lantern])
         let mockIO = await MockIOHandler()
@@ -284,6 +386,6 @@ struct MultipleObjectTests {
         
         // Assert: Should get appropriate message
         let output = await mockIO.flush()
-        #expect(output.contains("There is nothing here to take."))
+        expectNoDifference(output, "There is nothing here to take.")
     }
 } 

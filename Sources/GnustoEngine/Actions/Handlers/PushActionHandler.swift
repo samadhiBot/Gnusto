@@ -109,14 +109,10 @@ public struct PushActionHandler: ActionHandler {
         }
         
         // Generate appropriate message
-        let message: String
-        if pushedItems.isEmpty {
-            message = context.command.isAllCommand ? "There is nothing here to push." : "Push what?"
-        } else if pushedItems.count == 1 {
-            message = "You push the \(pushedItems[0].name). Nothing happens."
+        let message = if pushedItems.isEmpty {
+            context.command.isAllCommand ? "There is nothing here to push." : "Push what?"
         } else {
-            let itemNames = pushedItems.map { $0.name }
-            message = "You push \(itemNames.commaListing("and")). Nothing happens."
+            "You push \(pushedItems.listWithDefiniteArticles). Nothing happens."
         }
         
         return ActionResult(

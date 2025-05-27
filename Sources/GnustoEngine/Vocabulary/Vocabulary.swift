@@ -335,13 +335,23 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .wear,
             synonyms: "don", "put on",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
 
         Verb(
             id: .remove,
             synonyms: "take off", "doff",
-            syntax: [SyntaxRule(.verb, .directObject)],
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
             requiresLight: false
         ),
 

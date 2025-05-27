@@ -268,14 +268,11 @@ public struct InsertActionHandler: ActionHandler {
         }
         
         // Generate appropriate message
-        let message: String
-        if insertedItems.isEmpty {
-            message = context.command.isAllCommand ? "You have nothing to put in the \(container.name)." : "Insert what?"
-        } else if insertedItems.count == 1 {
-            message = "You put the \(insertedItems[0].name) in the \(container.name)."
+        let message = if insertedItems.isEmpty {
+            context.command.isAllCommand ? "You have nothing to put in the \(container.name)."
+                                         : "Insert what?"
         } else {
-            let itemNames = insertedItems.map { $0.name }
-            message = "You put \(itemNames.commaListing("and")) in the \(container.name)."
+            "You put \(insertedItems.listWithDefiniteArticles) in the \(container.name)."
         }
         
         return ActionResult(

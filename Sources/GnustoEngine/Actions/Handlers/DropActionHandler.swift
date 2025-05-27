@@ -161,18 +161,14 @@ public struct DropActionHandler: ActionHandler {
         }
         
         // Generate appropriate message
-        let message: String
-        if context.command.isAllCommand {
+        let message = if context.command.isAllCommand {
             if droppedItems.isEmpty {
-                message = "You aren't carrying anything."
-            } else if droppedItems.count == 1 {
-                message = "\(droppedItems[0].name): Dropped."
+                "You aren't carrying anything."
             } else {
-                let itemNames = droppedItems.map { $0.name }
-                message = "\(itemNames.joined(separator: ", ")): Dropped."
+                "You drop \(droppedItems.listWithDefiniteArticles)."
             }
         } else {
-            message = "Dropped."
+            "Dropped."
         }
         
         return ActionResult(
