@@ -35,6 +35,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["all", "everything", "each"]`
     public var specialKeywords: Set<String>
 
+    /// Conjunctions used to connect multiple objects in commands.
+    /// These words are used to parse commands like "TAKE SWORD AND LANTERN".
+    /// Example: `["and", ","]`
+    public var conjunctions: Set<String>
+
     /// Computed property to get the verb synonym mapping needed by the parser.
     /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
     public var verbSynonyms: [String: Set<VerbID>] {
@@ -66,6 +71,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.pronouns = Vocabulary.defaultPronouns
         self.directions = [:]
         self.specialKeywords = Vocabulary.defaultSpecialKeywords
+        self.conjunctions = Vocabulary.defaultConjunctions
     }
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
@@ -78,7 +84,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
         pronouns: Set<String> = Vocabulary.defaultPronouns,
-        specialKeywords: Set<String> = Vocabulary.defaultSpecialKeywords
+        specialKeywords: Set<String> = Vocabulary.defaultSpecialKeywords,
+        conjunctions: Set<String> = Vocabulary.defaultConjunctions
     ) {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
@@ -89,6 +96,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.prepositions = prepositions
         self.pronouns = pronouns
         self.specialKeywords = specialKeywords
+        self.conjunctions = conjunctions
     }
 
     // MARK: - Default Definitions
@@ -99,7 +107,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "'",
         "(",
         ")",
-        ",",
         ".",
         ":",
         ";",
@@ -107,7 +114,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "\"",
         "a",
         "an",
-        "and",
         "some",
         "that",
         "the",
@@ -147,6 +153,13 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "all",
         "everything",
         "each"
+    ]
+
+    /// Default set of conjunctions used to connect multiple objects.
+    /// These words are used to parse commands like "TAKE SWORD AND LANTERN".
+    public static let defaultConjunctions: Set<String> = [
+        "and",
+        ","
     ]
 
     /// Default verbs common to most IF games.
@@ -539,6 +552,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case pronouns
         case directions
         case specialKeywords
+        case conjunctions
         // Removed verbs, syntaxRules
     }
 
@@ -554,6 +568,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
         directions = try container.decode([String: Direction].self, forKey: .directions)
         specialKeywords = try container.decode(Set<String>.self, forKey: .specialKeywords)
+        conjunctions = try container.decodeIfPresent(Set<String>.self, forKey: .conjunctions) ?? Vocabulary.defaultConjunctions
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -567,5 +582,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(directions, forKey: .directions)
         try container.encode(specialKeywords, forKey: .specialKeywords)
+        try container.encode(conjunctions, forKey: .conjunctions)
     }
 }

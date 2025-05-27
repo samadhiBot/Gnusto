@@ -896,13 +896,13 @@ struct StandardParserTests {
     @Test("Remove noise words")
     func testRemoveNoise() {
         let tokens = ["take", "the", "brass", "lamp", "and", "the", "key"]
-        let expected = ["take", "brass", "lamp", "key"]
+        let expected = ["take", "brass", "lamp", "and", "key"]
         #expect(parser.removeNoise(tokens: tokens, noiseWords: vocabulary.noiseWords) == expected)
     }
 
     @Test("Remove noise words - only noise")
     func testRemoveNoiseOnlyNoise() {
-        let tokens = ["the", "a", "an", ".", ","]
+        let tokens = ["the", "a", "an", "."]
         let expected: [String] = []
         #expect(parser.removeNoise(tokens: tokens, noiseWords: vocabulary.noiseWords) == expected)
     }
