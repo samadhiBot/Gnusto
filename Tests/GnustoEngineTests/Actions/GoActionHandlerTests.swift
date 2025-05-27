@@ -12,7 +12,7 @@ struct GoActionHandlerTests {
         let startRoom = Location(
             id: .startRoom,
             .description("You are here."),
-            .exits([.north: Exit(destination: "end")]),
+            .exits([.north: .to("end")]),
             .inherentlyLit
         )
         let endRoom = Location(
@@ -142,7 +142,7 @@ struct GoActionHandlerTests {
         let foyer = Location(
             id: "foyer",
             .description("A grand foyer."),
-            .exits([.north: Exit(destination: "hall")]),
+            .exits([.north: .to("hall")]),
             .inherentlyLit
         )
         let hall = Location(
@@ -331,7 +331,7 @@ struct GoActionHandlerTests {
         #expect(await engine.gameState.flags.contains(conditionGlobalID))
 
         // Manually add the exit now that the condition is met
-        foyer.exits[.east] = Exit(destination: "garden")
+        foyer.exits[.east] = .to("garden")
         // Update the location in the game state directly for the test setup
 //        await engine.TEST_ONLY_updateLocation(foyer)
 

@@ -34,7 +34,7 @@ struct Act1Area: AreaBlueprint {
             magical stone bridge spans the creek that separates your property from the road.
             """),
         .exits([
-            .east: Exit(destination: .stoneBridge)
+            .east: .to(.stoneBridge)
         ]),
         .inherentlyLit
     )
@@ -52,8 +52,8 @@ struct Act1Area: AreaBlueprint {
             The bridge connects your house to the west with the country road to the east.
             """),
         .exits([
-            .west: Exit(destination: .yourHouse),
-            .east: Exit(destination: .countryRoad)
+            .west: .to(.yourHouse),
+            .east: .to(.countryRoad)
         ]),
         .inherentlyLit
     )
@@ -71,8 +71,8 @@ struct Act1Area: AreaBlueprint {
             Your stone bridge lies to the west, while Berzio's gate can be seen to the north.
             """),
         .exits([
-            .west: Exit(destination: .stoneBridge),
-            .north: Exit(destination: .berziosGate)
+            .west: .to(.stoneBridge),
+            .north: .to(.berziosGate)
         ]),
         .inherentlyLit
     )
@@ -90,8 +90,8 @@ struct Act1Area: AreaBlueprint {
             magical apparatus. The country road continues to the south.
             """),
         .exits([
-            .south: Exit(destination: .countryRoad),
-            .north: Exit(destination: .berziosGarden)
+            .south: .to(.countryRoad),
+            .north: .to(.berziosGarden)
         ]),
         .inherentlyLit
     )
@@ -108,7 +108,7 @@ struct Act1Area: AreaBlueprint {
             Little Gnusto bounces around happily, clearly delighted to be back in her proper home.
             """),
         .exits([
-            .south: Exit(destination: .berziosGate)
+            .south: .to(.berziosGate)
         ]),
         .inherentlyLit
     )

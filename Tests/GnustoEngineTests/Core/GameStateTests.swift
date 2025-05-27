@@ -50,13 +50,13 @@ struct GameStateTests {
                 id: Self.locWOH,
                 .name("West of House"),
                 .description("You are standing west of a white house."),
-                .exits([.north: Exit(destination: Self.locNorth)])
+                .exits([.north: .to(Self.locNorth)])
             ),
             Location(
                 id: Self.locNorth,
                 .name("North of House"),
                 .description("You are north of the house."),
-                .exits([.south: Exit(destination: Self.locWOH)])
+                .exits([.south: .to(Self.locWOH)])
             )
         ]
     }

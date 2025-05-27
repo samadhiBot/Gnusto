@@ -43,8 +43,8 @@ struct OperaHouse: AreaContents {
                 the street is to the north, and there are doorways south and west.
                 """),
         .exits([
-            .south: Exit(destination: "bar"),
-            .west: Exit(destination: "cloakroom"),
+            .south: .to("bar"),
+            .west: .to("cloakroom"),
             .north: Exit(
                 destination: "street",
                 blockedMessage: """

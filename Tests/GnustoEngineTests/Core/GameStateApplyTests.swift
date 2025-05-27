@@ -699,7 +699,7 @@ struct GameStateApplyTests {
         let locationID = GameStateTests.locWOH
         let initialExits = gameState.locations[locationID]?.exits ?? [:]
         var newExits = initialExits
-        newExits[.south] = Exit(destination: GameStateTests.locClearing)
+        newExits[.south] = .to(GameStateTests.locClearing)
 
         let change = StateChange(
             entityID: .location(locationID),
@@ -722,9 +722,9 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
         let actualOldExits = gameState.locations[locationID]?.exits ?? [:]
-        let incorrectOldExits: [Direction: Exit] = [.east: Exit(destination: "nowhere")] // Incorrect
+        let incorrectOldExits: [Direction: Exit] = [.east: .to("nowhere")] // Incorrect
         var newExits = actualOldExits
-        newExits[.south] = Exit(destination: GameStateTests.locClearing)
+        newExits[.south] = .to(GameStateTests.locClearing)
 
         let change = StateChange(
             entityID: .location(locationID),
