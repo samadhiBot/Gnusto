@@ -1627,6 +1627,58 @@ struct GameEngineTests {
             )
         )
     }
+
+    @Test("updatePronounsForMultipleObjects updates both 'it' and 'them' correctly")
+    func testUpdatePronounsForMultipleObjects() async throws {
+        let item1 = Item(id: "item1", .name("Item One"))
+        let item2 = Item(id: "item2", .name("Item Two"))
+        let item3 = Item(id: "item3", .name("Item Three"))
+        let engine = await GameEngine(
+            blueprint: MinimalGame(items: [item1, item2, item3]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let changes = await engine.updatePronounsForMultipleObjects(
+            lastItem: item3,
+            allItems: [item1, item2, item3]
+        )
+        
+        // Should return two changes: one for "it" and one for "them"
+        #expect(changes.count == 2)
+        
+        // Check "it" change (should refer to last item)
+        let itChange = changes.first { change in
+            if case .pronounReference(let pronoun) = change.attributeID {
+                return pronoun == "it"
+            }
+            return false
+        }
+        #expect(itChange != nil)
+        #expect(
+            itChange == StateChange(
+                entityID: .global,
+                attributeID: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(item3.id)])
+            )
+        )
+        
+        // Check "them" change (should refer to all items)
+        let themChange = changes.first { change in
+            if case .pronounReference(let pronoun) = change.attributeID {
+                return pronoun == "them"
+            }
+            return false
+        }
+        #expect(themChange != nil)
+        #expect(
+            themChange == StateChange(
+                entityID: .global,
+                attributeID: .pronounReference(pronoun: "them"),
+                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id), .item(item3.id)])
+            )
+        )
+    }
 }
 
 // Helper extension for OutputCall checks (optional)

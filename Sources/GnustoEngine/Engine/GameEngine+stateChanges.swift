@@ -86,6 +86,45 @@ extension GameEngine {
             newValue: .entityReferenceSet(newEntityReferences)
         )
     }
+
+    /// Builds `StateChange`s to update both "it" and "them" pronouns for multiple object commands.
+    ///
+    /// For multiple object commands, we want:
+    /// - "it" to refer to the last item processed
+    /// - "them" to refer to all the items processed
+    ///
+    /// This method creates the appropriate state changes for both pronouns.
+    ///
+    /// - Parameters:
+    ///   - lastItem: The last item processed (for "it" pronoun)
+    ///   - allItems: All items processed (for "them" pronoun)
+    /// - Returns: An array of `StateChange`s to update both pronouns, or empty array if no changes needed.
+    public func updatePronounsForMultipleObjects(lastItem: Item, allItems: [Item]) -> [StateChange] {
+        var changes: [StateChange] = []
+        
+        // Update "it" to refer to the last item
+        if let itChange = updatePronouns(to: lastItem) {
+            changes.append(itChange)
+        }
+        
+        // Update "them" to refer to all items (if more than one)
+        if allItems.count > 1 {
+            let allEntityReferences = Set(allItems.map { EntityReference.item($0.id) })
+            let oldThemReferences = gameState.pronouns["them"]
+            
+            if allEntityReferences != oldThemReferences {
+                let themChange = StateChange(
+                    entityID: .global,
+                    attributeID: .pronounReference(pronoun: "them"),
+                    oldValue: oldThemReferences.map { .entityReferenceSet($0) },
+                    newValue: .entityReferenceSet(allEntityReferences)
+                )
+                changes.append(themChange)
+            }
+        }
+        
+        return changes
+    }
 }
 
 // MARK: - Item StateChange factories

@@ -261,7 +261,11 @@ struct AllCommandTests {
 
         // Assert: Pronouns updated to last item
         #expect(await engine.getPronounReference(pronoun: "it") == [.item("lamp")])
-        #expect(await engine.getPronounReference(pronoun: "them") == [.item("lamp")])
+        #expect(await engine.getPronounReference(pronoun: "them") == [
+            .item("lamp"),
+            .item("key"),
+            .item("coin"),
+        ])
     }
 
     @Test("DROP ALL with no held items")

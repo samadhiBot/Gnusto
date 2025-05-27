@@ -105,10 +105,7 @@ public struct ExamineActionHandler: ActionHandler {
                         if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
                             itemStateChanges.append(update)
                         }
-                        // --- State Change: Update pronouns ---
-                        if let update = await context.engine.updatePronouns(to: targetItem) {
-                            itemStateChanges.append(update)
-                        }
+                        // Note: Pronoun updates are handled after processing all items
                     }
                     
                     // --- Determine Message ---
@@ -173,6 +170,24 @@ public struct ExamineActionHandler: ActionHandler {
                 // For ALL commands, skip non-items
                 if !context.command.isAllCommand {
                     return ActionResult("You can only examine items.")
+                }
+            }
+        }
+        
+        // Update pronouns appropriately for multiple objects
+        if !examinedItems.isEmpty {
+            let lastItem = examinedItems.last!
+            if examinedItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: examinedItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
                 }
             }
         }

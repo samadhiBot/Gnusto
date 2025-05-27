@@ -260,10 +260,20 @@ public struct InsertActionHandler: ActionHandler {
             }
         }
         
-        // Update pronouns to refer to the last inserted item (or first if only one)
+        // Update pronouns appropriately for multiple objects
         if let lastItem = lastInsertedItem {
-            if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
-                allStateChanges.append(pronounChange)
+            if insertedItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: insertedItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
             }
         }
         
