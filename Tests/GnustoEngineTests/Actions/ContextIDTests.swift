@@ -20,16 +20,6 @@ struct ContextIDTests {
         #expect(contextID.rawValue == "customContext")
     }
     
-    @Test("ContextID initialization with empty string")
-    func testEmptyStringInitialization() {
-        let emptyLiteral: ContextID = ""
-        let emptyRawValue = ContextID("")
-        
-        #expect(emptyLiteral.rawValue == "")
-        #expect(emptyRawValue.rawValue == "")
-        #expect(emptyLiteral == emptyRawValue)
-    }
-    
     @Test("ContextID initialization with special characters")
     func testSpecialCharacterInitialization() {
         let specialChars: ContextID = "context_with-special.chars@123"

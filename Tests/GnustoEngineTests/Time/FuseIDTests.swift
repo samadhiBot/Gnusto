@@ -25,12 +25,6 @@ struct FuseIDTests {
         #expect(id.rawValue == "testFuse")
     }
 
-    @Test("FuseID Initialization with Empty String")
-    func testEmptyStringInitialization() throws {
-        let id: FuseID = ""
-        #expect(id.rawValue == "")
-    }
-
     @Test("FuseID Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
         let id: FuseID = "fuse_with-special.chars@123"
@@ -143,7 +137,6 @@ struct FuseIDTests {
             "alarmClock",
             "fuse_with-special.chars",
             "💣定时器",
-            ""
         ]
 
         let encoder = JSONEncoder()

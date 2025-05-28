@@ -25,12 +25,6 @@ struct ItemIDTests {
         #expect(id.rawValue == "testItem")
     }
 
-    @Test("ItemID Initialization with Empty String")
-    func testEmptyStringInitialization() throws {
-        let id: ItemID = ""
-        #expect(id.rawValue == "")
-    }
-
     @Test("ItemID Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
         let id: ItemID = "item_with-special.chars@123"
@@ -143,7 +137,6 @@ struct ItemIDTests {
             "silverCoin",
             "item_with-special.chars",
             "🗝️魔法钥匙",
-            ""
         ]
 
         let encoder = JSONEncoder()

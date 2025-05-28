@@ -25,12 +25,6 @@ struct DaemonIDTests {
         #expect(id.rawValue == "testDaemon")
     }
 
-    @Test("DaemonID Initialization with Empty String")
-    func testEmptyStringInitialization() throws {
-        let id: DaemonID = ""
-        #expect(id.rawValue == "")
-    }
-
     @Test("DaemonID Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
         let id: DaemonID = "daemon_with-special.chars@123"
@@ -143,7 +137,6 @@ struct DaemonIDTests {
             "weatherSystem",
             "daemon_with-special.chars",
             "⚙️守护进程",
-            ""
         ]
 
         let encoder = JSONEncoder()

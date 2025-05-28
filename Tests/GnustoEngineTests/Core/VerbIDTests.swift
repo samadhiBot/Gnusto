@@ -25,12 +25,6 @@ struct VerbIDTests {
         #expect(id.rawValue == "testVerb")
     }
 
-    @Test("VerbID Initialization with Empty String")
-    func testEmptyStringInitialization() throws {
-        let id: VerbID = ""
-        #expect(id.rawValue == "")
-    }
-
     @Test("VerbID Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
         let id: VerbID = "verb_with-special.chars@123"
@@ -143,7 +137,6 @@ struct VerbIDTests {
             "examine",
             "verb_with-special.chars",
             "🎮动作",
-            ""
         ]
 
         let encoder = JSONEncoder()

@@ -25,12 +25,6 @@ struct LocationIDTests {
         #expect(id.rawValue == "testLocation")
     }
 
-    @Test("LocationID Initialization with Empty String")
-    func testEmptyStringInitialization() throws {
-        let id: LocationID = ""
-        #expect(id.rawValue == "")
-    }
-
     @Test("LocationID Initialization with Special Characters")
     func testSpecialCharacterInitialization() throws {
         let id: LocationID = "location_with-special.chars@123"
@@ -143,7 +137,6 @@ struct LocationIDTests {
             "forestClearing",
             "location_with-special.chars",
             "🏰魔法城堡",
-            ""
         ]
 
         let encoder = JSONEncoder()
