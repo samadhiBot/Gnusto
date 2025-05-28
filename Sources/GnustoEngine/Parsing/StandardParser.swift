@@ -917,7 +917,7 @@ public struct StandardParser: Parser {
                     if allSameAdjectives {
                         // All truly identical
                         logger.error("""
-                            💥 StandardParser cannot distinguish between \
+                            StandardParser cannot distinguish between \
                             \(itemEntities.count) identical items
                             """)
                         return .failure(.ambiguity("Which \(baseName) do you mean?"))

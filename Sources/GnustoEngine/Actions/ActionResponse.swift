@@ -208,8 +208,8 @@ extension ActionResponse: CustomStringConvertible {
         case .itemNotInContainer(let item, let container):
             """
             .itemNotInContainer(
-               \(item),
-               \(container)
+               item: \(item),
+               container: \(container)
             )
             """
         case .itemNotLockable(let itemID):
@@ -217,8 +217,8 @@ extension ActionResponse: CustomStringConvertible {
         case .itemNotOnSurface(let item, let surface):
             """
             .itemNotOnSurface(
-               \(item),
-               \(surface)
+               item: \(item),
+               surface: \(surface)
             )
             """
         case .itemNotOpenable(let itemID):
@@ -236,8 +236,8 @@ extension ActionResponse: CustomStringConvertible {
         case .itemTooLargeForContainer(let item, let container):
             """
             .itemTooLargeForContainer(
-               \(item),
-               \(container)
+               item: \(item),
+               container: \(container)
             )
             """
         case .playerCannotCarryMore:
@@ -247,12 +247,21 @@ extension ActionResponse: CustomStringConvertible {
         case .roomIsDark:
             ".roomIsDark"
         case .stateValidationFailed(let change, let actualOldValue):
-            """
-            .stateValidationFailed(
-               change: \(change.description.indent(omitFirst: true)),
-               actualOldValue: \((actualOldValue ?? .undefined).description.indent(omitFirst: true))
-            )
-            """
+            if let actualOldValue {
+                """
+                .stateValidationFailed(
+                   change: \(change.description.multiline(2)),
+                   actualOldValue: \(actualOldValue)
+                )
+                """
+            } else {
+                """
+                .stateValidationFailed(
+                   change: \(change.description.multiline(2)),
+                   actualOldValue: nil
+                )
+                """
+            }
         case .targetIsNotAContainer(let itemID):
             ".targetIsNotAContainer(\(itemID))"
         case .targetIsNotASurface(let itemID):
@@ -266,8 +275,8 @@ extension ActionResponse: CustomStringConvertible {
         case .wrongKey(let keyID, let lockID):
             """
             .wrongKey(
-               \(keyID),
-               \(lockID)
+               key: \(keyID),
+               lock: \(lockID)
             )
             """
         }

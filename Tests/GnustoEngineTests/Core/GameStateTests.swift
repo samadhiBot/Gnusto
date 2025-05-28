@@ -529,7 +529,7 @@ struct GameStateTests {
         try? state.apply(change)
 
         #expect(change.entityID == EntityID.location("testLoc"))
-        #expect(change.attributeID == .locationAttribute(AttributeID.isLit))
+        #expect(change.attribute == .locationAttribute(AttributeID.isLit))
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
@@ -584,7 +584,7 @@ struct GameStateTests {
         try? state.apply(change)
 
         #expect(change.entityID == .location("testLoc"))
-        #expect(change.attributeID == .locationAttribute(.description))
+        #expect(change.attribute == .locationAttribute(.description))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched

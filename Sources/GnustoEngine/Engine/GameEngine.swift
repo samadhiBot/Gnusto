@@ -61,7 +61,7 @@ public actor GameEngine: Sendable {
 
     /// The registry for custom logic that dynamically computes or validates item and
     /// location attributes. This is initialized from the `GameBlueprint` and can be
-    /// further modified by game developers using methods like `registerItemCompute(attributeID:handler:)`.
+    /// further modified by game developers using methods like `registerItemCompute(attribute:handler:)`.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
@@ -152,7 +152,7 @@ extension GameEngine {
             }
             try await describeCurrentLocation()
         } catch {
-            logger.error("💥 \(error)")
+            logError("\(error)")
         }
 
         while !shouldQuit {
@@ -160,7 +160,7 @@ extension GameEngine {
             do {
                 try await processTurn()
             } catch {
-                logger.error("💥 \(error)")
+                logError("\(error)")
             }
         }
 
@@ -365,18 +365,18 @@ extension GameEngine {
         // Log detailed errors separately
         switch response {
         case .internalEngineError(let msg):
-            logger.error("💥 ActionResponse: Internal Engine Error: \(msg)")
+            logError("ActionResponse: Internal Engine Error: \(msg)")
         case .invalidValue(let msg):
-            logger.error("💥 ActionResponse: Invalid Value: \(msg)")
+            logError("ActionResponse: Invalid Value: \(msg)")
         case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
             // Construct the log string first
             let logDetail = """
                 State Validation Failed!
-                    - Change: \(String(describing: change))
-                    - Expected Old Value: \(String(describing: change.oldValue))
-                    - Actual Old Value: \(String(describing: actualOldValue))
+                   - Change: \(change.description.multiline(2))
+                   - Expected Old Value: \(String(describing: change.oldValue))
+                   - Actual Old Value: \(String(describing: actualOldValue))
                 """
-            logger.error("💥 ActionResponse: \(logDetail)")
+            logError("ActionResponse: \(logDetail)")
         default:
             break // No detailed logging needed for other handled errors
         }
@@ -411,7 +411,7 @@ extension GameEngine {
         }
         await ioHandler.print(message)
         if case .internalError(let details) = parseError {
-            logger.error("💥 ParseError: \(details)")
+            logError("ParseError: \(details)")
         }
     }
 
@@ -637,7 +637,7 @@ extension GameEngine {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                logger.warning("💥 Error in room beforeTurn handler: \(error)")
+                logWarning("Error in room beforeTurn handler: \(error)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -690,8 +690,8 @@ extension GameEngine {
             if let specificResponse = response as? ActionResponse {
                 await report(specificResponse)
             } else {
-                logger.warning("""
-                    💥 An unexpected error occurred in an object handler: \
+                logWarning("""
+                    An unexpected error occurred in an object handler: \
                     \(response)
                     """)
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
@@ -706,8 +706,8 @@ extension GameEngine {
             // Correct: Look up the Verb definition directly
             guard let verb = gameState.vocabulary.verbDefinitions[command.verb] else {
                 // This case should ideally not be reached if parser validates verbs
-                logger.warning("""
-                    💥 Internal Error: Unknown verb ID \
+                logWarning("""
+                    Internal Error: Unknown verb ID \
                     '\(command.verb.rawValue)' reached execution. \
                     If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
@@ -723,8 +723,8 @@ extension GameEngine {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verb] else {
                     // No handler registered for this verb (should match vocabulary definition)
-                    logger.warning("""
-                        💥 Internal Error: No ActionHandler registered for verb ID \
+                    logWarning("""
+                        Internal Error: No ActionHandler registered for verb ID \
                         '\(command.verb.rawValue)'.
                         """)
                     await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
@@ -756,7 +756,7 @@ extension GameEngine {
                     await report(actionResponse)
                 } catch {
                     // Catch any other unexpected errors from handlers
-                    logger.error("💥 Unexpected error during handler execution: \(error)")
+                    logError("Unexpected error during handler execution: \(error)")
                     await ioHandler.print("An unexpected problem occurred.")
                 }
                 // --- End Execute Handler ---
@@ -774,7 +774,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in direct object afterTurn handler: \(error)")
+                logWarning("Error in direct object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -787,7 +787,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in indirect object afterTurn handler: \(error)")
+                logWarning("Error in indirect object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -802,7 +802,7 @@ extension GameEngine {
                 ),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in room afterTurn handler: \(error)")
+                logWarning("Error in room afterTurn handler: \(error)")
             }
             // Check if handler quit the game
             if shouldQuit { return }
@@ -827,8 +827,8 @@ extension GameEngine {
             do {
                 try await applyWithDynamicValidation(change)
             } catch {
-                logger.error("""
-                    💥 Failed to apply state change during processActionResult:
+                logError("""
+                    Failed to apply state change during processActionResult:
                        - \(error)
                        - Change: \(change.description.multiline(2))
                     """)
@@ -858,7 +858,7 @@ extension GameEngine {
     ///           any errors from `GameState.apply()`.
     private func applyWithDynamicValidation(_ change: StateChange) async throws {
         // Perform dynamic validation for item and location attributes
-        switch change.attributeID {
+        switch change.attribute {
         case .itemAttribute(let key):
             guard case .item(let itemID) = change.entityID else {
                 throw ActionResponse.internalEngineError(
@@ -958,6 +958,26 @@ extension GameEngine {
         handlers[.debug] = DebugActionHandler()
     #endif
         return handlers
+    }
+}
+
+// MARK: - Logging helpers
+
+extension GameEngine {
+    func logError(_ message: String) {
+        logger.error(
+            Logger.Message(
+                stringLiteral: message.multiline()
+            )
+        )
+    }
+
+    func logWarning(_ message: String) {
+        logger.warning(
+            Logger.Message(
+                stringLiteral: message.multiline()
+            )
+        )
     }
 }
 

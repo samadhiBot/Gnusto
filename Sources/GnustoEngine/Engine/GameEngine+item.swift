@@ -235,8 +235,8 @@ extension GameEngine {
         attributeID: AttributeID
     ) async -> StateValue? {
         guard let item = gameState.items[itemID] else {
-            logger.warning("""
-                💥 Attempted to get dynamic value '\(attributeID.rawValue)' for non-existent item: \
+            logWarning("""
+                Attempted to get dynamic value '\(attributeID.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
                 """)
             return nil
@@ -250,8 +250,8 @@ extension GameEngine {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
-                logger.error("""
-                    💥 Error computing dynamic value '\(attributeID.rawValue)' \
+                logError("""
+                    Error computing dynamic value '\(attributeID.rawValue)' \
                     for item \(itemID.rawValue): \(error)
                     """)
                 // Fall through to return stored value or nil? Or return nil on error? Let's return nil.

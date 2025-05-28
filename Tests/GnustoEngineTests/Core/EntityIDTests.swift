@@ -1,5 +1,7 @@
+import CustomDump
 import Testing
 import Foundation
+
 @testable import GnustoEngine
 
 @Suite("EntityID Tests")
@@ -280,7 +282,9 @@ struct EntityIDTests {
             guard case ActionResponse.internalEngineError(let message) = error else {
                 return false
             }
-            return message.contains("got: player")
+
+            expectNoDifference(message, "EntityID expected to be DaemonID, got: .player")
+            return true
         }
         
         #expect {
@@ -289,7 +293,9 @@ struct EntityIDTests {
             guard case ActionResponse.internalEngineError(let message) = error else {
                 return false
             }
-            return message.contains("got: player")
+
+            expectNoDifference(message, "EntityID expected to be FuseID, got: .player")
+            return true
         }
         
         #expect {
@@ -298,7 +304,9 @@ struct EntityIDTests {
             guard case ActionResponse.internalEngineError(let message) = error else {
                 return false
             }
-            return message.contains("got: player")
+
+            expectNoDifference(message, "EntityID expected to be ItemID, got: .player")
+            return true
         }
         
         #expect {
@@ -307,7 +315,9 @@ struct EntityIDTests {
             guard case ActionResponse.internalEngineError(let message) = error else {
                 return false
             }
-            return message.contains("got: player")
+
+            expectNoDifference(message, "EntityID expected to be LocationID, got: .player")
+            return true
         }
     }
 

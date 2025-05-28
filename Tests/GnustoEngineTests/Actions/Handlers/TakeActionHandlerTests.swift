@@ -62,7 +62,7 @@ struct TakeActionHandlerTests {
             )
 
             // Avoid adding duplicate change if already handled by the general attribute comparison
-            if let existingIndex = changes.firstIndex(where: { $0.attributeID == .itemAttribute(.isTouched) }) {
+            if let existingIndex = changes.firstIndex(where: { $0.attribute == .itemAttribute(.isTouched) }) {
                 // If a change exists, make sure its newValue is true
                 if changes[existingIndex].newValue != true {
                     changes[existingIndex] = touchedChange
@@ -712,7 +712,7 @@ struct TakeActionHandlerTests {
         // Since isTouched was already true, no change for it should be generated.
         // Only parent and pronoun changes are expected.
         #expect(expectedChanges.count == 2, "Expected only parent and pronoun changes")
-        #expect(!expectedChanges.contains { $0.attributeID == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
+        #expect(!expectedChanges.contains { $0.attribute == .itemAttribute(.isTouched) }, "Should not contain isTouched change")
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory.sorted(), expectedChanges)
     }

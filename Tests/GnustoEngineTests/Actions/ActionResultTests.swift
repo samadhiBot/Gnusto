@@ -105,7 +105,7 @@ struct ActionResultTests {
         )
 
         #expect(change.entityID == .item("door"))
-        #expect(change.attributeID == .itemAttribute(.isOpen))
+        #expect(change.attribute == .itemAttribute(.isOpen))
         #expect(change.oldValue == false)
         #expect(change.newValue == true)
     }
@@ -119,7 +119,7 @@ struct ActionResultTests {
         )
 
         #expect(change.entityID == .player)
-        #expect(change.attributeID == .playerScore)
+        #expect(change.attribute == .playerScore)
         #expect(change.oldValue == nil)
         #expect(change.newValue == .int(10))
     }
@@ -133,7 +133,7 @@ struct ActionResultTests {
             newValue: true
         )
 
-        #expect(change.attributeID == .setFlag("lightsOut"))
+        #expect(change.attribute == .setFlag("lightsOut"))
         #expect(change.newValue == true)
         #expect(change.oldValue == false)
     }
@@ -147,7 +147,7 @@ struct ActionResultTests {
             newValue: .int(6)
         )
 
-        #expect(change.attributeID == .globalState(attributeID: "puzzleCounter"))
+        #expect(change.attribute == .globalState(attributeID: "puzzleCounter"))
         #expect(change.newValue == .int(6))
     }
 

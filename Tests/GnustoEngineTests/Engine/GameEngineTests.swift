@@ -731,7 +731,7 @@ struct GameEngineTests {
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attributeID == .playerMoves &&
+                change.attribute == .playerMoves &&
                 change.newValue == .int(1)
             },
             "History should contain playerMoves increment to 1"
@@ -741,7 +741,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityID == .item(testItemID),
-                      case .itemAttribute(let prop) = change.attributeID,
+                      case .itemAttribute(let prop) = change.attribute,
                       change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
             },
@@ -752,7 +752,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityID == .global &&
-                    change.attributeID == .setFlag(testFlagKey) &&
+                    change.attribute == .setFlag(testFlagKey) &&
                     change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
@@ -1649,7 +1649,7 @@ struct GameEngineTests {
         
         // Check "it" change (should refer to last item)
         let itChange = changes.first { change in
-            if case .pronounReference(let pronoun) = change.attributeID {
+            if case .pronounReference(let pronoun) = change.attribute {
                 return pronoun == "it"
             }
             return false
@@ -1665,7 +1665,7 @@ struct GameEngineTests {
         
         // Check "them" change (should refer to all items)
         let themChange = changes.first { change in
-            if case .pronounReference(let pronoun) = change.attributeID {
+            if case .pronounReference(let pronoun) = change.attribute {
                 return pronoun == "them"
             }
             return false

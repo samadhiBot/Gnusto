@@ -197,8 +197,8 @@ extension GameEngine {
         attributeID: AttributeID
     ) async -> StateValue? {
         guard let location = gameState.locations[locationID] else {
-            logger.warning("""
-                💥 Attempted to get dynamic value '\(attributeID.rawValue)' \
+            logWarning("""
+                Attempted to get dynamic value '\(attributeID.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
                 """)
             return nil
@@ -211,8 +211,8 @@ extension GameEngine {
             do {
                 return try await computeHandler(location, gameState)
             } catch {
-                logger.error("""
-                    💥 Error computing dynamic value '\(attributeID.rawValue)' \
+                logError("""
+                    Error computing dynamic value '\(attributeID.rawValue)' \
                     for location \(locationID.rawValue): \(error)
                     """)
                 return nil

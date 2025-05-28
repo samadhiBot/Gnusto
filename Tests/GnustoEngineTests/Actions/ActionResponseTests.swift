@@ -180,8 +180,8 @@ struct ActionResponseTests {
         )
         let expected = """
             .itemNotInContainer(
-               \(testItemID),
-               \(testContainerID)
+               item: \(testItemID),
+               container: \(testContainerID)
             )
             """
         #expect(response.description == expected)
@@ -202,8 +202,8 @@ struct ActionResponseTests {
         )
         let expected = """
             .itemNotOnSurface(
-               \(testItemID),
-               \(testSurfaceID)
+               item: \(testItemID),
+               surface: \(testSurfaceID)
             )
             """
         #expect(response.description == expected)
@@ -259,8 +259,8 @@ struct ActionResponseTests {
         )
         let expected = """
             .itemTooLargeForContainer(
-               \(testItemID),
-               \(testContainerID)
+               item: \(testItemID),
+               container: \(testContainerID)
             )
             """
         #expect(response.description == expected)
@@ -297,21 +297,24 @@ struct ActionResponseTests {
             newValue: .bool(true)
         )
         let actualOldValue: StateValue = .bool(true)
-        
-        let response = ActionResponse.stateValidationFailed(change: stateChange, actualOldValue: actualOldValue)
-        
-        let expected = """
+
+        let response = ActionResponse.stateValidationFailed(
+            change: stateChange,
+            actualOldValue: actualOldValue
+        )
+
+        expectNoDifference(response.description, """
             .stateValidationFailed(
-               change: StateChange(
-                  entityID: item(.testItem)
-                  attributeID: itemAttribute(testAttribute)
-                  oldValue: false
-                  newValue: true
-               ),
+               change: 
+                  StateChange(
+                     entityID: .item(.testItem)
+                     attribute: .itemAttribute(.testAttribute)
+                     oldValue: false
+                     newValue: true
+                  ),
                actualOldValue: true
             )
-            """
-        #expect(response.description == expected)
+            """)
     }
 
     @Test("stateValidationFailed description with nil actualOldValue")
@@ -322,18 +325,22 @@ struct ActionResponseTests {
             oldValue: .bool(false),
             newValue: .bool(true)
         )
-        
-        let response = ActionResponse.stateValidationFailed(change: stateChange, actualOldValue: nil)
+
+        let response = ActionResponse.stateValidationFailed(
+            change: stateChange,
+            actualOldValue: nil
+        )
 
         expectNoDifference(response.description, """
             .stateValidationFailed(
-               change: StateChange(
-                  entityID: item(.testItem)
-                  attributeID: itemAttribute(testAttribute)
-                  oldValue: false
-                  newValue: true
-               ),
-               actualOldValue: .undefined
+               change: 
+                  StateChange(
+                     entityID: .item(.testItem)
+                     attribute: .itemAttribute(.testAttribute)
+                     oldValue: false
+                     newValue: true
+                  ),
+               actualOldValue: nil
             )
             """)
     }
@@ -398,13 +405,15 @@ struct ActionResponseTests {
             keyID: testKeyID,
             lockID: testLockID
         )
-        let expected = """
+        expectNoDifference(
+            response.description,
+            """
             .wrongKey(
-               .testKey,
-               .testLock
+               key: .testKey,
+               lock: .testLock
             )
             """
-        #expect(response.description == expected)
+        )
     }
 
     // MARK: - Edge Cases
@@ -473,7 +482,7 @@ struct ActionResponseTests {
             (.targetIsNotAContainer(testItemID), ".targetIsNotAContainer(\(testItemID))"),
             (.targetIsNotASurface(testItemID), ".targetIsNotASurface(\(testItemID))"),
         ]
-        
+
         for (response, expectedDescription) in testCases {
             #expect(response.description == expectedDescription, "Inconsistent format for \(response)")
         }
@@ -481,61 +490,56 @@ struct ActionResponseTests {
 
     @Test("All two-parameter ItemID cases follow consistent multiline format")
     func testTwoItemIDCasesConsistency() {
-        let testCases: [(ActionResponse, String)] = [
-            (
-                .itemNotInContainer(
-                    item: testItemID,
-                    container: testContainerID
-                ),
+        expectNoDifference(
+            ActionResponse.itemNotInContainer(
+                item: testItemID,
+                container: testContainerID
+            ).description,
+            """
+            .itemNotInContainer(
+               item: .testItem,
+               container: .testContainer
+            )
+            """
+        )
 
-             """
-             .itemNotInContainer(
-                .testItem,
-                .testContainer
-             )
-             """
-            ),
-            (
-                .itemNotOnSurface(
-                    item: testItemID,
-                    surface: testSurfaceID
-                ),
-             """
-             .itemNotOnSurface(
-                .testItem,
-                .testSurface
-             )
-             """
-            ),
-            (
-                .itemTooLargeForContainer(
-                    item: testItemID,
-                    container: testContainerID
-                ),
-             """
-             .itemTooLargeForContainer(
-                .testItem,
-                .testContainer
-             )
-             """
-            ),
-            (
-                .wrongKey(
-                    keyID: testKeyID,
-                    lockID: testLockID
-                ),
-             """
-             .wrongKey(
-                .testKey,
-                .testLock
-             )
-             """
-            ),
-        ]
+        expectNoDifference(
+            ActionResponse.itemNotOnSurface(
+                item: testItemID,
+                surface: testSurfaceID
+            ).description,
+            """
+            .itemNotOnSurface(
+               item: .testItem,
+               surface: .testSurface
+            )
+            """
+        )
 
-        for (response, expectedDescription) in testCases {
-            expectNoDifference(response.description, expectedDescription)
-        }
+        expectNoDifference(
+            ActionResponse.itemTooLargeForContainer(
+                item: testItemID,
+                container: testContainerID
+            ).description,
+            """
+            .itemTooLargeForContainer(
+               item: .testItem,
+               container: .testContainer
+            )
+            """
+        )
+        expectNoDifference(
+            ActionResponse.wrongKey(
+                keyID: testKeyID,
+                lockID: testLockID
+            ).description,
+            """
+            .wrongKey(
+               key: .testKey,
+               lock: .testLock
+            )
+            """
+        )
     }
 
     @Test("All no-parameter cases follow consistent format")
