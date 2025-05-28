@@ -2,8 +2,20 @@ import CustomDump
 import Foundation
 
 /// A unique identifier for a verb within the game's vocabulary.
-public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct VerbID: RawRepresentable, Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
     public let rawValue: String
+
+    /// Initializes a `VerbID` with a raw string value.
+    /// - Parameter rawValue: The string value for the ID.
+    public init(rawValue: String) {
+        self.rawValue = rawValue
+    }
+
+    /// Convenience initializer for backward compatibility.
+    /// - Parameter rawValue: The string value for the ID.
+    public init(_ rawValue: String) {
+        self.rawValue = rawValue
+    }
 
     /// Initializes a `VerbID` using a string literal.
     /// - Parameter value: The string literal representing the verb ID.
@@ -11,10 +23,20 @@ public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral,
         self.rawValue = value
     }
 
-    /// Initializes a `VerbID` with a raw string value.
-    /// - Parameter rawValue: The string value for the ID.
-    public init(_ rawValue: String) {
-        self.rawValue = rawValue
+    /// Creates a new VerbID from a decoder.
+    /// Required for `Codable` conformance.
+    /// - Parameter decoder: The decoder to read data from.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.rawValue = try container.decode(String.self)
+    }
+
+    /// Encodes this VerbID into the given encoder.
+    /// Required for `Codable` conformance.
+    /// - Parameter encoder: The encoder to write data to.
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(self.rawValue)
     }
 
     public static func < (lhs: VerbID, rhs: VerbID) -> Bool {
@@ -49,6 +71,7 @@ extension VerbID {
     public static let turnOn = VerbID("turnOn")
     public static let unlock = VerbID("unlock")
     public static let wear = VerbID("wear")
+    public static let xyzzy = VerbID("xyzzy")
 }
 
 // MARK: - Meta verbs
@@ -62,7 +85,6 @@ extension VerbID {
     public static let score = VerbID("score")
     public static let verbose = VerbID("verbose")
     public static let wait = VerbID("wait")
-    public static let xyzzy = VerbID("xyzzy")
 }
 
 #if DEBUG
