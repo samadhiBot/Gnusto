@@ -941,6 +941,7 @@ extension GameEngine {
             .turnOn: TurnOnActionHandler(),
             .unlock: UnlockActionHandler(),
             .wear: WearActionHandler(),
+            .xyzzy: XyzzyActionHandler(),
 
             // Meta Actions
 //            .brief: BriefActionHandler(),
@@ -951,7 +952,6 @@ extension GameEngine {
             .score: ScoreActionHandler(),
 //            .verbose: VerboseActionHandler(),
             .wait: WaitActionHandler(),
-            .xyzzy: XyzzyActionHandler()
         ]
 
     #if DEBUG

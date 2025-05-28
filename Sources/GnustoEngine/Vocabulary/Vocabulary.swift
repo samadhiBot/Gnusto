@@ -221,8 +221,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             requiresLight: false
         ),
 
-        // Movement
-        // Note: Single directions (N, S, E, W...) handled separately by StandardParser
+        // Movement (Single directions (N, S, E, W...) handled separately by StandardParser)
 
         Verb(
             id: .go,
@@ -393,7 +392,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .taste,
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: true
+            requiresLight: false
         ),
 
         Verb(
