@@ -259,9 +259,9 @@ struct DaemonIDTests {
     @Test("DaemonID String Interpolation")
     func testStringInterpolation() throws {
         let id: DaemonID = "heartbeat"
-        let message = "The daemon is \(id)"
+        let message = "The daemon is \(id)."
         // DaemonID doesn't implement CustomStringConvertible, so it shows the full struct representation
-        #expect(message == "The daemon is DaemonID(rawValue: \"heartbeat\")")
+        #expect(message == "The daemon is `.heartbeat`.")
     }
 
     // MARK: - Array and Collection Tests

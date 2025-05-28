@@ -182,8 +182,8 @@ struct ItemIDTests {
     @Test("ItemID CustomStringConvertible")
     func testCustomStringConvertible() throws {
         let id: ItemID = "brassLantern"
-        #expect(id.description == "brassLantern")
-        #expect("\(id)" == "brassLantern")
+        #expect(id.description == "`.brassLantern`")
+        #expect("\(id)" == "`.brassLantern`")
     }
 
     // MARK: - Standard Item IDs Tests

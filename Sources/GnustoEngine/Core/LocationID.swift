@@ -21,11 +21,3 @@ public struct LocationID: GnustoID {
         self.rawValue = rawValue
     }
 }
-
-// MARK: - CustomDumpStringConvertible
-
-extension LocationID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
-}

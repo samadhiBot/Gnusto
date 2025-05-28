@@ -21,22 +21,6 @@ public struct ItemID: GnustoID {
     }
 }
 
-// MARK: - CustomDumpStringConvertible
-
-extension ItemID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
-}
-
-// MARK: - CustomStringConvertible
-
-extension ItemID: CustomStringConvertible {
-    public var description: String {
-        rawValue
-    }
-}
-
 // MARK: - Standard Item IDs
 
 public extension ItemID {

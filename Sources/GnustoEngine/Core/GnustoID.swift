@@ -1,3 +1,4 @@
+import CustomDump
 import Foundation
 
 /// A protocol that defines the common interface and behavior for all identifier types
@@ -32,7 +33,14 @@ import Foundation
 /// - `ExpressibleByStringLiteral` for convenient initialization
 /// - `Sendable` for concurrency safety
 /// - Convenience initializer `init(_:)`
-public protocol GnustoID: RawRepresentable, Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable where RawValue == String {
+public protocol GnustoID: Codable,
+                          Comparable,
+                          CustomDumpStringConvertible,
+                          CustomStringConvertible,
+                          ExpressibleByStringLiteral,
+                          Hashable,
+                          RawRepresentable,
+                          Sendable where RawValue == String {
     /// The underlying string value of the identifier.
     var rawValue: String { get }
     
@@ -83,4 +91,12 @@ public extension GnustoID {
     static func < (lhs: Self, rhs: Self) -> Bool {
         lhs.rawValue < rhs.rawValue
     }
-} 
+
+    var customDumpDescription: String {
+        ".\(rawValue)"
+    }
+
+    var description: String {
+        "`.\(rawValue)`"
+    }
+}
