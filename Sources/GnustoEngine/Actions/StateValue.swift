@@ -1,4 +1,3 @@
-import CustomDump
 
 /// A type-safe enumeration that represents the various kinds of values that game state
 /// properties can hold.
@@ -217,12 +216,12 @@ extension StateValue: CustomStringConvertible {
             entityReferenceSet?.map(\.description).joined(separator: ", ") ?? "[]"
         case .exits(let exits):
             exits.map {
-                "\n\($0.customDumpDescription): \($1.customDumpDescription)"
+                "\n\($0): \($1)"
             }.joined().indent()
         case .locationID(let locationID):
             ".\(locationID)"
         case .parentEntity(let parentEntity):
-            parentEntity.customDumpDescription
+            parentEntity.description
         case .string(let string):
             string.multiline()
         case .stringSet(let stringSet):

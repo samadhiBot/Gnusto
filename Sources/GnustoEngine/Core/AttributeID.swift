@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 
 /// A unique identifier for a standard or dynamic property within the game.
@@ -207,12 +206,4 @@ public extension AttributeID {
 
     /// Magic does not function here.
     static let breaksMagic = AttributeID("breaksMagic")
-}
-
-// MARK: - CustomDumpStringConvertible conformance
-
-extension AttributeID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
 }

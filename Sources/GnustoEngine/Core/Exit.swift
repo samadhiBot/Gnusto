@@ -86,7 +86,7 @@ extension Exit: CustomDumpStringConvertible {
 
 extension Dictionary: @retroactive CustomDumpStringConvertible where Key == Direction, Value == Exit {
     public var customDumpDescription: String {
-        let elements = self.map { "\($0.customDumpDescription): \($1.customDumpDescription)" }
+        let elements = self.map { "\($0): \($1)" }
         return """
             \(elements.joined(separator: "\n").indent())
             """

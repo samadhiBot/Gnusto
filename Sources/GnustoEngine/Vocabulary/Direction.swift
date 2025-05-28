@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 
 /// Represents cardinal and other directions used for navigation and spatial representation.
@@ -44,8 +43,8 @@ extension Direction: Comparable {
 
 // MARK: - CustomDumpStringConvertible conformance
 
-extension Direction: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
+extension Direction: CustomStringConvertible {
+    public var description: String {
         ".\(rawValue)"
     }
 }

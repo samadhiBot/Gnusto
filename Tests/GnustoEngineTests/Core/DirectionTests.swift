@@ -64,13 +64,13 @@ struct DirectionTests {
         #expect(sorted == expected)
     }
 
-    @Test("Direction CustomDumpStringConvertible")
-    func testCustomDumpDescription() throws {
-        #expect(Direction.north.customDumpDescription == ".north")
-        #expect(Direction.east.customDumpDescription == ".east")
-        #expect(Direction.inside.customDumpDescription == ".in")
-        #expect(Direction.outside.customDumpDescription == ".out")
-        #expect(Direction.southwest.customDumpDescription == ".southwest")
+    @Test("Direction description")
+    func testDescription() throws {
+        #expect(Direction.north.description == ".north")
+        #expect(Direction.east.description == ".east")
+        #expect(Direction.inside.description == ".in")
+        #expect(Direction.outside.description == ".out")
+        #expect(Direction.southwest.description == ".southwest")
     }
 
     @Test("Direction Codable - Encoding")
