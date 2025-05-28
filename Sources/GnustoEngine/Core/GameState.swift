@@ -637,7 +637,10 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue == expectedOldValue ||
             (actualCurrentValue == nil && expectedOldValue == false)
         else {
-            throw ActionResponse.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
+            throw ActionResponse.stateValidationFailed(
+                change: change,
+                actualOldValue: actualCurrentValue
+            )
         }
     }
 }

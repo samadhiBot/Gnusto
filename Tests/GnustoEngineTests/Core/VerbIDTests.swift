@@ -168,13 +168,13 @@ struct VerbIDTests {
     @Test("VerbID CustomDumpStringConvertible")
     func testCustomDumpStringConvertible() throws {
         let id: VerbID = "take"
-        #expect(id.customDumpDescription == ".take")
+        #expect(id.description == ".take")
     }
 
     @Test("VerbID CustomDumpStringConvertible with Special Characters")
     func testCustomDumpStringConvertibleWithSpecialCharacters() throws {
         let id: VerbID = "verb_with-special.chars@123"
-        #expect(id.customDumpDescription == ".verb_with-special.chars@123")
+        #expect(id.description == ".verb_with-special.chars@123")
     }
 
     // MARK: - CustomStringConvertible Tests
@@ -182,8 +182,8 @@ struct VerbIDTests {
     @Test("VerbID CustomStringConvertible")
     func testCustomStringConvertible() throws {
         let id: VerbID = "take"
-        #expect(id.description == "take")
-        #expect("\(id)" == "take")
+        #expect(id.description == ".take")
+        #expect("\(id)" == ".take")
     }
 
     // MARK: - Interactive Verbs Tests
@@ -363,7 +363,7 @@ struct VerbIDTests {
     func testStringInterpolation() throws {
         let id: VerbID = "take"
         let message = "The verb is \(id)"
-        #expect(message == "The verb is take")
+        #expect(message == "The verb is .take")
     }
 
     // MARK: - Array and Collection Tests

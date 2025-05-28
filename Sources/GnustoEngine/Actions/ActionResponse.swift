@@ -163,3 +163,113 @@ public enum ActionResponse: Error, Equatable, Sendable {
     /// Includes `ItemID`s for both the key and the lock.
     case wrongKey(keyID: ItemID, lockID: ItemID)
 }
+
+extension ActionResponse: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .containerIsClosed(let itemID):
+            ".containerIsClosed(\(itemID))"
+        case .containerIsOpen(let itemID):
+            ".containerIsOpen(\(itemID))"
+        case .custom(let string):
+            ".custom(\(string))"
+        case .directionIsBlocked(let string):
+            ".directionIsBlocked(\(string ?? ""))"
+        case .internalEngineError(let string):
+            ".internalEngineError(\(string))"
+        case .invalidDirection:
+            ".invalidDirection"
+        case .invalidIndirectObject(let string):
+            ".invalidIndirectObject(\(string ?? ""))"
+        case .invalidValue(let string):
+            ".invalidValue(\(string))"
+        case .itemAlreadyClosed(let itemID):
+            ".itemAlreadyClosed(\(itemID))"
+        case .itemAlreadyOpen(let itemID):
+            ".itemAlreadyOpen(\(itemID))"
+        case .itemIsAlreadyWorn(let itemID):
+            ".itemIsAlreadyWorn(\(itemID))"
+        case .itemIsLocked(let itemID):
+            ".itemIsLocked(\(itemID))"
+        case .itemIsNotWorn(let itemID):
+            ".itemIsNotWorn(\(itemID))"
+        case .itemIsUnlocked(let itemID):
+            ".itemIsUnlocked(\(itemID))"
+        case .itemNotAccessible(let itemID):
+            ".itemNotAccessible(\(itemID))"
+        case .itemNotClosable(let itemID):
+            ".itemNotClosable(\(itemID))"
+        case .itemNotDroppable(let itemID):
+            ".itemNotDroppable(\(itemID))"
+        case .itemNotEdible(let itemID):
+            ".itemNotEdible(\(itemID))"
+        case .itemNotHeld(let itemID):
+            ".itemNotHeld(\(itemID))"
+        case .itemNotInContainer(let item, let container):
+            """
+            .itemNotInContainer(
+               \(item),
+               \(container)
+            )
+            """
+        case .itemNotLockable(let itemID):
+            ".itemNotLockable(\(itemID))"
+        case .itemNotOnSurface(let item, let surface):
+            """
+            .itemNotOnSurface(
+               \(item),
+               \(surface)
+            )
+            """
+        case .itemNotOpenable(let itemID):
+            ".itemNotOpenable(\(itemID))"
+        case .itemNotReadable(let itemID):
+            ".itemNotReadable(\(itemID))"
+        case .itemNotRemovable(let itemID):
+            ".itemNotRemovable(\(itemID))"
+        case .itemNotTakable(let itemID):
+            ".itemNotTakable(\(itemID))"
+        case .itemNotUnlockable(let itemID):
+            ".itemNotUnlockable(\(itemID))"
+        case .itemNotWearable(let itemID):
+            ".itemNotWearable(\(itemID))"
+        case .itemTooLargeForContainer(let item, let container):
+            """
+            .itemTooLargeForContainer(
+               \(item),
+               \(container)
+            )
+            """
+        case .playerCannotCarryMore:
+            ".playerCannotCarryMore"
+        case .prerequisiteNotMet(let string):
+            ".prerequisiteNotMet(\(string))"
+        case .roomIsDark:
+            ".roomIsDark"
+        case .stateValidationFailed(let change, let actualOldValue):
+            """
+            .stateValidationFailed(
+               change: \(change.description.indent(omitFirst: true)),
+               actualOldValue: \((actualOldValue ?? .undefined).description.indent(omitFirst: true))
+            )
+            """
+        case .targetIsNotAContainer(let itemID):
+            ".targetIsNotAContainer(\(itemID))"
+        case .targetIsNotASurface(let itemID):
+            ".targetIsNotASurface(\(itemID))"
+        case .toolMissing(let string):
+            ".toolMissing(\(string))"
+        case .unknownEntity(let entityReference):
+            ".unknownEntity(\(entityReference))"
+        case .unknownVerb(let string):
+            ".unknownVerb(\(string))"
+        case .wrongKey(let keyID, let lockID):
+            """
+            .wrongKey(
+               \(keyID),
+               \(lockID)
+            )
+            """
+        }
+    }
+}

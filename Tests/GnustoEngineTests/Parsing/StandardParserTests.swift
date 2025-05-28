@@ -263,7 +263,7 @@ struct StandardParserTests {
                 vocabulary: vocabulary,
                 gameState: gameState
             )
-            #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb 'examine'.")))
+            #expect(result.isFailure(matching: .badGrammar("Expected a direct object phrase for verb '.examine'.")))
         }
     }
 
@@ -279,7 +279,7 @@ struct StandardParserTests {
         #expect(
             result.isFailure(
                 matching: .badGrammar(
-                    "Expected a direct object phrase for verb 'take'."
+                    "Expected a direct object phrase for verb '.take'."
                 )
             )
         )

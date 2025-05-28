@@ -830,7 +830,7 @@ extension GameEngine {
                 logger.error("""
                     💥 Failed to apply state change during processActionResult:
                        - \(error)
-                       - Change: \(String(describing: change))
+                       - Change: \(change.description.multiline(2))
                     """)
                 throw error // Re-throw the error to be caught by execute()
             }

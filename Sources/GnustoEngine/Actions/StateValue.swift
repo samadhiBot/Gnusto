@@ -201,10 +201,9 @@ extension StateValue: ExpressibleByStringLiteral {
 
 // MARK: - Debugging Support
 
-extension StateValue: CustomDumpStringConvertible {
-    /// Provides a custom string representation for `StateValue` when used with the
-    /// `swift-custom-dump` library, aiding in debugging.
-    public var customDumpDescription: String {
+extension StateValue: CustomStringConvertible {
+    /// Provides a custom string representation for `StateValue`.
+    public var description: String {
         switch self {
         case .bool(let bool):
             "\(bool)"
@@ -213,9 +212,9 @@ extension StateValue: CustomDumpStringConvertible {
         case .itemID(let itemID):
             ".\(itemID)"
         case .itemIDSet(let itemIDSet):
-            itemIDSet.map(\.customDumpDescription).joined(separator: ", ")
+            itemIDSet.map(\.description).joined(separator: ", ")
         case .entityReferenceSet(let entityReferenceSet):
-            entityReferenceSet?.map(\.customDumpDescription).joined(separator: ", ") ?? "[]"
+            entityReferenceSet?.map(\.description).joined(separator: ", ") ?? "[]"
         case .exits(let exits):
             exits.map {
                 "\n\($0.customDumpDescription): \($1.customDumpDescription)"
@@ -225,7 +224,7 @@ extension StateValue: CustomDumpStringConvertible {
         case .parentEntity(let parentEntity):
             parentEntity.customDumpDescription
         case .string(let string):
-            string.multiline
+            string.multiline()
         case .stringSet(let stringSet):
             stringSet.map { "'\($0)'" }.joined(separator: ", ")
         case .undefined:

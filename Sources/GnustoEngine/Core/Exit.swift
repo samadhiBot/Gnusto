@@ -74,9 +74,11 @@ public struct Exit: Codable, Hashable, Sendable {
 
 extension Exit: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-        var details = ["to: \(destinationID.customDumpDescription)"]
-        if let blockedMessage { details.append("blocked: \(blockedMessage.multiline)") }
-        if let doorID { details.append("door: \(doorID.customDumpDescription)")}
+        var details = ["to: \(destinationID)"]
+        if let blockedMessage {
+            details.append("blocked: \(blockedMessage.indent(omitFirst: true))")
+        }
+        if let doorID { details.append("door: \(doorID)")}
         return "\n\(details.joined(separator: "\n").indent())"
 
     }

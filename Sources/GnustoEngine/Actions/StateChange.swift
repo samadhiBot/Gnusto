@@ -74,6 +74,24 @@ extension StateChange: Comparable {
     }
 }
 
+extension StateChange: CustomStringConvertible {
+    public var description: String {
+        var rows = [
+            "entityID: \(entityID)",
+            "attributeID: \(attributeID)",
+            "newValue: \(newValue)",
+        ]
+        if let oldValue {
+            rows.insert("oldValue: \(oldValue)", at: 2)
+        }
+        return """
+            StateChange(
+            \(rows.joined(separator: "\n").indent())
+            )
+            """
+    }
+}
+
 extension StateChange: Equatable {
     /// Determines if two `StateChange` objects are equal based on their core properties.
     ///

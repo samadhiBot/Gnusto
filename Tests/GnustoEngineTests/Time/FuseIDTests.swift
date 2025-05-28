@@ -260,7 +260,7 @@ struct FuseIDTests {
     func testStringInterpolation() throws {
         let id: FuseID = "bombFuse"
         let message = "The fuse is \(id)."
-        #expect(message == "The fuse is `.bombFuse`.")
+        #expect(message == "The fuse is .bombFuse.")
     }
 
     // MARK: - Array and Collection Tests

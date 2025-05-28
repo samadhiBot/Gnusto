@@ -23,8 +23,8 @@ public enum ParentEntity: Hashable, Codable, Equatable, Sendable {
 extension ParentEntity: CustomDumpStringConvertible {
     public var customDumpDescription: String {
         switch self {
-        case .item(let id): ".item(\(id.customDumpDescription))"
-        case .location(let id): ".location(\(id.customDumpDescription))"
+        case .item(let id): ".item(\(id))"
+        case .location(let id): ".location(\(id))"
         case .nowhere: ".nowhere"
         case .player: ".player"
         }

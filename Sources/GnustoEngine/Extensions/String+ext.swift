@@ -26,12 +26,13 @@ extension String {
     /// - Parameter tabs: The number of tab levels to indent by. Each level adds 4 spaces.
     /// - Returns: The indented string, with each line prefixed by the appropriate number of spaces.
     ///            Empty strings are returned unchanged.
-    func indent(_ tabs: Int = 1, tabWidth: Int = 3) -> String {
+    func indent(_ tabs: Int = 1, tabWidth: Int = 3, omitFirst: Bool = false) -> String {
         guard !isEmpty else { return self }
         let spaces = String(repeating: " ", count: tabs * tabWidth)
-        return components(separatedBy: .newlines)
+        let lines = components(separatedBy: .newlines)
             .map { $0.isEmpty ? "" : spaces + $0 }
             .joined(separator: "\n")
+        return omitFirst ? lines.trimmingCharacters(in: .whitespacesAndNewlines) : lines
     }
 
     /// Formats a multiline string for debug output by indenting all lines after the first line.
@@ -39,10 +40,10 @@ extension String {
     /// - Parameter indent: The number of spaces to indent continuation lines by. Defaults to 4.
     /// - Returns: The formatted string with continuation lines indented.
     ///            Single-line strings are returned unchanged.
-    var multiline: String {
+    func multiline(_ tabs: Int = 1) -> String {
         let lines = components(separatedBy: .newlines)
         return if lines.count > 1 {
-            "\n\(self.indent())"
+            "\n\(self.indent(tabs))"
         } else {
             "'\(self)'"
         }

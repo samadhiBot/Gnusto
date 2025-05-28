@@ -27,9 +27,9 @@ extension EntityReference: CustomDumpStringConvertible {
     public var customDumpDescription: String {
         switch self {
         case .item(let itemID):
-            itemID.customDumpDescription
+            itemID.description
         case .location(let locationID):
-            locationID.customDumpDescription
+            locationID.description
         case .player:
             ".player"
         }

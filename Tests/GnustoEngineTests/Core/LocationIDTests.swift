@@ -168,13 +168,13 @@ struct LocationIDTests {
     @Test("LocationID CustomDumpStringConvertible")
     func testCustomDumpStringConvertible() throws {
         let id: LocationID = "westOfHouse"
-        #expect(id.customDumpDescription == ".westOfHouse")
+        #expect(id.description == ".westOfHouse")
     }
 
     @Test("LocationID CustomDumpStringConvertible with Special Characters")
     func testCustomDumpStringConvertibleWithSpecialCharacters() throws {
         let id: LocationID = "location_with-special.chars@123"
-        #expect(id.customDumpDescription == ".location_with-special.chars@123")
+        #expect(id.description == ".location_with-special.chars@123")
     }
 
     // MARK: - ExpressibleByStringLiteral Tests
@@ -276,7 +276,7 @@ struct LocationIDTests {
         let id: LocationID = "kitchen"
         let message = "You are in the \(id)."
         // LocationID doesn't implement CustomStringConvertible, so it shows the full struct representation
-        #expect(message == "You are in the `.kitchen`.")
+        #expect(message == "You are in the .kitchen.")
     }
 
     // MARK: - Array and Collection Tests

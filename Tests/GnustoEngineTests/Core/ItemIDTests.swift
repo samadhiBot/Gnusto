@@ -168,13 +168,13 @@ struct ItemIDTests {
     @Test("ItemID CustomDumpStringConvertible")
     func testCustomDumpStringConvertible() throws {
         let id: ItemID = "brassLantern"
-        #expect(id.customDumpDescription == ".brassLantern")
+        #expect(id.description == ".brassLantern")
     }
 
     @Test("ItemID CustomDumpStringConvertible with Special Characters")
     func testCustomDumpStringConvertibleWithSpecialCharacters() throws {
         let id: ItemID = "item_with-special.chars@123"
-        #expect(id.customDumpDescription == ".item_with-special.chars@123")
+        #expect(id.description == ".item_with-special.chars@123")
     }
 
     // MARK: - CustomStringConvertible Tests
@@ -182,8 +182,8 @@ struct ItemIDTests {
     @Test("ItemID CustomStringConvertible")
     func testCustomStringConvertible() throws {
         let id: ItemID = "brassLantern"
-        #expect(id.description == "`.brassLantern`")
-        #expect("\(id)" == "`.brassLantern`")
+        #expect(id.description == ".brassLantern")
+        #expect("\(id)" == ".brassLantern")
     }
 
     // MARK: - Standard Item IDs Tests

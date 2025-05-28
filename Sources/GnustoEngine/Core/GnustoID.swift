@@ -35,7 +35,7 @@ import Foundation
 /// - Convenience initializer `init(_:)`
 public protocol GnustoID: Codable,
                           Comparable,
-                          CustomDumpStringConvertible,
+//                          CustomDumpStringConvertible,
                           CustomStringConvertible,
                           ExpressibleByStringLiteral,
                           Hashable,
@@ -92,11 +92,11 @@ public extension GnustoID {
         lhs.rawValue < rhs.rawValue
     }
 
-    var customDumpDescription: String {
-        ".\(rawValue)"
-    }
+//    var customDumpDescription: String {
+//        ".\(rawValue)"
+//    }
 
     var description: String {
-        "`.\(rawValue)`"
+        ".\(rawValue)"
     }
 }

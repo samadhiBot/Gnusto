@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 
 /// A unique identifier for a verb within the game's vocabulary.
@@ -65,17 +64,3 @@ extension VerbID {
 }
 
 #endif
-
-// MARK: - Conformances
-
-extension VerbID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
-}
-
-extension VerbID: CustomStringConvertible {
-    public var description: String {
-        rawValue
-    }
-}

@@ -694,7 +694,8 @@ public struct StandardParser: Parser {
             let isLocationNoun = vocabulary.locationNames.keys.contains(word)
             let isPlayerAlias = playerAliases.contains(word)
             let isPronoun = vocabulary.pronouns.contains(word)
-            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun {
+            let isSpecialKeyword = vocabulary.specialKeywords.contains(word)
+            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun || isSpecialKeyword {
                 knownNounIndices.append(index)
             }
         }
@@ -706,7 +707,8 @@ public struct StandardParser: Parser {
                 !playerAliases.contains(word) &&
                 !vocabulary.verbSynonyms.keys.contains(word) &&
                 !vocabulary.prepositions.contains(word) &&
-                !vocabulary.directions.keys.contains(word)
+                !vocabulary.directions.keys.contains(word) &&
+                !vocabulary.specialKeywords.contains(word)
             }
             return (nil, potentialMods)
         }
