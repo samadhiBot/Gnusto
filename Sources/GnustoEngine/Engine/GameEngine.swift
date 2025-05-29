@@ -239,28 +239,46 @@ extension GameEngine {
         case .success(let command):
             if command.verb == .quit || shouldQuit { return }
 
+            // Store the player's current location before executing the command
+            let locationBeforeCommand = playerLocationID
+            
+            // For GO commands, check if the destination is unvisited before execution
+            let destinationWasUnvisited: Bool
+            if command.verb == .go {
+                let exit = try? command.direction.flatMap { direction in
+                    try location(playerLocationID).exits[direction]
+                }
+                destinationWasUnvisited = if let destination = try? location(exit?.destinationID) {
+                    !destination.hasFlag(.isVisited)
+                } else {
+                    false
+                }
+            } else {
+                destinationWasUnvisited = false
+            }
+
+            await execute(command: command)
+
+            if command.verb == .quit || shouldQuit { return }
+
             // Handle location description after movement or light change
             let shouldDescribe: Bool
             switch command.verb {
             case .go:
-                // Check if the destination room was visited before the movement
-                let exit = try command.direction.flatMap { direction in
-                    try location(playerLocationID).exits[direction]
-                }
-                shouldDescribe = if let destination = try? location(exit?.destinationID) {
-                    !destination.hasFlag(.isVisited)
+                // Check if the player actually moved to a different location
+                let locationAfterCommand = playerLocationID
+                if locationBeforeCommand != locationAfterCommand {
+                    // Player moved - use the pre-execution check for whether to describe
+                    shouldDescribe = destinationWasUnvisited
                 } else {
-                    false
+                    // Player didn't move (movement was prevented)
+                    shouldDescribe = false
                 }
             case .turnOn, .turnOff:
                 shouldDescribe = true // Light change commands
             default:
                 shouldDescribe = false
             }
-
-            await execute(command: command)
-
-            if command.verb == .quit || shouldQuit { return }
 
             if shouldDescribe {
                 try await describeCurrentLocation()
@@ -820,7 +838,7 @@ extension GameEngine {
     /// - Returns: `true` if the `ActionResult` contained a message that was printed,
     ///   `false` otherwise.
     /// - Throws: Re-throws errors encountered during state application.
-    private func processActionResult(_ result: ActionResult) async throws -> Bool {
+    func processActionResult(_ result: ActionResult) async throws -> Bool {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.stateChanges {
@@ -836,15 +854,27 @@ extension GameEngine {
             }
         }
 
-        // 2. Print Result Message
+        // 2. Process Side Effects
+        if !result.sideEffects.isEmpty {
+            do {
+                try await processSideEffects(result.sideEffects)
+            } catch {
+                logError("""
+                    Failed to process side effects during processActionResult:
+                       - \(error)
+                       - Side Effects: \(result.sideEffects)
+                    """)
+                throw error
+            }
+        }
+
+        // 3. Print Result Message
         if let message = result.message {
             await ioHandler.print(message)
             return true
         } else {
             return false
         }
-
-        // TODO: Handle SideEffects if they are added to ActionResult?
     }
     
     /// Applies a `StateChange` with dynamic validation, respecting the action pipeline.
@@ -856,7 +886,7 @@ extension GameEngine {
     /// - Parameter change: The `StateChange` to validate and apply.
     /// - Throws: `ActionResponse.invalidValue` if dynamic validation fails, or re-throws
     ///           any errors from `GameState.apply()`.
-    private func applyWithDynamicValidation(_ change: StateChange) async throws {
+    func applyWithDynamicValidation(_ change: StateChange) async throws {
         // Perform dynamic validation for item and location attributes
         switch change.attribute {
         case .itemAttribute(let key):

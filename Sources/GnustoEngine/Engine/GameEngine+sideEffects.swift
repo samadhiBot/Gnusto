@@ -10,10 +10,23 @@ extension GameEngine {
         try gameState.apply(change)
     }
 
+    /// Processes side effects from an ActionResult.
+    ///
+    /// This method is called by the main action processing pipeline to handle any side effects
+    /// that were generated as part of an action's execution.
+    ///
+    /// - Parameter sideEffects: An array of `SideEffect` objects to process.
+    /// - Throws: An error if any side effect cannot be processed.
+    func processSideEffects(_ sideEffects: [SideEffect]) async throws {
+        for effect in sideEffects {
+            try await processSideEffect(effect)
+        }
+    }
+
     /// Processes a single side effect, potentially triggering StateChanges.
     /// - Parameter effect: The `SideEffect` to process.
     /// - Throws: An error if processing the side effect fails (e.g., definition not found, apply fails).
-    private func processSideEffect(_ effect: SideEffect, gameState: inout GameState) throws {
+    private func processSideEffect(_ effect: SideEffect) async throws {
         switch effect.type {
         case .startFuse:
             let fuseID = try effect.targetID.fuseID()
@@ -33,7 +46,7 @@ extension GameEngine {
                 oldValue: gameState.activeFuses[definition.id].map { .int($0) },
                 newValue: .int(initialTurns)
             )
-            try gameState.apply(addChange)
+            try await applyWithDynamicValidation(addChange)
 
         case .stopFuse:
             let fuseID = try effect.targetID.fuseID()
@@ -44,7 +57,7 @@ extension GameEngine {
                 oldValue: oldTurns.map { StateValue.int($0) },
                 newValue: .int(0)
             )
-            try gameState.apply(removeChange)
+            try await applyWithDynamicValidation(removeChange)
 
         case .runDaemon:
             let daemonID = try effect.targetID.daemonID()
@@ -55,7 +68,7 @@ extension GameEngine {
                     """)
             }
             if !gameState.activeDaemons.contains(daemonID) {
-                try gameState.apply(
+                try await applyWithDynamicValidation(
                     StateChange(
                         entityID: .global,
                         attributeID: .addActiveDaemon(daemonID: daemonID),
@@ -68,7 +81,7 @@ extension GameEngine {
         case .stopDaemon:
             let daemonID = try effect.targetID.daemonID()
             if gameState.activeDaemons.contains(daemonID) {
-                try gameState.apply(
+                try await applyWithDynamicValidation(
                     StateChange(
                         entityID: .global,
                         attributeID: .removeActiveDaemon(daemonID: daemonID),
@@ -79,10 +92,12 @@ extension GameEngine {
             }
 
         case .scheduleEvent:
-            // For scheduleEvent, effect.targetID (EntityID) can be used directly
-            // without needing to convert it to a definition key.
-            // The actual scheduling logic would go here.
-            print("Warning: SideEffectType.scheduleEvent for target '\(effect.targetID)' not yet fully implemented.")
+            // For now, log that this feature is not yet implemented
+            // In the future, this could integrate with a scheduling system
+            logWarning("""
+                SideEffectType.scheduleEvent for target '\(effect.targetID)' is not yet implemented.
+                Parameters: \(effect.parameters)
+                """)
         }
     }
 }
