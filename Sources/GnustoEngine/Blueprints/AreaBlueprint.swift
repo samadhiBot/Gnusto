@@ -3,8 +3,9 @@ import Foundation
 /// A protocol for types that group together the definitions for a specific area or region
 /// of the game world, including its locations, items, and any associated event handlers.
 ///
-/// Game developers conform to `AreaBlueprint` by creating a struct or class that holds
-/// properties representing the static definitions for that area. For example:
+/// ## Traditional Implementation
+/// Game developers conform to `AreaBlueprint` by creating a struct that holds
+/// properties representing the static definitions for that area:
 ///
 /// ```swift
 /// struct WestOfHouseArea: AreaBlueprint {
@@ -25,16 +26,97 @@ import Foundation
 /// }
 /// ```
 ///
-/// The `AreaBlueprint` protocol extension then uses reflection to automatically discover
-/// all `Location`, `Item`, `LocationEventHandler`, and `ItemEventHandler` instances
-/// defined as properties within the conforming type. This allows for a declarative way
-/// to define game content, which can then be aggregated by the `GameBlueprint`.
+/// ## Macro-Based Implementation (Recommended)
+/// With the `@GameArea` macro, you can spread definitions across multiple files:
+///
+/// ```swift
+/// @GameArea
+/// struct Act1Area {
+///     // Content discovered from extensions automatically
+/// }
+///
+/// extension Act1Area {
+///     @GameItem
+///     static let basket = Item(.name("wicker basket"), .isTakable)
+///
+///     @GameLocation  
+///     static let cottage = Location(.name("Your Cottage"))
+///
+///     @ItemEventHandler(.basket)
+///     static let basketHandler = ItemEventHandler { ... }
+/// }
+/// ```
+///
+/// The `AreaBlueprint` protocol extension uses reflection (traditional) or macro generation
+/// (modern) to automatically discover all content and create the appropriate collections.
 public protocol AreaBlueprint {
     /// Conforming types must provide an accessible default initializer (e.g., `init()`).
     /// This is necessary for the reflection-based discovery mechanism to instantiate
     /// the blueprint and access its properties.
     init()
+    
+    /// All items defined in this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@GameItem` marked properties across all extensions.
+    static var items: [Item] { get }
+    
+    /// All locations defined in this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@GameLocation` marked properties across all extensions.
+    static var locations: [Location] { get }
+    
+    /// Event handlers for specific items in this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@ItemEventHandler` marked properties across all extensions.
+    static var itemEventHandlers: [ItemID: ItemEventHandler] { get }
+    
+    /// Event handlers for specific locations in this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@LocationEventHandler` marked properties across all extensions.
+    static var locationEventHandlers: [LocationID: LocationEventHandler] { get }
+    
+    /// Fuse definitions for this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@GameFuse` marked properties across all extensions.
+    static var fuseDefinitions: [FuseID: FuseDefinition] { get }
+    
+    /// Daemon definitions for this area.
+    /// 
+    /// With the `@GameArea` macro, this is automatically populated by discovering
+    /// all `@GameDaemon` marked properties across all extensions.
+    static var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
+    
+    /// Dynamic attribute registry for this area.
+    /// 
+    /// With the `@GameArea` macro, this can be populated by discovering
+    /// dynamic attribute handlers across all extensions.
+    static var dynamicAttributeRegistry: DynamicAttributeRegistry { get }
 }
+
+// MARK: - Default Implementations
+
+extension AreaBlueprint {
+    /// Default implementation returns an empty fuse definitions dictionary.
+    /// The `@GameArea` macro overrides this with discovered fuses.
+    public static var fuseDefinitions: [FuseID: FuseDefinition] { [:] }
+    
+    /// Default implementation returns an empty daemon definitions dictionary.
+    /// The `@GameArea` macro overrides this with discovered daemons.
+    public static var daemonDefinitions: [DaemonID: DaemonDefinition] { [:] }
+    
+    /// Default implementation returns an empty dynamic attribute registry.
+    /// The `@GameArea` macro overrides this with discovered dynamic attributes.
+    public static var dynamicAttributeRegistry: DynamicAttributeRegistry { 
+        DynamicAttributeRegistry() 
+    }
+}
+
+// MARK: - Legacy Reflection-Based Discovery
 
 extension AreaBlueprint {
     /// Discovers and returns all `Item` instances defined as properties within the conforming type.
@@ -42,6 +124,7 @@ extension AreaBlueprint {
     /// This method uses reflection (`Mirror`) to find all properties that are of type `Item`.
     /// It's crucial that each `Item` has a unique `ItemID` across the entire game to avoid conflicts.
     ///
+    /// > Note: This is the legacy implementation. Use `@GameArea` macro for new areas.
     /// - Note: An assertion failure will occur during development if duplicate `ItemID`s are found
     ///         within this blueprint.
     /// - Returns: An array containing all `Item` instances defined as properties.
@@ -74,6 +157,7 @@ extension AreaBlueprint {
     /// let magicWandHandler = ItemEventHandler { ... }
     /// ```
     ///
+    /// > Note: This is the legacy implementation. Use `@ItemEventHandler(.itemID)` macro for new handlers.
     /// - Note: If a property is typed as `ItemEventHandler` but its name does not follow this
     ///         convention, an assertion failure will occur during development, and the handler
     ///         will be skipped.
@@ -112,6 +196,7 @@ extension AreaBlueprint {
     /// This method uses reflection (`Mirror`) to find all properties that are of type `Location`.
     /// Each `Location` must have a unique `LocationID` across the entire game.
     ///
+    /// > Note: This is the legacy implementation. Use `@GameArea` macro for new areas.
     /// - Note: An assertion failure will occur during development if duplicate `LocationID`s are found
     ///         within this blueprint.
     /// - Returns: An array containing all `Location` instances defined as properties.
@@ -144,6 +229,7 @@ extension AreaBlueprint {
     /// let grueLairHandler = LocationEventHandler { ... }
     /// ```
     ///
+    /// > Note: This is the legacy implementation. Use `@LocationEventHandler(.locationID)` macro for new handlers.
     /// - Note: If a property is typed as `LocationEventHandler` but its name does not follow this
     ///         convention, an assertion failure will occur during development, and the handler
     ///         will be skipped.

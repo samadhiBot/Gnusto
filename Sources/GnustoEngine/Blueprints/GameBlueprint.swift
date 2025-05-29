@@ -2,15 +2,30 @@ import Foundation
 
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
-/// Implement this protocol to specify all the essential elements for your game,
-/// including initial world state, game-specific constants, custom behaviors, and event handlers.
-/// The `GameEngine` uses this blueprint to initialize and run the game.
+/// With the macro system, creating a game is now incredibly simple - just specify
+/// your game's metadata and let the macros discover everything else automatically.
 ///
-/// For organizing game content (locations, items, and their specific event handlers),
-/// consider using types that conform to `AreaBlueprint`. The definitions from these
-/// area blueprints can then be aggregated and provided to the relevant properties of
-/// your `GameBlueprint` implementation (e.g., `state`, `itemEventHandlers`,
-/// `locationEventHandlers`).
+/// ## Traditional Implementation
+/// ```swift
+/// struct MyGame: GameBlueprint {
+///     var constants: GameConstants { ... }
+///     var areas: [any AreaBlueprint.Type] { [Act1Area.self, Act2Area.self] }
+///     var player: Player { Player(in: .startingRoom) }
+/// }
+/// ```
+///
+/// ## Macro-Based Implementation (Recommended)
+/// ```swift
+/// @GameBlueprint(
+///     title: "My Adventure",
+///     introduction: "Welcome to my game...",
+///     maxScore: 100,
+///     startingLocation: .startingRoom
+/// )
+/// struct MyGame {
+///     // Everything else discovered automatically!
+/// }
+/// ```
 public protocol GameBlueprint: Sendable {
     /// The core metadata constants for the game.
     ///
@@ -18,88 +33,75 @@ public protocol GameBlueprint: Sendable {
     /// the story title, introduction, release information, and maximum score.
     /// This information is often displayed to the player at the start of the game.
     var constants: GameConstants { get }
-
-    /// The complete state of the world at the start of the game.
-    ///
-    /// This `GameState` instance defines all locations, items (and their properties),
-    /// the initial player state, active timers (fuses and daemons), and any global
-    /// variables at the moment the game begins.
-    ///
-    /// > Important: This property **only** defomes the state at the game's outset. Any later
-    ///   mutations occur on a separate copy maintained by the ``GameEngine`` actor.
-    var state: GameState { get }
-
-    /// Optional closures to provide custom action handlers for specific verbs,
-    /// overriding the default engine handlers.
-    ///
-    /// Use this dictionary to replace or augment the standard behavior for verbs
-    /// like "take", "open", "go", etc. The key is a `VerbID` (e.g., `.take`) and
-    /// the value is an `ActionHandler` implementation.
-    ///
-    /// The default implementation provides an empty dictionary, meaning all verbs
-    /// will use their standard engine behaviors unless overridden.
+    
+    /// The game areas that define your world.
+    /// 
+    /// With the `@GameBlueprint` macro, this is automatically populated by
+    /// convention-based discovery of all `*Area` types in your module.
+    var areas: [any AreaBlueprint.Type] { get }
+    
+    /// The initial player state.
+    var player: Player { get }
+    
+    /// Optional: Custom action handlers to override engine defaults.
     var customActionHandlers: [VerbID: ActionHandler] { get }
-
-    /// Handlers triggered by events occurring for a specific item.
-    ///
-    /// This dictionary allows you to define custom logic that runs when certain
-    /// events happen to specific items. The key is an `ItemID` and the value is
-    /// an `ItemEventHandler`. Events include `beforeTurn` and `afterTurn`.
-    ///
-    /// The default implementation provides an empty dictionary.
-    var itemEventHandlers: [ItemID: ItemEventHandler] { get }
-
-    /// Handlers triggered by events occurring within a specific location.
-    ///
-    /// This dictionary allows you to define custom logic that runs when certain
-    /// events happen within specific locations. The key is a `LocationID` and the value is
-    /// a `LocationEventHandler`. Events include `beforeTurn`, `afterTurn`, and `onEnter`.
-    ///
-    /// The default implementation provides an empty dictionary.
-    var locationEventHandlers: [LocationID: LocationEventHandler] { get }
-
-    /// The registry containing definitions for timed events (fuses) and background
-    /// processes (daemons).
-    ///
-    /// Use this to provide `FuseDefinition` and `DaemonDefinition` instances that
-    /// the `GameEngine` will manage throughout the game. Fuses trigger an action
-    /// after a set number of turns, while daemons run their action every turn they
-    /// are active.
-    ///
-    /// The default implementation provides an empty `TimeRegistry`.
-    var timeRegistry: TimeRegistry { get }
-
-    /// The registry containing handlers for dynamically computing or validating
-    /// item and location attributes.
-    ///
-    /// Provide a `DynamicAttributeRegistry` to define custom logic for how certain
-    /// item or location attributes (like `description`, `name`, or custom flags)
-    /// are calculated at runtime or to validate changes to their values.
-    ///
-    /// The default implementation provides an empty `DynamicAttributeRegistry`.
-    var dynamicAttributeRegistry: DynamicAttributeRegistry { get }
+    
+    /// Optional: Global state values to initialize the game with.
+    var globalState: [GlobalID: StateValue] { get }
 }
 
-// MARK: - Default implementations
+// MARK: - Automatic Generation
 
 extension GameBlueprint {
-    public var customActionHandlers: [VerbID: ActionHandler] {
-        [:]
+    /// Default implementation for custom action handlers.
+    public var customActionHandlers: [VerbID: ActionHandler] { [:] }
+    
+    /// Default implementation for global state.
+    public var globalState: [GlobalID: StateValue] { [:] }
+    
+    /// Automatically generated GameState from the specified areas and player.
+    public var state: GameState {
+        GameState(
+            areas: areas,
+            player: player,
+            globalState: globalState
+        )
     }
-
+    
+    /// Automatically aggregated item event handlers from all areas.
     public var itemEventHandlers: [ItemID: ItemEventHandler] {
-        [:]
+        areas.reduce(into: [:]) { result, areaType in
+            result.merge(areaType.itemEventHandlers) { _, new in new }
+        }
     }
-
+    
+    /// Automatically aggregated location event handlers from all areas.
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
-        [:]
+        areas.reduce(into: [:]) { result, areaType in
+            result.merge(areaType.locationEventHandlers) { _, new in new }
+        }
     }
-
+    
+    /// Automatically aggregated time registry from all areas.
     public var timeRegistry: TimeRegistry {
-        TimeRegistry()
+        let allFuses = areas.reduce(into: [:]) { result, areaType in
+            result.merge(areaType.fuseDefinitions) { _, new in new }
+        }
+        
+        let allDaemons = areas.reduce(into: [:]) { result, areaType in
+            result.merge(areaType.daemonDefinitions) { _, new in new }
+        }
+        
+        return TimeRegistry(
+            fuseDefinitions: allFuses,
+            daemonDefinitions: allDaemons
+        )
     }
-
+    
+    /// Automatically aggregated dynamic attribute registry from all areas.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry {
-        DynamicAttributeRegistry()
+        areas.reduce(into: DynamicAttributeRegistry()) { result, areaType in
+            result.merge(areaType.dynamicAttributeRegistry)
+        }
     }
 }
