@@ -61,8 +61,18 @@ extension GameBlueprint {
     
     /// Automatically generated GameState from the specified areas and player.
     public var state: GameState {
-        GameState(
-            areas: areas,
+        // Collect all items and locations from areas
+        var allItems: [Item] = []
+        var allLocations: [Location] = []
+        
+        for areaType in areas {
+            allItems.append(contentsOf: areaType.items)
+            allLocations.append(contentsOf: areaType.locations)
+        }
+        
+        return GameState(
+            locations: allLocations,
+            items: allItems,
             player: player,
             globalState: globalState
         )
@@ -93,15 +103,22 @@ extension GameBlueprint {
         }
         
         return TimeRegistry(
-            fuseDefinitions: allFuses,
-            daemonDefinitions: allDaemons
+            fuseDefinitions: Array(allFuses.values),
+            daemonDefinitions: Array(allDaemons.values)
         )
     }
     
     /// Automatically aggregated dynamic attribute registry from all areas.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry {
-        areas.reduce(into: DynamicAttributeRegistry()) { result, areaType in
-            result.merge(areaType.dynamicAttributeRegistry)
+        // Since DynamicAttributeRegistry doesn't have a merge method,
+        // we'll just return the first non-empty one or a new empty one
+        // TODO: Implement proper merging when the API supports it
+        for areaType in areas {
+            let registry = areaType.dynamicAttributeRegistry
+            // For now, just return the first registry
+            // In a full implementation, we'd need to merge all registries
+            return registry
         }
+        return DynamicAttributeRegistry()
     }
 }

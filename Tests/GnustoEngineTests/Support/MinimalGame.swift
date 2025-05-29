@@ -7,39 +7,17 @@ struct MinimalGame: GameBlueprint {
         release: "0.0.1",
         maximumScore: 10
     )
-    var state: GameState
-    var customActionHandlers: [VerbID: ActionHandler]
-    var itemEventHandlers: [ItemID: ItemEventHandler]
-    var locationEventHandlers: [LocationID: LocationEventHandler]
-    var timeRegistry: TimeRegistry
-    var dynamicAttributeRegistry: DynamicAttributeRegistry
+    
+    let areas: [any AreaBlueprint.Type] = [MinimalArea.self]
+    
+    let player = Player(in: .startRoom)
+}
 
-    init(
-        player: Player = Player(in: .startRoom),
-        locations: [Location]? = nil,
-        items: [Item]? = nil,
-        globalState: [GlobalID: StateValue]? = nil,
-        customActionHandlers: [VerbID: ActionHandler] = [:],
-        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
-        locationEventHandlers: [LocationID: LocationEventHandler] = [:],
-        timeRegistry: TimeRegistry = TimeRegistry(),
-        dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
-    ) {
-        self.customActionHandlers = customActionHandlers
-        self.timeRegistry = timeRegistry
-        self.dynamicAttributeRegistry = dynamicAttributeRegistry
-        self.itemEventHandlers = itemEventHandlers
-        self.locationEventHandlers = locationEventHandlers
-
-        let gameLocations = locations ?? [
-            Location(
-                id: .startRoom,
-                .name("Void"),
-                .description("An empty void."),
-                .inherentlyLit
-            )
-        ]
-        let gameItems = items ?? [
+struct MinimalArea: AreaBlueprint {
+    init() {}
+    
+    static var items: [Item] {
+        [
             Item(
                 id: .startItem,
                 .name("pebble"),
@@ -54,24 +32,24 @@ struct MinimalGame: GameBlueprint {
                 .isScenery
             )
         ]
-
-        // Build vocabulary including verbs from custom handlers
-        var customVerbs: [Verb] = []
-        for verbID in customActionHandlers.keys {
-            // Create a basic definition; requiresLight=false is a safe default for tests
-            let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
-            customVerbs.append(verbDef)
-        }
-        let vocabulary = Vocabulary.build(items: gameItems, verbs: customVerbs)
-
-        self.state = GameState(
-            locations: gameLocations,
-            items: gameItems,
-            player: player,
-            vocabulary: vocabulary,
-            globalState: globalState ?? [:]
-        )
     }
+    
+    static var locations: [Location] {
+        [
+            Location(
+                id: .startRoom,
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
+            )
+        ]
+    }
+    
+    static var itemEventHandlers: [ItemID: ItemEventHandler] { [:] }
+    static var locationEventHandlers: [LocationID: LocationEventHandler] { [:] }
+    static var fuseDefinitions: [FuseID: FuseDefinition] { [:] }
+    static var daemonDefinitions: [DaemonID: DaemonDefinition] { [:] }
+    static var dynamicAttributeRegistry: DynamicAttributeRegistry { DynamicAttributeRegistry() }
 }
 
 extension ItemID {

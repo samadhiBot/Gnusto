@@ -62,35 +62,35 @@ struct FrobozzMagicDemoKit {
 
 // MARK: - Manual Areas Registration (Temporary)
 // TODO: Remove this once convention-based discovery is implemented
-extension FrobozzMagicDemoKit {
-    var areas: [any AreaBlueprint.Type] {
-        [
-            Act1Area.self,
-            // Act2Area.self,  // When implemented
-            // Act3Area.self,  // When implemented
-        ]
-    }
-}
-
-// MARK: - Auto-Generated ID Constants
-// TODO: These will be generated automatically by the @GameArea macro
-
-extension LocationID {
-    static let berziosGarden = LocationID("berziosGarden")
-    static let berziosGate = LocationID("berziosGate")
-    static let countryRoad = LocationID("countryRoad")
-    static let stoneBridge = LocationID("stoneBridge")
-    static let yourCottage = LocationID("yourCottage")
-}
-
-extension ItemID {
-    static let basket = ItemID("basket")
-    static let butterCrock = ItemID("butterCrock")
-    static let gnustoDog = ItemID("gnustoDog")
-    static let lemonade = ItemID("lemonade")
-    static let preserveJar = ItemID("preserveJar")
-    static let sourdoughBoule = ItemID("sourdoughBoule")
-}
+//extension FrobozzMagicDemoKit {
+//    var areas: [any AreaBlueprint.Type] {
+//        [
+//            Act1Area.self,
+//            // Act2Area.self,  // When implemented
+//            // Act3Area.self,  // When implemented
+//        ]
+//    }
+//}
+//
+//// MARK: - Auto-Generated ID Constants
+//// TODO: These will be generated automatically by the @GameArea macro
+//
+//extension LocationID {
+//    static let berziosGarden = LocationID("berziosGarden")
+//    static let berziosGate = LocationID("berziosGate")
+//    static let countryRoad = LocationID("countryRoad")
+//    static let stoneBridge = LocationID("stoneBridge")
+//    static let yourCottage = LocationID("yourCottage")
+//}
+//
+//extension ItemID {
+//    static let basket = ItemID("basket")
+//    static let butterCrock = ItemID("butterCrock")
+//    static let gnustoDog = ItemID("gnustoDog")
+//    static let lemonade = ItemID("lemonade")
+//    static let preserveJar = ItemID("preserveJar")
+//    static let sourdoughBoule = ItemID("sourdoughBoule")
+//}
 
 extension GlobalID {
     static let basketPutDown = GlobalID("basketPutDown")

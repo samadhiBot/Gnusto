@@ -1,12 +1,13 @@
 import SwiftSyntax
 import SwiftSyntaxMacros
 import SwiftSyntaxBuilder
+import SwiftDiagnostics
 
 /// The main macro implementation for `@GameBlueprint`.
 ///
 /// This macro performs convention-based discovery of all `*Area` types in the module
 /// and generates a complete `GameBlueprint` implementation.
-public struct GameBlueprintMacro: MemberMacro, ConformanceMacro {
+public struct GameBlueprintMacro: MemberMacro, ExtensionMacro {
     
     public static func expansion(
         of node: AttributeSyntax,
@@ -17,55 +18,68 @@ public struct GameBlueprintMacro: MemberMacro, ConformanceMacro {
         
         // Extract macro arguments
         guard case let .argumentList(arguments) = node.arguments else {
-            throw MacroError.invalidArguments("@GameBlueprint requires title, introduction, maxScore, and startingLocation")
+            let diagnostic = Diagnostic(
+                node: node,
+                message: GameBlueprintMacroError.invalidArguments("@GameBlueprint requires title, introduction, maxScore, and startingLocation")
+            )
+            context.diagnose(diagnostic)
+            return []
         }
         
-        let macroArgs = try parseMacroArguments(arguments)
+        let macroArgs: MacroArguments
+        do {
+            macroArgs = try parseMacroArguments(arguments)
+        } catch {
+            let diagnostic = Diagnostic(
+                node: node,
+                message: error as! GameBlueprintMacroError
+            )
+            context.diagnose(diagnostic)
+            return []
+        }
         
-        // TODO: In a real implementation, we'd scan the module for *Area types
-        // For now, we'll generate a template that can be customized
-        
+        // Generate the GameBlueprint implementation
         let generated: [DeclSyntax] = [
             // Generate constants
-            """
-            var constants: GameConstants {
-                GameConstants(
-                    storyTitle: \(literal: macroArgs.title),
-                    introduction: \(literal: macroArgs.introduction),
-                    release: "1.0.0",
-                    maximumScore: \(literal: macroArgs.maxScore)
-                )
-            }
-            """,
+            DeclSyntax("""
+                var constants: GameConstants {
+                    GameConstants(
+                        storyTitle: \(literal: macroArgs.title),
+                        introduction: \(literal: macroArgs.introduction),
+                        release: "1.0.0",
+                        maximumScore: \(literal: macroArgs.maxScore)
+                    )
+                }
+                """),
             
             // Generate areas discovery
-            """
-            var areas: [any AreaBlueprint.Type] {
-                // Auto-discovered *Area types in module
-                discoverGameAreas()
-            }
-            """,
+            DeclSyntax("""
+                var areas: [any AreaBlueprint.Type] {
+                    // Auto-discovered *Area types in module
+                    discoverGameAreas()
+                }
+                """),
             
             // Generate player
-            """
-            var player: Player {
-                Player(in: \(raw: macroArgs.startingLocation ?? ".defaultStart"))
-            }
-            """,
+            DeclSyntax("""
+                var player: Player {
+                    Player(in: \(raw: macroArgs.startingLocation ?? ".defaultStart"))
+                }
+                """),
             
             // Generate area discovery function
-            """
-            private func discoverGameAreas() -> [any AreaBlueprint.Type] {
-                // Convention-based discovery of *Area types
-                // This would use Swift's metadata system in a real implementation
-                var areas: [any AreaBlueprint.Type] = []
-                
-                // For now, areas must be manually registered
-                // TODO: Implement automatic discovery via Swift metadata
-                
-                return areas
-            }
-            """
+            DeclSyntax("""
+                private func discoverGameAreas() -> [any AreaBlueprint.Type] {
+                    // Convention-based discovery of *Area types
+                    // This would use Swift's metadata system in a real implementation
+                    var areas: [any AreaBlueprint.Type] = []
+                    
+                    // For now, areas must be manually registered
+                    // TODO: Implement automatic discovery via Swift metadata
+                    
+                    return areas
+                }
+                """)
         ]
         
         return generated
@@ -73,10 +87,18 @@ public struct GameBlueprintMacro: MemberMacro, ConformanceMacro {
     
     public static func expansion(
         of node: AttributeSyntax,
-        providingConformancesOf declaration: some DeclGroupSyntax,
+        attachedTo declaration: some DeclGroupSyntax,
+        providingExtensionsOf type: some TypeSyntaxProtocol,
+        conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
-    ) throws -> [(TypeSyntax, GenericWhereClauseSyntax?)] {
-        return [("GameBlueprint", nil)]
+    ) throws -> [ExtensionDeclSyntax] {
+        let gameBlueprint: DeclSyntax = "extension \(type.trimmed): GameBlueprint {}"
+        
+        guard let extensionDecl = gameBlueprint.as(ExtensionDeclSyntax.self) else {
+            return []
+        }
+        
+        return [extensionDecl]
     }
 }
 
@@ -89,17 +111,25 @@ struct MacroArguments {
     let startingLocation: String?
 }
 
-enum MacroError: Error, CustomStringConvertible {
+enum GameBlueprintMacroError: Error, DiagnosticMessage {
     case invalidArguments(String)
     case missingRequiredArgument(String)
     
-    var description: String {
+    var message: String {
         switch self {
         case .invalidArguments(let message):
-            return "Invalid macro arguments: \(message)"
+            return message
         case .missingRequiredArgument(let arg):
             return "Missing required argument: \(arg)"
         }
+    }
+    
+    var diagnosticID: MessageID {
+        MessageID(domain: "GnustoMacros", id: "GameBlueprintMacro")
+    }
+    
+    var severity: DiagnosticSeverity {
+        .error
     }
 }
 
@@ -129,13 +159,13 @@ func parseMacroArguments(_ arguments: LabeledExprListSyntax) throws -> MacroArgu
     }
     
     guard let title = title else {
-        throw MacroError.missingRequiredArgument("title")
+        throw GameBlueprintMacroError.missingRequiredArgument("title")
     }
     guard let introduction = introduction else {
-        throw MacroError.missingRequiredArgument("introduction")
+        throw GameBlueprintMacroError.missingRequiredArgument("introduction")
     }
     guard let maxScore = maxScore else {
-        throw MacroError.missingRequiredArgument("maxScore")
+        throw GameBlueprintMacroError.missingRequiredArgument("maxScore")
     }
     
     return MacroArguments(

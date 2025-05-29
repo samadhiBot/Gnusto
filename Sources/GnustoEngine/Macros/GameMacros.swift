@@ -1,7 +1,3 @@
-import SwiftSyntax
-import SwiftSyntaxMacros
-import SwiftCompilerPlugin
-
 /// The main macro for defining a complete game with convention-based discovery.
 ///
 /// This macro:
@@ -23,140 +19,67 @@ import SwiftCompilerPlugin
 /// }
 /// ```
 @attached(member, names: arbitrary)
-@attached(conformance, names: named(GameBlueprint))
+@attached(extension, conformances: GameBlueprint)
 public macro GameBlueprint(
     title: String,
     introduction: String,
     maxScore: Int,
-    startingLocation: ItemID? = nil
+    startingLocation: LocationID
 ) = #externalMacro(module: "GnustoMacros", type: "GameBlueprintMacro")
 
-/// Marks a struct as a game area with automatic discovery of items, locations, and handlers.
+/// Marks a struct as a game area with automatic discovery of all content.
 ///
 /// This macro:
-/// 1. Scans all extensions of the marked type across all files in the module
-/// 2. Discovers `@GameItem`, `@GameLocation`, `@ItemEventHandler`, etc. declarations
-/// 3. Generates the complete `AreaBlueprint` conformance
-/// 4. Auto-generates ID constants for all discovered items/locations
-/// 5. Validates all cross-references within the area
+/// 1. Scans all extensions of the marked type for `@GameItem`, `@GameLocation`, etc.
+/// 2. Generates the complete `AreaBlueprint` conformance
+/// 3. Auto-generates discovery functions for all content types
+/// 4. Validates cross-references within the area
 ///
 /// Usage:
 /// ```swift
 /// @GameArea
 /// struct Act1Area {
-///     // Items, locations, handlers discovered from extensions
+///     // Content discovered automatically from extensions!
 /// }
 /// ```
 @attached(member, names: arbitrary)
-@attached(conformance, names: named(AreaBlueprint))
+@attached(extension, conformances: AreaBlueprint)
 public macro GameArea() = #externalMacro(module: "GnustoMacros", type: "GameAreaMacro")
 
-/// Marks a static property as a game item with automatic ID generation.
-///
-/// The item ID is auto-generated from the property name using camelCase conversion.
-/// For example, `sourdoughBoule` becomes `ItemID("sourdoughBoule")`.
+/// Marks a game item and auto-generates its ID constant.
 ///
 /// Usage:
 /// ```swift
-/// extension MyArea {
-///     @GameItem
-///     static let magicSword = Item(
-///         .name("magic sword"),
-///         .in(.location(.armory))
-///     )
-/// }
+/// @GameItem
+/// static let magicSword = Item(.name("magic sword"))
+/// // Generates: static let magicSwordID = ItemID("magicSword")
 /// ```
-@attached(peer)
+@attached(peer, names: suffixed(ID))
 public macro GameItem() = #externalMacro(module: "GnustoMacros", type: "GameItemMacro")
 
-/// Marks a static property as a game location with automatic ID generation.
+/// Marks a game location and auto-generates its ID constant.
 ///
 /// Usage:
 /// ```swift
-/// extension MyArea {
-///     @GameLocation
-///     static let throneRoom = Location(
-///         .name("Throne Room"),
-///         .exits([.north: .to(.greatHall)])
-///     )
-/// }
+/// @GameLocation
+/// static let throneRoom = Location(.name("Throne Room"))
+/// // Generates: static let throneRoomID = LocationID("throneRoom")
 /// ```
-@attached(peer)
+@attached(peer, names: suffixed(ID))
 public macro GameLocation() = #externalMacro(module: "GnustoMacros", type: "GameLocationMacro")
 
-/// Marks an item event handler with automatic association to the specified item.
-///
-/// Usage:
-/// ```swift
-/// extension MyArea {
-///     @ItemEventHandler(.magicSword)
-///     static let swordHandler = ItemEventHandler { engine, event in
-///         // Handler logic
-///     }
-/// }
-/// ```
+/// Marks an item event handler for automatic registration.
 @attached(peer)
-public macro ItemEventHandler(_ itemID: ItemID) = #externalMacro(module: "GnustoMacros", type: "ItemEventHandlerMacro")
+public macro ItemEventHandler(for itemID: ItemID) = #externalMacro(module: "GnustoMacros", type: "ItemEventHandlerMacro")
 
-/// Marks a location event handler with automatic association to the specified location.
-///
-/// Usage:
-/// ```swift
-/// extension MyArea {
-///     @LocationEventHandler(.throneRoom)
-///     static let throneHandler = LocationEventHandler { engine, event in
-///         // Handler logic
-///     }
-/// }
-/// ```
+/// Marks a location event handler for automatic registration.
 @attached(peer)
-public macro LocationEventHandler(_ locationID: LocationID) = #externalMacro(module: "GnustoMacros", type: "LocationEventHandlerMacro")
+public macro LocationEventHandler(for locationID: LocationID) = #externalMacro(module: "GnustoMacros", type: "LocationEventHandlerMacro")
 
-/// Marks a fuse definition with automatic ID generation and registration.
-///
-/// Usage:
-/// ```swift
-/// extension MyArea {
-///     @GameFuse("hunger_timer")
-///     static let hungerFuse = FuseDefinition(
-///         turns: 10,
-///         action: { engine in
-///             // Fuse action
-///         }
-///     )
-/// }
-/// ```
+/// Marks a fuse definition for automatic registration.
 @attached(peer)
-public macro GameFuse(_ id: String) = #externalMacro(module: "GnustoMacros", type: "GameFuseMacro")
+public macro GameFuse() = #externalMacro(module: "GnustoMacros", type: "GameFuseMacro")
 
-/// Marks a daemon definition with automatic ID generation and registration.
-///
-/// Usage:
-/// ```swift
-/// extension MyArea {
-///     @GameDaemon("weather_system")
-///     static let weatherDaemon = DaemonDefinition(
-///         frequency: 5,
-///         action: { engine in
-///             // Daemon action
-///         }
-///     )
-/// }
-/// ```
+/// Marks a daemon definition for automatic registration.
 @attached(peer)
-public macro GameDaemon(_ id: String) = #externalMacro(module: "GnustoMacros", type: "GameDaemonMacro")
-
-/// Compiler plugin registration
-@main
-struct GnustoMacroPlugin: CompilerPlugin {
-    let providingMacros: [Macro.Type] = [
-        GameBlueprintMacro.self,
-        GameAreaMacro.self,
-        GameItemMacro.self,
-        GameLocationMacro.self,
-        ItemEventHandlerMacro.self,
-        LocationEventHandlerMacro.self,
-        GameFuseMacro.self,
-        GameDaemonMacro.self,
-    ]
-} 
+public macro GameDaemon() = #externalMacro(module: "GnustoMacros", type: "GameDaemonMacro") 
