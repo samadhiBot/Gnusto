@@ -25,10 +25,6 @@ struct GameItemMacroTests {
         } expansion: {
             """
             static let magicSword = Item(.name("magic sword"))
-
-            extension ItemID {
-                static let magicSword = ItemID("magicSword")
-            }
             """
         }
     }
@@ -43,10 +39,6 @@ struct GameItemMacroTests {
         } expansion: {
             """
             static let throneRoom = Location(.name("Throne Room"))
-
-            extension LocationID {
-                static let throneRoom = LocationID("throneRoom")
-            }
             """
         }
     }

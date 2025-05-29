@@ -4,35 +4,18 @@ import SwiftDiagnostics
 
 /// Macro implementation for `@GameItem`.
 ///
-/// This macro generates global ID constants by adding extensions to ItemID.
+/// This is a peer macro that doesn't generate anything itself,
+/// but marks items for processing by the GameArea extension macro.
 public struct GameItemMacro: PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
         providingPeersOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        
-        guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self) else {
-            let diagnostic = Diagnostic(
-                node: Syntax(declaration),
-                message: GameItemMacroError.invalidDeclaration("@GameItem can only be applied to variable declarations")
-            )
-            context.diagnose(diagnostic)
-            return []
-        }
-        
-        let itemName = identifier.identifier.text
-        
-        // Generate extension to ItemID for global accessibility
-        return [
-            DeclSyntax("""
-                extension ItemID {
-                    static let \(raw: itemName) = ItemID("\(raw: itemName)")
-                }
-                """)
-        ]
+        // This macro doesn't generate peers directly.
+        // The GameArea extension macro will scan for @GameItem annotations
+        // and generate the appropriate ID extensions.
+        return []
     }
 }
 
@@ -44,28 +27,10 @@ public struct GameLocationMacro: PeerMacro {
         providingPeersOf declaration: some DeclSyntaxProtocol,
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
-        
-        guard let varDecl = declaration.as(VariableDeclSyntax.self),
-              let binding = varDecl.bindings.first,
-              let identifier = binding.pattern.as(IdentifierPatternSyntax.self) else {
-            let diagnostic = Diagnostic(
-                node: Syntax(declaration),
-                message: GameItemMacroError.invalidDeclaration("@GameLocation can only be applied to variable declarations")
-            )
-            context.diagnose(diagnostic)
-            return []
-        }
-        
-        let locationName = identifier.identifier.text
-        
-        // Generate extension to LocationID for global accessibility
-        return [
-            DeclSyntax("""
-                extension LocationID {
-                    static let \(raw: locationName) = LocationID("\(raw: locationName)")
-                }
-                """)
-        ]
+        // This macro doesn't generate peers directly.
+        // The GameArea extension macro will scan for @GameLocation annotations
+        // and generate the appropriate ID extensions.
+        return []
     }
 }
 

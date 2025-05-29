@@ -3,11 +3,14 @@ import SwiftSyntaxMacros
 import SwiftSyntaxBuilder
 import SwiftDiagnostics
 
-/// The macro implementation for `@GameArea`.
+/// Macro implementation for `@GameArea`.
 ///
-/// This macro scans all extensions of the marked type across the module
-/// and discovers all game content marked with `@GameItem`, `@GameLocation`, etc.
+/// This macro generates:
+/// 1. Area protocol conformance via member macro
+/// 2. Global ID extensions via extension macro
 public struct GameAreaMacro: MemberMacro, ExtensionMacro {
+    
+    // MARK: - MemberMacro
     
     public static func expansion(
         of node: AttributeSyntax,
@@ -16,7 +19,7 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         
-        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
+        guard declaration.is(StructDeclSyntax.self) else {
             let diagnostic = Diagnostic(
                 node: Syntax(declaration),
                 message: GameAreaMacroError.invalidDeclaration("@GameArea can only be applied to structs")
@@ -25,68 +28,43 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
             return []
         }
         
-        let areaName = structDecl.name.text
-        
-        // Generate the AreaBlueprint conformance structure
-        let generated: [DeclSyntax] = [
-            // Generate the required initializer
+        // Generate the required initializer and discovery properties
+        return [
             DeclSyntax("init() {}"),
-            
-            // Generate items discovery
             DeclSyntax("""
                 static var items: [Item] {
                     discoverItems()
                 }
                 """),
-            
-            // Generate locations discovery  
             DeclSyntax("""
                 static var locations: [Location] {
                     discoverLocations()
                 }
                 """),
-            
-            // Generate item event handlers discovery
             DeclSyntax("""
                 static var itemEventHandlers: [ItemID: ItemEventHandler] {
                     discoverItemEventHandlers()
                 }
                 """),
-            
-            // Generate location event handlers discovery
             DeclSyntax("""
                 static var locationEventHandlers: [LocationID: LocationEventHandler] {
                     discoverLocationEventHandlers()
                 }
                 """),
-            
-            // Generate fuse definitions discovery
             DeclSyntax("""
-                static var fuseDefinitions: [FuseID: FuseDefinition] {
-                    discoverFuseDefinitions()
+                static var fuses: [FuseDefinition] {
+                    discoverFuses()
                 }
                 """),
-            
-            // Generate daemon definitions discovery
             DeclSyntax("""
-                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
-                    discoverDaemonDefinitions()
+                static var daemons: [DaemonDefinition] {
+                    discoverDaemons()
                 }
-                """),
-            
-            // Generate dynamic attribute registry
-            DeclSyntax("""
-                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
-                    DynamicAttributeRegistry()
-                }
-                """),
-            
-            // Generate discovery functions
-            generateDiscoveryFunctions(for: areaName)
+                """)
         ]
-        
-        return generated
     }
+    
+    // MARK: - ExtensionMacro
     
     public static func expansion(
         of node: AttributeSyntax,
@@ -95,13 +73,123 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
-        let areaBlueprint: DeclSyntax = "extension \(type.trimmed): AreaBlueprint {}"
         
-        guard let extensionDecl = areaBlueprint.as(ExtensionDeclSyntax.self) else {
+        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
             return []
         }
         
-        return [extensionDecl]
+        var extensions: [ExtensionDeclSyntax] = []
+        
+        // Add AreaBlueprint conformance
+        let areaBlueprintConformance = try ExtensionDeclSyntax("extension \(type): AreaBlueprint") {
+            // Empty - conformance is provided by generated members
+        }
+        extensions.append(areaBlueprintConformance)
+        
+        // Scan for @GameItem and @GameLocation declarations to generate ID extensions
+        let itemIDExtensions = try generateItemIDExtensions(from: structDecl, context: context)
+        let locationIDExtensions = try generateLocationIDExtensions(from: structDecl, context: context)
+        
+        extensions.append(contentsOf: itemIDExtensions)
+        extensions.append(contentsOf: locationIDExtensions)
+        
+        return extensions
+    }
+    
+    // MARK: - Helper Methods
+    
+    private static func generateItemIDExtensions(
+        from structDecl: StructDeclSyntax,
+        context: some MacroExpansionContext
+    ) throws -> [ExtensionDeclSyntax] {
+        
+        var itemNames: [String] = []
+        
+        // Scan all members for @GameItem annotations
+        for member in structDecl.memberBlock.members {
+            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
+            
+            // Check if this variable has a @GameItem attribute
+            let hasGameItemAttribute = varDecl.attributes.contains { attr in
+                guard case let .attribute(attribute) = attr else { return false }
+                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameItem"
+            }
+            
+            if hasGameItemAttribute {
+                // Extract the variable name
+                if let binding = varDecl.bindings.first,
+                   let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
+                    itemNames.append(pattern.identifier.text)
+                }
+            }
+        }
+        
+        // Generate ItemID extension if we found any items
+        if !itemNames.isEmpty {
+            var memberList: [DeclSyntax] = []
+            for itemName in itemNames {
+                memberList.append(DeclSyntax("""
+                    static let \(raw: itemName) = ItemID("\(raw: itemName)")
+                    """))
+            }
+            
+            let itemIDExtension = try ExtensionDeclSyntax("extension ItemID") {
+                for member in memberList {
+                    member
+                }
+            }
+            
+            return [itemIDExtension]
+        }
+        
+        return []
+    }
+    
+    private static func generateLocationIDExtensions(
+        from structDecl: StructDeclSyntax,
+        context: some MacroExpansionContext
+    ) throws -> [ExtensionDeclSyntax] {
+        
+        var locationNames: [String] = []
+        
+        // Scan all members for @GameLocation annotations
+        for member in structDecl.memberBlock.members {
+            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
+            
+            // Check if this variable has a @GameLocation attribute
+            let hasGameLocationAttribute = varDecl.attributes.contains { attr in
+                guard case let .attribute(attribute) = attr else { return false }
+                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameLocation"
+            }
+            
+            if hasGameLocationAttribute {
+                // Extract the variable name
+                if let binding = varDecl.bindings.first,
+                   let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
+                    locationNames.append(pattern.identifier.text)
+                }
+            }
+        }
+        
+        // Generate LocationID extension if we found any locations
+        if !locationNames.isEmpty {
+            var memberList: [DeclSyntax] = []
+            for locationName in locationNames {
+                memberList.append(DeclSyntax("""
+                    static let \(raw: locationName) = LocationID("\(raw: locationName)")
+                    """))
+            }
+            
+            let locationIDExtension = try ExtensionDeclSyntax("extension LocationID") {
+                for member in memberList {
+                    member
+                }
+            }
+            
+            return [locationIDExtension]
+        }
+        
+        return []
     }
 }
 
@@ -113,7 +201,7 @@ enum GameAreaMacroError: Error, DiagnosticMessage {
     var message: String {
         switch self {
         case .invalidDeclaration(let message):
-            return "Invalid @GameArea declaration: \(message)"
+            return "Invalid macro declaration: \(message)"
         }
     }
     

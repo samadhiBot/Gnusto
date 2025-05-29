@@ -30,42 +30,53 @@ public macro GameBlueprint(
 /// Marks a struct as a game area with automatic discovery of all content.
 ///
 /// This macro:
-/// 1. Scans all extensions of the marked type for `@GameItem`, `@GameLocation`, etc.
+/// 1. Scans all members for `@GameItem`, `@GameLocation`, etc.
 /// 2. Generates the complete `AreaBlueprint` conformance
-/// 3. Auto-generates discovery functions for all content types
+/// 3. Auto-generates global ID extensions for cross-area references
 /// 4. Validates cross-references within the area
 ///
 /// Usage:
 /// ```swift
 /// @GameArea
 /// struct Act1Area {
-///     // Content discovered automatically from extensions!
+///     @GameItem
+///     static let sword = Item(.name("magic sword"))
+///     
+///     @GameLocation  
+///     static let throne = Location(.name("Throne Room"))
 /// }
+/// // Generates:
+/// // extension ItemID { static let sword = ItemID("sword") }
+/// // extension LocationID { static let throne = LocationID("throne") }
 /// ```
 @attached(member, names: arbitrary)
-@attached(extension, conformances: AreaBlueprint)
+@attached(extension, conformances: AreaBlueprint, names: arbitrary)
 public macro GameArea() = #externalMacro(module: "GnustoMacros", type: "GameAreaMacro")
 
-/// Marks a game item and auto-generates its ID constant.
+/// Marks a game item for processing by @GameArea.
+///
+/// This macro doesn't generate anything itself - it's a marker for the @GameArea macro
+/// to scan and generate the appropriate global ItemID extension.
 ///
 /// Usage:
 /// ```swift
 /// @GameItem
 /// static let magicSword = Item(.name("magic sword"))
-/// // Generates: static let magicSwordID = ItemID("magicSword")
 /// ```
-@attached(peer, names: suffixed(ID))
+@attached(peer)
 public macro GameItem() = #externalMacro(module: "GnustoMacros", type: "GameItemMacro")
 
-/// Marks a game location and auto-generates its ID constant.
+/// Marks a game location for processing by @GameArea.
+///
+/// This macro doesn't generate anything itself - it's a marker for the @GameArea macro
+/// to scan and generate the appropriate global LocationID extension.
 ///
 /// Usage:
 /// ```swift
 /// @GameLocation
 /// static let throneRoom = Location(.name("Throne Room"))
-/// // Generates: static let throneRoomID = LocationID("throneRoom")
 /// ```
-@attached(peer, names: suffixed(ID))
+@attached(peer)
 public macro GameLocation() = #externalMacro(module: "GnustoMacros", type: "GameLocationMacro")
 
 /// Marks an item event handler for automatic registration.
