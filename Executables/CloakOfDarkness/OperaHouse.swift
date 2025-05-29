@@ -90,6 +90,17 @@ struct OperaHouse: AreaBlueprint {
         .isWorn,
     )
 
+    // Need another location for street
+    let street = Location(
+        id: .street,
+        .name("Street"),
+        .description("Rain-soaked November street."),
+        .exits([
+            .south: .to(.foyer),
+        ]),
+        .inherentlyLit
+    )
+
     // MARK: - Location event handlers
 
     let barHandler = LocationEventHandler { engine, event in
@@ -198,14 +209,16 @@ struct OperaHouse: AreaBlueprint {
                     """,
                 stateChanges: [await engine.updatePlayerScore(by: 1)]
             )
-
         } else {
-            throw ActionResponse.custom("""
-                The message has been carelessly trampled, making it
-                difficult to read. You can just distinguish the words...
+            return ActionResult(
+                message: """
+                    The message has been carelessly trampled, making it difficult to read.
+                    You can just distinguish the words...
 
-                "You lose."
-                """)
+                    "You lose."
+                    """,
+                stateChanges: []
+            )
         }
     }
 }

@@ -26,7 +26,9 @@ struct GameItemMacroTests {
             """
             static let magicSword = Item(.name("magic sword"))
 
-            static let magicSwordID = ItemID("magicSword")
+            extension ItemID {
+                static let magicSword = ItemID("magicSword")
+            }
             """
         }
     }
@@ -42,7 +44,9 @@ struct GameItemMacroTests {
             """
             static let throneRoom = Location(.name("Throne Room"))
 
-            static let throneRoomID = LocationID("throneRoom")
+            extension LocationID {
+                static let throneRoom = LocationID("throneRoom")
+            }
             """
         }
     }

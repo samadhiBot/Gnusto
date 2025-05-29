@@ -4,7 +4,7 @@ import SwiftDiagnostics
 
 /// Macro implementation for `@GameItem`.
 ///
-/// This macro generates automatic ID constants for game items.
+/// This macro generates global ID constants by adding extensions to ItemID.
 public struct GameItemMacro: PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
@@ -25,10 +25,12 @@ public struct GameItemMacro: PeerMacro {
         
         let itemName = identifier.identifier.text
         
-        // Generate the ID constant
+        // Generate extension to ItemID for global accessibility
         return [
             DeclSyntax("""
-                static let \(raw: itemName)ID = ItemID("\(raw: itemName)")
+                extension ItemID {
+                    static let \(raw: itemName) = ItemID("\(raw: itemName)")
+                }
                 """)
         ]
     }
@@ -56,10 +58,12 @@ public struct GameLocationMacro: PeerMacro {
         
         let locationName = identifier.identifier.text
         
-        // Generate the ID constant
+        // Generate extension to LocationID for global accessibility
         return [
             DeclSyntax("""
-                static let \(raw: locationName)ID = LocationID("\(raw: locationName)")
+                extension LocationID {
+                    static let \(raw: locationName) = LocationID("\(raw: locationName)")
+                }
                 """)
         ]
     }
