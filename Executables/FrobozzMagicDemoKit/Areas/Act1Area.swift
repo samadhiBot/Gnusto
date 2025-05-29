@@ -1,6 +1,6 @@
 import GnustoEngine
 
-/// Act I: "The Helpful Neighbor" - Core Engine Mechanics Demonstration
+/// # Act I: "The Helpful Neighbor" - Core Engine Mechanics Demonstration
 ///
 /// This area demonstrates the foundational features of the Gnusto Interactive Fiction Engine:
 /// - Basic `Location` and `Item` definitions
@@ -9,11 +9,13 @@ import GnustoEngine
 /// - Standard action handling and scope resolution
 ///
 /// ## Story Summary
+///
 /// You're bringing food to your neighbor Berzio when his excited dog Gnusto escapes from the gate.
 /// The puzzle involves managing your full hands while catching the dog, demonstrating item juggling
 /// mechanics and the engine's scope and interaction systems.
 ///
 /// ## Engine Features Showcased
+///
 /// - Location exits and navigation
 /// - Container items with capacity limits
 /// - Item properties (takable, wearable, etc.)
@@ -25,14 +27,26 @@ struct Act1Area: AreaBlueprint {
     // MARK: - Locations
 
     /// Your house - the starting location where the journey begins
-    let yourHouse = Location(
-        id: .yourHouse,
-        .name("Your House"),
-        .description("""
-            Your cozy cottage sits comfortably beside the winding country road. A cheerful garden
-            surrounds the house, with vegetables and herbs growing in neat rows. To the east, a
-            magical stone bridge spans the creek that separates your property from the road.
-            """),
+    let yourCottage = Location(
+        id: .yourCottage,
+        .name("Your Cottage"),
+        .description(
+            """
+            Your cozy cottage sits beside the gentle creek that winds
+            through this peaceful stretch of countryside. Stone walls weathered
+            to warm honey catch the morning light, while climbing roses frame
+            the windows in cheerful abundance. Your garden spreads in neat,
+            contented rows—vegetables and herbs growing with the quiet
+            satisfaction that comes from good soil and careful tending.
+
+            The creek babbles softly as it flows past, its clear water catching
+            glints of sunlight. To the east, Berzio's magical bridge spans the
+            water in graceful, fitted stone arcs that hover just above the
+            surface. Beyond the bridge, the winding country road continues its
+            meandering path between the scattered cottages of your small
+            community.
+            """
+        ),
         .exits([
             .east: .to(.stoneBridge)
         ]),
@@ -43,17 +57,22 @@ struct Act1Area: AreaBlueprint {
     let stoneBridge = Location(
         id: .stoneBridge,
         .name("Stone Bridge"),
-        .description("""
-            The bridge spanning the creek is one of Berzio's magical creations, formed from
-            fitted stones that hover slightly above the water. Usually it's perfectly stable,
-            but today you can feel it wobble and bob slightly under your feet. Feeble sparks
-            crackle between the stones - telltale signs that Berzio hasn't been eating properly.
+        .description(
+            """
+            Berzio's magical bridge arcs gracefully over the creek, its
+            fitted stones rising several feet above the water before descending
+            to meet the banks on either side. Usually these stones hold steady
+            as solid ground, but today they wobble and bob beneath your feet
+            like a boat in gentle swells. Feeble sparks crackle between the
+            gaps—clear signs that Berzio hasn't been eating properly again.
 
-            The bridge connects your house to the west with the country road to the east.
-            """),
+            Your cottage lies to the west, while the country road continues east
+            toward Berzio's gate.
+            """
+        ),
         .exits([
-            .west: .to(.yourHouse),
-            .east: .to(.countryRoad)
+            .west: .to(.yourCottage),
+            .east: .to(.countryRoad),
         ]),
         .inherentlyLit
     )
@@ -62,17 +81,22 @@ struct Act1Area: AreaBlueprint {
     let countryRoad = Location(
         id: .countryRoad,
         .name("Country Road"),
-        .description("""
-            This section of the winding country road is particularly lovely. Ancient oak trees
-            line both sides, their branches forming a natural canopy overhead. Wild flowers
-            bloom in abundance along the verges, and the hedges grow in perfectly maintained
-            shapes - all thanks to Berzio's beneficent magical influence.
+        .description(
+            """
+            This stretch of the winding lane captures the very essence of
+            pastoral charm. Ancient oaks form a natural canopy overhead, their
+            branches heavy with summer leaves, while wildflowers bloom in
+            glorious abundance along the verges. The hedges grow in perfectly
+            maintained shapes—all thanks to Berzio's beneficent influence
+            keeping the countryside in gentle order.
 
-            Your stone bridge lies to the west, while Berzio's gate can be seen to the north.
-            """),
+            Your stone bridge lies to the west, while Berzio's gate beckons
+            invitingly to the north.
+            """
+        ),
         .exits([
             .west: .to(.stoneBridge),
-            .north: .to(.berziosGate)
+            .north: .to(.berziosGate),
         ]),
         .inherentlyLit
     )
@@ -81,17 +105,21 @@ struct Act1Area: AreaBlueprint {
     let berziosGate = Location(
         id: .berziosGate,
         .name("Berzio's Gate"),
-        .description("""
-            You stand before the wrought-iron gate that leads into Berzio's garden. The gate
-            is beautifully crafted, with intricate patterns that seem to shift slightly when
-            you're not looking directly at them. A worn brass latch holds it closed.
+        .description(
+            """
+            The wrought-iron gate stands before you, its intricate metalwork
+            bearing patterns that seem to shift and dance when you're not
+            looking directly at them. A worn brass latch holds it closed,
+            polished smooth by countless hands over the years.
 
-            Through the gate, you can see Berzio's peaceful garden with its herb plots and
-            magical apparatus. The country road continues to the south.
+            Through the bars to the north, you glimpse peaceful herb plots
+            arranged in mystical patterns and various pieces of magical
+            apparatus resting on wooden tables. The country road continues
+            south, leading back toward your bridge and home.
             """),
         .exits([
             .south: .to(.countryRoad),
-            .north: .to(.berziosGarden)
+            .north: .to(.berziosGarden),
         ]),
         .inherentlyLit
     )
@@ -100,12 +128,19 @@ struct Act1Area: AreaBlueprint {
     let berziosGarden = Location(
         id: .berziosGarden,
         .name("Berzio's Garden"),
-        .description("""
-            You've successfully entered Berzio's peaceful garden. Herb plots are arranged in
-            mystical patterns, and various pieces of magical apparatus sit on wooden tables.
-            A path leads to Berzio's cottage, where warm light glows in the windows.
+        .description(
+            """
+            You've successfully entered Berzio's peaceful sanctuary. Herb
+            plots spread before you in intricate, mystical patterns that seem to
+            hold deeper meaning than mere gardening. Various pieces of magical
+            apparatus sit on wooden tables—alembics, retorts, and devices whose
+            purposes remain charmingly mysterious. A well-worn path leads north
+            toward Berzio's cottage, where warm light glows invitingly in the
+            windows.
 
-            Little Gnusto bounces around happily, clearly delighted to be back in her proper home.
+            Little Gnusto bounces around happily among the herbs, clearly
+            delighted to be back in her proper home. The gate stands open to the
+            south, should you need to return to the road.
             """),
         .exits([
             .south: .to(.berziosGate)
@@ -119,11 +154,16 @@ struct Act1Area: AreaBlueprint {
     let basket = Item(
         id: .basket,
         .name("wicker basket"),
-        .description("""
-            A sturdy wicker basket with a gingham cloth lining. It's the perfect size for
-            carrying food offerings to neighbors. The basket feels comfortably familiar in your hands.
+        .description(
+            """
+            A sturdy wicker basket lined with cheerful gingham cloth—the
+            perfect size for carrying neighborly offerings. The weave is tight
+            and even, speaking of skilled craftsmanship, and the handles are
+            worn smooth from years of faithful service. It feels comfortably
+            familiar in your hands, like an old friend ready for another
+            journey.
             """),
-        .in(.location(.yourHouse)),
+        .in(.location(.yourCottage)),
         .capacity(5),
         .isContainer,
         .isOpenable,
@@ -135,9 +175,13 @@ struct Act1Area: AreaBlueprint {
         id: .sourdoughBoule,
         .name("sourdough boule"),
         .adjectives("warm", "fresh"),
-        .description("""
-            A round loaf of sourdough bread, still warm from the oven. Its crust is golden-brown
-            and perfectly crispy, and the wonderful aroma makes your mouth water.
+        .description(
+            """
+            A round loaf of sourdough bread, still warm from your oven this
+            morning. Its crust gleams golden-brown and perfectly crispy, while
+            the wonderful aroma makes your mouth water even though you baked it
+            yourself. The surface bears those telltale bubbles and blisters that
+            mark truly excellent bread—Berzio will be delighted.
             """),
         .in(.item(.basket)),
         .isTakable,
@@ -149,9 +193,13 @@ struct Act1Area: AreaBlueprint {
         id: .butterCrock,
         .name("butter crock"),
         .adjectives("fresh"),
-        .description("""
-            A small ceramic crock filled with fresh, creamy butter. The butter is perfectly
-            spreadable and has a rich, golden color that speaks of quality cream.
+        .description(
+            """
+            A small ceramic crock filled with fresh, creamy butter churned
+            just yesterday. The butter gleams with that rich, golden color that
+            speaks of quality cream from contented cows. It's perfectly
+            spreadable and smells of sweet pastures and morning sunshine—exactly
+            what good bread deserves.
             """),
         .in(.item(.basket)),
         .isTakable,
@@ -164,9 +212,13 @@ struct Act1Area: AreaBlueprint {
         .name("preserve jar"),
         .synonyms("jar", "preserves"),
         .adjectives("cherry"),
-        .description("""
-            A glass jar filled with ruby-red cherry preserves. The preserves gleam like jewels
-            in the light, and you can see whole cherry pieces suspended in the thick, sweet mixture.
+        .description(
+            """
+            A glass jar filled with ruby-red cherry preserves that gleam
+            like jewels in the light. Whole cherry pieces float suspended in the
+            thick, sweet mixture, and you can almost taste the summer sunshine
+            that went into their making. The preserves will complement the bread
+            and butter perfectly.
             """),
         .in(.item(.basket)),
         .isTakable,
@@ -179,14 +231,17 @@ struct Act1Area: AreaBlueprint {
         .name("lemonade jug"),
         .synonyms("jug", "glass"),
         .adjectives("blackberry"),
-        .description("""
-            A clear glass jug filled with freshly squeezed blackberry lemonade. The deep purple
-            liquid has a lovely fruity aroma, and condensation beads on the outside of the glass
-            from the cool temperature.
+        .description(
+            """
+            A clear glass jug filled with freshly squeezed blackberry
+            lemonade. The deep purple liquid has a lovely fruity aroma that
+            makes your mouth water, and condensation beads on the outside of the
+            glass from the cool temperature. It's exactly the sort of refreshing
+            drink that a hard-working thaumaturge needs on a warm day.
             """),
-        .in(.location(.yourHouse)),
+        .in(.location(.yourCottage)),
         .isTakable,
-        .isWearable, // Can be balanced on head!
+        .isWearable,  // Can be balanced on head!
         .size(3)
     )
 
@@ -195,40 +250,47 @@ struct Act1Area: AreaBlueprint {
         id: .gnustoDog,
         .name("Gnusto"),
         .adjectives("little", "excited"),
-        .description("""
-            Berzio's little dog is a bundle of energy and enthusiasm. She's a medium-sized mutt
-            with floppy ears and bright, intelligent eyes. Her tail wags constantly, and she
-            seems to think that everything in the world exists solely for her entertainment.
+        .description(
+            """
+            Berzio's little dog is a bundle of pure energy and enthusiasm
+            wrapped in a medium-sized, floppy-eared package. She's clearly a
+            mutt of excellent character, with bright, intelligent eyes and a
+            tail that never stops wagging. Her expression suggests she believes
+            the entire world exists solely for her entertainment—and she might
+            just be right.
             """),
-        .in(.nowhere), // Starts nowhere, appears when gate is opened
-        .isTakable, // Can be picked up to solve puzzle
-        .size(15) // Too big for containers
+        .in(.nowhere),  // Starts nowhere, appears when gate is opened
+        .isTakable,  // Can be picked up to solve puzzle
+        .size(15)  // Too big for containers
     )
 
     // MARK: - Event Handlers (Simplified for now)
 
     /// Prevents leaving your house without food for Berzio.
-    let yourHouseHandler = LocationEventHandler { engine, event in
+    let yourCottageHandler = LocationEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
             case .go:
-//                engine.playerInventory
+                //                engine.playerInventory
                 let basket = try await engine.item(.basket)
                 let lemonade = try await engine.item(.lemonade)
                 return switch (basket.parent, lemonade.parent) {
                 case (.player, .player):
                     nil
                 case (.player, _):
-                    ActionResult("""
+                    ActionResult(
+                        """
                         You're halfway out the door when you remember the glass jug of blackberry lemonade sitting inside. Berzio does get terribly absorbed in his work — sometimes for days at a time — and the lemonade is just as important as the food. Your neighbors have always included something to drink with their weekly offerings. After all, even brilliant thaumaturges need proper hydration.
                         """)
                 case (_, .player):
-                    ActionResult("""
+                    ActionResult(
+                        """
                         You pause at your doorstep, the jug of blackberry lemonade in hand. What else did you need to bring? Oh right. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside — carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
                         """)
                 default:
-                    ActionResult("""
+                    ActionResult(
+                        """
                         You pause at your doorstep, empty-handed. The warm sourdough boule, fresh butter, and cherry preserves are still waiting inside — carefully prepared for your weekly visit to Berzio. It's a tradition that goes back generations in your family, and you'd hate to break it now. Grandmother always said the magic that keeps the neighborhood so pleasant depends on these small kindnesses.
                         """)
                 }
@@ -236,13 +298,13 @@ struct Act1Area: AreaBlueprint {
             default:
                 return nil
             }
-//        case .onEnter:
-//            let basket = try await engine.item(.basket)
-//            let lemonade = try await engine.item(.lemonade)
-//
-//            let baseDescription = """
-//                    Hi
-//                    """
+        //        case .onEnter:
+        //            let basket = try await engine.item(.basket)
+        //            let lemonade = try await engine.item(.lemonade)
+        //
+        //            let baseDescription = """
+        //                    Hi
+        //                    """
 
         default:
             return nil
@@ -269,14 +331,14 @@ struct Act1Area: AreaBlueprint {
 
     /// Gate puzzle logic (simplified)
     let berziosGateHandler = LocationEventHandler { engine, event in
-//        switch event {
-//        case .beforeTurn(let command):
-//            <#code#>
-//        case .afterTurn(let command):
-//            <#code#>
-//        case .onEnter:
-//            <#code#>
-//        }
+        //        switch event {
+        //        case .beforeTurn(let command):
+        //            <#code#>
+        //        case .afterTurn(let command):
+        //            <#code#>
+        //        case .onEnter:
+        //            <#code#>
+        //        }
         // This is where Gnusto escapes!
         guard await engine.isFlagSet(.gnustoEscaped) != true else {
             return nil

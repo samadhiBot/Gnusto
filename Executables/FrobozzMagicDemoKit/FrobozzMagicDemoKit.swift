@@ -23,16 +23,33 @@ struct FrobozzMagicDemoKit: GameBlueprint {
         GameConstants(
             storyTitle: "The Frobozz Magic Demo Kit",
             introduction: """
-                769 GUE. You are a neighbor of a little-known thaumaturge named Berzio.
+                769 GUE
 
-                Like all of the nearby neighbors, you pack up some food about once a week,
-                and drop it off at Berzio's front door. In return, a pleasant aura of magic
-                pervades your mile of the winding country road, keeping the hedges in check
-                and the flowers in bloom.
+                You are a neighbor of Berzio, a reclusive thaumaturge whose
+                modest cottage sits just across the creek from your own. Like
+                your grandmother before you, and her grandmother before that,
+                you've kept up the old tradition—once a week, you pack up some
+                food and carry it to his gate. It's a small kindness that goes
+                back generations, one of those quiet customs that makes a
+                community feel like home.
 
-                On this day you leave your house with basket in hand, containing a warm
-                sourdough boule, a crock of fresh butter and a jar of cherry preserves.
-                Your other hand grips a glass jug filled with freshly squeezed blackberry lemonade.
+                In return, Berzio's gentle magic keeps your little corner of the
+                world just as it should be. The hedges grow in perfect shapes
+                without pruning, wildflowers bloom in endless abundance, and
+                even the weather seems a touch more agreeable. Your own magical
+                bridge—fitted stones that hover gracefully above the
+                creek—stands as testament to his beneficent influence.
+
+                Today you've prepared something special: a warm sourdough boule
+                still fragrant from the oven, a crock of golden butter churned
+                yesterday, and a jar of cherry preserves that gleam like rubies
+                in the morning light. In your other hand, you carry a jug of
+                freshly squeezed blackberry lemonade—the perfect refreshment for
+                a thaumaturge who sometimes forgets to eat for days at a time.
+
+                The morning is beautiful, your basket is full, and Berzio's
+                bridge awaits. Time to pay your weekly visit to the most
+                absent-minded neighbor in the countryside.
                 """,
             release: "Demo v0.1.0",
             maximumScore: 100
@@ -41,76 +58,34 @@ struct FrobozzMagicDemoKit: GameBlueprint {
 
     // MARK: - Game State
 
-    var state: GameState {
-        // Combine all areas for Act I
-        let act1 = Act1Area()
-
-        // Build vocabulary from all items and standard verbs
-        let vocabulary = Vocabulary.build(
-            items: Act1Area.items,
-            verbs: [] // Using engine defaults for now
-        )
-
-        return GameState(
-            locations: Act1Area.locations,
-            items: Act1Area.items,
-            player: Player(in: "yourHouse"),
-            vocabulary: vocabulary,
-            globalState: [
-                // Global flags for Act I story progression
-                "gnustoEscaped": .bool(false),
-                "lemonadeOnHead": .bool(false),
-                "basketPutDown": .bool(false),
-                "gnustoCaught": .bool(false)
-            ]
-        )
-    }
-
-    // MARK: - Event Handlers
-
-    var itemEventHandlers: [ItemID: ItemEventHandler] {
-        Act1Area.itemEventHandlers
-    }
-
-    var locationEventHandlers: [LocationID: LocationEventHandler] {
-        Act1Area.locationEventHandlers
-    }
-
-    // MARK: - Game Hooks
-
-//    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
-//        { engine, command in
-//            // Check for the classic parser confusion with "gnusto"
-//            if command.rawInput.lowercased().contains("gnusto") &&
-//               command.verb == .unknown {
-//                await engine.ioHandler.print("What do you want to gnusto?")
-//                return true // Command handled
-//            }
-//
-//            return false
-//        }
-//    }
+    let state = GameState(
+        areas: Act1Area.self,
+        player: Player(in: .yourCottage)
+    )
 }
 
 // MARK: - Supporting Types
 
 extension GlobalID {
-    static let gnustoEscaped: GlobalID = "gnustoEscaped"
+    static let basketPutDown = GlobalID("basketPutDown")
+    static let gnustoCaught = GlobalID("gnustoCaught")
+    static let gnustoEscaped = GlobalID("gnustoEscaped")
+    static let lemonadeOnHead = GlobalID("lemonadeOnHead")
 }
 
 extension LocationID {
-    static let yourHouse: LocationID = "yourHouse"
-    static let stoneBridge: LocationID = "stoneBridge"
-    static let countryRoad: LocationID = "countryRoad"
-    static let berziosGate: LocationID = "berziosGate"
-    static let berziosGarden: LocationID = "berziosGarden"
+    static let berziosGarden = LocationID("berziosGarden")
+    static let berziosGate = LocationID("berziosGate")
+    static let countryRoad = LocationID("countryRoad")
+    static let stoneBridge = LocationID("stoneBridge")
+    static let yourCottage = LocationID("yourCottage")
 }
 
 extension ItemID {
-    static let basket: ItemID = "basket"
-    static let sourdoughBoule: ItemID = "sourdoughBoule"
-    static let butterCrock: ItemID = "butterCrock"
-    static let preserveJar: ItemID = "preserveJar"
-    static let lemonade: ItemID = "lemonade"
-    static let gnustoDog: ItemID = "gnustoDog"
+    static let basket = ItemID("basket")
+    static let butterCrock = ItemID("butterCrock")
+    static let gnustoDog = ItemID("gnustoDog")
+    static let lemonade = ItemID("lemonade")
+    static let preserveJar = ItemID("preserveJar")
+    static let sourdoughBoule = ItemID("sourdoughBoule")
 }
