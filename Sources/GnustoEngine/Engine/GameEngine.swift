@@ -887,6 +887,53 @@ extension GameEngine {
     /// - Throws: `ActionResponse.invalidValue` if dynamic validation fails, or re-throws
     ///           any errors from `GameState.apply()`.
     func applyWithDynamicValidation(_ change: StateChange) async throws {
+        // Check if this is a lighting change that requires clearing visited flags
+        var additionalChanges: [StateChange] = []
+        
+        // Detect location lighting changes (isLit flag changes)
+        if case .locationAttribute(let attributeID) = change.attribute,
+           attributeID == .isLit,
+           case .location(let locationID) = change.entityID {
+            
+            // Get current lighting status before the change
+            let currentLocation = try location(locationID)
+            let wasLit = await isLocationLit(at: locationID)
+            
+            // Apply the change temporarily to see what the new lighting status would be
+            var tempGameState = gameState
+            try tempGameState.apply(change)
+            
+            // Check what the lighting status will be after the change
+            let willBeLit = if let updatedLocation = tempGameState.locations[locationID] {
+                // Use the same logic as ScopeResolver.isLocationLit
+                updatedLocation.hasFlag(.inherentlyLit) || 
+                updatedLocation.hasFlag(.isLit) ||
+                // Check if the player is carrying an active light source
+                tempGameState.items.values.contains { item in
+                    item.parent == .player &&
+                    item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
+                } ||
+                // Check if there is an active light source directly in the location
+                tempGameState.items.values.contains { item in
+                    item.parent == .location(locationID) &&
+                    item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
+                }
+            } else {
+                false
+            }
+            
+            // If lighting status changed, clear the visited flag (like ZIL's NOW-LIT?)
+            if wasLit != willBeLit && currentLocation.hasFlag(.isVisited) {
+                let clearVisitedChange = StateChange(
+                    entityID: .location(locationID),
+                    attributeID: .locationAttribute(.isVisited),
+                    oldValue: true,
+                    newValue: false
+                )
+                additionalChanges.append(clearVisitedChange)
+            }
+        }
+        
         // Perform dynamic validation for item and location attributes
         switch change.attribute {
         case .itemAttribute(let key):
@@ -934,8 +981,13 @@ extension GameEngine {
             break
         }
         
-        // Apply the change to the game state
+        // Apply the original change to the game state
         try gameState.apply(change)
+        
+        // Apply any additional changes (like clearing visited flags)
+        for additionalChange in additionalChanges {
+            try gameState.apply(additionalChange)
+        }
     }
 }
 

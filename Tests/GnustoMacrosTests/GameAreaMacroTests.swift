@@ -14,23 +14,24 @@ struct GameAreaMacroTests {
             """
             @GameArea
             enum TestArea {
-                @GameItem
-                static let sword = Item(.name("sword"))
+                enum Items {
+                    static let sword = Item(.name("sword"))
+                }
                 
-                @GameLocation
-                static let room = Location(.name("room"))
+                enum Locations {
+                    static let room = Location(.name("room"))
+                }
             }
             """
         } expansion: {
             """
             enum TestArea {
-                @GameItem
-                static let sword = Item(.name("sword"))
+                enum Items {
+                    static let sword = Item(.name("sword"))
+                }
                 
-                @GameLocation
-                static let room = Location(.name("room"))
-
-                init() {
+                enum Locations {
+                    static let room = Location(.name("room"))
                 }
 
                 static var items: [Item] {
@@ -49,12 +50,40 @@ struct GameAreaMacroTests {
                     discoverLocationEventHandlers()
                 }
 
-                static var fuses: [FuseDefinition] {
-                    discoverFuses()
+                static var fuseDefinitions: [FuseID: FuseDefinition] {
+                    discoverFuseDefinitions()
                 }
 
-                static var daemons: [DaemonDefinition] {
-                    discoverDaemons()
+                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
+                    discoverDaemonDefinitions()
+                }
+
+                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
+                    DynamicAttributeRegistry()
+                }
+
+                private static func discoverItems() -> [Item] {
+                    [Self.Items.sword]
+                }
+
+                private static func discoverLocations() -> [Location] {
+                    [Self.Locations.room]
+                }
+
+                private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
+                    [:]
+                }
+
+                private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
+                    [:]
+                }
+
+                private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
+                    [:]
+                }
+
+                private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
+                    [:]
                 }
             }
 
@@ -112,9 +141,6 @@ struct GameAreaMacroTests {
                     // Custom implementation
                 }
 
-                init() {
-                }
-
                 static var items: [Item] {
                     discoverItems()
                 }
@@ -131,12 +157,40 @@ struct GameAreaMacroTests {
                     discoverLocationEventHandlers()
                 }
 
-                static var fuses: [FuseDefinition] {
-                    discoverFuses()
+                static var fuseDefinitions: [FuseID: FuseDefinition] {
+                    discoverFuseDefinitions()
                 }
 
-                static var daemons: [DaemonDefinition] {
-                    discoverDaemons()
+                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
+                    discoverDaemonDefinitions()
+                }
+
+                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
+                    DynamicAttributeRegistry()
+                }
+
+                private static func discoverItems() -> [Item] {
+                    []
+                }
+
+                private static func discoverLocations() -> [Location] {
+                    []
+                }
+
+                private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
+                    [:]
+                }
+
+                private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
+                    [:]
+                }
+
+                private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
+                    [:]
+                }
+
+                private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
+                    [:]
                 }
             }
 
@@ -158,9 +212,6 @@ struct GameAreaMacroTests {
             """
             enum EmptyArea {
 
-                init() {
-                }
-
                 static var items: [Item] {
                     discoverItems()
                 }
@@ -177,12 +228,40 @@ struct GameAreaMacroTests {
                     discoverLocationEventHandlers()
                 }
 
-                static var fuses: [FuseDefinition] {
-                    discoverFuses()
+                static var fuseDefinitions: [FuseID: FuseDefinition] {
+                    discoverFuseDefinitions()
                 }
 
-                static var daemons: [DaemonDefinition] {
-                    discoverDaemons()
+                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
+                    discoverDaemonDefinitions()
+                }
+
+                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
+                    DynamicAttributeRegistry()
+                }
+
+                private static func discoverItems() -> [Item] {
+                    []
+                }
+
+                private static func discoverLocations() -> [Location] {
+                    []
+                }
+
+                private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
+                    [:]
+                }
+
+                private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
+                    [:]
+                }
+
+                private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
+                    [:]
+                }
+
+                private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
+                    [:]
                 }
             }
 

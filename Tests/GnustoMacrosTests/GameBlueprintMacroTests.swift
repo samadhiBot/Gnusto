@@ -24,6 +24,7 @@ struct GameBlueprintMacroTests {
         } expansion: {
             """
             struct TestGame {
+
                 var constants: GameConstants {
                     GameConstants(
                         storyTitle: "Test Game",
@@ -32,21 +33,24 @@ struct GameBlueprintMacroTests {
                         maximumScore: 100
                     )
                 }
+
                 var areas: [any AreaBlueprint.Type] {
                     // Auto-discovered *Area types in module
                     discoverGameAreas()
                 }
+
                 var player: Player {
-                    Player(in: .startRoom)
+                    Player(in: startRoom)
                 }
+
                 private func discoverGameAreas() -> [any AreaBlueprint.Type] {
                     // Convention-based discovery of *Area types
                     // This would use Swift's metadata system in a real implementation
                     var areas: [any AreaBlueprint.Type] = []
-                    
+
                     // For now, areas must be manually registered
                     // TODO: Implement automatic discovery via Swift metadata
-                    
+
                     return areas
                 }
             }
@@ -72,6 +76,7 @@ struct GameBlueprintMacroTests {
         } expansion: {
             """
             struct MinimalGame {
+
                 var constants: GameConstants {
                     GameConstants(
                         storyTitle: "Minimal Game",
@@ -80,21 +85,24 @@ struct GameBlueprintMacroTests {
                         maximumScore: 50
                     )
                 }
+
                 var areas: [any AreaBlueprint.Type] {
                     // Auto-discovered *Area types in module
                     discoverGameAreas()
                 }
+
                 var player: Player {
                     Player(in: .defaultStart)
                 }
+
                 private func discoverGameAreas() -> [any AreaBlueprint.Type] {
                     // Convention-based discovery of *Area types
                     // This would use Swift's metadata system in a real implementation
                     var areas: [any AreaBlueprint.Type] = []
-                    
+
                     // For now, areas must be manually registered
                     // TODO: Implement automatic discovery via Swift metadata
-                    
+
                     return areas
                 }
             }
@@ -119,7 +127,6 @@ struct GameBlueprintMacroTests {
         } diagnostics: {
             """
             @GameBlueprint(
-            ┬─────────────
             ╰─ 🛑 Missing required argument: title
                 introduction: "Welcome!",
                 maxScore: 100

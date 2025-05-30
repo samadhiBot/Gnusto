@@ -68,14 +68,14 @@ let package = Package(
         // ),
         
         // Test targets
-//        .testTarget(
-//            name: "GnustoEngineTests",
-//            dependencies: [
-//                "GnustoEngine",
-//                "CloakOfDarkness",
-//                .product(name: "CustomDump", package: "swift-custom-dump"),
-//            ]
-//        ),
+        .testTarget(
+            name: "GnustoEngineTests",
+            dependencies: [
+                "GnustoEngine",
+                "CloakOfDarkness",
+                .product(name: "CustomDump", package: "swift-custom-dump"),
+            ]
+        ),
 
         .testTarget(
             name: "GnustoMacrosTests",

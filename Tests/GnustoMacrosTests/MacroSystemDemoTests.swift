@@ -7,9 +7,7 @@ import Testing
 
 @Suite(.macros([
     GameBlueprintMacro.self,
-    GameAreaMacro.self,
-    GameItemMacro.self,
-    GameLocationMacro.self
+    GameAreaMacro.self
 ]))
 struct MacroSystemDemoTests {
     
@@ -73,15 +71,12 @@ struct MacroSystemDemoTests {
         assertMacro {
             """
             @GameArea
-            struct StartingArea {
+            enum StartingArea {
             }
             """
         } expansion: {
             """
-            struct StartingArea {
-
-                init() {
-                }
+            enum StartingArea {
 
                 static var items: [Item] {
                     discoverItems()
@@ -111,67 +106,28 @@ struct MacroSystemDemoTests {
                     DynamicAttributeRegistry()
                 }
 
-                // MARK: - Discovery Functions
-
                 private static func discoverItems() -> [Item] {
-                    // This would be populated by scanning @GameItem marked properties
-                    // across all extensions of StartingArea
-                    var items: [Item] = []
-
-                    // Auto-generated item registrations would go here
-                    // Example: items.append(Self.basket.withID(.basket))
-
-                    return items
+                    []
                 }
 
                 private static func discoverLocations() -> [Location] {
-                    // This would be populated by scanning @GameLocation marked properties
-                    var locations: [Location] = []
-                    
-                    // Auto-generated location registrations would go here
-                    // Example: locations.append(Self.yourCottage.withID(.yourCottage))
-                    
-                    return locations
+                    []
                 }
 
                 private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
-                    // This would be populated by scanning @ItemEventHandler marked properties
-                    var handlers: [ItemID: ItemEventHandler] = [:]
-                    
-                    // Auto-generated handler registrations would go here
-                    // Example: handlers[.basket] = Self.basketHandler
-                    
-                    return handlers
+                    [:]
                 }
 
                 private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
-                    // This would be populated by scanning @LocationEventHandler marked properties
-                    var handlers: [LocationID: LocationEventHandler] = [:]
-                    
-                    // Auto-generated handler registrations would go here
-                    // Example: handlers[.stoneBridge] = Self.bridgeHandler
-                    
-                    return handlers
+                    [:]
                 }
 
                 private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
-                    // This would be populated by scanning @GameFuse marked properties
-                    var fuses: [FuseID: FuseDefinition] = [:]
-                    
-                    // Auto-generated fuse registrations would go here
-                    // Example: fuses[.hungerTimer] = Self.hungerFuse.withID(.hungerTimer)
-                    
-                    return fuses
+                    [:]
                 }
 
                 private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
-                    // This would be populated by scanning @GameDaemon marked properties
-                    var daemons: [DaemonID: DaemonDefinition] = [:]
-                    
-                    // Auto-generated daemon registrations would go here
-                    // Example: daemons[.weatherSystem] = Self.weatherDaemon.withID(.weatherSystem)
-                    
-                    return daemons
+                    [:]
                 }
             }
 

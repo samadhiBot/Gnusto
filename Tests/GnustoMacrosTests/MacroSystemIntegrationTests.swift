@@ -7,8 +7,7 @@ import Testing
 
 @Suite(.macros([
     GameAreaMacro.self,
-    GameItemMacro.self,
-    GameLocationMacro.self
+    GameBlueprintMacro.self
 ]))
 struct MacroSystemIntegrationTests {
     
@@ -18,35 +17,29 @@ struct MacroSystemIntegrationTests {
             """
             @GameArea
             enum OperaHouse {
-                @GameItem
-                static let cloak = Item(.name("velvet cloak"))
+                enum Items {
+                    static let cloak = Item(.name("velvet cloak"))
+                    static let hook = Item(.name("brass hook"))
+                }
                 
-                @GameItem  
-                static let hook = Item(.name("brass hook"))
-                
-                @GameLocation
-                static let foyer = Location(.name("Foyer"))
-                
-                @GameLocation
-                static let cloakroom = Location(.name("Cloakroom"))
+                enum Locations {
+                    static let foyer = Location(.name("Foyer"))
+                    static let cloakroom = Location(.name("Cloakroom"))
+                }
             }
             """
         } expansion: {
             """
             enum OperaHouse {
-                @GameItem
-                static let cloak = Item(.name("velvet cloak"))
+                enum Items {
+                    static let cloak = Item(.name("velvet cloak"))
+                    static let hook = Item(.name("brass hook"))
+                }
                 
-                @GameItem  
-                static let hook = Item(.name("brass hook"))
-                
-                @GameLocation
-                static let foyer = Location(.name("Foyer"))
-                
-                @GameLocation
-                static let cloakroom = Location(.name("Cloakroom"))
-            
-                init() {}
+                enum Locations {
+                    static let foyer = Location(.name("Foyer"))
+                    static let cloakroom = Location(.name("Cloakroom"))
+                }
             
                 static var items: [Item] {
                     discoverItems()
@@ -64,12 +57,40 @@ struct MacroSystemIntegrationTests {
                     discoverLocationEventHandlers()
                 }
             
-                static var fuses: [FuseDefinition] {
-                    discoverFuses()
+                static var fuseDefinitions: [FuseID: FuseDefinition] {
+                    discoverFuseDefinitions()
                 }
             
-                static var daemons: [DaemonDefinition] {
-                    discoverDaemons()
+                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
+                    discoverDaemonDefinitions()
+                }
+            
+                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
+                    DynamicAttributeRegistry()
+                }
+            
+                private static func discoverItems() -> [Item] {
+                    [Self.Items.cloak, Self.Items.hook]
+                }
+            
+                private static func discoverLocations() -> [Location] {
+                    [Self.Locations.foyer, Self.Locations.cloakroom]
+                }
+            
+                private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
+                    [:]
+                }
+            
+                private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
+                    [:]
+                }
+            
+                private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
+                    [:]
+                }
+            
+                private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
+                    [:]
                 }
             }
 
