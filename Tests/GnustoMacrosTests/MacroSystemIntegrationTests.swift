@@ -17,7 +17,7 @@ struct MacroSystemIntegrationTests {
         assertMacro {
             """
             @GameArea
-            struct OperaHouse {
+            enum OperaHouse {
                 @GameItem
                 static let cloak = Item(.name("velvet cloak"))
                 
@@ -33,7 +33,7 @@ struct MacroSystemIntegrationTests {
             """
         } expansion: {
             """
-            struct OperaHouse {
+            enum OperaHouse {
                 @GameItem
                 static let cloak = Item(.name("velvet cloak"))
                 

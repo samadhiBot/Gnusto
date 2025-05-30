@@ -27,7 +27,7 @@ public macro GameBlueprint(
     startingLocation: LocationID
 ) = #externalMacro(module: "GnustoMacros", type: "GameBlueprintMacro")
 
-/// Marks a struct as a game area with automatic discovery of all content.
+/// Marks an enum as a game area with automatic discovery of all content.
 ///
 /// This macro:
 /// 1. Scans all members for `@GameItem`, `@GameLocation`, etc.
@@ -38,7 +38,7 @@ public macro GameBlueprint(
 /// Usage:
 /// ```swift
 /// @GameArea
-/// struct Act1Area {
+/// enum Act1Area {
 ///     @GameItem
 ///     static let sword = Item(.name("magic sword"))
 ///     

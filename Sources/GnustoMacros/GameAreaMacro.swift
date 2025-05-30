@@ -19,18 +19,20 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         in context: some MacroExpansionContext
     ) throws -> [DeclSyntax] {
         
-        guard declaration.is(StructDeclSyntax.self) else {
+        guard let enumDecl = declaration.as(EnumDeclSyntax.self) else {
             let diagnostic = Diagnostic(
                 node: Syntax(declaration),
-                message: GameAreaMacroError.invalidDeclaration("@GameArea can only be applied to structs")
+                message: GameAreaMacroError.invalidDeclaration("@GameArea can only be applied to enums")
             )
             context.diagnose(diagnostic)
             return []
         }
         
-        // Generate the required initializer and discovery properties
+        // Scan for @GameItem and @GameLocation marked properties
+        let (itemNames, locationNames) = scanForGameContent(from: enumDecl)
+        
+        // Generate the required discovery properties (no init() needed!)
         return [
-            DeclSyntax("init() {}"),
             DeclSyntax("""
                 static var items: [Item] {
                     discoverItems()
@@ -52,13 +54,41 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
                 }
                 """),
             DeclSyntax("""
-                static var fuses: [FuseDefinition] {
-                    discoverFuses()
+                static var fuseDefinitions: [FuseID: FuseDefinition] {
+                    discoverFuseDefinitions()
                 }
                 """),
             DeclSyntax("""
-                static var daemons: [DaemonDefinition] {
-                    discoverDaemons()
+                static var daemonDefinitions: [DaemonID: DaemonDefinition] {
+                    discoverDaemonDefinitions()
+                }
+                """),
+            DeclSyntax("""
+                static var dynamicAttributeRegistry: DynamicAttributeRegistry {
+                    DynamicAttributeRegistry()
+                }
+                """),
+            // Discovery function implementations with actual content
+            generateDiscoverItemsFunction(itemNames: itemNames),
+            generateDiscoverLocationsFunction(locationNames: locationNames),
+            DeclSyntax("""
+                private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
+                    [:]
+                }
+                """),
+            DeclSyntax("""
+                private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
+                    [:]
+                }
+                """),
+            DeclSyntax("""
+                private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
+                    [:]
+                }
+                """),
+            DeclSyntax("""
+                private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
+                    [:]
                 }
                 """)
         ]
@@ -74,7 +104,7 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
         
-        guard let structDecl = declaration.as(StructDeclSyntax.self) else {
+        guard let enumDecl = declaration.as(EnumDeclSyntax.self) else {
             return []
         }
         
@@ -86,27 +116,81 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         }
         extensions.append(areaBlueprintConformance)
         
-        // Scan for @GameItem and @GameLocation declarations to generate ID extensions
-        let itemIDExtensions = try generateItemIDExtensions(from: structDecl, context: context)
-        let locationIDExtensions = try generateLocationIDExtensions(from: structDecl, context: context)
-        
-        extensions.append(contentsOf: itemIDExtensions)
-        extensions.append(contentsOf: locationIDExtensions)
+        // TODO: Temporarily disabled ID extensions - need to fix redeclaration conflicts
+        // The macro is extending OperaHouse instead of ItemID/LocationID
+        // extensions.append(contentsOf: try generateItemIDExtensions(from: enumDecl, context: context))
+        // extensions.append(contentsOf: try generateLocationIDExtensions(from: enumDecl, context: context))
         
         return extensions
     }
     
     // MARK: - Helper Methods
     
+    private static func scanForGameContent(from enumDecl: EnumDeclSyntax) -> ([String], [String]) {
+        var itemNames: [String] = []
+        var locationNames: [String] = []
+        
+        // Scan all members for @GameItem and @GameLocation annotations
+        for member in enumDecl.memberBlock.members {
+            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
+            
+            // Check if this variable has a @GameItem attribute
+            let hasGameItemAttribute = varDecl.attributes.contains { attr in
+                guard case let .attribute(attribute) = attr else { return false }
+                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameItem"
+            }
+            
+            // Check if this variable has a @GameLocation attribute
+            let hasGameLocationAttribute = varDecl.attributes.contains { attr in
+                guard case let .attribute(attribute) = attr else { return false }
+                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameLocation"
+            }
+            
+            if hasGameItemAttribute || hasGameLocationAttribute {
+                // Extract the variable name
+                if let binding = varDecl.bindings.first,
+                   let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
+                    let name = pattern.identifier.text
+                    if hasGameItemAttribute {
+                        itemNames.append(name)
+                    }
+                    if hasGameLocationAttribute {
+                        locationNames.append(name)
+                    }
+                }
+            }
+        }
+        
+        return (itemNames, locationNames)
+    }
+    
+    private static func generateDiscoverItemsFunction(itemNames: [String]) -> DeclSyntax {
+        let itemsArray = itemNames.map { "Self.\($0)" }.joined(separator: ", ")
+        return DeclSyntax("""
+            private static func discoverItems() -> [Item] {
+                [\(raw: itemsArray)]
+            }
+            """)
+    }
+    
+    private static func generateDiscoverLocationsFunction(locationNames: [String]) -> DeclSyntax {
+        let locationsArray = locationNames.map { "Self.\($0)" }.joined(separator: ", ")
+        return DeclSyntax("""
+            private static func discoverLocations() -> [Location] {
+                [\(raw: locationsArray)]
+            }
+            """)
+    }
+    
     private static func generateItemIDExtensions(
-        from structDecl: StructDeclSyntax,
+        from enumDecl: EnumDeclSyntax,
         context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
         
         var itemNames: [String] = []
         
         // Scan all members for @GameItem annotations
-        for member in structDecl.memberBlock.members {
+        for member in enumDecl.memberBlock.members {
             guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
             
             // Check if this variable has a @GameItem attribute
@@ -146,14 +230,14 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
     }
     
     private static func generateLocationIDExtensions(
-        from structDecl: StructDeclSyntax,
+        from enumDecl: EnumDeclSyntax,
         context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
         
         var locationNames: [String] = []
         
         // Scan all members for @GameLocation annotations
-        for member in structDecl.memberBlock.members {
+        for member in enumDecl.memberBlock.members {
             guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
             
             // Check if this variable has a @GameLocation attribute

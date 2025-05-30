@@ -4,8 +4,8 @@ import SwiftSyntaxMacros
 @main
 struct GnustoMacroPlugin: CompilerPlugin {
     let providingMacros: [Macro.Type] = [
-        GameBlueprintMacro.self,
         GameAreaMacro.self,
+        GameBlueprintMacro.self,
         GameItemMacro.self,
         GameLocationMacro.self,
         ItemEventHandlerMacro.self,

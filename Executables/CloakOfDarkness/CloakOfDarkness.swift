@@ -34,15 +34,7 @@ extension GlobalID {
     static let barMessageDisturbances = GlobalID("barMessageDisturbances")
 }
 
-extension ItemID {
-    static let cloak = ItemID("cloak")
-    static let hook = ItemID("hook")
-    static let message = ItemID("message")
-}
-
+// Temporary manual extension - need to fix macro-generated extensions
 extension LocationID {
-    static let bar = LocationID("bar")
-    static let cloakroom = LocationID("cloakroom")
     static let foyer = LocationID("foyer")
-    static let street = LocationID("street")
-}
+} 

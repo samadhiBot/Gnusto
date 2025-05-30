@@ -13,7 +13,7 @@ struct GameAreaMacroTests {
         assertMacro {
             """
             @GameArea
-            struct TestArea {
+            enum TestArea {
                 @GameItem
                 static let sword = Item(.name("sword"))
                 
@@ -23,7 +23,7 @@ struct GameAreaMacroTests {
             """
         } expansion: {
             """
-            struct TestArea {
+            enum TestArea {
                 @GameItem
                 static let sword = Item(.name("sword"))
                 
@@ -73,18 +73,18 @@ struct GameAreaMacroTests {
     }
     
     @Test
-    func testGameAreaOnNonStruct() {
+    func testGameAreaOnNonEnum() {
         assertMacro {
             """
             @GameArea
-            class TestArea {
+            struct TestArea {
             }
             """
         } diagnostics: {
             """
             @GameArea
-            ╰─ 🛑 Invalid macro declaration: @GameArea can only be applied to structs
-            class TestArea {
+            ╰─ 🛑 Invalid macro declaration: @GameArea can only be applied to enums
+            struct TestArea {
             }
             """
         }
@@ -95,20 +95,20 @@ struct GameAreaMacroTests {
         assertMacro {
             """
             @GameArea
-            struct TestArea {
-                let customProperty = "test"
+            enum TestArea {
+                static let customProperty = "test"
                 
-                func customMethod() {
+                static func customMethod() {
                     // Custom implementation
                 }
             }
             """
         } expansion: {
             """
-            struct TestArea {
-                let customProperty = "test"
+            enum TestArea {
+                static let customProperty = "test"
                 
-                func customMethod() {
+                static func customMethod() {
                     // Custom implementation
                 }
 
@@ -151,12 +151,12 @@ struct GameAreaMacroTests {
         assertMacro {
             """
             @GameArea
-            struct EmptyArea {
+            enum EmptyArea {
             }
             """
         } expansion: {
             """
-            struct EmptyArea {
+            enum EmptyArea {
 
                 init() {
                 }

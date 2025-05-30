@@ -1,9 +1,11 @@
 import GnustoEngine
 
-struct OperaHouse: AreaBlueprint {
+@GameArea
+enum OperaHouse {
     // MARK: - Foyer of the Opera House
 
-    let foyer = Location(
+    @GameLocation
+    static let foyer = Location(
         id: .foyer,
         .name("Foyer of the Opera House"),
         .description("""
@@ -12,10 +14,10 @@ struct OperaHouse: AreaBlueprint {
                 the street is to the north, and there are doorways south and west.
                 """),
         .exits([
-            .south: .to(.bar),
-            .west: .to(.cloakroom),
+            .south: .to("bar"),
+            .west: .to("cloakroom"),
             .north: Exit(
-                destination: .street,
+                destination: "street",
                 blockedMessage: """
                     You've only just arrived, and besides, the weather outside
                     seems to be getting worse.
@@ -27,23 +29,25 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Cloakroom
 
-    let cloakroom = Location(
-        id: .cloakroom,
+    @GameLocation
+    static let cloakroom = Location(
+        id: "cloakroom",
         .name("Cloakroom"),
         .description("""
             The walls of this small room were clearly once lined with hooks,
             though now only one remains. The exit is a door to the east.
             """),
         .exits([
-            .east: .to(.foyer),
+            .east: .to("foyer"),
         ]),
         .inherentlyLit
     )
 
-    let hook = Item(
-        id: .hook,
+    @GameItem
+    static let hook = Item(
+        id: "hook",
         .adjectives("small", "brass"),
-        .in(.location(.cloakroom)),
+        .in(.location("cloakroom")),
         .isScenery,
         .isSurface,
         .name("small brass hook"),
@@ -52,8 +56,9 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Bar
 
-    let bar = Location(
-        id: .bar,
+    @GameLocation
+    static let bar = Location(
+        id: "bar",
         .name("Bar"),
         .description("""
             The bar, much rougher than you'd have guessed after the opulence
@@ -61,22 +66,24 @@ struct OperaHouse: AreaBlueprint {
             be some sort of message scrawled in the sawdust on the floor.
             """),
         .exits([
-            .north: .to(.foyer),
+            .north: .to("foyer"),
         ])
     )
 
-    let message = Item(
-        id: .message,
+    @GameItem
+    static let message = Item(
+        id: "message",
         .name("scrawled message"),
-        .in(.location(.bar)),
+        .in(.location("bar")),
         .synonyms("sawdust", "floor"),
         .isReadable,
     )
 
     // MARK: - Items
 
-    let cloak = Item(
-        id: .cloak,
+    @GameItem
+    static let cloak = Item(
+        id: "cloak",
         .name("velvet cloak"),
         .description("""
             A handsome cloak, of velvet trimmed with satin, and slightly
@@ -91,19 +98,20 @@ struct OperaHouse: AreaBlueprint {
     )
 
     // Need another location for street
-    let street = Location(
-        id: .street,
+    @GameLocation
+    static let street = Location(
+        id: "street",
         .name("Street"),
         .description("Rain-soaked November street."),
         .exits([
-            .south: .to(.foyer),
+            .south: .to("foyer"),
         ]),
         .inherentlyLit
     )
 
     // MARK: - Location event handlers
 
-    let barHandler = LocationEventHandler { engine, event in
+    static let barHandler = LocationEventHandler { engine, event in
         guard
             case .beforeTurn(let command) = event,
             await engine.playerLocationIsLit() == false
@@ -132,12 +140,12 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Item event handlers
 
-    let cloakHandler = ItemEventHandler { engine, event in
+    static let cloakHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
             case .drop, .putOn:
-                guard await engine.playerLocationID == .cloakroom else {
+                guard await engine.playerLocationID == "cloakroom" else {
                     throw ActionResponse.prerequisiteNotMet(
                         "This isn't the best place to leave a smart cloak lying around."
                     )
@@ -147,7 +155,7 @@ struct OperaHouse: AreaBlueprint {
             }
 
         case .afterTurn(let command):
-            guard await engine.playerLocationID == .cloakroom else {
+            guard await engine.playerLocationID == "cloakroom" else {
                 return nil
             }
             switch command.verb {
@@ -156,12 +164,12 @@ struct OperaHouse: AreaBlueprint {
                 if await engine.playerScore < 1 {
                     stateChanges.append(await engine.updatePlayerScore(by: 1))
                 }
-                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
+                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location("bar")) {
                     stateChanges.append(lightenBar)
                 }
                 return ActionResult(stateChanges: stateChanges)
             case .take:
-                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(.bar)) {
+                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location("bar")) {
                     return ActionResult(stateChange: darkenBar)
                 }
             default:
@@ -171,12 +179,12 @@ struct OperaHouse: AreaBlueprint {
         return nil
     }
 
-    let hookHandler = ItemEventHandler { engine, event in
+    static let hookHandler = ItemEventHandler { engine, event in
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
-        let cloak = try await engine.item(.cloak)
-        let hookDetail = if cloak.parent == .item(.hook) {
+        let cloak = try await engine.item("cloak")
+        let hookDetail = if cloak.parent == .item("hook") {
             "with a cloak hanging on it"
         } else {
             "screwed to the wall"
@@ -184,16 +192,16 @@ struct OperaHouse: AreaBlueprint {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    let messageHandler = ItemEventHandler { engine, event in
+    static let messageHandler = ItemEventHandler { engine, event in
         guard
             case .beforeTurn(let command) = event,
             [.examine, .read].contains(command.verb),
-            await engine.playerLocationID == .bar
+            await engine.playerLocationID == "bar"
         else {
             return nil
         }
         // Fix: Check location exists before accessing properties
-        let bar = try await engine.location(.bar)
+        let bar = try await engine.location("bar")
         guard bar.hasFlag(.isLit) else {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }

@@ -19,8 +19,10 @@ public struct GameItemMacro: PeerMacro {
     }
 }
 
-// MARK: - Supporting Macros
-
+/// Macro implementation for `@GameLocation`.
+///
+/// This is a peer macro that doesn't generate anything itself,
+/// but marks locations for processing by the GameArea extension macro.
 public struct GameLocationMacro: PeerMacro {
     public static func expansion(
         of node: AttributeSyntax,
