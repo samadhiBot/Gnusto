@@ -6,7 +6,6 @@ enum OperaHouse {
     // MARK: - Locations
     
     enum Locations {
-        @GameLocation
         static let foyer = Location(
             id: OperaHouse.foyer,
             .name("Foyer of the Opera House"),
@@ -16,10 +15,10 @@ enum OperaHouse {
                     the street is to the north, and there are doorways south and west.
                     """),
             .exits([
-                .south: .to("bar"),
-                .west: .to("cloakroom"),
+                .south: .to(OperaHouse.bar),
+                .west: .to(OperaHouse.cloakroom),
                 .north: Exit(
-                    destination: "street",
+                    destination: OperaHouse.street,
                     blockedMessage: """
                         You've only just arrived, and besides, the weather outside
                         seems to be getting worse.
@@ -29,7 +28,6 @@ enum OperaHouse {
             .inherentlyLit
         )
 
-        @GameLocation
         static let cloakroom = Location(
             id: OperaHouse.cloakroom,
             .name("Cloakroom"),
@@ -38,12 +36,11 @@ enum OperaHouse {
                 though now only one remains. The exit is a door to the east.
                 """),
             .exits([
-                .east: .to("foyer"),
+                .east: .to(OperaHouse.foyer),
             ]),
             .inherentlyLit
         )
 
-        @GameLocation
         static let bar = Location(
             id: OperaHouse.bar,
             .name("Bar"),
@@ -53,17 +50,16 @@ enum OperaHouse {
                 be some sort of message scrawled in the sawdust on the floor.
                 """),
             .exits([
-                .north: .to("foyer"),
+                .north: .to(OperaHouse.foyer),
             ])
         )
 
-        @GameLocation
         static let street = Location(
             id: OperaHouse.street,
             .name("Street"),
             .description("Rain-soaked November street."),
             .exits([
-                .south: .to("foyer"),
+                .south: .to(OperaHouse.foyer),
             ]),
             .inherentlyLit
         )
@@ -72,27 +68,24 @@ enum OperaHouse {
     // MARK: - Items
 
     enum Items {
-        @GameItem
         static let hook = Item(
             id: OperaHouse.hook,
             .adjectives("small", "brass"),
-            .in(.location("cloakroom")),
+            .in(.location(OperaHouse.cloakroom)),
             .isScenery,
             .isSurface,
             .name("small brass hook"),
             .synonyms("peg"),
         )
 
-        @GameItem
         static let message = Item(
             id: OperaHouse.message,
             .name("scrawled message"),
-            .in(.location("bar")),
+            .in(.location(OperaHouse.bar)),
             .synonyms("sawdust", "floor"),
             .isReadable,
         )
 
-        @GameItem
         static let cloak = Item(
             id: OperaHouse.cloak,
             .name("velvet cloak"),
@@ -145,7 +138,7 @@ enum OperaHouse {
         case .beforeTurn(let command):
             switch command.verb {
             case .drop, .putOn:
-                guard await engine.playerLocationID == "cloakroom" else {
+                guard await engine.playerLocationID == OperaHouse.cloakroom else {
                     throw ActionResponse.prerequisiteNotMet(
                         "This isn't the best place to leave a smart cloak lying around."
                     )
@@ -155,7 +148,7 @@ enum OperaHouse {
             }
 
         case .afterTurn(let command):
-            guard await engine.playerLocationID == "cloakroom" else {
+            guard await engine.playerLocationID == OperaHouse.cloakroom else {
                 return nil
             }
             switch command.verb {
@@ -164,12 +157,12 @@ enum OperaHouse {
                 if await engine.playerScore < 1 {
                     stateChanges.append(await engine.updatePlayerScore(by: 1))
                 }
-                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location("bar")) {
+                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(OperaHouse.bar)) {
                     stateChanges.append(lightenBar)
                 }
                 return ActionResult(stateChanges: stateChanges)
             case .take:
-                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location("bar")) {
+                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(OperaHouse.bar)) {
                     return ActionResult(stateChange: darkenBar)
                 }
             default:
@@ -183,8 +176,8 @@ enum OperaHouse {
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
-        let cloak = try await engine.item("cloak")
-        let hookDetail = if cloak.parent == .item("hook") {
+        let cloak = try await engine.item(OperaHouse.cloak)
+        let hookDetail = if cloak.parent == .item(OperaHouse.hook) {
             "with a cloak hanging on it"
         } else {
             "screwed to the wall"
@@ -196,12 +189,12 @@ enum OperaHouse {
         guard
             case .beforeTurn(let command) = event,
             [.examine, .read].contains(command.verb),
-            await engine.playerLocationID == "bar"
+            await engine.playerLocationID == OperaHouse.bar
         else {
             return nil
         }
         // Fix: Check location exists before accessing properties
-        let bar = try await engine.location("bar")
+        let bar = try await engine.location(OperaHouse.bar)
         guard bar.hasFlag(.isLit) else {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }

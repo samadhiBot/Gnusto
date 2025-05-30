@@ -28,8 +28,10 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
             return []
         }
         
-        // Scan for @GameItem and @GameLocation marked properties
-        let (itemNames, locationNames) = scanForGameContent(from: enumDecl)
+        // Scan for Item and Location declarations using type inference
+        let (items, locations) = scanForGameContentWithEnums(from: enumDecl)
+        let itemNames = items.map { $0.name }
+        let locationNames = locations.map { $0.name }
         
         // Generate the required discovery properties (no init() needed!)
         var members: [DeclSyntax] = [
@@ -85,8 +87,8 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         
         // Add discovery function implementations
         members.append(contentsOf: [
-            generateDiscoverItemsFunction(itemNames: itemNames),
-            generateDiscoverLocationsFunction(locationNames: locationNames),
+            generateDiscoverItemsFunction(items: items),
+            generateDiscoverLocationsFunction(locations: locations),
             DeclSyntax("""
                 private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
                     [:]
@@ -116,13 +118,13 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
     
     public static func expansion(
         of node: AttributeSyntax,
-        attachedTo declaration: some DeclGroupSyntax,
+        attachedTo declaration: some DeclSyntaxProtocol,
         providingExtensionsOf type: some TypeSyntaxProtocol,
         conformingTo protocols: [TypeSyntax],
         in context: some MacroExpansionContext
     ) throws -> [ExtensionDeclSyntax] {
         
-        guard let enumDecl = declaration.as(EnumDeclSyntax.self) else {
+        guard declaration.is(EnumDeclSyntax.self) else {
             return []
         }
         
@@ -137,66 +139,75 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
         return extensions
     }
     
-    // MARK: - Helper Methods
+    // MARK: - Type Inference Scanning
     
-    private static func scanForGameContent(from enumDecl: EnumDeclSyntax) -> ([String], [String]) {
-        var itemNames: [String] = []
-        var locationNames: [String] = []
+    private static func scanForGameContentWithEnums(from enumDecl: EnumDeclSyntax) -> ([NestedItemInfo], [NestedLocationInfo]) {
+        var items: [NestedItemInfo] = []
+        var locations: [NestedLocationInfo] = []
         
-        // Scan all members, including nested enums
+        // Scan all nested enums and track which enum contains each item/location
         for member in enumDecl.memberBlock.members {
-            // Check direct members
-            if let varDecl = member.decl.as(VariableDeclSyntax.self) {
-                scanVariableDeclaration(varDecl, itemNames: &itemNames, locationNames: &locationNames)
-            }
-            
-            // Check nested enums (like Locations, Items)
             if let nestedEnum = member.decl.as(EnumDeclSyntax.self) {
+                let nestedEnumName = nestedEnum.name.text
+                
                 for nestedMember in nestedEnum.memberBlock.members {
                     if let varDecl = nestedMember.decl.as(VariableDeclSyntax.self) {
-                        scanVariableDeclaration(varDecl, itemNames: &itemNames, locationNames: &locationNames)
+                        if let itemName = getItemName(from: varDecl) {
+                            items.append(NestedItemInfo(name: itemName, enumName: nestedEnumName))
+                        }
+                        if let locationName = getLocationName(from: varDecl) {
+                            locations.append(NestedLocationInfo(name: locationName, enumName: nestedEnumName))
+                        }
                     }
                 }
             }
         }
         
-        return (itemNames, locationNames)
+        return (items, locations)
     }
     
-    private static func scanVariableDeclaration(
-        _ varDecl: VariableDeclSyntax,
-        itemNames: inout [String],
-        locationNames: inout [String]
-    ) {
-        // Check if this variable has a @GameItem attribute
-        let hasGameItemAttribute = varDecl.attributes.contains { attr in
-            guard case let .attribute(attribute) = attr else { return false }
-            return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameItem"
+    private static func getItemName(from varDecl: VariableDeclSyntax) -> String? {
+        guard varDecl.bindingSpecifier.text == "let",
+              varDecl.modifiers.contains(where: { $0.name.text == "static" }),
+              let binding = varDecl.bindings.first,
+              let pattern = binding.pattern.as(IdentifierPatternSyntax.self),
+              let initializer = binding.initializer,
+              let functionCall = initializer.value.as(FunctionCallExprSyntax.self),
+              let identifierExpr = functionCall.calledExpression.as(DeclReferenceExprSyntax.self),
+              identifierExpr.baseName.text == "Item" else {
+            return nil
         }
         
-        // Check if this variable has a @GameLocation attribute
-        let hasGameLocationAttribute = varDecl.attributes.contains { attr in
-            guard case let .attribute(attribute) = attr else { return false }
-            return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameLocation"
-        }
-        
-        if hasGameItemAttribute || hasGameLocationAttribute {
-            // Extract the variable name
-            if let binding = varDecl.bindings.first,
-               let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
-                let name = pattern.identifier.text
-                if hasGameItemAttribute {
-                    itemNames.append(name)
-                }
-                if hasGameLocationAttribute {
-                    locationNames.append(name)
-                }
-            }
-        }
+        return pattern.identifier.text
     }
     
-    private static func generateDiscoverItemsFunction(itemNames: [String]) -> DeclSyntax {
-        let itemsArray = itemNames.map { "Self.Items.\($0)" }.joined(separator: ", ")
+    private static func getLocationName(from varDecl: VariableDeclSyntax) -> String? {
+        guard varDecl.bindingSpecifier.text == "let",
+              varDecl.modifiers.contains(where: { $0.name.text == "static" }),
+              let binding = varDecl.bindings.first,
+              let pattern = binding.pattern.as(IdentifierPatternSyntax.self),
+              let initializer = binding.initializer,
+              let functionCall = initializer.value.as(FunctionCallExprSyntax.self),
+              let identifierExpr = functionCall.calledExpression.as(DeclReferenceExprSyntax.self),
+              identifierExpr.baseName.text == "Location" else {
+            return nil
+        }
+        
+        return pattern.identifier.text
+    }
+    
+    struct NestedItemInfo {
+        let name: String
+        let enumName: String
+    }
+    
+    struct NestedLocationInfo {
+        let name: String
+        let enumName: String
+    }
+    
+    private static func generateDiscoverItemsFunction(items: [NestedItemInfo]) -> DeclSyntax {
+        let itemsArray = items.map { "Self.\($0.enumName).\($0.name)" }.joined(separator: ", ")
         return DeclSyntax("""
             private static func discoverItems() -> [Item] {
                 [\(raw: itemsArray)]
@@ -204,107 +215,13 @@ public struct GameAreaMacro: MemberMacro, ExtensionMacro {
             """)
     }
     
-    private static func generateDiscoverLocationsFunction(locationNames: [String]) -> DeclSyntax {
-        let locationsArray = locationNames.map { "Self.Locations.\($0)" }.joined(separator: ", ")
+    private static func generateDiscoverLocationsFunction(locations: [NestedLocationInfo]) -> DeclSyntax {
+        let locationsArray = locations.map { "Self.\($0.enumName).\($0.name)" }.joined(separator: ", ")
         return DeclSyntax("""
             private static func discoverLocations() -> [Location] {
                 [\(raw: locationsArray)]
             }
             """)
-    }
-    
-    private static func generateItemIDExtensions(
-        from enumDecl: EnumDeclSyntax,
-        context: some MacroExpansionContext
-    ) throws -> [ExtensionDeclSyntax] {
-        
-        var itemNames: [String] = []
-        
-        // Scan all members for @GameItem annotations
-        for member in enumDecl.memberBlock.members {
-            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
-            
-            // Check if this variable has a @GameItem attribute
-            let hasGameItemAttribute = varDecl.attributes.contains { attr in
-                guard case let .attribute(attribute) = attr else { return false }
-                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameItem"
-            }
-            
-            if hasGameItemAttribute {
-                // Extract the variable name
-                if let binding = varDecl.bindings.first,
-                   let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
-                    itemNames.append(pattern.identifier.text)
-                }
-            }
-        }
-        
-        // Generate ItemID extension if we found any items
-        if !itemNames.isEmpty {
-            var memberList: [DeclSyntax] = []
-            for itemName in itemNames {
-                memberList.append(DeclSyntax("""
-                    static let \(raw: itemName) = ItemID("\(raw: itemName)")
-                    """))
-            }
-            
-            let itemIDExtension = try ExtensionDeclSyntax("extension ItemID") {
-                for member in memberList {
-                    member
-                }
-            }
-            
-            return [itemIDExtension]
-        }
-        
-        return []
-    }
-    
-    private static func generateLocationIDExtensions(
-        from enumDecl: EnumDeclSyntax,
-        context: some MacroExpansionContext
-    ) throws -> [ExtensionDeclSyntax] {
-        
-        var locationNames: [String] = []
-        
-        // Scan all members for @GameLocation annotations
-        for member in enumDecl.memberBlock.members {
-            guard let varDecl = member.decl.as(VariableDeclSyntax.self) else { continue }
-            
-            // Check if this variable has a @GameLocation attribute
-            let hasGameLocationAttribute = varDecl.attributes.contains { attr in
-                guard case let .attribute(attribute) = attr else { return false }
-                return attribute.attributeName.as(IdentifierTypeSyntax.self)?.name.text == "GameLocation"
-            }
-            
-            if hasGameLocationAttribute {
-                // Extract the variable name
-                if let binding = varDecl.bindings.first,
-                   let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
-                    locationNames.append(pattern.identifier.text)
-                }
-            }
-        }
-        
-        // Generate LocationID extension if we found any locations
-        if !locationNames.isEmpty {
-            var memberList: [DeclSyntax] = []
-            for locationName in locationNames {
-                memberList.append(DeclSyntax("""
-                    static let \(raw: locationName) = LocationID("\(raw: locationName)")
-                    """))
-            }
-            
-            let locationIDExtension = try ExtensionDeclSyntax("extension LocationID") {
-                for member in memberList {
-                    member
-                }
-            }
-            
-            return [locationIDExtension]
-        }
-        
-        return []
     }
 }
 
@@ -327,73 +244,4 @@ enum GameAreaMacroError: Error, DiagnosticMessage {
     var severity: DiagnosticSeverity {
         .error
     }
-}
-
-// MARK: - Discovery Function Generation
-
-func generateDiscoveryFunctions(for areaName: String) -> DeclSyntax {
-    DeclSyntax("""
-        // MARK: - Discovery Functions
-        
-        private static func discoverItems() -> [Item] {
-            // This would be populated by scanning @GameItem marked properties
-            // across all extensions of \(raw: areaName)
-            var items: [Item] = []
-            
-            // Auto-generated item registrations would go here
-            // Example: items.append(Self.basket.withID(.basket))
-            
-            return items
-        }
-        
-        private static func discoverLocations() -> [Location] {
-            // This would be populated by scanning @GameLocation marked properties
-            var locations: [Location] = []
-            
-            // Auto-generated location registrations would go here
-            // Example: locations.append(Self.yourCottage.withID(.yourCottage))
-            
-            return locations
-        }
-        
-        private static func discoverItemEventHandlers() -> [ItemID: ItemEventHandler] {
-            // This would be populated by scanning @ItemEventHandler marked properties
-            var handlers: [ItemID: ItemEventHandler] = [:]
-            
-            // Auto-generated handler registrations would go here
-            // Example: handlers[.basket] = Self.basketHandler
-            
-            return handlers
-        }
-        
-        private static func discoverLocationEventHandlers() -> [LocationID: LocationEventHandler] {
-            // This would be populated by scanning @LocationEventHandler marked properties
-            var handlers: [LocationID: LocationEventHandler] = [:]
-            
-            // Auto-generated handler registrations would go here
-            // Example: handlers[.stoneBridge] = Self.bridgeHandler
-            
-            return handlers
-        }
-        
-        private static func discoverFuseDefinitions() -> [FuseID: FuseDefinition] {
-            // This would be populated by scanning @GameFuse marked properties
-            var fuses: [FuseID: FuseDefinition] = [:]
-            
-            // Auto-generated fuse registrations would go here
-            // Example: fuses[.hungerTimer] = Self.hungerFuse.withID(.hungerTimer)
-            
-            return fuses
-        }
-        
-        private static func discoverDaemonDefinitions() -> [DaemonID: DaemonDefinition] {
-            // This would be populated by scanning @GameDaemon marked properties
-            var daemons: [DaemonID: DaemonDefinition] = [:]
-            
-            // Auto-generated daemon registrations would go here
-            // Example: daemons[.weatherSystem] = Self.weatherDaemon.withID(.weatherSystem)
-            
-            return daemons
-        }
-        """)
 } 
