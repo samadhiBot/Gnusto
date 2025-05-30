@@ -1,5 +1,5 @@
 ---
-description:
+description: 
 globs: *Tests.swift
 alwaysApply: false
 ---
@@ -20,6 +20,16 @@ let output = await mockIO.recordedOutput
 let output = await mockIO.flush()  // 💡 Use `flush()` rather than `output.contains` and `output.count`
 expectNoDifference(output, "You can't take things out of the stone statue.")
 ```
+
+## Curly Quotes in Test Output
+
+- **Curly quotes and apostrophes (', ', ", ") in test output are CORRECT and should NOT be changed**
+- The Gnusto engine uses Markdown for game text, which renders straight quotes as curly quotes
+- Examples of CORRECT test output:
+  - `"You can’t take the pebble."` ✅ (curly apostrophe)
+  - `"It’s too dark to do that."` ✅ (curly apostrophe)  
+  - `"“The bar is closed,” says the squirrel."` ✅ (curly quotes)
+- Do NOT "fix" these to straight quotes - they represent the actual rendered game output
 
 ## Mocks
 
