@@ -22,7 +22,7 @@ struct CloakOfDarkness: GameBlueprint {
     }
 
     var player: Player {
-        Player(in: .foyer)
+        Player(in: OperaHouse.foyer)
     }
 
     var globalState: [GlobalID: StateValue] {
@@ -33,8 +33,3 @@ struct CloakOfDarkness: GameBlueprint {
 extension GlobalID {
     static let barMessageDisturbances = GlobalID("barMessageDisturbances")
 }
-
-// Temporary manual extension - need to fix macro-generated extensions
-extension LocationID {
-    static let foyer = LocationID("foyer")
-} 
