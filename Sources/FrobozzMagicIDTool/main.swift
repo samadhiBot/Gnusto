@@ -97,6 +97,17 @@ struct DiscoveredGameData {
     let areaBlueprintTypes: Set<String>
     let items: Set<String>  // Property names
     let locations: Set<String>  // Property names
+    
+    // MARK: - Handler-to-Area Mappings (Scope Resolution)
+    
+    /// Maps handler names to the AreaBlueprint type that defines them
+    let handlerToAreaMap: [String: String]
+    
+    /// Maps fuse definition names to the AreaBlueprint type that defines them  
+    let fuseToAreaMap: [String: String]
+    
+    /// Maps daemon definition names to the AreaBlueprint type that defines them
+    let daemonToAreaMap: [String: String]
 }
 
 func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
@@ -120,6 +131,11 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
     var items = Set<String>()
     var locations = Set<String>()
     
+    // MARK: - Handler-to-Area Mappings (Scope Resolution)
+    var handlerToAreaMap: [String: String] = [:]
+    var fuseToAreaMap: [String: String] = [:]
+    var daemonToAreaMap: [String: String] = [:]
+    
     // Track existing constants to avoid duplicates
     var existingLocationIDs = Set<String>()
     var existingItemIDs = Set<String>()
@@ -130,6 +146,18 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
     
     for filePath in filePaths {
         let content = try String(contentsOfFile: filePath, encoding: .utf8)
+        
+        // First, discover which AreaBlueprint types are in this file
+        let areaBlueprintMatches = content.matches(of: /(?:struct|class)\s+(\w+)\s*:\s*.*?AreaBlueprint/)
+        var currentFileAreas: [String] = []
+        for match in areaBlueprintMatches {
+            let typeName = String(match.1)
+            areaBlueprintTypes.insert(typeName)
+            currentFileAreas.append(typeName)
+        }
+        
+        // Use the first AreaBlueprint in this file as the "owner" for handlers found in this file
+        let fileAreaOwner = currentFileAreas.first
         
         // MARK: - Scan for existing static constants
         
@@ -170,13 +198,6 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         for match in gameBlueprintMatches {
             let typeName = String(match.1)
             gameBlueprintTypes.insert(typeName)
-        }
-        
-        // struct SomeName: AreaBlueprint patterns
-        let areaBlueprintMatches = content.matches(of: /(?:struct|class)\s+(\w+)\s*:\s*.*?AreaBlueprint/)
-        for match in areaBlueprintMatches {
-            let typeName = String(match.1)
-            areaBlueprintTypes.insert(typeName)
         }
         
         // MARK: - Discover Item and Location Properties
@@ -355,47 +376,11 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             }
         }
         
-        // FuseDefinition(id: .someID, ...) patterns
-        let fuseDefMatches = content.matches(of: /FuseDefinition\s*\(\s*id:\s*\.(\w+)/)
-        for match in fuseDefMatches {
-            let identifier = String(match.1)
-            if !existingFuseIDs.contains(identifier) {
-                fuseIDs.insert(identifier)
-            }
-        }
-        
-        // FuseDefinition(id: "someString", ...) patterns
-        let fuseDefStringMatches = content.matches(of: /FuseDefinition\s*\(\s*id:\s*"(\w+)"/)
-        for match in fuseDefStringMatches {
-            let identifier = String(match.1)
-            if !existingFuseIDs.contains(identifier) {
-                fuseIDs.insert(identifier)
-            }
-        }
-        
         // MARK: - Discover DaemonIDs
         
         // DaemonID("someString") patterns
         let daemonIDMatches = content.matches(of: /DaemonID\s*\(\s*"(\w+)"\s*\)/)
         for match in daemonIDMatches {
-            let identifier = String(match.1)
-            if !existingDaemonIDs.contains(identifier) {
-                daemonIDs.insert(identifier)
-            }
-        }
-        
-        // DaemonDefinition(id: .someID, ...) patterns
-        let daemonDefMatches = content.matches(of: /DaemonDefinition\s*\(\s*id:\s*\.(\w+)/)
-        for match in daemonDefMatches {
-            let identifier = String(match.1)
-            if !existingDaemonIDs.contains(identifier) {
-                daemonIDs.insert(identifier)
-            }
-        }
-        
-        // DaemonDefinition(id: "someString", ...) patterns
-        let daemonDefStringMatches = content.matches(of: /DaemonDefinition\s*\(\s*id:\s*"(\w+)"/)
-        for match in daemonDefStringMatches {
             let identifier = String(match.1)
             if !existingDaemonIDs.contains(identifier) {
                 daemonIDs.insert(identifier)
@@ -424,20 +409,30 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             }
         }
         
-        // MARK: - Discover Event Handlers
-        
-        // Look for ItemEventHandler variables following naming convention
-        let itemHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*ItemEventHandler/)
-        for match in itemHandlerMatches {
+        // MARK: - Discover Event Handlers (with area tracking)
+
+        // Item Event Handlers: let someNameHandler = ItemEventHandler
+        let itemEventHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*ItemEventHandler/)
+        for match in itemEventHandlerMatches {
             let handlerName = String(match.1)
             itemEventHandlers.insert(handlerName)
+            
+            // Associate handler with its containing area
+            if let areaOwner = fileAreaOwner {
+                handlerToAreaMap[handlerName] = areaOwner
+            }
         }
-        
-        // Look for LocationEventHandler variables following naming convention
-        let locationHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*LocationEventHandler/)
-        for match in locationHandlerMatches {
+
+        // Location Event Handlers: let someNameHandler = LocationEventHandler
+        let locationEventHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*LocationEventHandler/)
+        for match in locationEventHandlerMatches {
             let handlerName = String(match.1)
             locationEventHandlers.insert(handlerName)
+            
+            // Associate handler with its containing area
+            if let areaOwner = fileAreaOwner {
+                handlerToAreaMap[handlerName] = areaOwner
+            }
         }
         
         // MARK: - Discover Custom Action Handlers
@@ -449,13 +444,18 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             customActionHandlers.insert(handlerName)
         }
         
-        // MARK: - Discover Fuse and Daemon Definitions
+        // MARK: - Discover Fuse and Daemon Definitions (with area tracking)
         
         // let someDefinition = FuseDefinition( patterns
         let fuseDefVarMatches = content.matches(of: /let\s+(\w+)(?:Fuse|FuseDef|FuseDefinition)?\s*=\s*FuseDefinition/)
         for match in fuseDefVarMatches {
             let defName = String(match.1)
             fuseDefinitions.insert(defName)
+            
+            // Associate fuse with its containing area
+            if let areaOwner = fileAreaOwner {
+                fuseToAreaMap[defName] = areaOwner
+            }
         }
         
         // let someDefinition = DaemonDefinition( patterns
@@ -463,6 +463,11 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         for match in daemonDefVarMatches {
             let defName = String(match.1)
             daemonDefinitions.insert(defName)
+            
+            // Associate daemon with its containing area
+            if let areaOwner = fileAreaOwner {
+                daemonToAreaMap[defName] = areaOwner
+            }
         }
     }
     
@@ -485,7 +490,10 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         dynamicLocationValidate: dynamicLocationValidate,
         areaBlueprintTypes: areaBlueprintTypes,
         items: items,
-        locations: locations
+        locations: locations,
+        handlerToAreaMap: handlerToAreaMap,
+        fuseToAreaMap: fuseToAreaMap,
+        daemonToAreaMap: daemonToAreaMap
     )
 }
 
@@ -584,12 +592,70 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
         output.append("")
     }
     
-    // Generate GameBlueprint Extensions (The Big Innovation!)
-    
-    for gameBlueprintType in discoveredData.gameBlueprintTypes.sorted() {
-        var hasExtensionContent = false
+    // Generate GameBlueprint extensions
+    for gameBlueprintType in discoveredData.gameBlueprintTypes {
         var extensionOutput: [String] = []
+        var hasExtensionContent = false
         
+        // Generate static instances for AreaBlueprints (performance optimization)
+        if !discoveredData.areaBlueprintTypes.isEmpty {
+            extensionOutput.append("    // MARK: - Static Area Instances (Performance Optimization)")
+            extensionOutput.append("")
+            for areaBlueprintType in discoveredData.areaBlueprintTypes.sorted() {
+                let instanceName = "_\(areaBlueprintType.prefix(1).lowercased())\(areaBlueprintType.dropFirst())"
+                extensionOutput.append("    private static let \(instanceName) = \(areaBlueprintType)()")
+            }
+            extensionOutput.append("")
+        }
+
+        // Generate timeRegistry property
+        if !discoveredData.fuseDefinitions.isEmpty || !discoveredData.daemonDefinitions.isEmpty {
+            hasExtensionContent = true
+            extensionOutput.append("    var timeRegistry: TimeRegistry {")
+            extensionOutput.append("        let registry = TimeRegistry()")
+            
+            if !discoveredData.fuseDefinitions.isEmpty {
+                extensionOutput.append("")
+                extensionOutput.append("        // Auto-discovered Fuse Definitions")
+                let sortedFuses = discoveredData.fuseDefinitions.sorted()
+                for fuseProperty in sortedFuses {
+                    // Use proper scope-aware mapping
+                    if let areaType = discoveredData.fuseToAreaMap[fuseProperty] {
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("        registry.registerFuse(Self.\(instanceName).\(fuseProperty))")
+                    } else {
+                        // Fallback: try the first area (but add a comment)
+                        let areaType = discoveredData.areaBlueprintTypes.first ?? "/* Area type not found */"
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("        registry.registerFuse(Self.\(instanceName).\(fuseProperty)) // ⚠️ Area mapping unknown, using first area")
+                    }
+                }
+            }
+            
+            if !discoveredData.daemonDefinitions.isEmpty {
+                extensionOutput.append("")
+                extensionOutput.append("        // Auto-discovered Daemon Definitions")
+                let sortedDaemons = discoveredData.daemonDefinitions.sorted()
+                for daemonProperty in sortedDaemons {
+                    // Use proper scope-aware mapping
+                    if let areaType = discoveredData.daemonToAreaMap[daemonProperty] {
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("        registry.registerDaemon(Self.\(instanceName).\(daemonProperty))")
+                    } else {
+                        // Fallback: try the first area (but add a comment)
+                        let areaType = discoveredData.areaBlueprintTypes.first ?? "/* Area type not found */"
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("        registry.registerDaemon(Self.\(instanceName).\(daemonProperty)) // ⚠️ Area mapping unknown, using first area")
+                    }
+                }
+            }
+            
+            extensionOutput.append("")
+            extensionOutput.append("        return registry")
+            extensionOutput.append("    }")
+            extensionOutput.append("")
+        }
+
         // Generate itemEventHandlers property
         if !discoveredData.itemEventHandlers.isEmpty {
             hasExtensionContent = true
@@ -597,13 +663,22 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             extensionOutput.append("        [")
             let sortedItemHandlers = discoveredData.itemEventHandlers.sorted()
             for handlerName in sortedItemHandlers {
-                extensionOutput.append("            .\(handlerName): \(handlerName)Handler,")
+                // Find which area contains this handler and use proper static instance reference
+                if let areaType = discoveredData.handlerToAreaMap[handlerName] {
+                    let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                    extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
+                } else {
+                    // Fallback: try the first area (but add a comment)
+                    let areaType = discoveredData.areaBlueprintTypes.first ?? "/* Area type not found */"
+                    let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                    extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
+                }
             }
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
         }
-        
+
         // Generate locationEventHandlers property
         if !discoveredData.locationEventHandlers.isEmpty {
             hasExtensionContent = true
@@ -611,112 +686,22 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             extensionOutput.append("        [")
             let sortedLocationHandlers = discoveredData.locationEventHandlers.sorted()
             for handlerName in sortedLocationHandlers {
-                extensionOutput.append("            .\(handlerName): \(handlerName)Handler,")
+                // Find which area contains this handler and use proper static instance reference
+                if let areaType = discoveredData.handlerToAreaMap[handlerName] {
+                    let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                    extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
+                } else {
+                    // Fallback: try the first area (but add a comment)
+                    let areaType = discoveredData.areaBlueprintTypes.first ?? "/* Area type not found */"
+                    let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                    extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
+                }
             }
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
         }
-        
-        // Generate customActionHandlers property
-        if !discoveredData.customActionHandlers.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var customActionHandlers: [VerbID: ActionHandler] {")
-            extensionOutput.append("        [")
-            let sortedActionHandlers = discoveredData.customActionHandlers.sorted()
-            for handlerName in sortedActionHandlers {
-                // Try to derive the verb from the handler name
-                let verbName = handlerName.lowercased()
-                extensionOutput.append("            .\(verbName): \(handlerName)ActionHandler,")
-            }
-            extensionOutput.append("        ]")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
-        
-        // Generate timeRegistry property
-        if !discoveredData.fuseDefinitions.isEmpty || !discoveredData.daemonDefinitions.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var timeRegistry: TimeRegistry {")
-            extensionOutput.append("        TimeRegistry(")
-            
-            if !discoveredData.fuseDefinitions.isEmpty {
-                extensionOutput.append("            fuseDefinitions: [")
-                let sortedFuseDefinitions = discoveredData.fuseDefinitions.sorted()
-                for fuseDef in sortedFuseDefinitions {
-                    // Handle common naming patterns
-                    extensionOutput.append("                \(fuseDef),")
-                }
-                extensionOutput.append("            ],")
-            }
-            
-            if !discoveredData.daemonDefinitions.isEmpty {
-                extensionOutput.append("            daemonDefinitions: [")
-                let sortedDaemonDefinitions = discoveredData.daemonDefinitions.sorted()
-                for daemonDef in sortedDaemonDefinitions {
-                    extensionOutput.append("                \(daemonDef),")
-                }
-                extensionOutput.append("            ]")
-            }
-            
-            extensionOutput.append("        )")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
-        
-        // Generate dynamicAttributeRegistry property
-        let hasDynamicAttributes = !discoveredData.dynamicItemCompute.isEmpty ||
-                                  !discoveredData.dynamicItemValidate.isEmpty ||
-                                  !discoveredData.dynamicLocationCompute.isEmpty ||
-                                  !discoveredData.dynamicLocationValidate.isEmpty
-        
-        if hasDynamicAttributes {
-            hasExtensionContent = true
-            extensionOutput.append("    var dynamicAttributeRegistry: DynamicAttributeRegistry {")
-            extensionOutput.append("        var registry = DynamicAttributeRegistry()")
-            extensionOutput.append("")
-            
-            // Generate item compute registrations
-            for registration in discoveredData.dynamicItemCompute.sorted(by: { $0.entityID < $1.entityID }) {
-                extensionOutput.append("        registry.registerItemCompute(itemID: .\(registration.entityID), attributeID: .\(registration.attributeID)) { item, gameState in")
-                extensionOutput.append("            // TODO: Implement \(registration.entityID).\(registration.attributeID) compute logic")
-                extensionOutput.append("            return .undefined")
-                extensionOutput.append("        }")
-                extensionOutput.append("")
-            }
-            
-            // Generate item validate registrations
-            for registration in discoveredData.dynamicItemValidate.sorted(by: { $0.entityID < $1.entityID }) {
-                extensionOutput.append("        registry.registerItemValidate(itemID: .\(registration.entityID), attributeID: .\(registration.attributeID)) { item, newValue in")
-                extensionOutput.append("            // TODO: Implement \(registration.entityID).\(registration.attributeID) validation logic")
-                extensionOutput.append("            return true")
-                extensionOutput.append("        }")
-                extensionOutput.append("")
-            }
-            
-            // Generate location compute registrations
-            for registration in discoveredData.dynamicLocationCompute.sorted(by: { $0.entityID < $1.entityID }) {
-                extensionOutput.append("        registry.registerLocationCompute(locationID: .\(registration.entityID), attributeID: .\(registration.attributeID)) { location, gameState in")
-                extensionOutput.append("            // TODO: Implement \(registration.entityID).\(registration.attributeID) compute logic")
-                extensionOutput.append("            return .undefined")
-                extensionOutput.append("        }")
-                extensionOutput.append("")
-            }
-            
-            // Generate location validate registrations
-            for registration in discoveredData.dynamicLocationValidate.sorted(by: { $0.entityID < $1.entityID }) {
-                extensionOutput.append("        registry.registerLocationValidate(locationID: .\(registration.entityID), attributeID: .\(registration.attributeID)) { location, newValue in")
-                extensionOutput.append("            // TODO: Implement \(registration.entityID).\(registration.attributeID) validation logic")
-                extensionOutput.append("            return true")
-                extensionOutput.append("        }")
-                extensionOutput.append("")
-            }
-            
-            extensionOutput.append("        return registry")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
-        
+
         // Only generate the extension if there's content
         if hasExtensionContent {
             output.append("// MARK: - \(gameBlueprintType) Auto-Generated Extensions")
