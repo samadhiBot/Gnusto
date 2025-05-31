@@ -14,7 +14,6 @@ import PackagePlugin
 /// for manual ID constant maintenance.
 @main
 struct IDGeneratorPlugin: BuildToolPlugin {
-    
     func createBuildCommands(
         context: PluginContext,
         target: Target
@@ -50,8 +49,8 @@ struct IDGeneratorPlugin: BuildToolPlugin {
 
         print("🔧 IDGeneratorPlugin (SPM): Configuring ID generation for target '\(target.name)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
-        print("📝 Output: \(outputURL)")
-        print("🛠️ Tool: \(tool.url.path())")
+        print("📝 Output: \(outputURL.path())")
+        print("🛠️ Tool: \(tool.name)")
 
         return [
             .buildCommand(
@@ -66,6 +65,7 @@ struct IDGeneratorPlugin: BuildToolPlugin {
 }
 
 #if canImport(XcodeProjectPlugin)
+
 import XcodeProjectPlugin
 
 extension IDGeneratorPlugin: XcodeBuildToolPlugin {
@@ -110,10 +110,10 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
 
         print("🔧 IDGeneratorPlugin (Xcode): Configuring ID generation for target '\(target.displayName)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
-        print("📝 Output: \(outputURL)")
-        print("🛠️ Tool: \(tool.url.path())")
+        print("📝 Output: \(outputURL.path())")
+        print("🛠️ Tool: \(tool.name)")
         print("📋 Arguments: \(arguments.joined(separator: " "))")
-        
+
         return [
             .buildCommand(
                 displayName: "Generate ID Constants for \(target.displayName)",
@@ -125,4 +125,5 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         ]
     }
 }
-#endif 
+
+#endif

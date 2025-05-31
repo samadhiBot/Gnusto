@@ -16,8 +16,23 @@ let sourceFiles = Array(arguments[sourceFileStartIndex...])
 
 print("🔍 Scanning \(sourceFiles.count) source files for ID patterns...")
 
+// Convert file URLs to file paths if needed
+let resolvedSourceFiles = sourceFiles.map { filePath in
+    if filePath.hasPrefix("file://") {
+        return URL(string: filePath)?.path ?? filePath
+    }
+    return filePath
+}
+
+let resolvedOutputPath = {
+    if outputPath.hasPrefix("file://") {
+        return URL(string: outputPath)?.path ?? outputPath
+    }
+    return outputPath
+}()
+
 // Scan source files
-let discoveredIDs = try scanSourceFiles(sourceFiles)
+let discoveredIDs = try scanSourceFiles(resolvedSourceFiles)
 
 print("📝 Discovered \(discoveredIDs.locationIDs.count) LocationIDs and \(discoveredIDs.itemIDs.count) ItemIDs")
 print("📝 New LocationIDs: \(discoveredIDs.locationIDs.sorted().joined(separator: ", "))")
@@ -27,9 +42,9 @@ print("📝 New ItemIDs: \(discoveredIDs.itemIDs.sorted().joined(separator: ", "
 let generatedCode = generateIDExtensions(discoveredIDs)
 
 // Write output
-try generatedCode.write(toFile: outputPath, atomically: true, encoding: .utf8)
+try generatedCode.write(toFile: resolvedOutputPath, atomically: true, encoding: .utf8)
 
-print("✅ Generated ID constants written to: \(outputPath)")
+print("✅ Generated ID constants written to: \(resolvedOutputPath)")
 
 // MARK: - Discovery
 
