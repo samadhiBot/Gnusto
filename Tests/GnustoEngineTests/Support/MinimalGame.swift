@@ -8,7 +8,8 @@ struct MinimalGame: GameBlueprint {
         maximumScore: 10
     )
     var player: Player
-    var state: GameState
+    var items: [Item]
+    var locations: [Location]
     var customActionHandlers: [VerbID: ActionHandler]
     var itemEventHandlers: [ItemID: ItemEventHandler]
     var locationEventHandlers: [LocationID: LocationEventHandler]
@@ -27,21 +28,7 @@ struct MinimalGame: GameBlueprint {
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
         self.player = player
-        self.customActionHandlers = customActionHandlers
-        self.timeRegistry = timeRegistry
-        self.dynamicAttributeRegistry = dynamicAttributeRegistry
-        self.itemEventHandlers = itemEventHandlers
-        self.locationEventHandlers = locationEventHandlers
-
-        let gameLocations = locations ?? [
-            Location(
-                id: .startRoom,
-                .name("Void"),
-                .description("An empty void."),
-                .inherentlyLit
-            )
-        ]
-        let gameItems = items ?? [
+        self.items = items ?? [
             Item(
                 id: .startItem,
                 .name("pebble"),
@@ -56,6 +43,19 @@ struct MinimalGame: GameBlueprint {
                 .isScenery
             )
         ]
+        self.locations = locations ?? [
+            Location(
+                id: .startRoom,
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
+            )
+        ]
+        self.customActionHandlers = customActionHandlers
+        self.timeRegistry = timeRegistry
+        self.dynamicAttributeRegistry = dynamicAttributeRegistry
+        self.itemEventHandlers = itemEventHandlers
+        self.locationEventHandlers = locationEventHandlers
 
         // Build vocabulary including verbs from custom handlers
         var customVerbs: [Verb] = []
@@ -64,15 +64,15 @@ struct MinimalGame: GameBlueprint {
             let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
             customVerbs.append(verbDef)
         }
-        let vocabulary = Vocabulary.build(items: gameItems, verbs: customVerbs)
+//        let vocabulary = Vocabulary.build(items: gameItems, verbs: customVerbs)
 
-        self.state = GameState(
-            locations: gameLocations,
-            items: gameItems,
-            player: player,
-            vocabulary: vocabulary,
-            globalState: globalState ?? [:]
-        )
+//        self.state = GameState(
+//            locations: gameLocations,
+//            items: gameItems,
+//            player: player,
+//            vocabulary: vocabulary,
+//            globalState: globalState ?? [:]
+//        )
     }
 }
 

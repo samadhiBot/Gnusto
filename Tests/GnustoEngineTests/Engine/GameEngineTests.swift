@@ -183,7 +183,7 @@ struct GameEngineTests {
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -542,8 +542,8 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
-        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
+        #expect(game.items.find(.startItem)?.hasFlag(.isTakable) == true)
+        #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
             blueprint: game,
@@ -939,7 +939,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
         let command = Command(
             verb: .take,
@@ -969,7 +969,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
+        #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
         let command = Command(
             verb: .wear,
@@ -1425,7 +1425,7 @@ struct GameEngineTests {
         )
 
         #expect(
-            game.state.locations[.startRoom]?.hasFlag(.inherentlyLit) == false
+            game.locations.find(.startRoom)?.hasFlag(.inherentlyLit) == false
         )
 
         let command = Command(

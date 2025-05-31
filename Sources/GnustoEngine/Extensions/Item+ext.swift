@@ -22,6 +22,13 @@ extension Item {
 }
 
 extension Array where Element == Item {
+    /// <#Description#>
+    /// - Parameter id: <#id description#>
+    /// - Returns: <#description#>
+    func find(_ id: ItemID) -> Item? {
+        first { $0.id == id }
+    }
+
     /// Returns a grammatically correct string listing the elements, orted alphabetically,
     /// with appropriate definite articles prepended.
     ///
