@@ -22,8 +22,8 @@ let package = Package(
             targets: ["FrobozzMagicDemoKit"]
         ),
         .plugin(
-            name: "IDGeneratorPlugin",
-            targets: ["IDGeneratorPlugin"]
+            name: "FrobozzMagicIDPlugin",
+            targets: ["FrobozzMagicIDPlugin"]
         )
     ],
     dependencies: [
@@ -53,19 +53,19 @@ let package = Package(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
             path: "Executables/FrobozzMagicDemoKit",
-            plugins: ["IDGeneratorPlugin"]
+            plugins: ["FrobozzMagicIDPlugin"]
         ),
         .executableTarget(
-            name: "IDGeneratorTool",
-            path: "Sources/IDGeneratorTool",
+            name: "FrobozzMagicIDTool",
+            path: "Sources/FrobozzMagicIDTool",
             swiftSettings: [
                 .enableUpcomingFeature("BareSlashRegexLiterals")
             ]
         ),
         .plugin(
-            name: "IDGeneratorPlugin",
+            name: "FrobozzMagicIDPlugin",
             capability: .buildTool(),
-            dependencies: ["IDGeneratorTool"]
+            dependencies: ["FrobozzMagicIDTool"]
         ),
         .testTarget(
             name: "GnustoEngineTests",

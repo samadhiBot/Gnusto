@@ -13,7 +13,7 @@ import PackagePlugin
 /// And generates corresponding static constants in extensions, eliminating the need
 /// for manual ID constant maintenance.
 @main
-struct IDGeneratorPlugin: BuildToolPlugin {
+struct FrobozzMagicIDPlugin: BuildToolPlugin {
     func createBuildCommands(
         context: PluginContext,
         target: Target
@@ -21,7 +21,7 @@ struct IDGeneratorPlugin: BuildToolPlugin {
         
         // Only process Swift source module targets
         guard let target = target as? SwiftSourceModuleTarget else {
-            print("🚫 IDGeneratorPlugin: Skipping non-Swift target '\(target.name)'")
+            print("🚫 FrobozzMagicIDPlugin: Skipping non-Swift target '\(target.name)'")
             return []
         }
         
@@ -30,7 +30,7 @@ struct IDGeneratorPlugin: BuildToolPlugin {
         
         // Skip if no Swift files to process
         guard !swiftFiles.isEmpty else {
-            print("🚫 IDGeneratorPlugin: No Swift files found in target '\(target.name)'")
+            print("🚫 FrobozzMagicIDPlugin: No Swift files found in target '\(target.name)'")
             return []
         }
         
@@ -38,7 +38,7 @@ struct IDGeneratorPlugin: BuildToolPlugin {
         let outputURL = context.pluginWorkDirectoryURL.appending(path: "GeneratedIDs.swift")
 
         // Get the ID generator tool
-        let tool = try context.tool(named: "IDGeneratorTool")
+        let tool = try context.tool(named: "FrobozzMagicIDTool")
         
         // Build arguments for the tool
         var arguments = [
@@ -47,7 +47,7 @@ struct IDGeneratorPlugin: BuildToolPlugin {
         ]
         arguments += swiftFiles.map { $0.url.absoluteString }
 
-        print("🔧 IDGeneratorPlugin (SPM): Configuring ID generation for target '\(target.name)'")
+        print("🔧 FrobozzMagicIDPlugin (SPM): Configuring ID generation for target '\(target.name)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
@@ -68,14 +68,14 @@ struct IDGeneratorPlugin: BuildToolPlugin {
 
 import XcodeProjectPlugin
 
-extension IDGeneratorPlugin: XcodeBuildToolPlugin {
+extension FrobozzMagicIDPlugin: XcodeBuildToolPlugin {
     
     func createBuildCommands(
         context: XcodePluginContext,
         target: XcodeTarget
     ) throws -> [Command] {
         
-        print("🔧 IDGeneratorPlugin (Xcode): Starting plugin for target '\(target.displayName)'")
+        print("🔧 FrobozzMagicIDPlugin (Xcode): Starting plugin for target '\(target.displayName)'")
         
         // Get all Swift source files in the target
         let swiftFiles = target.inputFiles.filter {
@@ -84,7 +84,7 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         
         // Skip if no Swift files to process
         guard !swiftFiles.isEmpty else {
-            print("🚫 IDGeneratorPlugin (Xcode): No Swift files found in target '\(target.displayName)'")
+            print("🚫 FrobozzMagicIDPlugin (Xcode): No Swift files found in target '\(target.displayName)'")
             return []
         }
         
@@ -94,10 +94,10 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         // Get the ID generator tool
         let tool: PluginContext.Tool
         do {
-            tool = try context.tool(named: "IDGeneratorTool")
-            print("✅ IDGeneratorPlugin (Xcode): Found tool at \(tool.url.path())")
+            tool = try context.tool(named: "FrobozzMagicIDTool")
+            print("✅ FrobozzMagicIDPlugin (Xcode): Found tool at \(tool.url.path())")
         } catch {
-            print("❌ IDGeneratorPlugin (Xcode): Failed to find tool: \(error)")
+            print("❌ FrobozzMagicIDPlugin (Xcode): Failed to find tool: \(error)")
             throw error
         }
         
@@ -108,7 +108,7 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         ]
         arguments += swiftFiles.map { $0.url.absoluteString }
 
-        print("🔧 IDGeneratorPlugin (Xcode): Configuring ID generation for target '\(target.displayName)'")
+        print("🔧 FrobozzMagicIDPlugin (Xcode): Configuring ID generation for target '\(target.displayName)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
