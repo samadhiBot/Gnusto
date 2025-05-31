@@ -36,30 +36,30 @@ struct IDGeneratorPlugin: BuildToolPlugin {
         }
         
         // Define output file path in plugin work directory
-        let outputPath = context.pluginWorkDirectory.appending("GeneratedIDs.swift")
-        
+        let outputURL = context.pluginWorkDirectoryURL.appending(path: "GeneratedIDs.swift")
+
         // Get the ID generator tool
         let tool = try context.tool(named: "IDGeneratorTool")
         
         // Build arguments for the tool
         var arguments = [
-            "--output", outputPath.string,
+            "--output", outputURL.absoluteString,
             "--source-files"
         ]
-        arguments += swiftFiles.map { $0.path.string }
-        
+        arguments += swiftFiles.map { $0.url.absoluteString }
+
         print("🔧 IDGeneratorPlugin (SPM): Configuring ID generation for target '\(target.name)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
-        print("📝 Output: \(outputPath)")
-        print("🛠️ Tool: \(tool.path)")
-        
+        print("📝 Output: \(outputURL)")
+        print("🛠️ Tool: \(tool.url.path())")
+
         return [
             .buildCommand(
                 displayName: "Generate ID Constants for \(target.name)",
-                executable: tool.path,
+                executable: tool.url,
                 arguments: arguments,
-                inputFiles: swiftFiles.map { $0.path },
-                outputFiles: [outputPath]
+                inputFiles: swiftFiles.map(\.url),
+                outputFiles: [outputURL]
             )
         ]
     }
@@ -78,8 +78,8 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         print("🔧 IDGeneratorPlugin (Xcode): Starting plugin for target '\(target.displayName)'")
         
         // Get all Swift source files in the target
-        let swiftFiles = target.inputFiles.filter { 
-            $0.type == .source && $0.path.extension == "swift" 
+        let swiftFiles = target.inputFiles.filter {
+            $0.type == .source && $0.url.pathExtension == "swift"
         }
         
         // Skip if no Swift files to process
@@ -89,13 +89,13 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         }
         
         // Define output file path in plugin work directory
-        let outputPath = context.pluginWorkDirectory.appending("GeneratedIDs.swift")
-        
+        let outputURL = context.pluginWorkDirectoryURL.appending(path: "GeneratedIDs.swift")
+
         // Get the ID generator tool
         let tool: PluginContext.Tool
         do {
             tool = try context.tool(named: "IDGeneratorTool")
-            print("✅ IDGeneratorPlugin (Xcode): Found tool at \(tool.path)")
+            print("✅ IDGeneratorPlugin (Xcode): Found tool at \(tool.url.path())")
         } catch {
             print("❌ IDGeneratorPlugin (Xcode): Failed to find tool: \(error)")
             throw error
@@ -103,24 +103,24 @@ extension IDGeneratorPlugin: XcodeBuildToolPlugin {
         
         // Build arguments for the tool
         var arguments = [
-            "--output", outputPath.string,
+            "--output", outputURL.absoluteString,
             "--source-files"
         ]
-        arguments += swiftFiles.map { $0.path.string }
-        
+        arguments += swiftFiles.map { $0.url.absoluteString }
+
         print("🔧 IDGeneratorPlugin (Xcode): Configuring ID generation for target '\(target.displayName)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
-        print("📝 Output: \(outputPath)")
-        print("🛠️ Tool: \(tool.path)")
+        print("📝 Output: \(outputURL)")
+        print("🛠️ Tool: \(tool.url.path())")
         print("📋 Arguments: \(arguments.joined(separator: " "))")
         
         return [
             .buildCommand(
                 displayName: "Generate ID Constants for \(target.displayName)",
-                executable: tool.path,
+                executable: tool.url,
                 arguments: arguments,
-                inputFiles: swiftFiles.map { $0.path },
-                outputFiles: [outputPath]
+                inputFiles: swiftFiles.map(\.url),
+                outputFiles: [outputURL]
             )
         ]
     }

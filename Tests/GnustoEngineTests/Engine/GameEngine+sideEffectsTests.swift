@@ -30,7 +30,7 @@ struct GameEngineSideEffectsTests {
             id: testDaemonID
         ) { engine in
             // Test daemon action - increment a counter
-            if let currentCount: Int = await engine.global("daemonTicks") {
+            if let _: Int = await engine.global("daemonTicks") {
                 if let change = await engine.adjustGlobal("daemonTicks", by: 1) {
                     try? await engine.apply(change)
                 }
