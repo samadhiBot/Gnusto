@@ -95,17 +95,37 @@ public actor GameEngine: Sendable {
     /// with all game-specific data (initial state, constants, definitions) and logic (custom handlers, hooks).
     ///
     /// - Parameters:
-    ///   - blueprint: The `GameBlueprint` containing all game definitions, initial state,
-    ///                custom handlers, and hooks.
+    ///   - blueprint: The `GameBlueprint` containing all game definitions, custom handlers, and hooks.
+    ///   - player: The initial `Player` state.
+    ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated from items.
+    ///   - pronouns: Optional. Initial pronoun references.
+    ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
+    ///   - activeDaemons: Optional. Initially active daemons.
+    ///   - globalState: Optional. Initial game-specific global key-value data.
     ///   - parser: The `Parser` instance to be used for understanding player input.
     ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     public init(
         blueprint: GameBlueprint,
+        player: Player,
+        vocabulary: Vocabulary? = nil,
+        pronouns: [String: Set<EntityReference>] = [:],
+        activeFuses: [FuseID: Int] = [:],
+        activeDaemons: Set<DaemonID> = [],
+        globalState: [GlobalID: StateValue] = [:],
         parser: Parser,
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
-        self.gameState = blueprint.state
+        self.gameState = GameState(
+            locations: blueprint.locations,
+            items: blueprint.items,
+            player: player,
+            vocabulary: vocabulary,
+            pronouns: pronouns,
+            activeFuses: activeFuses,
+            activeDaemons: activeDaemons,
+            globalState: globalState
+        )
         self.parser = parser
         self.ioHandler = ioHandler
         self.timeRegistry = blueprint.timeRegistry

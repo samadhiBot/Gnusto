@@ -55,13 +55,6 @@ struct FrobozzMagicDemoKit: GameBlueprint {
             maximumScore: 100
         )
     }
-
-    // MARK: - Game State
-
-    let state = GameState(
-        areas: Act1Area.self,
-        player: Player(in: .yourCottage)
-    )
 }
 
 // MARK: - Supporting Types

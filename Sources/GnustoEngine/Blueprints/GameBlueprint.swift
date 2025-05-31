@@ -3,13 +3,13 @@ import Foundation
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
 /// Implement this protocol to specify all the essential elements for your game,
-/// including initial world state, game-specific constants, custom behaviors, and event handlers.
-/// The `GameEngine` uses this blueprint to initialize and run the game.
+/// including game-specific constants, custom behaviors, and event handlers.
+/// The `GameEngine` uses this blueprint to build the initial `GameState` and configure the game.
 ///
 /// For organizing game content (locations, items, and their specific event handlers),
 /// consider using types that conform to `AreaBlueprint`. The definitions from these
 /// area blueprints can then be aggregated and provided to the relevant properties of
-/// your `GameBlueprint` implementation (e.g., `state`, `itemEventHandlers`,
+/// your `GameBlueprint` implementation (e.g., `items`, `locations`, `itemEventHandlers`,
 /// `locationEventHandlers`).
 public protocol GameBlueprint: Sendable {
     /// The core metadata constants for the game.
@@ -19,15 +19,19 @@ public protocol GameBlueprint: Sendable {
     /// This information is often displayed to the player at the start of the game.
     var constants: GameConstants { get }
 
-    /// The complete state of the world at the start of the game.
+    /// All items in the game world.
     ///
-    /// This `GameState` instance defines all locations, items (and their properties),
-    /// the initial player state, active timers (fuses and daemons), and any global
-    /// variables at the moment the game begins.
+    /// This array defines all items that exist in the game, including their properties,
+    /// initial locations, and other characteristics. The `GameEngine` uses this to
+    /// build the initial `GameState`.
+    var items: [Item] { get }
+
+    /// All locations in the game world.
     ///
-    /// > Important: This property **only** defomes the state at the game's outset. Any later
-    ///   mutations occur on a separate copy maintained by the ``GameEngine`` actor.
-    var state: GameState { get }
+    /// This array defines all locations that exist in the game, including their
+    /// descriptions, exits, and properties. The `GameEngine` uses this to
+    /// build the initial `GameState`.
+    var locations: [Location] { get }
 
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
@@ -83,6 +87,14 @@ public protocol GameBlueprint: Sendable {
 // MARK: - Default implementations
 
 extension GameBlueprint {
+    public var items: [Item] {
+        []
+    }
+
+    public var locations: [Location] {
+        []
+    }
+
     public var customActionHandlers: [VerbID: ActionHandler] {
         [:]
     }

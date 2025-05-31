@@ -15,17 +15,40 @@ struct CloakOfDarkness: GameBlueprint {
         maximumScore: 2
     )
 
-    var state = GameState(
-        areas: OperaHouse.self,
-        player: Player(in: .foyer),
-        globalState: [
-            .barMessageDisturbances: 0
+    // For now, manually aggregate from OperaHouse until plugin supports this
+    var items: [Item] {
+        let operaHouse = OperaHouse()
+        return [
+            operaHouse.hook,
+            operaHouse.message,
+            operaHouse.cloak
         ]
-    )
+    }
 
-    let itemEventHandlers = OperaHouse.itemEventHandlers
+    var locations: [Location] {
+        let operaHouse = OperaHouse()
+        return [
+            operaHouse.foyer,
+            operaHouse.cloakroom,
+            operaHouse.bar
+        ]
+    }
 
-    let locationEventHandlers = OperaHouse.locationEventHandlers
+    var itemEventHandlers: [ItemID: ItemEventHandler] {
+        let operaHouse = OperaHouse()
+        return [
+            .cloak: operaHouse.cloakHandler,
+            .hook: operaHouse.hookHandler,
+            .message: operaHouse.messageHandler
+        ]
+    }
+
+    var locationEventHandlers: [LocationID: LocationEventHandler] {
+        let operaHouse = OperaHouse()
+        return [
+            .bar: operaHouse.barHandler
+        ]
+    }
 }
 
 extension GlobalID {

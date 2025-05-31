@@ -656,51 +656,35 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             extensionOutput.append("")
         }
 
-        // Generate aggregated items property (across all areas)
-        if !discoveredData.items.isEmpty {
+        // Generate aggregated items property
+        if !discoveredData.areaBlueprintTypes.isEmpty {
             hasExtensionContent = true
             extensionOutput.append("    var items: [Item] {")
             extensionOutput.append("        [")
-            
-            // Group items by their containing area and use static instances
-            let itemsByArea = Dictionary(grouping: discoveredData.items.sorted()) { itemProperty in
-                // Find which area contains this item by looking through discovered data
-                // For now, assume all items are in the first area (we can improve this with better tracking)
-                discoveredData.areaBlueprintTypes.first ?? "UnknownArea"
-            }
-            
-            for (areaType, itemProperties) in itemsByArea.sorted(by: { $0.key < $1.key }) {
-                let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                for itemProperty in itemProperties {
+            for areaBlueprintType in discoveredData.areaBlueprintTypes.sorted() {
+                let instanceName = "_\(areaBlueprintType.prefix(1).lowercased())\(areaBlueprintType.dropFirst())"
+                // Use the area instance to access items discovered by reflection
+                for itemProperty in discoveredData.items.sorted() {
                     extensionOutput.append("            Self.\(instanceName).\(itemProperty),")
                 }
             }
-            
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
         }
-
-        // Generate aggregated locations property (across all areas)
-        if !discoveredData.locations.isEmpty {
+        
+        // Generate aggregated locations property  
+        if !discoveredData.areaBlueprintTypes.isEmpty {
             hasExtensionContent = true
             extensionOutput.append("    var locations: [Location] {")
             extensionOutput.append("        [")
-            
-            // Group locations by their containing area and use static instances
-            let locationsByArea = Dictionary(grouping: discoveredData.locations.sorted()) { locationProperty in
-                // Find which area contains this location by looking through discovered data
-                // For now, assume all locations are in the first area (we can improve this with better tracking)
-                discoveredData.areaBlueprintTypes.first ?? "UnknownArea"
-            }
-            
-            for (areaType, locationProperties) in locationsByArea.sorted(by: { $0.key < $1.key }) {
-                let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                for locationProperty in locationProperties {
+            for areaBlueprintType in discoveredData.areaBlueprintTypes.sorted() {
+                let instanceName = "_\(areaBlueprintType.prefix(1).lowercased())\(areaBlueprintType.dropFirst())"
+                // Use the area instance to access locations discovered by reflection
+                for locationProperty in discoveredData.locations.sorted() {
                     extensionOutput.append("            Self.\(instanceName).\(locationProperty),")
                 }
             }
-            
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
