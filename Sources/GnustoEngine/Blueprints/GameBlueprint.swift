@@ -19,6 +19,10 @@ public protocol GameBlueprint: Sendable {
     /// This information is often displayed to the player at the start of the game.
     var constants: GameConstants { get }
 
+    /// An object representing the player character, containing their current status, inventory,
+    /// score, location, etc.
+    var player: Player { get }
+
     /// All items in the game world.
     ///
     /// This array defines all items that exist in the game, including their properties,

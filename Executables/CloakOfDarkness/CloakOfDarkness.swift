@@ -15,6 +15,8 @@ struct CloakOfDarkness: GameBlueprint {
         maximumScore: 2
     )
 
+    let player = Player(in: .foyer)
+
     // For now, manually aggregate from OperaHouse until plugin supports this
     var items: [Item] {
         let operaHouse = OperaHouse()

@@ -34,7 +34,7 @@ struct DynamicPropertyTests {
         )
 
         // Set initial value through StateChange builder
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("simpleProp"), on: item, to: .int(10)) {
             try await engine.apply(change)
         }
@@ -44,7 +44,7 @@ struct DynamicPropertyTests {
         #expect(initialValue == 10)
 
         // Set new value
-        let updatedItem = await engine.gameState.items["testItem"]!
+        let updatedItem = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("simpleProp"), on: updatedItem, to: .int(20)) {
             try await engine.apply(change)
         }
@@ -93,7 +93,7 @@ struct DynamicPropertyTests {
         )
 
         // Set a valid value using StateChange builder
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("validatedProp"), on: item, to: .int(5)) {
             try await engine.apply(change)
         }
@@ -135,14 +135,14 @@ struct DynamicPropertyTests {
         )
 
         // Set initial valid value
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("validatedProp"), on: item, to: .int(1)) {
             try await engine.apply(change)
         }
 
         // Attempt to set an invalid value (zero)
         await #expect(throws: ActionResponse.self) {
-            let currentItem = await engine.gameState.items["testItem"]!
+            let currentItem = try await engine.item("testItem")
             if let change = await engine.setAttribute(.init("validatedProp"), on: currentItem, to: .int(0)) {
                 try await engine.apply(change)
             }
@@ -154,7 +154,7 @@ struct DynamicPropertyTests {
 
         // Attempt to set wrong type
         await #expect(throws: ActionResponse.self) {
-            let currentItem = await engine.gameState.items["testItem"]!
+            let currentItem = try await engine.item("testItem")
             if let change = await engine.setAttribute(.init("validatedProp"), on: currentItem, to: .string("invalid")) {
                 try await engine.apply(change)
             }
@@ -188,7 +188,7 @@ struct DynamicPropertyTests {
         )
 
         // Set a valid value using StateChange builder
-        let location = await engine.gameState.locations["testLocation"]!
+        let location = try await engine.location("testLocation")
         if let change = await engine.setAttribute(.init("lightLevel"), on: location, to: .int(5)) {
             try await engine.apply(change)
         }
@@ -224,7 +224,7 @@ struct DynamicPropertyTests {
 
         // Attempt to set an invalid value (too high)
         await #expect(throws: ActionResponse.self) {
-            let location = await engine.gameState.locations["testLocation"]!
+            let location = try await engine.location("testLocation")
             if let change = await engine.setAttribute(.init("lightLevel"), on: location, to: .int(15)) {
                 try await engine.apply(change)
             }
@@ -263,7 +263,7 @@ struct DynamicPropertyTests {
         )
 
         // Set flag to true using StateChange builder
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute("isOpen", on: item, to: true) {
             try await engine.apply(change)
         }
@@ -272,7 +272,7 @@ struct DynamicPropertyTests {
         #expect(itemAfterSet?.attributes["isOpen"] == StateValue.bool(true))
 
         // Set flag to false
-        let updatedItem = await engine.gameState.items["testItem"]!
+        let updatedItem = try await engine.item("testItem")
         if let change = await engine.setAttribute("isOpen", on: updatedItem, to: false) {
             try await engine.apply(change)
         }
@@ -300,7 +300,7 @@ struct DynamicPropertyTests {
         )
 
         // Set flag to true using StateChange builder
-        let location = await engine.gameState.locations["testLocation"]!
+        let location = try await engine.location("testLocation")
         if let change = await engine.setAttribute("isLit", on: location, to: true) {
             try await engine.apply(change)
         }
@@ -336,7 +336,7 @@ struct DynamicPropertyTests {
         )
 
         // Change description using StateChange builder
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setDescription(on: item, to: "New dynamic description") {
             try await engine.apply(change)
         }
@@ -365,7 +365,7 @@ struct DynamicPropertyTests {
         )
 
         // Change description using StateChange builder
-        let location = await engine.gameState.locations["testLocation"]!
+        let location = try await engine.location("testLocation")
         if let change = await engine.setDescription(on: location, to: "New dynamic description") {
             try await engine.apply(change)
         }
@@ -402,7 +402,7 @@ struct DynamicPropertyTests {
         )
 
         // Set integer attribute using StateChange builder
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("strength"), on: item, to: 42) {
             try await engine.apply(change)
         }
@@ -411,7 +411,7 @@ struct DynamicPropertyTests {
         #expect(itemAfterInt?.attributes["strength"] == StateValue.int(42))
 
         // Set string attribute
-        let updatedItem = await engine.gameState.items["testItem"]!
+        let updatedItem = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("color"), on: updatedItem, to: "blue") {
             try await engine.apply(change)
         }
@@ -439,7 +439,7 @@ struct DynamicPropertyTests {
         )
 
         // Set integer attribute using StateChange builder
-        let location = await engine.gameState.locations["testLocation"]!
+        let location = try await engine.location("testLocation")
         if let change = await engine.setAttribute(.init("temperature"), on: location, to: 72) {
             try await engine.apply(change)
         }
@@ -448,7 +448,7 @@ struct DynamicPropertyTests {
         #expect(locationAfterInt?.attributes["temperature"] == StateValue.int(72))
 
         // Set string attribute
-        let updatedLocation = await engine.gameState.locations["testLocation"]!
+        let updatedLocation = try await engine.location("testLocation")
         if let change = await engine.setAttribute(.init("atmosphere"), on: updatedLocation, to: "spooky") {
             try await engine.apply(change)
         }
@@ -504,31 +504,31 @@ struct DynamicPropertyTests {
         )
 
         // Set up troll with weapon and fighting using StateChange builders
-        let trollItem = await engine.gameState.items["troll"]!
+        let trollItem = try await engine.item("troll")
         if let change = await engine.setAttribute("hasWeapon", on: trollItem, to: true) {
             try await engine.apply(change)
         }
         
-        let trollWithWeapon = await engine.gameState.items["troll"]!
+        let trollWithWeapon = try await engine.item("troll")
         if let change = await engine.setAttribute("fighting", on: trollWithWeapon, to: true) {
             try await engine.apply(change)
         }
 
         // Should fail to stop fighting while troll has weapon and is conscious
         await #expect(throws: ActionResponse.self) {
-            let currentTroll = await engine.gameState.items["troll"]!
+            let currentTroll = try await engine.item("troll")
             if let change = await engine.setAttribute("fighting", on: currentTroll, to: false) {
                 try await engine.apply(change)
             }
         }
 
         // Make troll unconscious, then should be able to stop fighting
-        let consciousTroll = await engine.gameState.items["troll"]!
+        let consciousTroll = try await engine.item("troll")
         if let change = await engine.setAttribute("unconscious", on: consciousTroll, to: true) {
             try await engine.apply(change)
         }
         
-        let unconsciousTroll = await engine.gameState.items["troll"]!
+        let unconsciousTroll = try await engine.item("troll")
         if let change = await engine.setAttribute("fighting", on: unconsciousTroll, to: false) {
             try await engine.apply(change)
         }
@@ -582,7 +582,7 @@ struct DynamicPropertyTests {
 
         // Should throw specific error for wrong type
         await #expect(throws: ActionResponse.self) {
-            let item = await engine.gameState.items["testItem"]!
+            let item = try await engine.item("testItem")
             if let change = await engine.setAttribute(.init("restrictedProp"), on: item, to: .int(42)) {
                 try await engine.apply(change)
             }
@@ -590,14 +590,14 @@ struct DynamicPropertyTests {
 
         // Should throw specific error for forbidden value
         await #expect(throws: ActionResponse.self) {
-            let item = await engine.gameState.items["testItem"]!
+            let item = try await engine.item("testItem")
             if let change = await engine.setAttribute(.init("restrictedProp"), on: item, to: .string("forbidden")) {
                 try await engine.apply(change)
             }
         }
 
         // Should succeed for valid value
-        let item = await engine.gameState.items["testItem"]!
+        let item = try await engine.item("testItem")
         if let change = await engine.setAttribute(.init("restrictedProp"), on: item, to: .string("allowed")) {
             try await engine.apply(change)
         }

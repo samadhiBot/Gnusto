@@ -96,7 +96,6 @@ public actor GameEngine: Sendable {
     ///
     /// - Parameters:
     ///   - blueprint: The `GameBlueprint` containing all game definitions, custom handlers, and hooks.
-    ///   - player: The initial `Player` state.
     ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated from items.
     ///   - pronouns: Optional. Initial pronoun references.
     ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
@@ -106,7 +105,8 @@ public actor GameEngine: Sendable {
     ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     public init(
         blueprint: GameBlueprint,
-        player: Player,
+//        gameState: GameState,
+//        player: Player,
         vocabulary: Vocabulary? = nil,
         pronouns: [String: Set<EntityReference>] = [:],
         activeFuses: [FuseID: Int] = [:],
@@ -119,7 +119,7 @@ public actor GameEngine: Sendable {
         self.gameState = GameState(
             locations: blueprint.locations,
             items: blueprint.items,
-            player: player,
+            player: blueprint.player,
             vocabulary: vocabulary,
             pronouns: pronouns,
             activeFuses: activeFuses,

@@ -16,7 +16,6 @@ import GnustoEngine
 /// - ⏳ **Act II**: Time-based events and custom behaviors (planned)
 /// - ⏳ **Act III**: Complex systems integration (planned)
 struct FrobozzMagicDemoKit: GameBlueprint {
-
     // MARK: - Game Metadata
 
     var constants: GameConstants {
@@ -55,6 +54,8 @@ struct FrobozzMagicDemoKit: GameBlueprint {
             maximumScore: 100
         )
     }
+
+    let player = Player(in: .yourCottage)
 }
 
 // MARK: - Supporting Types

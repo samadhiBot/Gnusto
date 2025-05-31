@@ -7,6 +7,7 @@ struct MinimalGame: GameBlueprint {
         release: "0.0.1",
         maximumScore: 10
     )
+    var player: Player
     var state: GameState
     var customActionHandlers: [VerbID: ActionHandler]
     var itemEventHandlers: [ItemID: ItemEventHandler]
@@ -25,6 +26,7 @@ struct MinimalGame: GameBlueprint {
         timeRegistry: TimeRegistry = TimeRegistry(),
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
+        self.player = player
         self.customActionHandlers = customActionHandlers
         self.timeRegistry = timeRegistry
         self.dynamicAttributeRegistry = dynamicAttributeRegistry

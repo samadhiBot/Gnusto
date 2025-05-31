@@ -399,6 +399,12 @@ struct GameEngineTests {
         // Check status line was updated for each turn (initial + 2 turns)
         let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 3) // Initial state + 2 turns
+
+        guard statuses.count == 3 else {
+            Issue.record("Missing status lines")
+            return
+        }
+
         #expect(statuses[0].turns == 0)
         #expect(statuses[1].turns == 1)
         #expect(statuses[2].turns == 2)
