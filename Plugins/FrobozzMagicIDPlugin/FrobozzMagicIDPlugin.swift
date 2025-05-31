@@ -1,17 +1,31 @@
 import Foundation
 import PackagePlugin
 
-/// A build tool plugin that automatically generates LocationID and ItemID constant extensions
-/// by scanning Swift source files for usage patterns.
+/// A comprehensive build tool plugin that automatically discovers and generates game setup
+/// boilerplate by scanning Swift source files for Gnusto Engine patterns.
 ///
-/// This plugin discovers:
-/// - `Location(id: .someID, ...)` patterns
-/// - `Item(id: .someID, ...)` patterns  
-/// - `LocationID("rawValue")` patterns
-/// - `ItemID("rawValue")` patterns
+/// This plugin discovers and generates:
+/// 
+/// **ID Constants:**
+/// - `Location(id: .someID, ...)` → `LocationID.someID`
+/// - `Item(id: .someID, ...)` → `ItemID.someID`
+/// - `GlobalID("key")` or global state patterns → `GlobalID.key`
+/// - `FuseDefinition(id: .someID, ...)` → `FuseID.someID`
+/// - `DaemonDefinition(id: .someID, ...)` → `DaemonID.someID`
+/// - Custom `VerbID("verb")` patterns → `VerbID.verb`
 ///
-/// And generates corresponding static constants in extensions, eliminating the need
-/// for manual ID constant maintenance.
+/// **Event Handler Discovery:**
+/// - `let itemNameHandler = ItemEventHandler { ... }`
+/// - `let locationNameHandler = LocationEventHandler { ... }`
+///
+/// **Game Setup Templates:**
+/// - GlobalState initialization reminders
+/// - TimeRegistry setup with discovered fuses/daemons
+/// - Custom action handler registration examples
+/// - AreaBlueprint usage recommendations
+///
+/// The plugin eliminates manual ID constant maintenance and provides helpful
+/// setup templates, making game development faster and less error-prone.
 @main
 struct FrobozzMagicIDPlugin: BuildToolPlugin {
     func createBuildCommands(
@@ -47,14 +61,14 @@ struct FrobozzMagicIDPlugin: BuildToolPlugin {
         ]
         arguments += swiftFiles.map { $0.url.absoluteString }
 
-        print("🔧 FrobozzMagicIDPlugin (SPM): Configuring ID generation for target '\(target.name)'")
+        print("🔧 FrobozzMagicIDPlugin (SPM): Configuring comprehensive game setup generation for target '\(target.name)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
 
         return [
             .buildCommand(
-                displayName: "Generate ID Constants for \(target.name)",
+                displayName: "Generate Game Setup Code for \(target.name)",
                 executable: tool.url,
                 arguments: arguments,
                 inputFiles: swiftFiles.map(\.url),
@@ -75,7 +89,7 @@ extension FrobozzMagicIDPlugin: XcodeBuildToolPlugin {
         target: XcodeTarget
     ) throws -> [Command] {
         
-        print("🔧 FrobozzMagicIDPlugin (Xcode): Starting plugin for target '\(target.displayName)'")
+        print("🔧 FrobozzMagicIDPlugin (Xcode): Starting comprehensive game setup analysis for target '\(target.displayName)'")
         
         // Get all Swift source files in the target
         let swiftFiles = target.inputFiles.filter {
@@ -108,7 +122,7 @@ extension FrobozzMagicIDPlugin: XcodeBuildToolPlugin {
         ]
         arguments += swiftFiles.map { $0.url.absoluteString }
 
-        print("🔧 FrobozzMagicIDPlugin (Xcode): Configuring ID generation for target '\(target.displayName)'")
+        print("🔧 FrobozzMagicIDPlugin (Xcode): Configuring comprehensive game setup generation for target '\(target.displayName)'")
         print("📁 Will scan \(swiftFiles.count) Swift files")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
@@ -116,7 +130,7 @@ extension FrobozzMagicIDPlugin: XcodeBuildToolPlugin {
 
         return [
             .buildCommand(
-                displayName: "Generate ID Constants for \(target.displayName)",
+                displayName: "Generate Game Setup Code for \(target.displayName)",
                 executable: tool.url,
                 arguments: arguments,
                 inputFiles: swiftFiles.map(\.url),
