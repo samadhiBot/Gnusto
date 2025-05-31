@@ -110,51 +110,51 @@ public struct GameState: Codable, Equatable, Sendable {
     ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated.
     ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
     ///   - activeDaemons: Optional. A variadic list of initially active `DaemonID`s.
-    public init(
-        areas: AreaBlueprint.Type...,
-        player: Player,
-        vocabulary: Vocabulary? = nil,
-        activeFuses: [FuseID: Int] = [:],
-        activeDaemons: [DaemonID] = [],
-        globalState: [GlobalID: StateValue] = [:]
-    ) {
-        var allItems: [Item] = []
-        var allLocations: [Location] = []
-        var knownItems = Set<ItemID>()
-        var knownLocations = Set<LocationID>()
-
-        for areaType in areas {
-            for item in areaType.items {
-                assert(!knownItems.contains(item.id), """
-                    Duplicate ItemID '\(item.id)' found across multiple AreaBlueprint \
-                    types (detected in \(areaType)).
-                    """)
-                knownItems.insert(item.id)
-                allItems.append(item)
-            }
-
-            for location in areaType.locations {
-                assert(!knownLocations.contains(location.id), """
-                    Duplicate LocationID '\(location.id)' found across multiple AreaBlueprint \
-                    types (detected in \(areaType)).
-                    """)
-                knownLocations.insert(location.id)
-                allLocations.append(location)
-            }
-        }
-
-        self.init(
-            locations: allLocations,
-            items: allItems,
-            player: player,
-            vocabulary: vocabulary,
-            pronouns: [:],
-            activeFuses: activeFuses,
-            activeDaemons: Set(activeDaemons),
-            globalState: globalState,
-            changeHistory: []
-        )
-    }
+//    public init(
+//        areas: AreaBlueprint.Type...,
+//        player: Player,
+//        vocabulary: Vocabulary? = nil,
+//        activeFuses: [FuseID: Int] = [:],
+//        activeDaemons: [DaemonID] = [],
+//        globalState: [GlobalID: StateValue] = [:]
+//    ) {
+//        var allItems: [Item] = []
+//        var allLocations: [Location] = []
+//        var knownItems = Set<ItemID>()
+//        var knownLocations = Set<LocationID>()
+//
+//        for areaType in areas {
+//            for item in areaType.items {
+//                assert(!knownItems.contains(item.id), """
+//                    Duplicate ItemID '\(item.id)' found across multiple AreaBlueprint \
+//                    types (detected in \(areaType)).
+//                    """)
+//                knownItems.insert(item.id)
+//                allItems.append(item)
+//            }
+//
+//            for location in areaType.locations {
+//                assert(!knownLocations.contains(location.id), """
+//                    Duplicate LocationID '\(location.id)' found across multiple AreaBlueprint \
+//                    types (detected in \(areaType)).
+//                    """)
+//                knownLocations.insert(location.id)
+//                allLocations.append(location)
+//            }
+//        }
+//
+//        self.init(
+//            locations: allLocations,
+//            items: allItems,
+//            player: player,
+//            vocabulary: vocabulary,
+//            pronouns: [:],
+//            activeFuses: activeFuses,
+//            activeDaemons: Set(activeDaemons),
+//            globalState: globalState,
+//            changeHistory: []
+//        )
+//    }
 
     /// A computed property that returns an immutable snapshot (a copy) of the current `GameState`.
     ///
