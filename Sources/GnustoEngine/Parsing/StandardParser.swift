@@ -339,13 +339,35 @@ public struct StandardParser: Parser {
         // Simple whitespace and punctuation separation, converts to lowercase.
         // ZIL tokenization was more complex (e.g., dictionary separators).
 
-        // Filter out non-alphanumeric characters (except spaces used for separation)
-        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces)
+        // Allow alphanumeric characters, spaces, and commas (for conjunctions)
+        let allowedChars = CharacterSet.alphanumerics.union(.whitespaces).union(CharacterSet(charactersIn: ","))
         let sanitizedInput = String(input.unicodeScalars.filter { allowedChars.contains($0) })
 
-        return sanitizedInput.lowercased()
-             .components(separatedBy: .whitespacesAndNewlines)
-             .filter { !$0.isEmpty }
+        // Split by whitespace and also treat commas as separate tokens
+        var tokens: [String] = []
+        let words = sanitizedInput.lowercased()
+            .components(separatedBy: .whitespacesAndNewlines)
+            .filter { !$0.isEmpty }
+        
+        for word in words {
+            if word.contains(",") {
+                // Split words containing commas
+                let parts = word.components(separatedBy: ",")
+                for (index, part) in parts.enumerated() {
+                    if !part.isEmpty {
+                        tokens.append(part)
+                    }
+                    // Add comma as separate token (except after the last part)
+                    if index < parts.count - 1 {
+                        tokens.append(",")
+                    }
+                }
+            } else {
+                tokens.append(word)
+            }
+        }
+        
+        return tokens
     }
 
     /// Filters out noise words from a token list.
@@ -468,69 +490,192 @@ public struct StandardParser: Parser {
             return .failure(.badGrammar("Unexpected words found after command: '\(Array(tokens[tokenCursor...]).joined(separator: " "))'"))
         }
 
-        let (doNounExtracted, doModsExtracted) = extractNounAndMods(from: directObjectPhraseTokens, vocabulary: vocabulary)
-        let (ioNounExtracted, ioModsExtracted) = extractNounAndMods(from: indirectObjectPhraseTokens, vocabulary: vocabulary)
+        // Parse multiple noun phrases connected by conjunctions
+        let directObjectPhrases = parseConjunctedNounPhrases(from: directObjectPhraseTokens, vocabulary: vocabulary)
+        let indirectObjectPhrases = parseConjunctedNounPhrases(from: indirectObjectPhraseTokens, vocabulary: vocabulary)
 
-        let nounToResolveDO = doNounExtracted ?? directObjectPhraseTokens.last
-        let modsToUseDO = (doNounExtracted != nil) ? doModsExtracted : Array(directObjectPhraseTokens.dropLast())
-
-        let nounToResolveIO = ioNounExtracted ?? indirectObjectPhraseTokens.last
-        let modsToUseIO = (ioNounExtracted != nil) ? ioModsExtracted : Array(indirectObjectPhraseTokens.dropLast())
-
-        let resolvedDirectObjectResult: Result<EntityReference?, ParseError>
+        // Handle direct object resolution (including ALL and conjunctions)
+        var resolvedDirectObjects: [EntityReference] = []
+        var isAllCommandDO = false
+        var isMultipleObjectsDO = false
+        
         if rule.pattern.contains(.directObject) {
-             if let actualNoun = nounToResolveDO {
-                 resolvedDirectObjectResult = resolveObject(
-                     noun: actualNoun,
-                     verb: verb,
-                     modifiers: modsToUseDO,
-                     in: gameState,
-                     using: vocabulary,
-                     requiredConditions: rule.directObjectConditions
-                 )
-             } else {
-                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
-             }
-        } else {
-             resolvedDirectObjectResult = .success(nil)
+            if directObjectPhrases.isEmpty {
+                return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
+            }
+            
+            // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
+            if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
+                isMultipleObjectsDO = true
+            } else if directObjectPhrases.count > 1 {
+                return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple objects."))
+            }
+            
+            // Process each noun phrase
+            for (noun, modifiers) in directObjectPhrases {
+                let lowercasedNoun = noun.lowercased()
+                
+                // Check if this is an ALL command and the rule allows multiple objects
+                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                   rule.directObjectConditions.contains(.allowsMultiple) {
+                    isAllCommandDO = true
+                    let allObjectsResult = resolveAllObjects(
+                        verb: verb,
+                        modifiers: modifiers,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.directObjectConditions
+                    )
+                    switch allObjectsResult {
+                    case .success(let objects):
+                        resolvedDirectObjects.append(contentsOf: objects)
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                } else {
+                    // Regular single object resolution
+                    let singleObjectResult = resolveObject(
+                        noun: noun,
+                        verb: verb,
+                        modifiers: modifiers,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.directObjectConditions
+                    )
+                    switch singleObjectResult {
+                    case .success(let objectRef):
+                        if let ref = objectRef {
+                            resolvedDirectObjects.append(ref)
+                        }
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                }
+            }
         }
 
-        let resolvedIndirectObjectResult: Result<EntityReference?, ParseError>
+        // Handle indirect object resolution (including ALL and conjunctions)
+        var resolvedIndirectObjects: [EntityReference] = []
+        var isAllCommandIO = false
+        var isMultipleObjectsIO = false
+        
         if rule.pattern.contains(.indirectObject) {
-            if let actualNoun = nounToResolveIO {
-                resolvedIndirectObjectResult = resolveObject(
-                    noun: actualNoun,
-                    verb: verb,
-                    modifiers: modsToUseIO,
-                    in: gameState,
-                    using: vocabulary,
-                    requiredConditions: rule.indirectObjectConditions
-                )
-            } else {
+            if indirectObjectPhrases.isEmpty {
                 return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
             }
-        } else {
-            resolvedIndirectObjectResult = .success(nil)
+            
+            // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
+            if indirectObjectPhrases.count > 1 && rule.indirectObjectConditions.contains(.allowsMultiple) {
+                isMultipleObjectsIO = true
+            } else if indirectObjectPhrases.count > 1 {
+                return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple indirect objects."))
+            }
+            
+            // Process each noun phrase
+            for (noun, modifiers) in indirectObjectPhrases {
+                let lowercasedNoun = noun.lowercased()
+                
+                // Check if this is an ALL command and the rule allows multiple objects
+                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                   rule.indirectObjectConditions.contains(.allowsMultiple) {
+                    isAllCommandIO = true
+                    let allObjectsResult = resolveAllObjects(
+                        verb: verb,
+                        modifiers: modifiers,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.indirectObjectConditions
+                    )
+                    switch allObjectsResult {
+                    case .success(let objects):
+                        resolvedIndirectObjects.append(contentsOf: objects)
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                } else {
+                    // Regular single object resolution
+                    let singleObjectResult = resolveObject(
+                        noun: noun,
+                        verb: verb,
+                        modifiers: modifiers,
+                        in: gameState,
+                        using: vocabulary,
+                        requiredConditions: rule.indirectObjectConditions
+                    )
+                    switch singleObjectResult {
+                    case .success(let objectRef):
+                        if let ref = objectRef {
+                            resolvedIndirectObjects.append(ref)
+                        }
+                    case .failure(let error):
+                        return .failure(error)
+                    }
+                }
+            }
         }
 
-        switch (resolvedDirectObjectResult, resolvedIndirectObjectResult) {
-        case (.success(let doRef), .success(let ioRef)):
-            let command = Command(
-                verb: verb,
-                directObject: doRef,
-                directObjectModifiers: modsToUseDO,
-                indirectObject: ioRef,
-                indirectObjectModifiers: modsToUseIO,
-                preposition: matchedPreposition,
-                direction: matchedDirection,
-                rawInput: originalInput
-            )
-            return .success(command)
-        case (.failure(let error), _):
-            return .failure(error)
-        case (_, .failure(let error)):
-            return .failure(error)
+        // Create command with multiple object support
+        let command = Command(
+            verb: verb,
+            directObjects: resolvedDirectObjects,
+            directObjectModifiers: directObjectPhrases.first?.1 ?? [], // Use modifiers from first phrase
+            indirectObjects: resolvedIndirectObjects,
+            indirectObjectModifiers: indirectObjectPhrases.first?.1 ?? [], // Use modifiers from first phrase
+            isAllCommand: isAllCommandDO || isAllCommandIO || isMultipleObjectsDO || isMultipleObjectsIO,
+            preposition: matchedPreposition,
+            direction: matchedDirection,
+            rawInput: originalInput
+        )
+        return .success(command)
+    }
+
+    /// Parses a token sequence that may contain multiple noun phrases connected by conjunctions.
+    /// Returns an array of (noun, modifiers) tuples, one for each noun phrase.
+    /// For example, "sword and lantern" becomes [("sword", []), ("lantern", [])]
+    /// and "red book, blue pen and green pencil" becomes [("book", ["red"]), ("pen", ["blue"]), ("pencil", ["green"])]
+    private func parseConjunctedNounPhrases(
+        from tokens: [String],
+        vocabulary: Vocabulary
+    ) -> [(noun: String, modifiers: [String])] {
+        guard !tokens.isEmpty else { return [] }
+        
+        // Split the tokens by conjunctions
+        var phrases: [[String]] = []
+        var currentPhrase: [String] = []
+        
+        for token in tokens {
+            if vocabulary.conjunctions.contains(token) {
+                // Found a conjunction, save current phrase and start a new one
+                if !currentPhrase.isEmpty {
+                    phrases.append(currentPhrase)
+                    currentPhrase = []
+                }
+            } else {
+                currentPhrase.append(token)
+            }
         }
+        
+        // Add the last phrase
+        if !currentPhrase.isEmpty {
+            phrases.append(currentPhrase)
+        }
+        
+        // If no conjunctions were found, we have a single phrase
+        if phrases.isEmpty && !tokens.isEmpty {
+            phrases = [tokens]
+        }
+        
+        // Extract noun and modifiers from each phrase
+        let result: [(noun: String, modifiers: [String])] = phrases.compactMap { phrase in
+            let (noun, mods) = extractNounAndMods(from: phrase, vocabulary: vocabulary)
+            // If we can't extract a noun, use the last word in the phrase as the noun
+            // This allows unknown nouns to be handled by the resolution phase
+            let finalNoun = noun ?? phrase.last
+            guard let finalNoun = finalNoun else { return nil }
+            return (noun: finalNoun, modifiers: mods)
+        }
+        
+        return result
     }
 
     /// Extracts the likely noun and preceding modifiers from a phrase.
@@ -549,7 +694,8 @@ public struct StandardParser: Parser {
             let isLocationNoun = vocabulary.locationNames.keys.contains(word)
             let isPlayerAlias = playerAliases.contains(word)
             let isPronoun = vocabulary.pronouns.contains(word)
-            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun {
+            let isSpecialKeyword = vocabulary.specialKeywords.contains(word)
+            if isItemNoun || isLocationNoun || isPlayerAlias || isPronoun || isSpecialKeyword {
                 knownNounIndices.append(index)
             }
         }
@@ -561,7 +707,8 @@ public struct StandardParser: Parser {
                 !playerAliases.contains(word) &&
                 !vocabulary.verbSynonyms.keys.contains(word) &&
                 !vocabulary.prepositions.contains(word) &&
-                !vocabulary.directions.keys.contains(word)
+                !vocabulary.directions.keys.contains(word) &&
+                !vocabulary.specialKeywords.contains(word)
             }
             return (nil, potentialMods)
         }
@@ -770,7 +917,7 @@ public struct StandardParser: Parser {
                     if allSameAdjectives {
                         // All truly identical
                         logger.error("""
-                            💥 StandardParser cannot distinguish between \
+                            StandardParser cannot distinguish between \
                             \(itemEntities.count) identical items
                             """)
                         return .failure(.ambiguity("Which \(baseName) do you mean?"))
@@ -799,6 +946,79 @@ public struct StandardParser: Parser {
         }
 
         return .success(resolvedAndScopedEntities.first!)
+    }
+
+    /// Resolves ALL keywords to multiple objects based on verb and conditions.
+    func resolveAllObjects(
+        verb: VerbID,
+        modifiers: [String],
+        in gameState: GameState,
+        using vocabulary: Vocabulary,
+        requiredConditions: ObjectCondition
+    ) -> Result<[EntityReference], ParseError> {
+        // Get all candidates that match the required conditions
+        let itemCandidates = gatherCandidates(
+            in: gameState,
+            requiredConditions: requiredConditions
+        )
+        
+        // Filter candidates based on verb-specific criteria
+        var validItems: [Item] = []
+        
+        for item in itemCandidates.values {
+            // Apply verb-specific filtering (similar to Zork's TAKEBIT, etc.)
+            var isValidForVerb = false
+            
+            switch verb {
+            case .take:
+                // For TAKE ALL, only include takable items not already held
+                isValidForVerb = item.hasFlag(.isTakable) && item.parent != .player
+            case .drop:
+                // For DROP ALL, only include items currently held by player
+                isValidForVerb = item.parent == .player
+            case .examine:
+                // For EXAMINE ALL, include all visible items
+                isValidForVerb = true
+            default:
+                // For other verbs, include all items (let action handler decide)
+                isValidForVerb = true
+            }
+            
+            if isValidForVerb {
+                // Apply modifier filtering if any modifiers are specified
+                if filterCandidates(item: item, modifiers: modifiers) {
+                    validItems.append(item)
+                }
+            }
+        }
+        
+        // Sort items for consistent ordering (by name, then by ID)
+        validItems.sort { lhs, rhs in
+            if lhs.name != rhs.name {
+                return lhs.name < rhs.name
+            }
+            return lhs.id.rawValue < rhs.id.rawValue
+        }
+        
+        guard !validItems.isEmpty else {
+            // Return appropriate error based on context
+            if modifiers.isEmpty {
+                            switch verb {
+            case .take:
+                return .failure(.itemNotInScope(noun: "There is nothing here to take."))
+            case .drop:
+                return .failure(.itemNotInScope(noun: "You aren't carrying anything."))
+            default:
+                return .failure(.itemNotInScope(noun: "There is nothing here."))
+            }
+            } else {
+                return .failure(.modifierMismatch(noun: "all", modifiers: modifiers))
+            }
+        }
+        
+        // Convert to EntityReferences
+        let entityRefs = validItems.map { EntityReference.item($0.id) }
+        return .success(entityRefs)
     }
 
     /// Gathers all potential candidate ItemIDs currently in scope and matching required conditions.

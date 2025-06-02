@@ -50,13 +50,13 @@ struct GameStateTests {
                 id: Self.locWOH,
                 .name("West of House"),
                 .description("You are standing west of a white house."),
-                .exits([.north: Exit(destination: Self.locNorth)])
+                .exits([.north: .to(Self.locNorth)])
             ),
             Location(
                 id: Self.locNorth,
                 .name("North of House"),
                 .description("You are north of the house."),
-                .exits([.south: Exit(destination: Self.locWOH)])
+                .exits([.south: .to(Self.locWOH)])
             )
         ]
     }
@@ -132,67 +132,13 @@ struct GameStateTests {
         #expect(!state.vocabulary.verbDefinitions.isEmpty || !state.vocabulary.items.isEmpty)
     }
 
-    @Test("Initialization with Multiple Areas")
-    func testInitWithAreas() {
-        // Define mock AreaBlueprint with *instance* properties
-        struct Area1: AreaBlueprint {
-            let loc1 = Location(
-                id: "loc1",
-                .name("Area 1 Room"),
-                .description("A dark, dark room.")
-            )
-            let item1 = Item(
-                id: "item1",
-                .name("Area 1 Item"),
-                .in(.location("loc1"))
-            )
-        }
-        struct Area2: AreaBlueprint {
-            let loc2 = Location(
-                id: "loc2",
-                .name("Area 2 Room"),
-                .description("A dark, dark room.")
-            )
-            let loc3 = Location(
-                id: "loc3",
-                .name("Area 3 Room"),
-                .description("A dark, dark room.")
-            )
-            let item2 = Item(
-                id: "item2",
-                .name("Area 2 Item"),
-                .in(.location("loc2"))
-            )
-            let item3 = Item(
-                id: "item3",
-                .name("Area 3 Item"),
-                .in(.location("loc2"))
-            )
-        }
-
-        let player = Player(in: "loc1")
-        let state = GameState(
-            areas: Area1.self, Area2.self,
-            player: player
-        )
-
-        #expect(state.locations.count == 3)
-        #expect(state.locations.keys.map(\.rawValue).sorted() == ["loc1", "loc2", "loc3"])
-
-        #expect(state.items.count == 3)
-        #expect(state.items.keys.map(\.rawValue).sorted() == ["item1", "item2", "item3"])
-
-        #expect(state.items["item1"]?.parent == .location("loc1"))
-        #expect(!state.vocabulary.items.isEmpty)
-    }
-
     // MARK: - Codable Tests
 
     @Test("GameState Basic Codable Conformance")
     func testGameStateBasicCodable() throws {
         var originalState = createInitialState() // Make mutable for change history
         // Add some history for encoding
-        let change1 = StateChange(entityID: .player, attributeKey: .playerScore, newValue: .int(10))
+        let change1 = StateChange(entityID: .player, attribute: .playerScore, newValue: .int(10))
         try originalState.apply(change1)
 
         let encoder = JSONEncoder()
@@ -215,7 +161,7 @@ struct GameStateTests {
         #expect(state1 == state2)
 
         // Modify state3 slightly
-        let change = StateChange(entityID: .player, attributeKey: .playerScore, newValue: .int(5))
+        let change = StateChange(entityID: .player, attribute: .playerScore, newValue: .int(5))
         try state3.apply(change)
 
         #expect(state1 != state3)
@@ -231,7 +177,7 @@ struct GameStateTests {
         // Modify state1
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attribute: .playerScore,
             newValue: .int(10)
         )
         try state1.apply(change)
@@ -294,17 +240,17 @@ struct GameStateTests {
         try state.apply(
             StateChange(
                 entityID: .location(Self.locWOH),
-                attributeKey: .locationAttribute(.description),
+                attribute: .locationAttribute(.description),
                 newValue: "A new description."
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemName,
+                attribute: .itemName,
                 newValue: "Magic Lantern"
             ),
             StateChange(
                 entityID: .item(Self.itemSword),
-                attributeKey: .itemParent,
+                attribute: .itemParent,
                 newValue: .parentEntity(.location(Self.locWOH))
             )
         )
@@ -330,12 +276,12 @@ struct GameStateTests {
         try originalState.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemParent,
+                attribute: .itemParent,
                 newValue: .parentEntity(.player)
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemAttribute(.isOn),
+                attribute: .itemAttribute(.isOn),
                 newValue: true
             )
         )
@@ -388,7 +334,7 @@ struct GameStateTests {
         try state2.apply(
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attribute: .playerMoves,
                 newValue: 5
             )
         )
@@ -404,12 +350,12 @@ struct GameStateTests {
         try state2.apply(
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemName,
+                attribute: .itemName,
                 newValue: "Shiny Lantern"
             ),
             StateChange(
                 entityID: .item(Self.itemLantern),
-                attributeKey: .itemParent,
+                attribute: .itemParent,
                 newValue: .parentEntity(.player)
             ),
         )
@@ -458,7 +404,7 @@ struct GameStateTests {
         // When: Applying a change to remove the non-existent fuse with oldValue: nil
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: fuseID),
+            attribute: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Explicitly stating we expect it to be nil (non-existent)
             newValue: .int(0) // newValue is often ignored for removals
         )
@@ -482,7 +428,7 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: "existingFuse"),
+            attribute: .removeActiveFuse(fuseID: "existingFuse"),
             oldValue: .int(1), // Providing the wrong oldValue
             newValue: .int(0) // newValue is ignored for remove
         )
@@ -503,7 +449,7 @@ struct GameStateTests {
             Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
-        // Verify state hasn’t changed unexpectedly
+        // Verify state hasn't changed unexpectedly
         #expect(gameState.activeFuses == ["existingFuse": 5]) // Fuse should still be present
         #expect(gameState.changeHistory.isEmpty) // Apply should fail before adding to history
     }
@@ -522,14 +468,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.isLit),
+            attribute: .locationAttribute(.isLit),
             oldValue: state.locations["testLoc"]?.attributes[.isLit],
             newValue: true
         )
         try? state.apply(change)
 
         #expect(change.entityID == EntityID.location("testLoc"))
-        #expect(change.attributeKey == AttributeKey.locationAttribute(AttributeID.isLit))
+        #expect(change.attribute == .locationAttribute(AttributeID.isLit))
         #expect(change.oldValue == nil || change.oldValue == false)
         #expect(change.newValue == true)
         // Verify description remains untouched initially
@@ -552,7 +498,7 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.inherentlyLit),
+            attribute: .locationAttribute(.inherentlyLit),
             oldValue: true,
             newValue: false
         )
@@ -577,14 +523,14 @@ struct GameStateTests {
 
         let change = StateChange(
             entityID: .location("testLoc"),
-            attributeKey: .locationAttribute(.description),
+            attribute: .locationAttribute(.description),
             oldValue: .string("Original Desc"),
             newValue: .string("Updated Desc")
         )
         try? state.apply(change)
 
         #expect(change.entityID == .location("testLoc"))
-        #expect(change.attributeKey == .locationAttribute(.description))
+        #expect(change.attribute == .locationAttribute(.description))
         #expect(change.oldValue == .string("Original Desc"))
         #expect(change.newValue == .string("Updated Desc"))
         // Ensure properties are untouched
@@ -607,13 +553,13 @@ struct GameStateTests {
         // Try to change a property, but provide the wrong oldValue
         let incorrectChange = StateChange(
             entityID: .location(.startRoom),
-            attributeKey: .locationAttribute(.description),
+            attribute: .locationAttribute(.description),
             oldValue: .string("Wrong Old Description"), // Incorrect old value
             newValue: .string("New Description")
         )
         let correctChange = StateChange(
             entityID: .location(.startRoom),
-            attributeKey: .locationAttribute(.description),
+            attribute: .locationAttribute(.description),
             oldValue: state.locations[.startRoom]?.attributes[.description],
             newValue: .string("New Description")
         )
@@ -631,12 +577,12 @@ struct GameStateTests {
             Issue.record("Expected ActionResponse, but got unexpected error type: \(error)")
         }
 
-        // Verify the state hasn’t changed
+        // Verify the state hasn't changed
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.oldValue)
         #expect(state.changeHistory.isEmpty) // No change should be recorded
 
         // Now apply the correct change
-        try? state.apply(correctChange) // Use try? as we don’t care about the error here
+        try? state.apply(correctChange) // Use try? as we don't care about the error here
         #expect(state.locations[.startRoom]?.attributes[.description] == correctChange.newValue)
         #expect(state.changeHistory.count == 1)
     }

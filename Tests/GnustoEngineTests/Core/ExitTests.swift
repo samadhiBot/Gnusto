@@ -7,7 +7,7 @@ struct ExitTests {
     @Test("Exit Initialization - Destination Only")
     func testExitInitializationDestination() throws {
         let destination: LocationID = "clearing"
-        let exit = Exit(destination: destination)
+        let exit = Exit.to(destination)
 
         #expect(exit.destinationID == destination)
         #expect(exit.blockedMessage == nil)

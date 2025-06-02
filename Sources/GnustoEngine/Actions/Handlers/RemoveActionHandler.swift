@@ -7,21 +7,23 @@ public struct RemoveActionHandler: ActionHandler {
     ///
     /// This method ensures that:
     /// 1. A direct object is specified (the player must indicate *what* to remove).
-    /// 2. The direct object refers to an existing item.
-    /// 3. The item currently has the `.isWorn` flag set (it is being worn by the player).
-    /// 4. The item does not have the `.isScenery` flag set (it's not an immovable part of the
-    ///    environment that happens to be marked as worn, which would be unusual but is checked).
-    ///
-    /// Note: It implicitly assumes the item is "held" by virtue of being worn.
+    /// 2. For single object commands, validates the specific item.
+    /// 3. For ALL commands, allows empty directObjects (handled in process method).
     ///
     /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet` (for missing object or wrong item type),
-    ///           `itemIsNotWorn` (if the item isn't currently worn),
-    ///           `itemNotRemovable` (if the item is scenery).
-    ///           Can also throw errors from `context.engine.item()`.
+    /// - Throws: Various `ActionResponse` errors if validation fails.
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object and it's an item
+        // For ALL commands, allow empty directObjects (handled in process method)
+        if context.command.isAllCommand {
+            return
+        }
+        
+        // 1. Ensure we have at least one direct object for non-ALL commands
+        guard !context.command.directObjects.isEmpty else {
+            throw ActionResponse.prerequisiteNotMet("Remove what?")
+        }
+        
+        // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Remove what?")
         }
@@ -29,15 +31,15 @@ public struct RemoveActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet("You can only remove items.")
         }
 
-        // 2. Check if the item exists and is held by the player
+        // 2. Check if the item exists and is worn by the player
         let targetItem = try await context.engine.item(targetItemID)
 
-        // 3. Check if the (held) item is currently worn
+        // 3. Check if the item is currently worn
         guard targetItem.hasFlag(.isWorn) else {
             throw ActionResponse.itemIsNotWorn(targetItemID)
         }
 
-        // 4. Check if the item is fixed scenery (e.g., the ground)
+        // 4. Check if the item is fixed scenery
         guard !targetItem.hasFlag(.isScenery) else {
             throw ActionResponse.itemNotRemovable(targetItemID)
         }
@@ -45,49 +47,107 @@ public struct RemoveActionHandler: ActionHandler {
 
     /// Processes the "REMOVE" command.
     ///
-    /// Assuming validation has passed (the item is worn and not scenery),
-    /// this action performs the following:
-    /// 1. Retrieves the target item.
-    /// 2. Clears the `.isWorn` flag on the item.
-    /// 3. Ensures the `.isTouched` flag is set on the item.
-    /// 4. Updates pronouns to refer to the removed item.
-    /// 5. Returns an `ActionResult` with a confirmation message (e.g., "You take off the cloak.")
-    ///    and the state changes.
+    /// For each item to be removed:
+    /// 1. Checks if the item is currently worn
+    /// 2. Checks if the item is removable (not scenery)
+    /// 3. Clears the `.isWorn` flag on the item
+    /// 4. Updates touched flags and pronouns
+    /// 5. Provides appropriate feedback
     ///
-    /// After being removed, the item remains in the player's inventory.
+    /// After being removed, items remain in the player's inventory.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item
-    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Remove: directObject was not an item in process.")
+        // For ALL commands, empty directObjects is valid (means nothing to remove)
+        if !context.command.isAllCommand {
+            guard !context.command.directObjects.isEmpty else {
+                return ActionResult("Remove what?")
+            }
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        
+        var allStateChanges: [StateChange] = []
+        var removedItems: [Item] = []
+        var lastRemovedItem: Item?
+        
+        // Process each object individually
+        for directObjectRef in context.command.directObjects {
+            guard case .item(let targetItemID) = directObjectRef else {
+                if context.command.isAllCommand {
+                    continue // Skip non-items in ALL commands
+                } else {
+                    return ActionResult("You can only remove items.")
+                }
+            }
+            
+            do {
+                let targetItem = try await context.engine.item(targetItemID)
+                
+                // Validate this specific item for ALL commands
+                if context.command.isAllCommand {
+                    // Check if item is currently worn
+                    guard targetItem.hasFlag(.isWorn) else {
+                        continue // Skip items not worn in ALL commands
+                    }
+                    
+                    // Check if item is removable (not scenery)
+                    guard !targetItem.hasFlag(.isScenery) else {
+                        continue // Skip non-removable items in ALL commands
+                    }
+                }
+                
+                // --- Calculate State Changes for this item ---
+                var itemStateChanges: [StateChange] = []
 
-        var stateChanges: [StateChange] = []
+                // Change 1: Clear .isWorn flag
+                if let wornChange = await context.engine.clearFlag(.isWorn, on: targetItem) {
+                    itemStateChanges.append(wornChange)
+                }
 
-        // Change 1: Set `.isWorn` to false
-        if let addTouchedFlag = await context.engine.clearFlag(.isWorn, on: targetItem) {
-            stateChanges.append(addTouchedFlag)
+                // Change 2: Set .isTouched flag if not already set
+                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                    itemStateChanges.append(touchedChange)
+                }
+
+                allStateChanges.append(contentsOf: itemStateChanges)
+                removedItems.append(targetItem)
+                lastRemovedItem = targetItem
+                
+            } catch {
+                // For ALL commands, skip items that cause errors
+                if !context.command.isAllCommand {
+                    throw error
+                }
+            }
         }
-
-        // Change 2: Set `.isTouched` to true
-        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(addTouchedFlag)
+        
+        // Update pronouns appropriately for multiple objects
+        if let lastItem = lastRemovedItem {
+            if removedItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: removedItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
+            }
         }
-
-        // Change 3: Update pronoun "it"
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
+        
+        // Generate appropriate message
+        let message = if removedItems.isEmpty {
+            context.command.isAllCommand ? "You aren't wearing anything." : "Remove what?"
+        } else {
+            "You take off \(removedItems.listWithDefiniteArticles)."
         }
-
-        // --- Prepare Result ---
+        
         return ActionResult(
-            message: "You take off the \(targetItem.name).",
-            stateChanges: stateChanges
+            message: message,
+            stateChanges: allStateChanges
         )
     }
 }

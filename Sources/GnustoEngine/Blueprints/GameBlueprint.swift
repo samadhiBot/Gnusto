@@ -2,15 +2,15 @@ import Foundation
 
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
-/// Implement this protocol to specify all the essential elements for your game,
-/// including initial world state, game-specific constants, custom behaviors, and event handlers.
-/// The `GameEngine` uses this blueprint to initialize and run the game.
+/// Implement this protocol to specify all the essential elements for your game, including
+/// game-specific constants, custom behaviors, and event handlers.
 ///
-/// For organizing game content (locations, items, and their specific event handlers),
-/// consider using types that conform to `AreaBlueprint`. The definitions from these
-/// area blueprints can then be aggregated and provided to the relevant properties of
-/// your `GameBlueprint` implementation (e.g., `state`, `itemEventHandlers`,
-/// `locationEventHandlers`).
+/// The `GameEngine` uses this blueprint to build the initial `GameState` and configure the game.
+///
+/// For organizing game content (locations, items, and their specific event handlers), consider
+/// grouping them into logical area structures (enums or structs). The definitions from these areas
+/// can then be aggregated and provided to the relevant properties of your `GameBlueprint`
+/// implementation (e.g., `items`, `locations`, `itemEventHandlers`, `locationEventHandlers`).
 public protocol GameBlueprint: Sendable {
     /// The core metadata constants for the game.
     ///
@@ -19,12 +19,23 @@ public protocol GameBlueprint: Sendable {
     /// This information is often displayed to the player at the start of the game.
     var constants: GameConstants { get }
 
-    /// The complete state of the world at the start of the game.
+    /// An object representing the player character, containing their current status, inventory,
+    /// score, location, etc.
+    var player: Player { get }
+
+    /// All items in the game world.
     ///
-    /// This `GameState` instance defines all locations, items (and their properties),
-    /// the initial player state, active timers (fuses and daemons), and any global
-    /// variables at the moment the game begins.
-    var state: GameState { get }
+    /// This array defines all items that exist in the game, including their properties,
+    /// initial locations, and other characteristics. The `GameEngine` uses this to
+    /// build the initial `GameState`.
+    var items: [Item] { get }
+
+    /// All locations in the game world.
+    ///
+    /// This array defines all locations that exist in the game, including their
+    /// descriptions, exits, and properties. The `GameEngine` uses this to
+    /// build the initial `GameState`.
+    var locations: [Location] { get }
 
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
@@ -55,33 +66,6 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }
 
-    /// Called when the player successfully enters a new location.
-    ///
-    /// Implement this closure to perform custom actions or checks immediately after the player
-    /// moves into a different location. The closure receives the `GameEngine` instance
-    /// and the `LocationID` of the newly entered location.
-    ///
-    /// - Returns: Return `true` if your handler fully manages the situation and no
-    ///   further default engine processing for entering the room (like describing it)
-    ///   should occur. Return `false` to allow normal engine processing to continue.
-    ///
-    /// The default implementation always returns `false`.
-    var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool { get }
-
-    /// Called at the beginning of each turn, before the player's command is processed.
-    ///
-    /// Implement this closure to execute game logic that needs to run every turn
-    /// before the main command handling occurs. This could include weather changes,
-    /// NPC actions, or checking for time-sensitive conditions. The closure receives
-    /// the `GameEngine` instance and the parsed `Command` for the current turn.
-    ///
-    /// - Returns: Return `true` if your handler fully manages the command (or the turn's
-    ///   pre-processing) and no further engine processing for the command should occur.
-    ///   Return `false` to allow normal command processing to continue.
-    ///
-    /// The default implementation always returns `false`.
-    var beforeTurn: @Sendable (GameEngine, Command) async -> Bool { get }
-
     /// The registry containing definitions for timed events (fuses) and background
     /// processes (daemons).
     ///
@@ -107,6 +91,14 @@ public protocol GameBlueprint: Sendable {
 // MARK: - Default implementations
 
 extension GameBlueprint {
+    public var items: [Item] {
+        []
+    }
+
+    public var locations: [Location] {
+        []
+    }
+
     public var customActionHandlers: [VerbID: ActionHandler] {
         [:]
     }
@@ -117,14 +109,6 @@ extension GameBlueprint {
 
     public var locationEventHandlers: [LocationID: LocationEventHandler] {
         [:]
-    }
-
-    public var onEnterRoom: @Sendable (GameEngine, LocationID) async -> Bool {
-        { _, _ in false }
-    }
-
-    public var beforeTurn: @Sendable (GameEngine, Command) async -> Bool {
-        { _, _ in false }
     }
 
     public var timeRegistry: TimeRegistry {

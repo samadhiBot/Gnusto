@@ -1,9 +1,9 @@
 import GnustoEngine
 
-struct OperaHouse: AreaBlueprint {
+enum OperaHouse {
     // MARK: - Foyer of the Opera House
 
-    let foyer = Location(
+    static let foyer = Location(
         id: .foyer,
         .name("Foyer of the Opera House"),
         .description("""
@@ -25,9 +25,14 @@ struct OperaHouse: AreaBlueprint {
         .inherentlyLit
     )
 
+    static let street = Location(
+        id: .street,
+        .description("The street outside the Opera House (not accessible in this demo)")
+    )
+
     // MARK: - Cloakroom
 
-    let cloakroom = Location(
+    static let cloakroom = Location(
         id: .cloakroom,
         .name("Cloakroom"),
         .description("""
@@ -40,7 +45,7 @@ struct OperaHouse: AreaBlueprint {
         .inherentlyLit
     )
 
-    let hook = Item(
+    static let hook = Item(
         id: .hook,
         .adjectives("small", "brass"),
         .in(.location(.cloakroom)),
@@ -52,7 +57,7 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Bar
 
-    let bar = Location(
+    static let bar = Location(
         id: .bar,
         .name("Bar"),
         .description("""
@@ -65,7 +70,7 @@ struct OperaHouse: AreaBlueprint {
         ])
     )
 
-    let message = Item(
+    static let message = Item(
         id: .message,
         .name("scrawled message"),
         .in(.location(.bar)),
@@ -75,7 +80,7 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Items
 
-    let cloak = Item(
+    static let cloak = Item(
         id: .cloak,
         .name("velvet cloak"),
         .description("""
@@ -92,7 +97,7 @@ struct OperaHouse: AreaBlueprint {
 
     // MARK: - Location event handlers
 
-    let barHandler = LocationEventHandler { engine, event in
+    static let barHandler = LocationEventHandler { engine, event in
         guard
             case .beforeTurn(let command) = event,
             await engine.playerLocationIsLit() == false
@@ -104,24 +109,24 @@ struct OperaHouse: AreaBlueprint {
             if command.direction == .north {
                 nil
             } else {
-                await ActionResult(
+                ActionResult(
                     message: "Blundering around in the dark isn't a good idea!",
-                    stateChange: engine.adjustGlobal(.barMessageDisturbances, by: 2)
+                    stateChange: await engine.adjustGlobal(.barMessageDisturbances, by: 2)
                 )
             }
         case .look, .inventory:
             nil
         default:
-            await ActionResult(
+            ActionResult(
                 message: "In the dark? You could easily disturb something!",
-                stateChange: engine.adjustGlobal(.barMessageDisturbances, by: 1)
+                stateChange: await engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
         }
     }
 
     // MARK: - Item event handlers
 
-    let cloakHandler = ItemEventHandler { engine, event in
+    static let cloakHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -160,7 +165,7 @@ struct OperaHouse: AreaBlueprint {
         return nil
     }
 
-    let hookHandler = ItemEventHandler { engine, event in
+    static let hookHandler = ItemEventHandler { engine, event in
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
             return nil
         }
@@ -173,7 +178,7 @@ struct OperaHouse: AreaBlueprint {
         throw ActionResponse.custom("It's just a small brass hook, \(hookDetail).")
     }
 
-    let messageHandler = ItemEventHandler { engine, event in
+    static let messageHandler = ItemEventHandler { engine, event in
         guard
             case .beforeTurn(let command) = event,
             [.examine, .read].contains(command.verb),
@@ -187,7 +192,7 @@ struct OperaHouse: AreaBlueprint {
             throw ActionResponse.prerequisiteNotMet("It's too dark to do that.")
         }
 
-        let disturbedCount = await engine.getStateValue(key: .barMessageDisturbances)?.toInt ?? 0
+        let disturbedCount = await engine.global(.barMessageDisturbances) ?? 0
         await engine.requestQuit()
         if disturbedCount < 2 {
             return ActionResult(

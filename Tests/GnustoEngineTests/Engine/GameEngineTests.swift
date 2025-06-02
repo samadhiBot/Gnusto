@@ -123,15 +123,15 @@ struct GameEngineTests {
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.getChangeHistory() == [
+        #expect(await engine.changeHistory() == [
             StateChange(
                 entityID: .location(.startRoom),
-                attributeKey: .locationAttribute(.isVisited),
+                attribute: .locationAttribute(.isVisited),
                 newValue: true
             ),
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attribute: .playerMoves,
                 oldValue: 0,
                 newValue: 1
             ),
@@ -183,7 +183,7 @@ struct GameEngineTests {
         )
 
         // Make pebble non-takable in this test's state
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
         // Configure IO
         await mockIO.enqueueInput("take pebble", "quit")
@@ -228,15 +228,15 @@ struct GameEngineTests {
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.getChangeHistory() == [
+        #expect(await engine.changeHistory() == [
             StateChange(
                 entityID: .location(.startRoom),
-                attributeKey: .locationAttribute(.isVisited),
+                attribute: .locationAttribute(.isVisited),
                 newValue: true
             ),
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attribute: .playerMoves,
                 oldValue: 0,
                 newValue: 1
             ),
@@ -399,6 +399,12 @@ struct GameEngineTests {
         // Check status line was updated for each turn (initial + 2 turns)
         let statuses = await mockIO.recordedStatusLines
         #expect(statuses.count == 3) // Initial state + 2 turns
+
+        guard statuses.count == 3 else {
+            Issue.record("Missing status lines")
+            return
+        }
+
         #expect(statuses[0].turns == 0)
         #expect(statuses[1].turns == 1)
         #expect(statuses[2].turns == 2)
@@ -536,15 +542,15 @@ struct GameEngineTests {
         }
 
         // Ensure pebble is initially takable and in the room (check initial game state)
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == true)
-        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
+        #expect(game.items.find(.startItem)?.hasFlag(.isTakable) == true)
+        #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
         let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
-        #expect(await engine.items(in: .player).isEmpty == true)
+        #expect(await engine.items(in: .player).isEmpty)
 
         // Configure IO for the command sequence
         await mockIO.enqueueInput("take pebble", "inventory", "quit")
@@ -602,14 +608,12 @@ struct GameEngineTests {
             """)
     }
 
-    @Test("Engine Records State Changes from Enhanced Handler")
-    func testEngineRecordsStateChangesFromEnhancedHandler() async throws {
-        // Given: An enhanced handler that changes multiple things
+    @Test("Engine Records State Changes from Action Handler")
+    func testEngineRecordsStateChangesFromActionHandler() async throws {
+        // Given: An action handler that changes multiple things
         struct MockMultiChangeHandler: ActionHandler {
             let itemIDToModify: ItemID
             let flagToSet: String
-
-            func validate(context: ActionContext) async throws { }
 
             func process(context: ActionContext) async throws -> ActionResult {
                 // Use snapshot for checks
@@ -620,14 +624,14 @@ struct GameEngineTests {
                 // Define multiple changes
                 let change1 = StateChange(
                     entityID: .item(itemIDToModify),
-                    attributeKey: .itemAttribute(.isTouched),
+                    attribute: .itemAttribute(.isTouched),
                     oldValue: item.attributes[.isTouched],
                     newValue: true,
                 )
 
                 let change2 = StateChange(
                     entityID: .item(itemIDToModify),
-                    attributeKey: .itemAttribute(.isOn),
+                    attribute: .itemAttribute(.isOn),
                     oldValue: item.attributes[.isOn],
                     newValue: true,
                 )
@@ -635,12 +639,12 @@ struct GameEngineTests {
                 // Get old flag value from snapshot using GlobalID and engine helper
                 let flagID = GlobalID(rawValue: flagToSet)
                 // Use the engine context to check the flag state before the change
-                let actualOldFlagValue = await context.engine.isFlagSet(flagID)
-                let flagOldValueState: StateValue? = actualOldFlagValue ? true : nil // Simpler conversion
+                let actualOldFlagValue: Bool? = await context.engine.global(flagID)
+                let flagOldValueState: StateValue? = actualOldFlagValue.map(StateValue.bool)
 
                 let change3 = StateChange(
                     entityID: .global,
-                    attributeKey: .setFlag(flagID),
+                    attribute: .setFlag(flagID),
                     oldValue: flagOldValueState,
                     newValue: true,
                 )
@@ -650,13 +654,10 @@ struct GameEngineTests {
                     stateChanges: [change1, change2, change3]
                 )
             }
-
-            // Add empty postProcess for conformance
-            func postProcess(context: ActionContext, result: ActionResult) async throws { }
         }
 
-        let testItemID: ItemID = "lamp"
-        let testFlagKey: GlobalID = "lampLit" // Use GlobalID type
+        let testItemID = ItemID("lamp")
+        let testFlagKey = GlobalID("lampLit") // Use GlobalID type
         let lamp = Item(
             id: testItemID,
             .name("brass lamp"),
@@ -664,7 +665,7 @@ struct GameEngineTests {
             .isLightSource,
             .in(.location(.startRoom))
         )
-        let mockEnhancedHandler = MockMultiChangeHandler(
+        let mockActionHandler = MockMultiChangeHandler(
             itemIDToModify: testItemID,
             flagToSet: testFlagKey.rawValue
         ) // Pass rawValue if handler needs string
@@ -678,7 +679,7 @@ struct GameEngineTests {
             items: [lamp],
             // Use customActionHandlers directly with the ActionHandler
             customActionHandlers: [
-                "activate": mockEnhancedHandler // No bridge needed
+                "activate": mockActionHandler
             ]
         )
 
@@ -703,10 +704,10 @@ struct GameEngineTests {
         )
 
         // Ensure initial state
-        #expect(await engine.isFlagSet(testFlagKey) == false)
+        #expect(await engine.global(testFlagKey) != true)
         #expect(try await engine.item(testItemID).attributes[.isOn] == nil)
         #expect(try await engine.item(testItemID).attributes[.isTouched] == nil)
-        #expect(await engine.getChangeHistory().isEmpty)
+        #expect(await engine.changeHistory().isEmpty)
 
         // Act
         await mockIO.enqueueInput("activate lamp", "quit")
@@ -714,7 +715,7 @@ struct GameEngineTests {
 
         // Then
         // Check final state
-        #expect(await engine.isFlagSet(testFlagKey), "Flag should be set")
+        #expect(await engine.global(testFlagKey) == true, "Flag should be set")
         #expect(
             try await engine.item(testItemID).attributes[.isOn] == true,
             "Item .on property should be set"
@@ -725,14 +726,14 @@ struct GameEngineTests {
         )
 
         // Check history recorded correctly
-        let history = await engine.getChangeHistory()
+        let history = await engine.changeHistory()
         #expect(!history.isEmpty, "Change history should not be empty")
 
         // Check for Player moves increment change
         #expect(
             history.contains { change in
-                change.attributeKey == AttributeKey.playerMoves &&
-                change.newValue == StateValue.int(1)
+                change.attribute == .playerMoves &&
+                change.newValue == .int(1)
             },
             "History should contain playerMoves increment to 1"
         )
@@ -741,7 +742,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 guard change.entityID == .item(testItemID),
-                      case .itemAttribute(let prop) = change.attributeKey,
+                      case .itemAttribute(let prop) = change.attribute,
                       change.newValue == true else { return false }
                 return prop == .isTouched || prop == .isOn
             },
@@ -752,7 +753,7 @@ struct GameEngineTests {
         #expect(
             history.contains { change in
                 change.entityID == .global &&
-                    change.attributeKey == AttributeKey.setFlag(testFlagKey) &&
+                    change.attribute == .setFlag(testFlagKey) &&
                     change.newValue == true
             },
             "History should contain flag change to true for \(testFlagKey)"
@@ -933,7 +934,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.attributes[.isTakable] == nil)
+        #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
         let command = Command(
             verb: .take,
@@ -963,7 +964,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(locations: [startRoom], items: [pebble])
 
-        #expect(game.state.items["startItem"]?.parent == .location(.startRoom))
+        #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
         let command = Command(
             verb: .wear,
@@ -1419,7 +1420,7 @@ struct GameEngineTests {
         )
 
         #expect(
-            game.state.locations[.startRoom]?.hasFlag(.inherentlyLit) == false
+            game.locations.find(.startRoom)?.hasFlag(.inherentlyLit) == false
         )
 
         let command = Command(
@@ -1479,7 +1480,7 @@ struct GameEngineTests {
     @Test("Apply Action Result - Success")
     func testApplyActionResult_Success() async throws {
         // Define ItemID and initial item state
-        let itemID: ItemID = "lamp"
+        let itemID = ItemID("lamp")
         let lamp = Item(
             id: itemID,
             .name("brass lamp"),
@@ -1492,13 +1493,13 @@ struct GameEngineTests {
         let turnOnChanges = [
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isOn),
+                attribute: .itemAttribute(.isOn),
                 oldValue: false,
                 newValue: true,
             ),
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemAttribute(.isTouched),
+                attribute: .itemAttribute(.isTouched),
                 oldValue: nil, // Assuming not touched initially
                 newValue: true,
             )
@@ -1518,7 +1519,7 @@ struct GameEngineTests {
             func postProcess(context: ActionContext, result: ActionResult) async throws { /* No post-processing needed */ }
         }
 
-        let testVerb: VerbID = "testapply"
+        let testVerb = VerbID("testapply")
         let mockHandler = MockResultHandler(result: resultToTest)
 
         // Setup game with the mock handler
@@ -1550,21 +1551,37 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let engine = await GameEngine(blueprint: MinimalGame(), parser: MockParser(), ioHandler: await MockIOHandler())
-        let itemID: ItemID = "testItem"
+        let engine = await GameEngine(
+            blueprint: MinimalGame(),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
 
-        await engine.applyPronounChange(pronoun: "it", itemID: itemID)
+        // Create the command to trigger the mock handler
+        let testCommand = Command(
+            verb: .examine,
+            directObject: .item(.startItem),
+            rawInput: "examine the pebble"
+        )
+
+        // Act: Execute the command
+        await engine.execute(command: testCommand)
 
         let pronouns = await engine.gameState.pronouns
-        #expect(pronouns["it"] == [.item(itemID)])
+        #expect(pronouns["it"] == [.item(.startItem)])
 
         // Check change history
         let history = await engine.gameState.changeHistory
         expectNoDifference(history, [
             StateChange(
+                entityID: .item(.startItem),
+                attribute: .itemAttribute(.isTouched),
+                newValue: true
+            ),
+            StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
-                newValue: .entityReferenceSet([.item(itemID)])
+                attribute: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(.startItem)])
             )
         ])
     }
@@ -1586,7 +1603,7 @@ struct GameEngineTests {
         #expect(
             stateChange == StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "it"),
+                attribute: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item(item.id)])
             )
         )
@@ -1606,8 +1623,60 @@ struct GameEngineTests {
         #expect(
             change == StateChange(
                 entityID: .global,
-                attributeKey: .pronounReference(pronoun: "them"),
+                attribute: .pronounReference(pronoun: "them"),
                 newValue: .entityReferenceSet([.item(item1.id), .item(item2.id)])
+            )
+        )
+    }
+
+    @Test("updatePronounsForMultipleObjects updates both 'it' and 'them' correctly")
+    func testUpdatePronounsForMultipleObjects() async throws {
+        let item1 = Item(id: "item1", .name("Item One"))
+        let item2 = Item(id: "item2", .name("Item Two"))
+        let item3 = Item(id: "item3", .name("Item Three"))
+        let engine = await GameEngine(
+            blueprint: MinimalGame(items: [item1, item2, item3]),
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let changes = await engine.updatePronounsForMultipleObjects(
+            lastItem: item3,
+            allItems: [item1, item2, item3]
+        )
+        
+        // Should return two changes: one for "it" and one for "them"
+        #expect(changes.count == 2)
+        
+        // Check "it" change (should refer to last item)
+        let itChange = changes.first { change in
+            if case .pronounReference(let pronoun) = change.attribute {
+                return pronoun == "it"
+            }
+            return false
+        }
+        #expect(itChange != nil)
+        #expect(
+            itChange == StateChange(
+                entityID: .global,
+                attribute: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet([.item(item3.id)])
+            )
+        )
+        
+        // Check "them" change (should refer to all items)
+        let themChange = changes.first { change in
+            if case .pronounReference(let pronoun) = change.attribute {
+                return pronoun == "them"
+            }
+            return false
+        }
+        #expect(themChange != nil)
+        #expect(
+            themChange == StateChange(
+                entityID: .global,
+                attribute: .pronounReference(pronoun: "them"),
+                newValue: .entityReferenceSet([.item(item1.id), .item(item2.id), .item(item3.id)])
             )
         )
     }

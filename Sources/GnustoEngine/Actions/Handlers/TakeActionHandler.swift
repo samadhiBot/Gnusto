@@ -26,7 +26,17 @@ public struct TakeActionHandler: ActionHandler {
     ///           `containerIsClosed`, or `playerCannotCarryMore`.
     ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object and it's an item
+        // For ALL commands, allow empty directObjects (handled in process method)
+        if context.command.isAllCommand {
+            return
+        }
+        
+        // 1. Ensure we have at least one direct object for non-ALL commands
+        guard !context.command.directObjects.isEmpty else {
+            throw ActionResponse.prerequisiteNotMet("Take what?")
+        }
+        
+        // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Take what?")
         }
@@ -90,8 +100,8 @@ public struct TakeActionHandler: ActionHandler {
     /// Processes the "TAKE" command.
     ///
     /// Assuming basic validation has passed, this action performs the following:
-    /// 1. Retrieves the target item.
-    /// 2. Checks if the player already has the item. If so, a message "You already have that."
+    /// 1. Retrieves the target item(s).
+    /// 2. For each item, checks if the player already has it. If so, a message "You already have that."
     ///    is returned.
     /// 3. If the player does not have the item:
     ///    a. Creates a `StateChange` to move the item to the player's inventory (`.player` parent).
@@ -99,44 +109,123 @@ public struct TakeActionHandler: ActionHandler {
     ///    c. Updates pronouns to refer to the taken item.
     ///    d. Returns a confirmation message, typically "Taken."
     ///
+    /// For ALL commands, processes each object individually and provides consolidated feedback.
+    ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing a message and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` if direct object is not an item (should be
     ///           caught by validate), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            // This should ideally be caught by validate.
-            throw ActionResponse.internalEngineError("Take: directObject was not an item in process.")
+        // For ALL commands, empty directObjects is valid (means nothing to take)
+        if !context.command.isAllCommand {
+            guard !context.command.directObjects.isEmpty else {
+                throw ActionResponse.internalEngineError("Take: no direct objects in process.")
+            }
         }
-        let targetItem = try await context.engine.item(targetItemID)
+        
+        var allStateChanges: [StateChange] = []
+        var messages: [String] = []
+        var takenItems: [Item] = []
+        var lastTakenItem: Item?
+        
+        // Process each object individually
+        for directObjectRef in context.command.directObjects {
+            guard case .item(let targetItemID) = directObjectRef else {
+                if context.command.isAllCommand {
+                    continue // Skip non-items in ALL commands
+                } else {
+                    throw ActionResponse.internalEngineError("Take: directObject was not an item in process.")
+                }
+            }
+            
+            do {
+                let targetItem = try await context.engine.item(targetItemID)
+                
+                // Check if player already has this item
+                if targetItem.parent == .player {
+                    if context.command.isAllCommand {
+                        continue // Skip items already held in ALL commands
+                    } else {
+                        return ActionResult("You already have that.")
+                    }
+                }
+                
+                // Validate this specific item for ALL commands
+                if context.command.isAllCommand {
+                    // Check if item is takable
+                    guard targetItem.hasFlag(.isTakable) else {
+                        continue // Skip non-takable items in ALL commands
+                    }
+                    
+                    // Check if player can reach the item
+                    guard await context.engine.playerCanReach(targetItemID) else {
+                        continue // Skip unreachable items in ALL commands
+                    }
+                    
+                    // Check capacity
+                    guard await context.engine.playerCanCarry(targetItem) else {
+                        if takenItems.isEmpty {
+                            messages.append("Your hands are full.")
+                        }
+                        break // Stop processing if capacity is exceeded
+                    }
+                }
+                
+                // --- Calculate State Changes for this item ---
+                var itemStateChanges: [StateChange] = []
 
-        // Handle "already have" case detected (but not thrown) in validate
-        if targetItem.parent == .player {
-            return ActionResult("You already have that.")
+                // Change 1: Parent
+                let moveChange = await context.engine.move(targetItem, to: .player)
+                itemStateChanges.append(moveChange)
+
+                // Change 2: Set `.isTouched` flag if not already set
+                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                    itemStateChanges.append(touchedChange)
+                }
+
+                allStateChanges.append(contentsOf: itemStateChanges)
+                takenItems.append(targetItem)
+                lastTakenItem = targetItem
+                
+            } catch {
+                // For ALL commands, skip items that cause errors
+                if !context.command.isAllCommand {
+                    throw error
+                }
+            }
         }
-
-        // --- Calculate State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Parent
-        let update = await context.engine.move(targetItem, to: .player)
-        stateChanges.append(update)
-
-        // Change 2: Set `.isTouched` flag if not already set
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
+        
+        // Update pronouns appropriately for multiple objects
+        if let lastItem = lastTakenItem {
+            if takenItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: takenItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
+            }
         }
-
-        // Change 3: Pronoun ("it")
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
+        
+        // Generate appropriate message
+        let message = if context.command.isAllCommand {
+            if takenItems.isEmpty {
+                "There is nothing here to take."
+            } else {
+                "You take \(takenItems.listWithDefiniteArticles)."
+            }
+        } else {
+            "Taken."
         }
-
-        // --- Prepare Result ---
+        
         return ActionResult(
-            message: "Taken.",
-            stateChanges: stateChanges
+            message: message,
+            stateChanges: allStateChanges
         )
     }
 

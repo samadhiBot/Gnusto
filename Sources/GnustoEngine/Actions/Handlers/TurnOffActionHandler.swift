@@ -78,7 +78,7 @@ public struct TurnOffActionHandler: ActionHandler {
         if targetItem.attributes[.isTouched] != true {
             stateChanges.append(StateChange(
                 entityID: .item(targetItem.id),
-                attributeKey: .itemAttribute(.isTouched),
+                attribute: .itemAttribute(.isTouched),
                 oldValue: targetItem.attributes[.isTouched] ?? false,
                 newValue: true,
             ))
@@ -88,7 +88,7 @@ public struct TurnOffActionHandler: ActionHandler {
         if targetItem.attributes[.isOn] == true {
             stateChanges.append(StateChange(
                 entityID: .item(targetItem.id),
-                attributeKey: .itemAttribute(.isOn),
+                attribute: .itemAttribute(.isOn),
                 oldValue: true,
                 newValue: false
             ))

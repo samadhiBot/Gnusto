@@ -1,26 +1,14 @@
-import CustomDump
 import Foundation
 
 /// A unique identifier for a standard or dynamic property within the game.
-public struct AttributeID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct AttributeID: GnustoID {
     public let rawValue: String
-
-    /// Initializes a `AttributeID` using a string literal.
-    /// - Parameter value: The string literal representing the property ID.
-    public init(stringLiteral value: String) {
-        assert(!value.isEmpty, "Attribute ID cannot be empty")
-        self.rawValue = value
-    }
 
     /// Initializes a `AttributeID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
-    public init(_ rawValue: String) {
+    public init(rawValue: String) {
         assert(!rawValue.isEmpty, "Attribute ID cannot be empty")
         self.rawValue = rawValue
-    }
-
-    public static func < (lhs: AttributeID, rhs: AttributeID) -> Bool {
-        lhs.rawValue < rhs.rawValue
     }
 }
 
@@ -53,6 +41,9 @@ public extension AttributeID {
 
     /// Synonyms for an item (e.g., "lamp", "light").
     static let synonyms = AttributeID("synonyms")
+
+    /// The value of the item.
+    static let value = AttributeID("value")
 }
 
 // MARK: - Descriptions
@@ -215,12 +206,4 @@ public extension AttributeID {
 
     /// Magic does not function here.
     static let breaksMagic = AttributeID("breaksMagic")
-}
-
-// MARK: - CustomDumpStringConvertible conformance
-
-extension AttributeID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
 }

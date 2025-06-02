@@ -7,20 +7,23 @@ public struct WearActionHandler: ActionHandler {
     ///
     /// This method ensures that:
     /// 1. A direct object is specified (the player must indicate *what* to wear).
-    /// 2. The direct object refers to an existing item.
-    /// 3. The player is currently holding the item.
-    /// 4. The item has the `.isWearable` flag set.
-    /// 5. The item does not already have the `.isWorn` flag set (it's not already being worn).
+    /// 2. For single object commands, validates the specific item.
+    /// 3. For ALL commands, allows empty directObjects (handled in process method).
     ///
     /// - Parameter context: The `ActionContext` for the current action.
-    /// - Throws: Various `ActionResponse` errors if validation fails, such as:
-    ///           `prerequisiteNotMet` (for missing object or wrong item type),
-    ///           `itemNotHeld` (if player isn't holding the item),
-    ///           `itemNotWearable` (if the item cannot be worn),
-    ///           `itemIsAlreadyWorn` (if the item is already being worn).
-    ///           Can also throw errors from `context.engine.item()`.
+    /// - Throws: Various `ActionResponse` errors if validation fails.
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object and it's an item
+        // For ALL commands, allow empty directObjects (handled in process method)
+        if context.command.isAllCommand {
+            return
+        }
+        
+        // 1. Ensure we have at least one direct object for non-ALL commands
+        guard !context.command.directObjects.isEmpty else {
+            throw ActionResponse.prerequisiteNotMet("Wear what?")
+        }
+        
+        // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Wear what?")
         }
@@ -48,46 +51,110 @@ public struct WearActionHandler: ActionHandler {
 
     /// Processes the "WEAR" command.
     ///
-    /// Assuming validation has passed (the item is held, wearable, and not already worn),
-    /// this action performs the following:
-    /// 1. Retrieves the target item.
-    /// 2. Sets the `.isWorn` flag on the item.
-    /// 3. Ensures the `.isTouched` flag is set on the item.
-    /// 4. Updates pronouns to refer to the worn item.
-    /// 5. Returns an `ActionResult` with a confirmation message (e.g., "You put on the cloak.")
-    ///    and the state changes.
+    /// For each item to be worn:
+    /// 1. Checks if the player is holding the item
+    /// 2. Checks if the item is wearable and not already worn
+    /// 3. Sets the `.isWorn` flag on the item
+    /// 4. Updates touched flags and pronouns
+    /// 5. Provides appropriate feedback
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
-    /// - Throws: `ActionResponse.internalEngineError` if the direct object is not an item
-    ///           (this should be caught by `validate`), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Wear: directObject was not an item in process.")
+        // For ALL commands, empty directObjects is valid (means nothing to wear)
+        if !context.command.isAllCommand {
+            guard !context.command.directObjects.isEmpty else {
+                return ActionResult("Wear what?")
+            }
         }
-        let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
+        
+        var allStateChanges: [StateChange] = []
+        var wornItems: [Item] = []
+        var lastWornItem: Item?
+        
+        // Process each object individually
+        for directObjectRef in context.command.directObjects {
+            guard case .item(let targetItemID) = directObjectRef else {
+                if context.command.isAllCommand {
+                    continue // Skip non-items in ALL commands
+                } else {
+                    return ActionResult("You can only wear items.")
+                }
+            }
+            
+            do {
+                let targetItem = try await context.engine.item(targetItemID)
+                
+                // Validate this specific item for ALL commands
+                if context.command.isAllCommand {
+                    // Check if player is holding the item
+                    guard await context.engine.playerIsHolding(targetItemID) else {
+                        continue // Skip items not held in ALL commands
+                    }
+                    
+                    // Check if item is wearable
+                    guard targetItem.hasFlag(.isWearable) else {
+                        continue // Skip non-wearable items in ALL commands
+                    }
+                    
+                    // Check if already worn
+                    guard !targetItem.hasFlag(.isWorn) else {
+                        continue // Skip already worn items in ALL commands
+                    }
+                }
+                
+                // --- Calculate State Changes for this item ---
+                var itemStateChanges: [StateChange] = []
 
-        // Change 1: Add .worn (if not already worn)
-        if let update = await context.engine.setFlag(.isWorn, on: targetItem) {
-            stateChanges.append(update)
+                // Change 1: Set .isWorn flag
+                if let wornChange = await context.engine.setFlag(.isWorn, on: targetItem) {
+                    itemStateChanges.append(wornChange)
+                }
+
+                // Change 2: Set .isTouched flag if not already set
+                if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+                    itemStateChanges.append(touchedChange)
+                }
+
+                allStateChanges.append(contentsOf: itemStateChanges)
+                wornItems.append(targetItem)
+                lastWornItem = targetItem
+                
+            } catch {
+                // For ALL commands, skip items that cause errors
+                if !context.command.isAllCommand {
+                    throw error
+                }
+            }
+        }
+        
+        // Update pronouns appropriately for multiple objects
+        if let lastItem = lastWornItem {
+            if wornItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: wornItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
+            }
+        }
+        
+        // Generate appropriate message
+        let message = if wornItems.isEmpty {
+            context.command.isAllCommand ? "You have nothing to wear." : "Wear what?"
+        } else {
+            "You put on \(wornItems.listWithDefiniteArticles)."
         }
 
-        // Change 2: Add .touched (if not already touched)
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Update pronoun "it"
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // --- Prepare Result ---
         return ActionResult(
-            message: "You put on the \(targetItem.name).",
-            stateChanges: stateChanges
+            message: message,
+            stateChanges: allStateChanges
         )
     }
 }

@@ -37,15 +37,17 @@ struct CloakOfDarknessWalkthroughTests {
 
             A basic IF demonstration.
 
-            Hurrying through the rainswept November night, you’re glad to see the
-            bright lights of the Opera House. It’s surprising that there aren’t more
-            people about but, hey, what do you expect in a cheap demo game…?
+            Hurrying through the rainswept November night, you’re glad to
+            see the bright lights of the Opera House. It’s surprising that
+            there aren’t more people about but, hey, what do you expect in
+            a cheap demo game…?
 
             — Foyer of the Opera House —
 
-            You are standing in a spacious hall, splendidly decorated in red
-            and gold, with glittering chandeliers overhead. The entrance from
-            the street is to the north, and there are doorways south and west.
+            You are standing in a spacious hall, splendidly decorated in
+            red and gold, with glittering chandeliers overhead. The
+            entrance from the street is to the north, and there are
+            doorways south and west.
 
             > inventory
             You are carrying:
@@ -70,8 +72,9 @@ struct CloakOfDarknessWalkthroughTests {
             > go west
             — Cloakroom —
 
-            The walls of this small room were clearly once lined with hooks,
-            though now only one remains. The exit is a door to the east.
+            The walls of this small room were clearly once lined with
+            hooks, though now only one remains. The exit is a door to the
+            east.
 
             You can see a small brass hook here.
 
@@ -130,15 +133,17 @@ struct CloakOfDarknessWalkthroughTests {
 
             A basic IF demonstration.
 
-            Hurrying through the rainswept November night, you’re glad to see the
-            bright lights of the Opera House. It’s surprising that there aren’t more
-            people about but, hey, what do you expect in a cheap demo game…?
+            Hurrying through the rainswept November night, you’re glad to
+            see the bright lights of the Opera House. It’s surprising that
+            there aren’t more people about but, hey, what do you expect in
+            a cheap demo game…?
 
             — Foyer of the Opera House —
 
-            You are standing in a spacious hall, splendidly decorated in red
-            and gold, with glittering chandeliers overhead. The entrance from
-            the street is to the north, and there are doorways south and west.
+            You are standing in a spacious hall, splendidly decorated in
+            red and gold, with glittering chandeliers overhead. The
+            entrance from the street is to the north, and there are
+            doorways south and west.
 
             > go north
             You’ve only just arrived, and besides, the weather outside
@@ -164,9 +169,10 @@ struct CloakOfDarknessWalkthroughTests {
             > look
             — Foyer of the Opera House —
 
-            You are standing in a spacious hall, splendidly decorated in red
-            and gold, with glittering chandeliers overhead. The entrance from
-            the street is to the north, and there are doorways south and west.
+            You are standing in a spacious hall, splendidly decorated in
+            red and gold, with glittering chandeliers overhead. The
+            entrance from the street is to the north, and there are
+            doorways south and west.
 
             > go east
             You can’t go that way.
@@ -174,8 +180,9 @@ struct CloakOfDarknessWalkthroughTests {
             > go west
             — Cloakroom —
 
-            The walls of this small room were clearly once lined with hooks,
-            though now only one remains. The exit is a door to the east.
+            The walls of this small room were clearly once lined with
+            hooks, though now only one remains. The exit is a door to the
+            east.
 
             You can see a small brass hook here.
 
@@ -190,14 +197,14 @@ struct CloakOfDarknessWalkthroughTests {
             > look
             — Bar —
 
-            The bar, much rougher than you’d have guessed after the opulence
-            of the foyer to the north, is completely empty. There seems to
-            be some sort of message scrawled in the sawdust on the floor.
-            You can see a scrawled message here.
+            The bar, much rougher than you’d have guessed after the
+            opulence of the foyer to the north, is completely empty. There
+            seems to be some sort of message scrawled in the sawdust on the
+            floor. You can see a scrawled message here.
 
             > read the message
-            The message has been carelessly trampled, making it
-            difficult to read. You can just distinguish the words…
+            The message has been carelessly trampled, making it difficult
+            to read. You can just distinguish the words…
 
             “You lose.”
             """)

@@ -26,7 +26,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemAttribute(attributeID), // Use new key
+            attribute: .itemAttribute(attributeID), // Use new key
             oldValue: oldAttributeValue, // Use actual or .absent
             newValue: newAttributeValue // Use direct StateValue
         )
@@ -59,7 +59,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemAttribute(attributeID), // Use new key
+            attribute: .itemAttribute(attributeID), // Use new key
             oldValue: incorrectOldValue, // Use incorrect old value
             newValue: newValue // Use direct StateValue
         )
@@ -105,7 +105,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemToMove),
-            attributeKey: .itemParent,
+            attribute: .itemParent,
             oldValue: .parentEntity(.nowhere), // Correct old value
             newValue: .parentEntity(newParent)
         )
@@ -134,7 +134,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemToMove),
-            attributeKey: .itemParent,
+            attribute: .itemParent,
             oldValue: .parentEntity(incorrectOldParent), // Incorrect old value
             newValue: .parentEntity(newParent)
         )
@@ -172,7 +172,7 @@ struct GameStateApplyTests {
         let itemID: ItemID = "testItem"
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemParent,
+            attribute: .itemParent,
             oldValue: .parentEntity(.location(.startRoom)),
             newValue: .parentEntity(.player)
         )
@@ -208,7 +208,7 @@ struct GameStateApplyTests {
         try state.apply(
             StateChange(
                 entityID: .item(itemID),
-                attributeKey: .itemParent,
+                attribute: .itemParent,
                 newValue: .parentEntity(.player)
             )
         )
@@ -216,7 +216,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemParent,
+            attribute: .itemParent,
             oldValue: .parentEntity(.player),
             newValue: .parentEntity(.location(newLocationID))
         )
@@ -241,7 +241,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemSize,
+            attribute: .itemSize,
             oldValue: .int(initialSize),
             newValue: .int(newSize)
         )
@@ -265,7 +265,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemSize,
+            attribute: .itemSize,
             oldValue: .int(incorrectOldSize),
             newValue: .int(newSize)
         )
@@ -305,7 +305,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemCapacity,
+            attribute: .itemCapacity,
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -329,7 +329,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemCapacity,
+            attribute: .itemCapacity,
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )
@@ -369,7 +369,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemName,
+            attribute: .itemName,
             oldValue: .string(initialName),
             newValue: .string(newName)
         )
@@ -393,7 +393,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemName,
+            attribute: .itemName,
             oldValue: .string(incorrectOldName),
             newValue: .string(newName)
         )
@@ -433,7 +433,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemAdjectives,
+            attribute: .itemAdjectives,
             oldValue: .stringSet(initialAdjectives),
             newValue: .stringSet(newAdjectives)
         )
@@ -457,7 +457,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemAdjectives,
+            attribute: .itemAdjectives,
             oldValue: .stringSet(incorrectOldAdjectives),
             newValue: .stringSet(newAdjectives)
         )
@@ -497,7 +497,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemSynonyms,
+            attribute: .itemSynonyms,
             oldValue: .stringSet(initialSynonyms),
             newValue: .stringSet(newSynonyms)
         )
@@ -521,7 +521,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .item(itemID),
-            attributeKey: .itemSynonyms,
+            attribute: .itemSynonyms,
             oldValue: .stringSet(incorrectOldSynonyms),
             newValue: .stringSet(newSynonyms)
         )
@@ -567,7 +567,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationAttribute(attributeID), // Use new key
+            attribute: .locationAttribute(attributeID), // Use new key
             oldValue: oldAttributeValue,
             newValue: newAttributeValue
         )
@@ -598,7 +598,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationAttribute(attributeID), // Use new key
+            attribute: .locationAttribute(attributeID), // Use new key
             oldValue: incorrectOldValue, // Incorrect old value
             newValue: newValue
         )
@@ -638,7 +638,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationName,
+            attribute: .locationName,
             oldValue: .string(initialName),
             newValue: .string(newName)
         )
@@ -662,7 +662,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .locationName,
+            attribute: .locationName,
             oldValue: .string(incorrectOldName),
             newValue: .string(newName)
         )
@@ -699,11 +699,11 @@ struct GameStateApplyTests {
         let locationID = GameStateTests.locWOH
         let initialExits = gameState.locations[locationID]?.exits ?? [:]
         var newExits = initialExits
-        newExits[.south] = Exit(destination: GameStateTests.locClearing)
+        newExits[.south] = .to(GameStateTests.locClearing)
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .exits,
+            attribute: .exits,
             oldValue: .exits(initialExits),
             newValue: .exits(newExits)
         )
@@ -722,13 +722,13 @@ struct GameStateApplyTests {
         var gameState = await helper.createSampleGameState()
         let locationID = GameStateTests.locWOH
         let actualOldExits = gameState.locations[locationID]?.exits ?? [:]
-        let incorrectOldExits: [Direction: Exit] = [.east: Exit(destination: "nowhere")] // Incorrect
+        let incorrectOldExits: [Direction: Exit] = [.east: .to("nowhere")] // Incorrect
         var newExits = actualOldExits
-        newExits[.south] = Exit(destination: GameStateTests.locClearing)
+        newExits[.south] = .to(GameStateTests.locClearing)
 
         let change = StateChange(
             entityID: .location(locationID),
-            attributeKey: .exits,
+            attribute: .exits,
             oldValue: .exits(incorrectOldExits),
             newValue: .exits(newExits)
         )
@@ -767,7 +767,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attribute: .playerScore,
             oldValue: .int(initialScore),
             newValue: .int(newScore)
         )
@@ -790,7 +790,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerScore,
+            attribute: .playerScore,
             oldValue: .int(incorrectOldScore),
             newValue: .int(newScore)
         )
@@ -829,7 +829,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerMoves,
+            attribute: .playerMoves,
             oldValue: .int(initialMoves),
             newValue: .int(newMoves)
         )
@@ -852,7 +852,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerMoves,
+            attribute: .playerMoves,
             oldValue: .int(incorrectOldMoves),
             newValue: .int(newMoves)
         )
@@ -891,7 +891,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerInventoryLimit, // Corrected key
+            attribute: .playerInventoryLimit, // Corrected key
             oldValue: .int(initialCapacity),
             newValue: .int(newCapacity)
         )
@@ -914,7 +914,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerInventoryLimit, // Corrected key
+            attribute: .playerInventoryLimit, // Corrected key
             oldValue: .int(incorrectOldCapacity),
             newValue: .int(newCapacity)
         )
@@ -954,7 +954,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerLocation,
+            attribute: .playerLocation,
             oldValue: .locationID(initialLocation),
             newValue: .locationID(newLocation)
         )
@@ -977,7 +977,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerLocation,
+            attribute: .playerLocation,
             oldValue: .locationID(incorrectOldLocation),
             newValue: .locationID(newLocation)
         )
@@ -1015,7 +1015,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerLocation,
+            attribute: .playerLocation,
             oldValue: .locationID(initialLocation),
             newValue: .locationID(invalidNewLocation)
         )
@@ -1054,7 +1054,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .setFlag(flagID),
+            attribute: .setFlag(flagID),
             oldValue: nil,
             newValue: true,
         )
@@ -1074,7 +1074,7 @@ struct GameStateApplyTests {
         // Set the flag using apply instead of direct assignment
         let setFlag = StateChange(
             entityID: .global,
-            attributeKey: .setFlag(flagID),
+            attribute: .setFlag(flagID),
             oldValue: nil,
             newValue: true
         )
@@ -1083,7 +1083,7 @@ struct GameStateApplyTests {
 
         let clearFlag = StateChange(
             entityID: .global,
-            attributeKey: .clearFlag(flagID),
+            attribute: .clearFlag(flagID),
             oldValue: true, // Expecting it was true
             newValue: false
         )
@@ -1102,7 +1102,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .clearFlag("gameStarted"),
+            attribute: .clearFlag("gameStarted"),
             oldValue: false, // INCORRECT
             newValue: false
         )
@@ -1129,7 +1129,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .setFlag(flagID),
+            attribute: .setFlag(flagID),
             oldValue: nil, // No validation expected
             newValue: true
         )
@@ -1154,7 +1154,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .pronounReference(pronoun: pronoun),
+            attribute: .pronounReference(pronoun: pronoun),
             oldValue: .entityReferenceSet(initialValue), // Correct old value
             newValue: .entityReferenceSet(newValue)
         )
@@ -1180,7 +1180,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .pronounReference(pronoun: pronoun),
+            attribute: .pronounReference(pronoun: pronoun),
             oldValue: nil, // Expecting nil
             newValue: .entityReferenceSet(newValue)
         )
@@ -1205,7 +1205,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .pronounReference(pronoun: pronoun),
+            attribute: .pronounReference(pronoun: pronoun),
             oldValue: .entityReferenceSet(incorrectOldValue),
             newValue: .entityReferenceSet(newValue)
         )
@@ -1245,7 +1245,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
+            attribute: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             // No oldValue for add
             newValue: .int(initialTurns)
         )
@@ -1267,7 +1267,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityID: .global,
-            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
+            attribute: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
@@ -1276,7 +1276,7 @@ struct GameStateApplyTests {
         let newInitialTurns = 20 // New turns value for the 'add'
         let change = StateChange(
             entityID: .global,
-            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: newInitialTurns),
+            attribute: .addActiveFuse(fuseID: fuseID, initialTurns: newInitialTurns),
             // No oldValue for add (even when overwriting)
             newValue: .int(newInitialTurns)
         )
@@ -1298,7 +1298,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityID: .global,
-            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
+            attribute: .addActiveFuse(fuseID: fuseID, initialTurns: initialTurns),
             newValue: .int(initialTurns)
         )
         try gameState.apply(setupChange)
@@ -1306,7 +1306,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: fuseID),
+            attribute: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(initialTurns), // Expecting the current value
             newValue: .int(0) // Per convention for remove
         )
@@ -1328,7 +1328,7 @@ struct GameStateApplyTests {
         // Pre-populate using apply
         let setupChange = StateChange(
             entityID: .global,
-            attributeKey: .addActiveFuse(fuseID: fuseID, initialTurns: actualTurns),
+            attribute: .addActiveFuse(fuseID: fuseID, initialTurns: actualTurns),
             newValue: .int(actualTurns)
         )
         try gameState.apply(setupChange)
@@ -1336,7 +1336,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: fuseID),
+            attribute: .removeActiveFuse(fuseID: fuseID),
             oldValue: .int(incorrectOldTurns),
             newValue: .int(0)
         )
@@ -1373,7 +1373,7 @@ struct GameStateApplyTests {
 
         let change = StateChange(
             entityID: .global,
-            attributeKey: .removeActiveFuse(fuseID: fuseID),
+            attribute: .removeActiveFuse(fuseID: fuseID),
             oldValue: nil, // Correctly expecting nil
             newValue: .int(0)
         )
@@ -1395,7 +1395,7 @@ struct GameStateApplyTests {
         let newLimit = originalLimit + 50
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerInventoryLimit, // Already correct
+            attribute: .playerInventoryLimit, // Already correct
             oldValue: .int(originalLimit),
             newValue: .int(newLimit)
         )
@@ -1414,7 +1414,7 @@ struct GameStateApplyTests {
         let newLimit = state.player.carryingCapacity + 50
         let change = StateChange(
             entityID: .player,
-            attributeKey: .playerInventoryLimit, // Already correct
+            attribute: .playerInventoryLimit, // Already correct
             oldValue: .int(wrongOldLimit), // Incorrect oldValue
             newValue: .int(newLimit)
         )

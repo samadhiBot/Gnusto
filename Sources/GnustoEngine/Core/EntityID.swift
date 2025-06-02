@@ -73,3 +73,18 @@ extension EntityID {
         return locationID
     }
 }
+
+// MARK: - Conformances
+
+extension EntityID: CustomStringConvertible {
+    public var description: String {
+        switch self {
+        case .daemon(let id): ".daemon(\(id))"
+        case .fuse(let id): ".fuse(\(id))"
+        case .item(let id): ".item(\(id))"
+        case .location(let id): ".location(\(id)"
+        case .player: ".player"
+        case .global: ".global"
+        }
+    }
+}

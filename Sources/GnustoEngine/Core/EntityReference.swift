@@ -1,4 +1,3 @@
-import CustomDump
 import Foundation
 
 /// Represents a reference to a game entity, which can be an item, a location, or the player.
@@ -23,28 +22,15 @@ public enum EntityReference: Hashable, Sendable, Codable {
 
 // MARK: - Conformances
 
-extension EntityReference: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        switch self {
-        case .item(let itemID):
-            itemID.customDumpDescription
-        case .location(let locationID):
-            locationID.customDumpDescription
-        case .player:
-            ".player"
-        }
-    }
-}
-
 extension EntityReference: CustomStringConvertible {
     public var description: String {
         switch self {
         case .item(let itemID):
-            itemID.rawValue
+            itemID.description
         case .location(let locationID):
-            locationID.rawValue
+            locationID.description
         case .player:
-            "yourself"
+            ".player"
         }
     }
 }

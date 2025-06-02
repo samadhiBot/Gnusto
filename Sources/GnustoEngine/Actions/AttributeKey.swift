@@ -98,7 +98,7 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     /// A generic key for storing or retrieving a custom, game-defined global state value.
     /// `GlobalID` is a unique identifier you define for various global data points that
     /// don't fit the simple flag model. The associated value can be of any `Codable` type.
-    case globalState(key: GlobalID)
+    case globalState(attributeID: GlobalID)
 
     /// The `EntityReference` (e.g., an item, location, or the player) that a given
     /// pronoun (like "it", "them") currently refers to. This is managed by the parser
@@ -134,33 +134,33 @@ public enum AttributeKey: Codable, Sendable, Hashable {
 extension AttributeKey: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .addActiveDaemon(let id): "addActiveDaemon(\(id))"
-        case .addActiveFuse(let id, _): "addActiveFuse(\(id))"
-        case .itemAttribute(let key): "itemAttribute(\(key.rawValue))"
-        case .setFlag(let id): "setFlag(\(id.rawValue))"
-        case .clearFlag(let id): "clearFlag(\(id.rawValue))"
-        case .globalState(let key): "globalState(\(key.rawValue))"
-        case .itemAdjectives: "itemAdjectives"
-        case .itemCapacity: "itemCapacity"
-        case .itemName: "itemName"
-        case .itemParent: "itemParent"
-        case .itemSize: "itemSize"
-        case .itemSynonyms: "itemSynonyms"
-        case .itemValue: "itemValue"
-        case .locationDescription: "locationDescription"
-        case .exits: "exits"
-        case .locationName: "locationName"
-        case .locationAttribute(let key): "locationAttribute(\(key.rawValue))"
-        case .playerHealth: "playerHealth"
-        case .playerInventoryLimit: "playerInventoryLimit"
-        case .playerLocation: "playerLocation"
-        case .playerMoves: "playerMoves"
-        case .playerScore: "playerScore"
-        case .playerStrength: "playerStrength"
-        case .pronounReference(let p): "pronounReference(\(p))"
-        case .removeActiveDaemon(let id): "removeActiveDaemon(\(id))"
-        case .removeActiveFuse(let id): "removeActiveFuse(\(id))"
-        case .updateFuseTurns(let id): "updateFuseTurns(\(id))"
+        case .addActiveDaemon(let id): ".addActiveDaemon(.\(id))"
+        case .addActiveFuse(let id, _): ".addActiveFuse(.\(id))"
+        case .itemAttribute(let key): ".itemAttribute(.\(key.rawValue))"
+        case .setFlag(let id): ".setFlag(.\(id.rawValue))"
+        case .clearFlag(let id): ".clearFlag(.\(id.rawValue))"
+        case .globalState(let key): ".globalState(.\(key.rawValue))"
+        case .itemAdjectives: ".itemAdjectives"
+        case .itemCapacity: ".itemCapacity"
+        case .itemName: ".itemName"
+        case .itemParent: ".itemParent"
+        case .itemSize: ".itemSize"
+        case .itemSynonyms: ".itemSynonyms"
+        case .itemValue: ".itemValue"
+        case .locationDescription: ".locationDescription"
+        case .exits: ".exits"
+        case .locationName: ".locationName"
+        case .locationAttribute(let key): ".locationAttribute(.\(key.rawValue))"
+        case .playerHealth: ".playerHealth"
+        case .playerInventoryLimit: ".playerInventoryLimit"
+        case .playerLocation: ".playerLocation"
+        case .playerMoves: ".playerMoves"
+        case .playerScore: ".playerScore"
+        case .playerStrength: ".playerStrength"
+        case .pronounReference(let p): ".pronounReference(.\(p))"
+        case .removeActiveDaemon(let id): ".removeActiveDaemon(.\(id))"
+        case .removeActiveFuse(let id): ".removeActiveFuse(.\(id))"
+        case .updateFuseTurns(let id): ".updateFuseTurns(.\(id))"
         }
     }
 }
