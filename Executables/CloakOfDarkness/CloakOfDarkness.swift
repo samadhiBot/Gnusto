@@ -15,32 +15,5 @@ struct CloakOfDarkness: GameBlueprint {
         maximumScore: 2
     )
 
-    var state = GameState(
-        areas: OperaHouse.self,
-        player: Player(in: .foyer),
-        globalState: [
-            .barMessageDisturbances: 0
-        ]
-    )
-
-    let itemEventHandlers = OperaHouse.itemEventHandlers
-
-    let locationEventHandlers = OperaHouse.locationEventHandlers
-}
-
-extension GlobalID {
-    static let barMessageDisturbances = GlobalID("barMessageDisturbances")
-}
-
-extension ItemID {
-    static let cloak = ItemID("cloak")
-    static let hook = ItemID("hook")
-    static let message = ItemID("message")
-}
-
-extension LocationID {
-    static let bar = LocationID("bar")
-    static let cloakroom = LocationID("cloakroom")
-    static let foyer = LocationID("foyer")
-    static let street = LocationID("street")
+    let player = Player(in: .foyer)
 }

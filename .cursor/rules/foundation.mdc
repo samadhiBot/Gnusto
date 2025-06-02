@@ -17,6 +17,7 @@ alwaysApply: true
 
 - Common operations should have simple, direct APIs. Any need for workarounds in client game code shows that the current engine design isn't fully considering the client game developer's experience.
 - The cleanest code is no code. Minimize boilerplate. The presence of the Gnusto Interactive Fiction Engine should be as unobtrusive as possible, so developers can focus on their game worlds. It should make game creation as easy, fun and intuitive as possible.
+- **Respect the action pipeline.** All state mutations should flow through the established action handler pipeline via `StateChange` objects. Avoid direct state mutation methods that bypass validation, event handlers, and proper sequencing. Use `StateChange` builders in `GameEngine+stateChanges.swift` to create changes that respect the pipeline.
 
 ## Foundational Rules
 

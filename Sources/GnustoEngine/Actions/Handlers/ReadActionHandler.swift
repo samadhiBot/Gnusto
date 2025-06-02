@@ -84,7 +84,10 @@ public struct ReadActionHandler: ActionHandler {
 
         // Fetch text from dynamic values
         do {
-            let textToRead: String = try await context.engine.fetch(targetItem.id, .readText)
+            let textToRead: String = try await context.engine.attribute(
+                .readText,
+                of: targetItem.id
+            )
             if textToRead.isEmpty {
                 message = "There's nothing written on the \(targetItem.name)."
             } else {

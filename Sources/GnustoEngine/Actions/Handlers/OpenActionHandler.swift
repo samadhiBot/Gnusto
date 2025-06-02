@@ -23,7 +23,12 @@ public struct OpenActionHandler: ActionHandler {
     ///           `itemIsLocked` (if item is locked).
     ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object and it's an item
+        // 1. Check for multiple objects (not supported by OPEN)
+        if context.command.directObjects.count > 1 {
+            throw ActionResponse.prerequisiteNotMet("The OPEN command doesn't support multiple objects.")
+        }
+        
+        // 2. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Open what?")
         }
@@ -31,7 +36,7 @@ public struct OpenActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet("You can only open items.")
         }
 
-        // 2. Check if item exists and is accessible using ScopeResolver
+        // 3. Check if item exists and is accessible using ScopeResolver
         let targetItem = try await context.engine.item(targetItemID)
 
         // Use ScopeResolver to determine reachability
@@ -39,12 +44,12 @@ public struct OpenActionHandler: ActionHandler {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 3. Check if item is openable
+        // 4. Check if item is openable
         guard targetItem.hasFlag(.isOpenable) else {
             throw ActionResponse.itemNotOpenable(targetItemID)
         }
 
-        // 4. Check if locked
+        // 5. Check if locked
         if targetItem.hasFlag(.isLocked) {
             throw ActionResponse.itemIsLocked(targetItemID)
         }
@@ -79,7 +84,7 @@ public struct OpenActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Check if already open
-        if try await context.engine.fetch(targetItem.id, .isOpen) {
+        if try await context.engine.attribute(.isOpen, of: targetItem.id) {
             throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 

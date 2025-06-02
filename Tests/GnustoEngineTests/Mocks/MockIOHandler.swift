@@ -1,5 +1,4 @@
 import Foundation
-import Markdown
 
 @testable import GnustoEngine
 

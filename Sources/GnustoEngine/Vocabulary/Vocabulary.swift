@@ -30,6 +30,16 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Example: `["north": .north, "n": .north, "up": .up]`
     public var directions: [String: Direction]
 
+    /// Special keywords that receive special parser treatment.
+    /// These are not treated as regular nouns but trigger special parsing logic.
+    /// Example: `["all", "everything", "each"]`
+    public var specialKeywords: Set<String>
+
+    /// Conjunctions used to connect multiple objects in commands.
+    /// These words are used to parse commands like "TAKE SWORD AND LANTERN".
+    /// Example: `["and", ","]`
+    public var conjunctions: Set<String>
+
     /// Computed property to get the verb synonym mapping needed by the parser.
     /// Maps a synonym string (lowercase) to the Set of VerbIDs it can represent.
     public var verbSynonyms: [String: Set<VerbID>] {
@@ -60,6 +70,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.prepositions = Vocabulary.defaultPrepositions
         self.pronouns = Vocabulary.defaultPronouns
         self.directions = [:]
+        self.specialKeywords = Vocabulary.defaultSpecialKeywords
+        self.conjunctions = Vocabulary.defaultConjunctions
     }
 
     /// Initializes a vocabulary with pre-populated dictionaries and sets.
@@ -71,7 +83,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         directions: [String: Direction] = [:],
         noiseWords: Set<String> = Vocabulary.defaultNoiseWords,
         prepositions: Set<String> = Vocabulary.defaultPrepositions,
-        pronouns: Set<String> = Vocabulary.defaultPronouns
+        pronouns: Set<String> = Vocabulary.defaultPronouns,
+        specialKeywords: Set<String> = Vocabulary.defaultSpecialKeywords,
+        conjunctions: Set<String> = Vocabulary.defaultConjunctions
     ) {
         self.verbDefinitions = verbDefinitions // Assign new dictionary
         self.items = items
@@ -81,6 +95,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         self.noiseWords = noiseWords
         self.prepositions = prepositions
         self.pronouns = pronouns
+        self.specialKeywords = specialKeywords
+        self.conjunctions = conjunctions
     }
 
     // MARK: - Default Definitions
@@ -91,7 +107,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "'",
         "(",
         ")",
-        ",",
         ".",
         ":",
         ";",
@@ -99,7 +114,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "\"",
         "a",
         "an",
-        "and",
         "some",
         "that",
         "the",
@@ -133,6 +147,21 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         "them"
     ]
 
+    /// Default set of special keywords that receive special parser treatment.
+    /// These words trigger special parsing logic rather than being treated as regular nouns.
+    public static let defaultSpecialKeywords: Set<String> = [
+        "all",
+        "everything",
+        "each"
+    ]
+
+    /// Default set of conjunctions used to connect multiple objects.
+    /// These words are used to parse commands like "TAKE SWORD AND LANTERN".
+    public static let defaultConjunctions: Set<String> = [
+        "and",
+        ","
+    ]
+
     /// Default verbs common to most IF games.
     public static let defaultVerbs: [Verb] = [
         // Core Actions
@@ -150,7 +179,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .examine,
             synonyms: "x", "inspect",
-            syntax: [SyntaxRule(.verb, .directObject)],
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
             requiresLight: true
         ),
 
@@ -181,8 +215,13 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             requiresLight: false
         ),
 
-        // Movement
-        // Note: Single directions (N, S, E, W...) handled separately by StandardParser
+        Verb(
+            id: .xyzzy,
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        // Movement (Single directions (N, S, E, W...) handled separately by StandardParser)
 
         Verb(
             id: .go,
@@ -196,7 +235,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .take,
             synonyms: "get", "grab", "pick",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
 
         Verb(
@@ -205,10 +249,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "in"
                 ),
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "into"
                 ),
             ],
@@ -221,10 +267,12 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "on"
                 ),
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
                     requiredPreposition: "onto"
                 ),
             ],
@@ -234,8 +282,39 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .drop,
             synonyms: "discard",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
+
+        Verb(
+            id: .give,
+            synonyms: "donate", "offer", "feed", "hand",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
+                    requiredPreposition: "to"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .push,
+            synonyms: "press", "shove",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
+            requiresLight: true
+        ),
+
         Verb(
             id: .open,
             syntax: [SyntaxRule(.verb, .directObject)]
@@ -255,13 +334,23 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .wear,
             synonyms: "don", "put on",
-            syntax: [SyntaxRule(.verb, .directObject)]
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ]
         ),
 
         Verb(
             id: .remove,
             synonyms: "take off", "doff",
-            syntax: [SyntaxRule(.verb, .directObject)],
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
             requiresLight: false
         ),
 
@@ -303,7 +392,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .taste,
             syntax: [SyntaxRule(.verb, .directObject)],
-            requiresLight: true
+            requiresLight: false
         ),
 
         Verb(
@@ -506,6 +595,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         case prepositions
         case pronouns
         case directions
+        case specialKeywords
+        case conjunctions
         // Removed verbs, syntaxRules
     }
 
@@ -520,6 +611,8 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         prepositions = try container.decode(Set<String>.self, forKey: .prepositions)
         pronouns = try container.decode(Set<String>.self, forKey: .pronouns)
         directions = try container.decode([String: Direction].self, forKey: .directions)
+        specialKeywords = try container.decode(Set<String>.self, forKey: .specialKeywords)
+        conjunctions = try container.decodeIfPresent(Set<String>.self, forKey: .conjunctions) ?? Vocabulary.defaultConjunctions
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -532,5 +625,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         try container.encode(prepositions, forKey: .prepositions)
         try container.encode(pronouns, forKey: .pronouns)
         try container.encode(directions, forKey: .directions)
+        try container.encode(specialKeywords, forKey: .specialKeywords)
+        try container.encode(conjunctions, forKey: .conjunctions)
     }
 }

@@ -93,69 +93,6 @@ public struct GameState: Codable, Equatable, Sendable {
         self.vocabulary = vocabulary ?? .build(items: items, locations: locations)
     }
 
-    /// Initializes a `GameState` from one or more `AreaBlueprint` types, simplifying the
-    /// creation of the game world.
-    ///
-    /// Each `AreaBlueprint` defines a collection of items and locations for a part of your game.
-    /// This initializer aggregates all items and locations from the provided blueprints.
-    /// It includes assertions to help you catch duplicate `ItemID`s or `LocationID`s across
-    /// different blueprints during development.
-    ///
-    /// If `vocabulary` is `nil`, it will be automatically built based on the items and locations
-    /// from the blueprints.
-    ///
-    /// - Parameters:
-    ///   - areas: A variadic list of `AreaBlueprint.Type`s that define the game world.
-    ///   - player: The `Player` object representing the player's initial state.
-    ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated.
-    ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
-    ///   - activeDaemons: Optional. A variadic list of initially active `DaemonID`s.
-    public init(
-        areas: AreaBlueprint.Type...,
-        player: Player,
-        vocabulary: Vocabulary? = nil,
-        activeFuses: [FuseID: Int] = [:],
-        activeDaemons: DaemonID...,
-        globalState: [GlobalID: StateValue] = [:]
-    ) {
-        var allItems: [Item] = []
-        var allLocations: [Location] = []
-        var knownItems = Set<ItemID>()
-        var knownLocations = Set<LocationID>()
-
-        for areaType in areas {
-            for item in areaType.items {
-                assert(!knownItems.contains(item.id), """
-                    Duplicate ItemID '\(item.id)' found across multiple AreaBlueprint \
-                    types (detected in \(areaType)).
-                    """)
-                knownItems.insert(item.id)
-                allItems.append(item)
-            }
-
-            for location in areaType.locations {
-                assert(!knownLocations.contains(location.id), """
-                    Duplicate LocationID '\(location.id)' found across multiple AreaBlueprint \
-                    types (detected in \(areaType)).
-                    """)
-                knownLocations.insert(location.id)
-                allLocations.append(location)
-            }
-        }
-
-        self.init(
-            locations: allLocations,
-            items: allItems,
-            player: player,
-            vocabulary: vocabulary,
-            pronouns: [:],
-            activeFuses: activeFuses,
-            activeDaemons: Set(activeDaemons),
-            globalState: globalState,
-            changeHistory: []
-        )
-    }
-
     /// A computed property that returns an immutable snapshot (a copy) of the current `GameState`.
     ///
     /// This is useful when you need to pass the game state to a component that should not
@@ -191,7 +128,7 @@ public struct GameState: Codable, Equatable, Sendable {
     /// - Parameter changes: A variadic list of optional `StateChange` objects to apply.
     /// - Throws: `ActionResponse.internalEngineError` or `ActionResponse.stateValidationFailed`
     ///   if any change is invalid, cannot be applied, or fails validation against its expected old value.
-    public mutating func apply(_ changes: StateChange?...) throws {
+    mutating func apply(_ changes: StateChange?...) throws {
         for stateChange in changes {
             if let stateChange {
                 try apply(change: stateChange)
@@ -205,7 +142,7 @@ public struct GameState: Codable, Equatable, Sendable {
         try validateOldValue(for: change)
 
         // --- Mutation Phase ---
-        switch change.attributeKey {
+        switch change.attribute {
 
         // MARK: Item Properties
 
@@ -497,7 +434,7 @@ public struct GameState: Codable, Equatable, Sendable {
 
         // Determine the actual current value based on the property key.
         let actualCurrentValue: StateValue?
-        switch change.attributeKey {
+        switch change.attribute {
         // Item Properties
         case .itemAdjectives:
             guard case .item(let itemID) = change.entityID else {
@@ -637,7 +574,10 @@ public struct GameState: Codable, Equatable, Sendable {
             actualCurrentValue == expectedOldValue ||
             (actualCurrentValue == nil && expectedOldValue == false)
         else {
-            throw ActionResponse.stateValidationFailed(change: change, actualOldValue: actualCurrentValue)
+            throw ActionResponse.stateValidationFailed(
+                change: change,
+                actualOldValue: actualCurrentValue
+            )
         }
     }
 }

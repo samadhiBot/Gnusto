@@ -17,10 +17,21 @@ public struct ExamineActionHandler: ActionHandler {
     ///           `ActionResponse.prerequisiteNotMet` if trying to examine something other
     ///           than an item or the player.
     public func validate(context: ActionContext) async throws {
-        // 1. Ensure we have a direct object
+        // For ALL commands, allow empty directObjects (handled in process method)
+        if context.command.isAllCommand {
+            return
+        }
+        
+        // 1. Ensure we have at least one direct object for non-ALL commands
+        guard !context.command.directObjects.isEmpty else {
+            throw ActionResponse.custom("Examine what?")
+        }
+        
+        // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Examine what?")
         }
+        
         switch directObjectRef {
         case .item(let targetItemID):
             // 2. Check if item exists
@@ -54,71 +65,149 @@ public struct ExamineActionHandler: ActionHandler {
     ///      d. Otherwise, the item's standard dynamic long description is fetched.
     ///   4. An `ActionResult` is returned with the generated message and any state changes.
     ///
+    /// For ALL commands, processes each object individually and provides consolidated feedback.
+    ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the detailed description and any relevant state changes.
     /// - Throws: Can throw errors from engine calls if issues occur (e.g., item not found during processing).
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject else {
-            return ActionResult("You can only examine items.")
+        // For ALL commands, empty directObjects is valid (means nothing to examine)
+        if !context.command.isAllCommand {
+            guard !context.command.directObjects.isEmpty else {
+                return ActionResult("You can only examine items.")
+            }
         }
-        switch directObjectRef {
-        case .item(let targetItemID):
-            let targetItem = try await context.engine.item(targetItemID)
-            var stateChanges: [StateChange] = []
-            // Special case: examining 'self' as an item should not record any state changes
-            if targetItem.id != "self" {
-                // --- State Change: Mark as Touched ---
-                if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-                    stateChanges.append(update)
+        
+        var allStateChanges: [StateChange] = []
+        var messages: [String] = []
+        var examinedItems: [Item] = []
+        
+        // Process each object individually
+        for directObjectRef in context.command.directObjects {
+            switch directObjectRef {
+            case .item(let targetItemID):
+                do {
+                    let targetItem = try await context.engine.item(targetItemID)
+                    
+                    // Validate this specific item for ALL commands
+                    if context.command.isAllCommand {
+                        // Check if player can reach the item
+                        guard await context.engine.playerCanReach(targetItemID) else {
+                            continue // Skip unreachable items in ALL commands
+                        }
+                    }
+                    
+                    var itemStateChanges: [StateChange] = []
+                    
+                    // Special case: examining 'self' as an item should not record any state changes
+                    if targetItem.id != "self" {
+                        // --- State Change: Mark as Touched ---
+                        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
+                            itemStateChanges.append(update)
+                        }
+                        // Note: Pronoun updates are handled after processing all items
+                    }
+                    
+                    // --- Determine Message ---
+                    let message: String
+                    // Priority 1: Readable Text (Check dynamic value)
+                    if targetItem.hasFlag(.isReadable),
+                       let readText: String = try? await context.engine.attribute(.readText, of: targetItem.id),
+                       !readText.isEmpty
+                    {
+                        message = readText
+                    }
+                    // Priority 2: Container/Door Description
+                    else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
+                        message = try await describeContainerOrDoor(
+                            targetItem: targetItem,
+                            engine: context.engine
+                        )
+                    }
+                    // Priority 3: Surface Description
+                    else if targetItem.hasFlag(.isSurface) {
+                        message = await describeSurface(
+                            targetItem: targetItem,
+                            engine: context.engine
+                        )
+                    }
+                    // Priority 4: Dynamic Long Description
+                    else {
+                        // Use the registry to generate the description using the item ID and key
+                        message = await context.engine.generateDescription(
+                            for: targetItem.id,
+                            attributeID: .description,
+                            engine: context.engine
+                        )
+                    }
+                    
+                    allStateChanges.append(contentsOf: itemStateChanges)
+                    examinedItems.append(targetItem)
+                    
+                    // For multiple objects, prefix with item name
+                    if context.command.isAllCommand || context.command.directObjects.count > 1 {
+                        messages.append("- \(targetItem.name.capitalizedFirst): \(message)")
+                    } else {
+                        messages.append(message)
+                    }
+                    
+                } catch {
+                    // For ALL commands, skip items that cause errors
+                    if !context.command.isAllCommand {
+                        throw error
+                    }
                 }
-                // --- State Change: Update pronouns ---
-                if let update = await context.engine.updatePronouns(to: targetItem) {
-                    stateChanges.append(update)
+                
+            case .player:
+                // Classic Zork response for EXAMINE SELF
+                if context.command.isAllCommand || context.command.directObjects.count > 1 {
+                    messages.append("- Yourself: You are your usual self.")
+                } else {
+                    messages.append("You are your usual self.")
+                }
+                
+            default:
+                // For ALL commands, skip non-items
+                if !context.command.isAllCommand {
+                    return ActionResult("You can only examine items.")
                 }
             }
-            // --- Determine Message ---
-            let message: String
-            // Priority 1: Readable Text (Check dynamic value)
-            if targetItem.hasFlag(.isReadable),
-               let readText: String = try? await context.engine.fetch(targetItem.id, .readText),
-               !readText.isEmpty
-            {
-                message = readText
-            }
-            // Priority 2: Container/Door Description
-            else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
-                message = try await describeContainerOrDoor(
-                    targetItem: targetItem,
-                    engine: context.engine
-                )
-            }
-            // Priority 3: Surface Description
-            else if targetItem.hasFlag(.isSurface) {
-                message = await describeSurface(
-                    targetItem: targetItem,
-                    engine: context.engine
-                )
-            }
-            // Priority 4: Dynamic Long Description
-            else {
-                // Use the registry to generate the description using the item ID and key
-                message = await context.engine.generateDescription(
-                    for: targetItem.id,
-                    key: .description,
-                    engine: context.engine
-                )
-            }
-            // --- Create Result ---
-            return ActionResult(
-                message: message,
-                stateChanges: stateChanges
-            )
-        case .player:
-            // Classic Zork response for EXAMINE SELF
-            return ActionResult("You are your usual self.")
-        default:
-            return ActionResult("You can only examine items.")
         }
+        
+        // Update pronouns appropriately for multiple objects
+        if !examinedItems.isEmpty {
+            let lastItem = examinedItems.last!
+            if examinedItems.count > 1 {
+                // For multiple items, update both "it" and "them"
+                let pronounChanges = await context.engine.updatePronounsForMultipleObjects(
+                    lastItem: lastItem,
+                    allItems: examinedItems
+                )
+                allStateChanges.append(contentsOf: pronounChanges)
+            } else {
+                // For single item, use the original method
+                if let pronounChange = await context.engine.updatePronouns(to: lastItem) {
+                    allStateChanges.append(pronounChange)
+                }
+            }
+        }
+        
+        // Generate appropriate message
+        let finalMessage: String
+        if context.command.isAllCommand {
+            if examinedItems.isEmpty && messages.isEmpty {
+                finalMessage = "There is nothing here to examine."
+            } else {
+                finalMessage = messages.joined(separator: "\n")
+            }
+        } else {
+            finalMessage = messages.joined(separator: "\n")
+        }
+        
+        return ActionResult(
+            message: finalMessage,
+            stateChanges: allStateChanges
+        )
     }
 
     // MARK: - Private Helpers (Adapted to return String)
@@ -142,13 +231,13 @@ public struct ExamineActionHandler: ActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.generateDescription(
             for: targetItem.id,
-            key: .description,
+            attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)
 
         // Check dynamic property for open state
-        let isOpen: Bool = try await engine.fetch(targetItem.id, .isOpen)
+        let isOpen: Bool = try await engine.attribute(.isOpen, of: targetItem.id)
         let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {
@@ -180,7 +269,7 @@ public struct ExamineActionHandler: ActionHandler {
         // Start with the item's main description, using the registry with ID and key
         let baseDescription = await engine.generateDescription(
             for: targetItem.id,
-            key: .description,
+            attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)

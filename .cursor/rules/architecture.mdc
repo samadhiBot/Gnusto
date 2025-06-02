@@ -5,25 +5,21 @@ alwaysApply: true
 ---
 # Engine Architecture Overview
 
-## ActionHandler / EnhancedActionHandler
+## ActionHandler
 
-Protocols defining how specific game verbs (like "take", "open", "go") are implemented. They encapsulate the logic for performing an action, including validation and state changes (via ActionResult for enhanced handlers). [ActionHandler.swift](mdc:Sources/GnustoEngine/Actions/Support/ActionHandler.swift) [EnhancedActionHandler.swift](mdc:Sources/GnustoEngine/Actions/Support/EnhancedActionHandler.swift)
+Protocol defining how specific game verbs (like "take", "open", "go") are implemented. It encapsulates the logic for performing an action, including validation, processing (which returns an `ActionResult`), and post-processing. [ActionHandler.swift](mdc:Sources/GnustoEngine/Actions/ActionHandler.swift)
 
-## DefinitionRegistry
+## GameBlueprint
 
-A registry holding definitions for potentially game-specific elements like timed events (FuseDefinition, DaemonDefinition) and custom action overrides (ObjectActionHandler, RoomActionHandler). Allows decoupling of game-specific logic from the core engine handlers. [DefinitionRegistry.swift](mdc:Sources/GnustoEngine/Definitions/DefinitionRegistry.swift)
-
-## DescriptionHandlerRegistry / DescriptionHandler
-
-Responsible for generating dynamic descriptions for items and locations, potentially based on game state. [DescriptionHandlerRegistry.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandlerRegistry.swift) [DescriptionHandler.swift](mdc:Sources/GnustoEngine/Content/Description/DescriptionHandler.swift)
+Protocol defining the static structure and game-specific configurations for a game. Implementations of `GameBlueprint` provide the initial game state, vocabulary, custom action handlers, item/location event handlers (for specific object/room behaviors), timed event definitions (via `TimeRegistry`), dynamic attribute providers, and other custom behaviors to the `GameEngine`. [GameBlueprint.swift](mdc:Sources/GnustoEngine/Blueprints/GameBlueprint.swift)
 
 ## GameEngine
 
-The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers, processes timed events (tickClock), and provides helper methods for common state access and mutation. GameEngine is `Sendable`. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
+The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers (obtained from the `GameBlueprint` or engine defaults), processes timed events (from the `TimeRegistry`), and provides helper methods for common state access and mutation. `GameEngine` is `Sendable`. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
 
 ## GameState
 
-The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via GameEngine helpers). GameState is `Codable` and `Sendable`. [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
+The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via `GameEngine` helpers). `GameState` is `Codable` and `Sendable`. [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
 
 ## IOHandler
 
@@ -35,12 +31,20 @@ The core model structs representing entities in the game world. They hold relati
 
 ## Parser
 
-Defines the interface for turning raw player input strings into structured Command objects. Concrete implementations handle grammar, vocabulary lookup, and disambiguation. [Parser.swift](mdc:Sources/GnustoEngine/Parsing/Parser.swift)
+Defines the interface for turning raw player input strings into structured `Command` objects. Concrete implementations handle grammar, vocabulary lookup, and disambiguation. [Parser.swift](mdc:Sources/GnustoEngine/Parsing/Parser.swift)
 
 ## ScopeResolver
 
 Centralizes logic for determining what the player can see and interact with based on location, light, container state, etc. [ScopeResolver.swift](mdc:Sources/GnustoEngine/Core/ScopeResolver.swift)
 
+## StateChange
+
+The fundamental mechanism for all game state mutations. `StateChange` objects describe proposed modifications to the game world (e.g., moving items, setting flags, updating scores) without immediately applying them. This pattern preserves the action pipeline by ensuring all state changes flow through proper validation, event handlers, and sequencing. Factory methods in `GameEngine+stateChanges.swift` provide convenient builders for common state changes. [StateChange.swift](mdc:Sources/GnustoEngine/Actions/StateChange.swift)
+
+## TimeRegistry
+
+A repository for game-specific timed event definitions (`FuseDefinition`, `DaemonDefinition`). The `GameEngine` consults this registry (defined in `DefinitionRegistry.swift`) for fuse and daemon behaviors. It's typically configured via the `GameBlueprint`. [DefinitionRegistry.swift](mdc:Sources/GnustoEngine/Time/DefinitionRegistry.swift)
+
 ## Vocabulary
 
-Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. [Vocabulary.swift](mdc:Sources/GnustoEngine/Core/Vocabulary/Vocabulary.swift)
+Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. The `Vocabulary` is typically provided by the `GameBlueprint`. [Vocabulary.swift](mdc:Sources/GnustoEngine/Vocabulary/Vocabulary.swift)

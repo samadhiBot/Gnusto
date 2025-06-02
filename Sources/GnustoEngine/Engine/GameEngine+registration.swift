@@ -1,81 +1,105 @@
 // MARK: - Registration Methods (Items)
 
 extension GameEngine {
-    /// Registers a dynamic computation handler for a specific item attribute.
+    /// Registers a dynamic computation handler for a specific item's attribute.
     ///
-    /// When the engine needs the value of this attribute for an item, it will execute
+    /// When the engine needs the value of this attribute for the specified item, it will execute
     /// the provided `handler` closure instead of just reading a stored value.
     /// The handler receives the `Item` instance and the current `GameState`, and should
     /// return the computed `StateValue`.
     ///
-    /// If a compute handler already exists for this `AttributeID`, it will be overwritten.
+    /// This approach provides better separation of concerns than attribute-centric registration,
+    /// as each item can have its own specific logic without requiring large switch statements.
+    ///
+    /// If a compute handler already exists for this item and attribute combination, it will be overwritten.
     /// This method forwards the registration to the `dynamicAttributeRegistry`.
     ///
     /// - Parameters:
-    ///   - key: The `AttributeID` of the attribute whose value will be computed.
+    ///   - itemID: The `ItemID` of the specific item whose attribute will be computed.
+    ///   - attributeID: The `AttributeID` of the attribute whose value will be computed.
     ///   - handler: The closure that computes the attribute's value.
     public func registerItemCompute(
-        key: AttributeID,
+        itemID: ItemID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.ItemComputeHandler
     ) {
-        dynamicAttributeRegistry.registerItemCompute(key: key, handler: handler)
+        dynamicAttributeRegistry.registerItemCompute(itemID: itemID, attributeID: attributeID, handler: handler)
     }
 
-    /// Registers a validation handler for a specific item attribute.
+    /// Registers a validation handler for a specific item's attribute.
     ///
-    /// Before the engine applies a `StateChange` to modify this attribute for an item,
+    /// Before the engine applies a `StateChange` to modify this attribute for the specified item,
     /// it will first execute the provided `handler` closure. The handler receives the
     /// `Item` instance and the proposed new `StateValue`. It should return `true` if the
     /// new value is valid, or `false` (or throw an error) if it's invalid.
     ///
-    /// If a validation handler already exists for this `AttributeID`, it will be overwritten.
+    /// This approach provides better separation of concerns than attribute-centric registration,
+    /// as each item can have its own specific validation logic.
+    ///
+    /// If a validation handler already exists for this item and attribute combination, it will be overwritten.
     /// This method forwards the registration to the `dynamicAttributeRegistry`.
     ///
     /// - Parameters:
-    ///   - key: The `AttributeID` of the attribute whose changes will be validated.
+    ///   - itemID: The `ItemID` of the specific item whose attribute changes will be validated.
+    ///   - attributeID: The `AttributeID` of the attribute whose changes will be validated.
     ///   - handler: The closure that validates a proposed new value for the attribute.
     public func registerItemValidate(
-        key: AttributeID,
+        itemID: ItemID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.ItemValidateHandler
     ) {
-        dynamicAttributeRegistry.registerItemValidate(key: key, handler: handler)
+        dynamicAttributeRegistry.registerItemValidate(itemID: itemID, attributeID: attributeID, handler: handler)
     }
 
     // MARK: - Registration Methods (Locations)
 
-    /// Registers a dynamic computation handler for a specific location attribute.
+    /// Registers a dynamic computation handler for a specific location's attribute.
     ///
-    /// Similar to `registerItemCompute`, but for location attributes. When the engine needs
-    /// the value of this attribute for a location, it will execute the provided `handler`.
+    /// When the engine needs the value of this attribute for the specified location, it will execute
+    /// the provided `handler` closure instead of just reading a stored value.
+    /// The handler receives the `Location` instance and the current `GameState`, and should
+    /// return the computed `StateValue`.
     ///
-    /// If a compute handler already exists, it's overwritten.
-    /// Forwards to `dynamicAttributeRegistry`.
+    /// This approach provides better separation of concerns than attribute-centric registration,
+    /// as each location can have its own specific logic without requiring large switch statements.
+    ///
+    /// If a compute handler already exists for this location and attribute combination, it will be overwritten.
+    /// This method forwards the registration to the `dynamicAttributeRegistry`.
     ///
     /// - Parameters:
-    ///   - key: The `AttributeID` of the location attribute.
-    ///   - handler: The closure to compute the attribute's value.
+    ///   - locationID: The `LocationID` of the specific location whose attribute will be computed.
+    ///   - attributeID: The `AttributeID` of the attribute whose value will be computed.
+    ///   - handler: The closure that computes the attribute's value.
     public func registerLocationCompute(
-        key: AttributeID,
+        locationID: LocationID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.LocationComputeHandler
     ) {
-        dynamicAttributeRegistry.registerLocationCompute(key: key, handler: handler)
+        dynamicAttributeRegistry.registerLocationCompute(locationID: locationID, attributeID: attributeID, handler: handler)
     }
 
-    /// Registers a validation handler for a specific location attribute.
+    /// Registers a validation handler for a specific location's attribute.
     ///
-    /// Similar to `registerItemValidate`, but for location attributes. Before the engine
-    /// applies a `StateChange` to this attribute for a location, it executes the `handler`.
+    /// Before the engine applies a `StateChange` to modify this attribute for the specified location,
+    /// it will first execute the provided `handler` closure. The handler receives the
+    /// `Location` instance and the proposed new `StateValue`. It should return `true` if the
+    /// new value is valid, or `false` (or throw an error) if it's invalid.
     ///
-    /// If a validation handler already exists, it's overwritten.
-    /// Forwards to `dynamicAttributeRegistry`.
+    /// This approach provides better separation of concerns than attribute-centric registration,
+    /// as each location can have its own specific validation logic.
+    ///
+    /// If a validation handler already exists for this location and attribute combination, it will be overwritten.
+    /// This method forwards the registration to the `dynamicAttributeRegistry`.
     ///
     /// - Parameters:
-    ///   - key: The `AttributeID` of the location attribute.
-    ///   - handler: The closure to validate a new value.
+    ///   - locationID: The `LocationID` of the specific location whose attribute changes will be validated.
+    ///   - attributeID: The `AttributeID` of the attribute whose changes will be validated.
+    ///   - handler: The closure that validates a proposed new value for the attribute.
     public func registerLocationValidate(
-        key: AttributeID,
+        locationID: LocationID,
+        attributeID: AttributeID,
         handler: @escaping DynamicAttributeRegistry.LocationValidateHandler
     ) {
-        dynamicAttributeRegistry.registerLocationValidate(key: key, handler: handler)
+        dynamicAttributeRegistry.registerLocationValidate(locationID: locationID, attributeID: attributeID, handler: handler)
     }
 }

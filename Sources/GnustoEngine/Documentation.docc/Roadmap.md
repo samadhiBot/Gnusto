@@ -2,16 +2,23 @@
 
 ## Phase 1: Improved Developer Ergonomics
 
-### 1.1 Handler Registration Improvements
+### 1.1 Handler Registration Improvements ✅ COMPLETED
 
-- [x] Implement reflection-based handler discovery for `ItemEventHandler` and `LocationActionHandler`
-  - Allow handlers to be defined as static methods in the same struct as items/locations
-  - Use naming conventions (e.g., `{itemID}Handler`) to automatically register handlers
-  - Provide compile-time validation of handler signatures
-- [ ] SPIKE: Add builder-style API for handler registration
-  - Support fluent chaining of handler registrations
-  - Enable type-safe handler composition
-  - Allow conditional handler registration
+- [x] ✅ **Implement automatic handler discovery with GnustoAutoWiringPlugin**
+  - ✅ Allow handlers to be defined as static properties in game area structs/enums
+  - ✅ Use automatic pattern discovery to register handlers via build tool plugin
+  - ✅ Provide comprehensive game setup generation including items, locations, handlers, and time registry
+  - ✅ Support both static (enum-based) and instance (struct-based) area architectures
+- [x] ✅ **Automatic ID constant generation**
+  - ✅ Scan `Location(id: .someID, ...)` patterns and generate `LocationID.someID` extensions
+  - ✅ Scan `Item(id: .someID, ...)` patterns and generate `ItemID.someID` extensions
+  - ✅ Support `GlobalID`, `FuseID`, `DaemonID`, and custom `VerbID` generation
+- [x] ✅ **Complete GameBlueprint integration**
+  - ✅ Auto-aggregate all items and locations from multiple area files
+  - ✅ Auto-wire event handlers with proper scoping
+  - ✅ Auto-register fuse and daemon definitions in TimeRegistry
+
+**The GnustoAutoWiringPlugin has eliminated virtually all boilerplate code for game setup!**
 
 ### 1.2 State Change Ergonomics
 
@@ -113,9 +120,9 @@
 
 1. **Developer Experience**
 
-   - Reduced boilerplate code
-   - Faster development cycles
-   - Fewer runtime errors
+   - ✅ **Dramatically reduced boilerplate code** - GnustoAutoWiringPlugin eliminates manual ID generation and game setup
+   - ✅ **Faster development cycles** - Plugin handles all the wiring automatically
+   - ✅ **Fewer runtime errors** - Compile-time discovery ensures consistent setup
 
 2. **Code Quality**
 

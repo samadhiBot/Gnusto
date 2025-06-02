@@ -61,7 +61,7 @@ public actor GameEngine: Sendable {
 
     /// The registry for custom logic that dynamically computes or validates item and
     /// location attributes. This is initialized from the `GameBlueprint` and can be
-    /// further modified by game developers using methods like `registerItemCompute(key:handler:)`.
+    /// further modified by game developers using methods like `registerItemCompute(attribute:handler:)`.
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
@@ -82,47 +82,10 @@ public actor GameEngine: Sendable {
     /// Internal logger for engine messages, warnings, and errors.
     let logger = Logger(label: "com.samadhibot.Gnusto.GameEngine")
 
-    /// The maximum line length used for formatting some descriptions by the `IOHandler`.
-    /// This is primarily an internal detail but might influence how game developers structure
-    /// very long descriptive texts if they want to avoid automatic wrapping.
-    private let maximumDescriptionLength: Int = 100 // TODO: Make this configurable via GameConstants?
-
     /// Internal flag to control the main game loop's continuation.
     /// Game developers can call `requestQuit()` to set this flag to `true`,
     /// causing the game to end after the current turn completes.
     var shouldQuit: Bool = false
-
-    // MARK: - Custom Game Hooks (Closures)
-
-    /// A closure, provided by the `GameBlueprint`, that is called after the player
-    /// successfully moves to a new location (e.g., after a successful "GO" command).
-    ///
-    /// Use this to implement custom logic that should occur immediately upon entering a room,
-    /// such as triggering special events, updating state based on the new location, or
-    /// providing unique descriptive text that overrides the default room description behavior.
-    /// The closure receives the `GameEngine` instance and the `LocationID` of the room just entered.
-    ///
-    /// - Returns: Return `true` if your hook fully handles all necessary actions (including any
-    ///   output to the player like describing the room) and the engine should **not** perform its
-    ///   default processing for entering the room (which typically includes calling
-    ///   `describeCurrentLocation()`). Return `false` or `nil` if the engine should proceed
-    ///   with its default behavior after the hook completes.
-    public var onEnterRoom: (@Sendable (GameEngine, LocationID) async -> Bool)?
-
-    /// A closure, provided by the `GameBlueprint`, that is called at the very start of
-    /// each turn, before the player's `Command` is parsed or processed further by event handlers
-    /// or action handlers.
-    ///
-    /// This is a critical hook for implementing per-turn global logic such as weather changes,
-    /// ambient effects, time-passing events not tied to fuses/daemons, or proactive NPC behaviors.
-    /// The closure receives the `GameEngine` instance and the raw `Command` object (which might
-    /// still be in a preliminary state if parsing hasn't fully completed).
-    ///
-    /// - Returns: Return `true` if your hook fully handles the turn or command, and no further
-    ///   engine processing for this turn/command should occur (the engine will skip to the next
-    ///   turn). Return `false` or `nil` if the engine should proceed with its normal turn
-    ///   processing after the hook completes.
-    public var beforeTurn: (@Sendable (GameEngine, Command) async -> Bool)?
 
     // MARK: - Initialization
 
@@ -132,17 +95,58 @@ public actor GameEngine: Sendable {
     /// with all game-specific data (initial state, constants, definitions) and logic (custom handlers, hooks).
     ///
     /// - Parameters:
-    ///   - blueprint: The `GameBlueprint` containing all game definitions, initial state,
-    ///                custom handlers, and hooks.
+    ///   - blueprint: The `GameBlueprint` containing all game definitions, custom handlers, and hooks.
+    ///   - vocabulary: Optional. The `Vocabulary` for the game. If `nil`, it's auto-generated from items.
+    ///   - pronouns: Optional. Initial pronoun references.
+    ///   - activeFuses: Optional. Initially active fuses and their remaining turns.
+    ///   - activeDaemons: Optional. Initially active daemons.
+    ///   - globalState: Optional. Initial game-specific global key-value data.
     ///   - parser: The `Parser` instance to be used for understanding player input.
     ///   - ioHandler: The `IOHandler` instance for interacting with the player (text input/output).
     public init(
         blueprint: GameBlueprint,
+        vocabulary: Vocabulary? = nil,
+        pronouns: [String: Set<EntityReference>] = [:],
+        activeFuses: [FuseID: Int] = [:],
+        activeDaemons: Set<DaemonID> = [],
+        globalState: [GlobalID: StateValue] = [:],
         parser: Parser,
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
-        self.gameState = blueprint.state
+        
+        // Build vocabulary with custom verbs if not provided
+        let gameVocabulary: Vocabulary
+        if let providedVocabulary = vocabulary {
+            gameVocabulary = providedVocabulary
+        } else {
+            // Create custom verbs from the blueprint's custom action handlers
+            var customVerbs: [Verb] = []
+            for verbID in blueprint.customActionHandlers.keys {
+                // Create a basic definition; requiresLight=false is a safe default for custom verbs
+                let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
+                customVerbs.append(verbDef)
+            }
+            
+            // Build vocabulary with custom verbs
+            gameVocabulary = Vocabulary.build(
+                items: blueprint.items,
+                locations: blueprint.locations,
+                verbs: customVerbs,
+                useDefaultVerbs: true
+            )
+        }
+        
+        self.gameState = GameState(
+            locations: blueprint.locations,
+            items: blueprint.items,
+            player: blueprint.player,
+            vocabulary: gameVocabulary,
+            pronouns: pronouns,
+            activeFuses: activeFuses,
+            activeDaemons: activeDaemons,
+            globalState: globalState
+        )
         self.parser = parser
         self.ioHandler = ioHandler
         self.timeRegistry = blueprint.timeRegistry
@@ -151,8 +155,6 @@ public actor GameEngine: Sendable {
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.itemEventHandlers = blueprint.itemEventHandlers
         self.locationEventHandlers = blueprint.locationEventHandlers
-        self.onEnterRoom = blueprint.onEnterRoom
-        self.beforeTurn = blueprint.beforeTurn
 
         #if DEBUG
         self.actionHandlers[.debug] = DebugActionHandler()
@@ -191,7 +193,7 @@ extension GameEngine {
             }
             try await describeCurrentLocation()
         } catch {
-            logger.error("💥 \(error)")
+            logError("\(error)")
         }
 
         while !shouldQuit {
@@ -199,11 +201,20 @@ extension GameEngine {
             do {
                 try await processTurn()
             } catch {
-                logger.error("💥 \(error)")
+                logError("\(error)")
             }
         }
 
         await ioHandler.teardown()
+    }
+
+    /// Signals the engine to stop the main game loop and end the game after the
+    /// current turn has been fully processed.
+    ///
+    /// This is the standard way to programmatically quit the game from within an
+    /// action handler or game hook.
+    public func requestQuit() {
+        self.shouldQuit = true
     }
 
     // MARK: Private helpers
@@ -218,11 +229,9 @@ extension GameEngine {
     /// 3. Parses the player's input string into a structured `Command` using the `parser`.
     /// 4. Increments the player's move counter in `gameState`.
     /// 5. If parsing is successful:
-    ///    a. Executes the `beforeTurn` game hook, if defined. If the hook returns `true`
-    ///       or sets `shouldQuit`, the turn ends.
-    ///    b. If the command is to quit or `shouldQuit` is set, the turn ends.
-    ///    c. Calls `execute(command:)` to process the command through event and action handlers.
-    ///    d. If the command was a movement command (`.go`) to an unvisited room, or a command
+    ///    a. If the command is to quit or `shouldQuit` is set, the turn ends.
+    ///    b. Calls `execute(command:)` to process the command through event and action handlers.
+    ///    c. If the command was a movement command (`.go`) to an unvisited room, or a command
     ///       that changed the light state (e.g., `.turnOn`, `.turnOff` a light source), it then
     ///       calls `describeCurrentLocation()`.
     /// 6. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
@@ -260,7 +269,7 @@ extension GameEngine {
         try gameState.apply(
             StateChange(
                 entityID: .player,
-                attributeKey: .playerMoves,
+                attribute: .playerMoves,
                 oldValue: .int(moves),
                 newValue: .int(moves + 1)
             )
@@ -269,10 +278,27 @@ extension GameEngine {
         // 3. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
-            // --- Custom Hook: Before Turn ---
-            if await beforeTurn?(self, command) == true || shouldQuit {
-                return
+            if command.verb == .quit || shouldQuit { return }
+
+            // Store the player's current location before executing the command
+            let locationBeforeCommand = playerLocationID
+            
+            // For GO commands, check if the destination is unvisited before execution
+            let destinationWasUnvisited: Bool
+            if command.verb == .go {
+                let exit = try? command.direction.flatMap { direction in
+                    try location(playerLocationID).exits[direction]
+                }
+                destinationWasUnvisited = if let destination = try? location(exit?.destinationID) {
+                    !destination.hasFlag(.isVisited)
+                } else {
+                    false
+                }
+            } else {
+                destinationWasUnvisited = false
             }
+
+            await execute(command: command)
 
             if command.verb == .quit || shouldQuit { return }
 
@@ -280,24 +306,20 @@ extension GameEngine {
             let shouldDescribe: Bool
             switch command.verb {
             case .go:
-                // Check if the destination room was visited before the movement
-                let exit = try command.direction.flatMap { direction in
-                    try location(playerLocationID).exits[direction]
-                }
-                shouldDescribe = if let destination = try? location(exit?.destinationID) {
-                    !destination.hasFlag(.isVisited)
+                // Check if the player actually moved to a different location
+                let locationAfterCommand = playerLocationID
+                if locationBeforeCommand != locationAfterCommand {
+                    // Player moved - use the pre-execution check for whether to describe
+                    shouldDescribe = destinationWasUnvisited
                 } else {
-                    false
+                    // Player didn't move (movement was prevented)
+                    shouldDescribe = false
                 }
             case .turnOn, .turnOff:
                 shouldDescribe = true // Light change commands
             default:
                 shouldDescribe = false
             }
-
-            await execute(command: command)
-
-            if command.verb == .quit || shouldQuit { return }
 
             if shouldDescribe {
                 try await describeCurrentLocation()
@@ -402,18 +424,18 @@ extension GameEngine {
         // Log detailed errors separately
         switch response {
         case .internalEngineError(let msg):
-            logger.error("💥 ActionResponse: Internal Engine Error: \(msg)")
+            logError("ActionResponse: Internal Engine Error: \(msg)")
         case .invalidValue(let msg):
-            logger.error("💥 ActionResponse: Invalid Value: \(msg)")
+            logError("ActionResponse: Invalid Value: \(msg)")
         case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
             // Construct the log string first
             let logDetail = """
                 State Validation Failed!
-                    - Change: \(String(describing: change))
-                    - Expected Old Value: \(String(describing: change.oldValue))
-                    - Actual Old Value: \(String(describing: actualOldValue))
+                   - Change: \(change.description.multiline(2))
+                   - Expected Old Value: \(String(describing: change.oldValue))
+                   - Actual Old Value: \(String(describing: actualOldValue))
                 """
-            logger.error("💥 ActionResponse: \(logDetail)")
+            logError("ActionResponse: \(logDetail)")
         default:
             break // No detailed logging needed for other handled errors
         }
@@ -448,7 +470,7 @@ extension GameEngine {
         }
         await ioHandler.print(message)
         if case .internalError(let details) = parseError {
-            logger.error("💥 ParseError: \(details)")
+            logError("ParseError: \(details)")
         }
     }
 
@@ -553,7 +575,7 @@ extension GameEngine {
 
             let updateChange = StateChange(
                 entityID: .global,
-                attributeKey: .updateFuseTurns(fuseID: fuseID),
+                attribute: .updateFuseTurns(fuseID: fuseID),
                 oldValue: .int(currentTurns),
                 newValue: .int(newTurns)
             )
@@ -568,7 +590,7 @@ extension GameEngine {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
                         entityID: .global,
-                        attributeKey: .removeActiveFuse(fuseID: fuseID),
+                        attribute: .removeActiveFuse(fuseID: fuseID),
                         oldValue: .int(newTurns),
                         newValue: .int(0)
                     )
@@ -583,7 +605,7 @@ extension GameEngine {
 
                 let removeChange = StateChange(
                     entityID: .global,
-                    attributeKey: .removeActiveFuse(fuseID: fuseID),
+                    attribute: .removeActiveFuse(fuseID: fuseID),
                     oldValue: .int(newTurns),
                     newValue: .int(0)
                 )
@@ -674,7 +696,7 @@ extension GameEngine {
                 }
             } catch {
                 // Log error and potentially halt turn?
-                logger.warning("💥 Error in room beforeTurn handler: \(error)")
+                logWarning("Error in room beforeTurn handler: \(error)")
                 // Decide if this error should block the turn. For now, let's continue.
             }
             // Check if handler quit the game
@@ -727,8 +749,8 @@ extension GameEngine {
             if let specificResponse = response as? ActionResponse {
                 await report(specificResponse)
             } else {
-                logger.warning("""
-                    💥 An unexpected error occurred in an object handler: \
+                logWarning("""
+                    An unexpected error occurred in an object handler: \
                     \(response)
                     """)
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
@@ -743,8 +765,8 @@ extension GameEngine {
             // Correct: Look up the Verb definition directly
             guard let verb = gameState.vocabulary.verbDefinitions[command.verb] else {
                 // This case should ideally not be reached if parser validates verbs
-                logger.warning("""
-                    💥 Internal Error: Unknown verb ID \
+                logWarning("""
+                    Internal Error: Unknown verb ID \
                     '\(command.verb.rawValue)' reached execution. \
                     If you encounter this error during testing, make sure to use \
                     `parse(input:vocabulary:gameState:)` to generate the command.
@@ -760,8 +782,8 @@ extension GameEngine {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verb] else {
                     // No handler registered for this verb (should match vocabulary definition)
-                    logger.warning("""
-                        💥 Internal Error: No ActionHandler registered for verb ID \
+                    logWarning("""
+                        Internal Error: No ActionHandler registered for verb ID \
                         '\(command.verb.rawValue)'.
                         """)
                     await ioHandler.print("I don't know how to '\(command.verb.rawValue)'.")
@@ -793,7 +815,7 @@ extension GameEngine {
                     await report(actionResponse)
                 } catch {
                     // Catch any other unexpected errors from handlers
-                    logger.error("💥 Unexpected error during handler execution: \(error)")
+                    logError("Unexpected error during handler execution: \(error)")
                     await ioHandler.print("An unexpected problem occurred.")
                 }
                 // --- End Execute Handler ---
@@ -811,7 +833,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in direct object afterTurn handler: \(error)")
+                logWarning("Error in direct object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -824,7 +846,7 @@ extension GameEngine {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in indirect object afterTurn handler: \(error)")
+                logWarning("Error in indirect object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
         }
@@ -839,7 +861,7 @@ extension GameEngine {
                 ),
                    try await processActionResult(result) { return }
             } catch {
-                logger.warning("💥 Error in room afterTurn handler: \(error)")
+                logWarning("Error in room afterTurn handler: \(error)")
             }
             // Check if handler quit the game
             if shouldQuit { return }
@@ -857,30 +879,217 @@ extension GameEngine {
     /// - Returns: `true` if the `ActionResult` contained a message that was printed,
     ///   `false` otherwise.
     /// - Throws: Re-throws errors encountered during state application.
-    private func processActionResult(_ result: ActionResult) async throws -> Bool {
+    func processActionResult(_ result: ActionResult) async throws -> Bool {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
         for change in result.stateChanges {
             do {
-                try gameState.apply(change)
+                try await applyWithDynamicValidation(change)
             } catch {
-                logger.error("""
-                    💥 Failed to apply state change during processActionResult:
+                logError("""
+                    Failed to apply state change during processActionResult:
                        - \(error)
-                       - Change: \(String(describing: change))
+                       - Change: \(change.description.multiline(2))
                     """)
                 throw error // Re-throw the error to be caught by execute()
             }
         }
 
-        // 2. Print Result Message
+        // 2. Process Side Effects
+        if !result.sideEffects.isEmpty {
+            do {
+                try await processSideEffects(result.sideEffects)
+            } catch {
+                logError("""
+                    Failed to process side effects during processActionResult:
+                       - \(error)
+                       - Side Effects: \(result.sideEffects)
+                    """)
+                throw error
+            }
+        }
+
+        // 3. Print Result Message
         if let message = result.message {
             await ioHandler.print(message)
             return true
         } else {
             return false
         }
-
-        // TODO: Handle SideEffects if they are added to ActionResult?
+    }
+    
+    /// Applies a `StateChange` with dynamic validation, respecting the action pipeline.
+    ///
+    /// This method performs dynamic validation using the `DynamicAttributeRegistry` before
+    /// applying the change to the game state. This ensures that dynamic validation handlers
+    /// are respected even when state changes are applied directly.
+    ///
+    /// - Parameter change: The `StateChange` to validate and apply.
+    /// - Throws: `ActionResponse.invalidValue` if dynamic validation fails, or re-throws
+    ///           any errors from `GameState.apply()`.
+    func applyWithDynamicValidation(_ change: StateChange) async throws {
+        // Perform dynamic validation for item and location attributes
+        switch change.attribute {
+        case .itemAttribute(let key):
+            guard case .item(let itemID) = change.entityID else {
+                throw ActionResponse.internalEngineError(
+                    "Invalid entity ID for itemAttribute: expected .item"
+                )
+            }
+            
+            let isValid = try await validateStateValue(
+                itemID: itemID,
+                attributeID: key,
+                newValue: change.newValue
+            )
+            
+            if !isValid {
+                throw ActionResponse.invalidValue("""
+                    Dynamic validation failed for item attribute '\(key.rawValue)' \
+                    on \(itemID.rawValue): \(change.newValue)
+                    """)
+            }
+            
+        case .locationAttribute(let key):
+            guard case .location(let locationID) = change.entityID else {
+                throw ActionResponse.internalEngineError(
+                    "Invalid entity ID for locationAttribute: expected .location"
+                )
+            }
+            
+            let isValid = try await validateStateValue(
+                locationID: locationID,
+                attributeID: key,
+                newValue: change.newValue
+            )
+            
+            if !isValid {
+                throw ActionResponse.invalidValue("""
+                    Dynamic validation failed for location attribute '\(key.rawValue)' \
+                    on \(locationID.rawValue): \(change.newValue)
+                    """)
+            }
+            
+        default:
+            // No dynamic validation needed for other attribute types
+            break
+        }
+        
+        // Apply the change to the game state
+        try gameState.apply(change)
     }
 }
+
+// MARK: - Default Handlers
+
+extension GameEngine {
+    /// Default action handlers provided by the engine.
+    /// Games can override these via the `TimeRegistry`.
+    static var defaultActionHandlers: [VerbID: ActionHandler] {
+        var handlers: [VerbID: ActionHandler] = [
+            // Movement & World Interaction
+            .close: CloseActionHandler(),
+            .drop: DropActionHandler(),
+            .examine: ExamineActionHandler(),
+            .give: GiveActionHandler(),
+            .go: GoActionHandler(),
+            .insert: InsertActionHandler(),
+            .inventory: InventoryActionHandler(),
+            .listen: ListenActionHandler(),
+            .lock: LockActionHandler(),
+            .look: LookActionHandler(),
+            .open: OpenActionHandler(),
+            .push: PushActionHandler(),
+            .putOn: PutOnActionHandler(),
+            .read: ReadActionHandler(),
+            .remove: RemoveActionHandler(),
+            .smell: SmellActionHandler(),
+            .take: TakeActionHandler(),
+            .taste: TasteActionHandler(),
+            .thinkAbout: ThinkAboutActionHandler(),
+            .touch: TouchActionHandler(),
+            .turnOff: TurnOffActionHandler(),
+            .turnOn: TurnOnActionHandler(),
+            .unlock: UnlockActionHandler(),
+            .wear: WearActionHandler(),
+            .xyzzy: XyzzyActionHandler(),
+
+            // Meta Actions
+//            .brief: BriefActionHandler(),
+//            .help: HelpActionHandler(),
+            .quit: QuitActionHandler(),
+//            .restore: RestoreActionHandler(),
+//            .save: SaveActionHandler(),
+            .score: ScoreActionHandler(),
+//            .verbose: VerboseActionHandler(),
+            .wait: WaitActionHandler(),
+        ]
+
+    #if DEBUG
+        handlers[.debug] = DebugActionHandler()
+    #endif
+        return handlers
+    }
+}
+
+// MARK: - Logging helpers
+
+extension GameEngine {
+    func logError(_ message: String) {
+        logger.error(
+            Logger.Message(
+                stringLiteral: message.multiline()
+            )
+        )
+    }
+
+    func logWarning(_ message: String) {
+        logger.warning(
+            Logger.Message(
+                stringLiteral: message.multiline()
+            )
+        )
+    }
+}
+
+#if DEBUG
+
+// MARK: - Internal State Mutation (Testing & Engine Use Only)
+
+extension GameEngine {
+    /// Applies a `StateChange` directly to the game state.
+    ///
+    /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
+    ///   operations and testing scenarios where direct state manipulation is necessary. Game
+    ///   developers should use the action handler system (`ActionResult.stateChanges`) rather
+    ///   than calling this method directly.
+    ///
+    /// This method bypasses the normal action handler pipeline, including:
+    /// - Before/after turn event handlers
+    /// - Action validation
+    /// - Side effect processing
+    ///
+    /// Use this method only when:
+    /// - Setting up test scenarios that require specific game states
+    /// - Internal engine operations that need direct state access
+    /// - Implementing low-level engine functionality
+    ///
+    /// - Parameter change: The `StateChange` to apply to the game state.
+    /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
+    func apply(_ change: StateChange) async throws {
+        try await applyWithDynamicValidation(change)
+    }
+
+    /// Retrieves the complete history of all `StateChange`s applied to the `gameState`
+    /// since the game started or the state was last loaded.
+    ///
+    /// This can be useful for debugging or advanced game mechanics that need to inspect
+    /// past state transitions.
+    ///
+    /// - Returns: An array of `StateChange` objects, in the order they were applied.
+    func changeHistory() -> [StateChange] {
+        gameState.changeHistory
+    }
+}
+
+#endif

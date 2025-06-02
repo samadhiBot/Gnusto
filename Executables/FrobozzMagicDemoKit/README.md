@@ -1,18 +1,14 @@
-# Frobozz Magic Demo Kit
-
-Welcome, aspiring Implementor! This folder contains the genuine Frobozz Magic Demo Kit, guaranteed\* to demonstrate the wondrous capabilities of the Gnusto Interactive Fiction Engine. Its goal is to provide a clear, approachable reference implementation to help new developers understand how to create magical interactive adventures with Gnusto.
-
 \*Guarantee void if used near grues, volcanoes, or during Implementor Incantations.
 
 ## Design Philosophy
 
-The `FrobozzMagicDemoKit` class (the heart of the Demo Kit) demonstrates:
+The `FrobozzMagicDemoKit` struct (the heart of the Demo Kit) demonstrates:
 
-1. Setting up a complete game with the engine (some assembly required)
-2. Defining magical game content (locations, items, verbs)
-3. Implementing custom spell-like behavior through game hooks
-4. Managing time-based enchantments with fuses and daemons
-5. Testing the user-friendliness (ergonomics) of the engine for client games
+1.  Setting up a complete game with the engine (some assembly required)
+2.  Defining magical game content (locations, items, verbs)
+3.  Implementing custom spell-like behavior through game hooks
+4.  Managing time-based enchantments with fuses and daemons
+5.  Testing the user-friendliness (ergonomics) of the engine for client games
 
 ### Adding More Magic to the Demo Kit
 
@@ -20,108 +16,135 @@ The `FrobozzMagicDemoKit` class (the heart of the Demo Kit) demonstrates:
 - The Demo Kit is the proving ground for engine functionality and ease-of-use.
 - The Gnusto Interactive Fiction Engine is still under active development (pre 0.0.1!), so feel free to enhance and improve the engine whenever you find missing functionality or awkward enchantments.
 
-## Demonstrated Features
+## Engine Features to Demonstrate
 
-The Demo Kit showcases several important engine features:
+This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Interactive Fiction Engine. Below is a technical outline of features we will implement and demonstrate:
 
-### Location and Item Setup
+### 1. Core World Representation (`Item`, `Location`, `GameState`)
 
-```swift
-// Creating locations with descriptions and exits
-Location(
-    id: "treasureRoom",
-    name: "Treasure Room",
-    description: """
-        This small chamber sparkles with reflections from numerous precious gems \
-        embedded in the walls. A stone pedestal in the center of the room holds \
-        what appears to be a golden crown.
-        """,
-    exits: [
-        .south: Exit(destination: "darkChamber")
-    ]
-)
+- **Locations (`Location`)**:
+  - Defining locations with unique IDs, names, and detailed descriptions.
+  - Implementing static descriptions and dynamic descriptions (e.g., through custom logic or event handlers).
+  - Utilizing `LocationProperty` (e.g., `.light`, `.outside`, `.waterSource`).
+  - Configuring exits:
+    - Standard directional exits (`.north`, `.south`, etc.).
+    - Conditional exits (e.g., requiring an item or a specific game state).
+    - Hidden or initially unavailable exits.
+  - Managing "globals": items consistently present or accessible within a location.
+  - Demonstrating room-specific event handling (e.g., `LocationEvent.beforeTurn`, `LocationEvent.onEnter`) using `LocationEventHandler` (configured in `GameBlueprint`).
+- **Items (`Item`)**:
+  - Defining items with unique IDs, names, adjectives, and synonyms for robust parsing.
+  - Crafting descriptive text for items, including static and dynamic descriptions.
+  - Assigning `ItemProperty` flags (e.g., `.takable`, `.container`, `.wearable`, `.lightSource`, `.readable`, `.food`, `.weapon`).
+  - Specifying initial item placement (`ParentEntity`): in a location, inside a container, carried by the player, or `.nowhere`.
+  - Defining and using item attributes (e.g., `size`, `capacity`, `strength`, `charges`).
+  - Implementing item-specific event handling (e.g., `ItemEvent.beforeTurn`, `ItemEvent.afterTurn`) using `ItemEventHandler` (configured in `GameBlueprint`).
+- **Game State (`GameState`)**:
+  - Tracking and modifying player status (current location, score, turn count, health/status effects).
+  - Managing the player's inventory.
+  - Reflecting dynamic item states (e.g., a lantern being lit or unlit, an open/closed container, charges remaining).
+  - Tracking dynamic location states (e.g., "has been visited," "puzzle solved").
+  - Utilizing global game flags for arbitrary boolean states.
+  - (If applicable) Demonstrating game saving and loading via `Codable` conformance.
 
-// Creating items with properties
-Item(
-    id: "brassLantern",
-    name: "lantern",
-    adjectives: "brass",
-    synonyms: "lamp", "light",
-    description: "A sturdy brass lantern, useful for exploring dark places.",
-    properties: .takable, .lightSource,
-    .in(.location(.startRoom))
-)
-```
+### 2. Player Input and Parsing (`Vocabulary`, `Parser`)
 
-### Game Hooks (Incantations)
+- **Vocabulary (`Vocabulary`)**:
+  - Populating the vocabulary with nouns (for items, locations, significant game entities), verbs (standard and custom), adjectives, directions, and prepositions.
+- **Parser (`Parser`)**:
+  - Handling a variety of command structures:
+    - Simple: `VERB`, `VERB NOUN` (e.g., `LOOK`, `TAKE LANTERN`)
+    - Complex: `VERB ADJECTIVE NOUN`, `VERB NOUN PREPOSITION NOUN` (e.g., `OPEN RED CHEST`, `PUT COIN IN SLOT`)
+  - Demonstrating the parser's disambiguation logic when noun phrases are ambiguous.
+  - Providing clear error messages for unrecognized words or unparsable grammar.
 
-The Demo Kit demonstrates how to implement custom behavior for specific game events:
+### 3. Action Processing (`ActionHandler`, `GameEngine`)
 
-```swift
-// Custom logic when player enters a room
-private static func onEnterRoom(engine: GameEngine, locationID: LocationID) async {
-    if locationID == "treasureRoom" {
-        let flag = "visited_treasure_room"
-        let hasVisited = await engine.getCurrentGameState().flags[flag] ?? false
+- **Standard Actions**:
+  - Implementing and showcasing a suite of common actions:
+    - Movement: `GO NORTH`, `SOUTH`, `ENTER CAVE`, `UP`.
+    - Item Manipulation: `TAKE KEY`, `DROP SWORD`, `PUT TREASURE IN CHEST`, `OPEN DOOR`, `CLOSE BOX`, `EXAMINE STATUE`, `READ SCROLL`.
+    - Inventory: `INVENTORY`, `I`.
+    - Interaction: `ATTACK GRUE`, `USE ROPE ON HOOK`, `GIVE WATER TO MAN`.
+    - Sensory: `LOOK`, `LISTEN`.
 
-        if !hasVisited {
-            // First-time discovery behavior
-            // ...
-        }
-    }
-}
+**Action Results**:
 
-// Custom logic at the start of each turn
-private static func beforeEachTurn(engine: GameEngine) async {
-    // Atmospheric messages based on location and turn count
-    // ...
-}
+- Demonstrating how `ActionHandler` methods (`validate`, `process`) can enforce pre-conditions.
+- Showing how the `process` method returns an `ActionResult` to signal success, failure, or specific outcomes, and how these can lead to `StateChange`s applied to `GameState`.
 
-// Custom item examination behavior
-private static func onExamineItem(engine: GameEngine, itemID: ItemID) async -> Bool {
-    // Special behavior for certain items
-    // ...
-}
-```
+### 4. Scope, Visibility, and Interaction (`ScopeResolver`)
 
-### Time-Based Events (Fuses & Daemons)
+- **Light and Darkness**:
+  - Demonstrating the effect of `ItemProperty.lightSource` on visibility.
+  - Implementing "pitch black" rooms and the classic grue warning/encounter.
+- **Container Logic**:
+  - Showing how `ScopeResolver` handles visibility of items within open vs. closed containers.
+- **Accessibility**:
+  - Illustrating how the resolver determines which items are in scope for interaction (player's inventory, current location, accessible containers).
 
-The Demo Kit includes a complete implementation of a lantern timer system similar to Zork's:
+### 5. Time-Based Events and Daemons (`FuseDefinition`, `DaemonDefinition`, `GameEngine.tickClock`)
 
-```swift
-// Create a daemon that runs every turn
-private static func createLanternTimerDaemon() -> DaemonDefinition {
-    return DaemonDefinition(
-        id: LanternConstants.timerDaemonID,
-        frequency: 1 // Run every turn
-    ) { engine in
-        // Track battery life, trigger warnings, etc.
-        // ...
-    }
-}
+- **Daemons (`DaemonDefinition`)**:
+  - Creating background processes that run each turn or at set intervals (e.g., lantern dimming progressively, atmospheric messages, NPC behavior).
+- **Fuses (`FuseDefinition`)**:
+  - Implementing delayed, one-time events (e.g., a final lantern warning before it goes out, a timed puzzle element, a trap triggering).
+  - Showing how these are scheduled and processed by `GameEngine.tickClock`.
 
-// Create a fuse that triggers after a certain number of turns
-private static func createLanternWarningFuse() -> FuseDefinition {
-    return FuseDefinition(
-        id: LanternConstants.lowBatteryWarningFuseID,
-        initialTurns: LanternConstants.lowBatteryThreshold / 2
-    ) { engine in
-        // Provide a warning message
-        // ...
-    }
-}
-```
+### 6. Player Feedback and Output (`IOHandler`)
+
+- **Text Output**:
+  - Delivering clear and engaging game responses, descriptions, and messages.
+  - Utilizing different text styles (if supported by `IOHandler`) for emphasis or clarity.
+- **Status Display**:
+  - (If part of `IOHandler`'s responsibility) Displaying a standard status line (current location, score, turns).
+- **List Formatting**:
+  - Presenting lists of items or visible objects in a readable format (e.g., "You can see a rusty key, a worn map, and a curious glint in the corner.").
+
+### 7. Game Customization and Extensibility (`GameBlueprint`, `TimeRegistry`)
+
+- **GameBlueprint**:
+  - The primary way to customize a game.
+  - Registering custom `ActionHandler` implementations for new verbs.
+  - Providing game-specific `ItemEventHandler` and `LocationEventHandler` instances to tailor interactions with specific entities.
+  - Supplying the game's `Vocabulary`.
+  - Configuring the `TimeRegistry` with `FuseDefinition`s and `DaemonDefinition`s.
+  - Providing `DynamicAttributeProvider`s for complex, stateful item/location properties.
+- **TimeRegistry (via `GameBlueprint`)**:
+  - Registering custom `FuseDefinition`s (for timed, one-off events) and `DaemonDefinition`s (for recurring background processes).
+
+### 8. Advanced Gameplay Mechanics (Illustrative Examples)
+
+- **Puzzles**:
+  - Simple item-based puzzles (e.g., using a key to open a chest).
+  - Puzzles requiring item combination or specific sequences of actions.
+  - Puzzles based on environmental interaction or observation.
+- **Conditional Logic**:
+  - Implementing game responses and events that depend on `GameState` flags, item properties, or player actions.
+- **Scoring**:
+  - Demonstrating a simple scoring system tied to discovering locations, solving puzzles, or acquiring treasure.
+- **(Optional) Basic NPCs**:
+  - If feasible within the engine's current capabilities, demonstrating simple non-player characters with basic dialogue or reactive behaviors.
+
+This outline will serve as a blueprint for developing the `FrobozzMagicDemoKit`, ensuring we thoroughly test and exemplify the Gnusto Engine's power and flexibility.
 
 ## Running the Demo Kit
 
-To run the Demo Kit, simply build and execute the `FrobozzMagicDemoKit` target. The demonstration will start in the console and guide you through exploring a small cave system with a lantern and treasure (standard adventuring gear).
+Todo
 
-## Using This as a Template
+## Demo Game Design
 
-You can use `FrobozzMagicDemoKit.swift` as a starting point for your own magical creations. Key points to understand:
+### Puzzle and Story Design
 
-1. The `createGameData()` method sets up your game world
-2. The game hooks (`onEnterRoom`, etc.) provide custom behavior
-3. The main `run()` method starts the game
+We should design at least a few puzzles/locations/items that showcase:
 
-Feel free to modify and extend this Demo Kit to create your own interactive fiction adventures!
+- Room and item events that trigger before/after turns or on entry.
+- Items and locations with dynamic, state-dependent descriptions.
+- Actions that demonstrate precondition checks and varying outcomes.
+- Timed puzzles or background events (e.g., a lantern dimming, a guard's patrol, a spell wearing off).
+- Custom verbs and parser disambiguation.
+- Scoring and state tracking (e.g., tracking which puzzles are solved, treasures found).
+
+### Teaching Moment
+
+Each core feature should be easy to point to in the demo, so users can see how the engine supports it (and how to do it themselves).

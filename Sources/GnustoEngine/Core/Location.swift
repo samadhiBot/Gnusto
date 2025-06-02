@@ -39,7 +39,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     ///     id: "livingRoom",
     ///     .name("Living Room"),
     ///     .description("A comfortably furnished living room. There are exits to the north and east."),
-    ///     .exits([.north: Exit(destination: "garden"), .east: Exit(destination: "kitchen")]),
+    ///     .exits([.north: .to("garden"), .east: .to("kitchen")]),
     ///     .setFlag(.isLit) // e.g., if lit by default
     /// )
     /// ```

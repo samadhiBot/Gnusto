@@ -1,24 +1,14 @@
-import CustomDump
 import Foundation
 
 /// A unique identifier for a verb within the game's vocabulary.
-public struct VerbID: Hashable, Comparable, Codable, ExpressibleByStringLiteral, Sendable {
+public struct VerbID: GnustoID {
     public let rawValue: String
-
-    /// Initializes a `VerbID` using a string literal.
-    /// - Parameter value: The string literal representing the verb ID.
-    public init(stringLiteral value: String) {
-        self.rawValue = value
-    }
 
     /// Initializes a `VerbID` with a raw string value.
     /// - Parameter rawValue: The string value for the ID.
-    public init(_ rawValue: String) {
+    public init(rawValue: String) {
+        assert(!rawValue.isEmpty, "Verb ID cannot be empty")
         self.rawValue = rawValue
-    }
-
-    public static func < (lhs: VerbID, rhs: VerbID) -> Bool {
-        lhs.rawValue < rhs.rawValue
     }
 }
 
@@ -28,6 +18,7 @@ extension VerbID {
     public static let close = VerbID("close")
     public static let drop = VerbID("drop")
     public static let examine = VerbID("examine")
+    public static let give = VerbID("give")
     public static let go = VerbID("go")
     public static let insert = VerbID("insert")
     public static let inventory = VerbID("inventory")
@@ -35,6 +26,7 @@ extension VerbID {
     public static let lock = VerbID("lock")
     public static let look = VerbID("look")
     public static let open = VerbID("open")
+    public static let push = VerbID("push")
     public static let putOn = VerbID("putOn")
     public static let read = VerbID("read")
     public static let remove = VerbID("remove")
@@ -47,6 +39,7 @@ extension VerbID {
     public static let turnOn = VerbID("turnOn")
     public static let unlock = VerbID("unlock")
     public static let wear = VerbID("wear")
+    public static let xyzzy = VerbID("xyzzy")
 }
 
 // MARK: - Meta verbs
@@ -71,17 +64,3 @@ extension VerbID {
 }
 
 #endif
-
-// MARK: - Conformances
-
-extension VerbID: CustomDumpStringConvertible {
-    public var customDumpDescription: String {
-        ".\(rawValue)"
-    }
-}
-
-extension VerbID: CustomStringConvertible {
-    public var description: String {
-        rawValue
-    }
-}

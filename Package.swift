@@ -17,10 +17,14 @@ let package = Package(
             name: "CloakOfDarkness",
             targets: ["CloakOfDarkness"]
         ),
-//        .executable(
-//            name: "FrobozzMagicDemoKit",
-//            targets: ["FrobozzMagicDemoKit"]
-//        )
+        .executable(
+            name: "FrobozzMagicDemoKit",
+            targets: ["FrobozzMagicDemoKit"]
+        ),
+        .plugin(
+            name: "GnustoAutoWiringPlugin",
+            targets: ["GnustoAutoWiringPlugin"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
@@ -43,13 +47,24 @@ let package = Package(
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
-            path: "Executables/CloakOfDarkness"
+            path: "Executables/CloakOfDarkness",
+            plugins: ["GnustoAutoWiringPlugin"]
         ),
-//        .executableTarget(
-//            name: "FrobozzMagicDemoKit",
-//            dependencies: ["GnustoEngine"],
-//            path: "Executables/FrobozzMagicDemoKit"
-//        ),
+        .executableTarget(
+            name: "FrobozzMagicDemoKit",
+            dependencies: ["GnustoEngine"],
+            path: "Executables/FrobozzMagicDemoKit",
+            plugins: ["GnustoAutoWiringPlugin"]
+        ),
+        .executableTarget(
+            name: "GnustoAutoWiringTool",
+            path: "Sources/GnustoAutoWiringTool"
+        ),
+        .plugin(
+            name: "GnustoAutoWiringPlugin",
+            capability: .buildTool(),
+            dependencies: ["GnustoAutoWiringTool"]
+        ),
         .testTarget(
             name: "GnustoEngineTests",
             dependencies: [
