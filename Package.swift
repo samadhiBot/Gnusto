@@ -21,6 +21,10 @@ let package = Package(
             name: "FrobozzMagicDemoKit",
             targets: ["FrobozzMagicDemoKit"]
         ),
+        .executable(
+            name: "Zork1",
+            targets: ["Zork1"]
+        ),
         .plugin(
             name: "GnustoAutoWiringPlugin",
             targets: ["GnustoAutoWiringPlugin"]
@@ -54,6 +58,12 @@ let package = Package(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
             path: "Executables/FrobozzMagicDemoKit",
+            plugins: ["GnustoAutoWiringPlugin"]
+        ),
+        .executableTarget(
+            name: "Zork1",
+            dependencies: ["GnustoEngine"],
+            path: "Executables/Zork1",
             plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
