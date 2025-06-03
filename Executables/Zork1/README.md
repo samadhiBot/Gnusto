@@ -136,7 +136,7 @@ Executables/Zork1/
 
 ### Validation Approach
 
-- Compare outputs against `Zork 1.pdf` walkthrough
+- Compare outputs against `Zork1.rtf` walkthrough
 - Test all documented commands and responses
 - Verify scoring system accuracy
 - Confirm puzzle solution sequences

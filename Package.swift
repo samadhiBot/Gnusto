@@ -83,5 +83,14 @@ let package = Package(
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),
+        .testTarget(
+            name: "GnustoAutoWiringPluginTests",
+            dependencies: [
+                "GnustoEngine",
+                .product(name: "CustomDump", package: "swift-custom-dump"),
+            ],
+            path: "Tests/GnustoAutoWiringPluginTests",
+            plugins: ["GnustoAutoWiringPlugin"]
+        ),
     ]
 )

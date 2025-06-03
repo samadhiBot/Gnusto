@@ -1,0 +1,27 @@
+import GnustoEngine
+
+// MARK: - Stone Barrow Area
+
+enum StoneBarrow {
+    // MARK: - Locations
+
+    static let stoneBarrow = Location(
+        id: .stoneBarrow,
+        .name("Stone Barrow"),
+        .description("""
+            You are standing in front of a large stone barrow. There appears to be an entrance \
+            to the east.
+            """),
+        .exits([
+            .west: .to(.forest1),
+            .east: Exit(
+                destination: .blockedExit,
+                blockedMessage: "The entrance is sealed."
+            ),
+        ]),
+        .inherentlyLit
+    )
+
+    // MARK: - Items
+    // (No items currently in this area)
+}

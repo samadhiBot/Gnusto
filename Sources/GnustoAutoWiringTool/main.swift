@@ -201,30 +201,37 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             gameBlueprintTypes.insert(typeName)
         }
 
-        // MARK: - Discover Item and Location Properties (Multiple Patterns)
+        // MARK: - Discover Item and Location Properties with Proper Scope Tracking
 
-        // Enhanced pattern matching for: let/var name = Location/Item( and let/var name: Type = Location/Item(
-        let locationPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Location)?\s*=\s*(?:Location\s*\(|\.init\s*\()/
-        let locationPropertyMatches = content.matches(of: locationPropertyPattern)
-        for match in locationPropertyMatches {
-            let propertyName = String(match.1)
-            locations.insert(propertyName)
+        // For each game area in this file, find the properties it contains
+        for areaType in currentFileGameAreas {
+            // Create a pattern to match the area's content block - using string regex for interpolation
+            let areaPatternString = "(?:enum|struct|class)\\s+\(areaType)\\s*\\{([^}]*(?:\\{[^}]*\\}[^}]*)*?)\\}"
+            let areaPattern = try! Regex(areaPatternString)
 
-            // Associate property with its containing area
-            if let areaOwner = fileAreaOwner {
-                locationToAreaMap[propertyName] = areaOwner
-            }
-        }
+            if let areaMatch = content.firstMatch(of: areaPattern) {
+                // Extract the content inside the area's braces (capture group 1)
+                let fullMatch = areaMatch.output
+                guard fullMatch.count > 1, let range = fullMatch[1].range else { continue }
+                let areaContent = String(content[range])
 
-        let itemPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Item)?\s*=\s*(?:Item\s*\(|\.init\s*\()/
-        let itemPropertyMatches = content.matches(of: itemPropertyPattern)
-        for match in itemPropertyMatches {
-            let propertyName = String(match.1)
-            items.insert(propertyName)
+                // Find location properties within this area
+                let locationPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Location)?\s*=\s*(?:Location\s*\(|\.init\s*\()/
+                let locationPropertyMatches = areaContent.matches(of: locationPropertyPattern)
+                for match in locationPropertyMatches {
+                    let propertyName = String(match.1)
+                    locations.insert(propertyName)
+                    locationToAreaMap[propertyName] = areaType
+                }
 
-            // Associate property with its containing area
-            if let areaOwner = fileAreaOwner {
-                itemToAreaMap[propertyName] = areaOwner
+                // Find item properties within this area
+                let itemPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Item)?\s*=\s*(?:Item\s*\(|\.init\s*\()/
+                let itemPropertyMatches = areaContent.matches(of: itemPropertyPattern)
+                for match in itemPropertyMatches {
+                    let propertyName = String(match.1)
+                    items.insert(propertyName)
+                    itemToAreaMap[propertyName] = areaType
+                }
             }
         }
 
