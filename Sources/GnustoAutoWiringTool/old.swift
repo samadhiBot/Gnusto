@@ -1,3 +1,5 @@
+/*
+
 import Foundation
 
 // MARK: - Helper Types
@@ -29,11 +31,21 @@ let sourceFiles = Array(arguments[sourceFileStartIndex...])
 print("🔍 Scanning \(sourceFiles.count) source files for game patterns...")
 
 // Convert file URLs to file paths if needed
-let resolvedSourceFiles = sourceFiles.map { filePath in
-    if filePath.hasPrefix("file://") {
-        return URL(string: filePath)?.path ?? filePath
+let resolvedSourceFiles: [String] = sourceFiles.compactMap { filePath in
+    let path = if filePath.hasPrefix("file://") {
+        URL(string: filePath)?.path ?? filePath
+    } else {
+        filePath
     }
-    return filePath
+
+    // Skip test files that contain example code snippets (not real game areas)
+    let filename = URL(fileURLWithPath: path).lastPathComponent
+    if filename.hasSuffix("Tests.swift") {
+        print("⏭️  Skipping test file: \(filename)")
+        return nil
+    }
+
+    return path
 }
 
 let resolvedOutputPath = {
@@ -94,14 +106,14 @@ struct DiscoveredGameData {
     let dynamicItemValidate: Set<AttributeRegistration>
     let dynamicLocationCompute: Set<AttributeRegistration>
     let dynamicLocationValidate: Set<AttributeRegistration>
-    let gameAreaTypes: Set<String>  // Renamed from areaBlueprintTypes
-    let items: Set<String>  // Property names
-    let locations: Set<String>  // Property names
+    let gameAreaTypes: Set<String>
+    let items: Set<String>
+    let locations: Set<String>
 
-    // MARK: - Static vs Instance Property Detection
+    // MARK: - Per-Entity Static Property Tracking
 
-    /// Maps game area type names to whether they use static properties (true = static, false = instance)
-    let gameAreaUsesStaticProperties: [String: Bool]
+    /// Maps individual property names to whether they are static
+    let propertyIsStatic: [String: Bool]
 
     // MARK: - Handler-to-Area Mappings (Scope Resolution)
 
@@ -144,8 +156,8 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
     var items = Set<String>()
     var locations = Set<String>()
 
-    // MARK: - Static vs Instance Property Detection
-    var gameAreaUsesStaticProperties: [String: Bool] = [:]
+    // MARK: - Per-Entity Static Property Tracking
+    var propertyIsStatic: [String: Bool] = [:]
 
     // MARK: - Handler-to-Area Mappings (Scope Resolution)
     var handlerToAreaMap: [String: String] = [:]
@@ -165,7 +177,7 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
     var existingVerbIDs = Set<String>()
 
     for filePath in filePaths {
-        let content = try String(contentsOfFile: filePath, encoding: .utf8)
+        let content = try String(contentsOfFile: filePath, encoding: String.Encoding.utf8)
 
         // MARK: - Discover Game Area Types (Pure Detection)
 
@@ -181,11 +193,6 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             if content.contains(typePattern) {
                 gameAreaTypes.insert(typeName)  // Add to the accumulating set
                 currentFileGameAreas.append(typeName)
-
-                // Detect if this game area uses static properties
-                let staticPattern = try! Regex("static\\s+let\\s+\\w+\\s*=\\s*(?:Location|Item)\\s*\\(")
-                let hasStaticProperties = content.contains(staticPattern)
-                gameAreaUsesStaticProperties[typeName] = hasStaticProperties
             }
         }
 
@@ -201,7 +208,7 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             gameBlueprintTypes.insert(typeName)
         }
 
-        // MARK: - Discover Item and Location Properties with Proper Scope Tracking
+        // MARK: - Discover Item and Location Properties with Per-Entity Static Tracking
 
         // For each game area in this file, find the properties it contains
         for areaType in currentFileGameAreas {
@@ -215,22 +222,68 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
                 guard fullMatch.count > 1, let range = fullMatch[1].range else { continue }
                 let areaContent = String(content[range])
 
-                // Find location properties within this area
-                let locationPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Location)?\s*=\s*(?:Location\s*\(|\.init\s*\()/
+                // Find location properties within this area, tracking static vs instance per property
+                let locationPropertyPattern = /(static\s+)?(let|var)\s+(\w+)(?:\s*:\s*Location)?\s*=\s*(?:Location\s*\(|\.init\s*\()/
                 let locationPropertyMatches = areaContent.matches(of: locationPropertyPattern)
                 for match in locationPropertyMatches {
-                    let propertyName = String(match.1)
+                    let isStatic = match.1 != nil
+                    let propertyName = String(match.3)
                     locations.insert(propertyName)
                     locationToAreaMap[propertyName] = areaType
+                    propertyIsStatic[propertyName] = isStatic
                 }
 
-                // Find item properties within this area
-                let itemPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Item)?\s*=\s*(?:Item\s*\(|\.init\s*\()/
+                // Find item properties within this area, tracking static vs instance per property
+                let itemPropertyPattern = /(static\s+)?(let|var)\s+(\w+)(?:\s*:\s*Item)?\s*=\s*(?:Item\s*\(|\.init\s*\()/
                 let itemPropertyMatches = areaContent.matches(of: itemPropertyPattern)
                 for match in itemPropertyMatches {
-                    let propertyName = String(match.1)
+                    let isStatic = match.1 != nil
+                    let propertyName = String(match.3)
                     items.insert(propertyName)
                     itemToAreaMap[propertyName] = areaType
+                    propertyIsStatic[propertyName] = isStatic
+                }
+
+                // Find event handlers within this area, tracking static vs instance per handler
+                let itemEventHandlerPattern = /(static\s+)?(let|var)\s+(\w+)Handler\s*=\s*ItemEventHandler/
+                let itemHandlerMatches = areaContent.matches(of: itemEventHandlerPattern)
+                for match in itemHandlerMatches {
+                    let isStatic = match.1 != nil
+                    let handlerName = String(match.3)
+                    itemEventHandlers.insert(handlerName)
+                    handlerToAreaMap[handlerName] = areaType
+                    propertyIsStatic[handlerName] = isStatic
+                }
+
+                let locationEventHandlerPattern = /(static\s+)?(let|var)\s+(\w+)Handler\s*=\s*LocationEventHandler/
+                let locationHandlerMatches = areaContent.matches(of: locationEventHandlerPattern)
+                for match in locationHandlerMatches {
+                    let isStatic = match.1 != nil
+                    let handlerName = String(match.3)
+                    locationEventHandlers.insert(handlerName)
+                    handlerToAreaMap[handlerName] = areaType
+                    propertyIsStatic[handlerName] = isStatic
+                }
+
+                // Find fuse and daemon definitions within this area
+                let fuseDefPattern = /(static\s+)?(let|var)\s+(\w+)(?:Fuse|FuseDef|FuseDefinition)?\s*=\s*FuseDefinition/
+                let fuseMatches = areaContent.matches(of: fuseDefPattern)
+                for match in fuseMatches {
+                    let isStatic = match.1 != nil
+                    let defName = String(match.3)
+                    fuseDefinitions.insert(defName)
+                    fuseToAreaMap[defName] = areaType
+                    propertyIsStatic[defName] = isStatic
+                }
+
+                let daemonDefPattern = /(static\s+)?(let|var)\s+(\w+)(?:Daemon|DaemonDef|DaemonDefinition)?\s*=\s*DaemonDefinition/
+                let daemonMatches = areaContent.matches(of: daemonDefPattern)
+                for match in daemonMatches {
+                    let isStatic = match.1 != nil
+                    let defName = String(match.3)
+                    daemonDefinitions.insert(defName)
+                    daemonToAreaMap[defName] = areaType
+                    propertyIsStatic[defName] = isStatic
                 }
             }
         }
@@ -417,65 +470,6 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
             }
         }
 
-        // customActionHandlers: [.someVerb: handler] patterns
-        let customHandlerMatches = content.matches(of: /\.(\w+):\s*\w+ActionHandler/)
-        for match in customHandlerMatches {
-            let identifier = String(match.1)
-            if !existingVerbIDs.contains(identifier) {
-                verbIDs.insert(identifier)
-            }
-        }
-
-        // MARK: - Discover Event Handlers (with area tracking)
-
-        // Item Event Handlers: let someNameHandler = ItemEventHandler (instance)
-        let itemEventHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*ItemEventHandler/)
-        for match in itemEventHandlerMatches {
-            let handlerName = String(match.1)
-            itemEventHandlers.insert(handlerName)
-
-            // Associate handler with its containing area
-            if let areaOwner = fileAreaOwner {
-                handlerToAreaMap[handlerName] = areaOwner
-            }
-        }
-
-        // Item Event Handlers: static let someNameHandler = ItemEventHandler (static)
-        let staticItemEventHandlerMatches = content.matches(of: /static\s+let\s+(\w+)Handler\s*=\s*ItemEventHandler/)
-        for match in staticItemEventHandlerMatches {
-            let handlerName = String(match.1)
-            itemEventHandlers.insert(handlerName)
-
-            // Associate handler with its containing area
-            if let areaOwner = fileAreaOwner {
-                handlerToAreaMap[handlerName] = areaOwner
-            }
-        }
-
-        // Location Event Handlers: let someNameHandler = LocationEventHandler (instance)
-        let locationEventHandlerMatches = content.matches(of: /let\s+(\w+)Handler\s*=\s*LocationEventHandler/)
-        for match in locationEventHandlerMatches {
-            let handlerName = String(match.1)
-            locationEventHandlers.insert(handlerName)
-
-            // Associate handler with its containing area
-            if let areaOwner = fileAreaOwner {
-                handlerToAreaMap[handlerName] = areaOwner
-            }
-        }
-
-        // Location Event Handlers: static let someNameHandler = LocationEventHandler (static)
-        let staticLocationEventHandlerMatches = content.matches(of: /static\s+let\s+(\w+)Handler\s*=\s*LocationEventHandler/)
-        for match in staticLocationEventHandlerMatches {
-            let handlerName = String(match.1)
-            locationEventHandlers.insert(handlerName)
-
-            // Associate handler with its containing area
-            if let areaOwner = fileAreaOwner {
-                handlerToAreaMap[handlerName] = areaOwner
-            }
-        }
-
         // MARK: - Discover Custom Action Handlers
 
         // let someActionHandler = SomeActionHandler() patterns
@@ -566,7 +560,7 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         gameAreaTypes: gameAreaTypes,
         items: items,
         locations: locations,
-        gameAreaUsesStaticProperties: gameAreaUsesStaticProperties,
+        propertyIsStatic: propertyIsStatic,
         handlerToAreaMap: handlerToAreaMap,
         fuseToAreaMap: fuseToAreaMap,
         daemonToAreaMap: daemonToAreaMap,
@@ -678,15 +672,41 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
         // Note: No need for static instances when using enum-based areas with static properties
 
         // Generate static instances for struct-based game areas (performance optimization)
-        let structBasedAreas = discoveredData.gameAreaTypes.filter { gameAreaType in
-            !(discoveredData.gameAreaUsesStaticProperties[gameAreaType] ?? false)
+        let areasNeedingInstances = discoveredData.gameAreaTypes.filter { gameAreaType in
+            // Check if this area has any non-static properties that need instances
+            let hasNonStaticItems = discoveredData.items.contains { item in
+                discoveredData.itemToAreaMap[item] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[item] ?? false)
+            }
+            let hasNonStaticLocations = discoveredData.locations.contains { location in
+                discoveredData.locationToAreaMap[location] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[location] ?? false)
+            }
+            let hasNonStaticHandlers = discoveredData.itemEventHandlers.contains { handler in
+                discoveredData.handlerToAreaMap[handler] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[handler] ?? false)
+            } || discoveredData.locationEventHandlers.contains { handler in
+                discoveredData.handlerToAreaMap[handler] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[handler] ?? false)
+            }
+            let hasNonStaticFuses = discoveredData.fuseDefinitions.contains { fuse in
+                discoveredData.fuseToAreaMap[fuse] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[fuse] ?? false)
+            }
+            let hasNonStaticDaemons = discoveredData.daemonDefinitions.contains { daemon in
+                discoveredData.daemonToAreaMap[daemon] == gameAreaType &&
+                !(discoveredData.propertyIsStatic[daemon] ?? false)
+            }
+
+            return hasNonStaticItems || hasNonStaticLocations || hasNonStaticHandlers ||
+                   hasNonStaticFuses || hasNonStaticDaemons
         }
 
-        if !structBasedAreas.isEmpty {
+        if !areasNeedingInstances.isEmpty {
             hasExtensionContent = true
             extensionOutput.append("    // MARK: - Static Area Instances (Performance Optimization)")
             extensionOutput.append("")
-            for gameAreaType in structBasedAreas.sorted() {
+            for gameAreaType in areasNeedingInstances.sorted() {
                 let instanceName = "_\(gameAreaType.prefix(1).lowercased())\(gameAreaType.dropFirst())"
                 extensionOutput.append("    private static let \(instanceName) = \(gameAreaType)()")
             }
@@ -702,7 +722,7 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             for itemProperty in discoveredData.items.sorted() {
                 // Use proper scope-aware mapping
                 if let areaType = discoveredData.itemToAreaMap[itemProperty] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
+                    let usesStaticProperties = discoveredData.propertyIsStatic[itemProperty] ?? false
                     if usesStaticProperties {
                         extensionOutput.append("            \(areaType).\(itemProperty),")
                     } else {
@@ -730,7 +750,7 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             for locationProperty in discoveredData.locations.sorted() {
                 // Use proper scope-aware mapping
                 if let areaType = discoveredData.locationToAreaMap[locationProperty] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
+                    let usesStaticProperties = discoveredData.propertyIsStatic[locationProperty] ?? false
                     if usesStaticProperties {
                         extensionOutput.append("            \(areaType).\(locationProperty),")
                     } else {
@@ -750,116 +770,120 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
         }
 
         // Generate itemEventHandlers property
-        if !discoveredData.itemEventHandlers.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var itemEventHandlers: [ItemID: ItemEventHandler] {")
-            extensionOutput.append("        [")
-            let sortedItemHandlers = discoveredData.itemEventHandlers.sorted()
-            for handlerName in sortedItemHandlers {
-                // Find which area contains this handler and use appropriate access pattern
-                if let areaType = discoveredData.handlerToAreaMap[handlerName] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                    if usesStaticProperties {
-                        extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler,")
-                    } else {
-                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                        extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
-                    }
-                } else {
-                    // Fallback: try the first area
-                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                    extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
-                }
-            }
-            extensionOutput.append("        ]")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
+        // TODO: Event handler mapping needs manual configuration - handler names don't directly map to ItemIDs
+        // if !discoveredData.itemEventHandlers.isEmpty {
+        //     hasExtensionContent = true
+        //     extensionOutput.append("    var itemEventHandlers: [ItemID: ItemEventHandler] {")
+        //     extensionOutput.append("        [")
+        //     let sortedItemHandlers = discoveredData.itemEventHandlers.sorted()
+        //     for handlerName in sortedItemHandlers {
+        //         // Find which area contains this handler and use appropriate access pattern
+        //         if let areaType = discoveredData.handlerToAreaMap[handlerName] {
+        //             let usesStaticProperties = discoveredData.propertyIsStatic[handlerName] ?? false
+        //             if usesStaticProperties {
+        //                 extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler,")
+        //             } else {
+        //                 let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+        //                 extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
+        //             }
+        //         } else {
+        //             // Fallback: try the first area
+        //             let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+        //             extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
+        //         }
+        //     }
+        //     extensionOutput.append("        ]")
+        //     extensionOutput.append("    }")
+        //     extensionOutput.append("")
+        // }
 
         // Generate locationEventHandlers property
-        if !discoveredData.locationEventHandlers.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var locationEventHandlers: [LocationID: LocationEventHandler] {")
-            extensionOutput.append("        [")
-            let sortedLocationHandlers = discoveredData.locationEventHandlers.sorted()
-            for handlerName in sortedLocationHandlers {
-                // Find which area contains this handler and use appropriate access pattern
-                if let areaType = discoveredData.handlerToAreaMap[handlerName] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                    if usesStaticProperties {
-                        extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler,")
-                    } else {
-                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                        extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
-                    }
-                } else {
-                    // Fallback: try the first area
-                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                    extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
-                }
-            }
-            extensionOutput.append("        ]")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
+        // TODO: Event handler mapping needs manual configuration - handler names don't directly map to LocationIDs
+        // if !discoveredData.locationEventHandlers.isEmpty {
+        //     hasExtensionContent = true
+        //     extensionOutput.append("    var locationEventHandlers: [LocationID: LocationEventHandler] {")
+        //     extensionOutput.append("        [")
+        //     let sortedLocationHandlers = discoveredData.locationEventHandlers.sorted()
+        //     for handlerName in sortedLocationHandlers {
+        //         // Find which area contains this handler and use appropriate access pattern
+        //         if let areaType = discoveredData.handlerToAreaMap[handlerName] {
+        //             let usesStaticProperties = discoveredData.propertyIsStatic[handlerName] ?? false
+        //             if usesStaticProperties {
+        //                 extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler,")
+        //             } else {
+        //                 let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+        //                 extensionOutput.append("            .\(handlerName): Self.\(instanceName).\(handlerName)Handler,")
+        //             }
+        //         } else {
+        //             // Fallback: try the first area
+        //             let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+        //             extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
+        //         }
+        //     }
+        //     extensionOutput.append("        ]")
+        //     extensionOutput.append("    }")
+        //     extensionOutput.append("")
+        // }
 
         // Generate fuseDefinitions property
-        if !discoveredData.fuseDefinitions.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var fuseDefinitions: [FuseID: FuseDefinition] {")
-            extensionOutput.append("        [")
+        // TODO: Fuse definition mapping needs to be fixed - area mapping is not working correctly
+        // if !discoveredData.fuseDefinitions.isEmpty {
+        //     hasExtensionContent = true
+        //     extensionOutput.append("    var fuseDefinitions: [FuseID: FuseDefinition] {")
+        //     extensionOutput.append("        [")
 
-            let sortedFuses = discoveredData.fuseDefinitions.sorted()
-            for fuseProperty in sortedFuses {
-                // Use proper scope-aware mapping
-                if let areaType = discoveredData.fuseToAreaMap[fuseProperty] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                    if usesStaticProperties {
-                        extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty),")
-                    } else {
-                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                        extensionOutput.append("            Self.\(instanceName).\(fuseProperty).id: Self.\(instanceName).\(fuseProperty),")
-                    }
-                } else {
-                    // Fallback: try the first area
-                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                    extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty), // ⚠️ Area mapping unknown, using first area")
-                }
-            }
+        //     let sortedFuses = discoveredData.fuseDefinitions.sorted()
+        //     for fuseProperty in sortedFuses {
+        //         // Use proper scope-aware mapping
+        //         if let areaType = discoveredData.fuseToAreaMap[fuseProperty] {
+        //             let usesStaticProperties = discoveredData.propertyIsStatic[fuseProperty] ?? false
+        //             if usesStaticProperties {
+        //                 extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty),")
+        //             } else {
+        //                 let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+        //                 extensionOutput.append("            Self.\(instanceName).\(fuseProperty).id: Self.\(instanceName).\(fuseProperty),")
+        //             }
+        //         } else {
+        //             // Fallback: try the first area
+        //             let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+        //             extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty), // ⚠️ Area mapping unknown, using first area")
+        //         }
+        //     }
 
-            extensionOutput.append("        ]")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
+        //     extensionOutput.append("        ]")
+        //     extensionOutput.append("    }")
+        //     extensionOutput.append("")
+        // }
 
         // Generate daemonDefinitions property
-        if !discoveredData.daemonDefinitions.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var daemonDefinitions: [DaemonID: DaemonDefinition] {")
-            extensionOutput.append("        [")
+        // TODO: Daemon definition mapping needs to be fixed - area mapping is not working correctly
+        // if !discoveredData.daemonDefinitions.isEmpty {
+        //     hasExtensionContent = true
+        //     extensionOutput.append("    var daemonDefinitions: [DaemonID: DaemonDefinition] {")
+        //     extensionOutput.append("        [")
 
-            let sortedDaemons = discoveredData.daemonDefinitions.sorted()
-            for daemonProperty in sortedDaemons {
-                // Use proper scope-aware mapping
-                if let areaType = discoveredData.daemonToAreaMap[daemonProperty] {
-                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                    if usesStaticProperties {
-                        extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty),")
-                    } else {
-                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                        extensionOutput.append("            Self.\(instanceName).\(daemonProperty).id: Self.\(instanceName).\(daemonProperty),")
-                    }
-                } else {
-                    // Fallback: try the first area
-                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                    extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty), // ⚠️ Area mapping unknown, using first area")
-                }
-            }
+        //     let sortedDaemons = discoveredData.daemonDefinitions.sorted()
+        //     for daemonProperty in sortedDaemons {
+        //         // Use proper scope-aware mapping
+        //         if let areaType = discoveredData.daemonToAreaMap[daemonProperty] {
+        //             let usesStaticProperties = discoveredData.propertyIsStatic[daemonProperty] ?? false
+        //             if usesStaticProperties {
+        //                 extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty),")
+        //             } else {
+        //                 let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+        //                 extensionOutput.append("            Self.\(instanceName).\(daemonProperty).id: Self.\(instanceName).\(daemonProperty),")
+        //             }
+        //         } else {
+        //             // Fallback: try the first area
+        //             let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+        //             extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty), // ⚠️ Area mapping unknown, using first area")
+        //         }
+        //     }
 
-            extensionOutput.append("        ]")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
+        //     extensionOutput.append("        ]")
+        //     extensionOutput.append("    }")
+        //     extensionOutput.append("")
+        // }
 
         // Only generate the extension if there's content
         if hasExtensionContent {
@@ -877,3 +901,4 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
 
     return output.joined(separator: "\n")
 }
+*/

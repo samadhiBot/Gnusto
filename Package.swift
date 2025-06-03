@@ -25,16 +25,22 @@ let package = Package(
             name: "Zork1",
             targets: ["Zork1"]
         ),
+        .executable(
+            name: "GnustoAutoWiringTool",
+            targets: ["GnustoAutoWiringTool"]
+        ),
         .plugin(
             name: "GnustoAutoWiringPlugin",
             targets: ["GnustoAutoWiringPlugin"]
         )
     ],
     dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser", from: "1.5.0"),
         .package(url: "https://github.com/apple/swift-docc-plugin", from: "1.3.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.5.0"),
         .package(url: "https://github.com/pointfreeco/swift-custom-dump", from: "1.0.0"),
         .package(url: "https://github.com/swiftlang/swift-markdown.git", branch: "main"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", "600.0.0"..<"602.0.0"),
     ],
     targets: [
         .target(
@@ -68,6 +74,11 @@ let package = Package(
         ),
         .executableTarget(
             name: "GnustoAutoWiringTool",
+            dependencies: [
+                .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+            ],
             path: "Sources/GnustoAutoWiringTool"
         ),
         .plugin(

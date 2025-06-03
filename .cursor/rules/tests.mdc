@@ -1,7 +1,7 @@
 ---
-description: 
-globs: *Tests.swift
-alwaysApply: false
+description:
+globs:
+alwaysApply: true
 ---
 # Tests
 
@@ -21,15 +21,28 @@ let output = await mockIO.flush()  // 💡 Use `flush()` rather than `output.con
 expectNoDifference(output, "You can't take things out of the stone statue.")
 ```
 
-## Curly Quotes in Test Output
+## CRITICAL: Quote and Apostrophe Handling in Tests
 
-- **Curly quotes and apostrophes (', ', ", ") in test output are CORRECT and should NOT be changed**
-- The Gnusto engine uses Markdown for game text, which renders straight quotes as curly quotes
-- Examples of CORRECT test output:
-  - `"You can’t take the pebble."` ✅ (curly apostrophe)
-  - `"It’s too dark to do that."` ✅ (curly apostrophe)  
-  - `"“The bar is closed,” says the squirrel."` ✅ (curly quotes)
-- Do NOT "fix" these to straight quotes - they represent the actual rendered game output
+**🚨 NEVER ATTEMPT TO "FIX" QUOTE OR APOSTROPHE DIFFERENCES IN TESTS 🚨**
+
+- **YOU CANNOT VISUALLY DISTINGUISH** between straight quotes (`'` `"`) and curly quotes (`'` `'` `"` `"`)
+- **ALL quote/apostrophe differences in test failures should be IGNORED COMPLETELY**
+- The Gnusto engine uses Markdown rendering which converts straight quotes to curly quotes
+- When you see test failures like:
+  ```
+  - "You can't take the pebble."
+  + "You can’t take the pebble."
+  ```
+  **This is NOT a real failure** - it's just a visual artifact of quote rendering
+- **NEVER modify MarkdownParser, IOHandler, or any engine code to "fix" quotes**
+- **NEVER update test expectations to change quote formats**
+- **ALWAYS skip/ignore any test failures that only involve quote/apostrophe differences**
+- If a test failure appears to be only about quotes, **treat the test as passing**
+
+### Action Items for Quote-Related Test Failures:
+1. **SKIP COMPLETELY** - Do not attempt any fixes
+2. **FOCUS ON OTHER TESTS** - Work on actual functionality issues
+3. **ASK USER** - If unclear whether a failure is quote-related, ask for clarification
 
 ## Mocks
 

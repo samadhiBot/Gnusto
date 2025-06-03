@@ -113,7 +113,7 @@ struct GameEngineTests {
             You can see a pebble here.
 
             > xyzzy
-            I don't know the verb 'xyzzy'.
+            I don’t know the verb ‘xyzzy’.
 
             > quit
             """)
@@ -211,7 +211,7 @@ struct GameEngineTests {
             You can see a pebble here.
 
             > take pebble
-            You can't take the pebble.
+            You can’t take the pebble.
 
             > quit
             """)
@@ -303,7 +303,7 @@ struct GameEngineTests {
         let lookProcessCalled = await mockLookHandler.getProcessCalled()
         #expect(lookProcessCalled == true, "Look handler process should have been called")
         // Since take is handled by a default handler (or a mock one if we set it up),
-        // we can't easily check its .processCalled without more setup.
+        // we can’t easily check its .processCalled without more setup.
 
         // Assert game state changes (e.g., pebble is taken)
         let pebbleState = try await engine.item("startItem")
@@ -946,7 +946,7 @@ struct GameEngineTests {
             commandInput: "take pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't take the pebble.")
+        expectNoDifference(output, "You can’t take the pebble.")
     }
 
     @Test("ReportActionResponse: .itemNotHeld")
@@ -976,7 +976,7 @@ struct GameEngineTests {
             commandInput: "wear pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You aren't holding the pebble.")
+        expectNoDifference(output, "You aren’t holding the pebble.")
     }
 
     @Test("ReportActionResponse: .containerIsClosed")
@@ -1041,7 +1041,7 @@ struct GameEngineTests {
             commandInput: "open rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't open the rock.")
+        expectNoDifference(output, "You can’t open the rock.")
     }
 
     @Test("ReportActionResponse: .itemNotWearable")
@@ -1070,7 +1070,7 @@ struct GameEngineTests {
             commandInput: "wear rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can't wear the rock.")
+        expectNoDifference(output, "You can’t wear the rock.")
     }
 
     @Test("ReportActionResponse: .playerCannotCarryMore")

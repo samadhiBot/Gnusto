@@ -22,6 +22,14 @@ public struct MinimalGame: GameBlueprint {
             maximumScore: 10
         ),
         player: Player = Player(in: LocationID("startRoom")),
+        locations: [Location] = [
+            Location(
+                id: LocationID("startRoom"),
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
+            )
+        ],
         items: [Item] = [
             Item(
                 id: ItemID("startItem"),
@@ -35,14 +43,6 @@ public struct MinimalGame: GameBlueprint {
                 .description("You are your usual self."),
                 .in(.player),
                 .isScenery
-            )
-        ],
-        locations: [Location] = [
-            Location(
-                id: LocationID("startRoom"),
-                .name("Void"),
-                .description("An empty void."),
-                .inherentlyLit
             )
         ],
         customActionHandlers: [VerbID: ActionHandler] = [:],

@@ -1,6 +1,6 @@
 import GnustoEngine
 
-enum SimpleArea {
+struct StructInstanceArea {
     static let room = Location(
         id: .room,
         .name("Room"),
