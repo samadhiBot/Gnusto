@@ -271,14 +271,104 @@ final class GameDataCollector: SyntaxAnyVisitor {
 
         let memberName = node.declName.baseName.text
 
-        // For now, we'll infer the ID type based on context
-        // This is heuristic-based and could be improved
+        // Only consider this an ID if it's in a context that suggests it's an ID
+        // We need to check the parent context to see if this is being used as an ID
+        guard isInIDContext(node) else { return }
+
+        // Assume it's an ID if it's lowercase (conventional for Swift enums)
         if memberName.allSatisfy({ $0.isLowercase || $0.isNumber || $0 == "_" }) {
-            // Assume it's an ID if it's lowercase (conventional for Swift enums)
-            // We'll categorize these during code generation based on usage patterns
-            gameData.locationIDs.insert(memberName)
-            gameData.itemIDs.insert(memberName)
+            // Try to determine the ID type based on the context
+            if let idType = inferIDType(from: node) {
+                switch idType {
+                case .location:
+                    gameData.locationIDs.insert(memberName)
+                case .item:
+                    gameData.itemIDs.insert(memberName)
+                case .global:
+                    gameData.globalIDs.insert(memberName)
+                case .fuse:
+                    gameData.fuseIDs.insert(memberName)
+                case .daemon:
+                    gameData.daemonIDs.insert(memberName)
+                case .unknown:
+                    // For unknown context, add to both location and item for compatibility
+                    gameData.locationIDs.insert(memberName)
+                    gameData.itemIDs.insert(memberName)
+                }
+            }
         }
+    }
+
+    private enum IDType {
+        case location, item, global, fuse, daemon, unknown
+    }
+
+    private func isInIDContext(_ node: MemberAccessExprSyntax) -> Bool {
+        // Walk up the syntax tree to find the context
+        var current: Syntax? = Syntax(node)
+
+        while let parent = current?.parent {
+            // Check if this is a labeled argument with "id:"
+            if let labeledExpr = parent.as(LabeledExprSyntax.self),
+               labeledExpr.label?.text == "id" {
+                return true
+            }
+
+            // Check if this node is the callee of a function call (i.e., it's a method being called)
+            if let functionCall = parent.as(FunctionCallExprSyntax.self),
+               functionCall.calledExpression.as(MemberAccessExprSyntax.self) == node {
+                // This node is the method being called, not an ID argument
+                return false
+            }
+
+            // Check if it's in a .to() call (these take IDs as arguments)
+            if let functionCall = parent.as(FunctionCallExprSyntax.self),
+               let memberAccess = functionCall.calledExpression.as(MemberAccessExprSyntax.self) {
+                let methodName = memberAccess.declName.baseName.text
+                if methodName == "to" {
+                    return true
+                }
+                // .location() method calls should be treated as method calls, not ID contexts
+                // unless they're inside a .to() call
+                if methodName == "location" {
+                    return false
+                }
+            }
+
+            current = parent
+        }
+
+        return false
+    }
+
+    private func inferIDType(from node: MemberAccessExprSyntax) -> IDType? {
+        // Walk up to find context clues about what type of ID this is
+        var current: Syntax? = Syntax(node)
+
+        while let parent = current?.parent {
+            // Check function call context
+            if let functionCall = parent.as(FunctionCallExprSyntax.self) {
+                let callDesc = functionCall.description
+                if callDesc.contains("Location(") {
+                    return .location
+                } else if callDesc.contains("Item(") {
+                    return .item
+                }
+            }
+
+            // Check method call context
+            if let functionCall = parent.as(FunctionCallExprSyntax.self),
+               let memberAccess = functionCall.calledExpression.as(MemberAccessExprSyntax.self) {
+                let methodName = memberAccess.declName.baseName.text
+                if methodName == "to" || methodName == "location" {
+                    return .location
+                }
+            }
+
+            current = parent
+        }
+
+        return .unknown
     }
 
     private func processInitializerExpressions(_ node: VariableDeclSyntax) {

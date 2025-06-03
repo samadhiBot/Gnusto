@@ -4,7 +4,7 @@ import Foundation
 @main
 struct GnustoAutoWiringTool: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "auto-wire",
+        commandName: "gnusto-auto-wire",
         abstract: """
             Scans game code and generates necessary ID constants, \
             extensions, and GameBlueprint wiring.

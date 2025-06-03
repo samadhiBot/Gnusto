@@ -57,17 +57,20 @@ let package = Package(
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
-            path: "Executables/CloakOfDarkness"
+            path: "Executables/CloakOfDarkness",
+            plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
-            path: "Executables/FrobozzMagicDemoKit"
+            path: "Executables/FrobozzMagicDemoKit",
+            plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
             name: "Zork1",
             dependencies: ["GnustoEngine"],
-            path: "Executables/Zork1"
+            path: "Executables/Zork1",
+            plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
             name: "GnustoAutoWiringTool",

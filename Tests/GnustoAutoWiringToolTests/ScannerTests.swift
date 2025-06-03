@@ -29,7 +29,8 @@ struct ScannerTests {
         }
         """
 
-        let gameData = parseGameData(from: source)
+        let scanner = Scanner(source: source)
+        let gameData = scanner.process()
 
         #expect(gameData.locationIDs.contains("room"))
         #expect(gameData.itemIDs.contains("chair"))
@@ -55,7 +56,8 @@ struct ScannerTests {
         }
         """
 
-        let gameData = parseGameData(from: source)
+        let scanner = Scanner(source: source)
+        let gameData = scanner.process()
 
         #expect(gameData.gameBlueprintTypes.contains("AutoWiringTestGame"))
         #expect(gameData.locationIDs.contains("livingRoom"))
@@ -77,17 +79,48 @@ struct ScannerTests {
         }
         """
 
-        let gameData = parseGameData(from: source)
+        let scanner = Scanner(source: source)
+        let gameData = scanner.process()
 
         #expect(gameData.itemEventHandlers.contains("cloak"))
         #expect(gameData.locationEventHandlers.contains("bar"))
         #expect(gameData.gameAreaTypes.contains("TestArea"))
     }
 
-    // MARK: - Helper Methods
+    @Test("Refined ID detection filters out method calls correctly")
+    func testRefinedIDDetection() {
+        let source = """
+        import GnustoEngine
 
-    private func parseGameData(from source: String) -> GameData {
-        let scanner = Scanner()
-        return scanner.processSource(source)
+        enum TestArea {
+            static let room = Location(
+                id: .room,
+                .name("Test Room"),
+                .description("A simple test room."),
+                .inherentlyLit
+            )
+
+            static let chair = Item(
+                id: .chair,
+                .name("chair"),
+                .description("A wooden chair."),
+                .in(.location(.room))
+            )
+        }
+        """
+
+        let scanner = Scanner(source: source)
+        let gameData = scanner.process()
+
+        // Should detect actual IDs
+        #expect(gameData.locationIDs.contains("room"))
+        #expect(gameData.itemIDs.contains("chair"))
+        #expect(gameData.gameAreaTypes.contains("TestArea"))
+
+        // Should NOT detect method calls as IDs
+        #expect(!gameData.locationIDs.contains("name"))
+        #expect(!gameData.locationIDs.contains("description"))
+        #expect(!gameData.locationIDs.contains("location"))
+        #expect(!gameData.itemIDs.contains("in"))
     }
 }
