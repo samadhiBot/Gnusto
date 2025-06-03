@@ -113,6 +113,14 @@ struct DiscoveredGameData {
 
     /// Maps daemon definition names to the game area type that defines them
     let daemonToAreaMap: [String: String]
+
+    // MARK: - Property-to-Area Mappings
+
+    /// Maps item property names to the game area type that defines them
+    let itemToAreaMap: [String: String]
+
+    /// Maps location property names to the game area type that defines them
+    let locationToAreaMap: [String: String]
 }
 
 func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
@@ -143,6 +151,10 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
     var handlerToAreaMap: [String: String] = [:]
     var fuseToAreaMap: [String: String] = [:]
     var daemonToAreaMap: [String: String] = [:]
+
+    // MARK: - Property-to-Area Mappings
+    var itemToAreaMap: [String: String] = [:]
+    var locationToAreaMap: [String: String] = [:]
 
     // Track existing constants to avoid duplicates
     var existingLocationIDs = Set<String>()
@@ -197,6 +209,11 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         for match in locationPropertyMatches {
             let propertyName = String(match.1)
             locations.insert(propertyName)
+
+            // Associate property with its containing area
+            if let areaOwner = fileAreaOwner {
+                locationToAreaMap[propertyName] = areaOwner
+            }
         }
 
         let itemPropertyPattern = /(?:static\s+)?(?:let|var)\s+(\w+)(?:\s*:\s*Item)?\s*=\s*(?:Item\s*\(|\.init\s*\()/
@@ -204,6 +221,11 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         for match in itemPropertyMatches {
             let propertyName = String(match.1)
             items.insert(propertyName)
+
+            // Associate property with its containing area
+            if let areaOwner = fileAreaOwner {
+                itemToAreaMap[propertyName] = areaOwner
+            }
         }
 
         // MARK: - Scan for existing static constants
@@ -540,7 +562,9 @@ func scanSourceFiles(_ filePaths: [String]) throws -> DiscoveredGameData {
         gameAreaUsesStaticProperties: gameAreaUsesStaticProperties,
         handlerToAreaMap: handlerToAreaMap,
         fuseToAreaMap: fuseToAreaMap,
-        daemonToAreaMap: daemonToAreaMap
+        daemonToAreaMap: daemonToAreaMap,
+        itemToAreaMap: itemToAreaMap,
+        locationToAreaMap: locationToAreaMap
     )
 }
 
@@ -719,48 +743,56 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
         }
 
         // Generate aggregated items property
-        if !discoveredData.gameAreaTypes.isEmpty {
+        if !discoveredData.items.isEmpty {
             hasExtensionContent = true
             extensionOutput.append("    var items: [Item] {")
             extensionOutput.append("        [")
-            for gameAreaType in discoveredData.gameAreaTypes.sorted() {
-                let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[gameAreaType] ?? false
 
-                for itemProperty in discoveredData.items.sorted() {
+            for itemProperty in discoveredData.items.sorted() {
+                // Use proper scope-aware mapping
+                if let areaType = discoveredData.itemToAreaMap[itemProperty] {
+                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
                     if usesStaticProperties {
-                        // For enums/types with static properties: DirectType.property
-                        extensionOutput.append("            \(gameAreaType).\(itemProperty),")
+                        extensionOutput.append("            \(areaType).\(itemProperty),")
                     } else {
-                        // For structs with instance properties: create static instance
-                        let instanceName = "_\(gameAreaType.prefix(1).lowercased())\(gameAreaType.dropFirst())"
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
                         extensionOutput.append("            Self.\(instanceName).\(itemProperty),")
                     }
+                } else {
+                    // Fallback: try the first area
+                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+                    extensionOutput.append("            \(areaType).\(itemProperty), // ⚠️ Area mapping unknown, using first area")
                 }
             }
+
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
         }
 
         // Generate aggregated locations property
-        if !discoveredData.gameAreaTypes.isEmpty {
+        if !discoveredData.locations.isEmpty {
             hasExtensionContent = true
             extensionOutput.append("    var locations: [Location] {")
             extensionOutput.append("        [")
-            for gameAreaType in discoveredData.gameAreaTypes.sorted() {
-                let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[gameAreaType] ?? false
 
-                for locationProperty in discoveredData.locations.sorted() {
+            for locationProperty in discoveredData.locations.sorted() {
+                // Use proper scope-aware mapping
+                if let areaType = discoveredData.locationToAreaMap[locationProperty] {
+                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
                     if usesStaticProperties {
-                        // For enums/types with static properties: DirectType.property
-                        extensionOutput.append("            \(gameAreaType).\(locationProperty),")
+                        extensionOutput.append("            \(areaType).\(locationProperty),")
                     } else {
-                        // For structs with instance properties: create static instance
-                        let instanceName = "_\(gameAreaType.prefix(1).lowercased())\(gameAreaType.dropFirst())"
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
                         extensionOutput.append("            Self.\(instanceName).\(locationProperty),")
                     }
+                } else {
+                    // Fallback: try the first area
+                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+                    extensionOutput.append("            \(areaType).\(locationProperty), // ⚠️ Area mapping unknown, using first area")
                 }
             }
+
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
