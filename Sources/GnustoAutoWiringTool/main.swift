@@ -693,62 +693,6 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
             extensionOutput.append("")
         }
 
-        // Generate timeRegistry property
-        if !discoveredData.fuseDefinitions.isEmpty || !discoveredData.daemonDefinitions.isEmpty {
-            hasExtensionContent = true
-            extensionOutput.append("    var timeRegistry: TimeRegistry {")
-            extensionOutput.append("        let registry = TimeRegistry()")
-
-            if !discoveredData.fuseDefinitions.isEmpty {
-                extensionOutput.append("")
-                extensionOutput.append("        // Auto-discovered Fuse Definitions")
-                let sortedFuses = discoveredData.fuseDefinitions.sorted()
-                for fuseProperty in sortedFuses {
-                    // Use proper scope-aware mapping
-                    if let areaType = discoveredData.fuseToAreaMap[fuseProperty] {
-                        let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                        if usesStaticProperties {
-                            extensionOutput.append("        registry.registerFuse(\(areaType).\(fuseProperty))")
-                        } else {
-                            let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                            extensionOutput.append("        registry.registerFuse(Self.\(instanceName).\(fuseProperty))")
-                        }
-                    } else {
-                        // Fallback: try the first area
-                        let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                        extensionOutput.append("        registry.registerFuse(\(areaType).\(fuseProperty)) // ⚠️ Area mapping unknown, using first area")
-                    }
-                }
-            }
-
-            if !discoveredData.daemonDefinitions.isEmpty {
-                extensionOutput.append("")
-                extensionOutput.append("        // Auto-discovered Daemon Definitions")
-                let sortedDaemons = discoveredData.daemonDefinitions.sorted()
-                for daemonProperty in sortedDaemons {
-                    // Use proper scope-aware mapping
-                    if let areaType = discoveredData.daemonToAreaMap[daemonProperty] {
-                        let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
-                        if usesStaticProperties {
-                            extensionOutput.append("        registry.registerDaemon(\(areaType).\(daemonProperty))")
-                        } else {
-                            let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
-                            extensionOutput.append("        registry.registerDaemon(Self.\(instanceName).\(daemonProperty))")
-                        }
-                    } else {
-                        // Fallback: try the first area
-                        let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
-                        extensionOutput.append("        registry.registerDaemon(\(areaType).\(daemonProperty)) // ⚠️ Area mapping unknown, using first area")
-                    }
-                }
-            }
-
-            extensionOutput.append("")
-            extensionOutput.append("        return registry")
-            extensionOutput.append("    }")
-            extensionOutput.append("")
-        }
-
         // Generate aggregated items property
         if !discoveredData.items.isEmpty {
             hasExtensionContent = true
@@ -854,6 +798,64 @@ func generateExtensions(_ discoveredData: DiscoveredGameData) -> String {
                     extensionOutput.append("            .\(handlerName): \(areaType).\(handlerName)Handler, // ⚠️ Area mapping unknown, using first area")
                 }
             }
+            extensionOutput.append("        ]")
+            extensionOutput.append("    }")
+            extensionOutput.append("")
+        }
+
+        // Generate fuseDefinitions property
+        if !discoveredData.fuseDefinitions.isEmpty {
+            hasExtensionContent = true
+            extensionOutput.append("    var fuseDefinitions: [FuseID: FuseDefinition] {")
+            extensionOutput.append("        [")
+
+            let sortedFuses = discoveredData.fuseDefinitions.sorted()
+            for fuseProperty in sortedFuses {
+                // Use proper scope-aware mapping
+                if let areaType = discoveredData.fuseToAreaMap[fuseProperty] {
+                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
+                    if usesStaticProperties {
+                        extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty),")
+                    } else {
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("            Self.\(instanceName).\(fuseProperty).id: Self.\(instanceName).\(fuseProperty),")
+                    }
+                } else {
+                    // Fallback: try the first area
+                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+                    extensionOutput.append("            \(areaType).\(fuseProperty).id: \(areaType).\(fuseProperty), // ⚠️ Area mapping unknown, using first area")
+                }
+            }
+
+            extensionOutput.append("        ]")
+            extensionOutput.append("    }")
+            extensionOutput.append("")
+        }
+
+        // Generate daemonDefinitions property
+        if !discoveredData.daemonDefinitions.isEmpty {
+            hasExtensionContent = true
+            extensionOutput.append("    var daemonDefinitions: [DaemonID: DaemonDefinition] {")
+            extensionOutput.append("        [")
+
+            let sortedDaemons = discoveredData.daemonDefinitions.sorted()
+            for daemonProperty in sortedDaemons {
+                // Use proper scope-aware mapping
+                if let areaType = discoveredData.daemonToAreaMap[daemonProperty] {
+                    let usesStaticProperties = discoveredData.gameAreaUsesStaticProperties[areaType] ?? false
+                    if usesStaticProperties {
+                        extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty),")
+                    } else {
+                        let instanceName = "_\(areaType.prefix(1).lowercased())\(areaType.dropFirst())"
+                        extensionOutput.append("            Self.\(instanceName).\(daemonProperty).id: Self.\(instanceName).\(daemonProperty),")
+                    }
+                } else {
+                    // Fallback: try the first area
+                    let areaType = discoveredData.gameAreaTypes.first ?? "/* Area type not found */"
+                    extensionOutput.append("            \(areaType).\(daemonProperty).id: \(areaType).\(daemonProperty), // ⚠️ Area mapping unknown, using first area")
+                }
+            }
+
             extensionOutput.append("        ]")
             extensionOutput.append("    }")
             extensionOutput.append("")
