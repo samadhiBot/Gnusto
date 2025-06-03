@@ -57,20 +57,17 @@ let package = Package(
         .executableTarget(
             name: "CloakOfDarkness",
             dependencies: ["GnustoEngine"],
-            path: "Executables/CloakOfDarkness",
-            plugins: ["GnustoAutoWiringPlugin"]
+            path: "Executables/CloakOfDarkness"
         ),
         .executableTarget(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
-            path: "Executables/FrobozzMagicDemoKit",
-            plugins: ["GnustoAutoWiringPlugin"]
+            path: "Executables/FrobozzMagicDemoKit"
         ),
         .executableTarget(
             name: "Zork1",
             dependencies: ["GnustoEngine"],
-            path: "Executables/Zork1",
-            plugins: ["GnustoAutoWiringPlugin"]
+            path: "Executables/Zork1"
         ),
         .executableTarget(
             name: "GnustoAutoWiringTool",
@@ -95,13 +92,12 @@ let package = Package(
             ]
         ),
         .testTarget(
-            name: "GnustoAutoWiringPluginTests",
+            name: "GnustoAutoWiringToolTests",
             dependencies: [
                 "GnustoEngine",
+                "GnustoAutoWiringTool",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
-            ],
-            path: "Tests/GnustoAutoWiringPluginTests",
-            plugins: ["GnustoAutoWiringPlugin"]
+            ]
         ),
     ]
 )
