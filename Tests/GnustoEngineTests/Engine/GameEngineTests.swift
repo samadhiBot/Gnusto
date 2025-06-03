@@ -113,7 +113,7 @@ struct GameEngineTests {
             You can see a pebble here.
 
             > xyzzy
-            I don’t know the verb ‘xyzzy’.
+            I don't know the verb 'xyzzy'.
 
             > quit
             """)
@@ -211,7 +211,7 @@ struct GameEngineTests {
             You can see a pebble here.
 
             > take pebble
-            You can’t take the pebble.
+            You can't take the pebble.
 
             > quit
             """)
@@ -303,7 +303,7 @@ struct GameEngineTests {
         let lookProcessCalled = await mockLookHandler.getProcessCalled()
         #expect(lookProcessCalled == true, "Look handler process should have been called")
         // Since take is handled by a default handler (or a mock one if we set it up),
-        // we can’t easily check its .processCalled without more setup.
+        // we can't easily check its .processCalled without more setup.
 
         // Assert game state changes (e.g., pebble is taken)
         let pebbleState = try await engine.item("startItem")
@@ -439,7 +439,7 @@ struct GameEngineTests {
         let teardownCount = await mockIO.teardownCallCount
         #expect(teardownCount == 1)
 
-        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn’t stop it)
+        // Ensure game loop exited (e.g., by checking turns or a flag if IO doesn't stop it)
         let finalMoves = await engine.playerMoves
         #expect(finalMoves == 0, "Quit command should not increment moves if it's the first command and handled cleanly")
     }
@@ -808,7 +808,7 @@ struct GameEngineTests {
 
         // Initialize game with fuse definition
         let game = MinimalGame(
-            timeRegistry: TimeRegistry(fuseDefinitions: [fuseDef])
+            fuseDefinitions: [fuseDef]
             // TODO: Need initial state setup for activeFuses
         )
 
@@ -841,7 +841,7 @@ struct GameEngineTests {
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
-            timeRegistry: TimeRegistry(daemonDefinitions: [testDaemonDef])
+            daemonDefinitions: [testDaemonDef]
             // TODO: Need initial state setup for activeDaemons
         )
         let _ = await GameEngine( // Use _ for unused engine
@@ -875,10 +875,8 @@ struct GameEngineTests {
 
         // Initialize game with definitions
         let game = MinimalGame(
-            timeRegistry: TimeRegistry(
-                fuseDefinitions: [testFuse],
-                daemonDefinitions: [testDaemon]
-            )
+            fuseDefinitions: [testFuse],
+            daemonDefinitions: [testDaemon]
             // TODO: Need initial state setup for active timers
         )
 
@@ -948,7 +946,7 @@ struct GameEngineTests {
             commandInput: "take pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You can’t take the pebble.")
+        expectNoDifference(output, "You can't take the pebble.")
     }
 
     @Test("ReportActionResponse: .itemNotHeld")
@@ -978,7 +976,7 @@ struct GameEngineTests {
             commandInput: "wear pebble",
             commandToParse: command
         )
-        expectNoDifference(output, "You aren’t holding the pebble.")
+        expectNoDifference(output, "You aren't holding the pebble.")
     }
 
     @Test("ReportActionResponse: .containerIsClosed")
@@ -1043,7 +1041,7 @@ struct GameEngineTests {
             commandInput: "open rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can’t open the rock.")
+        expectNoDifference(output, "You can't open the rock.")
     }
 
     @Test("ReportActionResponse: .itemNotWearable")
@@ -1072,7 +1070,7 @@ struct GameEngineTests {
             commandInput: "wear rock",
             commandToParse: command
         )
-        expectNoDifference(output, "You can’t wear the rock.")
+        expectNoDifference(output, "You can't wear the rock.")
     }
 
     @Test("ReportActionResponse: .playerCannotCarryMore")

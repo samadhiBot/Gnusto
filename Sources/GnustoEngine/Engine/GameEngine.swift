@@ -54,10 +54,13 @@ public actor GameEngine: Sendable {
     /// derived from the `GameBlueprint` used to initialize the engine.
     public let constants: GameConstants
 
-    /// The registry holding definitions for timed events (`FuseDefinition`)
-    /// and background processes (`DaemonDefinition`) provided by the `GameBlueprint`.
-    /// The engine uses this to manage these time-based game mechanics during `tickClock()`.
-    public let timeRegistry: TimeRegistry
+    /// Definitions for timed events (fuses) that trigger after a set number of turns.
+    /// These are derived from the `GameBlueprint` used to initialize the engine.
+    public let fuseDefinitions: [FuseID: FuseDefinition]
+
+    /// Definitions for background processes (daemons) that run periodically.
+    /// These are derived from the `GameBlueprint` used to initialize the engine.
+    public let daemonDefinitions: [DaemonID: DaemonDefinition]
 
     /// The registry for custom logic that dynamically computes or validates item and
     /// location attributes. This is initialized from the `GameBlueprint` and can be
@@ -114,6 +117,8 @@ public actor GameEngine: Sendable {
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
+        self.fuseDefinitions = blueprint.fuseDefinitions
+        self.daemonDefinitions = blueprint.daemonDefinitions
 
         // Build vocabulary with custom verbs if not provided
         let gameVocabulary: Vocabulary
@@ -149,7 +154,6 @@ public actor GameEngine: Sendable {
         )
         self.parser = parser
         self.ioHandler = ioHandler
-        self.timeRegistry = blueprint.timeRegistry
         self.dynamicAttributeRegistry = blueprint.dynamicAttributeRegistry
         self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
@@ -543,13 +547,13 @@ extension GameEngine {
     /// 1. **Fuses**: Iterates through all `activeFuses` in `gameState`.
     ///    - Decrements the turn counter for each active fuse.
     ///    - If a fuse's counter reaches zero or less:
-    ///        - Retrieves the corresponding `FuseDefinition` from the `timeRegistry`.
+    ///        - Retrieves the corresponding `FuseDefinition` from the `GameBlueprint`.
     ///        - Executes the fuse's `action` closure, passing the `GameEngine` instance.
     ///        - Removes the fuse from `activeFuses` in `gameState`.
     ///        - If the fuse's `repeats` flag is `true`, it reactivates the fuse by adding it
     ///          back to `activeFuses` with its `initialTurns` count.
     /// 2. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
-    ///    - Retrieves the corresponding `DaemonDefinition` from the `timeRegistry`.
+    ///    - Retrieves the corresponding `DaemonDefinition` from the `GameBlueprint`.
     ///    - Executes the daemon's `action` closure, passing the `GameEngine` instance.
     ///
     /// Fuse and daemon actions can modify game state, print messages (by returning an `ActionResult`
@@ -586,7 +590,7 @@ extension GameEngine {
             }
 
             if newTurns <= 0 {
-                guard let definition = timeRegistry.fuseDefinitions[fuseID] else {
+                guard let definition = fuseDefinitions[fuseID] else {
                     print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
                     let removeChangeOnError = StateChange(
                         entityID: .global,
@@ -652,7 +656,7 @@ extension GameEngine {
         // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
-            guard let definition = timeRegistry.daemonDefinitions[daemonID] else {
+            guard let definition = daemonDefinitions[daemonID] else {
                 print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }
@@ -1014,8 +1018,8 @@ extension GameEngine {
 // MARK: - Default Handlers
 
 extension GameEngine {
-    /// Default action handlers provided by the engine.
-    /// Games can override these via the `TimeRegistry`.
+    /// **Default Handlers**: The engine provides standard handlers for common verbs like
+    /// `take`, `drop`, `look`, etc. Games can override these via custom handlers in the `GameBlueprint`.
     static var defaultActionHandlers: [VerbID: ActionHandler] {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction

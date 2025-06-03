@@ -67,7 +67,7 @@ struct GameEngineSideEffectsTests {
             return nil
         }
 
-        let timeRegistry = TimeRegistry(
+        let gameBlueprint = MinimalGame(
             fuseDefinitions: [
                 testFuseDefinition,
                 anotherFuseDefinition
@@ -77,8 +77,6 @@ struct GameEngineSideEffectsTests {
                 anotherDaemonDefinition
             ]
         )
-
-        let gameBlueprint = MinimalGame(timeRegistry: timeRegistry)
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         return await GameEngine(

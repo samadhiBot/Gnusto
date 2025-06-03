@@ -66,16 +66,30 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var locationEventHandlers: [LocationID: LocationEventHandler] { get }
 
-    /// The registry containing definitions for timed events (fuses) and background
-    /// processes (daemons).
+    /// Definitions for timed events (fuses) that trigger after a set number of turns.
     ///
-    /// Use this to provide `FuseDefinition` and `DaemonDefinition` instances that
-    /// the `GameEngine` will manage throughout the game. Fuses trigger an action
-    /// after a set number of turns, while daemons run their action every turn they
-    /// are active.
+    /// Fuses are classic ZIL features used to implement delayed actions or events.
+    /// For example, a fuse might be lit on a stick of dynamite, causing an explosion
+    /// after a set number of turns, or a magical spell might wear off after a duration.
     ///
-    /// The default implementation provides an empty `TimeRegistry`.
-    var timeRegistry: TimeRegistry { get }
+    /// The `GameEngine` uses these definitions to manage active fuses throughout the game.
+    /// The key is a `FuseID` and the value is the corresponding `FuseDefinition`.
+    ///
+    /// The default implementation provides an empty dictionary.
+    var fuseDefinitions: [FuseID: FuseDefinition] { get }
+
+    /// Definitions for background processes (daemons) that run periodically.
+    ///
+    /// Daemons are classic ZIL features used to implement recurring game world events,
+    /// NPC behaviors, or other processes that occur automatically without direct player
+    /// command. For example, a daemon might make an NPC wander, cause a light source
+    /// to gradually dim, or check if a certain game condition triggers a special event.
+    ///
+    /// The `GameEngine` uses these definitions to manage active daemons throughout the game.
+    /// The key is a `DaemonID` and the value is the corresponding `DaemonDefinition`.
+    ///
+    /// The default implementation provides an empty dictionary.
+    var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
 
     /// The registry containing handlers for dynamically computing or validating
     /// item and location attributes.
@@ -111,8 +125,12 @@ extension GameBlueprint {
         [:]
     }
 
-    public var timeRegistry: TimeRegistry {
-        TimeRegistry()
+    public var fuseDefinitions: [FuseID: FuseDefinition] {
+        [:]
+    }
+
+    public var daemonDefinitions: [DaemonID: DaemonDefinition] {
+        [:]
     }
 
     public var dynamicAttributeRegistry: DynamicAttributeRegistry {

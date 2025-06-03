@@ -1,37 +1,32 @@
-@testable import GnustoEngine
+import GnustoEngine
 
-struct MinimalGame: GameBlueprint {
-    let constants = GameConstants(
-        storyTitle: "Minimal Game",
-        introduction: "Welcome to the Minimal Game!",
-        release: "0.0.1",
-        maximumScore: 10
-    )
-    var player: Player
-    var items: [Item]
-    var locations: [Location]
-    var customActionHandlers: [VerbID: ActionHandler]
-    var itemEventHandlers: [ItemID: ItemEventHandler]
-    var locationEventHandlers: [LocationID: LocationEventHandler]
-    var timeRegistry: TimeRegistry
-    var dynamicAttributeRegistry: DynamicAttributeRegistry
+/// A minimal game implementation for testing purposes.
+/// Provides sensible defaults that can be overridden in individual tests.
+public struct MinimalGame: GameBlueprint {
+    public var constants: GameConstants
+    public var player: Player
+    public var items: [Item]
+    public var locations: [Location]
+    public var customActionHandlers: [VerbID: ActionHandler]
+    public var itemEventHandlers: [ItemID: ItemEventHandler]
+    public var locationEventHandlers: [LocationID: LocationEventHandler]
+    public var fuseDefinitions: [FuseID: FuseDefinition]
+    public var daemonDefinitions: [DaemonID: DaemonDefinition]
+    public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
-    init(
-        player: Player = Player(in: .startRoom),
-        locations: [Location]? = nil,
-        items: [Item]? = nil,
-        customActionHandlers: [VerbID: ActionHandler] = [:],
-        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
-        locationEventHandlers: [LocationID: LocationEventHandler] = [:],
-        timeRegistry: TimeRegistry = TimeRegistry(),
-        dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
-    ) {
-        self.player = player
-        self.items = items ?? [
+    public init(
+        constants: GameConstants = GameConstants(
+            storyTitle: "Minimal Game",
+            introduction: "Welcome to the Minimal Game!",
+            release: "0.0.1",
+            maximumScore: 10
+        ),
+        player: Player = Player(in: LocationID("startRoom")),
+        items: [Item] = [
             Item(
-                id: .startItem,
+                id: ItemID("startItem"),
                 .name("pebble"),
-                .in(.location(.startRoom)),
+                .in(.location(LocationID("startRoom"))),
                 .isTakable
             ),
             Item(
@@ -41,27 +36,43 @@ struct MinimalGame: GameBlueprint {
                 .in(.player),
                 .isScenery
             )
-        ]
-        self.locations = locations ?? [
+        ],
+        locations: [Location] = [
             Location(
-                id: .startRoom,
+                id: LocationID("startRoom"),
                 .name("Void"),
                 .description("An empty void."),
                 .inherentlyLit
             )
-        ]
+        ],
+        customActionHandlers: [VerbID: ActionHandler] = [:],
+        itemEventHandlers: [ItemID: ItemEventHandler] = [:],
+        locationEventHandlers: [LocationID: LocationEventHandler] = [:],
+        fuseDefinitions: [FuseDefinition] = [],
+        daemonDefinitions: [DaemonDefinition] = [],
+        dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
+    ) {
+        self.constants = constants
+        self.player = player
+        self.items = items
+        self.locations = locations
         self.customActionHandlers = customActionHandlers
-        self.timeRegistry = timeRegistry
-        self.dynamicAttributeRegistry = dynamicAttributeRegistry
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
+        self.fuseDefinitions = Dictionary(
+            uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
+        )
+        self.daemonDefinitions = Dictionary(
+            uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
+        )
+        self.dynamicAttributeRegistry = dynamicAttributeRegistry
     }
 }
 
-extension ItemID {
+public extension ItemID {
     static let startItem: ItemID = "startItem"
 }
 
-extension LocationID {
+public extension LocationID {
     static let startRoom: LocationID = "startRoom"
 }
