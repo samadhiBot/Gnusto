@@ -10,7 +10,7 @@ struct GameEngineSideEffectsTests {
 
     private let testFuseID: FuseID = "testBomb"
     private let testDaemonID: DaemonID = "testClock"
-    private let anotherFuseID: FuseID = "delayedMessage" 
+    private let anotherFuseID: FuseID = "delayedMessage"
     private let anotherDaemonID: DaemonID = "backgroundMusic"
 
     // MARK: - Helper Methods
@@ -20,37 +20,51 @@ struct GameEngineSideEffectsTests {
             id: testFuseID,
             initialTurns: 3
         ) { engine in
-            // Test fuse action - just set a flag to indicate it fired
-            if let change = await engine.setFlag("fuseExploded") {
-                try? await engine.apply(change)
-            }
+            // Test fuse action - return ActionResult with side effect to set flag
+            let sideEffect = SideEffect(
+                type: .scheduleEvent,
+                targetID: .global,
+                parameters: ["flag": .string("fuseExploded")]
+            )
+            return ActionResult(message: "The fuse exploded!", sideEffects: [sideEffect])
         }
 
         let testDaemonDefinition = DaemonDefinition(
             id: testDaemonID
         ) { engine in
-            // Test daemon action - increment a counter
+            // Test daemon action - increment a counter using state changes
             let change = await engine.adjustGlobal("daemonTicks", by: 1)
-            try? await engine.apply(change)
+            return ActionResult(
+                message: "Daemon tick",
+                stateChanges: [change]
+            )
         }
 
         let anotherFuseDefinition = FuseDefinition(
             id: anotherFuseID,
             initialTurns: 5
         ) { engine in
-            // Another test fuse action
+            // Another test fuse action - return state change via ActionResult
             if let change = await engine.setFlag("messageDelivered") {
-                try? await engine.apply(change)
+                return ActionResult(
+                    message: "Message delivered!",
+                    stateChanges: [change]
+                )
             }
+            return nil
         }
 
         let anotherDaemonDefinition = DaemonDefinition(
             id: anotherDaemonID
         ) { engine in
-            // Another test daemon action
+            // Another test daemon action - return state change via ActionResult
             if let change = await engine.setFlag("musicPlaying") {
-                try? await engine.apply(change)
+                return ActionResult(
+                    message: "Music is playing",
+                    stateChanges: [change]
+                )
             }
+            return nil
         }
 
         let timeRegistry = TimeRegistry(
@@ -119,7 +133,7 @@ struct GameEngineSideEffectsTests {
     @Test("Start fuse side effect with undefined fuse throws error")
     func testStartUndefinedFuseThrowsError() async throws {
         let engine = await createTestEngine()
-        
+
         let undefinedFuseID: FuseID = "nonExistentFuse"
         let sideEffect = SideEffect(
             type: .startFuse,
@@ -235,7 +249,7 @@ struct GameEngineSideEffectsTests {
     @Test("Run daemon side effect with undefined daemon throws error")
     func testRunUndefinedDaemonThrowsError() async throws {
         let engine = await createTestEngine()
-        
+
         let undefinedDaemonID: DaemonID = "nonExistentDaemon"
         let sideEffect = SideEffect(
             type: .runDaemon,
@@ -487,4 +501,4 @@ struct GameEngineSideEffectsTests {
         #expect(finalState.activeDaemons.isEmpty)
         #expect(finalState.changeHistory.isEmpty)
     }
-} 
+}

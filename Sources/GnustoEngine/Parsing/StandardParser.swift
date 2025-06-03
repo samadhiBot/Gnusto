@@ -386,12 +386,10 @@ public struct StandardParser: Parser {
         tokens: [String],
         verbStartIndex: Int,
         verb: VerbID,
-        _debugHook: (() -> Void)? = nil, // Add parameter for debug hook
         vocabulary: Vocabulary,
         gameState: GameState,
         originalInput: String
     ) -> Result<Command, ParseError> {
-        _debugHook?() // Call the hook
         var tokenCursor = verbStartIndex + 1
         var directObjectPhraseTokens: [String] = []
         var indirectObjectPhraseTokens: [String] = []

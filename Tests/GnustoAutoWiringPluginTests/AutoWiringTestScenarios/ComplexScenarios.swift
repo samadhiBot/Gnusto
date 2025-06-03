@@ -6,22 +6,21 @@ import GnustoEngine
 // MARK: - Event Handler Test Area
 
 enum EventTestArea {
-    // Event handlers for testing
-    static let doorHandler = ItemEventHandler { engine, itemID, event in
+    static let doorHandler = ItemEventHandler { engine, event in
         switch event {
-        case .afterTake:
-            await engine.print("You pick up the mysterious door.")
+        case .afterTurn(let command):
+            ActionResult("You pick up the mysterious door.")
         default:
-            break
+            nil
         }
     }
 
-    static let mysticalRoomHandler = LocationEventHandler { engine, locationID, event in
+    static let mysticalRoomHandler = LocationEventHandler { engine, event in
         switch event {
-        case .onEnter:
-            await engine.print("The room shimmers with magical energy.")
+        case .beforeTurn(let command):
+            ActionResult("The room shimmers with magical energy.")
         default:
-            break
+            nil
         }
     }
 
@@ -37,7 +36,7 @@ enum EventTestArea {
         id: .mysticalRoom,
         .name("Mystical Room"),
         .description("A room filled with mystical energy."),
-        .exits([.out: .to(.normalRoom)]),
+        .exits([.outside: .to(.normalRoom)]),
         .inherentlyLit
     )
 
@@ -45,7 +44,7 @@ enum EventTestArea {
         id: .normalRoom,
         .name("Normal Room"),
         .description("A perfectly ordinary room."),
-        .exits([.in: .to(.mysticalRoom)]),
+        .exits([.inside: .to(.mysticalRoom)]),
         .inherentlyLit
     )
 }
@@ -53,41 +52,41 @@ enum EventTestArea {
 // MARK: - Timer Test Area (Fuses and Daemons)
 
 enum TimerTestArea {
-    // Fuse definitions for testing
+    // Fuse definitions for testing - now return ActionResult?
     static let explosiveDevice = FuseDefinition(
-        id: .bombFuse,
-        turns: 5
+        id: FuseID("bombFuse"),
+        initialTurns: 5
     ) { engine in
-        await engine.print("BOOM! The explosive device detonates!")
-        // Handle explosion logic
+        // Handle explosion logic and return ActionResult
+        return ActionResult("BOOM! The explosive device detonates!")
     }
 
     static let timedPuzzle = FuseDefinition(
-        id: .puzzleTimer,
-        turns: 10
+        id: FuseID("puzzleTimer"),
+        initialTurns: 10
     ) { engine in
-        await engine.print("Time's up! The puzzle resets itself.")
-        // Reset puzzle state
+        // Reset puzzle state and return ActionResult
+        return ActionResult("Time's up! The puzzle resets itself.")
     }
 
-    // Daemon definitions for testing
+    // Daemon definitions for testing - now return ActionResult?
     static let randomEvents = DaemonDefinition(
-        id: .randomEventDaemon,
-        probability: 15
+        id: DaemonID("randomEventDaemon"),
+        frequency: 15
     ) { engine in
         let events = [
             "You hear a distant sound.",
             "A cool breeze passes by.",
             "Something rustles in the shadows."
         ]
-        await engine.print(events.randomElement()!)
+        return ActionResult(events.randomElement()!)
     }
 
     static let atmosphericEffects = DaemonDefinition(
-        id: .atmosphereDaemon,
-        probability: 8
+        id: DaemonID("atmosphereDaemon"),
+        frequency: 8
     ) { engine in
-        await engine.print("The atmosphere grows more tense.")
+        return ActionResult("The atmosphere grows more tense.")
     }
 
     // Items related to timing
@@ -176,12 +175,12 @@ struct InstanceTestArea {
     )
 
     // Instance-based event handler
-    let dynamicHandler = ItemEventHandler { engine, itemID, event in
+    let dynamicHandler = ItemEventHandler { engine, event in
         switch event {
-        case .afterTake:
-            await engine.print("The dynamic item responds to your touch.")
+        case .afterTurn:
+            return ActionResult("The dynamic item responds to your touch.")
         default:
-            break
+            return nil
         }
     }
 }
@@ -189,7 +188,7 @@ struct InstanceTestArea {
 // MARK: - Complex Nested Patterns Test Area
 
 enum NestedTestArea {
-    static let complexLocation = Location(
+    static let complexLocation: Location = Location(
         id: .complexLocation,
         .name("Complex Location"),
         .description("""
@@ -203,33 +202,43 @@ enum NestedTestArea {
             .up: .to(.upperLevel),
             .down: .to(.lowerLevel)
         ]),
-        .globals(.hasVisitedComplex, .complexPuzzleSolved),
+        .localGlobals(.compartmentKey, .hiddenDocument),
         .inherentlyLit
     )
 
-    static let containerItem = Item(
+    static let containerItem: Item = Item(
         id: .complexContainer,
         .name("complex container"),
         .description("A container with multiple compartments."),
         .in(.location(.complexLocation)),
         .isContainer,
-        .isTakable,
-        .container([
-            .compartmentKey,
-            .hiddenDocument,
-            .mysteriousOrb
-        ])
+        .isTakable
+    )
+
+    // Child items that would be contained in the container
+    static let compartmentKey: Item = Item(
+        id: .compartmentKey,
+        .name("compartment key"),
+        .in(.item(.complexContainer))
+    )
+
+    static let hiddenDocument: Item = Item(
+        id: .hiddenDocument,
+        .name("hidden document"),
+        .in(.item(.complexContainer))
+    )
+
+    static let mysteriousOrb: Item = Item(
+        id: .mysteriousOrb,
+        .name("mysterious orb"),
+        .in(.item(.complexContainer))
     )
 
     // These IDs would be discovered through cross-references
-    static let northWing = Location(id: .northWing, .name("North Wing"))
-    static let southWing = Location(id: .southWing, .name("South Wing"))
-    static let eastWing = Location(id: .eastWing, .name("East Wing"))
-    static let westWing = Location(id: .westWing, .name("West Wing"))
-    static let upperLevel = Location(id: .upperLevel, .name("Upper Level"))
-    static let lowerLevel = Location(id: .lowerLevel, .name("Lower Level"))
-
-    static let compartmentKey = Item(id: .compartmentKey, .name("compartment key"))
-    static let hiddenDocument = Item(id: .hiddenDocument, .name("hidden document"))
-    static let mysteriousOrb = Item(id: .mysteriousOrb, .name("mysterious orb"))
+    static let northWing: Location = Location(id: .northWing, .name("North Wing"))
+    static let southWing: Location = Location(id: .southWing, .name("South Wing"))
+    static let eastWing: Location = Location(id: .eastWing, .name("East Wing"))
+    static let westWing: Location = Location(id: .westWing, .name("West Wing"))
+    static let upperLevel: Location = Location(id: .upperLevel, .name("Upper Level"))
+    static let lowerLevel: Location = Location(id: .lowerLevel, .name("Lower Level"))
 }

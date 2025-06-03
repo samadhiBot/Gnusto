@@ -799,11 +799,11 @@ struct GameEngineTests {
             // This closure is @Sendable and runs on the GameEngine actor context.
             // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
 
-            // To call mockIO.print (MainActor) from GameEngine actor context:
-            await mockIO.print("Fuse triggered!")
-
             // To call stateHolder.markFlag (TestStateHolder actor)
             await stateHolder.markFlag()
+
+            // Return ActionResult with message instead of printing directly
+            return ActionResult("Fuse triggered!")
         }
 
         // Initialize game with fuse definition
@@ -834,8 +834,10 @@ struct GameEngineTests {
 
         let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
-            await mockIO.print("Daemon ran!")
             await stateHolder.increment()
+
+            // Return ActionResult with message instead of printing directly
+            return ActionResult("Daemon ran!")
         }
         // Initialize game with daemon definition
         let game = MinimalGame(
@@ -863,12 +865,12 @@ struct GameEngineTests {
         let stateHolder = TestStateHolder()
 
         let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
-            await mockIO.print("Fuse! [\(stateHolder.getFlag())]")
             await stateHolder.markFlag()
+            return ActionResult("Fuse! [\(await stateHolder.getFlag())]")
         }
         let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
-            await mockIO.print("Daemon! [\(stateHolder.getCount())]")
             await stateHolder.increment()
+            return ActionResult("Daemon! [\(await stateHolder.getCount())]")
         }
 
         // Initialize game with definitions
@@ -1644,10 +1646,10 @@ struct GameEngineTests {
             lastItem: item3,
             allItems: [item1, item2, item3]
         )
-        
+
         // Should return two changes: one for "it" and one for "them"
         #expect(changes.count == 2)
-        
+
         // Check "it" change (should refer to last item)
         let itChange = changes.first { change in
             if case .pronounReference(let pronoun) = change.attribute {
@@ -1663,7 +1665,7 @@ struct GameEngineTests {
                 newValue: .entityReferenceSet([.item(item3.id)])
             )
         )
-        
+
         // Check "them" change (should refer to all items)
         let themChange = changes.first { change in
             if case .pronounReference(let pronoun) = change.attribute {

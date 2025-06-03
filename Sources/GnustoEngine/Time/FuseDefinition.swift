@@ -13,12 +13,8 @@ import Foundation
 /// the fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.
 /// When the turn counter for an active fuse reaches zero, its `action` is executed.
 public struct FuseDefinition: Identifiable, Sendable {
-
-    /// A unique identifier for the fuse definition.
-    public typealias ID = FuseID
-
     /// The unique ID of this fuse definition.
-    public let id: ID
+    public let id: FuseID
 
     /// The initial number of game turns from when the fuse is activated until it triggers.
     /// This must be a positive integer.
@@ -33,8 +29,14 @@ public struct FuseDefinition: Identifiable, Sendable {
     ///
     /// This closure is executed on the `GameEngine`'s actor context, allowing you to
     /// safely query and modify the `GameState` through the provided `GameEngine` instance.
-    /// - Parameter engine: The `GameEngine` instance, providing access to game state and mutation methods.
-    public var action: @Sendable (GameEngine) async -> Void
+    /// The closure can return an `ActionResult` with a message to display to the player
+    /// and any side effects to process, or `nil` if no player-visible output is needed.
+    ///
+    /// - Parameter engine: The `GameEngine` instance, providing access to game state and
+    ///                     mutation methods.
+    /// - Returns: An optional `ActionResult` containing a message and/or side effects, or `nil`
+    ///            for silent execution.
+    public var action: @Sendable (GameEngine) async -> ActionResult?
 
     /// Initializes a new fuse definition.
     ///
@@ -42,12 +44,13 @@ public struct FuseDefinition: Identifiable, Sendable {
     ///   - id: The unique `FuseID` for this fuse definition.
     ///   - initialTurns: The number of turns from activation until the fuse triggers (must be > 0).
     ///   - repeats: Whether the fuse reactivates itself after triggering. Defaults to `false`.
-    ///   - action: The closure to execute when the fuse triggers. It receives the `GameEngine` instance.
+    ///   - action: The closure to execute when the fuse triggers. It receives the `GameEngine`
+    ///             instance and can return an `ActionResult` with a message and side effects.
     public init(
         id: ID,
         initialTurns: Int,
         repeats: Bool = false,
-        action: @escaping @Sendable (GameEngine) async -> Void
+        action: @escaping @Sendable (GameEngine) async -> ActionResult?
     ) {
         precondition(initialTurns > 0, "Fuse must have a positive initial turn count.")
         self.id = id
@@ -57,7 +60,8 @@ public struct FuseDefinition: Identifiable, Sendable {
     }
 }
 
-// Basic Equatable and Hashable conformance based on ID
+// MARK: - Equatable and Hashable
+
 extension FuseDefinition: Equatable {
     public static func == (lhs: FuseDefinition, rhs: FuseDefinition) -> Bool {
         lhs.id == rhs.id // Equality based on ID only

@@ -114,7 +114,7 @@ public actor GameEngine: Sendable {
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
-        
+
         // Build vocabulary with custom verbs if not provided
         let gameVocabulary: Vocabulary
         if let providedVocabulary = vocabulary {
@@ -127,7 +127,7 @@ public actor GameEngine: Sendable {
                 let verbDef = Verb(id: verbID, syntax: [], requiresLight: false)
                 customVerbs.append(verbDef)
             }
-            
+
             // Build vocabulary with custom verbs
             gameVocabulary = Vocabulary.build(
                 items: blueprint.items,
@@ -136,7 +136,7 @@ public actor GameEngine: Sendable {
                 useDefaultVerbs: true
             )
         }
-        
+
         self.gameState = GameState(
             locations: blueprint.locations,
             items: blueprint.items,
@@ -282,7 +282,7 @@ extension GameEngine {
 
             // Store the player's current location before executing the command
             let locationBeforeCommand = playerLocationID
-            
+
             // For GO commands, check if the destination is unvisited before execution
             let destinationWasUnvisited: Bool
             if command.verb == .go {
@@ -560,8 +560,8 @@ extension GameEngine {
 
         // --- Process Fuses ---
         // Explicitly define the action type to match FuseDefinition.action
-        typealias FuseActionType = @Sendable (GameEngine) async -> Void
-        var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType)] = []
+        typealias FuseActionType = @Sendable (GameEngine) async -> ActionResult?
+        var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType, definition: FuseDefinition)] = []
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -601,7 +601,7 @@ extension GameEngine {
                     }
                     continue
                 }
-                expiredFuseIDsToExecute.append((id: fuseID, action: definition.action))
+                expiredFuseIDsToExecute.append((id: fuseID, action: definition.action, definition: definition))
 
                 let removeChange = StateChange(
                     entityID: .global,
@@ -619,7 +619,32 @@ extension GameEngine {
 
         // Execute actions of expired fuses AFTER all state changes for this tick's expirations are processed
         for fuseToExecute in expiredFuseIDsToExecute {
-            await fuseToExecute.action(self)
+            if let actionResult = await fuseToExecute.action(self) {
+                do {
+                    _ = try await processActionResult(actionResult)
+                } catch {
+                    logError("Error processing fuse '\(fuseToExecute.id)' action result: \(error)")
+                }
+            }
+
+            // Handle fuse repetition
+            if fuseToExecute.definition.repeats {
+                let restartChange = StateChange(
+                    entityID: .global,
+                    attribute: .addActiveFuse(
+                        fuseID: fuseToExecute.definition.id,
+                        initialTurns: fuseToExecute.definition.initialTurns
+                    ),
+                    oldValue: nil,
+                    newValue: .int(fuseToExecute.definition.initialTurns)
+                )
+                do {
+                    try gameState.apply(restartChange)
+                } catch {
+                    logError("TickClock Error: Failed to restart repeating fuse \(fuseToExecute.id): \(error)")
+                }
+            }
+
             if shouldQuit { return }
         }
 
@@ -636,7 +661,13 @@ extension GameEngine {
             // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
                 // Execute the daemon's action
-                await definition.action(self)
+                if let actionResult = await definition.action(self) {
+                    do {
+                        _ = try await processActionResult(actionResult)
+                    } catch {
+                        logError("Error processing daemon '\(daemonID)' action result: \(error)")
+                    }
+                }
                 if shouldQuit { return }
             }
         }
@@ -917,7 +948,7 @@ extension GameEngine {
             return false
         }
     }
-    
+
     /// Applies a `StateChange` with dynamic validation, respecting the action pipeline.
     ///
     /// This method performs dynamic validation using the `DynamicAttributeRegistry` before
@@ -936,45 +967,45 @@ extension GameEngine {
                     "Invalid entity ID for itemAttribute: expected .item"
                 )
             }
-            
+
             let isValid = try await validateStateValue(
                 itemID: itemID,
                 attributeID: key,
                 newValue: change.newValue
             )
-            
+
             if !isValid {
                 throw ActionResponse.invalidValue("""
                     Dynamic validation failed for item attribute '\(key.rawValue)' \
                     on \(itemID.rawValue): \(change.newValue)
                     """)
             }
-            
+
         case .locationAttribute(let key):
             guard case .location(let locationID) = change.entityID else {
                 throw ActionResponse.internalEngineError(
                     "Invalid entity ID for locationAttribute: expected .location"
                 )
             }
-            
+
             let isValid = try await validateStateValue(
                 locationID: locationID,
                 attributeID: key,
                 newValue: change.newValue
             )
-            
+
             if !isValid {
                 throw ActionResponse.invalidValue("""
                     Dynamic validation failed for location attribute '\(key.rawValue)' \
                     on \(locationID.rawValue): \(change.newValue)
                     """)
             }
-            
+
         default:
             // No dynamic validation needed for other attribute types
             break
         }
-        
+
         // Apply the change to the game state
         try gameState.apply(change)
     }
