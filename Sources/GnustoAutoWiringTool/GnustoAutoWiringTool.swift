@@ -37,6 +37,16 @@ struct GnustoAutoWiringTool: AsyncParsableCommand {
 
         // Print summary of discovered game data
         printGameDataSummary(allGameData)
+
+        // Generate Swift code
+        let codeGenerator = CodeGenerator()
+        let generatedCode = codeGenerator.generate(from: allGameData)
+
+        // Write generated code to output file
+        let outputURL = URL(fileURLWithPath: output)
+        try generatedCode.write(to: outputURL, atomically: true, encoding: .utf8)
+
+        print("\n✅ Generated code written to: \(output)")
     }
 
     private func findSwiftFiles(in rootURL: URL) -> [URL] {

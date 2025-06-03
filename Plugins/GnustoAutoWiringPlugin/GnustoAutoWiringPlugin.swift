@@ -54,15 +54,17 @@ struct GnustoAutoWiringPlugin: BuildToolPlugin {
         // Get the ID generator tool
         let tool = try context.tool(named: "GnustoAutoWiringTool")
 
+        // Use the target directory as the source directory
+        let sourceDirectory = target.directoryURL
+
         // Build arguments for the tool
-        var arguments = [
-            "--output", outputURL.absoluteString,
-            "--source-files"
+        let arguments = [
+            "--output", outputURL.path(),
+            "--source", sourceDirectory.path()
         ]
-        arguments += swiftFiles.map { $0.url.absoluteString }
 
         print("🔧 GnustoAutoWiringPlugin (SPM): Configuring comprehensive game setup generation for target '\(target.name)'")
-        print("📁 Will scan \(swiftFiles.count) Swift files")
+        print("📁 Will scan \(swiftFiles.count) Swift files in \(sourceDirectory.path())")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
 
@@ -115,15 +117,24 @@ extension GnustoAutoWiringPlugin: XcodeBuildToolPlugin {
             throw error
         }
 
+        // For Xcode, we need to determine the source directory from the input files
+        // Find the common source directory by getting the directory of the first Swift file
+        let sourceDirectory: URL
+        if let firstFile = swiftFiles.first {
+            sourceDirectory = firstFile.url.deletingLastPathComponent()
+        } else {
+            // Fallback to plugin work directory if no files found
+            sourceDirectory = context.pluginWorkDirectoryURL
+        }
+
         // Build arguments for the tool
-        var arguments = [
-            "--output", outputURL.absoluteString,
-            "--source-files"
+        let arguments = [
+            "--output", outputURL.path(),
+            "--source", sourceDirectory.path()
         ]
-        arguments += swiftFiles.map { $0.url.absoluteString }
 
         print("🔧 GnustoAutoWiringPlugin (Xcode): Configuring comprehensive game setup generation for target '\(target.displayName)'")
-        print("📁 Will scan \(swiftFiles.count) Swift files")
+        print("📁 Will scan \(swiftFiles.count) Swift files in \(sourceDirectory.path())")
         print("📝 Output: \(outputURL.path())")
         print("🛠️ Tool: \(tool.name)")
         print("📋 Arguments: \(arguments.joined(separator: " "))")
