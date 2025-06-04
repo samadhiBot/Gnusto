@@ -115,8 +115,29 @@ struct CodeGenerator {
                 }
             }
 
+            // Check for non-static event handlers that need area instances
+            for itemHandler in gameData.itemEventHandlers {
+                if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                    let handlerPropertyName = "\(itemHandler)Handler"
+                    let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                    if !isStatic {
+                        areaInstances.insert(areaType)
+                    }
+                }
+            }
+
+            for locationHandler in gameData.locationEventHandlers {
+                if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                    let handlerPropertyName = "\(locationHandler)Handler"
+                    let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                    if !isStatic {
+                        areaInstances.insert(areaType)
+                    }
+                }
+            }
+
             // Only generate extension if there's content
-            if !gameData.items.isEmpty || !gameData.locations.isEmpty {
+            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty {
                 output.append("extension \(gameBlueprintType) {")
 
                 // Generate items property
@@ -179,6 +200,74 @@ struct CodeGenerator {
                         } else {
                             // When area mapping is unknown, skip rather than guessing wrong
                             extensionLines.append("            // \(locationProperty), // Area mapping unknown - please add manually")
+                        }
+                    }
+
+                    extensionLines.append("        ]")
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                }
+
+                // Generate itemEventHandlers property
+                if !gameData.itemEventHandlers.isEmpty {
+                    extensionLines.append("    var itemEventHandlers: [ItemID: ItemEventHandler] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    extensionLines.append("        return [")
+
+                    for itemHandler in gameData.itemEventHandlers.sorted() {
+                        if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                            let handlerPropertyName = "\(itemHandler)Handler"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if isStatic {
+                                extensionLines.append("            .\(itemHandler): \(areaType).\(handlerPropertyName),")
+                            } else {
+                                extensionLines.append("            .\(itemHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                            }
+                        } else {
+                            extensionLines.append("            // .\(itemHandler): SomeArea.\(itemHandler)Handler, // Area mapping unknown - please add manually")
+                        }
+                    }
+
+                    extensionLines.append("        ]")
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                }
+
+                // Generate locationEventHandlers property
+                if !gameData.locationEventHandlers.isEmpty {
+                    extensionLines.append("    var locationEventHandlers: [LocationID: LocationEventHandler] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    extensionLines.append("        return [")
+
+                    for locationHandler in gameData.locationEventHandlers.sorted() {
+                        if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                            let handlerPropertyName = "\(locationHandler)Handler"
+                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                            if isStatic {
+                                extensionLines.append("            .\(locationHandler): \(areaType).\(handlerPropertyName),")
+                            } else {
+                                extensionLines.append("            .\(locationHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                            }
+                        } else {
+                            extensionLines.append("            // .\(locationHandler): SomeArea.\(locationHandler)Handler, // Area mapping unknown - please add manually")
                         }
                     }
 

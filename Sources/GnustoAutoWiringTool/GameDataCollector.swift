@@ -5,6 +5,7 @@ import SwiftParser
 /// A simple game data collector that walks a syntax tree to find game patterns.
 class GameDataCollector {
     var gameData = GameData()
+
     private var currentAreaType: String?
 
     func collect(from source: String) {
@@ -68,24 +69,76 @@ class GameDataCollector {
         }
 
         for binding in varDecl.bindings {
-            if let pattern = binding.pattern.as(IdentifierPatternSyntax.self),
-               let initializer = binding.initializer?.value {
+            if let pattern = binding.pattern.as(IdentifierPatternSyntax.self) {
+                let propertyName = pattern.identifier.text
 
-                // Check for Location/Item initialization patterns
-                if let functionCall = initializer.as(FunctionCallExprSyntax.self) {
-                    let functionName = functionCall.calledExpression.trimmedDescription
+                // Handle stored properties with initializers
+                if let initializer = binding.initializer?.value {
+                    // Check for Location/Item initialization patterns
+                    if let functionCall = initializer.as(FunctionCallExprSyntax.self) {
+                        let functionName = functionCall.calledExpression.trimmedDescription
 
-                    if functionName == "Location" {
-                        extractLocationData(from: functionCall, propertyName: pattern.identifier.text, isStatic: isStatic)
-                    } else if functionName == "Item" {
-                        extractItemData(from: functionCall, propertyName: pattern.identifier.text, isStatic: isStatic)
+                        if functionName == "Location" {
+                            extractLocationData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                        } else if functionName == "Item" {
+                            extractItemData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                        } else if functionName == "ItemEventHandler" {
+                            extractEventHandlerData(from: propertyName, type: .item, isStatic: isStatic)
+                        } else if functionName == "LocationEventHandler" {
+                            extractEventHandlerData(from: propertyName, type: .location, isStatic: isStatic)
+                        } else if functionName == "Player" {
+                            extractPlayerLocationData(from: functionCall)
+                        }
                     }
+                }
+
+                // Handle computed properties with accessors (getters)
+                if let accessorBlock = binding.accessorBlock {
+                    // Walk through the accessor block to find function calls
+                    walk(accessorBlock)
                 }
             }
         }
     }
 
-    private func extractLocationData(from functionCall: FunctionCallExprSyntax, propertyName: String, isStatic: Bool) {
+    private enum EventHandlerType {
+        case item
+        case location
+    }
+
+    private func extractEventHandlerData(
+        from propertyName: String,
+        type: EventHandlerType,
+        isStatic: Bool
+    ) {
+        // Extract the entity name from the handler property name
+        // e.g., "cloakHandler" -> "cloak", "barHandler" -> "bar"
+        if propertyName.hasSuffix("Handler") {
+            let entityName = String(propertyName.dropLast("Handler".count))
+
+            switch type {
+            case .item:
+                gameData.itemEventHandlers.insert(entityName)
+            case .location:
+                gameData.locationEventHandlers.insert(entityName)
+            }
+
+            // Map this handler to its area type and track if it's static
+            if let areaType = currentAreaType {
+                gameData.handlerToAreaMap[entityName] = areaType
+
+                // We need to find if the handler property is static - let's look at the parent variable declaration
+                // For now, we'll track the handler property name and its static status
+                gameData.propertyIsStatic["\(entityName)Handler"] = isStatic
+            }
+        }
+    }
+
+    private func extractLocationData(
+        from functionCall: FunctionCallExprSyntax,
+        propertyName: String,
+        isStatic: Bool
+    ) {
         // Look for id: .locationName pattern
         guard let arguments = functionCall.arguments.first else { return }
 
@@ -103,7 +156,11 @@ class GameDataCollector {
         }
     }
 
-    private func extractItemData(from functionCall: FunctionCallExprSyntax, propertyName: String, isStatic: Bool) {
+    private func extractItemData(
+        from functionCall: FunctionCallExprSyntax,
+        propertyName: String,
+        isStatic: Bool
+    ) {
         // Look for id: .itemName pattern
         guard let arguments = functionCall.arguments.first else { return }
 
@@ -178,6 +235,18 @@ class GameDataCollector {
                         let globalIDName = memberAccessArg.declName.baseName.text
                         gameData.globalIDs.insert(globalIDName)
                     }
+                }
+            }
+        }
+    }
+
+    private func extractPlayerLocationData(from functionCall: FunctionCallExprSyntax) {
+        // Look for Player(in: .locationID) pattern
+        for argument in functionCall.arguments {
+            if argument.label?.text == "in" {
+                if let memberAccess = argument.expression.as(MemberAccessExprSyntax.self) {
+                    let locationID = memberAccess.declName.baseName.text
+                    gameData.locationIDs.insert(locationID)
                 }
             }
         }
