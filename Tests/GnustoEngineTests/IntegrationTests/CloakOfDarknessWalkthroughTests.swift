@@ -65,6 +65,8 @@ struct CloakOfDarknessWalkthroughTests {
             It is pitch black. You are likely to be eaten by a grue.
 
             > walk north
+            — Foyer of the Opera House —
+
             > go north
             You’ve only just arrived, and besides, the weather outside
             seems to be getting worse.
@@ -91,7 +93,11 @@ struct CloakOfDarknessWalkthroughTests {
             It’s just a small brass hook, with a cloak hanging on it.
 
             > walk east
+            — Foyer of the Opera House —
+
             > go south
+            — Bar —
+
             > read the message
             The message, neatly marked in the sawdust, reads…
 
@@ -166,6 +172,8 @@ struct CloakOfDarknessWalkthroughTests {
             Blundering around in the dark isn’t a good idea!
 
             > go north
+            — Foyer of the Opera House —
+
             > look
             — Foyer of the Opera House —
 
@@ -193,7 +201,11 @@ struct CloakOfDarknessWalkthroughTests {
             Dropped.
 
             > e
+            — Foyer of the Opera House —
+
             > s
+            — Bar —
+
             > look
             — Bar —
 

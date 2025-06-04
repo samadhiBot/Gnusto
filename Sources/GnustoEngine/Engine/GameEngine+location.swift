@@ -133,6 +133,25 @@ extension GameEngine {
         try await listItemsInLocation(locationID: playerLocationID)
     }
 
+    /// Displays a brief description of the player's current location (just the name).
+    ///
+    /// This is used when the player moves to a previously visited location in brief mode,
+    /// providing acknowledgment of the movement without the full description. This matches
+    /// traditional IF behavior where visited locations show only their name unless explicitly
+    /// examined.
+    func showBriefLocation() async throws {
+        // 1. Check for light
+        guard await playerLocationIsLit() else {
+            // It's dark!
+            await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
+            return
+        }
+
+        // 2. If lit, get snapshot and print just the name
+        let location = try location(playerLocationID)
+        await ioHandler.print("--- \(location.name) ---")
+    }
+
     /// Validates a proposed value for a location attribute using the dynamic attribute registry.
     /// This is called internally when `StateChange`s are applied to ensure dynamic validation
     /// handlers are respected.

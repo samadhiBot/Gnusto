@@ -34,11 +34,6 @@ struct ForestTests {
             1983 Infocom, Inc. All rights reserved. ZORK is a registered
             trademark of Infocom, Inc. Revision 88 / Serial number 840726
             
-            West of House You are standing in an open field west of a white
-            house, with a boarded front door. There is a small mailbox
-            here.
-            
-            
             — West of House —
             
             You are standing in an open field west of a white house, with a

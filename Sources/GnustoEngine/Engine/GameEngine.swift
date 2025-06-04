@@ -308,25 +308,32 @@ extension GameEngine {
 
             // Handle location description after movement or light change
             let shouldDescribe: Bool
+            let shouldShowBrief: Bool
             switch command.verb {
             case .go:
                 // Check if the player actually moved to a different location
                 let locationAfterCommand = playerLocationID
                 if locationBeforeCommand != locationAfterCommand {
-                    // Player moved - use the pre-execution check for whether to describe
+                    // Player moved - decide what to show
                     shouldDescribe = destinationWasUnvisited
+                    shouldShowBrief = !destinationWasUnvisited
                 } else {
                     // Player didn't move (movement was prevented)
                     shouldDescribe = false
+                    shouldShowBrief = false
                 }
             case .turnOn, .turnOff:
                 shouldDescribe = true // Light change commands
+                shouldShowBrief = false
             default:
                 shouldDescribe = false
+                shouldShowBrief = false
             }
 
             if shouldDescribe {
                 try await describeCurrentLocation()
+            } else if shouldShowBrief {
+                try await showBriefLocation()
             }
 
         case .failure(let error):
