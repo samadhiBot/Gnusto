@@ -50,4 +50,14 @@ struct ExitTests {
         #expect(exit.blockedMessage == nil)
         #expect(exit.doorID == door.id)
     }
+
+    @Test("Exit Initialization - Blocked Exit with Message")
+    func testExitInitializationBlockedWithMessage() {
+        let message = "The path is overgrown with thorns."
+        let exit = Exit.blocked(message)
+
+        #expect(exit.destinationID == nil)
+        #expect(exit.blockedMessage == message)
+        #expect(exit.doorID == nil)
+    }
 }

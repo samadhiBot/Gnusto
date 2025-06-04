@@ -8,8 +8,9 @@ public struct GoActionHandler: ActionHandler {
     /// This method ensures that:
     /// 1. A direction is specified in the command.
     /// 2. The player's current location has an exit in the specified direction.
-    /// 3. If the exit has a static `blockedMessage`, that message is thrown as an error.
-    /// 4. If the exit is guarded by a door (`doorID` is present):
+    /// 3. If the exit has no destination (`destinationID` is `nil`), it's permanently blocked.
+    /// 4. If the exit has a static `blockedMessage`, that message is thrown as an error.
+    /// 5. If the exit is guarded by a door (`doorID` is present):
     ///    a. The door item exists.
     ///    b. The door is not flagged as `.isLocked`.
     ///    c. The door is flagged as `.isOpen`.
@@ -36,7 +37,13 @@ public struct GoActionHandler: ActionHandler {
 
         // 4. Check Exit Conditions
 
-        // Check for static blocked message first
+        // Check if exit is permanently blocked (no destination)
+        guard exit.destinationID != nil else {
+            let message = exit.blockedMessage ?? "You can't go that way."
+            throw ActionResponse.directionIsBlocked(message)
+        }
+
+        // Check for static blocked message
         if let staticBlockedMessage = exit.blockedMessage {
             throw ActionResponse.directionIsBlocked(staticBlockedMessage)
         }
@@ -77,14 +84,15 @@ public struct GoActionHandler: ActionHandler {
         let currentLocation = try await context.engine.playerLocation()
         guard
             let direction = context.command.direction,
-            let exit = currentLocation.exits[direction]
+            let exit = currentLocation.exits[direction],
+            let destinationID = exit.destinationID
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError(
-                "Exit disappeared between validate and process for GO context.command."
+                "Exit disappeared or became blocked between validate and process for GO context.command."
             )
         }
-        let destination = try await context.engine.location(exit.destinationID)
+        let destination = try await context.engine.location(destinationID)
 
         // Create state changes
         var stateChanges: [StateChange] = [
@@ -92,7 +100,7 @@ public struct GoActionHandler: ActionHandler {
                 entityID: .player,
                 attribute: .playerLocation,
                 oldValue: .locationID(currentLocation.id),
-                newValue: .locationID(exit.destinationID)
+                newValue: .locationID(destinationID)
             )
         ]
 

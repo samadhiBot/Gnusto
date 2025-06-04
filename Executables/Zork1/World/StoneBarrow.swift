@@ -14,10 +14,7 @@ enum StoneBarrow {
             """),
         .exits([
             .west: .to(.forest1),
-            .east: Exit(
-                destination: .blockedExit,
-                blockedMessage: "The entrance is sealed."
-            ),
+            .east: .blocked("The entrance is sealed."),
         ]),
         .inherentlyLit
     )

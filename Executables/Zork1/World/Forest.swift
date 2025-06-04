@@ -73,10 +73,7 @@ enum Forest {
         .description("The forest thins out, revealing impassable mountains."),
         .exits([
             .south: .to(.forest3),
-            .east: Exit(
-                destination: .blockedExit,
-                blockedMessage: "The mountains are impassable."
-            ),
+            .east: .blocked("The mountains are impassable."),
         ]),
         .inherentlyLit
     )

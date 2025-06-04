@@ -17,10 +17,7 @@ enum AroundHouse {
             .northeast: .to(.northOfHouse),
             .southeast: .to(.southOfHouse),
             .west: .to(.forest1),
-            .east: Exit(
-                destination: .blockedExit,
-                blockedMessage: "The door is boarded and you can't remove the boards."
-            ),
+            .east: .blocked("The door is boarded and you can't remove the boards."),
         ]),
         .inherentlyLit
     )

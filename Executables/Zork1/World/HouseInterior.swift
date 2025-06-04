@@ -32,10 +32,7 @@ enum HouseInterior {
             """),
         .exits([
             .east: .to(.kitchen),
-            .west: Exit(
-                destination: .blockedExit,
-                blockedMessage: "The door is nailed shut."
-            ),
+            .west: .blocked("The door is nailed shut."),
             .down: Exit(
                 destination: .cellar,
                 doorID: .trapDoor

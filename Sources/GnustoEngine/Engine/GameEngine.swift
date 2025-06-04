@@ -293,7 +293,8 @@ extension GameEngine {
                 let exit = try? command.direction.flatMap { direction in
                     try location(playerLocationID).exits[direction]
                 }
-                destinationWasUnvisited = if let destination = try? location(exit?.destinationID) {
+                destinationWasUnvisited = if let destinationID = exit?.destinationID,
+                                             let destination = try? location(destinationID) {
                     !destination.hasFlag(.isVisited)
                 } else {
                     false

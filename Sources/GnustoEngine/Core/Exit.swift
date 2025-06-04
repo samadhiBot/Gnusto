@@ -7,9 +7,15 @@ import Foundation
 /// (e.g., `.north`, `.east`) to the `Exit` that defines the path in that direction.
 /// An exit can be a simple passage or can be associated with a door (`doorID`)
 /// that might be open, closed, or locked, affecting traversal.
+///
+/// If `destinationID` is `nil`, the exit is permanently blocked (e.g., "You can't go that way").
 public struct Exit: Codable, Hashable, Sendable {
-    /// The `LocationID` of the location this exit leads to.
-    public var destinationID: LocationID
+    /// The `LocationID` of the location this exit leads to, or `nil` if the exit is permanently blocked.
+    ///
+    /// When `nil`, this represents an exit that doesn't actually lead anywhere (e.g., repeatedly
+    /// going north in Zork's forest). Such exits should typically display either the custom
+    /// `blockedMessage` or a default "You can't go that way" message.
+    public var destinationID: LocationID?
 
     /// An optional custom message to be displayed if the player attempts to use this exit
     /// but is prevented from doing so (e.g., because an associated door is closed and locked,
@@ -28,15 +34,16 @@ public struct Exit: Codable, Hashable, Sendable {
     /// and/or an associated door item.
     ///
     /// - Parameters:
-    ///   - destination: The `LocationID` this exit leads to.
+    ///   - destination: The `LocationID` this exit leads to, or `nil` for a permanently blocked exit.
     ///   - blockedMessage: An optional custom message to display if the player cannot
-    ///     use this exit (e.g., due to a closed door or other obstruction). If `nil`,
-    ///     the engine will use a default message.
+    ///     use this exit (e.g., due to a closed door or other obstruction). For permanently
+    ///     blocked exits (when `destination` is `nil`), this message will be shown instead
+    ///     of the default "You can't go that way."
     ///   - doorID: An optional `ItemID` for an item that acts as a door or barrier
     ///     for this exit. If set, the state of this item (e.g., open/closed/locked)
     ///     will typically determine if the player can pass through.
     public init(
-        destination: LocationID,
+        destination: LocationID? = nil,
         blockedMessage: String? = nil,
         doorID: ItemID? = nil
     ) {
@@ -64,6 +71,24 @@ public struct Exit: Codable, Hashable, Sendable {
         .init(destination: destination)
     }
 
+    /// A convenience factory method for creating a permanently blocked exit.
+    ///
+    /// This creates an exit that doesn't lead anywhere, optionally with a custom message.
+    ///
+    /// Example:
+    /// ```swift
+    /// .exits([
+    ///     .north: .blocked("The path is overgrown with thorns."),
+    /// ])
+    /// ```
+    ///
+    /// - Parameter message: A custom message to display when the player attempts to use this
+    ///                      blocked exit. If `nil`, a default message will be used.
+    /// - Returns: A new `Exit` instance with no destination.
+    public static func blocked(_ message: String) -> Exit {
+        .init(destination: nil, blockedMessage: message)
+    }
+
     // TODO: Consider adding properties for:
     // - Visibility (e.g., hidden exit)
     // - One-way exits
@@ -74,7 +99,7 @@ public struct Exit: Codable, Hashable, Sendable {
 
 extension Exit: CustomDumpStringConvertible {
     public var customDumpDescription: String {
-        var details = ["to: \(destinationID)"]
+        var details = ["to: \(destinationID?.description ?? "blocked")"]
         if let blockedMessage {
             details.append("blocked: \(blockedMessage.indent(omitFirst: true))")
         }

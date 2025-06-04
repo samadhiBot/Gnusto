@@ -370,4 +370,84 @@ struct GoActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "Go where?")
     }
+
+    @Test("GO fails with permanently blocked exit (nil destination)")
+    func testGoFailsWithPermanentlyBlockedExit() async throws {
+        // Given
+        let customMessage = "The path is overgrown with thorns."
+        let testLocation = Location(
+            id: "testLocation",
+            .name("Test Location"),
+            .description("A test location."),
+            .exits([
+                .north: .blocked(customMessage),
+            ]),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testLocation"),
+            locations: [testLocation]
+        )
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let command = Command(
+            verb: .go,
+            direction: .north,
+            rawInput: "go north"
+        )
+
+        // When/Then
+        await #expect(throws: ActionResponse.directionIsBlocked(customMessage)) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+    }
+
+    @Test("GO fails with permanently blocked exit (no custom message)")
+    func testGoFailsWithPermanentlyBlockedExitNoMessage() async throws {
+        // Given
+        let testLocation = Location(
+            id: "testLocation",
+            .name("Test Location"),
+            .description("A test location."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testLocation"),
+            locations: [testLocation]
+        )
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: await MockIOHandler()
+        )
+
+        let command = Command(
+            verb: .go,
+            direction: .south,
+            rawInput: "go south"
+        )
+
+        // When/Then
+        await #expect(throws: ActionResponse.invalidDirection) {
+            try await handler.validate(
+                context: ActionContext(
+                    command: command,
+                    engine: engine,
+                    stateSnapshot: engine.gameState
+                )
+            )
+        }
+    }
 }
