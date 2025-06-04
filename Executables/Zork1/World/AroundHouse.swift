@@ -71,7 +71,10 @@ enum AroundHouse {
         .exits([
             .north: .to(.northOfHouse),
             .south: .to(.southOfHouse),
-            .west: .to(.southOfHouse),
+            .west: Exit(
+                destination: .kitchen,
+                doorID: .kitchenWindow
+            ),
             .northwest: .to(.northOfHouse),
             .southwest: .to(.southOfHouse),
             .east: .to(.clearing),
@@ -142,6 +145,7 @@ enum AroundHouse {
         .adjectives("kitchen", "small"),
         .synonyms("window"),
         .in(.location(.eastOfHouse)),
-        .isOpenable
+        .isOpenable,
+        .isScenery
     )
 }
