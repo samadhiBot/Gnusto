@@ -91,6 +91,7 @@ let package = Package(
             dependencies: [
                 "GnustoEngine",
                 "CloakOfDarkness",
+                "Zork1",
                 .product(name: "CustomDump", package: "swift-custom-dump"),
             ]
         ),

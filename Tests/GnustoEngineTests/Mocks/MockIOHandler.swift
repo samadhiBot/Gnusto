@@ -22,6 +22,13 @@ final class MockIOHandler: IOHandler {
     private var inputQueue: [String?]
 
     // — Initialization —
+    init(
+        _ setup: [String] = [],
+        _ commands: String?...
+    ) {
+        inputQueue = setup + commands
+    }
+
     init(_ commands: String?...) {
         inputQueue = commands
     }

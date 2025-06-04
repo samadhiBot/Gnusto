@@ -36,6 +36,10 @@ enum HouseInterior {
                 destination: .blockedExit,
                 blockedMessage: "The door is nailed shut."
             ),
+            .down: Exit(
+                destination: .cellar,
+                doorID: .trapDoor
+            ),
         ]),
         .inherentlyLit
     )
@@ -146,7 +150,7 @@ enum HouseInterior {
         id: .carpet,
         .name("large oriental rug"),
         .description("""
-            The rug is extremely heavy and cannot be carried. There appears to be something \
+            The rug is extremely heavy and cannot be carried. There appears to be something
             underneath it.
             """),
         .adjectives("large", "oriental"),
@@ -164,6 +168,7 @@ enum HouseInterior {
         .in(.location(.livingRoom)),
         .isScenery,
         .isOpenable
+        // TODO: Should be initially invisible under carpet, revealed by "move rug"
     )
 
     static let woodenDoor = Item(
@@ -213,13 +218,14 @@ enum HouseInterior {
         id: .lamp,
         .name("brass lantern"),
         .description("""
-            The brass lantern is turned off. The brass lantern contains a clear glass globe \
+            The brass lantern is turned off. The brass lantern contains a clear glass globe
             which is currently dark.
             """),
         .adjectives("brass"),
         .synonyms("lantern", "lamp", "light"),
         .in(.location(.livingRoom)),
         .isTakable,
-        .isLightSource
+        .isLightSource,
+        .isDevice
     )
 }

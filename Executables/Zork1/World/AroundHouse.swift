@@ -35,7 +35,7 @@ enum AroundHouse {
         .exits([
             .south: .to(.westOfHouse),
             .west: .to(.westOfHouse),
-            .east: .to(.southOfHouse),
+            .east: .to(.eastOfHouse),
             .southeast: .to(.southOfHouse),
             .southwest: .to(.westOfHouse),
             .north: .to(.path),
