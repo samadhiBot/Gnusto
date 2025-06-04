@@ -62,7 +62,7 @@ struct CloakOfDarknessWalkthroughTests {
             This isn’t the best place to leave a smart cloak lying around.
 
             > go south
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can’t see a thing.
 
             > walk north
             — Foyer of the Opera House —
@@ -156,7 +156,7 @@ struct CloakOfDarknessWalkthroughTests {
             seems to be getting worse.
 
             > go south
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can’t see a thing.
 
             > inventory
             You are carrying:

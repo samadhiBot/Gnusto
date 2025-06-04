@@ -112,7 +112,7 @@ extension GameEngine {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
-            await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
+            await ioHandler.print("It is pitch black. You can't see a thing.")
             // Do not describe the room or list items.
             return
         }
@@ -143,7 +143,7 @@ extension GameEngine {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
-            await ioHandler.print("It is pitch black. You are likely to be eaten by a grue.")
+            await ioHandler.print("It is pitch black. You can't see a thing.")
             return
         }
 

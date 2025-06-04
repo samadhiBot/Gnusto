@@ -52,7 +52,7 @@ struct GameEngineTests {
 
             Welcome to the Minimal Game!
 
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can’t see a thing.
 
             > quit
             """)
@@ -1433,7 +1433,7 @@ struct GameEngineTests {
             commandInput: "examine shadow",
             commandToParse: command
         )
-        expectNoDifference(output, "It’s too dark to do that.")
+        expectNoDifference(output, "It is pitch black. You can’t see a thing.")
     }
 
     @Test("ReportActionResponse: .wrongKey")

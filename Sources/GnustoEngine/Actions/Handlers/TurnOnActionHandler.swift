@@ -92,6 +92,9 @@ public struct TurnOnActionHandler: ActionHandler {
         }
         let targetItem = try await context.engine.item(targetItemID)
 
+        // Check if room was dark before turning on the light
+        let wasRoomDark = await context.engine.playerLocationIsLit() == false
+
         // --- State Changes ---
         var stateChanges: [StateChange] = []
 
@@ -107,15 +110,45 @@ public struct TurnOnActionHandler: ActionHandler {
         }
 
         // --- Determine Message ---
-        let message = "The \(targetItem.name) is now on."
+        var messageParts: [String] = []
+        messageParts.append("The \(targetItem.name) is now on.")
 
-        // --- Side Effects (Optional) ---
-        // Check if the room became lit. If so, the context.engine loop will describe it.
-        // No explicit side effect needed here to trigger re-description.
+        // Check if turning on this light source illuminated a dark room
+        let isLightSource = targetItem.hasFlag(.isLightSource)
+        if wasRoomDark && isLightSource {
+            // Apply state changes temporarily to check if room becomes lit
+            let tempGameState = await context.engine.gameState
+            var updatedGameState = tempGameState
+
+            // Apply the state changes to see the effect
+            for change in stateChanges {
+                try? updatedGameState.apply(change)
+            }
+
+            // Check if room is now lit with the updated state
+            let currentLocation = try await context.engine.playerLocation()
+            let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
+
+            if !locationIsInherentlyLit {
+                // Check if this light source or others now provide light
+                let allItems = updatedGameState.items.values
+                let activeLightSources = allItems.filter { item in
+                    let isInPlayerInventory = item.parent == .player
+                    let isInCurrentLocation = item.parent == .location(currentLocation.id)
+                    let providesLight = item.hasFlag(.isLightSource)
+                    let isOn = item.hasFlag(.isOn)
+                    return (isInPlayerInventory || isInCurrentLocation) && providesLight && isOn
+                }
+
+                if !activeLightSources.isEmpty {
+                    messageParts.append("You can see your surroundings now.")
+                }
+            }
+        }
 
         // --- Create Result ---
         return ActionResult(
-            message: message,
+            message: messageParts.joined(separator: "\n"),
             stateChanges: stateChanges
         )
     }

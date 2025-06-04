@@ -415,7 +415,7 @@ extension GameEngine {
         case .prerequisiteNotMet(let customMessage):
             customMessage.isEmpty ? "You can't do that." : customMessage
         case .roomIsDark:
-            "It's too dark to do that."
+            "It is pitch black. You can't see a thing."
         case .stateValidationFailed:
             "A strange buzzing sound indicates something is wrong with the state validation."
         case .targetIsNotAContainer(let item):

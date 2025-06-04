@@ -198,7 +198,7 @@ struct LookActionHandlerTests {
         // Assert Output
         let output = await mockIO.flush()
         // Corrected Expectation: Darkness message
-        expectNoDifference(output, "It is pitch black. You are likely to be eaten by a grue.")
+        expectNoDifference(output, "It is pitch black. You can’t see a thing.")
 
         // Assert No State Change
         #expect(await engine.gameState.changeHistory.isEmpty)

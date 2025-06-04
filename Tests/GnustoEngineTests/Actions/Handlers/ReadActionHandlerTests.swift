@@ -543,7 +543,7 @@ struct ReadActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "It’s too dark to do that.")
+        expectNoDifference(output, "It is pitch black. You can’t see a thing.")
     }
 
     @Test("Read item providing light in dark room")

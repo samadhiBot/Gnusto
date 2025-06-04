@@ -44,10 +44,7 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            The lamp is now off. It is now pitch black. You are likely to
-            be eaten by a grue.
-            """)
+        expectNoDifference(output, "The lamp is now off. You are plunged into darkness.")
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
         #expect(finalItemState.hasFlag(.isTouched) == true)
@@ -123,7 +120,7 @@ struct TurnOffActionHandlerTests {
             rawInput: "turn off lamp"
         )
 
-        // Expect internalEngineError when item ID doesn’t exist in gameState
+        // Expect internalEngineError when item ID doesn't exist in gameState
         await #expect(throws: ActionResponse.itemNotAccessible("lamp")) {
             try await handler.validate(
                 context: ActionContext(
@@ -219,10 +216,7 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            The brass lantern is now off. It is now pitch black. You are
-            likely to be eaten by a grue.
-            """)
+        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
 
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(finallyLit == false)
@@ -398,10 +392,7 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            The brass lantern is now off. It is now pitch black. You are
-            likely to be eaten by a grue.
-            """)
+        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
     }
 
     @Test("Blow Out alias works correctly")
@@ -449,9 +440,6 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, """
-            The brass lantern is now off. It is now pitch black. You are
-            likely to be eaten by a grue.
-            """)
+        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
     }
 }

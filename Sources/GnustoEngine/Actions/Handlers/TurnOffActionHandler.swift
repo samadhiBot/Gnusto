@@ -56,7 +56,7 @@ public struct TurnOffActionHandler: ActionHandler {
     /// 4. Constructs a message confirming the action (e.g., "The flashlight is now off.").
     /// 5. If the turned-off item was a light source and the current location becomes dark as a result
     ///    (i.e., the location is not inherently lit and no other active light sources are present),
-    ///    appends the classic "It is now pitch black. You are likely to be eaten by a grue." message.
+    ///    appends the classic "You are plunged into darkness." message.
     /// 6. Returns an `ActionResult` with the constructed message and the state changes.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
@@ -119,7 +119,7 @@ public struct TurnOffActionHandler: ActionHandler {
                 }
 
                 if otherActiveLightSources.isEmpty {
-                    messageParts.append("It is now pitch black. You are likely to be eaten by a grue.")
+                    messageParts.append("You are plunged into darkness.")
                 }
             }
         }

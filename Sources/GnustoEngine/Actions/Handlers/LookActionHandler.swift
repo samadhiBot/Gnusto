@@ -69,7 +69,7 @@ public struct LookActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject else {
             // 1. Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                return ActionResult("It is pitch black. You are likely to be eaten by a grue.")
+                return ActionResult("It is pitch black. You can't see a thing.")
             }
 
             await context.engine.ioHandler.print(
