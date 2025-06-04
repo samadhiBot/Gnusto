@@ -13,7 +13,7 @@ struct AroundHouseTests {
         "west",
     ]
 
-    let introText = """
+    let enterKitchenPlayback = """
         Zork I: The Great Underground Empire
 
         ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
@@ -84,7 +84,7 @@ struct AroundHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > examine table
             The table seems to have been used recently for the preparation
@@ -127,7 +127,7 @@ struct AroundHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > west
             — Living Room —
@@ -219,7 +219,7 @@ struct AroundHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > examine table
             The table seems to have been used recently for the preparation

@@ -5,19 +5,116 @@ import Testing
 @testable import Zork1
 
 struct UndergroundTests {
+    let enterUndergroundSteps = [
+        "north",
+        "east",
+        "open window",
+        "west",
+        "west",
+        "take lamp",
+        "turn on lamp",
+        "examine trap door",
+        "open trap door",
+        "down",
+    ]
+
+    let enterUndergroundPlayback = """
+        Zork I: The Great Underground Empire
+
+        ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
+        1983 Infocom, Inc. All rights reserved. ZORK is a registered
+        trademark of Infocom, Inc. Revision 88 / Serial number 840726
+
+        West of House You are standing in an open field west of a white
+        house, with a boarded front door. There is a small mailbox
+        here.
+
+
+        — West of House —
+
+        You are standing in an open field west of a white house, with a
+        boarded front door.
+
+        You can see a front door, a small mailbox, and a white house
+        here.
+
+        > north
+        — North of House —
+
+        You are facing the north side of a white house. There is no
+        door here, and all the windows are boarded up. To the north a
+        narrow path winds through the trees.
+
+        > east
+        — Behind House —
+
+        You are behind the white house. A path leads into the forest to
+        the east. In one corner of the house there is a small window
+        which is slightly ajar.
+
+        You can see a kitchen window here.
+
+        > open window
+        You open the kitchen window.
+
+        > west
+        — Kitchen —
+
+        You are in the kitchen of the white house. A table seems to
+        have been used recently for the preparation of food. A passage
+        leads to the west and a dark staircase can be seen leading
+        upward. A dark chimney leads down and to the east is a small
+        window which is open.
+
+        You can see a chimney and a kitchen table here.
+
+        > west
+        — Living Room —
+
+        You are in the living room. There is a doorway to the east, a
+        wooden door with strange gothic lettering to the west, which
+        appears to be nailed shut, a trophy case, and a large oriental
+        rug in the center of the room.
+
+        You can see a large oriental rug, a brass lantern, a sword, a
+        trap door, a trophy case, and a wooden door here.
+
+        > take lamp
+        Taken.
+
+        > turn on lamp
+        The brass lantern is now on.
+
+        — Living Room —
+
+        You are in the living room. There is a doorway to the east, a
+        wooden door with strange gothic lettering to the west, which
+        appears to be nailed shut, a trophy case, and a large oriental
+        rug in the center of the room.
+
+        You can see a large oriental rug, a sword, a trap door, a
+        trophy case, and a wooden door here.
+
+        > examine trap door
+        It’s a closed trap door.
+
+        > open trap door
+        You open the trap door.
+
+        > down
+        — Cellar —
+
+        You are in a dark and damp cellar with a narrow passageway
+        leading north, and a crawlway to the south. On the west is the
+        bottom of a steep metal ramp which is unclimbable.
+
+        You can see a steep metal ramp here.
+        """
+
     @Test("Underground access via trap door")
     func testUndergroundAccess() async throws {
         let mockIO = await MockIOHandler(
-            "north",
-            "east",
-            "open window",
-            "west",
-            "west",
-            "take lamp",
-            "turn on lamp",
-            "examine trap door",
-            "open trap door",
-            "down",
+            enterUndergroundSteps,
             "look",
             "north"
         )
@@ -29,37 +126,33 @@ struct UndergroundTests {
         await engine.run()
 
         let transcript = await mockIO.flush()
-        let lines = transcript.components(separatedBy: "\n")
+        expectNoDifference(transcript, """
+            \(enterUndergroundPlayback)
 
-        // Should be able to reach living room
-        #expect(lines.contains { $0.contains("Living Room") })
+            > look
+            — Cellar —
 
-        // Should be able to take and turn on lamp
-        #expect(lines.contains { $0.contains("take") || $0.contains("Taken") })
-        #expect(lines.contains { $0.contains("The brass lantern is now on") || $0.contains("turn") })
+            You are in a dark and damp cellar with a narrow passageway
+            leading north, and a crawlway to the south. On the west is the
+            bottom of a steep metal ramp which is unclimbable. You can see
+            a steep metal ramp here.
 
-        // Should be able to open trap door
-        #expect(lines.contains { $0.contains("You open the trap door") })
+            > north
+            — Troll Room —
 
-        // Should be able to go down to cellar (now lit)
-        #expect(lines.contains { $0.contains("Cellar") })
+            This is a small room with passages to the east and south and a
+            forbidding hole leading west. Bloodstains and deep scratches
+            (perhaps made by an axe) mar the walls.
 
-        // Should be able to move to Troll Room
-        #expect(lines.contains { $0.contains("Troll Room") })
+            >
+            Goodbye!
+            """)
     }
 
     @Test("Basic underground exploration")
     func testUndergroundExploration() async throws {
         let mockIO = await MockIOHandler(
-            "north",
-            "east",
-            "open window",
-            "west",
-            "west",
-            "take lamp",
-            "turn on lamp",
-            "open trap door",
-            "down",
+            enterUndergroundSteps,
             "north",
             "east",
             "east",
@@ -79,14 +172,60 @@ struct UndergroundTests {
         await engine.run()
 
         let transcript = await mockIO.flush()
-        let lines = transcript.components(separatedBy: "\n")
+        expectNoDifference(transcript, """
+            \(enterUndergroundPlayback)
 
-        // Should be able to navigate underground areas (with lamp)
-        #expect(lines.contains { $0.contains("Cellar") })
-        #expect(lines.contains { $0.contains("Troll Room") })
-        #expect(lines.contains { $0.contains("East-West Passage") })
-        #expect(lines.contains { $0.contains("Round Room") })
-        #expect(lines.contains { $0.contains("East of Chasm") })
-        #expect(lines.contains { $0.contains("Gallery") })
+            > north
+            — Troll Room —
+
+            This is a small room with passages to the east and south and a
+            forbidding hole leading west. Bloodstains and deep scratches
+            (perhaps made by an axe) mar the walls.
+
+            > east
+            — East-West Passage —
+
+            This is a narrow east-west passageway. There is a narrow
+            stairway leading down at the north end of the room.
+
+            > east
+            — Round Room —
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
+            > look
+            — Round Room —
+
+            This is a circular stone room with passages in all directions.
+            Several of them have unfortunate endings.
+
+            > west
+            > west
+            > south
+            > south
+            — East of Chasm —
+
+            You are on the east edge of a chasm, the bottom of which cannot
+            be seen. A narrow passage goes north, and the path you are on
+            continues to the east.
+
+            > east
+            — Gallery —
+
+            This is an art gallery. Most of the paintings have been stolen
+            by vandals with exceptional taste. The vandals left through
+            either the north or west exits.
+
+            > look
+            — Gallery —
+
+            This is an art gallery. Most of the paintings have been stolen
+            by vandals with exceptional taste. The vandals left through
+            either the north or west exits.
+
+            >
+            Goodbye!
+            """)
     }
 }

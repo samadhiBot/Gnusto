@@ -12,7 +12,7 @@ struct Zork1WalkthroughTests {
         "west",
     ]
 
-    let introText = """
+    let enterKitchenPlayback = """
         Zork I: The Great Underground Empire
 
         ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
@@ -58,7 +58,7 @@ struct Zork1WalkthroughTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > north
             — North of House —
@@ -180,7 +180,7 @@ struct Zork1WalkthroughTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > north
             — North of House —
@@ -277,7 +277,7 @@ struct Zork1WalkthroughTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introText)
+            \(enterKitchenPlayback)
 
             > north
             — North of House —
