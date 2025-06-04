@@ -48,7 +48,11 @@ struct GnustoAutoWiringTool: AsyncParsableCommand {
 
         print("\n✅ Generated code written to: \(output)")
     }
+}
 
+// MARK: - Private helper methods
+
+extension GnustoAutoWiringTool {
     private func findSwiftFiles(in rootURL: URL) -> [URL] {
         guard
             let enumerator = FileManager.default.enumerator(
