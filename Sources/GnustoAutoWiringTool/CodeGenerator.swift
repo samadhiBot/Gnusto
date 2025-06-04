@@ -221,23 +221,33 @@ struct CodeGenerator {
                         extensionLines.append("")
                     }
 
-                    extensionLines.append("        return [")
-
-                    for itemHandler in gameData.itemEventHandlers.sorted() {
-                        if let areaType = gameData.handlerToAreaMap[itemHandler] {
-                            let handlerPropertyName = "\(itemHandler)Handler"
-                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
-                            if isStatic {
-                                extensionLines.append("            .\(itemHandler): \(areaType).\(handlerPropertyName),")
-                            } else {
-                                extensionLines.append("            .\(itemHandler): \(areaType.lowercased()).\(handlerPropertyName),")
-                            }
-                        } else {
-                            extensionLines.append("            // .\(itemHandler): SomeArea.\(itemHandler)Handler, // Area mapping unknown - please add manually")
-                        }
+                    // Check if we have any mapped handlers before generating the return statement
+                    let mappedHandlers = gameData.itemEventHandlers.filter { handler in
+                        gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    extensionLines.append("        ]")
+                    if mappedHandlers.isEmpty {
+                        extensionLines.append("        return [:]")
+                    } else {
+                        extensionLines.append("        return [")
+
+                        for itemHandler in gameData.itemEventHandlers.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                                let handlerPropertyName = "\(itemHandler)Handler"
+                                let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                                if isStatic {
+                                    extensionLines.append("            .\(itemHandler): \(areaType).\(handlerPropertyName),")
+                                } else {
+                                    extensionLines.append("            .\(itemHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(itemHandler): SomeArea.\(itemHandler)Handler, // Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
                     extensionLines.append("    }")
                     extensionLines.append("")
                 }
@@ -255,23 +265,33 @@ struct CodeGenerator {
                         extensionLines.append("")
                     }
 
-                    extensionLines.append("        return [")
-
-                    for locationHandler in gameData.locationEventHandlers.sorted() {
-                        if let areaType = gameData.handlerToAreaMap[locationHandler] {
-                            let handlerPropertyName = "\(locationHandler)Handler"
-                            let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
-                            if isStatic {
-                                extensionLines.append("            .\(locationHandler): \(areaType).\(handlerPropertyName),")
-                            } else {
-                                extensionLines.append("            .\(locationHandler): \(areaType.lowercased()).\(handlerPropertyName),")
-                            }
-                        } else {
-                            extensionLines.append("            // .\(locationHandler): SomeArea.\(locationHandler)Handler, // Area mapping unknown - please add manually")
-                        }
+                    // Check if we have any mapped handlers before generating the return statement
+                    let mappedHandlers = gameData.locationEventHandlers.filter { handler in
+                        gameData.handlerToAreaMap[handler] != nil
                     }
 
-                    extensionLines.append("        ]")
+                    if mappedHandlers.isEmpty {
+                        extensionLines.append("        return [:]")
+                    } else {
+                        extensionLines.append("        return [")
+
+                        for locationHandler in gameData.locationEventHandlers.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                                let handlerPropertyName = "\(locationHandler)Handler"
+                                let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+                                if isStatic {
+                                    extensionLines.append("            .\(locationHandler): \(areaType).\(handlerPropertyName),")
+                                } else {
+                                    extensionLines.append("            .\(locationHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(locationHandler): SomeArea.\(locationHandler)Handler, // Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
                     extensionLines.append("    }")
                     extensionLines.append("")
                 }

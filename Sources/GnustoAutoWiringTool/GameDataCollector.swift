@@ -24,6 +24,9 @@ class GameDataCollector {
         } else if let enumDecl = node.as(EnumDeclSyntax.self) {
             currentAreaType = enumDecl.name.text
             processEnumDecl(enumDecl)
+        } else if let extensionDecl = node.as(ExtensionDeclSyntax.self) {
+            currentAreaType = extensionDecl.extendedType.trimmedDescription
+            processExtensionDecl(extensionDecl)
         } else if let varDecl = node.as(VariableDeclSyntax.self) {
             processVariableDecl(varDecl)
         } else if let functionCall = node.as(FunctionCallExprSyntax.self) {
@@ -60,6 +63,12 @@ class GameDataCollector {
     private func processEnumDecl(_ enumDecl: EnumDeclSyntax) {
         // Assume enums containing game objects are game areas
         gameData.gameAreaTypes.insert(enumDecl.name.text)
+    }
+
+    private func processExtensionDecl(_ extensionDecl: ExtensionDeclSyntax) {
+        // Extensions don't define new game area types, they extend existing ones.
+        // The currentAreaType is already set to the extended type name.
+        // No additional processing needed here - the walk will handle the contents.
     }
 
     private func processVariableDecl(_ varDecl: VariableDeclSyntax) {

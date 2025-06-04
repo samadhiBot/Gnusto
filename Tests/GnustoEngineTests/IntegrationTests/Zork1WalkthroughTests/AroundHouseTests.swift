@@ -13,9 +13,17 @@ struct AroundHouseTests {
         "west",
     ]
 
+    let introPlayback = """
+        Zork I: The Great Underground Empire
+        
+        ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
+        1983 Infocom, Inc. All rights reserved. ZORK is a registered
+        trademark of Infocom, Inc. Revision 88 / Serial number 840726
+        """
+
     let enterKitchenPlayback = """
         Zork I: The Great Underground Empire
-
+        
         ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
         1983 Infocom, Inc. All rights reserved. ZORK is a registered
         trademark of Infocom, Inc. Revision 88 / Serial number 840726
@@ -97,6 +105,130 @@ struct AroundHouseTests {
             """)
     }
 
+    @Test("Interacting with the mailbox")
+    func testMailbox() async throws {
+        let mockIO = await MockIOHandler(
+            "take the mailbox",
+            "open the mailbox",
+            "east",
+            "open door",
+            "take boards",
+            "look house",
+        )
+        let engine = await GameEngine(
+            blueprint: Zork1(),
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
+        await engine.run()
+
+        let transcript = await mockIO.flush()
+        expectNoDifference(transcript, """
+            \(introPlayback)
+
+            — West of House —
+
+            You are standing in an open field west of a white house, with a
+            boarded front door.
+
+            You can see a front door, a small mailbox, and a white house
+            here.
+
+            > take the mailbox
+            It is securely anchored.
+
+            > open the mailbox
+            You open the small mailbox.
+
+            > east
+            The door is boarded and you can’t remove the boards.
+
+            > open door
+            You can’t open the front door.
+
+            > take boards
+            The boards are securely fastened.
+
+            > look house
+            The house is a beautiful colonial house which is painted white.
+            It is clear that the owners must have been extremely wealthy.
+
+            >
+            Goodbye!
+            """)
+    }
+
+    @Test("Interacting with the boards on the house")
+    func testBoards() async throws {
+        let mockIO = await MockIOHandler(
+            "take the boards",
+            "north",
+            "take the boards",
+            "east",
+            "take the boards",
+            "south",
+            "take the boards",
+        )
+        let engine = await GameEngine(
+            blueprint: Zork1(),
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
+        await engine.run()
+
+        let transcript = await mockIO.flush()
+        expectNoDifference(transcript, """
+            \(introPlayback)
+
+            — West of House —
+
+            You are standing in an open field west of a white house, with a
+            boarded front door.
+
+            You can see a front door, a small mailbox, and a white house
+            here.
+
+            > take the boards
+            The boards are securely fastened.
+
+            > north
+            — North of House —
+
+            You are facing the north side of a white house. There is no
+            door here, and all the windows are boarded up. To the north a
+            narrow path winds through the trees.
+
+            > take the boards
+            The boards are securely fastened.
+
+            > east
+            — Behind House —
+
+            You are behind the white house. A path leads into the forest to
+            the east. In one corner of the house there is a small window
+            which is slightly ajar.
+
+            You can see a kitchen window here.
+
+            > take the boards
+            The boards are securely fastened.
+
+            > south
+            — South of House —
+
+            You are facing the south side of a white house. There is no
+            door here, and all the windows are boarded.
+
+            You can see a boarded window here.
+
+            > take the boards
+            The boards are securely fastened.
+
+            >
+            Goodbye!
+            """)
+    }
+
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
         let mockIO = await MockIOHandler(
@@ -165,7 +297,7 @@ struct AroundHouseTests {
 
             > east
             — Kitchen —
-            
+
             > up
             — Attic —
 

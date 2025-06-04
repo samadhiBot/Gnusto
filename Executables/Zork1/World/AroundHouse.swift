@@ -3,8 +3,6 @@ import GnustoEngine
 // MARK: - Around House Area
 
 enum AroundHouse {
-    // MARK: - Locations
-
     static let westOfHouse = Location(
         id: .westOfHouse,
         .name("West of House"),
@@ -19,7 +17,8 @@ enum AroundHouse {
             .west: .to(.forest1),
             .east: .blocked("The door is boarded and you can't remove the boards."),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.boards)
     )
 
     static let northOfHouse = Location(
@@ -37,7 +36,8 @@ enum AroundHouse {
             .southwest: .to(.westOfHouse),
             .north: .to(.path),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.boards)
     )
 
     static let southOfHouse = Location(
@@ -55,7 +55,8 @@ enum AroundHouse {
             .northwest: .to(.westOfHouse),
             .southeast: .to(.eastOfHouse),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.boards)
     )
 
     static let eastOfHouse = Location(
@@ -76,11 +77,14 @@ enum AroundHouse {
             .southwest: .to(.southOfHouse),
             .east: .to(.clearing),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.boards)
     )
+}
 
-    // MARK: - Items
+// MARK: - Items
 
+extension AroundHouse {
     static let mailbox = Item(
         id: .mailbox,
         .name("small mailbox"),
@@ -89,9 +93,7 @@ enum AroundHouse {
         .synonyms("box"),
         .in(.location(.westOfHouse)),
         .isContainer,
-        .isOpenable,
-        .isOpen,
-        .isTakable
+        .isOpenable
     )
 
     static let leaflet = Item(
@@ -100,7 +102,9 @@ enum AroundHouse {
         .description("""
             "WELCOME TO ZORK!
 
-            ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!"
+            ZORK is a game of adventure, danger, and low cunning. 
+            In it you will explore some of the most amazing territory 
+            ever seen by mortals. No computer should be without one!"
             """),
         .synonyms("mail"),
         .in(.item(.mailbox)),
@@ -111,7 +115,10 @@ enum AroundHouse {
     static let whiteHouse = Item(
         id: .whiteHouse,
         .name("white house"),
-        .description("The house is a beautiful colonial house which is painted white. It is clear that the owners must have been extremely wealthy."),
+        .description("""
+            The house is a beautiful colonial house which is painted white.
+            It is clear that the owners must have been extremely wealthy.
+            """),
         .adjectives("white", "beautiful", "colonial"),
         .synonyms("house", "home", "building"),
         .in(.location(.westOfHouse))
@@ -122,8 +129,16 @@ enum AroundHouse {
         .name("front door"),
         .description("The door is boarded and you can't remove the boards."),
         .adjectives("front", "boarded"),
-        .synonyms("door", "boards"),
+        .synonyms("door"),
         .in(.location(.westOfHouse))
+    )
+
+    static let boards = Item(
+        id: .boards,
+        .name("boards"),
+        .description("The boards are securely fastened and cannot be removed."),
+        .synonyms("board"),
+        .isScenery
     )
 
     static let boardedWindow = Item(
@@ -131,7 +146,7 @@ enum AroundHouse {
         .name("boarded window"),
         .description("The windows are boarded up. There is no way you could enter through them."),
         .adjectives("boarded"),
-        .synonyms("window", "windows", "boards"),
+        .synonyms("window", "windows"),
         .in(.location(.southOfHouse))
     )
 
@@ -145,4 +160,30 @@ enum AroundHouse {
         .isOpenable,
         .isScenery
     )
+}
+
+// MARK: - Event handlers
+
+extension AroundHouse {
+    static let mailboxHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+            case .take: ActionResult("It is securely anchored.")
+            default: nil
+            }
+        case .afterTurn: nil
+        }
+    }
+
+    static let boardsHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+            case .take: ActionResult("The boards are securely fastened.")
+            default: nil
+            }
+        case .afterTurn: nil
+        }
+    }
 }
