@@ -71,9 +71,13 @@ struct ForestTests {
             [ should see trees ]
             
             > east
+            — West of House —
+
             > north
+            — North of House —
+
             > examine grating
-            You can’t see any ‘grating’ here.
+            [ should describe grating ]
             
             > move leaves
             [ need to implement move ]
