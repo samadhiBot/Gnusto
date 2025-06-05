@@ -90,6 +90,7 @@ public struct ScopeResolver: Sendable {
 
     /// Determines which items are in scope for interaction within a given location.
     /// Similar to `visibleItemsIn` but includes scenery items since they can be examined/interacted with.
+    /// Also includes local globals defined for the location.
     /// Considers light conditions and excludes only truly invisible items.
     ///
     /// - Parameters:
@@ -113,8 +114,20 @@ public struct ScopeResolver: Sendable {
             !item.hasFlag(.isInvisible)
         }
 
-        // 4. Return the IDs of the items in scope.
-        return itemsInScope.map(\.id).sorted()
+        // 4. Add local globals for this location
+        var scopeItemIDs = itemsInScope.map(\.id)
+        if let location = gameState.locations[locationID] {
+            for globalItemID in location.localGlobals {
+                // Only add if the item exists and is not invisible
+                if let globalItem = gameState.items[globalItemID],
+                   !globalItem.hasFlag(.isInvisible) {
+                    scopeItemIDs.append(globalItemID)
+                }
+            }
+        }
+
+        // 5. Return the IDs of the items in scope.
+        return scopeItemIDs.sorted()
     }
 
     /// Determines all items currently reachable by the player.

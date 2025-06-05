@@ -14,7 +14,8 @@ enum Forest {
             .east: .to(.westOfHouse),
             .north: .to(.forest2),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     static let forest2 = Location(
@@ -25,7 +26,8 @@ enum Forest {
             .south: .to(.forest1),
             .east: .to(.forest3),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     static let forest3 = Location(
@@ -36,18 +38,22 @@ enum Forest {
             .west: .to(.forest2),
             .north: .to(.mountains),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     static let mountains = Location(
         id: .mountains,
-        .name("Up in a Tree"),
+        .name("Forest"),
         .description("The forest thins out, revealing impassable mountains."),
         .exits([
             .south: .to(.forest3),
             .east: .blocked("The mountains are impassable."),
+            .north: .blocked("The forest becomes impenetrable to the north."),
+            .west: .blocked("The mountains are impassable."),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     static let path = Location(
@@ -62,7 +68,8 @@ enum Forest {
             .south: .to(.northOfHouse),
             .up: .to(.upATree),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     static let upATree = Location(
@@ -75,7 +82,8 @@ enum Forest {
         .exits([
             .down: .to(.path),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.forest)
     )
 
     // MARK: - Items
@@ -94,6 +102,14 @@ enum Forest {
         .isTakable,
         .isOpenable,
         .isContainer
+    )
+
+    static let forest = Item(
+        id: .forest,
+        .name("forest"),
+        .description("The forest is all around you, with trees in every direction."),
+        .synonyms("trees", "pines", "hemlocks"),
+        .isScenery
     )
 
     static let leaves = Item(
@@ -125,4 +141,23 @@ enum Forest {
         .in(.location(.path)),
         .isClimbable
     )
+}
+
+// MARK: - Event handlers
+
+extension Forest {
+    static let forestHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+            // For ZIL FOREST-F functionality:
+            case .listen:
+                return ActionResult("The pines and the hemlocks seem to be murmuring.")
+            default:
+                return nil
+            }
+        case .afterTurn:
+            return nil
+        }
+    }
 }
