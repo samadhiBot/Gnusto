@@ -80,7 +80,7 @@ struct ForestTests {
             You can’t see any ‘grating’ here.
 
             > move leaves
-            Expected a direction (like north, s, up) but found 'leaves'.
+            << SHOULD BE ABLE TO FIND AND MOVE A PILE OF LEAVES >>
 
             > examine grating
             You can't see any 'grating' here.
