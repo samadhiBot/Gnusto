@@ -69,14 +69,14 @@ public struct GoActionHandler: ActionHandler {
     /// 1. Retrieves the current location and the exit details for the specified direction.
     /// 2. Creates a `StateChange` to update the player's `currentLocationID` to the
     ///    destination of the exit.
-    /// 3. If the destination location has not yet been visited, creates a `StateChange` to set
-    ///    its `.isVisited` flag.
-    /// 4. Returns an `ActionResult` containing these state changes. Typically, no direct message
+    /// 3. Returns an `ActionResult` containing these state changes. Typically, no direct message
     ///    is returned by this action, as the game engine will subsequently describe the new location.
     ///
+    /// Note: The `.isVisited` flag is now set in `describeCurrentLocation()` following ZIL's
+    /// TOUCHBIT pattern - rooms are only marked as visited when they are actually described (lit).
+    ///
     /// - Parameter context: The `ActionContext` for the current action.
-    /// - Returns: An `ActionResult` with `StateChange`s to move the player and mark the new
-    ///            location as visited.
+    /// - Returns: An `ActionResult` with `StateChange`s to move the player.
     /// - Throws: `ActionResponse.internalEngineError` if the exit disappears between validation and
     ///           process, or errors from `context.engine.location()` / `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
@@ -92,26 +92,18 @@ public struct GoActionHandler: ActionHandler {
                 "Exit disappeared or became blocked between validate and process for GO context.command."
             )
         }
-        let destination = try await context.engine.location(destinationID)
 
-        // Create state changes
-        var stateChanges: [StateChange] = [
-            StateChange(
-                entityID: .player,
-                attribute: .playerLocation,
-                oldValue: .locationID(currentLocation.id),
-                newValue: .locationID(destinationID)
-            )
-        ]
-
-        // Set isVisited flag for the new location if it hasn't been visited yet
-        if let update = await context.engine.setFlag(.isVisited, on: destination) {
-            stateChanges.append(update)
-        }
+        // Create state change for player movement
+        let movePlayerChange = StateChange(
+            entityID: .player,
+            attribute: .playerLocation,
+            oldValue: .locationID(currentLocation.id),
+            newValue: .locationID(destinationID)
+        )
 
         // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
         // The context.engine's run loop will trigger describeCurrentLocation after state changes.
-        return ActionResult(stateChanges: stateChanges)
+        return ActionResult(stateChange: movePlayerChange)
     }
 }

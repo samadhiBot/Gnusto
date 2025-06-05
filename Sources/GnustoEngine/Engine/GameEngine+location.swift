@@ -108,7 +108,10 @@ extension GameEngine {
     /// This is called by the engine automatically when the player enters a new room, after
     /// certain commands that might change visibility (like turning a light on/off), or when
     /// the player explicitly looks around.
-    func describeCurrentLocation() async throws {
+    ///
+    /// - Parameter forceFullDescription: If true, always shows the full description regardless
+    ///   of visit status. If false, shows brief description for previously visited rooms.
+    func describeCurrentLocation(forceFullDescription: Bool = false) async throws {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
@@ -117,20 +120,34 @@ extension GameEngine {
             return
         }
 
-        // 2. If lit, get snapshot and print name
+        // 2. If lit, get snapshot and determine if this should be a full description
         let location = try location(playerLocationID)
+        let isFirstVisit = !location.hasFlag(.isVisited)
+        let shouldShowFullDescription = forceFullDescription || isFirstVisit
+
+        // 3. Always print the room name
         await ioHandler.print("--- \(location.name) ---")
 
-        // 3. Generate and print the description using the DescriptionHandlerRegistry
-        let description = await generateDescription(
-            for: location.id,
-            attributeID: .description,
-            engine: self
-        )
-        await ioHandler.print(description)
+        // 4. Show full description if forced or first visit
+        if shouldShowFullDescription {
+            // Generate and print the full description
+            let description = await generateDescription(
+                for: location.id,
+                attributeID: .description,
+                engine: self
+            )
+            await ioHandler.print(description)
 
-        // 4. List visible items
-        try await listItemsInLocation(locationID: playerLocationID)
+            // List visible items
+            try await listItemsInLocation(locationID: playerLocationID)
+
+            // Mark the room as visited now that we've actually described it
+            // (following ZIL's TOUCHBIT pattern - only set when room is lit and described)
+            if isFirstVisit, let visitedChange = setFlag(.isVisited, on: location) {
+                try gameState.apply(visitedChange)
+            }
+        }
+        // For subsequent visits without forceFullDescription, just show the room name (brief mode)
     }
 
     /// Displays a brief description of the player's current location (just the name).

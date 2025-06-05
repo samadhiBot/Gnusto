@@ -76,6 +76,7 @@ enum OperaHouse {
         .in(.location(.bar)),
         .synonyms("sawdust", "floor"),
         .isReadable,
+        .isScenery
     )
 
     // MARK: - Items

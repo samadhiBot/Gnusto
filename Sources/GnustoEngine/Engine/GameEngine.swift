@@ -190,12 +190,8 @@ extension GameEngine {
         await ioHandler.print(constants.introduction)
 
         do {
-            let startingLocationID = playerLocationID
-            let startingLoc = try location(startingLocationID)
-            if let addVisitedFlag = setFlag(.isVisited, on: startingLoc) {
-                try gameState.apply(addVisitedFlag)
-            }
-            try await describeCurrentLocation()
+            // Describe the starting location with full description
+            try await describeCurrentLocation(forceFullDescription: true)
         } catch {
             logError("\(error)")
         }
@@ -287,54 +283,29 @@ extension GameEngine {
             // Store the player's current location before executing the command
             let locationBeforeCommand = playerLocationID
 
-            // For GO commands, check if the destination is unvisited before execution
-            let destinationWasUnvisited: Bool
-            if command.verb == .go {
-                let exit = try? command.direction.flatMap { direction in
-                    try location(playerLocationID).exits[direction]
-                }
-                destinationWasUnvisited = if let destinationID = exit?.destinationID,
-                                             let destination = try? location(destinationID) {
-                    !destination.hasFlag(.isVisited)
-                } else {
-                    false
-                }
-            } else {
-                destinationWasUnvisited = false
-            }
-
             await execute(command: command)
 
             if command.verb == .quit || shouldQuit { return }
 
             // Handle location description after movement or light change
             let shouldDescribe: Bool
-            let shouldShowBrief: Bool
+            let forceFullDescription: Bool
             switch command.verb {
             case .go:
                 // Check if the player actually moved to a different location
                 let locationAfterCommand = playerLocationID
-                if locationBeforeCommand != locationAfterCommand {
-                    // Player moved - decide what to show
-                    shouldDescribe = destinationWasUnvisited
-                    shouldShowBrief = !destinationWasUnvisited
-                } else {
-                    // Player didn't move (movement was prevented)
-                    shouldDescribe = false
-                    shouldShowBrief = false
-                }
+                shouldDescribe = locationBeforeCommand != locationAfterCommand
+                forceFullDescription = false // Use visit-based logic for movement
             case .turnOn, .turnOff:
                 shouldDescribe = true // Light change commands
-                shouldShowBrief = false
+                forceFullDescription = true // Always show full description when light changes
             default:
                 shouldDescribe = false
-                shouldShowBrief = false
+                forceFullDescription = false
             }
 
             if shouldDescribe {
-                try await describeCurrentLocation()
-            } else if shouldShowBrief {
-                try await showBriefLocation()
+                try await describeCurrentLocation(forceFullDescription: forceFullDescription)
             }
 
         case .failure(let error):
