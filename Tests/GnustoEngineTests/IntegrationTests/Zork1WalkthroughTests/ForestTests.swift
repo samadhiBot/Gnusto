@@ -39,7 +39,7 @@ struct ForestTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a small mailbox here.
+            There is a small mailbox here.
 
             > north
             — North of House —
@@ -55,10 +55,11 @@ struct ForestTests {
             heads north-south here. One particularly large tree with some
             low branches stands at the edge of the path.
 
-            You can see a tree here.
+            There is a tree here.
 
             > examine tree
-            The tree is large and appears to have some low branches. It might be climbable.
+            The tree is large and appears to have some low branches. It
+            might be climbable.
 
             > north
             — Forest —

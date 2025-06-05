@@ -245,7 +245,7 @@ extension GameEngine {
     ///
     /// This method is only called if the location is determined to be lit.
     /// It uses the `ScopeResolver` to get a list of visible item IDs, fetches their
-    /// `Item` data, and then formats them into a sentence like "You can see a foo,
+    /// `Item` data, and then formats them into a sentence like "There are a foo,
     /// a bar, and a baz here."
     /// If no items are visible, it prints nothing.
     private func listItemsInLocation(locationID: LocationID) async throws {

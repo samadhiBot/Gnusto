@@ -127,8 +127,7 @@ struct OutsideHouseTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a front door, a small mailbox, and a white house
-            here.
+            There is a small mailbox here.
 
             > take the mailbox
             It is securely anchored.
@@ -181,8 +180,7 @@ struct OutsideHouseTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a front door, a small mailbox, and a white house
-            here.
+            There is a small mailbox here.
 
             > take the boards
             The boards are securely fastened.
@@ -204,8 +202,6 @@ struct OutsideHouseTests {
             the east. In one corner of the house there is a small window
             which is slightly ajar.
 
-            You can see a kitchen window here.
-
             > take the boards
             The boards are securely fastened.
 
@@ -215,7 +211,7 @@ struct OutsideHouseTests {
             You are facing the south side of a white house. There is no
             door here, and all the windows are boarded.
 
-            You can see a boarded window here.
+            There is a boarded window here.
 
             > take the boards
             The boards are securely fastened.
@@ -260,8 +256,7 @@ struct OutsideHouseTests {
             appears to be nailed shut, a trophy case, and a large oriental
             rug in the center of the room.
 
-            You can see a large oriental rug, a brass lantern, a sword, a
-            trap door, a trophy case, and a wooden door here.
+            There are a brass lantern and a sword here.
 
             > take lamp
             Taken.
@@ -283,9 +278,6 @@ struct OutsideHouseTests {
             appears to be nailed shut, a trophy case, and a large oriental
             rug in the center of the room.
 
-            You can see a large oriental rug, a trap door, a trophy case,
-            and a wooden door here.
-
             > inventory
             You are carrying:
             - A brass lantern
@@ -299,7 +291,7 @@ struct OutsideHouseTests {
 
             This is the attic. The only exit is a stairway leading down.
 
-            You can see a nasty knife and a rope here.
+            There are a nasty knife and a rope here.
 
             > take rope
             Taken.

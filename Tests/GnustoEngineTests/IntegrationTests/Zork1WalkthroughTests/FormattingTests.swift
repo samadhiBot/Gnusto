@@ -32,8 +32,7 @@ struct FormattingTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a front door, a small mailbox, and a white house
-            here.
+            There is a small mailbox here.
 
             >
             Goodbye!
@@ -70,8 +69,7 @@ struct FormattingTests {
             You are standing in an open field west of a white house, with a
             boarded front door.
 
-            You can see a front door, a small mailbox, and a white house
-            here.
+            There is a small mailbox here.
 
             > north
             — North of House —

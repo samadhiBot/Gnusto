@@ -30,8 +30,7 @@ struct UndergroundTests {
         You are standing in an open field west of a white house, with a
         boarded front door.
 
-        You can see a front door, a small mailbox, and a white house
-        here.
+        There is a small mailbox here.
 
         > north
         — North of House —
@@ -47,10 +46,9 @@ struct UndergroundTests {
         the east. In one corner of the house there is a small window
         which is slightly ajar.
 
-        You can see a kitchen window here.
-
         > open window
-        You open the kitchen window.
+        With great effort, you open the window far enough to allow
+        entry.
 
         > west
         — Kitchen —
@@ -61,8 +59,6 @@ struct UndergroundTests {
         upward. A dark chimney leads down and to the east is a small
         window which is open.
 
-        You can see a chimney and a kitchen table here.
-
         > west
         — Living Room —
 
@@ -71,8 +67,7 @@ struct UndergroundTests {
         appears to be nailed shut, a trophy case, and a large oriental
         rug in the center of the room.
 
-        You can see a large oriental rug, a brass lantern, a sword, a
-        trap door, a trophy case, and a wooden door here.
+        There are a brass lantern and a sword here.
 
         > take lamp
         Taken.
@@ -87,8 +82,7 @@ struct UndergroundTests {
         appears to be nailed shut, a trophy case, and a large oriental
         rug in the center of the room.
 
-        You can see a large oriental rug, a sword, a trap door, a
-        trophy case, and a wooden door here.
+        There is a sword here.
 
         > examine trap door
         It’s a closed trap door.
@@ -102,8 +96,6 @@ struct UndergroundTests {
         You are in a dark and damp cellar with a narrow passageway
         leading north, and a crawlway to the south. On the west is the
         bottom of a steep metal ramp which is unclimbable.
-
-        You can see a steep metal ramp here.
         """
 
     @Test("Underground access via trap door")
@@ -129,8 +121,7 @@ struct UndergroundTests {
 
             You are in a dark and damp cellar with a narrow passageway
             leading north, and a crawlway to the south. On the west is the
-            bottom of a steep metal ramp which is unclimbable. You can see
-            a steep metal ramp here.
+            bottom of a steep metal ramp which is unclimbable.
 
             > north
             — Troll Room —

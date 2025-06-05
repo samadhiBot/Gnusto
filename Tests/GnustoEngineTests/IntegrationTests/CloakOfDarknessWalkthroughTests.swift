@@ -78,8 +78,6 @@ struct CloakOfDarknessWalkthroughTests {
             hooks, though now only one remains. The exit is a door to the
             east.
 
-            You can see a small brass hook here.
-
             > examine the brass hook
             It’s just a small brass hook, screwed to the wall.
 
@@ -192,8 +190,6 @@ struct CloakOfDarknessWalkthroughTests {
             hooks, though now only one remains. The exit is a door to the
             east.
 
-            You can see a small brass hook here.
-
             > take the brass hook
             You can’t take the small brass hook.
 
@@ -212,7 +208,7 @@ struct CloakOfDarknessWalkthroughTests {
             The bar, much rougher than you’d have guessed after the
             opulence of the foyer to the north, is completely empty. There
             seems to be some sort of message scrawled in the sawdust on the
-            floor. You can see a scrawled message here.
+            floor. There is a scrawled message here.
 
             > read the message
             The message has been carelessly trampled, making it difficult

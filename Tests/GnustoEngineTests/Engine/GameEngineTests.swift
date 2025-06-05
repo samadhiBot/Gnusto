@@ -110,7 +110,7 @@ struct GameEngineTests {
 
             An empty void.
 
-            You can see a pebble here.
+            There is a pebble here.
 
             > xyzzy
             I don’t know the verb ‘xyzzy’.
@@ -208,7 +208,7 @@ struct GameEngineTests {
 
             You are in a nondescript location.
 
-            You can see a pebble here.
+            There is a pebble here.
 
             > take pebble
             You can’t take the pebble.
@@ -476,7 +476,7 @@ struct GameEngineTests {
 
             An empty void.
 
-            You can see a pebble here.
+            There is a pebble here.
 
             >
             Goodbye!
@@ -596,7 +596,7 @@ struct GameEngineTests {
 
             You are in a nondescript location.
 
-            You can see a pebble here.
+            There is a pebble here.
 
             > take pebble
             Taken.
@@ -776,7 +776,7 @@ struct GameEngineTests {
 
             You are in a nondescript location.
 
-            You can see a brass lamp here.
+            There is a brass lamp here.
 
             > activate lamp
             Multiple changes applied.
