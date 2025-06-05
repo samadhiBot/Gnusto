@@ -1009,6 +1009,7 @@ extension GameEngine {
             .listen: ListenActionHandler(),
             .lock: LockActionHandler(),
             .look: LookActionHandler(),
+            .move: MoveActionHandler(),
             .open: OpenActionHandler(),
             .push: PushActionHandler(),
             .putOn: PutOnActionHandler(),

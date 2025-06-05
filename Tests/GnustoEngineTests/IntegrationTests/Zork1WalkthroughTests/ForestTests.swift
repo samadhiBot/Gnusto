@@ -68,7 +68,7 @@ struct ForestTests {
             there appears to be sunlight.
 
             > examine trees
-            I don't see any 'trees' here.
+            The forest is all around you, with trees in every direction.
 
             > east
             — West of House —
@@ -77,7 +77,7 @@ struct ForestTests {
             — North of House —
 
             > examine grating
-            You can't see any 'grating' here.
+            You can’t see any ‘grating’ here.
 
             > move leaves
             Expected a direction (like north, s, up) but found 'leaves'.

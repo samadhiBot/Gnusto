@@ -225,7 +225,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .go,
-            synonyms: "move", "walk", "run", "proceed",
+            synonyms: "walk", "run", "proceed",
             syntax: [SyntaxRule(.verb, .direction)],
             requiresLight: false
         ),
@@ -453,6 +453,18 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                     requiredPreposition: "with"
                 )
             ]
+        ),
+
+        Verb(
+            id: .move,
+            synonyms: "shift", "slide",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject],
+                    directObjectConditions: .allowsMultiple
+                )
+            ],
+            requiresLight: true
         ),
 
         Verb(

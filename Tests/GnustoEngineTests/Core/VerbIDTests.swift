@@ -200,6 +200,7 @@ struct VerbIDTests {
         #expect(VerbID.listen.rawValue == "listen")
         #expect(VerbID.lock.rawValue == "lock")
         #expect(VerbID.look.rawValue == "look")
+        #expect(VerbID.move.rawValue == "move")
         #expect(VerbID.open.rawValue == "open")
         #expect(VerbID.push.rawValue == "push")
         #expect(VerbID.putOn.rawValue == "putOn")
@@ -259,12 +260,12 @@ struct VerbIDTests {
     func testAllInteractiveVerbs() throws {
         let interactiveVerbs: Set<VerbID> = [
             .close, .drop, .examine, .give, .go, .insert, .inventory,
-            .listen, .lock, .look, .open, .push, .putOn, .read, .remove,
+            .listen, .lock, .look, .move, .open, .push, .putOn, .read, .remove,
             .smell, .take, .taste, .thinkAbout, .touch, .turnOff, .turnOn,
             .unlock, .wear, .xyzzy
         ]
 
-        #expect(interactiveVerbs.count == 25)
+        #expect(interactiveVerbs.count == 26)
         #expect(interactiveVerbs.contains(.take))
         #expect(interactiveVerbs.contains(.drop))
         #expect(interactiveVerbs.contains(.examine))
@@ -395,13 +396,13 @@ struct VerbIDTests {
     func testMixedUsage() throws {
         let customVerb: VerbID = "customAction"
         let standardVerb = VerbID.take
-        
+
         let verbSet: Set<VerbID> = [customVerb, standardVerb, .drop, "anotherCustom"]
-        
+
         #expect(verbSet.count == 4)
         #expect(verbSet.contains(customVerb))
         #expect(verbSet.contains(standardVerb))
         #expect(verbSet.contains(.drop))
         #expect(verbSet.contains("anotherCustom"))
     }
-} 
+}
