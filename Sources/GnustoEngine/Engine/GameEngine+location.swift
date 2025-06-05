@@ -259,7 +259,9 @@ extension GameEngine {
         if !visibleItems.isEmpty {
             // Use the helper to generate a sentence like "a foo, a bar, and a baz"
             let itemListing = visibleItems.listWithIndefiniteArticles
-            await ioHandler.print("You can see \(itemListing) here.")
+            await ioHandler.print(
+                "There \(visibleItems.count == 1 ? "is" : "are") \(itemListing) here."
+            )
         }
         // No output if no items are visible
     }

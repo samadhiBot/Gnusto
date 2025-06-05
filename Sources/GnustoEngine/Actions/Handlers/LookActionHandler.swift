@@ -239,7 +239,9 @@ public struct LookActionHandler: ActionHandler {
 
         if !visibleItems.isEmpty {
             let itemListing = visibleItems.listWithIndefiniteArticles
-            description.append("You can see \(itemListing) here.")
+            description.append(
+                "There \(visibleItems.count == 1 ? "is" : "are") \(itemListing) here."
+            )
         }
 
         return description.joined(separator: "\n")

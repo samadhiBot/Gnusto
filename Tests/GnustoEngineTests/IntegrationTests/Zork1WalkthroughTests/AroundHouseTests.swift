@@ -33,8 +33,7 @@ struct AroundHouseTests {
         You are standing in an open field west of a white house, with a
         boarded front door.
 
-        You can see a front door, a small mailbox, and a white house
-        here.
+        There is a small mailbox here.
 
         > north
         — North of House —
@@ -50,13 +49,11 @@ struct AroundHouseTests {
         the east. In one corner of the house there is a small window
         which is slightly ajar.
 
-        You can see a kitchen window here.
-
         > examine window
         The window is slightly ajar, but not enough to allow entry.
 
         > open window
-        You open the kitchen window.
+        With great effort, you open the window far enough to allow entry.
 
         > west
         — Kitchen —

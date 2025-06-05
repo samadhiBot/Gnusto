@@ -121,7 +121,8 @@ extension AroundHouse {
             """),
         .adjectives("white", "beautiful", "colonial"),
         .synonyms("house", "home", "building"),
-        .in(.location(.westOfHouse))
+        .in(.location(.westOfHouse)),
+        .isScenery
     )
 
     static let frontDoor = Item(
@@ -130,7 +131,8 @@ extension AroundHouse {
         .description("The door is boarded and you can't remove the boards."),
         .adjectives("front", "boarded"),
         .synonyms("door"),
-        .in(.location(.westOfHouse))
+        .in(.location(.westOfHouse)),
+        .isScenery
     )
 
     static let boards = Item(

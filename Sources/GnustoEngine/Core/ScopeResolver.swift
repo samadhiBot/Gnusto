@@ -12,7 +12,7 @@ public struct ScopeResolver: Sendable {
     }
 
     /// Checks if the specified location is currently lit.
-    /// 
+    ///
     /// A location is lit if it has the `.inherentlyLit` property, or if the player
     /// (or perhaps an NPC in the same location) is carrying an active light source
     /// (`.lightSource` and `.on` properties).
@@ -61,6 +61,7 @@ public struct ScopeResolver: Sendable {
     /// Determines which items are directly visible within a given location.
     /// Considers light conditions and item properties (e.g., `.invisible`).
     /// Does not include contents of containers unless they are transparent.
+    /// Excludes scenery items from being listed in room descriptions.
     ///
     /// - Parameters:
     ///   - locationID: The unique identifier of the location.
@@ -78,9 +79,9 @@ public struct ScopeResolver: Sendable {
             item.parent == .location(locationID)
         }
 
-        // 3. Filter out items with the .invisible property.
+        // 3. Filter out items with the .invisible property and scenery items.
         let visibleItems = itemsDirectlyInLocation.filter { item in
-            !item.hasFlag(.isInvisible)
+            !item.hasFlag(.isInvisible) && !item.hasFlag(.isScenery)
         }
 
         // 4. Return the IDs of the visible items.
