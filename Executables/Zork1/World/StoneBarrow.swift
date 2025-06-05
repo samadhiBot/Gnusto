@@ -9,7 +9,7 @@ enum StoneBarrow {
         id: .stoneBarrow,
         .name("Stone Barrow"),
         .description("""
-            You are standing in front of a large stone barrow. There appears to be an entrance \
+            You are standing in front of a large stone barrow. There appears to be an entrance
             to the east.
             """),
         .exits([

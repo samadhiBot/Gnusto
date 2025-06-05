@@ -4,7 +4,7 @@ import Testing
 
 @testable import Zork1
 
-struct AroundHouseTests {
+struct OutsideHouseTests {
     let enterKitchenSteps = [
         "north",
         "east",
@@ -53,7 +53,8 @@ struct AroundHouseTests {
         The window is slightly ajar, but not enough to allow entry.
 
         > open window
-        With great effort, you open the window far enough to allow entry.
+        With great effort, you open the window far enough to allow
+        entry.
 
         > west
         — Kitchen —
@@ -63,8 +64,6 @@ struct AroundHouseTests {
         leads to the west and a dark staircase can be seen leading
         upward. A dark chimney leads down and to the east is a small
         window which is open.
-
-        You can see a chimney and a kitchen table here.
         """
 
     @Test("Basic house entry via kitchen window")

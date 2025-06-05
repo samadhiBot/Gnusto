@@ -9,8 +9,8 @@ enum Clearing {
         id: .clearing,
         .name("Clearing"),
         .description("""
-            You are in a clearing in the forest. The forest surrounds you on all sides. There \
-            appears to be a grating in the ground.
+            You are in a clearing in the forest. The forest surrounds you
+            on all sides. There appears to be a grating in the ground.
             """),
         .exits([
             .west: .to(.eastOfHouse),
@@ -23,7 +23,8 @@ enum Clearing {
         id: .gratingClearing,
         .name("Clearing"),
         .description("""
-            You are in a clearing, with a forest surrounding you on all sides. A path leads south.
+            You are in a clearing, with a forest surrounding you on all sides.
+            A path leads south.
             """),
         .exits([
             .south: .to(.clearing),
@@ -33,6 +34,14 @@ enum Clearing {
 
     // MARK: - Items
 
+    static let grating = Item(
+        id: .grating,
+        .name("grating"),
+        .description("The grating is a large metal framework, securely fastened to the ground."),
+        .synonyms("gate", "bars"),
+        .in(.location(.gratingClearing))
+    )
+
     static let pileOfLeaves = Item(
         id: .pileOfLeaves,
         .name("pile of leaves"),
@@ -41,13 +50,5 @@ enum Clearing {
         .synonyms("leaves", "leaf", "pile"),
         .in(.location(.clearing)),
         .isTakable
-    )
-
-    static let grating = Item(
-        id: .grating,
-        .name("grating"),
-        .description("The grating is a large metal framework, securely fastened to the ground."),
-        .synonyms("gate", "bars"),
-        .in(.location(.gratingClearing))
     )
 }

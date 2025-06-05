@@ -88,9 +88,38 @@ public struct ScopeResolver: Sendable {
         return visibleItems.map(\.id).sorted()
     }
 
+    /// Determines which items are in scope for interaction within a given location.
+    /// Similar to `visibleItemsIn` but includes scenery items since they can be examined/interacted with.
+    /// Considers light conditions and excludes only truly invisible items.
+    ///
+    /// - Parameters:
+    ///   - locationID: The unique identifier of the location.
+    /// - Returns: An array of IDs for items in scope in the location.
+    public func itemsInScopeFor(locationID: LocationID) async -> [ItemID] {
+        let gameState = await engine.gameState
+        // 1. Check if the location is lit.
+        guard await isLocationLit(locationID: locationID) else {
+            // If not lit, nothing is in scope.
+            return []
+        }
+
+        // 2. If lit, find items directly in the location.
+        let itemsDirectlyInLocation = gameState.items.values.filter { item in
+            item.parent == .location(locationID)
+        }
+
+        // 3. Filter out only items with the .invisible property (include scenery).
+        let itemsInScope = itemsDirectlyInLocation.filter { item in
+            !item.hasFlag(.isInvisible)
+        }
+
+        // 4. Return the IDs of the items in scope.
+        return itemsInScope.map(\.id).sorted()
+    }
+
     /// Determines all items currently reachable by the player.
     ///
-    /// This includes items in their inventory, items visible in the current location, and the
+    /// This includes items in their inventory, items in scope in the current location, and the
     /// contents of open or transparent containers that are themselves reachable.
     ///
     /// - Returns: A Set of IDs for items reachable by the player.
@@ -103,11 +132,11 @@ public struct ScopeResolver: Sendable {
         let inventoryItems = gameState.items.values.filter { $0.parent == .player }
         reachableItems.formUnion(inventoryItems.map(\.id))
 
-        // Add initially reachable items (visible in location)
-        let visibleLocationItems = await self.visibleItemsIn(
+        // Add initially reachable items (in scope in location - includes scenery for interaction)
+        let itemsInScopeInLocation = await self.itemsInScopeFor(
             locationID: gameState.player.currentLocationID
         )
-        reachableItems.formUnion(visibleLocationItems)
+        reachableItems.formUnion(itemsInScopeInLocation)
 
         // Now, process containers and surfaces among the currently reachable items
         var itemsToCheck = reachableItems // Copy the set to iterate while potentially modifying reachableItems

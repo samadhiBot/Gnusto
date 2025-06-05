@@ -368,6 +368,58 @@ struct ExamineActionHandlerTests {
         let finalItemState = try await engine.item("magicMirror")
         #expect(finalItemState.attributes[.isTouched] != true)
     }
+
+    @Test func testExamineSceneryItem() async throws {
+        let itemID: ItemID = "window"
+        let roomID: LocationID = "kitchen"
+        let item = Item(
+            id: itemID,
+            .name("kitchen window"),
+            .description("The window is slightly ajar, but not enough to allow entry."),
+            .in(.location(roomID)),
+            .isScenery
+        )
+        let room = Location(
+            id: roomID,
+            .name("Kitchen"),
+            .inherentlyLit
+        )
+        let game = MinimalGame(
+            player: Player(in: roomID),
+            locations: [room],
+            items: [item]
+        )
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let initialItemState = try await engine.item(itemID)
+        #expect(initialItemState.attributes[.isTouched] != true)
+        #expect(await engine.gameState.changeHistory.isEmpty)
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item(itemID),
+            rawInput: "examine window"
+        )
+        await engine.execute(command: command)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The window is slightly ajar, but not enough to allow entry.")
+
+        let finalItemState = try await engine.item(itemID)
+        #expect(finalItemState.attributes[.isTouched] == true)
+
+        let expectedChanges = expectedExamineChanges(
+            itemID: itemID,
+            initialAttributes: initialItemState.attributes
+        )
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
 }
 
 extension ExamineActionHandlerTests {

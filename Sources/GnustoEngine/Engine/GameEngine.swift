@@ -792,10 +792,7 @@ extension GameEngine {
             if let specificResponse = response as? ActionResponse {
                 await report(specificResponse)
             } else {
-                logWarning("""
-                    An unexpected error occurred in an object handler: \
-                    \(response)
-                    """)
+                logWarning("An unexpected error occurred in an object handler: \(response)")
                 await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {

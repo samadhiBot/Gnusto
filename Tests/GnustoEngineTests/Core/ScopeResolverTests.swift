@@ -201,6 +201,45 @@ struct ScopeResolverTests {
         #expect(!visibleIDs.contains(invisibleItem.id))
     }
 
+    @Test("Scenery items excluded from visible items but included in scope")
+    func testSceneryItemsVisibilityVsScope() async throws {
+        let visibleItem = Item(
+            id: "key",
+            .in(.location(.startRoom))
+        )
+        let sceneryItem = Item(
+            id: "window",
+            .in(.location(.startRoom)),
+            .isScenery
+        )
+        let invisibleItem = Item(
+            id: "dust",
+            .in(.location(.startRoom)),
+            .isInvisible
+        )
+        let game = MinimalGame(items: [visibleItem, sceneryItem, invisibleItem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let resolver = await engine.scopeResolver
+
+        // visibleItemsIn should exclude scenery
+        let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
+        #expect(Set(visibleIDs) == Set([visibleItem.id]))
+        #expect(!visibleIDs.contains(sceneryItem.id))
+        #expect(!visibleIDs.contains(invisibleItem.id))
+
+        // itemsInScopeFor should include scenery but exclude invisible
+        let scopeIDs = await resolver.itemsInScopeFor(locationID: .startRoom)
+        #expect(Set(scopeIDs) == Set([visibleItem.id, sceneryItem.id]))
+        #expect(scopeIDs.contains(sceneryItem.id))
+        #expect(!scopeIDs.contains(invisibleItem.id))
+    }
+
     @Test("No items visible in dark room")
     func testVisibleItemsDarkRoom() async throws {
         // Explicitly create a dark room
@@ -283,7 +322,7 @@ struct ScopeResolverTests {
         let visibleItem = Item(
             id: "key",
             .in(.location(.startRoom))
-)
+        )
         let invisibleItem = Item(
             id: "dust",
             .in(.location(.startRoom)),
@@ -666,5 +705,27 @@ struct ScopeResolverTests {
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
         #expect(visibleIDs.isEmpty)
+    }
+
+    @Test("Reachable includes scenery items in lit room")
+    func testReachableSceneryLitRoom() async throws {
+        let sceneryItem = Item(
+            id: "window",
+            .name("Window"),
+            .in(.location(.startRoom)),
+            .isScenery
+        )
+        let game = MinimalGame(items: [sceneryItem])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        let resolver = await engine.scopeResolver
+
+        let reachable = await resolver.itemsReachableByPlayer()
+        #expect(reachable.contains(sceneryItem.id))
     }
 }
