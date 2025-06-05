@@ -55,8 +55,6 @@ struct ForestTests {
             heads north-south here. One particularly large tree with some
             low branches stands at the edge of the path.
 
-            There is a tree here.
-
             > examine tree
             The tree is large and appears to have some low branches. It
             might be climbable.
