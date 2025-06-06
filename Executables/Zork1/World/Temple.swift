@@ -132,7 +132,7 @@ extension Temple {
         .isReadable,
         .isTakable,
         .isContainer,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .firstDescription("On the altar is a large black book, open to page 569."),
         .readText("""
             Commandment #12592

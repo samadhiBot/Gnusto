@@ -125,7 +125,7 @@ extension Dam {
         .adjectives("tour", "guide"),
         .isReadable,
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .firstDescription("""
             Some guidebooks entitled "Flood Control Dam #3" are on the reception
             desk.
@@ -165,7 +165,7 @@ extension Dam {
         .synonyms("boat", "pile", "plastic", "valve"),
         .adjectives("plastic", "inflat"),
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .description("""
             There is a folded pile of plastic here which has a small valve
             attached.

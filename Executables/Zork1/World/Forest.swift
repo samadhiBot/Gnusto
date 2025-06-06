@@ -185,22 +185,30 @@ enum Forest {
 
     static let leaves = Item(
         id: .leaves,
-        .name("leaves"),
-        .description("These are the leaves of the tree. The tree is large."),
-        .synonyms("leaf"),
-        .in(.location(.upATree))
+        .name("pile of leaves"),
+        .synonyms("leaves", "leaf", "pile"),
+        .isTakable,
+        .isFlammable,
+        .requiresTryTake,
+        .description("On the ground is a pile of leaves."),
+        .size(25),
+        .in(.location(.gratingClearing))
+        // Note: Has action handler LEAF-PILE
     )
 
     static let nest = Item(
         id: .nest,
         .name("bird's nest"),
-        .description("The bird's nest is skillfully woven of twigs and leaves."),
-        .adjectives("bird", "birds"),
         .synonyms("nest"),
-        .in(.location(.upATree)),
+        .adjectives("birds"),
         .isTakable,
+        .isFlammable,
         .isContainer,
-        .isOpenable
+        .isOpen,
+        .isSearchable,
+        .firstDescription("Beside you on the branch is a small bird's nest."),
+        .capacity(20),
+        .in(.location(.upATree))
     )
 
     static let tree = Item(

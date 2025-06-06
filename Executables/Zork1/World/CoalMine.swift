@@ -291,7 +291,7 @@ extension CoalMine {
         .synonyms("coal", "pile", "heap"),
         .adjectives("small"),
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .size(20),
         .in(.location(.deadEnd5))
     )
@@ -354,7 +354,7 @@ extension CoalMine {
         id: .raisedBasket,
         .name("basket"),
         .synonyms("cage", "dumbwaiter", "basket"),
-        .isTransparent,  // TRANSBIT
+        .isTransparent,
         .requiresTryTake,
         .isContainer,
         .isOpen,

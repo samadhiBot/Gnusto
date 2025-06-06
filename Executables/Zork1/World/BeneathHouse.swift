@@ -127,7 +127,7 @@ extension BeneathHouse {
         .synonyms("painting", "art", "canvas", "treasure"),
         .adjectives("beautiful"),
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .firstDescription("""
             Fortunately, there is still one chance for you to be a vandal, for on
             the far wall is a painting of unparalleled beauty.

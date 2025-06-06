@@ -65,13 +65,15 @@ enum InsideHouse {
     static let bottle = Item(
         id: .bottle,
         .name("glass bottle"),
-        .description("It's a glass bottle."),
-        .adjectives("glass", "clear"),
-        .synonyms("bottle"),
-        .in(.item(.kitchenTable)),
+        .synonyms("bottle", "container"),
+        .adjectives("clear", "glass"),
         .isTakable,
+        .isTransparent,
         .isContainer,
-        .isOpenable
+        .firstDescription("A bottle is sitting on the table."),
+        .capacity(4),
+        .in(.item(.kitchenTable))
+        // Note: Has action handler BOTTLE-FUNCTION
     )
 
     static let brownSack = Item(
@@ -113,69 +115,96 @@ enum InsideHouse {
     static let garlic = Item(
         id: .garlic,
         .name("clove of garlic"),
-        .description("It's a clove of garlic."),
         .synonyms("garlic", "clove"),
-        .in(.item(.brownSack)),
-        .isTakable
+        .isTakable,
+        .isEdible,
+        .size(4),
+        .in(.item(.sandwichBag))
+        // Note: Has action handler GARLIC-F
     )
 
     static let kitchenTable = Item(
         id: .kitchenTable,
         .name("kitchen table"),
-        .description("The table seems to have been used recently for the preparation of food."),
-        .adjectives("kitchen"),
         .synonyms("table"),
-        .in(.location(.kitchen)),
+        .adjectives("kitchen"),
+        .suppressDescription,
         .isContainer,
         .isOpen,
-        .isOpenable,
-        .isScenery,
-        .isSurface
+        .isSurface,
+        .capacity(50),
+        .in(.location(.kitchen))
     )
 
     static let knife = Item(
         id: .knife,
         .name("nasty knife"),
-        .description("It's a vicious-looking knife."),
-        .adjectives("nasty", "vicious"),
-        .synonyms("knife"),
-        .in(.location(.attic)),
+        .synonyms("knives", "knife", "blade"),
+        .adjectives("nasty", "unrusty"),
         .isTakable,
-        .isWeapon
+        .isWeapon,
+        .requiresTryTake,
+        .firstDescription("On a table is a nasty-looking knife."),
+        .in(.item(.atticTable))
+        // Note: Has action handler KNIFE-F
     )
 
     static let lamp = Item(
         id: .lamp,
         .name("brass lantern"),
-        .description("""
-            The brass lantern is turned off. The brass lantern contains a clear glass globe
-            which is currently dark.
-            """),
+        .synonyms("lamp", "lantern", "light"),
         .adjectives("brass"),
-        .synonyms("lantern", "lamp", "light"),
-        .in(.location(.livingRoom)),
         .isTakable,
-        .isLightSource,
-        .isDevice
+        .isLightSource,  // LIGHTBIT
+        .firstDescription("A battery-powered brass lantern is on the trophy case."),
+        .description("There is a brass lantern (battery-powered) here."),
+        .size(15),
+        .in(.location(.livingRoom))
+        // Note: Has action handler LANTERN
     )
 
     static let lunch = Item(
         id: .lunch,
         .name("lunch"),
-        .description("A hot pepper sandwich."),
+        .synonyms("food", "sandwich", "lunch", "dinner"),
         .adjectives("hot", "pepper"),
-        .synonyms("sandwich", "food", "dinner"),
-        .in(.item(.brownSack)),
-        .isTakable
+        .isTakable,
+        .isEdible,
+        .description("A hot pepper sandwich is here."),
+        .in(.item(.sandwichBag))
+    )
+
+    static let map = Item(
+        id: .map,
+        .name("ancient map"),
+        .synonyms("parchment", "map"),
+        .adjectives("antique", "old", "ancient"),
+        .isInvisible,
+        .isReadable,
+        .isTakable,
+        .firstDescription("In the trophy case is an ancient parchment which appears to be a map."),
+        .readText("""
+            The map shows a forest with three clearings. The largest clearing contains
+            a house. Three paths leave the large clearing. One of these paths, leading
+            southwest, is marked "To Stone Barrow".
+            """),
+        .size(2),
+        .in(.item(.trophyCase))
     )
 
     static let rope = Item(
         id: .rope,
         .name("rope"),
-        .description("It's a sturdy rope."),
-        .synonyms("rope"),
-        .in(.location(.attic)),
-        .isTakable
+        .synonyms("rope", "hemp", "coil"),
+        .adjectives("large"),
+        .isTakable,
+        .requiresTryTake,
+        .firstDescription("A large coil of rope is lying in the corner."),
+        .size(10),
+        .in(.location(.attic))
+        // Note: Has action handler ROPE-FUNCTION, SACREDBIT
+    )
+
     static let rug = Item(
         id: .rug,
         .name("carpet"),
@@ -194,7 +223,7 @@ enum InsideHouse {
         .adjectives("brown", "elongated", "smelly"),
         .isTakable,
         .isContainer,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
         .capacity(9),
         .size(9),
@@ -205,37 +234,42 @@ enum InsideHouse {
     static let sword = Item(
         id: .sword,
         .name("sword"),
-        .description("It's an elvish sword of great antiquity."),
-        .adjectives("elvish"),
-        .synonyms("sword", "blade"),
-        .in(.location(.livingRoom)),
+        .synonyms("sword", "orcrist", "glamdring", "blade"),
+        .adjectives("elvish", "old", "antique"),
         .isTakable,
-        .isWeapon
+        .isWeapon,
+        .requiresTryTake,
+        .firstDescription("Above the trophy case hangs an elvish sword of great antiquity."),
+        .size(30),
+        .in(.location(.livingRoom))
+        // Note: Has action handler SWORD-FCN, TVALUE 0
     )
 
     static let trapDoor = Item(
         id: .trapDoor,
         .name("trap door"),
-        .description("It's a closed trap door."),
-        .adjectives("trap"),
-        .synonyms("door", "trapdoor"),
-        .in(.location(.livingRoom)),
-        .isScenery,
-        .isOpenable
-        // TODO: Should be initially invisible under carpet, revealed by "move rug"
+        .synonyms("door", "trapdoor", "trap-door", "cover"),
+        .adjectives("trap", "dusty"),
+        .isDoor,
+        .suppressDescription,
+        .isInvisible,
+        .in(.location(.livingRoom))
+        // Note: Has action handler TRAP-DOOR-FCN
     )
 
     static let trophyCase = Item(
         id: .trophyCase,
         .name("trophy case"),
-        .description("The trophy case is securely fastened to the wall."),
-        .adjectives("trophy"),
         .synonyms("case"),
-        .in(.location(.livingRoom)),
-        .isScenery,
+        .adjectives("trophy"),
+        .isTransparent,
         .isContainer,
-        .isOpenable,
-        .isTransparent
+        .suppressDescription,
+        .requiresTryTake,
+        .isSearchable,
+        .capacity(10000),
+        .in(.location(.livingRoom))
+        // Note: Has action handler TROPHY-CASE-FCN
     )
 
     static let water = Item(
@@ -250,12 +284,14 @@ enum InsideHouse {
     static let woodenDoor = Item(
         id: .woodenDoor,
         .name("wooden door"),
-        .description("""
-            The wooden door has strange gothic lettering above it and appears to be nailed shut.
-            """),
-        .adjectives("wooden", "strange", "gothic"),
-        .synonyms("door"),
-        .in(.location(.livingRoom)),
-        .isScenery
+        .synonyms("door", "lettering", "writing"),
+        .adjectives("wooden", "gothic", "strange", "west"),
+        .isReadable,
+        .isDoor,
+        .suppressDescription,
+        .isTransparent,
+        .readText("The engravings translate to \"This space intentionally left blank.\""),
+        .in(.location(.livingRoom))
+        // Note: Has action handler FRONT-DOOR-FCN
     )
 }

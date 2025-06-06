@@ -319,7 +319,7 @@ extension River {
         .adjectives("tan", "fine"),
         .isReadable,
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .readText("""
               !!!!FROBOZZ MAGIC BOAT COMPANY!!!!
 
@@ -374,7 +374,7 @@ extension River {
         .synonyms("boat", "raft"),
         .adjectives("inflat", "magic", "plastic", "seaworthy"),
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .isVehicle,  // VEHBIT
         .isOpen,
         .isSearchable,
@@ -402,7 +402,7 @@ extension River {
         .synonyms("boat", "pile", "plastic"),
         .adjectives("plastic", "puncture", "large"),
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .size(20)
         // Note: Has action handler DBOAT-FUNCTION, parent not specified
     )

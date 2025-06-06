@@ -106,7 +106,7 @@ extension OutsideHouse {
         .adjectives("small"),
         .isReadable,
         .isTakable,
-        .isFlammable,  // BURNBIT
+        .isFlammable,
         .description("A small leaflet is on the ground."),
         .readText("""
             "WELCOME TO ZORK!
@@ -138,12 +138,13 @@ extension OutsideHouse {
 
     static let frontDoor = Item(
         id: .frontDoor,
-        .name("front door"),
-        .description("The door is boarded and you can't remove the boards."),
-        .adjectives("front", "boarded"),
+        .name("door"),
         .synonyms("door"),
-        .in(.location(.westOfHouse)),
-        .isScenery
+        .adjectives("front", "boarded"),
+        .isDoor,
+        .suppressDescription,
+        .in(.location(.westOfHouse))
+        // Note: Has action handler FRONT-DOOR-FCN
     )
 
     static let kitchenWindow = Item(
@@ -157,31 +158,16 @@ extension OutsideHouse {
         .isScenery
     )
 
-    static let leaflet = Item(
-        id: .leaflet,
-        .name("leaflet"),
-        .description("""
-            "WELCOME TO ZORK!
-
-            ZORK is a game of adventure, danger, and low cunning.
-            In it you will explore some of the most amazing territory
-            ever seen by mortals. No computer should be without one!"
-            """),
-        .synonyms("mail"),
-        .in(.item(.mailbox)),
-        .isReadable,
-        .isTakable
-    )
-
     static let mailbox = Item(
         id: .mailbox,
         .name("small mailbox"),
-        .description("It's a small mailbox."),
+        .synonyms("mailbox", "box"),
         .adjectives("small"),
-        .synonyms("box"),
-        .in(.location(.westOfHouse)),
         .isContainer,
-        .isOpenable
+        .requiresTryTake,
+        .capacity(10),
+        .in(.location(.westOfHouse))
+        // Note: Has action handler MAILBOX-F
     )
 
     static let whiteHouse = Item(
