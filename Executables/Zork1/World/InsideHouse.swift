@@ -1,35 +1,34 @@
 import GnustoEngine
 
-// MARK: - House Interior Area
+// MARK: - Inside the House
 
-enum HouseInterior {
-    // MARK: - Locations
-
+enum InsideHouse {
     static let attic = Location(
         id: .attic,
         .name("Attic"),
-        .description("This is the attic. The only exit is a stairway leading down."),
+        .description("""
+            This is the attic. The only exit is a stairway leading down.
+            """),
         .exits([
-            .down: .to(.kitchen),
+            .down: .to(.kitchen)
         ]),
-        .inherentlyLit
+        .localGlobals(.stairs)
     )
 
     static let kitchen = Location(
         id: .kitchen,
         .name("Kitchen"),
         .description("""
-            You are in the kitchen of the white house. A table seems to have been used recently
-            for the preparation of food. A passage leads to the west and a dark staircase can be
-            seen leading upward. A dark chimney leads down and to the east is a small window which
-            is open.
+            You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the north is a small window which is open.
             """),
         .exits([
             .west: .to(.livingRoom),
             .up: .to(.attic),
-            .east: .to(.eastOfHouse),
+            // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
+            // Note: DOWN exit to studio conditional on FALSE-FLAG
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.kitchenWindow, .chimney, .stairs)
     )
 
     static let livingRoom = Location(
@@ -43,12 +42,10 @@ enum HouseInterior {
         .exits([
             .east: .to(.kitchen),
             .west: .blocked("The door is nailed shut."),
-            .down: Exit(
-                destination: .cellar,
-                doorID: .trapDoor
-            ),
+            .down: .to(.cellar, via: .trapDoor),
         ]),
-        .inherentlyLit
+        .inherentlyLit,
+        .localGlobals(.stairs)
     )
 
     // MARK: - Items

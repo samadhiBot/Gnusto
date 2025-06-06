@@ -7,293 +7,28 @@ enum Rooms {
 extension Location {
     // MARK: - Forest and Outside of House
 
-    static let westOfHouse = Location(
-        id: "westOfHouse",
-        .name("West of House"),
-        .description("""
-            You are standing in an open field west of a white house, with a boarded front door.
-            """),
-        .exits([
-            .north: .to("northOfHouse"),
-            .south: .to("southOfHouse"),
-            .northeast: .to("northOfHouse"),
-            .southeast: .to("southOfHouse"),
-            .west: .to("forest1"),
-            // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
-            // Note: EAST exit has custom message about boarded door
-        ]),
-        .inherentlyLit,
-        .localGlobals("whiteHouse", "board", "forest")
-    )
 
-    static let stoneBarrow = Location(
-        id: "stoneBarrow",
-        .name("Stone Barrow"),
-        .description("""
-            You are standing in front of a massive barrow of stone. In the east face
-            is a huge stone door which is open. You cannot see into the dark of the tomb.
-            """),
-        .exits([
-            .northeast: .to("westOfHouse")
-        ]),
-        .inherentlyLit
-    )
-
-    static let northOfHouse = Location(
-        id: "northOfHouse",
-        .name("North of House"),
-        .description("""
-            You are facing the north side of a white house. There is no door here,
-            and all the windows are boarded up. To the north a narrow path winds through
-            the trees.
-            """),
-        .exits([
-            .southwest: .to("westOfHouse"),
-            .southeast: .to("eastOfHouse"),
-            .west: .to("westOfHouse"),
-            .east: .to("eastOfHouse"),
-            .north: .to("path"),
-            // Note: SOUTH exit has custom message about boarded windows
-        ]),
-        .inherentlyLit,
-        .localGlobals("boardedWindow", "board", "whiteHouse", "forest")
-    )
-
-    static let southOfHouse = Location(
-        id: "southOfHouse",
-        .name("South of House"),
-        .description("""
-            You are facing the south side of a white house. There is no door here,
-            and all the windows are boarded.
-            """),
-        .exits([
-            .west: .to("westOfHouse"),
-            .east: .to("eastOfHouse"),
-            .northeast: .to("eastOfHouse"),
-            .northwest: .to("westOfHouse"),
-            .south: .to("forest3"),
-            // Note: NORTH exit has custom message about boarded windows
-        ]),
-        .inherentlyLit,
-        .localGlobals("boardedWindow", "board", "whiteHouse", "forest")
-    )
-
-    static let eastOfHouse = Location(
-        id: "eastOfHouse",
-        .name("Behind House"),
-        .description("""
-            You are behind the white house. A path leads into the forest to the east. In one corner of the house there is a small window which is slightly ajar.
-            """),
-        .exits([
-            .north: .to("northOfHouse"),
-            .south: .to("southOfHouse"),
-            .southwest: .to("southOfHouse"),
-            .northwest: .to("northOfHouse"),
-            .east: .to("clearing"),
-            // Note: WEST and IN exits to kitchen conditional on kitchen window being open
-        ]),
-        .inherentlyLit,
-        .localGlobals("whiteHouse", "kitchenWindow", "forest")
-    )
-
-    static let forest1 = Location(
-        id: "forest1",
-        .name("Forest"),
-        .description("""
-            This is a forest, with trees in all directions. To the east,
-            there appears to be sunlight.
-            """),
-        .exits([
-            .north: .to("gratingClearing"),
-            .east: .to("path"),
-            .south: .to("forest3"),
-            // Note: UP and WEST exits have custom messages
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "songbird", "whiteHouse", "forest")
-    )
-
-    static let forest2 = Location(
-        id: "forest2",
-        .name("Forest"),
-        .description("""
-            This is a dimly lit forest, with large trees all around.
-            """),
-        .exits([
-            .east: .to("mountains"),
-            .south: .to("clearing"),
-            .west: .to("path"),
-            // Note: UP and NORTH exits have custom messages
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "songbird", "whiteHouse", "forest")
-    )
-
-    static let mountains = Location(
-        id: "mountains",
-        .name("Forest"),
-        .description("""
-            The forest thins out, revealing impassable mountains.
-            """),
-        .exits([
-            .north: .to("forest2"),
-            .south: .to("forest2"),
-            .west: .to("forest2"),
-            // Note: UP and EAST exits have custom messages about impassable mountains
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "whiteHouse")
-    )
-
-    static let forest3 = Location(
-        id: "forest3",
-        .name("Forest"),
-        .description("""
-            This is a dimly lit forest, with large trees all around.
-            """),
-        .exits([
-            .north: .to("clearing"),
-            .west: .to("forest1"),
-            .northwest: .to("southOfHouse"),
-            // Note: UP, EAST, and SOUTH exits have custom messages
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "songbird", "whiteHouse", "forest")
-    )
-
-    static let path = Location(
-        id: "path",
-        .name("Forest Path"),
-        .description("""
-            This is a path winding through a dimly lit forest. The path heads
-            north-south here. One particularly large tree with some low branches
-            stands at the edge of the path.
-            """),
-        .exits([
-            .up: .to("upATree"),
-            .north: .to("gratingClearing"),
-            .east: .to("forest2"),
-            .south: .to("northOfHouse"),
-            .west: .to("forest1")
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "songbird", "whiteHouse", "forest")
-    )
-
-    static let upATree = Location(
-        id: "upATree",
-        .name("Up a Tree"),
-        .description("""
-            You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach.
-            """),
-        .exits([
-            .down: .to("path"),
-            // Note: UP exit has custom message
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "forest", "songbird", "whiteHouse")
-    )
-
-    static let gratingClearing = Location(
-        id: "gratingClearing",
-        .name("Clearing"),
-        .description("""
-            You are in a clearing, with a forest surrounding you on all sides. A path leads south.
-            """),
-        .exits([
-            .east: .to("forest2"),
-            .west: .to("forest1"),
-            .south: .to("path"),
-            // Note: NORTH exit has custom message
-            // Note: DOWN exit has special condition handling via GRATING-EXIT
-        ]),
-        .inherentlyLit,
-        .localGlobals("whiteHouse", "grate")
-    )
-
-    static let clearing = Location(
-        id: "clearing",
-        .name("Clearing"),
-        .description("""
-            You are in a small clearing in a well marked forest path that
-            extends to the east and west.
-            """),
-        .exits([
-            .east: .to("canyonView"),
-            .north: .to("forest2"),
-            .south: .to("forest3"),
-            .west: .to("eastOfHouse"),
-            // Note: UP exit has custom message
-        ]),
-        .inherentlyLit,
-        .localGlobals("tree", "songbird", "whiteHouse", "forest")
-    )
-
-    // MARK: - House
-
-    static let kitchen = Location(
-        id: "kitchen",
-        .name("Kitchen"),
-        .description("""
-            You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the north is a small window which is open.
-            """),
-        .exits([
-            .west: .to("livingRoom"),
-            .up: .to("attic"),
-            // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
-            // Note: DOWN exit to studio conditional on FALSE-FLAG
-        ]),
-        .inherentlyLit,
-        .localGlobals("kitchenWindow", "chimney", "stairs")
-    )
-
-    static let attic = Location(
-        id: "attic",
-        .name("Attic"),
-        .description("""
-            This is the attic. The only exit is a stairway leading down.
-            """),
-        .exits([
-            .down: .to("kitchen")
-        ]),
-        .localGlobals("stairs")
-    )
-
-    static let livingRoom = Location(
-        id: "livingRoom",
-        .name("Living Room"),
-        .description("""
-            You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room.
-            """),
-        .exits([
-            .east: .to("kitchen"),
-            // Note: WEST exit to strange passage conditional on MAGIC-FLAG
-            // Note: DOWN exit has special condition handling via TRAP-DOOR-EXIT
-        ]),
-        .inherentlyLit,
-        .localGlobals("stairs")
-    )
 
     // MARK: - Cellar and Vicinity
 
     static let cellar = Location(
-        id: "cellar",
+        id: .cellar,
         .name("Cellar"),
         .description("""
             You are in a dark and damp cellar with a narrow passageway leading north and a crawlway to the south. On the west is the bottom of a narrow ramp which is too steep to climb.
             """),
         .exits([
-            .north: .to("trollRoom"),
-            .south: .to("eastOfChasm"),
+            .north: .to(.trollRoom),
+            .south: .to(.eastOfChasm),
             // Note: UP exit to living room conditional on trap door being open
             // Note: WEST exit has custom message about sliding back down
         ]),
         .isLand,
-        .localGlobals("trapDoor", "slide", "stairs")
+        .localGlobals(.trapDoor, .slide, .stairs)
     )
 
     static let trollRoom = Location(
-        id: "trollRoom",
+        id: .trollRoom,
         .name("The Troll Room"),
         .description("""
             This is a small room with passages to the east and south and a
@@ -301,7 +36,7 @@ extension Location {
             (perhaps made by an axe) mar the walls.
             """),
         .exits([
-            .south: .to("cellar"),
+            .south: .to(.cellar),
             // Note: EAST exit to EW-PASSAGE conditional on TROLL-FLAG
             // Note: WEST exit to MAZE-1 conditional on TROLL-FLAG
         ]),
@@ -309,7 +44,7 @@ extension Location {
     )
 
     static let eastOfChasm = Location(
-        id: "eastOfChasm",
+        id: .eastOfChasm,
         .name("East of Chasm"),
         .description("""
             You are on the east edge of a chasm, the bottom of which cannot be
@@ -317,15 +52,15 @@ extension Location {
             to the east.
             """),
         .exits([
-            .north: .to("cellar"),
-            .east: .to("gallery"),
+            .north: .to(.cellar),
+            .east: .to(.gallery),
             // Note: DOWN exit has custom message about chasm leading to infernal regions
         ]),
         .isLand
     )
 
     static let gallery = Location(
-        id: "gallery",
+        id: .gallery,
         .name("Gallery"),
         .description("""
             This is an art gallery. Most of the paintings have been stolen by
@@ -333,15 +68,15 @@ extension Location {
             north or west exits.
             """),
         .exits([
-            .west: .to("eastOfChasm"),
-            .north: .to("studio")
+            .west: .to(.eastOfChasm),
+            .north: .to(.studio)
         ]),
         .isLand,
         .inherentlyLit
     )
 
     static let studio = Location(
-        id: "studio",
+        id: .studio,
         .name("Studio"),
         .description("""
             This appears to have been an artist's studio. The walls and floors are
@@ -352,296 +87,296 @@ extension Location {
             you could get back down.
             """),
         .exits([
-            .south: .to("gallery"),
+            .south: .to(.gallery),
             // Note: UP exit has special condition handling via UP-CHIMNEY-FUNCTION
         ]),
         .isLand,
-        .localGlobals("chimney")
+        .localGlobals(.chimney)
     )
 
     // MARK: - Maze
 
     static let maze1 = Location(
-        id: "maze1",
+        id: .maze1,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .east: .to("trollRoom"),
-            .north: .to("maze1"),
-            .south: .to("maze2"),
-            .west: .to("maze4")
+            .east: .to(.trollRoom),
+            .north: .to(.maze1),
+            .south: .to(.maze2),
+            .west: .to(.maze4)
         ]),
         .isLand
     )
 
     static let maze2 = Location(
-        id: "maze2",
+        id: .maze2,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .south: .to("maze1"),
-            .east: .to("maze3"),
+            .south: .to(.maze1),
+            .east: .to(.maze3),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-4
         ]),
         .isLand
     )
 
     static let maze3 = Location(
-        id: "maze3",
+        id: .maze3,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .west: .to("maze2"),
-            .north: .to("maze4"),
-            .up: .to("maze5")
+            .west: .to(.maze2),
+            .north: .to(.maze4),
+            .up: .to(.maze5)
         ]),
         .isLand
     )
 
     static let maze4 = Location(
-        id: "maze4",
+        id: .maze4,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .west: .to("maze3"),
-            .north: .to("maze1"),
-            .east: .to("deadEnd1")
+            .west: .to(.maze3),
+            .north: .to(.maze1),
+            .east: .to(.deadEnd1)
         ]),
         .isLand
     )
 
     static let deadEnd1 = Location(
-        id: "deadEnd1",
+        id: .deadEnd1,
         .name("Dead End"),
         .description("""
             You have come to a dead end in the maze.
             """),
         .exits([
-            .south: .to("maze4")
+            .south: .to(.maze4)
         ]),
         .isLand
     )
 
     static let maze5 = Location(
-        id: "maze5",
+        id: .maze5,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             A skeleton, probably the remains of a luckless adventurer, lies here.
             """),
         .exits([
-            .east: .to("deadEnd2"),
-            .north: .to("maze3"),
-            .southwest: .to("maze6")
+            .east: .to(.deadEnd2),
+            .north: .to(.maze3),
+            .southwest: .to(.maze6)
         ]),
         .isLand
     )
 
     static let deadEnd2 = Location(
-        id: "deadEnd2",
+        id: .deadEnd2,
         .name("Dead End"),
         .description("""
             You have come to a dead end in the maze.
             """),
         .exits([
-            .west: .to("maze5")
+            .west: .to(.maze5)
         ]),
         .isLand
     )
 
     static let maze6 = Location(
-        id: "maze6",
+        id: .maze6,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .down: .to("maze5"),
-            .east: .to("maze7"),
-            .west: .to("maze6"),
-            .up: .to("maze9")
+            .down: .to(.maze5),
+            .east: .to(.maze7),
+            .west: .to(.maze6),
+            .up: .to(.maze9)
         ]),
         .isLand
     )
 
     static let maze7 = Location(
-        id: "maze7",
+        id: .maze7,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .up: .to("maze14"),
-            .west: .to("maze6"),
-            .east: .to("maze8"),
-            .south: .to("maze15"),
+            .up: .to(.maze14),
+            .west: .to(.maze6),
+            .east: .to(.maze8),
+            .south: .to(.maze15),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to DEAD-END-1
         ]),
         .isLand
     )
 
     static let maze8 = Location(
-        id: "maze8",
+        id: .maze8,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .northeast: .to("maze7"),
-            .west: .to("maze8"),
-            .southeast: .to("deadEnd3")
+            .northeast: .to(.maze7),
+            .west: .to(.maze8),
+            .southeast: .to(.deadEnd3)
         ]),
         .isLand
     )
 
     static let deadEnd3 = Location(
-        id: "deadEnd3",
+        id: .deadEnd3,
         .name("Dead End"),
         .description("""
             You have come to a dead end in the maze.
             """),
         .exits([
-            .north: .to("maze8")
+            .north: .to(.maze8)
         ]),
         .isLand
     )
 
     static let maze9 = Location(
-        id: "maze9",
+        id: .maze9,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .north: .to("maze6"),
-            .east: .to("maze10"),
-            .south: .to("maze13"),
-            .west: .to("maze12"),
-            .northwest: .to("maze9"),
+            .north: .to(.maze6),
+            .east: .to(.maze10),
+            .south: .to(.maze13),
+            .west: .to(.maze12),
+            .northwest: .to(.maze9),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-11
         ]),
         .isLand
     )
 
     static let maze10 = Location(
-        id: "maze10",
+        id: .maze10,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .east: .to("maze9"),
-            .west: .to("maze13"),
-            .up: .to("maze11")
+            .east: .to(.maze9),
+            .west: .to(.maze13),
+            .up: .to(.maze11)
         ]),
         .isLand
     )
 
     static let maze11 = Location(
-        id: "maze11",
+        id: .maze11,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .northeast: .to("gratingRoom"),
-            .down: .to("maze10"),
-            .northwest: .to("maze13"),
-            .southwest: .to("maze12")
+            .northeast: .to(.gratingRoom),
+            .down: .to(.maze10),
+            .northwest: .to(.maze13),
+            .southwest: .to(.maze12)
         ]),
         .isLand
     )
 
     static let gratingRoom = Location(
-        id: "gratingRoom",
+        id: .gratingRoom,
         .name("Grating Room"),
         .description("""
             You are in a small room near the maze. There is a grating overhead, but it is closed.
             """),
         .exits([
-            .southwest: .to("maze11"),
+            .southwest: .to(.maze11),
             // Note: UP exit to grating clearing conditional on grate being open
         ]),
         .isLand,
-        .localGlobals("grate")
+        .localGlobals(.grate)
     )
 
     static let maze12 = Location(
-        id: "maze12",
+        id: .maze12,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .southwest: .to("maze11"),
-            .east: .to("maze13"),
-            .up: .to("maze9"),
-            .north: .to("deadEnd4"),
+            .southwest: .to(.maze11),
+            .east: .to(.maze13),
+            .up: .to(.maze9),
+            .north: .to(.deadEnd4),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-5
         ]),
         .isLand
     )
 
     static let deadEnd4 = Location(
-        id: "deadEnd4",
+        id: .deadEnd4,
         .name("Dead End"),
         .description("""
             You have come to a dead end in the maze.
             """),
         .exits([
-            .south: .to("maze12")
+            .south: .to(.maze12)
         ]),
         .isLand
     )
 
     static let maze13 = Location(
-        id: "maze13",
+        id: .maze13,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .east: .to("maze9"),
-            .down: .to("maze12"),
-            .south: .to("maze10"),
-            .west: .to("maze11")
+            .east: .to(.maze9),
+            .down: .to(.maze12),
+            .south: .to(.maze10),
+            .west: .to(.maze11)
         ]),
         .isLand
     )
 
     static let maze14 = Location(
-        id: "maze14",
+        id: .maze14,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .west: .to("maze15"),
-            .northwest: .to("maze14"),
-            .northeast: .to("maze7"),
-            .south: .to("maze7")
+            .west: .to(.maze15),
+            .northwest: .to(.maze14),
+            .northeast: .to(.maze7),
+            .south: .to(.maze7)
         ]),
         .isLand
     )
 
     static let maze15 = Location(
-        id: "maze15",
+        id: .maze15,
         .name("Maze"),
         .description("""
             This is part of a maze of twisty little passages, all alike.
             """),
         .exits([
-            .west: .to("maze14"),
-            .south: .to("maze7"),
-            .southeast: .to("cyclopsRoom")
+            .west: .to(.maze14),
+            .south: .to(.maze7),
+            .southeast: .to(.cyclopsRoom)
         ]),
         .isLand
     )
@@ -649,22 +384,22 @@ extension Location {
     // MARK: - Cyclops and Hideaway
 
     static let cyclopsRoom = Location(
-        id: "cyclopsRoom",
+        id: .cyclopsRoom,
         .name("Cyclops Room"),
         .description("""
             This is the lair of the cyclops. The smell is terrible, and the floor is littered with bones.
             """),
         .exits([
-            .northwest: .to("maze15"),
+            .northwest: .to(.maze15),
             // Note: EAST exit to strange passage conditional on MAGIC-FLAG
             // Note: UP exit to treasure room conditional on CYCLOPS-FLAG
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let strangePassage = Location(
-        id: "strangePassage",
+        id: .strangePassage,
         .name("Strange Passage"),
         .description("""
             This is a long passage. To the west is one entrance. On the
@@ -672,15 +407,15 @@ extension Location {
             cyclops sized).
             """),
         .exits([
-            .west: .to("cyclopsRoom"),
-            .inside: .to("cyclopsRoom"),
-            .east: .to("livingRoom")
+            .west: .to(.cyclopsRoom),
+            .inside: .to(.cyclopsRoom),
+            .east: .to(.livingRoom)
         ]),
         .isLand
     )
 
     static let treasureRoom = Location(
-        id: "treasureRoom",
+        id: .treasureRoom,
         .name("Treasure Room"),
         .description("""
             This is a large room, whose east wall is solid granite. A number
@@ -688,79 +423,79 @@ extension Location {
             on the floor. There is an exit down a staircase.
             """),
         .exits([
-            .down: .to("cyclopsRoom")
+            .down: .to(.cyclopsRoom)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     // MARK: - Reservoir Area
 
     static let reservoirSouth = Location(
-        id: "reservoirSouth",
+        id: .reservoirSouth,
         .name("Reservoir South"),
         .description("""
             You are in a large chamber with water flowing from the north.
             """),
         .exits([
-            .southeast: .to("deepCanyon"),
-            .southwest: .to("chasmRoom"),
-            .east: .to("damRoom"),
-            .west: .to("streamView"),
+            .southeast: .to(.deepCanyon),
+            .southwest: .to(.chasmRoom),
+            .east: .to(.damRoom),
+            .west: .to(.streamView),
             // Note: NORTH exit to reservoir conditional on LOW-TIDE
         ]),
         .isLand,
-        .localGlobals("globalWater")
+        .localGlobals(.globalWater)
     )
 
     static let reservoir = Location(
-        id: "reservoir",
+        id: .reservoir,
         .name("Reservoir"),
         .description("""
             This is a large reservoir of water.
             """),
         .exits([
-            .north: .to("reservoirNorth"),
-            .south: .to("reservoirSouth"),
-            .up: .to("inStream"),
-            .west: .to("inStream"),
+            .north: .to(.reservoirNorth),
+            .south: .to(.reservoirSouth),
+            .up: .to(.inStream),
+            .west: .to(.inStream),
             // Note: DOWN exit has custom message about dam blocking way
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals("globalWater")
+        .localGlobals(.globalWater)
     )
 
     static let reservoirNorth = Location(
-        id: "reservoirNorth",
+        id: .reservoirNorth,
         .name("Reservoir North"),
         .description("""
             You are in the northern end of the reservoir.
             """),
         .exits([
-            .north: .to("atlantisRoom"),
+            .north: .to(.atlantisRoom),
             // Note: SOUTH exit to reservoir conditional on LOW-TIDE
         ]),
         .isLand,
-        .localGlobals("globalWater", "stairs")
+        .localGlobals(.globalWater, .stairs)
     )
 
     static let streamView = Location(
-        id: "streamView",
+        id: .streamView,
         .name("Stream View"),
         .description("""
             You are standing on a path beside a gently flowing stream. The path
             follows the stream, which flows from west to east.
             """),
         .exits([
-            .east: .to("reservoirSouth"),
+            .east: .to(.reservoirSouth),
             // Note: WEST exit has custom message about stream being too small
         ]),
         .isLand,
-        .localGlobals("globalWater")
+        .localGlobals(.globalWater)
     )
 
     static let inStream = Location(
-        id: "inStream",
+        id: .inStream,
         .name("Stream"),
         .description("""
             You are on the gently flowing stream. The upstream route is too narrow
@@ -770,267 +505,267 @@ extension Location {
         .exits([
             // Note: UP and WEST exits have custom messages about narrow channel
             // Note: LAND exit to stream view
-            .down: .to("reservoir"),
-            .east: .to("reservoir")
+            .down: .to(.reservoir),
+            .east: .to(.reservoir)
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .localGlobals("globalWater")
+        .localGlobals(.globalWater)
     )
 
     // MARK: - Mirror Rooms and Vicinity
 
     static let mirrorRoom1 = Location(
-        id: "mirrorRoom1",
+        id: .mirrorRoom1,
         .name("Mirror Room"),
         .description("""
             You are in a large room with a huge mirror hanging on one wall.
             """),
         .exits([
-            .north: .to("coldPassage"),
-            .west: .to("twistingPassage"),
-            .east: .to("smallCave")
+            .north: .to(.coldPassage),
+            .west: .to(.twistingPassage),
+            .east: .to(.smallCave)
         ]),
         .isLand
     )
 
     static let mirrorRoom2 = Location(
-        id: "mirrorRoom2",
+        id: .mirrorRoom2,
         .name("Mirror Room"),
         .description("""
             You are in a large room with a huge mirror hanging on one wall.
             """),
         .exits([
-            .west: .to("windingPassage"),
-            .north: .to("narrowPassage"),
-            .east: .to("tinyCave")
+            .west: .to(.windingPassage),
+            .north: .to(.narrowPassage),
+            .east: .to(.tinyCave)
         ]),
         .isLand,
         .inherentlyLit
     )
 
     static let smallCave = Location(
-        id: "smallCave",
+        id: .smallCave,
         .name("Cave"),
         .description("""
             This is a tiny cave with entrances west and north, and a staircase
             leading down.
             """),
         .exits([
-            .north: .to("mirrorRoom1"),
-            .down: .to("atlantisRoom"),
-            .south: .to("atlantisRoom"),
-            .west: .to("twistingPassage")
+            .north: .to(.mirrorRoom1),
+            .down: .to(.atlantisRoom),
+            .south: .to(.atlantisRoom),
+            .west: .to(.twistingPassage)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let tinyCave = Location(
-        id: "tinyCave",
+        id: .tinyCave,
         .name("Cave"),
         .description("""
             This is a tiny cave with entrances west and north, and a dark,
             forbidding staircase leading down.
             """),
         .exits([
-            .north: .to("mirrorRoom2"),
-            .west: .to("windingPassage"),
-            .down: .to("entranceToHades")
+            .north: .to(.mirrorRoom2),
+            .west: .to(.windingPassage),
+            .down: .to(.entranceToHades)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let coldPassage = Location(
-        id: "coldPassage",
+        id: .coldPassage,
         .name("Cold Passage"),
         .description("""
             This is a cold and damp corridor where a long east-west passageway
             turns into a southward path.
             """),
         .exits([
-            .south: .to("mirrorRoom1"),
-            .west: .to("slideRoom")
+            .south: .to(.mirrorRoom1),
+            .west: .to(.slideRoom)
         ]),
         .isLand
     )
 
     static let narrowPassage = Location(
-        id: "narrowPassage",
+        id: .narrowPassage,
         .name("Narrow Passage"),
         .description("""
             This is a long and narrow corridor where a long north-south passageway
             briefly narrows even further.
             """),
         .exits([
-            .north: .to("roundRoom"),
-            .south: .to("mirrorRoom2")
+            .north: .to(.roundRoom),
+            .south: .to(.mirrorRoom2)
         ]),
         .isLand
     )
 
     static let windingPassage = Location(
-        id: "windingPassage",
+        id: .windingPassage,
         .name("Winding Passage"),
         .description("""
             This is a winding passage. It seems that there are only exits
             on the east and north.
             """),
         .exits([
-            .north: .to("mirrorRoom2"),
-            .east: .to("tinyCave")
+            .north: .to(.mirrorRoom2),
+            .east: .to(.tinyCave)
         ]),
         .isLand
     )
 
     static let twistingPassage = Location(
-        id: "twistingPassage",
+        id: .twistingPassage,
         .name("Twisting Passage"),
         .description("""
             This is a winding passage. It seems that there are only exits
             on the east and north.
             """),
         .exits([
-            .north: .to("mirrorRoom1"),
-            .east: .to("smallCave")
+            .north: .to(.mirrorRoom1),
+            .east: .to(.smallCave)
         ]),
         .isLand
     )
 
     static let atlantisRoom = Location(
-        id: "atlantisRoom",
+        id: .atlantisRoom,
         .name("Atlantis Room"),
         .description("""
             This is an ancient room, long under water. There is an exit to
             the south and a staircase leading up.
             """),
         .exits([
-            .up: .to("smallCave"),
-            .south: .to("reservoirNorth")
+            .up: .to(.smallCave),
+            .south: .to(.reservoirNorth)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     // MARK: - Round Room and Vicinity
 
     static let ewPassage = Location(
-        id: "ewPassage",
+        id: .ewPassage,
         .name("East-West Passage"),
         .description("""
             This is a narrow east-west passageway. There is a narrow stairway
             leading down at the north end of the room.
             """),
         .exits([
-            .east: .to("roundRoom"),
-            .west: .to("trollRoom"),
-            .down: .to("chasmRoom"),
-            .north: .to("chasmRoom")
+            .east: .to(.roundRoom),
+            .west: .to(.trollRoom),
+            .down: .to(.chasmRoom),
+            .north: .to(.chasmRoom)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let roundRoom = Location(
-        id: "roundRoom",
+        id: .roundRoom,
         .name("Round Room"),
         .description("""
             This is a circular stone room with passages in all directions. Several
             of them have unfortunately been blocked by cave-ins.
             """),
         .exits([
-            .east: .to("loudRoom"),
-            .west: .to("ewPassage"),
-            .north: .to("nsPassage"),
-            .south: .to("narrowPassage"),
-            .southeast: .to("engravingsCave")
+            .east: .to(.loudRoom),
+            .west: .to(.ewPassage),
+            .north: .to(.nsPassage),
+            .south: .to(.narrowPassage),
+            .southeast: .to(.engravingsCave)
         ]),
         .isLand
     )
 
     static let deepCanyon = Location(
-        id: "deepCanyon",
+        id: .deepCanyon,
         .name("Deep Canyon"),
         .description("""
             You are on the south side of a deep canyon.
             """),
         .exits([
-            .northwest: .to("reservoirSouth"),
-            .east: .to("damRoom"),
-            .southwest: .to("nsPassage"),
-            .down: .to("loudRoom")
+            .northwest: .to(.reservoirSouth),
+            .east: .to(.damRoom),
+            .southwest: .to(.nsPassage),
+            .down: .to(.loudRoom)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let dampCave = Location(
-        id: "dampCave",
+        id: .dampCave,
         .name("Damp Cave"),
         .description("""
             This cave has exits to the west and east, and narrows to a crack toward
             the south. The earth is particularly damp here.
             """),
         .exits([
-            .west: .to("loudRoom"),
-            .east: .to("whiteCliffsNorth"),
+            .west: .to(.loudRoom),
+            .east: .to(.whiteCliffsNorth),
             // Note: SOUTH exit has custom message about being too narrow
         ]),
         .isLand,
-        .localGlobals("crack")
+        .localGlobals(.crack)
     )
 
     static let loudRoom = Location(
-        id: "loudRoom",
+        id: .loudRoom,
         .name("Loud Room"),
         .description("""
             This is a room where every sound is amplified.
             """),
         .exits([
-            .east: .to("dampCave"),
-            .west: .to("roundRoom"),
-            .up: .to("deepCanyon")
+            .east: .to(.dampCave),
+            .west: .to(.roundRoom),
+            .up: .to(.deepCanyon)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let nsPassage = Location(
-        id: "nsPassage",
+        id: .nsPassage,
         .name("North-South Passage"),
         .description("""
             This is a high north-south passage, which forks to the northeast.
             """),
         .exits([
-            .north: .to("chasmRoom"),
-            .northeast: .to("deepCanyon"),
-            .south: .to("roundRoom")
+            .north: .to(.chasmRoom),
+            .northeast: .to(.deepCanyon),
+            .south: .to(.roundRoom)
         ]),
         .isLand
     )
 
     static let chasmRoom = Location(
-        id: "chasmRoom",
+        id: .chasmRoom,
         .name("Chasm"),
         .description("""
             A chasm runs southwest to northeast and the path follows it. You are
             on the south side of the chasm, where a crack opens into a passage.
             """),
         .exits([
-            .northeast: .to("reservoirSouth"),
-            .southwest: .to("ewPassage"),
-            .up: .to("ewPassage"),
-            .south: .to("nsPassage"),
+            .northeast: .to(.reservoirSouth),
+            .southwest: .to(.ewPassage),
+            .up: .to(.ewPassage),
+            .south: .to(.nsPassage),
             // Note: DOWN exit has custom message
         ]),
         .isLand,
-        .localGlobals("crack", "stairs")
+        .localGlobals(.crack, .stairs)
     )
 
     // MARK: - Hades Area
 
     static let entranceToHades = Location(
-        id: "entranceToHades",
+        id: .entranceToHades,
         .name("Entrance to Hades"),
         .description("""
             You are outside a large gate. The gate is flanked by a pair of
@@ -1038,16 +773,16 @@ extension Location {
             realm of the dead.
             """),
         .exits([
-            .up: .to("tinyCave"),
+            .up: .to(.tinyCave),
             // Note: IN and SOUTH exits to land of living dead conditional on LLD-FLAG
         ]),
         .isLand,
         .inherentlyLit,
-        .localGlobals("bodies")
+        .localGlobals(.bodies)
     )
 
     static let landOfLivingDead = Location(
-        id: "landOfLivingDead",
+        id: .landOfLivingDead,
         .name("Land of the Dead"),
         .description("""
             You have entered the Land of the Living Dead. Thousands of lost souls
@@ -1056,74 +791,74 @@ extension Location {
             A passage exits to the north.
             """),
         .exits([
-            .outside: .to("entranceToHades"),
-            .north: .to("entranceToHades")
+            .outside: .to(.entranceToHades),
+            .north: .to(.entranceToHades)
         ]),
         .isLand,
         .inherentlyLit,
-        .localGlobals("bodies")
+        .localGlobals(.bodies)
     )
 
     // MARK: - Dome, Temple, Egypt Area
 
     static let engravingsCave = Location(
-        id: "engravingsCave",
+        id: .engravingsCave,
         .name("Engravings Cave"),
         .description("""
             You have entered a low cave with passages leading northwest and east.
             """),
         .exits([
-            .northwest: .to("roundRoom"),
-            .east: .to("domeRoom")
+            .northwest: .to(.roundRoom),
+            .east: .to(.domeRoom)
         ]),
         .isLand
     )
 
     static let egyptRoom = Location(
-        id: "egyptRoom",
+        id: .egyptRoom,
         .name("Egyptian Room"),
         .description("""
             This is a room which looks like an Egyptian tomb. There is an
             ascending staircase to the west.
             """),
         .exits([
-            .west: .to("northTemple"),
-            .up: .to("northTemple")
+            .west: .to(.northTemple),
+            .up: .to(.northTemple)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let domeRoom = Location(
-        id: "domeRoom",
+        id: .domeRoom,
         .name("Dome Room"),
         .description("""
             You are at the top of a large dome.
             """),
         .exits([
-            .west: .to("engravingsCave"),
+            .west: .to(.engravingsCave),
             // Note: DOWN exit to torch room conditional on DOME-FLAG
         ]),
         .isLand
     )
 
     static let torchRoom = Location(
-        id: "torchRoom",
+        id: .torchRoom,
         .name("Torch Room"),
         .description("""
             This is a large room with a white marble pedestal in the center.
             """),
         .exits([
             // Note: UP exit has custom message about not reaching rope
-            .south: .to("northTemple"),
-            .down: .to("northTemple")
+            .south: .to(.northTemple),
+            .down: .to(.northTemple)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let northTemple = Location(
-        id: "northTemple",
+        id: .northTemple,
         .name("Temple"),
         .description("""
             This is the north end of a large temple. On the east wall is an
@@ -1133,21 +868,21 @@ extension Location {
             marble pillars.
             """),
         .exits([
-            .down: .to("egyptRoom"),
-            .east: .to("egyptRoom"),
-            .north: .to("torchRoom"),
-            .outside: .to("torchRoom"),
-            .up: .to("torchRoom"),
-            .south: .to("southTemple")
+            .down: .to(.egyptRoom),
+            .east: .to(.egyptRoom),
+            .north: .to(.torchRoom),
+            .outside: .to(.torchRoom),
+            .up: .to(.torchRoom),
+            .south: .to(.southTemple)
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let southTemple = Location(
-        id: "southTemple",
+        id: .southTemple,
         .name("Altar"),
         .description("""
             This is the south end of a large temple. In front of you is what
@@ -1155,7 +890,7 @@ extension Location {
             which leads into darkness. You probably could not get back up it.
             """),
         .exits([
-            .north: .to("northTemple"),
+            .north: .to(.northTemple),
             // Note: DOWN exit to tiny cave conditional on COFFIN-CURE
         ]),
         .isLand,
@@ -1166,25 +901,25 @@ extension Location {
     // MARK: - Dam Area
 
     static let damRoom = Location(
-        id: "damRoom",
+        id: .damRoom,
         .name("Dam"),
         .description("""
             You are standing on top of the Flood Control Dam #3.
             """),
         .exits([
-            .south: .to("deepCanyon"),
-            .down: .to("damBase"),
-            .east: .to("damBase"),
-            .north: .to("damLobby"),
-            .west: .to("reservoirSouth")
+            .south: .to(.deepCanyon),
+            .down: .to(.damBase),
+            .east: .to(.damBase),
+            .north: .to(.damLobby),
+            .west: .to(.reservoirSouth)
         ]),
         .isLand,
         .inherentlyLit,
-        .localGlobals("globalWater")
+        .localGlobals(.globalWater)
     )
 
     static let damLobby = Location(
-        id: "damLobby",
+        id: .damLobby,
         .name("Dam Lobby"),
         .description("""
             This room appears to have been the waiting room for groups touring
@@ -1192,16 +927,16 @@ extension Location {
             "Private", and there is a path leading south over the top of the dam.
             """),
         .exits([
-            .south: .to("damRoom"),
-            .north: .to("maintenanceRoom"),
-            .east: .to("maintenanceRoom")
+            .south: .to(.damRoom),
+            .north: .to(.maintenanceRoom),
+            .east: .to(.maintenanceRoom)
         ]),
         .isLand,
         .inherentlyLit
     )
 
     static let maintenanceRoom = Location(
-        id: "maintenanceRoom",
+        id: .maintenanceRoom,
         .name("Maintenance Room"),
         .description("""
             This is what appears to have been the maintenance room for Flood
@@ -1211,8 +946,8 @@ extension Location {
             the west and south.
             """),
         .exits([
-            .south: .to("damLobby"),
-            .west: .to("damLobby")
+            .south: .to(.damLobby),
+            .west: .to(.damLobby)
         ]),
         .isLand
     )
@@ -1220,7 +955,7 @@ extension Location {
     // MARK: - River Area
 
     static let damBase = Location(
-        id: "damBase",
+        id: .damBase,
         .name("Dam Base"),
         .description("""
             You are at the base of Flood Control Dam #3, which looms above you
@@ -1230,17 +965,17 @@ extension Location {
             way downstream.
             """),
         .exits([
-            .north: .to("damRoom"),
-            .up: .to("damRoom")
+            .north: .to(.damRoom),
+            .up: .to(.damRoom)
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let river1 = Location(
-        id: "river1",
+        id: .river1,
         .name("Frigid River"),
         .description("""
             You are on the Frigid River in the vicinity of the Dam. The river
@@ -1248,19 +983,19 @@ extension Location {
             """),
         .exits([
             // Note: UP exit has custom message about strong currents
-            .west: .to("damBase"),
+            .west: .to(.damBase),
             // Note: LAND exit to dam base
-            .down: .to("river2"),
+            .down: .to(.river2),
             // Note: EAST exit has custom message about White Cliffs
         ]),
         // Note: This is NONLANDBIT in ZIL
         .isSacred,
         .inherentlyLit,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let river2 = Location(
-        id: "river2",
+        id: .river2,
         .name("Frigid River"),
         .description("""
             The river turns a corner here making it impossible to see the
@@ -1269,16 +1004,16 @@ extension Location {
             """),
         .exits([
             // Note: UP exit has custom message about strong currents
-            .down: .to("river3"),
+            .down: .to(.river3),
             // Note: LAND, EAST, WEST exits have custom messages
         ]),
         // Note: This is NONLANDBIT in ZIL
         .isSacred,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let river3 = Location(
-        id: "river3",
+        id: .river3,
         .name("Frigid River"),
         .description("""
             The river descends here into a valley. There is a narrow beach on the
@@ -1287,16 +1022,16 @@ extension Location {
             """),
         .exits([
             // Note: UP exit has custom message about strong currents
-            .down: .to("river4"),
+            .down: .to(.river4),
             // Note: LAND and WEST exits to white cliffs north
         ]),
         // Note: This is NONLANDBIT in ZIL
         .isSacred,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let whiteCliffsNorth = Location(
-        id: "whiteCliffsNorth",
+        id: .whiteCliffsNorth,
         .name("White Cliffs Beach"),
         .description("""
             You are on a narrow strip of beach which runs along the base of the
@@ -1306,11 +1041,11 @@ extension Location {
         .exits([:]),
         .isLand,
         .isSacred,
-        .localGlobals("globalWater", "whiteCliff", "river")
+        .localGlobals(.globalWater, .whiteCliff, .river)
     )
 
     static let whiteCliffsSouth = Location(
-        id: "whiteCliffsSouth",
+        id: .whiteCliffsSouth,
         .name("White Cliffs Beach"),
         .description("""
             You are on a rocky, narrow strip of beach beside the Cliffs. A
@@ -1319,11 +1054,11 @@ extension Location {
         .exits([:]),
         .isLand,
         .isSacred,
-        .localGlobals("globalWater", "whiteCliff", "river")
+        .localGlobals(.globalWater, .whiteCliff, .river)
     )
 
     static let river4 = Location(
-        id: "river4",
+        id: .river4,
         .name("Frigid River"),
         .description("""
             The river is running faster here and the sound ahead appears to be
@@ -1332,18 +1067,18 @@ extension Location {
             """),
         .exits([
             // Note: UP exit has custom message about strong currents
-            .down: .to("river5"),
+            .down: .to(.river5),
             // Note: LAND exit has custom message
-            .west: .to("whiteCliffsSouth"),
-            .east: .to("sandyBeach")
+            .west: .to(.whiteCliffsSouth),
+            .east: .to(.sandyBeach)
         ]),
         // Note: This is NONLANDBIT in ZIL
         .isSacred,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let river5 = Location(
-        id: "river5",
+        id: .river5,
         .name("Frigid River"),
         .description("""
             The sound of rushing water is nearly unbearable here. On the east
@@ -1351,17 +1086,17 @@ extension Location {
             """),
         .exits([
             // Note: UP exit has custom message about strong currents
-            .east: .to("shore"),
+            .east: .to(.shore),
             // Note: LAND exit to shore
         ]),
         // Note: This is NONLANDBIT in ZIL
         .isSacred,
         .inherentlyLit,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let shore = Location(
-        id: "shore",
+        id: .shore,
         .name("Shore"),
         .description("""
             You are on the east shore of the river. The water here seems somewhat
@@ -1369,17 +1104,17 @@ extension Location {
             quickly turning around a sharp corner.
             """),
         .exits([
-            .north: .to("sandyBeach"),
-            .south: .to("aragainFalls")
+            .north: .to(.sandyBeach),
+            .south: .to(.aragainFalls)
         ]),
         .isLand,
         .isSacred,
         .inherentlyLit,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let sandyBeach = Location(
-        id: "sandyBeach",
+        id: .sandyBeach,
         .name("Sandy Beach"),
         .description("""
             You are on a large sandy beach on the east shore of the river, which is
@@ -1387,28 +1122,28 @@ extension Location {
             a passage is partially buried in sand to the northeast.
             """),
         .exits([
-            .northeast: .to("sandyCave"),
-            .south: .to("shore")
+            .northeast: .to(.sandyCave),
+            .south: .to(.shore)
         ]),
         .isLand,
         .isSacred,
-        .localGlobals("globalWater", "river")
+        .localGlobals(.globalWater, .river)
     )
 
     static let sandyCave = Location(
-        id: "sandyCave",
+        id: .sandyCave,
         .name("Sandy Cave"),
         .description("""
             This is a sand-filled cave whose exit is to the southwest.
             """),
         .exits([
-            .southwest: .to("sandyBeach")
+            .southwest: .to(.sandyBeach)
         ]),
         .isLand
     )
 
     static let aragainFalls = Location(
-        id: "aragainFalls",
+        id: .aragainFalls,
         .name("Aragain Falls"),
         .description("""
             You are at the top of Aragain Falls.
@@ -1416,16 +1151,16 @@ extension Location {
         .exits([
             // Note: WEST and UP exits to rainbow conditional on RAINBOW-FLAG
             // Note: DOWN exit has custom message
-            .north: .to("shore")
+            .north: .to(.shore)
         ]),
         .isLand,
         .isSacred,
         .inherentlyLit,
-        .localGlobals("globalWater", "river", "rainbow")
+        .localGlobals(.globalWater, .river, .rainbow)
     )
 
     static let onRainbow = Location(
-        id: "onRainbow",
+        id: .onRainbow,
         .name("On the Rainbow"),
         .description("""
             You are on top of a rainbow (I bet you never thought you would walk
@@ -1433,17 +1168,17 @@ extension Location {
             travels east-west here.
             """),
         .exits([
-            .west: .to("endOfRainbow"),
-            .east: .to("aragainFalls")
+            .west: .to(.endOfRainbow),
+            .east: .to(.aragainFalls)
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("rainbow")
+        .localGlobals(.rainbow)
     )
 
     static let endOfRainbow = Location(
-        id: "endOfRainbow",
+        id: .endOfRainbow,
         .name("End of Rainbow"),
         .description("""
             You are on a small, rocky beach on the continuation of the Frigid
@@ -1454,15 +1189,15 @@ extension Location {
             """),
         .exits([
             // Note: UP, NE, EAST exits to rainbow conditional on RAINBOW-FLAG
-            .southwest: .to("canyonBottom")
+            .southwest: .to(.canyonBottom)
         ]),
         .isLand,
         .inherentlyLit,
-        .localGlobals("globalWater", "rainbow", "river")
+        .localGlobals(.globalWater, .rainbow, .river)
     )
 
     static let canyonBottom = Location(
-        id: "canyonBottom",
+        id: .canyonBottom,
         .name("Canyon Bottom"),
         .description("""
             You are beneath the walls of the river canyon which may be climbable
@@ -1470,17 +1205,17 @@ extension Location {
             To the north is a narrow path.
             """),
         .exits([
-            .up: .to("cliffMiddle"),
-            .north: .to("endOfRainbow")
+            .up: .to(.cliffMiddle),
+            .north: .to(.endOfRainbow)
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("globalWater", "climbableCliff", "river")
+        .localGlobals(.globalWater, .climbableCliff, .river)
     )
 
     static let cliffMiddle = Location(
-        id: "cliffMiddle",
+        id: .cliffMiddle,
         .name("Rocky Ledge"),
         .description("""
             You are on a ledge about halfway up the wall of the river canyon.
@@ -1490,17 +1225,17 @@ extension Location {
             climbable.
             """),
         .exits([
-            .up: .to("canyonView"),
-            .down: .to("canyonBottom")
+            .up: .to(.canyonView),
+            .down: .to(.canyonBottom)
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("climbableCliff", "river")
+        .localGlobals(.climbableCliff, .river)
     )
 
     static let canyonView = Location(
-        id: "canyonView",
+        id: .canyonView,
         .name("Canyon View"),
         .description("""
             You are at the top of the Great Canyon on its west wall. From here
@@ -1514,22 +1249,22 @@ extension Location {
             the canyon from here.
             """),
         .exits([
-            .east: .to("cliffMiddle"),
-            .down: .to("cliffMiddle"),
-            .northwest: .to("clearing"),
-            .west: .to("forest3"),
+            .east: .to(.cliffMiddle),
+            .down: .to(.cliffMiddle),
+            .northwest: .to(.clearing),
+            .west: .to(.forest3),
             // Note: SOUTH exit has custom message
         ]),
         .isLand,
         .inherentlyLit,
         .isSacred,
-        .localGlobals("climbableCliff", "river", "rainbow")
+        .localGlobals(.climbableCliff, .river, .rainbow)
     )
 
     // MARK: - Coal Mine Area
 
     static let mineEntrance = Location(
-        id: "mineEntrance",
+        id: .mineEntrance,
         .name("Mine Entrance"),
         .description("""
             You are standing at the entrance of what might have been a coal mine.
@@ -1537,43 +1272,43 @@ extension Location {
             end of the room.
             """),
         .exits([
-            .south: .to("slideRoom"),
-            .inside: .to("squeakyRoom"),
-            .west: .to("squeakyRoom")
+            .south: .to(.slideRoom),
+            .inside: .to(.squeakyRoom),
+            .west: .to(.squeakyRoom)
         ]),
         .isLand
     )
 
     static let squeakyRoom = Location(
-        id: "squeakyRoom",
+        id: .squeakyRoom,
         .name("Squeaky Room"),
         .description("""
             You are in a small room. Strange squeaky sounds may be heard coming
             from the passage at the north end. You may also escape to the east.
             """),
         .exits([
-            .north: .to("batRoom"),
-            .east: .to("mineEntrance")
+            .north: .to(.batRoom),
+            .east: .to(.mineEntrance)
         ]),
         .isLand
     )
 
     static let batRoom = Location(
-        id: "batRoom",
+        id: .batRoom,
         .name("Bat Room"),
         .description("""
             You are in a room infested with bats. Strange squeaky sounds fill the air.
             """),
         .exits([
-            .south: .to("squeakyRoom"),
-            .east: .to("shaftRoom")
+            .south: .to(.squeakyRoom),
+            .east: .to(.shaftRoom)
         ]),
         .isLand,
         .isSacred
     )
 
     static let shaftRoom = Location(
-        id: "shaftRoom",
+        id: .shaftRoom,
         .name("Shaft Room"),
         .description("""
             This is a large room, in the middle of which is a small shaft
@@ -1583,14 +1318,14 @@ extension Location {
             """),
         .exits([
             // Note: DOWN exit has custom message
-            .west: .to("batRoom"),
-            .north: .to("smellyRoom")
+            .west: .to(.batRoom),
+            .north: .to(.smellyRoom)
         ]),
         .isLand
     )
 
     static let smellyRoom = Location(
-        id: "smellyRoom",
+        id: .smellyRoom,
         .name("Smelly Room"),
         .description("""
             This is a small nondescript room. However, from the direction
@@ -1598,31 +1333,31 @@ extension Location {
             south is a narrow tunnel.
             """),
         .exits([
-            .down: .to("gasRoom"),
-            .south: .to("shaftRoom")
+            .down: .to(.gasRoom),
+            .south: .to(.shaftRoom)
         ]),
         .isLand,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let gasRoom = Location(
-        id: "gasRoom",
+        id: .gasRoom,
         .name("Gas Room"),
         .description("""
             This is a small room which smells strongly of coal gas. There is a
             short climb up some stairs and a narrow tunnel leading east.
             """),
         .exits([
-            .up: .to("smellyRoom"),
-            .east: .to("mine1")
+            .up: .to(.smellyRoom),
+            .east: .to(.mine1)
         ]),
         .isLand,
         .isSacred,
-        .localGlobals("stairs")
+        .localGlobals(.stairs)
     )
 
     static let ladderTop = Location(
-        id: "ladderTop",
+        id: .ladderTop,
         .name("Ladder Top"),
         .description("""
             This is a very small room. In the corner is a rickety wooden
@@ -1630,15 +1365,15 @@ extension Location {
             also a staircase leading upward.
             """),
         .exits([
-            .down: .to("ladderBottom"),
-            .up: .to("mine4")
+            .down: .to(.ladderBottom),
+            .up: .to(.mine4)
         ]),
         .isLand,
-        .localGlobals("ladder", "stairs")
+        .localGlobals(.ladder, .stairs)
     )
 
     static let ladderBottom = Location(
-        id: "ladderBottom",
+        id: .ladderBottom,
         .name("Ladder Bottom"),
         .description("""
             This is a rather wide room. On one side is the bottom of a
@@ -1646,28 +1381,28 @@ extension Location {
             leaving the room.
             """),
         .exits([
-            .south: .to("deadEnd5"),
-            .west: .to("timberRoom"),
-            .up: .to("ladderTop")
+            .south: .to(.deadEnd5),
+            .west: .to(.timberRoom),
+            .up: .to(.ladderTop)
         ]),
         .isLand,
-        .localGlobals("ladder")
+        .localGlobals(.ladder)
     )
 
     static let deadEnd5 = Location(
-        id: "deadEnd5",
+        id: .deadEnd5,
         .name("Dead End"),
         .description("""
             You have come to a dead end in the mine.
             """),
         .exits([
-            .north: .to("ladderBottom")
+            .north: .to(.ladderBottom)
         ]),
         .isLand
     )
 
     static let timberRoom = Location(
-        id: "timberRoom",
+        id: .timberRoom,
         .name("Timber Room"),
         .description("""
             This is a long and narrow passage, which is cluttered with broken
@@ -1676,7 +1411,7 @@ extension Location {
             comes a strong draft.
             """),
         .exits([
-            .east: .to("ladderBottom"),
+            .east: .to(.ladderBottom),
             // Note: WEST exit to lower shaft conditional on EMPTY-HANDED
         ]),
         .isLand,
@@ -1684,7 +1419,7 @@ extension Location {
     )
 
     static let lowerShaft = Location(
-        id: "lowerShaft",
+        id: .lowerShaft,
         .name("Drafty Room"),
         .description("""
             This is a small drafty room in which is the bottom of a long
@@ -1692,7 +1427,7 @@ extension Location {
             passage. In the shaft can be seen a heavy iron chain.
             """),
         .exits([
-            .south: .to("machineRoom"),
+            .south: .to(.machineRoom),
             // Note: OUT and EAST exits to timber room conditional on EMPTY-HANDED
         ]),
         .isLand,
@@ -1700,13 +1435,13 @@ extension Location {
     )
 
     static let machineRoom = Location(
-        id: "machineRoom",
+        id: .machineRoom,
         .name("Machine Room"),
         .description("""
             This room contains a large machine.
             """),
         .exits([
-            .north: .to("lowerShaft")
+            .north: .to(.lowerShaft)
         ]),
         .isLand
     )
@@ -1714,63 +1449,63 @@ extension Location {
     // MARK: - Coal Mine Proper
 
     static let mine1 = Location(
-        id: "mine1",
+        id: .mine1,
         .name("Coal Mine"),
         .description("""
             This is a nondescript part of a coal mine.
             """),
         .exits([
-            .north: .to("gasRoom"),
-            .east: .to("mine1"),
-            .northeast: .to("mine2")
+            .north: .to(.gasRoom),
+            .east: .to(.mine1),
+            .northeast: .to(.mine2)
         ]),
         .isLand
     )
 
     static let mine2 = Location(
-        id: "mine2",
+        id: .mine2,
         .name("Coal Mine"),
         .description("""
             This is a nondescript part of a coal mine.
             """),
         .exits([
-            .north: .to("mine2"),
-            .south: .to("mine1"),
-            .southeast: .to("mine3")
+            .north: .to(.mine2),
+            .south: .to(.mine1),
+            .southeast: .to(.mine3)
         ]),
         .isLand
     )
 
     static let mine3 = Location(
-        id: "mine3",
+        id: .mine3,
         .name("Coal Mine"),
         .description("""
             This is a nondescript part of a coal mine.
             """),
         .exits([
-            .south: .to("mine3"),
-            .southwest: .to("mine4"),
-            .east: .to("mine2")
+            .south: .to(.mine3),
+            .southwest: .to(.mine4),
+            .east: .to(.mine2)
         ]),
         .isLand
     )
 
     static let mine4 = Location(
-        id: "mine4",
+        id: .mine4,
         .name("Coal Mine"),
         .description("""
             This is a nondescript part of a coal mine.
             """),
         .exits([
-            .north: .to("mine3"),
-            .west: .to("mine4"),
-            .down: .to("ladderTop")
+            .north: .to(.mine3),
+            .west: .to(.mine4),
+            .down: .to(.ladderTop)
         ]),
         .isLand
     )
 
     static let slideRoom = Location(
-        id: "slideRoom",
+        id: .slideRoom,
         .name("Slide Room"),
         .description("""
             This is a small chamber, which appears to have been part of a
@@ -1780,11 +1515,11 @@ extension Location {
             a small opening.
             """),
         .exits([
-            .east: .to("coldPassage"),
-            .north: .to("mineEntrance"),
-            .down: .to("cellar")
+            .east: .to(.coldPassage),
+            .north: .to(.mineEntrance),
+            .down: .to(.cellar)
         ]),
         .isLand,
-        .localGlobals("slide")
+        .localGlobals(.slide)
     )
 }

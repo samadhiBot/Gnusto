@@ -3,23 +3,22 @@ import GnustoEngine
 // MARK: - Outside the White House
 
 enum OutsideHouse {
-    static let eastOfHouse = Location(
-        id: .eastOfHouse,
+    static let behindHouse = Location(
+        id: .behindHouse,
         .name("Behind House"),
         .description("""
-            You are behind the white house. A path leads into the forest to the east. In one
-            corner of the house there is a small window which is slightly ajar.
+            You are behind the white house. A path leads into the forest to
+            the east. In one corner of the house there is a small window which
+            is slightly ajar.
             """),
         .exits([
             .north: .to(.northOfHouse),
             .south: .to(.southOfHouse),
-            .west: Exit(
-                destination: .kitchen,
-                doorID: .kitchenWindow
-            ),
+            .west: .to(.kitchen, via: .kitchenWindow),
             .northwest: .to(.northOfHouse),
             .southwest: .to(.southOfHouse),
             .east: .to(.clearing),
+            .inside: .to(.kitchen, via: .kitchenWindow),
         ]),
         .inherentlyLit,
         .localGlobals(.boards)
@@ -29,38 +28,52 @@ enum OutsideHouse {
         id: .northOfHouse,
         .name("North of House"),
         .description("""
-            You are facing the north side of a white house. There is no door here, and all the
-            windows are boarded up. To the north a narrow path winds through the trees.
+            You are facing the north side of a white house. There is no door here,
+            and all the windows are boarded up. To the north a narrow path winds 
+            through the trees.
             """),
         .exits([
-            .south: .to(.westOfHouse),
-            .west: .to(.westOfHouse),
-            .east: .to(.eastOfHouse),
-            .southeast: .to(.southOfHouse),
             .southwest: .to(.westOfHouse),
+            .southeast: .to(.behindHouse),
+            .west: .to(.westOfHouse),
+            .east: .to(.behindHouse),
             .north: .to(.path),
+            // Note: SOUTH exit has custom message about boarded windows
         ]),
         .inherentlyLit,
-        .localGlobals(.boards)
+        .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
     )
 
     static let southOfHouse = Location(
         id: .southOfHouse,
         .name("South of House"),
         .description("""
-            You are facing the south side of a white house. There is no door here, and all the
-            windows are boarded.
+            You are facing the south side of a white house. There is no door here,
+            and all the windows are boarded.
             """),
         .exits([
-            .north: .to(.westOfHouse),
             .west: .to(.westOfHouse),
-            .east: .to(.eastOfHouse),
-            .northeast: .to(.westOfHouse),
+            .east: .to(.behindHouse),
+            .northeast: .to(.behindHouse),
             .northwest: .to(.westOfHouse),
-            .southeast: .to(.eastOfHouse),
+            .south: .to(.forest3),
+            // Note: NORTH exit has custom message about boarded windows
         ]),
         .inherentlyLit,
-        .localGlobals(.boards)
+        .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
+    )
+
+    static let stoneBarrow = Location(
+        id: .stoneBarrow,
+        .name("Stone Barrow"),
+        .description("""
+            You are standing in front of a massive barrow of stone. In the east face
+            is a huge stone door which is open. You cannot see into the dark of the tomb.
+            """),
+        .exits([
+            .northeast: .to(.westOfHouse)
+        ]),
+        .inherentlyLit
     )
 
     static let westOfHouse = Location(
@@ -75,10 +88,11 @@ enum OutsideHouse {
             .northeast: .to(.northOfHouse),
             .southeast: .to(.southOfHouse),
             .west: .to(.forest1),
+            // Note: SW and IN exits to Stone Barrow conditional on WON-FLAG
             .east: .blocked("The door is boarded and you can't remove the boards."),
         ]),
         .inherentlyLit,
-        .localGlobals(.boards)
+        .localGlobals(.whiteHouse, .board, .forest)
     )
 }
 
@@ -118,7 +132,7 @@ extension OutsideHouse {
         .description("The window is slightly ajar, but not enough to allow entry."),
         .adjectives("kitchen", "small"),
         .synonyms("window"),
-        .in(.location(.eastOfHouse)),
+        .in(.location(.behindHouse)),
         .isOpenable,
         .isScenery
     )

@@ -21,150 +21,142 @@ enum Forest {
         .localGlobals(.forest)
     )
 
-    static let clearing1 = Location(
-        id: .clearing1,
-        .name("Clearing"),
-        .description("""
-            You are in a clearing, with a forest surrounding you on all
-            sides. A path leads south.
-            """),
-        .exits([
-            .down: .blocked("GRATING PUZZLE"),
-            .east: .to(.forest2),
-            .south: .to(.forestPath),
-            .west: .to(.forest1),
-        ]),
-        .inherentlyLit,
-        .localGlobals(.forest)
-    )
-
-    static let clearing2 = Location(
-        id: .clearing2,
+    static let clearing = Location(
+        id: .clearing,
         .name("Clearing"),
         .description("""
             You are in a small clearing in a well marked forest path that
             extends to the east and west.
             """),
         .exits([
-            .up: .blocked("There is no tree here suitable for climbing."),
             .east: .to(.canyonView),
             .north: .to(.forest2),
             .south: .to(.forest3),
-            .west: .to(.eastOfHouse),
+            .west: .to(.behindHouse),
+            .up: .blocked("There is no tree here suitable for climbing."),
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
     )
 
     static let forest1 = Location(
         id: .forest1,
         .name("Forest"),
-        .description("This is a forest, with trees in all directions. To the east, there appears to be sunlight."),
+        .description("""
+            This is a forest, with trees in all directions. To the east,
+            there appears to be sunlight.
+            """),
         .exits([
+            .north: .to(.gratingClearing),
             .east: .to(.forestPath),
-            .north: .to(.clearing),
             .south: .to(.forest3),
+            // Note: UP and WEST exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
     )
 
     static let forest2 = Location(
         id: .forest2,
         .name("Forest"),
-        .description("This is a dimly lit forest, with large trees all around."),
+        .description("""
+            This is a dimly lit forest, with large trees all around.
+            """),
         .exits([
-            .south: .to(.forest1),
-            .east: .to(.forest3),
-            .west: .to(.forestPath)
+            .east: .to(.mountains),
+            .south: .to(.clearing),
+            .west: .to(.forestPath),
+            // Note: UP and NORTH exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
     )
 
     static let forest3 = Location(
         id: .forest3,
         .name("Forest"),
-        .description("This is a dimly lit forest, with large trees all around."),
+        .description("""
+            This is a dimly lit forest, with large trees all around.
+            """),
         .exits([
-            .west: .to(.forest2),
-            .north: .to(.mountains),
+            .north: .to(.clearing),
+            .west: .to(.forest1),
+            .northwest: .to(.southOfHouse),
+            // Note: UP, EAST, and SOUTH exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
-    )
-
-    static let forest4 = Location(
-        id: .forest4,
-        .name("Forest"),
-        .description("This is a dimly lit forest, with large trees all around."),
-        .exits([
-            .west: .to(.forest2),
-            .north: .to(.mountains),
-        ]),
-        .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
     )
 
     static let forestPath = Location(
         id: .forestPath,
         .name("Forest Path"),
         .description("""
-            This is a path winding through a dimly lit forest.The path
-            heads north-south here. One particularly large tree with some
-            low branches stands at the edge of the path.
+            This is a path winding through a dimly lit forest. The path heads
+            north-south here. One particularly large tree with some low branches
+            stands at the edge of the path.
             """),
         .exits([
+            .up: .to(.upATree),
+            .north: .to(.gratingClearing),
+            .east: .to(.forest2),
             .south: .to(.northOfHouse),
-            //            .east: .to(.westOfHouse),
-            //            .north: .to(.forest2),
+            .west: .to(.forest1)
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+    )
+
+    static let gratingClearing = Location(
+        id: .gratingClearing,
+        .name("Clearing"),
+        .description("""
+            You are in a clearing, with a forest surrounding you on all sides.
+            A path leads south.
+            """),
+        .exits([
+            .east: .to(.forest2),
+            .west: .to(.forest1),
+            .south: .to(.forestPath),
+            // Note: NORTH exit has custom message
+            // Note: DOWN exit has special condition handling via GRATING-EXIT
+        ]),
+        .inherentlyLit,
+        .localGlobals(.whiteHouse, .grate)
     )
 
     static let mountains = Location(
         id: .mountains,
         .name("Forest"),
-        .description("The forest thins out, revealing impassable mountains."),
+        .description("""
+            The forest thins out, revealing impassable mountains.
+            """),
         .exits([
-            .south: .to(.forest3),
+            .north: .to(.forest2),
+            .south: .to(.forest2),
+            .west: .to(.forest2),
+            // Note: UP and EAST exits have custom messages about impassable mountains
             .east: .blocked("The mountains are impassable."),
             .north: .blocked("The forest becomes impenetrable to the north."),
             .west: .blocked("The mountains are impassable."),
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
-    )
-
-    static let path = Location(
-        id: .path,
-        .name("Forest Path"),
-        .description("""
-            This is a path winding through a dimly lit forest. The path heads north-south here.
-            One particularly large tree with some low branches stands at the edge of the path.
-            """),
-        .exits([
-            .north: .to(.forest1),
-            .south: .to(.northOfHouse),
-            .up: .to(.upATree),
-        ]),
-        .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .whiteHouse)
     )
 
     static let upATree = Location(
         id: .upATree,
         .name("Up a Tree"),
         .description("""
-            You are about 10 feet above the ground nestled among some large branches. The
-            nearest branch above you is above your reach.
+            You are about 10 feet above the ground nestled among some large branches. 
+            The nearest branch above you is above your reach.
             """),
         .exits([
-            .down: .to(.path),
+            .down: .to(.forestPath),
+            // Note: UP exit has custom message
         ]),
         .inherentlyLit,
-        .localGlobals(.forest)
+        .localGlobals(.tree, .forest, .songbird, .whiteHouse)
     )
 
     // MARK: - Items
