@@ -154,7 +154,21 @@ public actor GameEngine: Sendable {
         )
         self.parser = parser
         self.ioHandler = ioHandler
-        self.dynamicAttributeRegistry = blueprint.dynamicAttributeRegistry
+
+        // Initialize the dynamic attribute registry and populate it with compute handlers from the blueprint
+        var registry = blueprint.dynamicAttributeRegistry
+        for (itemID, attributeHandlers) in blueprint.itemComputeHandlers {
+            for (attributeID, handler) in attributeHandlers {
+                registry.registerItemCompute(itemID: itemID, attributeID: attributeID, handler: handler)
+            }
+        }
+        for (locationID, attributeHandlers) in blueprint.locationComputeHandlers {
+            for (attributeID, handler) in attributeHandlers {
+                registry.registerLocationCompute(locationID: locationID, attributeID: attributeID, handler: handler)
+            }
+        }
+        self.dynamicAttributeRegistry = registry
+
         self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }
         self.itemEventHandlers = blueprint.itemEventHandlers

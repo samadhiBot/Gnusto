@@ -374,6 +374,72 @@ struct DynamicPropertyTests {
         #expect(updatedLocation?.attributes[.description] == StateValue.string("New dynamic description"))
     }
 
+    @Test("GameBlueprint item compute handlers integration")
+    func testGameBlueprintItemComputeHandlersIntegration() async throws {
+        let testItem = Item(
+            id: "testItem",
+            .name("magic sword"),
+            .in(.location("testLocation"))
+        )
+
+        let testLocation = Location(
+            id: "testLocation",
+            .name("Test Chamber")
+        )
+
+        let game = MinimalGame(
+            locations: [testLocation],
+            items: [testItem],
+            itemComputeHandlers: [
+                "testItem": [
+                    .description: { item, gameState in
+                        return .string("This sword glows with \(item.name) energy!")
+                    }
+                ]
+            ]
+        )
+        let mockIO = await MockIOHandler()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
+
+            // Fetch the dynamic description
+    let description: String = try await engine.attribute(.description, of: ItemID("testItem"))
+    #expect(description == "This sword glows with magic sword energy!")
+    }
+
+    @Test("GameBlueprint location compute handlers integration")
+    func testGameBlueprintLocationComputeHandlersIntegration() async throws {
+        let testLocation = Location(
+            id: "testLocation",
+            .name("Magic Chamber"),
+            .description("Static description")
+        )
+
+        let game = MinimalGame(
+            locations: [testLocation],
+            locationComputeHandlers: [
+                "testLocation": [
+                    .description: { location, gameState in
+                        return .string("The \(location.name) sparkles with mystical energy!")
+                    }
+                ]
+            ]
+        )
+        let mockIO = await MockIOHandler()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
+
+            // Fetch the dynamic description
+    let description: String = try await engine.attribute(.description, of: LocationID("testLocation"))
+    #expect(description == "The Magic Chamber sparkles with mystical energy!")
+    }
+
     // MARK: - Type-Specific Convenience Tests
 
     @Test("Set Item Int and String Attributes")
@@ -462,20 +528,20 @@ struct DynamicPropertyTests {
     @Test("Complex Validation - Troll Fighting Logic")
     func testComplexValidationTrollFighting() async throws {
         var registry = DynamicAttributeRegistry()
-        
+
         // Complex validation: Troll can only stop fighting if unconscious OR doesn't have weapon
         registry.registerItemValidate(itemID: "troll", attributeID: "fighting") { item, newValue in
             guard case .bool(let fighting) = newValue else { return false }
-            
+
             // If trying to set fighting to false, check conditions
             if !fighting {
                 let hasWeapon = item.attributes["hasWeapon"] == .bool(true)
                 let isUnconscious = item.attributes["unconscious"] == .bool(true)
-                
+
                 // Can only stop fighting if unconscious OR doesn't have weapon
                 return isUnconscious || !hasWeapon
             }
-            
+
             // Always allow setting fighting to true
             return true
         }
@@ -508,7 +574,7 @@ struct DynamicPropertyTests {
         if let change = await engine.setAttribute("hasWeapon", on: trollItem, to: true) {
             try await engine.apply(change)
         }
-        
+
         let trollWithWeapon = try await engine.item("troll")
         if let change = await engine.setAttribute("fighting", on: trollWithWeapon, to: true) {
             try await engine.apply(change)
@@ -527,7 +593,7 @@ struct DynamicPropertyTests {
         if let change = await engine.setAttribute("unconscious", on: consciousTroll, to: true) {
             try await engine.apply(change)
         }
-        
+
         let unconsciousTroll = try await engine.item("troll")
         if let change = await engine.setAttribute("fighting", on: unconsciousTroll, to: false) {
             try await engine.apply(change)

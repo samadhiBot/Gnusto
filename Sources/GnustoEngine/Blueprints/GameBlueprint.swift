@@ -91,6 +91,56 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
 
+    /// Dynamic compute handlers for item attributes, organized by item and attribute.
+    ///
+    /// This allows you to define custom logic for computing item attributes at runtime.
+    /// Each handler receives the `Item` instance and current `GameState`, returning
+    /// a computed `StateValue`. Common use cases include dynamic descriptions that
+    /// change based on game state, calculated properties, or conditional attributes.
+    ///
+    /// Example usage:
+    /// ```swift
+    /// var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {
+    ///     [
+    ///         .magicSword: [
+    ///             .description: { item, gameState in
+    ///                 let enchantment = item.attributes["enchantmentLevel"]?.toInt ?? 0
+    ///                 let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
+    ///                 return .string(desc)
+    ///             }
+    ///         ]
+    ///     ]
+    /// }
+    /// ```
+    ///
+    /// The default implementation provides an empty dictionary.
+    var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] { get }
+
+    /// Dynamic compute handlers for location attributes, organized by location and attribute.
+    ///
+    /// This allows you to define custom logic for computing location attributes at runtime.
+    /// Each handler receives the `Location` instance and current `GameState`, returning
+    /// a computed `StateValue`. Common use cases include dynamic descriptions that
+    /// change based on game state, environmental conditions, or player actions.
+    ///
+    /// Example usage:
+    /// ```swift
+    /// var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {
+    ///     [
+    ///         .magicRoom: [
+    ///             .description: { location, gameState in
+    ///                 let isEnchanted = gameState.globalState["roomEnchanted"] == true
+    ///                 let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
+    ///                 return .string(desc)
+    ///             }
+    ///         ]
+    ///     ]
+    /// }
+    /// ```
+    ///
+    /// The default implementation provides an empty dictionary.
+    var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] { get }
+
     /// The registry containing handlers for dynamically computing or validating
     /// item and location attributes.
     ///
@@ -130,6 +180,14 @@ extension GameBlueprint {
     }
 
     public var daemonDefinitions: [DaemonID: DaemonDefinition] {
+        [:]
+    }
+
+    public var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {
+        [:]
+    }
+
+    public var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {
         [:]
     }
 

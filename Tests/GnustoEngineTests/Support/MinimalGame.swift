@@ -12,6 +12,8 @@ public struct MinimalGame: GameBlueprint {
     public var locationEventHandlers: [LocationID: LocationEventHandler]
     public var fuseDefinitions: [FuseID: FuseDefinition]
     public var daemonDefinitions: [DaemonID: DaemonDefinition]
+    public var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]]
+    public var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]]
     public var dynamicAttributeRegistry: DynamicAttributeRegistry
 
     public init(
@@ -50,6 +52,8 @@ public struct MinimalGame: GameBlueprint {
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
+        itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] = [:],
+        locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] = [:],
         dynamicAttributeRegistry: DynamicAttributeRegistry = DynamicAttributeRegistry()
     ) {
         self.constants = constants
@@ -65,6 +69,8 @@ public struct MinimalGame: GameBlueprint {
         self.daemonDefinitions = Dictionary(
             uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
         )
+        self.itemComputeHandlers = itemComputeHandlers
+        self.locationComputeHandlers = locationComputeHandlers
         self.dynamicAttributeRegistry = dynamicAttributeRegistry
     }
 }

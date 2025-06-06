@@ -137,7 +137,7 @@ struct CodeGenerator {
             }
 
             // Only generate extension if there's content
-            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty {
+            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || hasComputeHandlersToGenerate(gameData) {
                 output.append("extension \(gameBlueprintType) {")
 
                 // Generate items property
@@ -296,10 +296,72 @@ struct CodeGenerator {
                     extensionLines.append("")
                 }
 
+                // Generate itemComputeHandlers property (scaffolding)
+                if hasItemsToGenerate(gameData) {
+                    extensionLines.append("    // TODO: Add compute handlers for dynamic item attributes")
+                    extensionLines.append("    // Example:")
+                    extensionLines.append("    // var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {")
+                    extensionLines.append("    //     [")
+                    for itemProperty in gameData.items.sorted().prefix(3) {
+                        extensionLines.append("    //         .\(extractItemID(from: itemProperty)): [")
+                        extensionLines.append("    //             .description: { item, gameState in")
+                        extensionLines.append("    //                 return .string(\"Dynamic description for \\(item.name)\")")
+                        extensionLines.append("    //             }")
+                        extensionLines.append("    //         ],")
+                    }
+                    extensionLines.append("    //     ]")
+                    extensionLines.append("    // }")
+                    extensionLines.append("")
+                }
+
+                // Generate locationComputeHandlers property (scaffolding)
+                if hasLocationsToGenerate(gameData) {
+                    extensionLines.append("    // TODO: Add compute handlers for dynamic location attributes")
+                    extensionLines.append("    // Example:")
+                    extensionLines.append("    // var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {")
+                    extensionLines.append("    //     [")
+                    for locationProperty in gameData.locations.sorted().prefix(3) {
+                        extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): [")
+                        extensionLines.append("    //             .description: { location, gameState in")
+                        extensionLines.append("    //                 return .string(\"Dynamic description for \\(location.name)\")")
+                        extensionLines.append("    //             }")
+                        extensionLines.append("    //         ],")
+                    }
+                    extensionLines.append("    //     ]")
+                    extensionLines.append("    // }")
+                    extensionLines.append("")
+                }
+
                 output.append(contentsOf: extensionLines)
                 output.append("}")
                 output.append("")
             }
         }
+    }
+
+    // MARK: - Helper methods
+
+    private func hasComputeHandlersToGenerate(_ gameData: GameData) -> Bool {
+        return hasItemsToGenerate(gameData) || hasLocationsToGenerate(gameData)
+    }
+
+    private func hasItemsToGenerate(_ gameData: GameData) -> Bool {
+        return !gameData.items.isEmpty
+    }
+
+    private func hasLocationsToGenerate(_ gameData: GameData) -> Bool {
+        return !gameData.locations.isEmpty
+    }
+
+    private func extractItemID(from propertyName: String) -> String {
+        // Try to extract the likely ItemID from the property name
+        // e.g., "magicSword" -> "magicSword", "sword" -> "sword"
+        return propertyName
+    }
+
+    private func extractLocationID(from propertyName: String) -> String {
+        // Try to extract the likely LocationID from the property name
+        // e.g., "livingRoom" -> "livingRoom", "room" -> "room"
+        return propertyName
     }
 }

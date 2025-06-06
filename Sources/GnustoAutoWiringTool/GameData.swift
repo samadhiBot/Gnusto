@@ -15,6 +15,8 @@ struct GameData {
     var gameAreaTypes: Set<String> = []
     var itemEventHandlers: Set<String> = []
     var locationEventHandlers: Set<String> = []
+    var itemComputeHandlers: Set<String> = []
+    var locationComputeHandlers: Set<String> = []
     var customActionHandlers: Set<String> = []
     var fuseDefinitions: Set<String> = []
     var daemonDefinitions: Set<String> = []

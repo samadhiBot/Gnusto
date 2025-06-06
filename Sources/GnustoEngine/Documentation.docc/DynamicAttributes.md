@@ -6,9 +6,107 @@ Learn how to use dynamic attributes and validation handlers to create sophistica
 
 The Gnusto Engine's dynamic attribute system allows you to create attributes that are computed at runtime or validated when changed. This enables complex game mechanics similar to those found in classic ZIL-based interactive fiction games like Zork.
 
-> **Note**: If you're using the GnustoAutoWiringPlugin, dynamic attribute registrations in your code (like `registerItemCompute(itemID: .sword, attribute: .sharpness)`) are automatically discovered and set up for you. You can focus on writing the logic while the plugin handles the wiring.
+There are two ways to define compute handlers:
+
+1. **GameBlueprint Properties** (Recommended): Define compute handlers directly in your `GameBlueprint` using the `itemComputeHandlers` and `locationComputeHandlers` properties.
+2. **Runtime Registration**: Register compute handlers at runtime using the `registerItemCompute` and `registerLocationCompute` methods.
+
+> **Note**: If you're using the GnustoAutoWiringPlugin, it will generate helpful scaffolding for the GameBlueprint approach, including commented examples for your items and locations.
 
 **Important**: All attribute changes must flow through the action pipeline using `StateChange` builders. This ensures proper validation, event handling, and consistency.
+
+## GameBlueprint Approach (Recommended)
+
+### Defining Compute Handlers in GameBlueprint
+
+The preferred way to define compute handlers is directly in your `GameBlueprint`:
+
+```swift
+struct MyGameBlueprint: GameBlueprint {
+    // ... other blueprint properties
+
+    var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {
+        [
+            .magicSword: [
+                .description: { item, gameState in
+                    let enchantment = item.attributes["enchantmentLevel"]?.toInt ?? 0
+                    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
+                    return .string(desc)
+                }
+            ],
+            .weatherVane: [
+                .direction: { item, gameState in
+                    let windDirection = gameState.globalState["windDirection"]?.toString ?? "north"
+                    return .string(windDirection)
+                }
+            ]
+        ]
+    }
+
+    var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {
+        [
+            .magicRoom: [
+                .description: { location, gameState in
+                    let isEnchanted = gameState.globalState["roomEnchanted"] == true
+                    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
+                    return .string(desc)
+                }
+            ]
+        ]
+    }
+}
+```
+
+### Auto-Generated Scaffolding
+
+When using the GnustoAutoWiringPlugin, it will generate helpful scaffolding in your GameBlueprint extension:
+
+```swift
+extension MyGameBlueprint {
+    // TODO: Add compute handlers for dynamic item attributes
+    // Example:
+    // var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {
+    //     [
+    //         .sword: [
+    //             .description: { item, gameState in
+    //                 return .string("Dynamic description for \(item.name)")
+    //             }
+    //         ],
+    //     ]
+    // }
+
+    // TODO: Add compute handlers for dynamic location attributes
+    // Example:
+    // var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {
+    //     [
+    //         .livingRoom: [
+    //             .description: { location, gameState in
+    //                 return .string("Dynamic description for \(location.name)")
+    //             }
+    //         ],
+    //     ]
+    // }
+}
+```
+
+## Runtime Registration Approach
+
+You can also register compute handlers at runtime, which is useful for conditional or complex setup scenarios:
+
+```swift
+// Register after creating the engine
+await engine.registerItemCompute(itemID: .magicSword, attributeID: .description) { item, gameState in
+    let enchantment = item.attributes["enchantmentLevel"]?.toInt ?? 0
+    let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
+    return .string(desc)
+}
+
+await engine.registerLocationCompute(locationID: .magicRoom, attributeID: .description) { location, gameState in
+    let isEnchanted = gameState.globalState["roomEnchanted"] == true
+    let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
+    return .string(desc)
+}
+```
 
 ## Basic Usage
 
