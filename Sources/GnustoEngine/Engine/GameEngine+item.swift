@@ -129,6 +129,15 @@ extension GameEngine {
             ).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
+    
+    /// <#Description#>
+    /// - Parameters:
+    ///   - attributeID: <#attributeID description#>
+    ///   - itemID: <#itemID description#>
+    /// - Returns: <#description#>
+    public func hasFlag(_ attributeID: AttributeID, on itemID: ItemID) async throws -> Bool {
+        try await attribute(attributeID, of: itemID) == true
+    }
 
     /// Retrieves an immutable copy (snapshot) of a specific item from the current game state.
     ///

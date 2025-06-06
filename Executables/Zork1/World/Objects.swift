@@ -1,248 +1,9 @@
 import GnustoEngine
 
 extension Item {
-    // MARK: - Global Objects and Scenery
 
-    static let board = Item(
-        id: .board,
-        .name("board"),
-        .synonyms("boards", "board"),
-        .suppressDescription
-        // Note: Has action handler BOARD-F
-    )
 
-    static let teeth = Item(
-        id: .teeth,
-        .name("set of teeth"),
-        .synonyms("overboard", "teeth"),
-        .suppressDescription
-        // Note: Parent is GLOBAL-OBJECTS, has action handler TEETH-F
-    )
 
-    static let wall = Item(
-        id: .wall,
-        .name("surrounding wall"),
-        .synonyms("wall", "walls"),
-        .adjectives("surrounding")
-        // Note: Parent is GLOBAL-OBJECTS
-    )
-
-    static let graniteWall = Item(
-        id: .graniteWall,
-        .name("granite wall"),
-        .synonyms("wall"),
-        .adjectives("granite"),
-        .suppressDescription
-        // Note: Parent is GLOBAL-OBJECTS, has action handler GRANITE-WALL-F
-    )
-
-    static let songbird = Item(
-        id: .songbird,
-        .name("songbird"),
-        .synonyms("bird", "songbird"),
-        .adjectives("song"),
-        .suppressDescription
-        // Note: Has action handler SONGBIRD-F
-    )
-
-    static let whiteHouse = Item(
-        id: .whiteHouse,
-        .name("white house"),
-        .synonyms("house"),
-        .adjectives("white", "beautiful", "colonial"),
-        .suppressDescription
-        // Note: Has action handler WHITE-HOUSE-F
-    )
-
-    static let forest = Item(
-        id: .forest,
-        .name("forest"),
-        .synonyms("forest", "trees", "pines", "hemlocks"),
-        .suppressDescription
-        // Note: Has action handler FOREST-F
-    )
-
-    static let tree = Item(
-        id: .tree,
-        .name("tree"),
-        .synonyms("tree", "branch"),
-        .adjectives("large", "storm"),
-        .isClimbable,
-        .suppressDescription
-    )
-
-    static let mountainRange = Item(
-        id: .mountainRange,
-        .name("mountain range"),
-        .synonyms("mountain", "range"),
-        .adjectives("impassable", "flathead"),
-        .isClimbable,
-        .suppressDescription,
-        .in(.location(.mountains))
-        // Note: Has action handler MOUNTAIN-RANGE-F
-    )
-
-    static let globalWater = Item(
-        id: .globalWater,
-        .name("water"),
-        .synonyms("water", "quantity"),
-        .isEdible  // DRINKBIT
-        // Note: Has action handler WATER-F
-    )
-
-    static let water = Item(
-        id: .water,
-        .name("quantity of water"),
-        .synonyms("water", "quantity", "liquid", "h2o"),
-        .isTakable,
-        .requiresTryTake,
-        .isEdible,  // DRINKBIT
-        .size(4),
-        .in(.item(.bottle))
-        // Note: Has action handler WATER-F
-    )
-
-    static let kitchenWindow = Item(
-        id: .kitchenWindow,
-        .name("kitchen window"),
-        .synonyms("window"),
-        .adjectives("kitchen", "small"),
-        .isDoor,
-        .suppressDescription
-        // Note: Has action handler KITCHEN-WINDOW-F
-    )
-
-    static let chimney = Item(
-        id: .chimney,
-        .name("chimney"),
-        .synonyms("chimney"),
-        .adjectives("dark", "narrow"),
-        .isClimbable,
-        .suppressDescription
-        // Note: Has action handler CHIMNEY-F
-    )
-
-    // MARK: - Characters and Creatures
-
-    static let ghosts = Item(
-        id: .ghosts,
-        .name("number of ghosts"),
-        .synonyms("ghosts", "spirits", "fiends", "force"),
-        .adjectives("invisible", "evil"),
-        .isCharacter,  // ACTORBIT
-        .suppressDescription,
-        .in(.location(.entranceToHades))
-        // Note: Has action handler GHOSTS-F
-    )
-
-    static let cyclops = Item(
-        id: .cyclops,
-        .name("cyclops"),
-        .synonyms("cyclops", "monster", "eye"),
-        .adjectives("hungry", "giant"),
-        .isCharacter,  // ACTORBIT
-        .suppressDescription,
-        .requiresTryTake,
-        .in(.location(.cyclopsRoom))
-        // Note: Has action handler CYCLOPS-FCN, STRENGTH 10000
-    )
-
-    static let bat = Item(
-        id: .bat,
-        .name("bat"),
-        .synonyms("bat", "vampire"),
-        .adjectives("vampire", "deranged"),
-        .isCharacter,  // ACTORBIT
-        .requiresTryTake,
-        .in(.location(.batRoom))
-        // Note: Has action handler BAT-F, DESCFCN BAT-D
-    )
-
-    static let troll = Item(
-        id: .troll,
-        .name("troll"),
-        .synonyms("troll"),
-        .adjectives("nasty"),
-        .isCharacter,  // ACTORBIT
-        .isOpen,  // OPENBIT
-        .requiresTryTake,
-        .description("""
-            A nasty-looking troll, brandishing a bloody axe, blocks all passages
-            out of the room.
-            """),
-        .in(.location(.trollRoom))
-        // Note: Has action handler TROLL-FCN, STRENGTH 2
-    )
-
-    // MARK: - Treasures
-
-    static let skull = Item(
-        id: .skull,
-        .name("crystal skull"),
-        .synonyms("skull", "head", "treasure"),
-        .adjectives("crystal"),
-        .isTakable,
-        .firstDescription("""
-            Lying in one corner of the room is a beautifully carved crystal skull.
-            It appears to be grinning at you rather nastily.
-            """),
-        .in(.location(.landOfLivingDead))
-        // Note: VALUE 10, TVALUE 10
-    )
-
-    static let sceptre = Item(
-        id: .sceptre,
-        .name("sceptre"),
-        .synonyms("sceptre", "scepter", "treasure"),
-        .adjectives("sharp", "egyptian", "ancient", "enameled"),
-        .isTakable,
-        .isWeapon,
-        .description("An ornamented sceptre, tapering to a sharp point, is here."),
-        .firstDescription("""
-            A sceptre, possibly that of ancient Egypt itself, is in the coffin. The
-            sceptre is ornamented with colored enamel, and tapers to a sharp point.
-            """),
-        .size(3),
-        .in(.item(.coffin))
-        // Note: VALUE 4, TVALUE 6, has action handler SCEPTRE-FUNCTION
-    )
-
-    static let chalice = Item(
-        id: .chalice,
-        .name("chalice"),
-        .synonyms("chalice", "cup", "silver", "treasure"),
-        .adjectives("silver", "engravings"),
-        .isTakable,
-        .requiresTryTake,
-        .isContainer,
-        .description("There is a silver chalice, intricately engraved, here."),
-        .capacity(5),
-        .size(10),
-        .in(.location(.treasureRoom))
-        // Note: VALUE 10, TVALUE 5, has action handler CHALICE-FCN
-    )
-
-    static let trident = Item(
-        id: .trident,
-        .name("crystal trident"),
-        .synonyms("trident", "fork", "treasure"),
-        .adjectives("poseidon", "own", "crystal"),
-        .isTakable,
-        .firstDescription("On the shore lies Poseidon's own crystal trident."),
-        .size(20),
-        .in(.location(.atlantisRoom))
-        // Note: VALUE 4, TVALUE 11
-    )
-
-    static let diamond = Item(
-        id: .diamond,
-        .name("huge diamond"),
-        .synonyms("diamond", "treasure"),
-        .adjectives("huge", "enormous"),
-        .isTakable,
-        .description("There is an enormous diamond (perfectly cut) here.")
-        // Note: VALUE 10, TVALUE 10, parent location not specified in ZIL
-    )
 
     static let jade = Item(
         id: .jade,
@@ -540,17 +301,6 @@ extension Item {
         // Note: Has action handler MAILBOX-F
     )
 
-    static let machine = Item(
-        id: .machine,
-        .name("machine"),
-        .synonyms("machine", "pdp10", "dryer", "lid"),
-        .isContainer,
-        .suppressDescription,
-        .requiresTryTake,
-        .capacity(50),
-        .in(.location(.machineRoom))
-        // Note: Has action handler MACHINE-F
-    )
 
     static let nest = Item(
         id: .nest,
@@ -612,20 +362,6 @@ extension Item {
         // Note: Has action handler SANDWICH-BAG-FCN
     )
 
-    static let coffin = Item(
-        id: .coffin,
-        .name("gold coffin"),
-        .synonyms("coffin", "casket", "treasure"),
-        .adjectives("solid", "gold"),
-        .isTakable,
-        .isContainer,
-        .isSearchable,
-        .description("The solid-gold coffin used for the burial of Ramses II is here."),
-        .capacity(35),
-        .size(55),
-        .in(.location(.egyptRoom))
-        // Note: VALUE 10, TVALUE 15, SACREDBIT
-    )
 
     static let buoy = Item(
         id: .buoy,
@@ -1298,7 +1034,7 @@ extension Item {
         .synonyms("reflection", "mirror", "enormous"),
         .requiresTryTake,
         .suppressDescription,
-        .in(.location(.mirrorRoom1))
+        .in(.location(.mirrorRoomNorth))
         // Note: Has action handler MIRROR-MIRROR
     )
 
@@ -1308,7 +1044,7 @@ extension Item {
         .synonyms("reflection", "mirror", "enormous"),
         .requiresTryTake,
         .suppressDescription,
-        .in(.location(.mirrorRoom2))
+        .in(.location(.mirrorRoomSouth))
         // Note: Has action handler MIRROR-MIRROR
     )
 

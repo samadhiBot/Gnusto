@@ -3,8 +3,6 @@ import GnustoEngine
 // MARK: - Clearing Area
 
 enum Clearing {
-    // MARK: - Locations
-
     static let clearing = Location(
         id: .clearing,
         .name("Clearing"),
@@ -13,7 +11,7 @@ enum Clearing {
             on all sides. There appears to be a grating in the ground.
             """),
         .exits([
-            .west: .to(.eastOfHouse),
+            .west: .to(.behindHouse),
             .north: .to(.gratingClearing),
         ]),
         .inherentlyLit
@@ -31,13 +29,17 @@ enum Clearing {
         ]),
         .inherentlyLit
     )
+}
 
-    // MARK: - Items
+// MARK: - Items
 
+extension Clearing {
     static let grating = Item(
         id: .grating,
         .name("grating"),
-        .description("The grating is a large metal framework, securely fastened to the ground."),
+        .description(
+            "The grating is a large metal framework, securely fastened to the ground."
+        ),
         .synonyms("gate", "bars"),
         .in(.location(.clearing)),
         .isInvisible
@@ -62,7 +64,7 @@ extension Clearing {
         case .beforeTurn(let command):
             if command.verb == .move {
                 // Check if grating is already revealed
-                let isGratingVisible = try await engine.attribute(.isInvisible, of: .grating) != true
+                let isGratingVisible = try await engine.hasFlag(.isInvisible, on: .grating)
 
                 if !isGratingVisible {
                     // Reveal the grating - this is the LEAVES-APPEAR functionality

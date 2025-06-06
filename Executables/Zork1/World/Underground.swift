@@ -17,11 +17,7 @@ enum Underground {
             .north: .to(.troll),
             .south: .to(.eastOfChasm),
             .west: .to(.steepRamp),
-            .up: Exit(
-                destination: .livingRoom,
-                blockedMessage: "The trap door is locked from above.",
-                doorID: .trapDoor
-            ),
+            .up: .to(.livingRoom, via: .trapDoor, else: "The trap door is locked from above."),
         ])
     )
 
@@ -189,9 +185,9 @@ enum Underground {
             """),
         .exits([
             .south: .to(.gallery),
-            .up: Exit(
-                destination: .kitchen,
-                blockedMessage: "You try to climb the chimney, but it's too narrow and steep."
+            .up: .to(
+                .kitchen,
+                else: "You try to climb the chimney, but it's too narrow and steep."
             ),
         ])
     )

@@ -1,6 +1,6 @@
 import GnustoEngine
 
-enum UnderHouse {
+enum BeneathHouse {
     static let cellar = Location(
         id: .cellar,
         .name("Cellar"),
@@ -83,6 +83,24 @@ enum UnderHouse {
         ]),
         .isLand
     )
+}
 
+// MARK: - Items
 
+extension BeneathHouse {
+    static let troll = Item(
+        id: .troll,
+        .name("troll"),
+        .synonyms("troll"),
+        .adjectives("nasty"),
+        .isCharacter,  // ACTORBIT
+        .isOpen,  // OPENBIT
+        .requiresTryTake,
+        .description("""
+            A nasty-looking troll, brandishing a bloody axe, blocks all passages
+            out of the room.
+            """),
+        .in(.location(.trollRoom))
+        // Note: Has action handler TROLL-FCN, STRENGTH 2
+    )
 }
