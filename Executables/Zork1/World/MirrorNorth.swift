@@ -90,4 +90,14 @@ extension MirrorNorth {
         .in(.location(.atlantisRoom))
         // Note: VALUE 4, TVALUE 11
     )
+
+    static let mirror1 = Item(
+        id: .mirror1,
+        .name("mirror"),
+        .synonyms("reflection", "mirror", "enormous"),
+        .requiresTryTake,
+        .suppressDescription,
+        .in(.location(.mirrorRoomNorth))
+        // Note: Has action handler MIRROR-MIRROR
+    )
 }

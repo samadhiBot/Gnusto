@@ -14,20 +14,12 @@ enum OperaHouse {
         .exits([
             .south: .to(.bar),
             .west: .to(.cloakroom),
-            .north: Exit(
-                destination: .street,
-                blockedMessage: """
-                    You've only just arrived, and besides, the weather outside
-                    seems to be getting worse.
-                    """
-            )
+            .north: .blocked("""
+                You've only just arrived, and besides, the weather outside
+                seems to be getting worse.
+                """)
         ]),
         .inherentlyLit
-    )
-
-    static let street = Location(
-        id: .street,
-        .description("The street outside the Opera House (not accessible in this demo)")
     )
 
     // MARK: - Cloakroom

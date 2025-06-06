@@ -274,6 +274,28 @@ extension CoalMine {
         // Note: Has action handler BAT-F, DESCFCN BAT-D
     )
 
+    static let bracelet = Item(
+        id: .bracelet,
+        .name("sapphire-encrusted bracelet"),
+        .synonyms("bracelet", "jewel", "sapphire", "treasure"),
+        .adjectives("sapphire"),
+        .isTakable,
+        .size(10),
+        .in(.location(.gasRoom))
+        // Note: VALUE 5, TVALUE 5
+    )
+
+    static let coal = Item(
+        id: .coal,
+        .name("small pile of coal"),
+        .synonyms("coal", "pile", "heap"),
+        .adjectives("small"),
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .size(20),
+        .in(.location(.deadEnd5))
+    )
+
     static let diamond = Item(
         id: .diamond,
         .name("huge diamond"),
@@ -282,6 +304,29 @@ extension CoalMine {
         .isTakable,
         .description("There is an enormous diamond (perfectly cut) here.")
         // Note: VALUE 10, TVALUE 10, parent location not specified in ZIL
+    )
+
+    static let jade = Item(
+        id: .jade,
+        .name("jade figurine"),
+        .synonyms("figurine", "treasure"),
+        .adjectives("exquisite", "jade"),
+        .isTakable,
+        .description("There is an exquisite jade figurine here."),
+        .size(10),
+        .in(.location(.batRoom))
+        // Note: VALUE 5, TVALUE 5
+    )
+
+    static let loweredBasket = Item(
+        id: .loweredBasket,
+        .name("basket"),
+        .synonyms("cage", "dumbwaiter", "basket"),
+        .adjectives("lowered"),
+        .requiresTryTake,
+        .description("From the chain is suspended a basket."),
+        .in(.location(.lowerShaft))
+        // Note: Has action handler BASKET-F
     )
 
     static let machine = Item(
@@ -294,5 +339,38 @@ extension CoalMine {
         .capacity(50),
         .in(.location(.machineRoom))
         // Note: Has action handler MACHINE-F
+    )
+
+    static let machineSwitch = Item(
+        id: .machineSwitch,
+        .name("switch"),
+        .synonyms("switch"),
+        .suppressDescription,
+        .in(.location(.machineRoom))
+        // Note: Has action handler MSWITCH-FUNCTION, TURNBIT
+    )
+
+    static let raisedBasket = Item(
+        id: .raisedBasket,
+        .name("basket"),
+        .synonyms("cage", "dumbwaiter", "basket"),
+        .isTransparent,  // TRANSBIT
+        .requiresTryTake,
+        .isContainer,
+        .isOpen,
+        .description("At the end of the chain is a basket."),
+        .capacity(50),
+        .in(.location(.shaftRoom))
+        // Note: Has action handler BASKET-F
+    )
+
+    static let timbers = Item(
+        id: .timbers,
+        .name("broken timber"),
+        .synonyms("timbers", "pile"),
+        .adjectives("wooden", "broken"),
+        .isTakable,
+        .size(50),
+        .in(.location(.timberRoom))
     )
 }

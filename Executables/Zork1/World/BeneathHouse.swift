@@ -88,6 +88,56 @@ enum BeneathHouse {
 // MARK: - Items
 
 extension BeneathHouse {
+    static let axe = Item(
+        id: .axe,
+        .name("bloody axe"),
+        .synonyms("axe", "ax"),
+        .adjectives("bloody"),
+        .isWeapon,
+        .requiresTryTake,
+        .isTakable,
+        .suppressDescription,
+        .size(25),
+        .in(.item(.troll))
+        // Note: Has action handler AXE-F
+    )
+
+    static let ownersManual = Item(
+        id: .ownersManual,
+        .name("ZORK owner's manual"),
+        .synonyms("manual", "piece", "paper"),
+        .adjectives("zork", "owners", "small"),
+        .isReadable,
+        .isTakable,
+        .firstDescription("Loosely attached to a wall is a small piece of paper."),
+        .readText("""
+            Congratulations!
+
+            You are the privileged owner of ZORK I: The Great Underground Empire,
+            a self-contained and self-maintaining universe. If used and maintained
+            in accordance with normal operating practices for small universes, ZORK
+            will provide many months of trouble-free operation.
+            """),
+        .in(.location(.studio))
+    )
+
+    static let painting = Item(
+        id: .painting,
+        .name("painting"),
+        .synonyms("painting", "art", "canvas", "treasure"),
+        .adjectives("beautiful"),
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .firstDescription("""
+            Fortunately, there is still one chance for you to be a vandal, for on
+            the far wall is a painting of unparalleled beauty.
+            """),
+        .description("A painting by a neglected genius is here."),
+        .size(15),
+        .in(.location(.gallery))
+        // Note: VALUE 4, TVALUE 6, has action handler PAINTING-FCN
+    )
+
     static let troll = Item(
         id: .troll,
         .name("troll"),

@@ -29,7 +29,7 @@ enum OutsideHouse {
         .name("North of House"),
         .description("""
             You are facing the north side of a white house. There is no door here,
-            and all the windows are boarded up. To the north a narrow path winds 
+            and all the windows are boarded up. To the north a narrow path winds
             through the trees.
             """),
         .exits([
@@ -37,7 +37,7 @@ enum OutsideHouse {
             .southeast: .to(.behindHouse),
             .west: .to(.westOfHouse),
             .east: .to(.behindHouse),
-            .north: .to(.path),
+            .north: .to(.forestPath),
             // Note: SOUTH exit has custom message about boarded windows
         ]),
         .inherentlyLit,
@@ -99,6 +99,26 @@ enum OutsideHouse {
 // MARK: - Items
 
 extension OutsideHouse {
+    static let advertisement = Item(
+        id: .advertisement,
+        .name("leaflet"),
+        .synonyms("advertisement", "leaflet", "booklet", "mail"),
+        .adjectives("small"),
+        .isReadable,
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .description("A small leaflet is on the ground."),
+        .readText("""
+            "WELCOME TO ZORK!
+
+            ZORK is a game of adventure, danger, and low cunning. In it you
+            will explore some of the most amazing territory ever seen by mortals.
+            No computer should be without one!"
+            """),
+        .size(2),
+        .in(.item(.mailbox))
+    )
+
     static let boardedWindow = Item(
         id: .boardedWindow,
         .name("boarded window"),

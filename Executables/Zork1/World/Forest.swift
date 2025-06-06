@@ -128,19 +128,17 @@ enum Forest {
     static let mountains = Location(
         id: .mountains,
         .name("Forest"),
-        .description("""
-            The forest thins out, revealing impassable mountains.
-            """),
+        .description("The forest thins out, revealing impassable mountains."),
         .exits([
+            .east: .blocked("The mountains are impassable."),
             .north: .to(.forest2),
             .south: .to(.forest2),
+            .up: .blocked("The mountains are impassable."),
             .west: .to(.forest2),
-            // Note: UP and EAST exits have custom messages about impassable mountains
-            .east: .blocked("The mountains are impassable."),
-            .north: .blocked("The forest becomes impenetrable to the north."),
-            .west: .blocked("The mountains are impassable."),
         ]),
         .inherentlyLit,
+        .isLand,
+        .isSacred,
         .localGlobals(.tree, .whiteHouse)
     )
 
@@ -148,7 +146,7 @@ enum Forest {
         id: .upATree,
         .name("Up a Tree"),
         .description("""
-            You are about 10 feet above the ground nestled among some large branches. 
+            You are about 10 feet above the ground nestled among some large branches.
             The nearest branch above you is above your reach.
             """),
         .exits([

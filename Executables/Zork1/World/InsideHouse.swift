@@ -50,6 +50,18 @@ enum InsideHouse {
 
     // MARK: - Items
 
+    static let atticTable = Item(
+        id: .atticTable,
+        .name("table"),
+        .synonyms("table"),
+        .suppressDescription,
+        .isContainer,
+        .isOpen,
+        .isSurface,
+        .capacity(40),
+        .in(.location(.attic))
+    )
+
     static let bottle = Item(
         id: .bottle,
         .name("glass bottle"),
@@ -164,6 +176,30 @@ enum InsideHouse {
         .synonyms("rope"),
         .in(.location(.attic)),
         .isTakable
+    static let rug = Item(
+        id: .rug,
+        .name("carpet"),
+        .synonyms("rug", "carpet"),
+        .adjectives("large", "oriental"),
+        .suppressDescription,
+        .requiresTryTake,
+        .in(.location(.livingRoom))
+        // Note: Has action handler RUG-FCN
+    )
+
+    static let sandwichBag = Item(
+        id: .sandwichBag,
+        .name("brown sack"),
+        .synonyms("bag", "sack"),
+        .adjectives("brown", "elongated", "smelly"),
+        .isTakable,
+        .isContainer,
+        .isFlammable,  // BURNBIT
+        .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
+        .capacity(9),
+        .size(9),
+        .in(.item(.kitchenTable))
+        // Note: Has action handler SANDWICH-BAG-FCN
     )
 
     static let sword = Item(

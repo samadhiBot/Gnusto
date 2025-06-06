@@ -286,3 +286,76 @@ enum Maze {
         .isLand
     )
 }
+
+// MARK: - Items
+
+extension Maze {
+    static let bagOfCoins = Item(
+        id: .bagOfCoins,
+        .name("leather bag of coins"),
+        .synonyms("bag", "coins", "treasure"),
+        .adjectives("old", "leather"),
+        .isTakable,
+        .description("An old leather bag, bulging with coins, is here."),
+        .size(15),
+        .in(.location(.maze5))
+        // Note: VALUE 10, TVALUE 5, has action handler BAG-OF-COINS-F
+    )
+
+    static let bones = Item(
+        id: .bones,
+        .name("skeleton"),
+        .synonyms("bones", "skeleton", "body"),
+        .requiresTryTake,
+        .suppressDescription,
+        .in(.location(.maze5))
+        // Note: Has action handler SKELETON
+    )
+
+    static let burnedOutLantern = Item(
+        id: .burnedOutLantern,
+        .name("burned-out lantern"),
+        .synonyms("lantern", "lamp"),
+        .adjectives("rusty", "burned", "dead", "useless"),
+        .isTakable,
+        .firstDescription("The deceased adventurer's useless lantern is here."),
+        .size(20),
+        .in(.location(.maze5))
+    )
+
+    static let grate = Item(
+        id: .grate,
+        .name("grating"),
+        .synonyms("grate", "grating"),
+        .isDoor,
+        .suppressDescription,
+        .isInvisible
+        // Note: Has action handler GRATE-FUNCTION
+    )
+
+    static let keys = Item(
+        id: .keys,
+        .name("skeleton key"),
+        .synonyms("key"),
+        .adjectives("skeleton"),
+        .isTakable,
+        .isTool,
+        .size(10),
+        .in(.location(.maze5))
+    )
+
+    static let rustyKnife = Item(
+        id: .rustyKnife,
+        .name("rusty knife"),
+        .synonyms("knives", "knife"),
+        .adjectives("rusty"),
+        .isTakable,
+        .requiresTryTake,
+        .isWeapon,
+        .isTool,
+        .firstDescription("Beside the skeleton is a rusty knife."),
+        .size(20),
+        .in(.location(.maze5))
+        // Note: Has action handler RUSTY-KNIFE-FCN
+    )
+}

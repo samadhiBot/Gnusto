@@ -102,6 +102,70 @@ enum Temple {
 // MARK: - Items
 
 extension Temple {
+    static let altar = Item(
+        id: .altar,
+        .name("altar"),
+        .synonyms("altar"),
+        .suppressDescription,
+        .isSurface,  // SURFACEBIT
+        .isContainer,
+        .isOpen,
+        .capacity(50),
+        .in(.location(.southTemple))
+    )
+
+    static let bell = Item(
+        id: .bell,
+        .name("brass bell"),
+        .synonyms("bell"),
+        .adjectives("small", "brass"),
+        .isTakable,
+        .in(.location(.northTemple))
+        // Note: Has action handler BELL-F
+    )
+
+    static let book = Item(
+        id: .book,
+        .name("black book"),
+        .synonyms("book", "prayer", "page", "books"),
+        .adjectives("large", "black"),
+        .isReadable,
+        .isTakable,
+        .isContainer,
+        .isFlammable,  // BURNBIT
+        .firstDescription("On the altar is a large black book, open to page 569."),
+        .readText("""
+            Commandment #12592
+
+            Oh ye who go about saying unto each:  "Hello sailor":
+            Dost thou know the magnitude of thy sin before the gods?
+            Yea, verily, thou shalt be ground between two stones.
+            Shall the angry gods cast thy body into the whirlpool?
+            Surely, thy eye shall be put out with a sharp stick!
+            Even unto the ends of the earth shalt thou wander and
+            Unto the land of the dead shalt thou be sent at last.
+            Surely thou shalt repent of thy cunning.
+            """),
+        .size(10),
+        .in(.item(.altar))
+        // Note: Has action handler BLACK-BOOK, TURNBIT
+    )
+
+    static let candles = Item(
+        id: .candles,
+        .name("pair of candles"),
+        .synonyms("candles", "pair"),
+        .adjectives("burning"),
+        .isTakable,
+        .isFlammable,  // FLAMEBIT
+        .isOn,  // ONBIT
+        .isLightSource,  // LIGHTBIT
+        .firstDescription("On the two ends of the altar are burning candles."),
+        .size(10),
+        .in(.location(.southTemple))
+        // Note: Has action handler CANDLES-FCN
+    )
+
     static let coffin = Item(
         id: .coffin,
         .name("gold coffin"),
@@ -115,6 +179,66 @@ extension Temple {
         .size(55),
         .in(.location(.egyptRoom))
         // Note: VALUE 10, TVALUE 15, SACREDBIT
+    )
+
+    static let engravings = Item(
+        id: .engravings,
+        .name("wall with engravings"),
+        .synonyms("wall", "engravings", "inscription"),
+        .adjectives("old", "ancient"),
+        .isReadable,
+        .description("There are old engravings on the walls here."),
+        .readText("""
+            The engravings were incised in the living rock of the cave wall by
+            an unknown hand. They depict, in symbolic form, the beliefs of the
+            ancient Zorkers. Skillfully interwoven with the bas reliefs are excerpts
+            illustrating the major religious tenets of that time. Unfortunately, a
+            later age seems to have considered them blasphemous and just as skillfully
+            excised them.
+            """),
+        .in(.location(.engravingsCave))
+        // Note: SACREDBIT
+    )
+
+    static let pedestal = Item(
+        id: .pedestal,
+        .name("pedestal"),
+        .synonyms("pedestal"),
+        .adjectives("white", "marble"),
+        .suppressDescription,
+        .isContainer,
+        .isOpen,
+        .isSurface,
+        .capacity(30),
+        .in(.location(.torchRoom))
+        // Note: Has action handler DUMB-CONTAINER
+    )
+
+    static let prayer = Item(
+        id: .prayer,
+        .name("prayer"),
+        .synonyms("prayer", "inscription"),
+        .adjectives("ancient", "old"),
+        .isReadable,
+        .suppressDescription,
+        .readText("""
+            The prayer is inscribed in an ancient script, rarely used today. It seems
+            to be a philippic against small insects, absent-mindedness, and the picking
+            up and dropping of small objects. The final verse consigns trespassers to
+            the land of the dead. All evidence indicates that the beliefs of the ancient
+            Zorkers were obscure.
+            """),
+        .in(.location(.northTemple))
+        // Note: SACREDBIT
+    )
+
+    static let railing = Item(
+        id: .railing,
+        .name("wooden railing"),
+        .synonyms("railing", "rail"),
+        .adjectives("wooden"),
+        .suppressDescription,
+        .in(.location(.domeRoom))
     )
 
     static let sceptre = Item(
@@ -132,5 +256,20 @@ extension Temple {
         .size(3),
         .in(.item(.coffin))
         // Note: VALUE 4, TVALUE 6, has action handler SCEPTRE-FUNCTION
+    )
+
+    static let torch = Item(
+        id: .torch,
+        .name("torch"),
+        .synonyms("torch", "ivory", "treasure"),
+        .adjectives("flaming", "ivory"),
+        .isTakable,
+        .isFlammable,  // FLAMEBIT
+        .isOn,  // ONBIT
+        .isLightSource,  // LIGHTBIT
+        .firstDescription("Sitting on the pedestal is a flaming torch, made of ivory."),
+        .size(20),
+        .in(.item(.pedestal))
+        // Note: VALUE 14, TVALUE 6, has action handler TORCH-OBJECT
     )
 }

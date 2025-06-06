@@ -308,3 +308,161 @@ enum River {
         .localGlobals(.globalWater, .whiteCliff, .river)
     )
 }
+
+// MARK: - Items
+
+extension River {
+    static let boatLabel = Item(
+        id: .boatLabel,
+        .name("tan label"),
+        .synonyms("label", "fineprint", "print"),
+        .adjectives("tan", "fine"),
+        .isReadable,
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .readText("""
+              !!!!FROBOZZ MAGIC BOAT COMPANY!!!!
+
+            Hello, Sailor!
+
+            Instructions for use:
+
+               To get into a body of water, say "Launch".
+               To get to shore, say "Land" or the direction in which you want
+            to maneuver the boat.
+
+            Warranty:
+
+              This boat is guaranteed against all defects for a period of 76
+            milliseconds from date of purchase or until first used, whichever comes first.
+
+            Warning:
+               This boat is made of thin plastic.
+               Good Luck!
+            """),
+        .size(2),
+        .in(.item(.inflatedBoat))
+    )
+
+    static let buoy = Item(
+        id: .buoy,
+        .name("red buoy"),
+        .synonyms("buoy"),
+        .adjectives("red"),
+        .isTakable,
+        .isContainer,
+        .firstDescription("There is a red buoy here (probably a warning)."),
+        .capacity(20),
+        .size(10),
+        .in(.location(.river4))
+        // Note: Has action handler TREASURE-INSIDE
+    )
+
+    static let emerald = Item(
+        id: .emerald,
+        .name("large emerald"),
+        .synonyms("emerald", "treasure"),
+        .adjectives("large"),
+        .isTakable,
+        .in(.item(.buoy))
+        // Note: VALUE 5, TVALUE 10
+    )
+
+    static let inflatedBoat = Item(
+        id: .inflatedBoat,
+        .name("magic boat"),
+        .synonyms("boat", "raft"),
+        .adjectives("inflat", "magic", "plastic", "seaworthy"),
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .isVehicle,  // VEHBIT
+        .isOpen,
+        .isSearchable,
+        .capacity(100),
+        .size(20)
+        // Note: Has action handler RBOAT-FUNCTION, VTYPE NONLANDBIT, parent not specified
+    )
+
+    static let potOfGold = Item(
+        id: .potOfGold,
+        .name("pot of gold"),
+        .synonyms("pot", "gold", "treasure"),
+        .adjectives("gold"),
+        .isTakable,
+        .isInvisible,
+        .firstDescription("At the end of the rainbow is a pot of gold."),
+        .size(15),
+        .in(.location(.endOfRainbow))
+        // Note: VALUE 10, TVALUE 10
+    )
+
+    static let puncturedBoat = Item(
+        id: .puncturedBoat,
+        .name("punctured boat"),
+        .synonyms("boat", "pile", "plastic"),
+        .adjectives("plastic", "puncture", "large"),
+        .isTakable,
+        .isFlammable,  // BURNBIT
+        .size(20)
+        // Note: Has action handler DBOAT-FUNCTION, parent not specified
+    )
+
+    static let rainbow = Item(
+        id: .rainbow,
+        .name("rainbow"),
+        .synonyms("rainbow"),
+        .suppressDescription,
+        .isClimbable
+        // Note: Has action handler RAINBOW-FCN
+    )
+
+    static let river = Item(
+        id: .river,
+        .name("river"),
+        .synonyms("river"),
+        .adjectives("frigid"),
+        .suppressDescription
+        // Note: Has action handler RIVER-FUNCTION
+    )
+
+    static let sand = Item(
+        id: .sand,
+        .name("sand"),
+        .synonyms("sand"),
+        .suppressDescription,
+        .in(.location(.sandyCave))
+        // Note: Has action handler SAND-FUNCTION
+    )
+
+    static let scarab = Item(
+        id: .scarab,
+        .name("beautiful jeweled scarab"),
+        .synonyms("scarab", "bug", "beetle", "treasure"),
+        .adjectives("beauti", "carved", "jeweled"),
+        .isTakable,
+        .isInvisible,
+        .size(8),
+        .in(.location(.sandyCave))
+        // Note: VALUE 5, TVALUE 5
+    )
+
+    static let shovel = Item(
+        id: .shovel,
+        .name("shovel"),
+        .synonyms("shovel", "tool", "tools"),
+        .isTakable,
+        .isTool,
+        .size(15),
+        .in(.location(.sandyBeach))
+    )
+
+    static let whiteCliff = Item(
+        id: .whiteCliff,
+        .name("white cliffs"),
+        .synonyms("cliff", "cliffs"),
+        .adjectives("white"),
+        .suppressDescription,
+        .isClimbable
+        // Note: Has action handler WCLIF-OBJECT
+    )
+}

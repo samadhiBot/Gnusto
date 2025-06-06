@@ -114,3 +114,81 @@ enum RoundRoom {
         .isLand
     )
 }
+
+// MARK: - Items
+
+extension RoundRoom {
+    static let climbableCliff = Item(
+        id: .climbableCliff,
+        .name("cliff"),
+        .synonyms("wall", "cliff", "walls", "ledge"),
+        .adjectives("rocky", "sheer"),
+        .suppressDescription,
+        .isClimbable
+        // Note: Has action handler CLIFF-OBJECT
+    )
+
+    static let crack = Item(
+        id: .crack,
+        .name("crack"),
+        .synonyms("crack"),
+        .adjectives("narrow"),
+        .suppressDescription
+        // Note: Has action handler CRACK-FCN
+    )
+
+    static let largeBag = Item(
+        id: .largeBag,
+        .name("large bag"),
+        .synonyms("bag"),
+        .adjectives("large", "thiefs"),
+        .requiresTryTake,
+        .suppressDescription,
+        .in(.item(.thief))
+        // Note: Has action handler LARGE-BAG-F
+    )
+
+    static let platinumBar = Item(
+        id: .platinumBar,
+        .name("platinum bar"),
+        .synonyms("bar", "platinum", "treasure"),
+        .adjectives("platinum", "large"),
+        .isTakable,
+        .description("On the ground is a large platinum bar."),
+        .size(20),
+        .in(.location(.loudRoom))
+        // Note: VALUE 10, TVALUE 5, SACREDBIT
+    )
+
+    static let stiletto = Item(
+        id: .stiletto,
+        .name("stiletto"),
+        .synonyms("stiletto"),
+        .adjectives("vicious"),
+        .isWeapon,
+        .requiresTryTake,
+        .isTakable,
+        .suppressDescription,
+        .size(10),
+        .in(.item(.thief))
+        // Note: Has action handler STILETTO-FUNCTION
+    )
+
+    static let thief = Item(
+        id: .thief,
+        .name("thief"),
+        .synonyms("thief", "robber", "man", "person"),
+        .adjectives("shady", "suspicious", "seedy"),
+        .isCharacter,  // ACTORBIT
+        .isInvisible,
+        .isContainer,
+        .isOpen,
+        .requiresTryTake,
+        .description("""
+            There is a suspicious-looking individual, holding a large bag, leaning
+            against one wall. He is armed with a deadly stiletto.
+            """),
+        .in(.location(.roundRoom))
+        // Note: Has action handler ROBBER-FUNCTION, STRENGTH 5
+    )
+}

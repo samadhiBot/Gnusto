@@ -40,6 +40,16 @@ enum Hades {
 // MARK: - Items
 
 extension Hades {
+    static let bodies = Item(
+        id: .bodies,
+        .name("pile of bodies"),
+        .synonyms("bodies", "body", "remains", "pile"),
+        .adjectives("mangled"),
+        .suppressDescription,
+        .requiresTryTake
+        // Note: Has action handler BODY-FUNCTION
+    )
+
     static let ghosts = Item(
         id: .ghosts,
         .name("number of ghosts"),

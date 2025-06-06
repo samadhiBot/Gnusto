@@ -1,12 +1,89 @@
 import GnustoEngine
 
+// MARK: - Global Items
+
 enum GlobalItems {
+    static let bauble = Item(
+        id: .bauble,
+        .name("beautiful brass bauble"),
+        .synonyms("bauble", "treasure"),
+        .adjectives("brass", "beautiful"),
+        .isTakable
+        // Note: VALUE 1, TVALUE 1, parent not specified in ZIL
+    )
+
     static let board = Item(
         id: .board,
         .name("board"),
         .synonyms("boards", "board"),
         .suppressDescription
         // Note: Has action handler BOARD-F
+    )
+
+    static let boardedWindow = Item(
+        id: .boardedWindow,
+        .name("boarded window"),
+        .synonyms("window"),
+        .adjectives("boarded"),
+        .suppressDescription
+        // Note: Has action handler BOARDED-WINDOW-FCN
+    )
+
+    static let brokenCanary = Item(
+        id: .brokenCanary,
+        .name("broken clockwork canary"),
+        .synonyms("canary", "treasure"),
+        .adjectives("broken", "clockwork", "gold", "golden"),
+        .isTakable,
+        .firstDescription("""
+            There is a golden clockwork canary nestled in the egg. It seems to
+            have recently had a bad experience. The mountings for its jewel-like
+            eyes are empty, and its silver beak is crumpled. Through a cracked
+            crystal window below its left wing you can see the remains of
+            intricate machinery. It is not clear what result winding it would
+            have, as the mainspring seems sprung.
+            """),
+        .in(.item(.brokenEgg))
+        // Note: TVALUE 1, has action handler CANARY-OBJECT
+    )
+
+    static let brokenEgg = Item(
+        id: .brokenEgg,
+        .name("broken jewel-encrusted egg"),
+        .synonyms("egg", "treasure"),
+        .adjectives("broken", "birds", "encrusted", "jewel"),
+        .isTakable,
+        .isContainer,
+        .isOpen,
+        .capacity(6),
+        .description("There is a somewhat ruined egg here.")
+        // Note: TVALUE 2, parent not specified in ZIL
+    )
+
+    static let brokenLamp = Item(
+        id: .brokenLamp,
+        .name("broken lantern"),
+        .synonyms("lamp", "lantern"),
+        .adjectives("broken"),
+        .isTakable
+        // Note: Parent not specified in ZIL
+    )
+
+    static let canary = Item(
+        id: .canary,
+        .name("golden clockwork canary"),
+        .synonyms("canary", "treasure"),
+        .adjectives("clockwork", "gold", "golden"),
+        .isTakable,
+        .isSearchable,
+        .firstDescription("""
+            There is a golden clockwork canary nestled in the egg. It has ruby
+            eyes and a silver beak. Through a crystal window below its left
+            wing you can see intricate machinery inside. It appears to have
+            wound down.
+            """),
+        .in(.item(.egg))
+        // Note: VALUE 6, TVALUE 4, has action handler CANARY-OBJECT
     )
 
     static let chimney = Item(
@@ -17,6 +94,26 @@ enum GlobalItems {
         .isClimbable,
         .suppressDescription
         // Note: Has action handler CHIMNEY-F
+    )
+
+    static let egg = Item(
+        id: .egg,
+        .name("jewel-encrusted egg"),
+        .synonyms("egg", "treasure"),
+        .adjectives("birds", "encrusted", "jeweled"),
+        .isTakable,
+        .isContainer,
+        .isSearchable,
+        .capacity(6),
+        .firstDescription("""
+            In the bird's nest is a large egg encrusted with precious jewels,
+            apparently scavenged by a childless songbird. The egg is covered with
+            fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl.
+            Unlike most eggs, this one is hinged and closed with a delicate looking
+            clasp. The egg appears extremely fragile.
+            """),
+        .in(.item(.nest))
+        // Note: VALUE 5, TVALUE 5, has action handler EGG-OBJECT
     )
 
     static let forest = Item(
@@ -44,6 +141,27 @@ enum GlobalItems {
         // Note: Parent is GLOBAL-OBJECTS, has action handler GRANITE-WALL-F
     )
 
+    static let gunk = Item(
+        id: .gunk,
+        .name("small piece of vitreous slag"),
+        .synonyms("gunk", "piece", "slag"),
+        .adjectives("small", "vitreous"),
+        .isTakable,
+        .requiresTryTake,
+        .size(10)
+        // Note: Has action handler GUNK-FUNCTION, parent not specified
+    )
+
+    static let hotBell = Item(
+        id: .hotBell,
+        .name("red hot brass bell"),
+        .synonyms("bell"),
+        .adjectives("brass", "hot", "red", "small"),
+        .requiresTryTake,
+        .description("On the ground is a red hot bell.")
+        // Note: Has action handler HOT-BELL-F, parent not specified
+    )
+
     static let kitchenWindow = Item(
         id: .kitchenWindow,
         .name("kitchen window"),
@@ -52,6 +170,15 @@ enum GlobalItems {
         .isDoor,
         .suppressDescription
         // Note: Has action handler KITCHEN-WINDOW-F
+    )
+
+    static let ladder = Item(
+        id: .ladder,
+        .name("wooden ladder"),
+        .synonyms("ladder"),
+        .adjectives("wooden", "rickety", "narrow"),
+        .suppressDescription,
+        .isClimbable
     )
 
     static let mountainRange = Item(
@@ -63,6 +190,15 @@ enum GlobalItems {
         .suppressDescription,
         .in(.location(.mountains))
         // Note: Has action handler MOUNTAIN-RANGE-F
+    )
+
+    static let slide = Item(
+        id: .slide,
+        .name("chute"),
+        .synonyms("chute", "ramp", "slide"),
+        .adjectives("steep", "metal", "twisting"),
+        .isClimbable
+        // Note: Has action handler SLIDE-FUNCTION
     )
 
     static let songbird = Item(

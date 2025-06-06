@@ -82,3 +82,31 @@ enum Reservoir {
         .localGlobals(.globalWater)
     )
 }
+
+// MARK: - Items
+
+extension Reservoir {
+    static let pump = Item(
+        id: .pump,
+        .name("hand-held air pump"),
+        .synonyms("pump", "air-pump", "tool", "tools"),
+        .adjectives("small", "hand-held"),
+        .isTakable,
+        .isTool,
+        .in(.location(.reservoirNorth))
+    )
+
+    static let trunk = Item(
+        id: .trunk,
+        .name("trunk of jewels"),
+        .synonyms("trunk", "chest", "jewels", "treasure"),
+        .adjectives("old"),
+        .isTakable,
+        .isInvisible,
+        .firstDescription("Lying half buried in the mud is an old trunk, bulging with jewels."),
+        .description("There is an old trunk here, bulging with assorted jewels."),
+        .size(35),
+        .in(.location(.reservoir))
+        // Note: VALUE 15, TVALUE 5, has action handler TRUNK-F
+    )
+}

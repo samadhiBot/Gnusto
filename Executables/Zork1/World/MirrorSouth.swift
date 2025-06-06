@@ -61,3 +61,17 @@ enum MirrorSouth {
     )
 
 }
+
+// MARK: - Items
+
+extension MirrorSouth {
+    static let mirror2 = Item(
+        id: .mirror2,
+        .name("mirror"),
+        .synonyms("reflection", "mirror", "enormous"),
+        .requiresTryTake,
+        .suppressDescription,
+        .in(.location(.mirrorRoomSouth))
+        // Note: Has action handler MIRROR-MIRROR
+    )
+}
