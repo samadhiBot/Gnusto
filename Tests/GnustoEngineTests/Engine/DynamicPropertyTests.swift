@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the dynamic property system (compute handlers and state integration).
@@ -142,16 +144,8 @@ struct DynamicPropertyTests {
             .description("A simple test room.")
         )
 
-        let player = Player(
-            name: "Test Player",
-            .at("testLocation"),
-            .score(0),
-            .moves(0),
-            .maxScore(100)
-        )
-
         let game = MinimalGame(
-            player: player,
+            player: Player(in: testLocation.id),
             locations: [testLocation],
             items: [testItem],
             itemComputeHandlers: [
@@ -171,14 +165,14 @@ struct DynamicPropertyTests {
         )
 
         // Test looking at the item
-        let lookHandler = LookActionHandler()
         let command = Command(
-            verbID: "look",
-            directObject: "magicSword",
+            verb: .look,
+            directObject: .item(testItem.id),
             rawInput: "look magic sword"
         )
 
-        try await lookHandler.perform(command: command, engine: engine)
+        // Act
+        await engine.execute(command: command)
 
         let output = await mockIO.flush()
         expectNoDifference(output, "The blade shimmers with arcane power.")
@@ -189,19 +183,12 @@ struct DynamicPropertyTests {
         let testLocation = Location(
             id: "testLocation",
             .name("Enchanted Forest"),
-            .description("A magical place")
-        )
-
-        let player = Player(
-            name: "Test Player",
-            .at("testLocation"),
-            .score(0),
-            .moves(0),
-            .maxScore(100)
+            .description("A magical place"),
+            .inherentlyLit
         )
 
         let game = MinimalGame(
-            player: player,
+            player: Player(in: testLocation.id),
             locations: [testLocation],
             locationComputeHandlers: [
                 "testLocation": [
@@ -223,8 +210,11 @@ struct DynamicPropertyTests {
         try await engine.describeCurrentLocation(forceFullDescription: true)
 
         let output = await mockIO.flush()
-        #expect(output.contains("--- Enchanted Forest ---"))
-        #expect(output.contains("Ethereal mists dance between towering oaks."))
+        expectNoDifference(output, """
+            — Enchanted Forest —
+            
+            Ethereal mists dance between towering oaks.
+            """)
     }
 
     // MARK: - Error Handling Tests

@@ -105,7 +105,7 @@ extension OutsideHouse {
         .description("A small leaflet is on the ground."),
         .readText("""
             "WELCOME TO ZORK!
-
+            
             ZORK is a game of adventure, danger, and low cunning. In it you
             will explore some of the most amazing territory ever seen by mortals.
             No computer should be without one!"
@@ -177,6 +177,17 @@ extension OutsideHouse {
         .in(.location(.westOfHouse)),
         .omitDescription
     )
+}
+
+// MARK: - Compute handlers
+
+extension OutsideHouse {
+    static let eastOfHouseComputer: ItemComputer = [
+        .description: { item, gameState in
+            let enchantment = item.attributes["enchantment"]?.toInt ?? 0
+            return .string(enchantment > 5 ? "The sword blazes!" : "The sword glows.")
+        }
+    ]
 }
 
 // MARK: - Event handlers

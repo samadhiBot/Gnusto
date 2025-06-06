@@ -311,10 +311,22 @@ struct LookActionHandlerTests {
             .inherentlyLit
         )
 
+        // Dynamic compute handler for the location's description
+        @Sendable func dynamicRoomDescription(
+            location: Location,
+            gameState: GameState
+        ) async throws -> StateValue {
+            let isFlagOn = gameState.globalState[specialFlag] == true
+            let text = isFlagOn ? "The room *sparkles* brightly via registry." :
+                                  "The room seems normal via registry."
+            return .string(text)
+        }
+
         // MinimalGame takes flags as variadic arguments
         let game = MinimalGame(
             player: Player(in: dynamicRoom.id),
-            locations: [dynamicRoom]
+            locations: [dynamicRoom],
+            locationComputeHandlers: [dynamicRoom.id: [.description: dynamicRoomDescription]]
         )
 
         let mockIO = await MockIOHandler()
@@ -324,17 +336,6 @@ struct LookActionHandlerTests {
             parser: MockParser(),
             ioHandler: mockIO
         )
-
-        // Register dynamic compute handler for the location's description
-        await engine.registerLocationCompute(
-            locationID: dynamicRoom.id,
-            attributeID: .description
-        ) { location, gameState in
-            let isFlagOn = gameState.globalState[specialFlag] == true
-            let text = isFlagOn ? "The room *sparkles* brightly via registry." :
-                                  "The room seems normal via registry."
-            return .string(text)
-        }
 
         let command = Command(
             verb: .look,

@@ -2,6 +2,10 @@ import Foundation
 
 // MARK: - Compute Handler Type Aliases
 
+public typealias ItemComputer = [AttributeID: ItemComputeHandler]
+
+public typealias LocationComputer = [AttributeID: LocationComputeHandler]
+
 /// A closure that dynamically computes the value of a specific item's attribute.
 ///
 /// When the `GameEngine` needs the value of an item attribute for which a compute handler
