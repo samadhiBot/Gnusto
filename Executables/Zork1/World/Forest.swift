@@ -5,14 +5,65 @@ import GnustoEngine
 enum Forest {
     // MARK: - Locations
 
+    static let canyonView = Location(
+        id: .canyonView,
+        .name("Canyon View"),
+        .description("""
+            You are in a clearing, with a forest surrounding you on all
+            sides. A path leads south.
+            """),
+        .exits([:]),
+//            .down: .blocked("GRATING PUZZLE"),
+//            .east: .to(.forest2),
+//            .south: .to(.forestPath),
+//            .west: .to(.forest1),
+        .inherentlyLit,
+        .localGlobals(.forest)
+    )
+
+    static let clearing1 = Location(
+        id: .clearing1,
+        .name("Clearing"),
+        .description("""
+            You are in a clearing, with a forest surrounding you on all
+            sides. A path leads south.
+            """),
+        .exits([
+            .down: .blocked("GRATING PUZZLE"),
+            .east: .to(.forest2),
+            .south: .to(.forestPath),
+            .west: .to(.forest1),
+        ]),
+        .inherentlyLit,
+        .localGlobals(.forest)
+    )
+
+    static let clearing2 = Location(
+        id: .clearing2,
+        .name("Clearing"),
+        .description("""
+            You are in a small clearing in a well marked forest path that
+            extends to the east and west.
+            """),
+        .exits([
+            .up: .blocked("There is no tree here suitable for climbing."),
+            .east: .to(.canyonView),
+            .north: .to(.forest2),
+            .south: .to(.forest3),
+            .west: .to(.eastOfHouse),
+        ]),
+        .inherentlyLit,
+        .localGlobals(.forest)
+    )
+
     static let forest1 = Location(
         id: .forest1,
         .name("Forest"),
         .description("This is a forest, with trees in all directions. To the east, there appears to be sunlight."),
         .exits([
-            .south: .to(.path),
-            .east: .to(.westOfHouse),
-            .north: .to(.forest2),
+            .east: .to(.forestPath),
+            .north: .to(.clearing),
+            .south: .to(.forest3),
         ]),
         .inherentlyLit,
         .localGlobals(.forest)
@@ -25,6 +76,7 @@ enum Forest {
         .exits([
             .south: .to(.forest1),
             .east: .to(.forest3),
+            .west: .to(.forestPath)
         ]),
         .inherentlyLit,
         .localGlobals(.forest)
@@ -37,6 +89,35 @@ enum Forest {
         .exits([
             .west: .to(.forest2),
             .north: .to(.mountains),
+        ]),
+        .inherentlyLit,
+        .localGlobals(.forest)
+    )
+
+    static let forest4 = Location(
+        id: .forest4,
+        .name("Forest"),
+        .description("This is a dimly lit forest, with large trees all around."),
+        .exits([
+            .west: .to(.forest2),
+            .north: .to(.mountains),
+        ]),
+        .inherentlyLit,
+        .localGlobals(.forest)
+    )
+
+    static let forestPath = Location(
+        id: .forestPath,
+        .name("Forest Path"),
+        .description("""
+            This is a path winding through a dimly lit forest.The path
+            heads north-south here. One particularly large tree with some
+            low branches stands at the edge of the path.
+            """),
+        .exits([
+            .south: .to(.northOfHouse),
+            //            .east: .to(.westOfHouse),
+            //            .north: .to(.forest2),
         ]),
         .inherentlyLit,
         .localGlobals(.forest)
@@ -135,11 +216,14 @@ enum Forest {
     static let tree = Item(
         id: .tree,
         .name("tree"),
-        .description("The tree is large and appears to have some low branches. It might be climbable."),
+        .description("""
+            The tree is large and appears to have some low branches. It might be climbable.
+            """),
         .adjectives("large", "storm", "tossed"),
         .synonyms("branch", "branches"),
         .in(.location(.path)),
-        .isClimbable
+        .isClimbable,
+        .isScenery
     )
 }
 
