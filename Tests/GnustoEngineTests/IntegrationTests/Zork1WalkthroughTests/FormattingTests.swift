@@ -42,9 +42,9 @@ struct FormattingTests {
     @Test("Visited location shows brief output")
     func testVisitedLocationBriefOutput() async throws {
         let mockIO = await MockIOHandler(
-            "north",    // Go to North of House (first visit - full description)
-            "south",    // Return to West of House (visited - brief)
-            "north"     // Go to North of House again (visited - brief)
+            "north",     // Go to North of House (first visit - full description)
+            "southwest", // Return to West of House (visited - brief)
+            "north"      // Go to North of House again (visited - brief)
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -78,7 +78,7 @@ struct FormattingTests {
             door here, and all the windows are boarded up. To the north a
             narrow path winds through the trees.
 
-            > south
+            > southwest
             — West of House —
 
             > north

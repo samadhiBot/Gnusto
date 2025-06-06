@@ -1319,7 +1319,7 @@ struct GameEngineTests {
             id: "statue",
             .name("statue"),
             .in(.player),
-            .isScenery
+            .omitDescription
         )
         let startRoom = Location(
             id: .startRoom,
@@ -1350,7 +1350,7 @@ struct GameEngineTests {
             .in(.player),
             .isWearable,
             .isWorn,
-            .isScenery
+            .omitDescription
         )
         let startRoom = Location(
             id: .startRoom,

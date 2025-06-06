@@ -307,7 +307,7 @@ extension Maze {
         .name("skeleton"),
         .synonyms("bones", "skeleton", "body"),
         .requiresTryTake,
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.maze5))
         // Note: Has action handler SKELETON
     )
@@ -328,7 +328,7 @@ extension Maze {
         .name("grating"),
         .synonyms("grate", "grating"),
         .isDoor,
-        .suppressDescription,
+        .omitDescription,
         .isInvisible
         // Note: Has action handler GRATE-FUNCTION
     )

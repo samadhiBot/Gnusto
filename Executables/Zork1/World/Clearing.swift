@@ -11,7 +11,7 @@ enum Clearing {
             on all sides. There appears to be a grating in the ground.
             """),
         .exits([
-            .west: .to(.behindHouse),
+            .west: .to(.eastOfHouse),
             .north: .to(.gratingClearing),
         ]),
         .inherentlyLit

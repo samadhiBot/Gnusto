@@ -210,7 +210,7 @@ struct ScopeResolverTests {
         let sceneryItem = Item(
             id: "window",
             .in(.location(.startRoom)),
-            .isScenery
+            .omitDescription
         )
         let invisibleItem = Item(
             id: "dust",
@@ -713,7 +713,7 @@ struct ScopeResolverTests {
             id: "window",
             .name("Window"),
             .in(.location(.startRoom)),
-            .isScenery
+            .omitDescription
         )
         let game = MinimalGame(items: [sceneryItem])
         let mockIO = await MockIOHandler()

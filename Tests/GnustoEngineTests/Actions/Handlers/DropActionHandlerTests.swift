@@ -196,7 +196,7 @@ struct DropActionHandlerTests {
             id: "sword-in-stone",
             .name("sword in stone"),
             .in(.player), // Hypothetically held
-            .isScenery
+            .omitDescription
         )
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()

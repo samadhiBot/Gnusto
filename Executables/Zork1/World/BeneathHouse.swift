@@ -96,7 +96,7 @@ extension BeneathHouse {
         .isWeapon,
         .requiresTryTake,
         .isTakable,
-        .suppressDescription,
+        .omitDescription,
         .size(25),
         .in(.item(.troll))
         // Note: Has action handler AXE-F

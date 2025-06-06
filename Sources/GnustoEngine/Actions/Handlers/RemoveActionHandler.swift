@@ -40,7 +40,7 @@ public struct RemoveActionHandler: ActionHandler {
         }
 
         // 4. Check if the item is fixed scenery
-        guard !targetItem.hasFlag(.isScenery) else {
+        guard !targetItem.hasFlag(.omitDescription) else {
             throw ActionResponse.itemNotRemovable(targetItemID)
         }
     }
@@ -91,7 +91,7 @@ public struct RemoveActionHandler: ActionHandler {
                     }
                     
                     // Check if item is removable (not scenery)
-                    guard !targetItem.hasFlag(.isScenery) else {
+                    guard !targetItem.hasFlag(.omitDescription) else {
                         continue // Skip non-removable items in ALL commands
                     }
                 }

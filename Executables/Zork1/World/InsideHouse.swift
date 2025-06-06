@@ -54,7 +54,7 @@ enum InsideHouse {
         id: .atticTable,
         .name("table"),
         .synonyms("table"),
-        .suppressDescription,
+        .omitDescription,
         .isContainer,
         .isOpen,
         .isSurface,
@@ -98,7 +98,7 @@ enum InsideHouse {
         .adjectives("large", "oriental"),
         .synonyms("rug", "carpet"),
         .in(.location(.livingRoom)),
-        .isScenery
+        .omitDescription
     )
 
     static let chimney = Item(
@@ -108,7 +108,7 @@ enum InsideHouse {
         .adjectives("dark", "narrow"),
         .synonyms("chimney"),
         .in(.location(.kitchen)),
-        .isScenery,
+        .omitDescription,
         .isClimbable
     )
 
@@ -128,7 +128,7 @@ enum InsideHouse {
         .name("kitchen table"),
         .synonyms("table"),
         .adjectives("kitchen"),
-        .suppressDescription,
+        .omitDescription,
         .isContainer,
         .isOpen,
         .isSurface,
@@ -210,7 +210,7 @@ enum InsideHouse {
         .name("carpet"),
         .synonyms("rug", "carpet"),
         .adjectives("large", "oriental"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .in(.location(.livingRoom))
         // Note: Has action handler RUG-FCN
@@ -251,7 +251,7 @@ enum InsideHouse {
         .synonyms("door", "trapdoor", "trap-door", "cover"),
         .adjectives("trap", "dusty"),
         .isDoor,
-        .suppressDescription,
+        .omitDescription,
         .isInvisible,
         .in(.location(.livingRoom))
         // Note: Has action handler TRAP-DOOR-FCN
@@ -264,7 +264,7 @@ enum InsideHouse {
         .adjectives("trophy"),
         .isTransparent,
         .isContainer,
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .isSearchable,
         .capacity(10000),
@@ -288,7 +288,7 @@ enum InsideHouse {
         .adjectives("wooden", "gothic", "strange", "west"),
         .isReadable,
         .isDoor,
-        .suppressDescription,
+        .omitDescription,
         .isTransparent,
         .readText("The engravings translate to \"This space intentionally left blank.\""),
         .in(.location(.livingRoom))

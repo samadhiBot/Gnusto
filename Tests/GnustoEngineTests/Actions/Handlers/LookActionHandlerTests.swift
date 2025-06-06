@@ -58,7 +58,7 @@ struct LookActionHandlerTests {
         let item4 = Item(
             id: "ceiling",
             .name("vaulted ceiling"),
-            .isScenery
+            .omitDescription
         )
 
         let game = MinimalGame(

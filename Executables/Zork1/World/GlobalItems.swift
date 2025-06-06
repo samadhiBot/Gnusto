@@ -16,7 +16,7 @@ enum GlobalItems {
         id: .board,
         .name("board"),
         .synonyms("boards", "board"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler BOARD-F
     )
 
@@ -25,7 +25,7 @@ enum GlobalItems {
         .name("boarded window"),
         .synonyms("window"),
         .adjectives("boarded"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler BOARDED-WINDOW-FCN
     )
 
@@ -92,7 +92,7 @@ enum GlobalItems {
         .synonyms("chimney"),
         .adjectives("dark", "narrow"),
         .isClimbable,
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler CHIMNEY-F
     )
 
@@ -120,7 +120,7 @@ enum GlobalItems {
         id: .forest,
         .name("forest"),
         .synonyms("forest", "trees", "pines", "hemlocks"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler FOREST-F
     )
 
@@ -137,7 +137,7 @@ enum GlobalItems {
         .name("granite wall"),
         .synonyms("wall"),
         .adjectives("granite"),
-        .suppressDescription
+        .omitDescription
         // Note: Parent is GLOBAL-OBJECTS, has action handler GRANITE-WALL-F
     )
 
@@ -168,7 +168,7 @@ enum GlobalItems {
         .synonyms("window"),
         .adjectives("kitchen", "small"),
         .isDoor,
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler KITCHEN-WINDOW-F
     )
 
@@ -177,7 +177,7 @@ enum GlobalItems {
         .name("wooden ladder"),
         .synonyms("ladder"),
         .adjectives("wooden", "rickety", "narrow"),
-        .suppressDescription,
+        .omitDescription,
         .isClimbable
     )
 
@@ -187,7 +187,7 @@ enum GlobalItems {
         .synonyms("mountain", "range"),
         .adjectives("impassable", "flathead"),
         .isClimbable,
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.mountains))
         // Note: Has action handler MOUNTAIN-RANGE-F
     )
@@ -206,7 +206,7 @@ enum GlobalItems {
         .name("songbird"),
         .synonyms("bird", "songbird"),
         .adjectives("song"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler SONGBIRD-F
     )
 
@@ -214,7 +214,7 @@ enum GlobalItems {
         id: .stairs,
         .name("stairs"),
         .synonyms("stairs", "staircase", "stairway", "steps"),
-        .suppressDescription
+        .omitDescription
         // Note: Global scenery object referenced in multiple rooms
     )
 
@@ -222,7 +222,7 @@ enum GlobalItems {
         id: .teeth,
         .name("set of teeth"),
         .synonyms("overboard", "teeth"),
-        .suppressDescription
+        .omitDescription
         // Note: Parent is GLOBAL-OBJECTS, has action handler TEETH-F
     )
 
@@ -232,7 +232,7 @@ enum GlobalItems {
         .synonyms("tree", "branch"),
         .adjectives("large", "storm"),
         .isClimbable,
-        .suppressDescription
+        .omitDescription
     )
 
     static let wall = Item(
@@ -260,7 +260,7 @@ enum GlobalItems {
         .name("white house"),
         .synonyms("house"),
         .adjectives("white", "beautiful", "colonial"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler WHITE-HOUSE-F
     )
 }

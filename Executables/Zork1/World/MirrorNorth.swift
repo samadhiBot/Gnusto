@@ -96,7 +96,7 @@ extension MirrorNorth {
         .name("mirror"),
         .synonyms("reflection", "mirror", "enormous"),
         .requiresTryTake,
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.mirrorRoomNorth))
         // Note: Has action handler MIRROR-MIRROR
     )

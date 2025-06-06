@@ -45,7 +45,7 @@ extension Hades {
         .name("pile of bodies"),
         .synonyms("bodies", "body", "remains", "pile"),
         .adjectives("mangled"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake
         // Note: Has action handler BODY-FUNCTION
     )
@@ -56,7 +56,7 @@ extension Hades {
         .synonyms("ghosts", "spirits", "fiends", "force"),
         .adjectives("invisible", "evil"),
         .isCharacter,  // ACTORBIT
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.entranceToHades))
         // Note: Has action handler GHOSTS-F
     )

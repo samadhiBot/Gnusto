@@ -411,7 +411,7 @@ extension River {
         id: .rainbow,
         .name("rainbow"),
         .synonyms("rainbow"),
-        .suppressDescription,
+        .omitDescription,
         .isClimbable
         // Note: Has action handler RAINBOW-FCN
     )
@@ -421,7 +421,7 @@ extension River {
         .name("river"),
         .synonyms("river"),
         .adjectives("frigid"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler RIVER-FUNCTION
     )
 
@@ -429,7 +429,7 @@ extension River {
         id: .sand,
         .name("sand"),
         .synonyms("sand"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.sandyCave))
         // Note: Has action handler SAND-FUNCTION
     )
@@ -461,7 +461,7 @@ extension River {
         .name("white cliffs"),
         .synonyms("cliff", "cliffs"),
         .adjectives("white"),
-        .suppressDescription,
+        .omitDescription,
         .isClimbable
         // Note: Has action handler WCLIF-OBJECT
     )

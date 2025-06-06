@@ -56,7 +56,7 @@ extension CyclopsHideaway {
         .name("pile of bodies"),
         .synonyms("bodies", "body", "remains", "pile"),
         .adjectives("mangled"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake
         // Note: Has action handler BODY-FUNCTION
     )
@@ -82,7 +82,7 @@ extension CyclopsHideaway {
         .synonyms("cyclops", "monster", "eye"),
         .adjectives("hungry", "giant"),
         .isCharacter,  // ACTORBIT
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .in(.location(.cyclopsRoom))
         // Note: Has action handler CYCLOPS-FCN, STRENGTH 10000

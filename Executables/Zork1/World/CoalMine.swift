@@ -334,7 +334,7 @@ extension CoalMine {
         .name("machine"),
         .synonyms("machine", "pdp10", "dryer", "lid"),
         .isContainer,
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .capacity(50),
         .in(.location(.machineRoom))
@@ -345,7 +345,7 @@ extension CoalMine {
         id: .machineSwitch,
         .name("switch"),
         .synonyms("switch"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.machineRoom))
         // Note: Has action handler MSWITCH-FUNCTION, TURNBIT
     )

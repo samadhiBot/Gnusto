@@ -97,7 +97,7 @@ enum OperaHouse {  // Organize content into logical areas
         id: .hook,  // Plugin auto-generates ItemID.hook
         .adjectives("small", "brass"),
         .in(.location(.cloakroom)),
-        .isScenery,
+        .omitDescription,
         .isSurface,
         .name("small brass hook"),
         .synonyms("peg"),

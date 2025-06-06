@@ -41,7 +41,7 @@ enum OperaHouse {
         id: .hook,
         .adjectives("small", "brass"),
         .in(.location(.cloakroom)),
-        .isScenery,
+        .omitDescription,
         .isSurface,
         .name("small brass hook"),
         .synonyms("peg"),
@@ -68,7 +68,7 @@ enum OperaHouse {
         .in(.location(.bar)),
         .synonyms("sawdust", "floor"),
         .isReadable,
-        .isScenery
+        .omitDescription
     )
 
     // MARK: - Items

@@ -70,7 +70,7 @@ extension MirrorSouth {
         .name("mirror"),
         .synonyms("reflection", "mirror", "enormous"),
         .requiresTryTake,
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.mirrorRoomSouth))
         // Note: Has action handler MIRROR-MIRROR
     )

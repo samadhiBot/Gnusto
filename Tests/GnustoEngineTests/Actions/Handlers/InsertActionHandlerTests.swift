@@ -1483,7 +1483,7 @@ struct InsertActionHandlerTests {
             .name("glass trophy"),
             .in(.player),
             .isTakable,
-            .isScenery,
+            .omitDescription,
         )
         let box = Item(
             id: "openBox",

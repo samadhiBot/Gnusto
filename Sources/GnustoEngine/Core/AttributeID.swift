@@ -95,9 +95,6 @@ public extension AttributeID {
     /// FEMALEBIT: Grammatically female.
     static let isFemale = AttributeID("isFemale")
 
-    /// Cannot be taken or moved (scenery).
-    static let isScenery = AttributeID("isScenery")
-
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = AttributeID("isFlammable")
 
@@ -118,12 +115,6 @@ public extension AttributeID {
 
     /// LOCKED: Is locked.
     static let isLocked = AttributeID("isLocked")
-
-    /// NARTICLEBIT: Suppress default article ("a", "the").
-    static let suppressArticle = AttributeID("suppressArticle")
-
-    /// NDESCBIT: Suppress automatic description in room contents.
-    static let suppressDescription = AttributeID("suppressDescription")
 
     /// ONBIT: Is currently switched on.
     static let isOn = AttributeID("isOn") // Note: Potential overlap with computed isLit? Review needed.
@@ -178,6 +169,12 @@ public extension AttributeID {
 
     /// WORNBIT: Is currently being worn.
     static let isWorn = AttributeID("isWorn")
+
+    /// NARTICLEBIT: Omit default article ("a", "the").
+    static let omitArticle = AttributeID("omitArticle")
+
+    /// NDESCBIT: Omit automatic description in room contents.
+    static let omitDescription = AttributeID("omitDescription")
 }
 
 // MARK: - Location Flags

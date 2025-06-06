@@ -167,7 +167,7 @@ struct RemoveActionHandlerTests {
             id: "amulet",
             .name("cursed amulet"),
             .in(.player),
-            .isScenery,
+            .omitDescription,
             .isWearable,
             .isWorn
         )
@@ -319,7 +319,7 @@ struct RemoveActionHandlerTests {
     @Test("REMOVE ALL skips scenery items")
     func testRemoveAllSkipsScenery() async throws {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let amulet = Item(id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn, .isScenery)
+        let amulet = Item(id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn, .omitDescription)
         
         let game = MinimalGame(items: [cloak, amulet])
         let mockIO = await MockIOHandler()

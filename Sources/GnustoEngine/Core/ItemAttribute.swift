@@ -199,11 +199,6 @@ extension ItemAttribute {
         ItemAttribute(id: .isFemale, rawValue: true)
     }
 
-    /// Cannot be taken or moved (scenery).
-    public static var isScenery: ItemAttribute {
-        ItemAttribute(id: .isScenery, rawValue: true)
-    }
-
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     public static var isFlammable: ItemAttribute {
         ItemAttribute(id: .isFlammable, rawValue: true)
@@ -237,16 +232,6 @@ extension ItemAttribute {
     /// LOCKED: Is locked.
     public static var isLocked: ItemAttribute {
         ItemAttribute(id: .isLocked, rawValue: true)
-    }
-
-    /// NARTICLEBIT: Suppress default article ("a", "the").
-    public static var suppressArticle: ItemAttribute {
-        ItemAttribute(id: .suppressArticle, rawValue: true)
-    }
-
-    /// NDESCBIT: Suppress automatic description in room contents.
-    public static var suppressDescription: ItemAttribute {
-        ItemAttribute(id: .suppressDescription, rawValue: true)
     }
 
     /// ONBIT: Is currently switched on.
@@ -339,4 +324,13 @@ extension ItemAttribute {
         ItemAttribute(id: .isWorn, rawValue: true)
     }
 
+    /// NARTICLEBIT: Suppress default article ("a", "the").
+    public static var omitArticle: ItemAttribute {
+        ItemAttribute(id: .omitArticle, rawValue: true)
+    }
+
+    /// NDESCBIT: Suppress automatic description in room contents.
+    public static var omitDescription: ItemAttribute {
+        ItemAttribute(id: .omitDescription, rawValue: true)
+    }
 }

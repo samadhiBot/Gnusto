@@ -123,7 +123,7 @@ extension RoundRoom {
         .name("cliff"),
         .synonyms("wall", "cliff", "walls", "ledge"),
         .adjectives("rocky", "sheer"),
-        .suppressDescription,
+        .omitDescription,
         .isClimbable
         // Note: Has action handler CLIFF-OBJECT
     )
@@ -133,7 +133,7 @@ extension RoundRoom {
         .name("crack"),
         .synonyms("crack"),
         .adjectives("narrow"),
-        .suppressDescription
+        .omitDescription
         // Note: Has action handler CRACK-FCN
     )
 
@@ -143,7 +143,7 @@ extension RoundRoom {
         .synonyms("bag"),
         .adjectives("large", "thiefs"),
         .requiresTryTake,
-        .suppressDescription,
+        .omitDescription,
         .in(.item(.thief))
         // Note: Has action handler LARGE-BAG-F
     )
@@ -168,7 +168,7 @@ extension RoundRoom {
         .isWeapon,
         .requiresTryTake,
         .isTakable,
-        .suppressDescription,
+        .omitDescription,
         .size(10),
         .in(.item(.thief))
         // Note: Has action handler STILETTO-FUNCTION

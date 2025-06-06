@@ -41,12 +41,12 @@ public struct DropActionHandler: ActionHandler {
         }
         
         // 3. Check if item is droppable (not scenery/fixed)
-        guard !targetItem.hasFlag(.isScenery) else {
+        guard !targetItem.hasFlag(.omitDescription) else {
             throw ActionResponse.itemNotDroppable(targetItemID)
         }
         
         // 3. Check if item is droppable (not scenery/fixed)
-        guard !targetItem.hasFlag(.isScenery) else {
+        guard !targetItem.hasFlag(.omitDescription) else {
             throw ActionResponse.itemNotDroppable(targetItemID)
         }
     }
@@ -109,7 +109,7 @@ public struct DropActionHandler: ActionHandler {
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if item is droppable (not scenery/fixed)
-                    guard !targetItem.hasFlag(.isScenery) else {
+                    guard !targetItem.hasFlag(.omitDescription) else {
                         continue // Skip non-droppable items in ALL commands
                     }
                 }
@@ -117,7 +117,7 @@ public struct DropActionHandler: ActionHandler {
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if item is droppable (not scenery/fixed)
-                    guard !targetItem.hasFlag(.isScenery) else {
+                    guard !targetItem.hasFlag(.omitDescription) else {
                         continue // Skip non-droppable items in ALL commands
                     }
                 }

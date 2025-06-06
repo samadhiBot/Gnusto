@@ -216,7 +216,7 @@ enum Underground {
         .adjectives("steep", "metal"),
         .synonyms("ramp"),
         .in(.location(.cellar)),
-        .isScenery,
+        .omitDescription,
         .isClimbable
     )
 }

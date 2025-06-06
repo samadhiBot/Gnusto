@@ -316,7 +316,7 @@ struct ScannerTests {
                     id: .hook,
                     .adjectives("small", "brass"),
                     .in(.location(.cloakroom)),
-                    .isScenery,
+                    .omitDescription,
                     .isSurface
                 )
             }

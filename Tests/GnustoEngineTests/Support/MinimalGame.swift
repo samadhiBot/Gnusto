@@ -42,7 +42,7 @@ public struct MinimalGame: GameBlueprint {
                 .name("self"),
                 .description("You are your usual self."),
                 .in(.player),
-                .isScenery
+                .omitDescription
             )
         ],
         customActionHandlers: [VerbID: ActionHandler] = [:],

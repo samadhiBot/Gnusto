@@ -32,7 +32,7 @@ enum Forest {
             .east: .to(.canyonView),
             .north: .to(.forest2),
             .south: .to(.forest3),
-            .west: .to(.behindHouse),
+            .west: .to(.eastOfHouse),
             .up: .blocked("There is no tree here suitable for climbing."),
         ]),
         .inherentlyLit,
@@ -180,7 +180,7 @@ enum Forest {
         .name("forest"),
         .description("The forest is all around you, with trees in every direction."),
         .synonyms("trees", "pines", "hemlocks"),
-        .isScenery
+        .omitDescription
     )
 
     static let leaves = Item(
@@ -221,7 +221,7 @@ enum Forest {
         .synonyms("branch", "branches"),
         .in(.location(.forestPath)),
         .isClimbable,
-        .isScenery
+        .omitDescription
     )
 }
 

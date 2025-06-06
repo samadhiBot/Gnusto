@@ -106,7 +106,7 @@ extension Temple {
         id: .altar,
         .name("altar"),
         .synonyms("altar"),
-        .suppressDescription,
+        .omitDescription,
         .isSurface,  // SURFACEBIT
         .isContainer,
         .isOpen,
@@ -205,7 +205,7 @@ extension Temple {
         .name("pedestal"),
         .synonyms("pedestal"),
         .adjectives("white", "marble"),
-        .suppressDescription,
+        .omitDescription,
         .isContainer,
         .isOpen,
         .isSurface,
@@ -220,7 +220,7 @@ extension Temple {
         .synonyms("prayer", "inscription"),
         .adjectives("ancient", "old"),
         .isReadable,
-        .suppressDescription,
+        .omitDescription,
         .readText("""
             The prayer is inscribed in an ancient script, rarely used today. It seems
             to be a philippic against small insects, absent-mindedness, and the picking
@@ -237,7 +237,7 @@ extension Temple {
         .name("wooden railing"),
         .synonyms("railing", "rail"),
         .adjectives("wooden"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.domeRoom))
     )
 

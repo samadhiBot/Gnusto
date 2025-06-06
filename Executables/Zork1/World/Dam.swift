@@ -62,7 +62,7 @@ extension Dam {
         .name("blue button"),
         .synonyms("button", "switch"),
         .adjectives("blue"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.maintenanceRoom))
         // Note: Has action handler BUTTON-F
     )
@@ -72,7 +72,7 @@ extension Dam {
         .name("bolt"),
         .synonyms("bolt", "nut"),
         .adjectives("metal", "large"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .in(.location(.damRoom))
         // Note: Has action handler BOLT-F, TURNBIT
@@ -83,7 +83,7 @@ extension Dam {
         .name("brown button"),
         .synonyms("button", "switch"),
         .adjectives("brown"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.maintenanceRoom))
         // Note: Has action handler BUTTON-F
     )
@@ -93,7 +93,7 @@ extension Dam {
         .name("green bubble"),
         .synonyms("bubble"),
         .adjectives("small", "green", "plastic"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .in(.location(.damRoom))
         // Note: Has action handler BUBBLE-F
@@ -104,7 +104,7 @@ extension Dam {
         .name("control panel"),
         .synonyms("panel"),
         .adjectives("control"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.damRoom))
     )
 
@@ -112,7 +112,7 @@ extension Dam {
         id: .dam,
         .name("dam"),
         .synonyms("dam", "gate", "gates", "fcd#3"),
-        .suppressDescription,
+        .omitDescription,
         .requiresTryTake,
         .in(.location(.damRoom))
         // Note: Has action handler DAM-FUNCTION
@@ -179,7 +179,7 @@ extension Dam {
         id: .leak,
         .name("leak"),
         .synonyms("leak", "drip", "pipe"),
-        .suppressDescription,
+        .omitDescription,
         .isInvisible,
         .in(.location(.maintenanceRoom))
         // Note: Has action handler LEAK-FUNCTION
@@ -234,7 +234,7 @@ extension Dam {
         .name("red button"),
         .synonyms("button", "switch"),
         .adjectives("red"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.maintenanceRoom))
         // Note: Has action handler BUTTON-F
     )
@@ -294,7 +294,7 @@ extension Dam {
         .name("yellow button"),
         .synonyms("button", "switch"),
         .adjectives("yellow"),
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.maintenanceRoom))
         // Note: Has action handler BUTTON-F
     )

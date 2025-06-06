@@ -63,7 +63,7 @@ extension OperaHouse {
         id: .hook,
         .adjectives("small", "brass"),
         .in(.location(.cloakroom)),
-        .isScenery,
+        .omitDescription,
         .isSurface,
         .name("small brass hook"),
         .synonyms("peg"),
@@ -90,7 +90,7 @@ Key ``ItemAttribute``s here include:
 
 - ``ItemAttribute/name(_:)``, ``ItemAttribute/description(_:)``, ``ItemAttribute/adjectives(_:)``, ``ItemAttribute/synonyms(_:)``: Help describe the item and how the player can refer to it.
 - ``ItemAttribute/in(_:)``: Specifies the item's initial ``ParentEntity``, which can be a location, a container item, or the player.
-- Flags are boolean properties like ``ItemAttribute/isTakable`` (can the player pick it up?), ``ItemAttribute/isWearable`` (can the player wear it?), or ``ItemAttribute/isScenery`` (is it just part of the background?).
+- Flags are boolean properties like ``ItemAttribute/isTakable`` (can the player pick it up?), ``ItemAttribute/isWearable`` (can the player wear it?), or ``ItemAttribute/omitDescription`` (is it just part of the background?).
 
 ### Making it Interactive: Actions and Responses
 

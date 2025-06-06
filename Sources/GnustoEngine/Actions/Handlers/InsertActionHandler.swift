@@ -82,7 +82,7 @@ public struct InsertActionHandler: ActionHandler {
         }
 
         // If the item being inserted is fixed scenery, Zork replies as if it is not a container.
-        if itemToInsert.hasFlag(.isScenery) {
+        if itemToInsert.hasFlag(.omitDescription) {
             throw ActionResponse.targetIsNotAContainer(itemToInsertID)
         }
 
@@ -188,7 +188,7 @@ public struct InsertActionHandler: ActionHandler {
                     }
                     
                     // Check if item is scenery
-                    if itemToInsert.hasFlag(.isScenery) {
+                    if itemToInsert.hasFlag(.omitDescription) {
                         continue // Skip scenery items in ALL commands
                     }
                     

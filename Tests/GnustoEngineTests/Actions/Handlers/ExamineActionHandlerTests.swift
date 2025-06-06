@@ -377,7 +377,7 @@ struct ExamineActionHandlerTests {
             .name("kitchen window"),
             .description("The window is slightly ajar, but not enough to allow entry."),
             .in(.location(roomID)),
-            .isScenery
+            .omitDescription
         )
         let room = Location(
             id: roomID,

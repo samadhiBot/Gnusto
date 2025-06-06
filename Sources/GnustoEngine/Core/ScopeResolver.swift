@@ -81,7 +81,7 @@ public struct ScopeResolver: Sendable {
 
         // 3. Filter out items with the .invisible property and scenery items.
         let visibleItems = itemsDirectlyInLocation.filter { item in
-            !item.hasFlag(.isInvisible) && !item.hasFlag(.isScenery)
+            !item.hasFlag(.isInvisible) && !item.hasFlag(.omitDescription)
         }
 
         // 4. Return the IDs of the visible items.

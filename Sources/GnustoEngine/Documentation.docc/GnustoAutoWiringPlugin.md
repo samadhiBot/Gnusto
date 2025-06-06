@@ -143,7 +143,7 @@ enum TownSquare {
         id: .fountain,    // Plugin generates ItemID.fountain
         .name("ornate fountain"),
         .in(.location(.townSquare)),
-        .isScenery
+        .omitDescription
     )
 
     static let fountainHandler = ItemEventHandler { engine, event in

@@ -3,14 +3,9 @@ import GnustoEngine
 // MARK: - Outside the White House
 
 enum OutsideHouse {
-    static let behindHouse = Location(
-        id: .behindHouse,
+    static let eastOfHouse = Location(
+        id: .eastOfHouse,
         .name("Behind House"),
-        .description("""
-            You are behind the white house. A path leads into the forest to
-            the east. In one corner of the house there is a small window which
-            is slightly ajar.
-            """),
         .exits([
             .north: .to(.northOfHouse),
             .south: .to(.southOfHouse),
@@ -21,7 +16,9 @@ enum OutsideHouse {
             .inside: .to(.kitchen, via: .kitchenWindow),
         ]),
         .inherentlyLit,
-        .localGlobals(.boards)
+        .isLand,
+        .isSacred,
+        .localGlobals(.whiteHouse, .kitchenWindow, .forest)
     )
 
     static let northOfHouse = Location(
@@ -34,13 +31,15 @@ enum OutsideHouse {
             """),
         .exits([
             .southwest: .to(.westOfHouse),
-            .southeast: .to(.behindHouse),
+            .southeast: .to(.eastOfHouse),
             .west: .to(.westOfHouse),
-            .east: .to(.behindHouse),
+            .east: .to(.eastOfHouse),
             .north: .to(.forestPath),
-            // Note: SOUTH exit has custom message about boarded windows
+            .south: .blocked("The windows are all boarded.")
         ]),
         .inherentlyLit,
+        .isLand,
+        .isSacred,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
     )
 
@@ -53,13 +52,15 @@ enum OutsideHouse {
             """),
         .exits([
             .west: .to(.westOfHouse),
-            .east: .to(.behindHouse),
-            .northeast: .to(.behindHouse),
+            .east: .to(.eastOfHouse),
+            .northeast: .to(.eastOfHouse),
             .northwest: .to(.westOfHouse),
             .south: .to(.forest3),
-            // Note: NORTH exit has custom message about boarded windows
+            .north: .blocked("The windows are all boarded.")
         ]),
         .inherentlyLit,
+        .isLand,
+        .isSacred,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
     )
 
@@ -133,7 +134,7 @@ extension OutsideHouse {
         .name("boards"),
         .description("The boards are securely fastened and cannot be removed."),
         .synonyms("board"),
-        .isScenery
+        .omitDescription
     )
 
     static let frontDoor = Item(
@@ -142,7 +143,7 @@ extension OutsideHouse {
         .synonyms("door"),
         .adjectives("front", "boarded"),
         .isDoor,
-        .suppressDescription,
+        .omitDescription,
         .in(.location(.westOfHouse))
         // Note: Has action handler FRONT-DOOR-FCN
     )
@@ -153,9 +154,9 @@ extension OutsideHouse {
         .description("The window is slightly ajar, but not enough to allow entry."),
         .adjectives("kitchen", "small"),
         .synonyms("window"),
-        .in(.location(.behindHouse)),
+        .in(.location(.eastOfHouse)),
         .isOpenable,
-        .isScenery
+        .omitDescription
     )
 
     static let mailbox = Item(
@@ -180,7 +181,7 @@ extension OutsideHouse {
         .adjectives("white", "beautiful", "colonial"),
         .synonyms("house", "home", "building"),
         .in(.location(.westOfHouse)),
-        .isScenery
+        .omitDescription
     )
 }
 
