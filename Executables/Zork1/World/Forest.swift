@@ -137,8 +137,6 @@ enum Forest {
             .west: .to(.forest2),
         ]),
         .inherentlyLit,
-        .isLand,
-        .isSacred,
         .localGlobals(.tree, .whiteHouse)
     )
 

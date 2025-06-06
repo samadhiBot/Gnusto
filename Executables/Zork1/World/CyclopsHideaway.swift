@@ -12,7 +12,6 @@ enum CyclopsHideaway {
             // Note: EAST exit to strange passage conditional on MAGIC-FLAG
             // Note: UP exit to treasure room conditional on CYCLOPS-FLAG
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -28,8 +27,7 @@ enum CyclopsHideaway {
             .west: .to(.cyclopsRoom),
             .inside: .to(.cyclopsRoom),
             .east: .to(.livingRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let treasureRoom = Location(
@@ -43,7 +41,6 @@ enum CyclopsHideaway {
         .exits([
             .down: .to(.cyclopsRoom)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 }

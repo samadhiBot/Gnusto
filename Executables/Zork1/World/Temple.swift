@@ -10,8 +10,7 @@ enum Temple {
         .exits([
             .west: .to(.engravingsCave),
             // Note: DOWN exit to torch room conditional on DOME-FLAG
-        ]),
-        .isLand
+        ])
     )
 
     static let egyptRoom = Location(
@@ -25,7 +24,6 @@ enum Temple {
             .west: .to(.northTemple),
             .up: .to(.northTemple)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -38,8 +36,7 @@ enum Temple {
         .exits([
             .northwest: .to(.roundRoom),
             .east: .to(.domeRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let northTemple = Location(
@@ -60,9 +57,7 @@ enum Temple {
             .up: .to(.torchRoom),
             .south: .to(.southTemple)
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.stairs)
     )
 
@@ -78,9 +73,7 @@ enum Temple {
             .north: .to(.northTemple),
             // Note: DOWN exit to tiny cave conditional on COFFIN-CURE
         ]),
-        .isLand,
-        .inherentlyLit,
-        .isSacred
+        .inherentlyLit
     )
 
     static let torchRoom = Location(
@@ -94,7 +87,6 @@ enum Temple {
             .south: .to(.northTemple),
             .down: .to(.northTemple)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 }

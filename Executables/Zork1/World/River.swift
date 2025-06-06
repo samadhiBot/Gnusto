@@ -12,8 +12,6 @@ enum River {
             // Note: DOWN exit has custom message
             .north: .to(.shore)
         ]),
-        .isLand,
-        .isSacred,
         .inherentlyLit,
         .localGlobals(.globalWater, .river, .rainbow)
     )
@@ -30,9 +28,7 @@ enum River {
             .up: .to(.cliffMiddle),
             .north: .to(.endOfRainbow)
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.globalWater, .climbableCliff, .river)
     )
 
@@ -57,9 +53,7 @@ enum River {
             .west: .to(.forest3),
             // Note: SOUTH exit has custom message
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.climbableCliff, .river, .rainbow)
     )
 
@@ -77,9 +71,7 @@ enum River {
             .up: .to(.canyonView),
             .down: .to(.canyonBottom)
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.climbableCliff, .river)
     )
 
@@ -97,9 +89,7 @@ enum River {
             .north: .to(.damRoom),
             .up: .to(.damRoom)
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.globalWater, .river)
     )
 
@@ -117,7 +107,6 @@ enum River {
             // Note: UP, NE, EAST exits to rainbow conditional on RAINBOW-FLAG
             .southwest: .to(.canyonBottom)
         ]),
-        .isLand,
         .inherentlyLit,
         .localGlobals(.globalWater, .rainbow, .river)
     )
@@ -134,9 +123,7 @@ enum River {
             .west: .to(.endOfRainbow),
             .east: .to(.aragainFalls)
         ]),
-        .isLand,
         .inherentlyLit,
-        .isSacred,
         .localGlobals(.rainbow)
     )
 
@@ -155,7 +142,6 @@ enum River {
             // Note: EAST exit has custom message about White Cliffs
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .isSacred,
         .inherentlyLit,
         .localGlobals(.globalWater, .river)
     )
@@ -174,7 +160,6 @@ enum River {
             // Note: LAND, EAST, WEST exits have custom messages
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .isSacred,
         .localGlobals(.globalWater, .river)
     )
 
@@ -192,7 +177,6 @@ enum River {
             // Note: LAND and WEST exits to white cliffs north
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .isSacred,
         .localGlobals(.globalWater, .river)
     )
 
@@ -212,7 +196,6 @@ enum River {
             .east: .to(.sandyBeach)
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .isSacred,
         .localGlobals(.globalWater, .river)
     )
 
@@ -229,7 +212,6 @@ enum River {
             // Note: LAND exit to shore
         ]),
         // Note: This is NONLANDBIT in ZIL
-        .isSacred,
         .inherentlyLit,
         .localGlobals(.globalWater, .river)
     )
@@ -246,8 +228,6 @@ enum River {
             .northeast: .to(.sandyCave),
             .south: .to(.shore)
         ]),
-        .isLand,
-        .isSacred,
         .localGlobals(.globalWater, .river)
     )
 
@@ -259,8 +239,7 @@ enum River {
             """),
         .exits([
             .southwest: .to(.sandyBeach)
-        ]),
-        .isLand
+        ])
     )
 
     static let shore = Location(
@@ -275,8 +254,6 @@ enum River {
             .north: .to(.sandyBeach),
             .south: .to(.aragainFalls)
         ]),
-        .isLand,
-        .isSacred,
         .inherentlyLit,
         .localGlobals(.globalWater, .river)
     )
@@ -290,8 +267,6 @@ enum River {
             and a tight passage leading west into the cliffs themselves.
             """),
         .exits([:]),
-        .isLand,
-        .isSacred,
         .localGlobals(.globalWater, .whiteCliff, .river)
     )
 
@@ -303,8 +278,6 @@ enum River {
             narrow path leads north along the shore.
             """),
         .exits([:]),
-        .isLand,
-        .isSacred,
         .localGlobals(.globalWater, .whiteCliff, .river)
     )
 }

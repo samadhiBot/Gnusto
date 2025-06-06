@@ -16,8 +16,6 @@ enum OutsideHouse {
             .inside: .to(.kitchen, via: .kitchenWindow),
         ]),
         .inherentlyLit,
-        .isLand,
-        .isSacred,
         .localGlobals(.whiteHouse, .kitchenWindow, .forest)
     )
 
@@ -38,8 +36,6 @@ enum OutsideHouse {
             .south: .blocked("The windows are all boarded.")
         ]),
         .inherentlyLit,
-        .isLand,
-        .isSacred,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
     )
 
@@ -59,8 +55,6 @@ enum OutsideHouse {
             .north: .blocked("The windows are all boarded.")
         ]),
         .inherentlyLit,
-        .isLand,
-        .isSacred,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
     )
 

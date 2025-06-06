@@ -46,7 +46,6 @@ enum Reservoir {
             .north: .to(.atlantisRoom),
             // Note: SOUTH exit to reservoir conditional on LOW-TIDE
         ]),
-        .isLand,
         .localGlobals(.globalWater, .stairs)
     )
 
@@ -63,7 +62,6 @@ enum Reservoir {
             .west: .to(.streamView),
             // Note: NORTH exit to reservoir conditional on LOW-TIDE
         ]),
-        .isLand,
         .localGlobals(.globalWater)
     )
 
@@ -78,7 +76,6 @@ enum Reservoir {
             .east: .to(.reservoirSouth),
             // Note: WEST exit has custom message about stream being too small
         ]),
-        .isLand,
         .localGlobals(.globalWater)
     )
 }

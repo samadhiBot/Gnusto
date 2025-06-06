@@ -10,9 +10,7 @@ enum CoalMine {
         .exits([
             .south: .to(.squeakyRoom),
             .east: .to(.shaftRoom)
-        ]),
-        .isLand,
-        .isSacred
+        ])
     )
 
     static let deadEnd5 = Location(
@@ -23,8 +21,7 @@ enum CoalMine {
             """),
         .exits([
             .north: .to(.ladderBottom)
-        ]),
-        .isLand
+        ])
     )
 
     static let gasRoom = Location(
@@ -38,8 +35,6 @@ enum CoalMine {
             .up: .to(.smellyRoom),
             .east: .to(.mine1)
         ]),
-        .isLand,
-        .isSacred,
         .localGlobals(.stairs)
     )
 
@@ -56,7 +51,6 @@ enum CoalMine {
             .west: .to(.timberRoom),
             .up: .to(.ladderTop)
         ]),
-        .isLand,
         .localGlobals(.ladder)
     )
 
@@ -72,7 +66,6 @@ enum CoalMine {
             .down: .to(.ladderBottom),
             .up: .to(.mine4)
         ]),
-        .isLand,
         .localGlobals(.ladder, .stairs)
     )
 
@@ -87,9 +80,7 @@ enum CoalMine {
         .exits([
             .south: .to(.machineRoom),
             // Note: OUT and EAST exits to timber room conditional on EMPTY-HANDED
-        ]),
-        .isLand,
-        .isSacred
+        ])
     )
 
     static let machineRoom = Location(
@@ -100,8 +91,7 @@ enum CoalMine {
             """),
         .exits([
             .north: .to(.lowerShaft)
-        ]),
-        .isLand
+        ])
     )
 
     static let mineEntrance = Location(
@@ -116,8 +106,7 @@ enum CoalMine {
             .south: .to(.slideRoom),
             .inside: .to(.squeakyRoom),
             .west: .to(.squeakyRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let mine1 = Location(
@@ -130,8 +119,7 @@ enum CoalMine {
             .north: .to(.gasRoom),
             .east: .to(.mine1),
             .northeast: .to(.mine2)
-        ]),
-        .isLand
+        ])
     )
 
     static let mine2 = Location(
@@ -144,8 +132,7 @@ enum CoalMine {
             .north: .to(.mine2),
             .south: .to(.mine1),
             .southeast: .to(.mine3)
-        ]),
-        .isLand
+        ])
     )
 
     static let mine3 = Location(
@@ -158,8 +145,7 @@ enum CoalMine {
             .south: .to(.mine3),
             .southwest: .to(.mine4),
             .east: .to(.mine2)
-        ]),
-        .isLand
+        ])
     )
 
     static let mine4 = Location(
@@ -172,8 +158,7 @@ enum CoalMine {
             .north: .to(.mine3),
             .west: .to(.mine4),
             .down: .to(.ladderTop)
-        ]),
-        .isLand
+        ])
     )
 
     static let shaftRoom = Location(
@@ -189,8 +174,7 @@ enum CoalMine {
             // Note: DOWN exit has custom message
             .west: .to(.batRoom),
             .north: .to(.smellyRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let slideRoom = Location(
@@ -208,7 +192,6 @@ enum CoalMine {
             .north: .to(.mineEntrance),
             .down: .to(.cellar)
         ]),
-        .isLand,
         .localGlobals(.slide)
     )
 
@@ -224,7 +207,6 @@ enum CoalMine {
             .down: .to(.gasRoom),
             .south: .to(.shaftRoom)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -238,8 +220,7 @@ enum CoalMine {
         .exits([
             .north: .to(.batRoom),
             .east: .to(.mineEntrance)
-        ]),
-        .isLand
+        ])
     )
 
     static let timberRoom = Location(
@@ -254,9 +235,7 @@ enum CoalMine {
         .exits([
             .east: .to(.ladderBottom),
             // Note: WEST exit to lower shaft conditional on EMPTY-HANDED
-        ]),
-        .isLand,
-        .isSacred
+        ])
     )
 }
 

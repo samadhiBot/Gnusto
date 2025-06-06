@@ -14,7 +14,6 @@ enum Dam {
             .north: .to(.maintenanceRoom),
             .east: .to(.maintenanceRoom)
         ]),
-        .isLand,
         .inherentlyLit
     )
 
@@ -31,7 +30,6 @@ enum Dam {
             .north: .to(.damLobby),
             .west: .to(.reservoirSouth)
         ]),
-        .isLand,
         .inherentlyLit,
         .localGlobals(.globalWater)
     )
@@ -49,8 +47,7 @@ enum Dam {
         .exits([
             .south: .to(.damLobby),
             .west: .to(.damLobby)
-        ]),
-        .isLand
+        ])
     )
 }
 

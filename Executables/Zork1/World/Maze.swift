@@ -12,8 +12,7 @@ enum Maze {
             .north: .to(.maze1),
             .south: .to(.maze2),
             .west: .to(.maze4)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze2 = Location(
@@ -26,8 +25,7 @@ enum Maze {
             .south: .to(.maze1),
             .east: .to(.maze3),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-4
-        ]),
-        .isLand
+        ])
     )
 
     static let maze3 = Location(
@@ -40,8 +38,7 @@ enum Maze {
             .west: .to(.maze2),
             .north: .to(.maze4),
             .up: .to(.maze5)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze4 = Location(
@@ -54,8 +51,7 @@ enum Maze {
             .west: .to(.maze3),
             .north: .to(.maze1),
             .east: .to(.deadEnd1)
-        ]),
-        .isLand
+        ])
     )
 
     static let deadEnd1 = Location(
@@ -66,8 +62,7 @@ enum Maze {
             """),
         .exits([
             .south: .to(.maze4)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze5 = Location(
@@ -81,8 +76,7 @@ enum Maze {
             .east: .to(.deadEnd2),
             .north: .to(.maze3),
             .southwest: .to(.maze6)
-        ]),
-        .isLand
+        ])
     )
 
     static let deadEnd2 = Location(
@@ -93,8 +87,7 @@ enum Maze {
             """),
         .exits([
             .west: .to(.maze5)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze6 = Location(
@@ -108,8 +101,7 @@ enum Maze {
             .east: .to(.maze7),
             .west: .to(.maze6),
             .up: .to(.maze9)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze7 = Location(
@@ -124,8 +116,7 @@ enum Maze {
             .east: .to(.maze8),
             .south: .to(.maze15),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to DEAD-END-1
-        ]),
-        .isLand
+        ])
     )
 
     static let maze8 = Location(
@@ -138,8 +129,7 @@ enum Maze {
             .northeast: .to(.maze7),
             .west: .to(.maze8),
             .southeast: .to(.deadEnd3)
-        ]),
-        .isLand
+        ])
     )
 
     static let deadEnd3 = Location(
@@ -150,8 +140,7 @@ enum Maze {
             """),
         .exits([
             .north: .to(.maze8)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze9 = Location(
@@ -167,8 +156,7 @@ enum Maze {
             .west: .to(.maze12),
             .northwest: .to(.maze9),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-11
-        ]),
-        .isLand
+        ])
     )
 
     static let maze10 = Location(
@@ -181,8 +169,7 @@ enum Maze {
             .east: .to(.maze9),
             .west: .to(.maze13),
             .up: .to(.maze11)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze11 = Location(
@@ -196,8 +183,7 @@ enum Maze {
             .down: .to(.maze10),
             .northwest: .to(.maze13),
             .southwest: .to(.maze12)
-        ]),
-        .isLand
+        ])
     )
 
     static let gratingRoom = Location(
@@ -210,7 +196,6 @@ enum Maze {
             .southwest: .to(.maze11),
             // Note: UP exit to grating clearing conditional on grate being open
         ]),
-        .isLand,
         .localGlobals(.grate)
     )
 
@@ -226,8 +211,7 @@ enum Maze {
             .up: .to(.maze9),
             .north: .to(.deadEnd4),
             // Note: DOWN exit has special condition handling via MAZE-DIODES to MAZE-5
-        ]),
-        .isLand
+        ])
     )
 
     static let deadEnd4 = Location(
@@ -238,8 +222,7 @@ enum Maze {
             """),
         .exits([
             .south: .to(.maze12)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze13 = Location(
@@ -253,8 +236,7 @@ enum Maze {
             .down: .to(.maze12),
             .south: .to(.maze10),
             .west: .to(.maze11)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze14 = Location(
@@ -268,8 +250,7 @@ enum Maze {
             .northwest: .to(.maze14),
             .northeast: .to(.maze7),
             .south: .to(.maze7)
-        ]),
-        .isLand
+        ])
     )
 
     static let maze15 = Location(
@@ -282,8 +263,7 @@ enum Maze {
             .west: .to(.maze14),
             .south: .to(.maze7),
             .southeast: .to(.cyclopsRoom)
-        ]),
-        .isLand
+        ])
     )
 }
 

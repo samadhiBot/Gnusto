@@ -12,7 +12,6 @@ enum MirrorNorth {
             .up: .to(.smallCave),
             .south: .to(.reservoirNorth)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -26,8 +25,7 @@ enum MirrorNorth {
         .exits([
             .south: .to(.mirrorRoomNorth),
             .west: .to(.slideRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let mirrorRoomNorth = Location(
@@ -40,8 +38,7 @@ enum MirrorNorth {
             .north: .to(.coldPassage),
             .west: .to(.twistingPassage),
             .east: .to(.smallCave)
-        ]),
-        .isLand
+        ])
     )
 
     static let smallCave = Location(
@@ -57,7 +54,6 @@ enum MirrorNorth {
             .south: .to(.atlantisRoom),
             .west: .to(.twistingPassage)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -71,8 +67,7 @@ enum MirrorNorth {
         .exits([
             .north: .to(.mirrorRoomNorth),
             .east: .to(.smallCave)
-        ]),
-        .isLand
+        ])
     )
 }
 

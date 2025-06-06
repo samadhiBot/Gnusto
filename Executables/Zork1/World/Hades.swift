@@ -13,7 +13,6 @@ enum Hades {
             .up: .to(.tinyCave),
             // Note: IN and SOUTH exits to land of living dead conditional on LLD-FLAG
         ]),
-        .isLand,
         .inherentlyLit,
         .localGlobals(.bodies)
     )
@@ -31,7 +30,6 @@ enum Hades {
             .outside: .to(.entranceToHades),
             .north: .to(.entranceToHades)
         ]),
-        .isLand,
         .inherentlyLit,
         .localGlobals(.bodies)
     )

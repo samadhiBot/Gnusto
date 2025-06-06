@@ -15,7 +15,6 @@ enum RoundRoom {
             .south: .to(.nsPassage),
             // Note: DOWN exit has custom message
         ]),
-        .isLand,
         .localGlobals(.crack, .stairs)
     )
 
@@ -31,7 +30,6 @@ enum RoundRoom {
             .east: .to(.whiteCliffsNorth),
             // Note: SOUTH exit has custom message about being too narrow
         ]),
-        .isLand,
         .localGlobals(.crack)
     )
 
@@ -47,7 +45,6 @@ enum RoundRoom {
             .southwest: .to(.nsPassage),
             .down: .to(.loudRoom)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -64,7 +61,6 @@ enum RoundRoom {
             .down: .to(.chasmRoom),
             .north: .to(.chasmRoom)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -79,7 +75,6 @@ enum RoundRoom {
             .west: .to(.roundRoom),
             .up: .to(.deepCanyon)
         ]),
-        .isLand,
         .localGlobals(.stairs)
     )
 
@@ -93,8 +88,7 @@ enum RoundRoom {
             .north: .to(.chasmRoom),
             .northeast: .to(.deepCanyon),
             .south: .to(.roundRoom)
-        ]),
-        .isLand
+        ])
     )
 
     static let roundRoom = Location(
@@ -110,8 +104,7 @@ enum RoundRoom {
             .north: .to(.nsPassage),
             .south: .to(.narrowPassage),
             .southeast: .to(.engravingsCave)
-        ]),
-        .isLand
+        ])
     )
 }
 

@@ -13,7 +13,6 @@ enum BeneathHouse {
             // Note: UP exit to living room conditional on trap door being open
             // Note: WEST exit has custom message about sliding back down
         ]),
-        .isLand,
         .localGlobals(.trapDoor, .slide, .stairs)
     )
 
@@ -29,8 +28,7 @@ enum BeneathHouse {
             .north: .to(.cellar),
             .east: .to(.gallery),
             // Note: DOWN exit has custom message about chasm leading to infernal regions
-        ]),
-        .isLand
+        ])
     )
 
     static let gallery = Location(
@@ -45,7 +43,6 @@ enum BeneathHouse {
             .west: .to(.eastOfChasm),
             .north: .to(.studio)
         ]),
-        .isLand,
         .inherentlyLit
     )
 
@@ -64,7 +61,6 @@ enum BeneathHouse {
             .south: .to(.gallery),
             // Note: UP exit has special condition handling via UP-CHIMNEY-FUNCTION
         ]),
-        .isLand,
         .localGlobals(.chimney)
     )
 
@@ -80,8 +76,7 @@ enum BeneathHouse {
             .south: .to(.cellar),
             // Note: EAST exit to EW-PASSAGE conditional on TROLL-FLAG
             // Note: WEST exit to MAZE-1 conditional on TROLL-FLAG
-        ]),
-        .isLand
+        ])
     )
 }
 
