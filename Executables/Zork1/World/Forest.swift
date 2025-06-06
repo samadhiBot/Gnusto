@@ -213,7 +213,7 @@ enum Forest {
             """),
         .adjectives("large", "storm", "tossed"),
         .synonyms("branch", "branches"),
-        .in(.location(.path)),
+        .in(.location(.forestPath)),
         .isClimbable,
         .isScenery
     )
