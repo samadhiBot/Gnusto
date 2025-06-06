@@ -6,10 +6,7 @@ Learn how to use dynamic attributes and validation handlers to create sophistica
 
 The Gnusto Engine's dynamic attribute system allows you to create attributes that are computed at runtime or validated when changed. This enables complex game mechanics similar to those found in classic ZIL-based interactive fiction games like Zork.
 
-There are two ways to define compute handlers:
-
-1. **GameBlueprint Properties** (Recommended): Define compute handlers directly in your `GameBlueprint` using the `itemComputeHandlers` and `locationComputeHandlers` properties.
-2. **Runtime Registration**: Register compute handlers at runtime using the `registerItemCompute` and `registerLocationCompute` methods.
+Compute handlers are defined in your `GameBlueprint` using the `itemComputeHandlers` and `locationComputeHandlers` properties. This compile-time approach ensures better performance and predictability.
 
 > **Note**: If you're using the GnustoAutoWiringPlugin, it will generate helpful scaffolding for the GameBlueprint approach, including commented examples for your items and locations.
 

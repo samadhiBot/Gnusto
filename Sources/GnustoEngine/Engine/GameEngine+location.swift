@@ -169,33 +169,22 @@ extension GameEngine {
         await ioHandler.print("--- \(location.name) ---")
     }
 
-    /// Validates a proposed value for a location attribute using the dynamic attribute registry.
-    /// This is called internally when `StateChange`s are applied to ensure dynamic validation
-    /// handlers are respected.
+    /// Validates a proposed value for a location attribute.
+    /// Since validation handlers have been removed, this always returns true.
+    /// This method is kept for compatibility during the transition.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the attribute being validated.
     ///   - locationID: The unique identifier of the location.
     ///   - newValue: The proposed new `StateValue`.
-    /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
-    /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
+    /// - Returns: Always `true` since validation handlers are not implemented yet.
     func validateStateValue(
         locationID: LocationID,
         attributeID: AttributeID,
         newValue: StateValue
     ) async throws -> Bool {
-        guard let location = gameState.locations[locationID] else {
-            return false // Location doesn't exist
-        }
-
-        return if let validateHandler = dynamicAttributeRegistry.locationValidateHandler(
-            for: locationID,
-            attributeID: attributeID
-        ) {
-            try await validateHandler(location, newValue)
-        } else {
-            true // No validator registered, allow the change
-        }
+        // Validation handlers removed for now, always allow changes
+        true
     }
 }
 
@@ -222,7 +211,7 @@ extension GameEngine {
     }
 
     /// Retrieves the current value of a potentially dynamic location property.
-    /// (Implementation mirrors fetchStateValue)
+    /// Checks for a compute handler first, then returns the stored value if no handler exists.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the desired value.
@@ -240,10 +229,7 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = dynamicAttributeRegistry.locationComputeHandler(
-            for: locationID,
-            attributeID: attributeID
-        ) {
+        if let computeHandler = locationComputeHandlers[locationID]?[attributeID] {
             do {
                 return try await computeHandler(location, gameState)
             } catch {

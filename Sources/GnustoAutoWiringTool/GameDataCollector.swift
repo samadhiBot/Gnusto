@@ -101,6 +101,15 @@ class GameDataCollector {
                     }
                 }
 
+                // Check for compute handler properties based on type annotation
+                if let typeAnnotation = binding.typeAnnotation?.type {
+                    checkForComputeHandlerType(
+                        typeAnnotation: typeAnnotation,
+                        propertyName: propertyName,
+                        isStatic: isStatic
+                    )
+                }
+
                 // Handle computed properties with accessors (getters)
                 if let accessorBlock = binding.accessorBlock {
                     // Walk through the accessor block to find function calls
@@ -111,6 +120,11 @@ class GameDataCollector {
     }
 
     private enum EventHandlerType {
+        case item
+        case location
+    }
+
+    private enum ComputeHandlerType {
         case item
         case location
     }
@@ -139,6 +153,51 @@ class GameDataCollector {
                 // We need to find if the handler property is static - let's look at the parent variable declaration
                 // For now, we'll track the handler property name and its static status
                 gameData.propertyIsStatic["\(entityName)Handler"] = isStatic
+            }
+        }
+    }
+
+    private func extractComputeHandlerData(
+        from propertyName: String,
+        type: ComputeHandlerType,
+        isStatic: Bool
+    ) {
+        // Extract the entity name from the compute handler property name
+        // e.g., "cloakCompute" -> "cloak", "barCompute" -> "bar"
+        if propertyName.hasSuffix("Compute") {
+            let entityName = String(propertyName.dropLast("Compute".count))
+
+            switch type {
+            case .item:
+                gameData.itemComputeHandlers.insert(entityName)
+            case .location:
+                gameData.locationComputeHandlers.insert(entityName)
+            }
+
+            // Map this handler to its area type and track if it's static
+            if let areaType = currentAreaType {
+                gameData.handlerToAreaMap[entityName] = areaType
+                gameData.propertyIsStatic["\(entityName)Compute"] = isStatic
+            }
+        }
+    }
+
+        private func checkForComputeHandlerType(
+        typeAnnotation: TypeSyntax,
+        propertyName: String,
+        isStatic: Bool
+    ) {
+        // Check if this is a compute handler type like [AttributeID: ItemComputeHandler]
+        if let arrayType = typeAnnotation.as(DictionaryTypeSyntax.self) {
+            let keyType = arrayType.key.trimmedDescription
+            let valueType = arrayType.value.trimmedDescription
+
+                        if keyType == "AttributeID" {
+                if valueType == "ItemComputeHandler" && propertyName.hasSuffix("Compute") {
+                    extractComputeHandlerData(from: propertyName, type: .item, isStatic: isStatic)
+                } else if valueType == "LocationComputeHandler" && propertyName.hasSuffix("Compute") {
+                    extractComputeHandlerData(from: propertyName, type: .location, isStatic: isStatic)
+                }
             }
         }
     }

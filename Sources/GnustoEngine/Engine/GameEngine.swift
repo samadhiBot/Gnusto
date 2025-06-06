@@ -62,10 +62,13 @@ public actor GameEngine: Sendable {
     /// These are derived from the `GameBlueprint` used to initialize the engine.
     public let daemonDefinitions: [DaemonID: DaemonDefinition]
 
-    /// The registry for custom logic that dynamically computes or validates item and
-    /// location attributes. This is initialized from the `GameBlueprint` and can be
-    /// further modified by game developers using methods like `registerItemCompute(attribute:handler:)`.
-    public var dynamicAttributeRegistry: DynamicAttributeRegistry
+    /// Storage for item compute handlers, organized by item and attribute.
+    /// These are initialized from the `GameBlueprint`.
+    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]]
+
+    /// Storage for location compute handlers, organized by location and attribute.
+    /// These are initialized from the `GameBlueprint`.
+    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]]
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
     /// These are a combination of default engine handlers and custom handlers provided
@@ -155,19 +158,9 @@ public actor GameEngine: Sendable {
         self.parser = parser
         self.ioHandler = ioHandler
 
-        // Initialize the dynamic attribute registry and populate it with compute handlers from the blueprint
-        var registry = blueprint.dynamicAttributeRegistry
-        for (itemID, attributeHandlers) in blueprint.itemComputeHandlers {
-            for (attributeID, handler) in attributeHandlers {
-                registry.registerItemCompute(itemID: itemID, attributeID: attributeID, handler: handler)
-            }
-        }
-        for (locationID, attributeHandlers) in blueprint.locationComputeHandlers {
-            for (attributeID, handler) in attributeHandlers {
-                registry.registerLocationCompute(locationID: locationID, attributeID: attributeID, handler: handler)
-            }
-        }
-        self.dynamicAttributeRegistry = registry
+        // Initialize the compute handlers directly from the blueprint
+        self.itemComputeHandlers = blueprint.itemComputeHandlers
+        self.locationComputeHandlers = blueprint.locationComputeHandlers
 
         self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }

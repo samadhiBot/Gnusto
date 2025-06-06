@@ -137,7 +137,7 @@ struct CodeGenerator {
             }
 
             // Only generate extension if there's content
-            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || hasComputeHandlersToGenerate(gameData) {
+            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || !gameData.itemComputeHandlers.isEmpty || !gameData.locationComputeHandlers.isEmpty || hasComputeHandlersToGenerate(gameData) {
                 output.append("extension \(gameBlueprintType) {")
 
                 // Generate items property
@@ -296,11 +296,55 @@ struct CodeGenerator {
                     extensionLines.append("")
                 }
 
-                // Generate itemComputeHandlers property (scaffolding)
-                if hasItemsToGenerate(gameData) {
+                // Generate itemComputeHandlers property
+                if !gameData.itemComputeHandlers.isEmpty {
+                    extensionLines.append("    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    // Check if we have any mapped handlers before generating the return statement
+                    let mappedHandlers = gameData.itemComputeHandlers.filter { handler in
+                        gameData.handlerToAreaMap[handler] != nil
+                    }
+
+                    if mappedHandlers.isEmpty {
+                        extensionLines.append("        return [:]")
+                    } else {
+                        extensionLines.append("        return [")
+
+                        for itemHandler in gameData.itemComputeHandlers.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[itemHandler] {
+                                let handlerPropertyName = "\(itemHandler)Compute"
+                                let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+
+                                // Generate a nested dictionary structure for compute handlers
+                                if isStatic {
+                                    extensionLines.append("            .\(itemHandler): \(areaType).\(handlerPropertyName),")
+                                } else {
+                                    extensionLines.append("            .\(itemHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(itemHandler): [:], // SomeArea.\(itemHandler)Compute - Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                } else if hasItemsToGenerate(gameData) {
+                    // Generate scaffolding if no compute handlers found but items exist
                     extensionLines.append("    // TODO: Add compute handlers for dynamic item attributes")
                     extensionLines.append("    // Example:")
-                    extensionLines.append("    // var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {")
+                    extensionLines.append("    // var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {")
                     extensionLines.append("    //     [")
                     for itemProperty in gameData.items.sorted().prefix(3) {
                         extensionLines.append("    //         .\(extractItemID(from: itemProperty)): [")
@@ -314,11 +358,55 @@ struct CodeGenerator {
                     extensionLines.append("")
                 }
 
-                // Generate locationComputeHandlers property (scaffolding)
-                if hasLocationsToGenerate(gameData) {
+                // Generate locationComputeHandlers property
+                if !gameData.locationComputeHandlers.isEmpty {
+                    extensionLines.append("    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    // Check if we have any mapped handlers before generating the return statement
+                    let mappedHandlers = gameData.locationComputeHandlers.filter { handler in
+                        gameData.handlerToAreaMap[handler] != nil
+                    }
+
+                    if mappedHandlers.isEmpty {
+                        extensionLines.append("        return [:]")
+                    } else {
+                        extensionLines.append("        return [")
+
+                        for locationHandler in gameData.locationComputeHandlers.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[locationHandler] {
+                                let handlerPropertyName = "\(locationHandler)Compute"
+                                let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
+
+                                // Generate a nested dictionary structure for compute handlers
+                                if isStatic {
+                                    extensionLines.append("            .\(locationHandler): \(areaType).\(handlerPropertyName),")
+                                } else {
+                                    extensionLines.append("            .\(locationHandler): \(areaType.lowercased()).\(handlerPropertyName),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(locationHandler): [:], // SomeArea.\(locationHandler)Compute - Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                } else if hasLocationsToGenerate(gameData) {
+                    // Generate scaffolding if no compute handlers found but locations exist
                     extensionLines.append("    // TODO: Add compute handlers for dynamic location attributes")
                     extensionLines.append("    // Example:")
-                    extensionLines.append("    // var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {")
+                    extensionLines.append("    // var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {")
                     extensionLines.append("    //     [")
                     for locationProperty in gameData.locations.sorted().prefix(3) {
                         extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): [")

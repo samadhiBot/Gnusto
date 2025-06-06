@@ -1,5 +1,31 @@
 import Foundation
 
+// MARK: - Compute Handler Type Aliases
+
+/// A closure that dynamically computes the value of a specific item's attribute.
+///
+/// When the `GameEngine` needs the value of an item attribute for which a compute handler
+/// is registered, it will invoke this closure.
+///
+/// - Parameters:
+///   - item: The specific `Item` instance whose attribute is being computed.
+///   - gameState: The current `GameState`, providing access to the entire game world state
+///                for complex calculations (e.g., checking other items, player status, global flags).
+/// - Returns: The computed `StateValue` for the attribute.
+/// - Throws: An error if computation fails (though typically, computation should aim to be non-failing).
+public typealias ItemComputeHandler = (@Sendable (Item, GameState) async throws -> StateValue)
+
+/// A closure that dynamically computes the value of a specific location's attribute.
+///
+/// Similar to `ItemComputeHandler`, but for `Location` attributes.
+///
+/// - Parameters:
+///   - location: The specific `Location` instance whose attribute is being computed.
+///   - gameState: The current `GameState`.
+/// - Returns: The computed `StateValue` for the attribute.
+/// - Throws: An error if computation fails.
+public typealias LocationComputeHandler = (@Sendable (Location, GameState) async throws -> StateValue)
+
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
 /// Implement this protocol to specify all the essential elements for your game, including
@@ -114,7 +140,7 @@ public protocol GameBlueprint: Sendable {
     /// ```
     ///
     /// The default implementation provides an empty dictionary.
-    var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] { get }
+    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] { get }
 
     /// Dynamic compute handlers for location attributes, organized by location and attribute.
     ///
@@ -139,17 +165,7 @@ public protocol GameBlueprint: Sendable {
     /// ```
     ///
     /// The default implementation provides an empty dictionary.
-    var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] { get }
-
-    /// The registry containing handlers for dynamically computing or validating
-    /// item and location attributes.
-    ///
-    /// Provide a `DynamicAttributeRegistry` to define custom logic for how certain
-    /// item or location attributes (like `description`, `name`, or custom flags)
-    /// are calculated at runtime or to validate changes to their values.
-    ///
-    /// The default implementation provides an empty `DynamicAttributeRegistry`.
-    var dynamicAttributeRegistry: DynamicAttributeRegistry { get }
+    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] { get }
 }
 
 // MARK: - Default implementations
@@ -183,15 +199,11 @@ extension GameBlueprint {
         [:]
     }
 
-    public var itemComputeHandlers: [ItemID: [AttributeID: DynamicAttributeRegistry.ItemComputeHandler]] {
+    public var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {
         [:]
     }
 
-    public var locationComputeHandlers: [LocationID: [AttributeID: DynamicAttributeRegistry.LocationComputeHandler]] {
+    public var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {
         [:]
-    }
-
-    public var dynamicAttributeRegistry: DynamicAttributeRegistry {
-        DynamicAttributeRegistry()
     }
 }

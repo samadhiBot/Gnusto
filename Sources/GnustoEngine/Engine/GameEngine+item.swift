@@ -129,7 +129,7 @@ extension GameEngine {
             ).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
-    
+
     /// <#Description#>
     /// - Parameters:
     ///   - attributeID: <#attributeID description#>
@@ -170,33 +170,22 @@ extension GameEngine {
 // MARK: - Internal helpers
 
 extension GameEngine {
-    /// Validates a proposed value for an item attribute using the dynamic attribute registry.
-    /// This is called internally when `StateChange`s are applied to ensure dynamic validation
-    /// handlers are respected.
+    /// Validates a proposed value for an item attribute.
+    /// Since validation handlers have been removed, this always returns true.
+    /// This method is kept for compatibility during the transition.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the attribute being validated.
     ///   - itemID: The unique identifier of the item.
     ///   - newValue: The proposed new `StateValue`.
-    /// - Returns: `true` if the value is valid or no validator is registered; `false` if validation fails.
-    /// - Throws: Errors from the validation handler if it throws instead of returning `false`.
+    /// - Returns: Always `true` since validation handlers are not implemented yet.
     func validateStateValue(
         itemID: ItemID,
         attributeID: AttributeID,
         newValue: StateValue
     ) async throws -> Bool {
-        guard let item = gameState.items[itemID] else {
-            return false // Item doesn't exist
-        }
-
-        return if let validateHandler = dynamicAttributeRegistry.itemValidateHandler(
-            for: itemID,
-            attributeID: attributeID
-        ) {
-            try await validateHandler(item, newValue)
-        } else {
-            true // No validator registered, allow the change
-        }
+        // Validation handlers removed for now, always allow changes
+        true
     }
 }
 
@@ -232,8 +221,7 @@ extension GameEngine {
     }
 
     /// Retrieves the current value of a potentially dynamic item property.
-    /// Checks the `DynamicAttributeRegistry` for a compute handler first.
-    /// If no handler exists, returns the value stored in the item's `attributes`.
+    /// Checks for a compute handler first, then returns the stored value if no handler exists.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the desired value.
@@ -251,11 +239,8 @@ extension GameEngine {
             return nil
         }
 
-        // Check registry for compute handler
-        if let computeHandler = dynamicAttributeRegistry.itemComputeHandler(
-            for: itemID,
-            attributeID: attributeID
-        ) {
+        // Check for compute handler
+        if let computeHandler = itemComputeHandlers[itemID]?[attributeID] {
             do {
                 return try await computeHandler(item, gameState)
             } catch {
