@@ -229,15 +229,19 @@ extension GameEngine {
             return nil
         }
 
-        if let computeHandler = locationComputeHandlers[locationID]?[attributeID] {
+        if let computer = locationComputers[locationID] {
             do {
-                return try await computeHandler(location, gameState)
+                return try await computer.compute(location, attributeID, gameState)
+            } catch ComputeError.attributeNotHandled {
+                // The computer doesn't handle this attribute, fall back to stored value
+                return location.attributes[attributeID]
             } catch {
                 logError("""
                     Error computing dynamic value '\(attributeID.rawValue)' \
                     for location \(locationID.rawValue): \(error)
                     """)
-                return nil
+                // Fall through to return stored value on error
+                return location.attributes[attributeID]
             }
         } else {
             return location.attributes[attributeID]

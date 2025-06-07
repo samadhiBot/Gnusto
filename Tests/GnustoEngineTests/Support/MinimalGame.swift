@@ -12,8 +12,8 @@ public struct MinimalGame: GameBlueprint {
     public var locationEventHandlers: [LocationID: LocationEventHandler]
     public var fuseDefinitions: [FuseID: FuseDefinition]
     public var daemonDefinitions: [DaemonID: DaemonDefinition]
-    public var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]]
-    public var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]]
+    public var itemComputers: [ItemID: ItemComputer]
+    public var locationComputers: [LocationID: LocationComputer]
 
     public init(
         constants: GameConstants = GameConstants(
@@ -51,8 +51,8 @@ public struct MinimalGame: GameBlueprint {
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
         fuseDefinitions: [FuseDefinition] = [],
         daemonDefinitions: [DaemonDefinition] = [],
-        itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] = [:],
-        locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] = [:]
+        itemComputers: [ItemID: ItemComputer] = [:],
+        locationComputers: [LocationID: LocationComputer] = [:]
     ) {
         self.constants = constants
         self.player = player
@@ -67,8 +67,8 @@ public struct MinimalGame: GameBlueprint {
         self.daemonDefinitions = Dictionary(
             uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
         )
-        self.itemComputeHandlers = itemComputeHandlers
-        self.locationComputeHandlers = locationComputeHandlers
+        self.itemComputers = itemComputers
+        self.locationComputers = locationComputers
     }
 }
 

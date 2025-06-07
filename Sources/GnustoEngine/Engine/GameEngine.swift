@@ -62,13 +62,13 @@ public actor GameEngine: Sendable {
     /// These are derived from the `GameBlueprint` used to initialize the engine.
     public let daemonDefinitions: [DaemonID: DaemonDefinition]
 
-    /// Storage for item compute handlers, organized by item and attribute.
+    /// Storage for item compute handlers.
     /// These are initialized from the `GameBlueprint`.
-    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]]
+    var itemComputers: [ItemID: ItemComputer]
 
-    /// Storage for location compute handlers, organized by location and attribute.
+    /// Storage for location compute handlers.
     /// These are initialized from the `GameBlueprint`.
-    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]]
+    var locationComputers: [LocationID: LocationComputer]
 
     /// Registered `ActionHandler`s for specific verb commands (e.g., `.take`, `.look`).
     /// These are a combination of default engine handlers and custom handlers provided
@@ -159,8 +159,8 @@ public actor GameEngine: Sendable {
         self.ioHandler = ioHandler
 
         // Initialize the compute handlers directly from the blueprint
-        self.itemComputeHandlers = blueprint.itemComputeHandlers
-        self.locationComputeHandlers = blueprint.locationComputeHandlers
+        self.itemComputers = blueprint.itemComputers
+        self.locationComputers = blueprint.locationComputers
 
         self.actionHandlers = blueprint.customActionHandlers
             .merging(Self.defaultActionHandlers) { (custom, _) in custom }

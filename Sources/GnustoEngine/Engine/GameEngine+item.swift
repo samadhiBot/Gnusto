@@ -240,16 +240,19 @@ extension GameEngine {
         }
 
         // Check for compute handler
-        if let computeHandler = itemComputeHandlers[itemID]?[attributeID] {
+        if let computer = itemComputers[itemID] {
             do {
-                return try await computeHandler(item, gameState)
+                return try await computer.compute(item, attributeID, gameState)
+            } catch ComputeError.attributeNotHandled {
+                // The computer doesn't handle this attribute, fall back to stored value
+                return item.attributes[attributeID]
             } catch {
                 logError("""
                     Error computing dynamic value '\(attributeID.rawValue)' \
                     for item \(itemID.rawValue): \(error)
                     """)
-                // Fall through to return stored value or nil? Or return nil on error? Let's return nil.
-                return nil
+                // Fall through to return stored value on error
+                return item.attributes[attributeID]
             }
         } else {
             // No compute handler, return stored value

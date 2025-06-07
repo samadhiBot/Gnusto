@@ -179,15 +179,21 @@ extension OutsideHouse {
     )
 }
 
-// MARK: - Compute handlers
+// MARK: - Computers
 
 extension OutsideHouse {
-    static let eastOfHouseComputer: ItemComputer = [
-        .description: { item, gameState in
-            let enchantment = item.attributes["enchantment"]?.toInt ?? 0
-            return .string(enchantment > 5 ? "The sword blazes!" : "The sword glows.")
+    static let eastOfHouseComputer = LocationComputer { location, attributeID, gameState in
+        let windowState = if gameState.items[.kitchenWindow]?.attributes[.isOpen] == true {
+            "open"
+        } else {
+            "slightly ajar"
         }
-    ]
+        return .string("""
+            You are behind the white house. A path leads into the forest
+            to the east. In one corner of the house there is a small window
+            which is \(windowState).
+            """)
+    }
 }
 
 // MARK: - Event handlers

@@ -1,34 +1,59 @@
 import Foundation
 
+// MARK: - Compute Handler Errors
+
+/// Errors that can occur during attribute computation.
+public enum ComputeError: Error, Sendable {
+    /// The compute handler doesn't handle the requested attribute.
+    case attributeNotHandled(AttributeID)
+
+    /// A custom computation error with a descriptive message.
+    case computationFailed(String)
+}
+
 // MARK: - Compute Handler Type Aliases
 
-public typealias ItemComputer = [AttributeID: ItemComputeHandler]
+/// A compute handler for dynamic item attributes.
+///
+/// Similar to `ItemEventHandler`, this provides a single handler per item that can compute
+/// dynamic values for multiple attributes based on the current game state.
+public struct ItemComputer: Sendable {
+    /// The compute function that calculates attribute values dynamically.
+    ///
+    /// - Parameters:
+    ///   - item: The item whose attribute is being computed
+    ///   - attributeID: The specific attribute being requested
+    ///   - gameState: The current game state for context
+    /// - Returns: The computed value for the attribute, or throws if computation fails
+    public let compute: @Sendable (Item, AttributeID, GameState) async throws -> StateValue
 
-public typealias LocationComputer = [AttributeID: LocationComputeHandler]
+    /// Creates a new item computer with the given compute function.
+    public init(compute: @escaping @Sendable (Item, AttributeID, GameState) async throws -> StateValue) {
+        self.compute = compute
+    }
+}
 
-/// A closure that dynamically computes the value of a specific item's attribute.
+/// A compute handler for dynamic location attributes.
 ///
-/// When the `GameEngine` needs the value of an item attribute for which a compute handler
-/// is registered, it will invoke this closure.
-///
-/// - Parameters:
-///   - item: The specific `Item` instance whose attribute is being computed.
-///   - gameState: The current `GameState`, providing access to the entire game world state
-///                for complex calculations (e.g., checking other items, player status, global flags).
-/// - Returns: The computed `StateValue` for the attribute.
-/// - Throws: An error if computation fails (though typically, computation should aim to be non-failing).
-public typealias ItemComputeHandler = (@Sendable (Item, GameState) async throws -> StateValue)
+/// Similar to `LocationEventHandler`, this provides a single handler per location that can compute
+/// dynamic values for multiple attributes based on the current game state.
+public struct LocationComputer: Sendable {
+    /// The compute function that calculates attribute values dynamically.
+    ///
+    /// - Parameters:
+    ///   - location: The location whose attribute is being computed
+    ///   - attributeID: The specific attribute being requested
+    ///   - gameState: The current game state for context
+    /// - Returns: The computed value for the attribute, or throws if computation fails
+    public let compute: @Sendable (Location, AttributeID, GameState) async throws -> StateValue
 
-/// A closure that dynamically computes the value of a specific location's attribute.
-///
-/// Similar to `ItemComputeHandler`, but for `Location` attributes.
-///
-/// - Parameters:
-///   - location: The specific `Location` instance whose attribute is being computed.
-///   - gameState: The current `GameState`.
-/// - Returns: The computed `StateValue` for the attribute.
-/// - Throws: An error if computation fails.
-public typealias LocationComputeHandler = (@Sendable (Location, GameState) async throws -> StateValue)
+    /// Creates a new location computer with the given compute function.
+    public init(compute: @escaping @Sendable (Location, AttributeID, GameState) async throws -> StateValue) {
+        self.compute = compute
+    }
+}
+
+
 
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
@@ -121,55 +146,61 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
 
-    /// Dynamic compute handlers for item attributes, organized by item and attribute.
+    /// Dynamic compute handlers for item attributes.
     ///
     /// This allows you to define custom logic for computing item attributes at runtime.
-    /// Each handler receives the `Item` instance and current `GameState`, returning
-    /// a computed `StateValue`. Common use cases include dynamic descriptions that
-    /// change based on game state, calculated properties, or conditional attributes.
+    /// Each handler receives the `Item` instance, the specific `AttributeID` being requested,
+    /// and current `GameState`, returning a computed `StateValue`. This follows the same
+    /// pattern as event handlers - one handler per item that can handle multiple attributes.
     ///
     /// Example usage:
     /// ```swift
-    /// var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {
+    /// var itemComputers: [ItemID: ItemComputer] {
     ///     [
-    ///         .magicSword: [
-    ///             .description: { item, gameState in
+    ///         .magicSword: ItemComputer { item, attributeID, gameState in
+    ///             switch attributeID {
+    ///             case .description:
     ///                 let enchantment = item.attributes["enchantmentLevel"]?.toInt ?? 0
     ///                 let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
     ///                 return .string(desc)
+    ///             default:
+    ///                 throw ComputeError.attributeNotHandled(attributeID)
     ///             }
-    ///         ]
+    ///         }
     ///     ]
     /// }
     /// ```
     ///
     /// The default implementation provides an empty dictionary.
-    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] { get }
+    var itemComputers: [ItemID: ItemComputer] { get }
 
-    /// Dynamic compute handlers for location attributes, organized by location and attribute.
+    /// Dynamic compute handlers for location attributes.
     ///
     /// This allows you to define custom logic for computing location attributes at runtime.
-    /// Each handler receives the `Location` instance and current `GameState`, returning
-    /// a computed `StateValue`. Common use cases include dynamic descriptions that
-    /// change based on game state, environmental conditions, or player actions.
+    /// Each handler receives the `Location` instance, the specific `AttributeID` being requested,
+    /// and current `GameState`, returning a computed `StateValue`. This follows the same
+    /// pattern as event handlers - one handler per location that can handle multiple attributes.
     ///
     /// Example usage:
     /// ```swift
-    /// var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {
+    /// var locationComputers: [LocationID: LocationComputer] {
     ///     [
-    ///         .magicRoom: [
-    ///             .description: { location, gameState in
+    ///         .magicRoom: LocationComputer { location, attributeID, gameState in
+    ///             switch attributeID {
+    ///             case .description:
     ///                 let isEnchanted = gameState.globalState["roomEnchanted"] == true
     ///                 let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
     ///                 return .string(desc)
+    ///             default:
+    ///                 throw ComputeError.attributeNotHandled(attributeID)
     ///             }
-    ///         ]
+    ///         }
     ///     ]
     /// }
     /// ```
     ///
     /// The default implementation provides an empty dictionary.
-    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] { get }
+    var locationComputers: [LocationID: LocationComputer] { get }
 }
 
 // MARK: - Default implementations
@@ -203,11 +234,11 @@ extension GameBlueprint {
         [:]
     }
 
-    public var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {
+    public var itemComputers: [ItemID: ItemComputer] {
         [:]
     }
 
-    public var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {
+    public var locationComputers: [LocationID: LocationComputer] {
         [:]
     }
 }

@@ -296,9 +296,9 @@ struct CodeGenerator {
                     extensionLines.append("")
                 }
 
-                // Generate itemComputeHandlers property
+                                // Generate itemComputers property
                 if !gameData.itemComputeHandlers.isEmpty {
-                    extensionLines.append("    var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {")
+                    extensionLines.append("    var itemComputers: [ItemID: ItemComputer] {")
 
                     // Create area instances within this property if needed
                     for areaType in areaInstances.sorted() {
@@ -321,17 +321,16 @@ struct CodeGenerator {
 
                         for itemHandler in gameData.itemComputeHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[itemHandler] {
-                                let handlerPropertyName = "\(itemHandler)Compute"
+                                let handlerPropertyName = "\(itemHandler)Computer"
                                 let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
 
-                                // Generate a nested dictionary structure for compute handlers
                                 if isStatic {
                                     extensionLines.append("            .\(itemHandler): \(areaType).\(handlerPropertyName),")
                                 } else {
                                     extensionLines.append("            .\(itemHandler): \(areaType.lowercased()).\(handlerPropertyName),")
                                 }
                             } else {
-                                extensionLines.append("            // .\(itemHandler): [:], // SomeArea.\(itemHandler)Compute - Area mapping unknown - please add manually")
+                                extensionLines.append("            // .\(itemHandler): SomeArea.\(itemHandler)Computer, // Area mapping unknown - please add manually")
                             }
                         }
 
@@ -344,23 +343,26 @@ struct CodeGenerator {
                     // Generate scaffolding if no compute handlers found but items exist
                     extensionLines.append("    // TODO: Add compute handlers for dynamic item attributes")
                     extensionLines.append("    // Example:")
-                    extensionLines.append("    // var itemComputeHandlers: [ItemID: [AttributeID: ItemComputeHandler]] {")
+                    extensionLines.append("    // var itemComputers: [ItemID: ItemComputer] {")
                     extensionLines.append("    //     [")
                     for itemProperty in gameData.items.sorted().prefix(3) {
-                        extensionLines.append("    //         .\(extractItemID(from: itemProperty)): [")
-                        extensionLines.append("    //             .description: { item, gameState in")
+                        extensionLines.append("    //         .\(extractItemID(from: itemProperty)): ItemComputer { item, attributeID, gameState in")
+                        extensionLines.append("    //             switch attributeID {")
+                        extensionLines.append("    //             case .description:")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(item.name)\")")
+                        extensionLines.append("    //             default:")
+                        extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
                         extensionLines.append("    //             }")
-                        extensionLines.append("    //         ],")
+                        extensionLines.append("    //         },")
                     }
                     extensionLines.append("    //     ]")
                     extensionLines.append("    // }")
                     extensionLines.append("")
                 }
 
-                // Generate locationComputeHandlers property
+                                // Generate locationComputers property
                 if !gameData.locationComputeHandlers.isEmpty {
-                    extensionLines.append("    var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {")
+                    extensionLines.append("    var locationComputers: [LocationID: LocationComputer] {")
 
                     // Create area instances within this property if needed
                     for areaType in areaInstances.sorted() {
@@ -383,17 +385,16 @@ struct CodeGenerator {
 
                         for locationHandler in gameData.locationComputeHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[locationHandler] {
-                                let handlerPropertyName = "\(locationHandler)Compute"
+                                let handlerPropertyName = "\(locationHandler)Computer"
                                 let isStatic = gameData.propertyIsStatic[handlerPropertyName] ?? true
 
-                                // Generate a nested dictionary structure for compute handlers
                                 if isStatic {
                                     extensionLines.append("            .\(locationHandler): \(areaType).\(handlerPropertyName),")
                                 } else {
                                     extensionLines.append("            .\(locationHandler): \(areaType.lowercased()).\(handlerPropertyName),")
                                 }
                             } else {
-                                extensionLines.append("            // .\(locationHandler): [:], // SomeArea.\(locationHandler)Compute - Area mapping unknown - please add manually")
+                                extensionLines.append("            // .\(locationHandler): SomeArea.\(locationHandler)Computer, // Area mapping unknown - please add manually")
                             }
                         }
 
@@ -406,14 +407,17 @@ struct CodeGenerator {
                     // Generate scaffolding if no compute handlers found but locations exist
                     extensionLines.append("    // TODO: Add compute handlers for dynamic location attributes")
                     extensionLines.append("    // Example:")
-                    extensionLines.append("    // var locationComputeHandlers: [LocationID: [AttributeID: LocationComputeHandler]] {")
+                    extensionLines.append("    // var locationComputers: [LocationID: LocationComputer] {")
                     extensionLines.append("    //     [")
                     for locationProperty in gameData.locations.sorted().prefix(3) {
-                        extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): [")
-                        extensionLines.append("    //             .description: { location, gameState in")
+                        extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): LocationComputer { location, attributeID, gameState in")
+                        extensionLines.append("    //             switch attributeID {")
+                        extensionLines.append("    //             case .description:")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(location.name)\")")
+                        extensionLines.append("    //             default:")
+                        extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
                         extensionLines.append("    //             }")
-                        extensionLines.append("    //         ],")
+                        extensionLines.append("    //         },")
                     }
                     extensionLines.append("    //     ]")
                     extensionLines.append("    // }")

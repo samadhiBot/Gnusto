@@ -95,20 +95,17 @@ class GameDataCollector {
                             extractEventHandlerData(from: propertyName, type: .item, isStatic: isStatic)
                         } else if functionName == "LocationEventHandler" {
                             extractEventHandlerData(from: propertyName, type: .location, isStatic: isStatic)
+                        } else if functionName == "ItemComputer" {
+                            extractComputeHandlerData(from: propertyName, type: .item, isStatic: isStatic)
+                        } else if functionName == "LocationComputer" {
+                            extractComputeHandlerData(from: propertyName, type: .location, isStatic: isStatic)
                         } else if functionName == "Player" {
                             extractPlayerLocationData(from: functionCall)
                         }
                     }
                 }
 
-                // Check for compute handler properties based on type annotation
-                if let typeAnnotation = binding.typeAnnotation?.type {
-                    checkForComputeHandlerType(
-                        typeAnnotation: typeAnnotation,
-                        propertyName: propertyName,
-                        isStatic: isStatic
-                    )
-                }
+
 
                 // Handle computed properties with accessors (getters)
                 if let accessorBlock = binding.accessorBlock {
@@ -163,9 +160,9 @@ class GameDataCollector {
         isStatic: Bool
     ) {
         // Extract the entity name from the compute handler property name
-        // e.g., "cloakCompute" -> "cloak", "barCompute" -> "bar"
-        if propertyName.hasSuffix("Compute") {
-            let entityName = String(propertyName.dropLast("Compute".count))
+        // e.g., "cloakComputer" -> "cloak", "barComputer" -> "bar"
+        if propertyName.hasSuffix("Computer") {
+            let entityName = String(propertyName.dropLast("Computer".count))
 
             switch type {
             case .item:
@@ -177,30 +174,12 @@ class GameDataCollector {
             // Map this handler to its area type and track if it's static
             if let areaType = currentAreaType {
                 gameData.handlerToAreaMap[entityName] = areaType
-                gameData.propertyIsStatic["\(entityName)Compute"] = isStatic
+                gameData.propertyIsStatic["\(entityName)Computer"] = isStatic
             }
         }
     }
 
-        private func checkForComputeHandlerType(
-        typeAnnotation: TypeSyntax,
-        propertyName: String,
-        isStatic: Bool
-    ) {
-        // Check if this is a compute handler type like [AttributeID: ItemComputeHandler]
-        if let arrayType = typeAnnotation.as(DictionaryTypeSyntax.self) {
-            let keyType = arrayType.key.trimmedDescription
-            let valueType = arrayType.value.trimmedDescription
 
-                        if keyType == "AttributeID" {
-                if valueType == "ItemComputeHandler" && propertyName.hasSuffix("Compute") {
-                    extractComputeHandlerData(from: propertyName, type: .item, isStatic: isStatic)
-                } else if valueType == "LocationComputeHandler" && propertyName.hasSuffix("Compute") {
-                    extractComputeHandlerData(from: propertyName, type: .location, isStatic: isStatic)
-                }
-            }
-        }
-    }
 
     private func extractLocationData(
         from functionCall: FunctionCallExprSyntax,
