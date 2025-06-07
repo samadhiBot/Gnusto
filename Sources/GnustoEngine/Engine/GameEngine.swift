@@ -120,8 +120,8 @@ public actor GameEngine: Sendable {
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
-        self.fuseDefinitions = blueprint.fuseDefinitions
-        self.daemonDefinitions = blueprint.daemonDefinitions
+        self.fuseDefinitions = blueprint.fuses
+        self.daemonDefinitions = blueprint.daemons
 
         // Build vocabulary with custom verbs if not provided
         let gameVocabulary: Vocabulary

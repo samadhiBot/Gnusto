@@ -76,7 +76,7 @@ public protocol GameBlueprint: Sendable {
     /// The key is a `FuseID` and the value is the corresponding `FuseDefinition`.
     ///
     /// The default implementation provides an empty dictionary.
-    var fuseDefinitions: [FuseID: FuseDefinition] { get }
+    var fuses: [FuseID: FuseDefinition] { get }
 
     /// Definitions for background processes (daemons) that run periodically.
     ///
@@ -89,7 +89,7 @@ public protocol GameBlueprint: Sendable {
     /// The key is a `DaemonID` and the value is the corresponding `DaemonDefinition`.
     ///
     /// The default implementation provides an empty dictionary.
-    var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
+    var daemons: [DaemonID: DaemonDefinition] { get }
 
     /// Custom compute handlers for dynamic item attributes.
     ///
@@ -103,7 +103,7 @@ public protocol GameBlueprint: Sendable {
     ///         .magicSword: ItemComputer { attributeID, gameState in
     ///             switch attributeID {
     ///             case .description:
-    ///                 let enchantment = gameState.items[.magicSword]?.attributes["enchantmentLevel"]?.toInt ?? 0
+    ///                 let enchantment = try gameState.value(of: .enchantmentLevel, on: .magicSword) ?? 0
     ///                 return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
     ///             default:
     ///                 return nil
@@ -126,7 +126,7 @@ public protocol GameBlueprint: Sendable {
     ///         .enchantedForest: LocationComputer { attributeID, gameState in
     ///             switch attributeID {
     ///             case .description:
-    ///                 let timeOfDay = gameState.globals["timeOfDay"]?.toString ?? "day"
+    ///                 let timeOfDay = try gameState.value(of: .timeOfDay) ?? "day"
     ///                 return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
     ///             default:
     ///                 return nil
@@ -161,11 +161,11 @@ extension GameBlueprint {
         [:]
     }
 
-    public var fuseDefinitions: [FuseID: FuseDefinition] {
+    public var fuses: [FuseID: FuseDefinition] {
         [:]
     }
 
-    public var daemonDefinitions: [DaemonID: DaemonDefinition] {
+    public var daemons: [DaemonID: DaemonDefinition] {
         [:]
     }
 

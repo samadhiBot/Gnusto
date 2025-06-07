@@ -185,7 +185,8 @@ extension OutsideHouse {
     static let eastOfHouseComputer = LocationComputer { attributeID, gameState in
         switch attributeID {
         case .description:
-            let windowState = if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
+            
+            let windowState = if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
                 "open"
             } else {
                 "slightly ajar"

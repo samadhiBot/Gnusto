@@ -12,8 +12,8 @@ struct ScoreActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the player's score and move count.
     func process(context: ActionContext) async throws -> ActionResult {
         // Fetch current score and turn count
-        let currentScore = await context.engine.gameState.player.score
-        let turnCount = await context.engine.gameState.player.moves
+        let currentScore = await context.engine.playerScore
+        let turnCount = await context.engine.playerMoves
 
         // The SCORE context.command only reports information, it doesn't change state.
         return ActionResult("Your score is \(currentScore) in \(turnCount) moves.")

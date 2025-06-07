@@ -9,46 +9,34 @@ extension GameState {
     }
 
     public func value(
-        _ attributeID: AttributeID,
-        on itemID: ItemID,
-        defaultValue: Int? = 0
-    ) throws -> Int {
+        of attributeID: AttributeID,
+        on itemID: ItemID
+    ) throws -> Int? {
         guard let item = items[itemID] else {
             throw GameStateError.itemNotFound(itemID)
         }
-        switch item.attributes[attributeID] {
-        case .int(let value):
-            return value
-        case .none:
-            if let defaultValue {
-                return defaultValue
-            } else {
-                throw GameStateError.itemAttributeUndefined
-            }
-        default:
-            throw GameStateError.itemAttributeTypeMismatch(itemID, attributeID)
+        guard let stateValue = item.attributes[attributeID] else {
+            return nil
         }
+        guard case .int(let value) = stateValue else {
+            throw GameStateError.itemAttributeTypeMismatch(itemID, attributeID, actual: stateValue)
+        }
+        return value
     }
 
     public func value(
-        _ attributeID: AttributeID,
-        on itemID: ItemID,
-        defaultValue: String? = ""
-    ) throws -> String {
+        of attributeID: AttributeID,
+        on itemID: ItemID
+    ) throws -> String? {
         guard let item = items[itemID] else {
             throw GameStateError.itemNotFound(itemID)
         }
-        switch item.attributes[attributeID] {
-        case .string(let value):
-            return value
-        case .none:
-            if let defaultValue {
-                return defaultValue
-            } else {
-                throw GameStateError.itemAttributeUndefined
-            }
-        default:
-            throw GameStateError.itemAttributeTypeMismatch(itemID, attributeID)
+        guard let stateValue = item.attributes[attributeID] else {
+            return nil
         }
+        guard case .string(let value) = stateValue else {
+            throw GameStateError.itemAttributeTypeMismatch(itemID, attributeID, actual: stateValue)
+        }
+        return value
     }
 }

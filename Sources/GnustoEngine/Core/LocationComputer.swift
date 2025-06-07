@@ -8,7 +8,7 @@
 /// static let enchantedForestComputer = LocationComputer { attributeID, gameState in
 ///     switch attributeID {
 ///     case .description:
-///         let timeOfDay = gameState.globals["timeOfDay"]?.toString ?? "day"
+///         let timeOfDay = try gameState.value(of: .timeOfDay) ?? "day"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     default:
 ///         return nil

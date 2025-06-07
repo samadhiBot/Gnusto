@@ -10,8 +10,8 @@ public struct MinimalGame: GameBlueprint {
     public var customActionHandlers: [VerbID: ActionHandler]
     public var itemEventHandlers: [ItemID: ItemEventHandler]
     public var locationEventHandlers: [LocationID: LocationEventHandler]
-    public var fuseDefinitions: [FuseID: FuseDefinition]
-    public var daemonDefinitions: [DaemonID: DaemonDefinition]
+    public var fuses: [FuseID: FuseDefinition]
+    public var daemons: [DaemonID: DaemonDefinition]
     public var itemComputers: [ItemID: ItemComputer]
     public var locationComputers: [LocationID: LocationComputer]
 
@@ -61,10 +61,10 @@ public struct MinimalGame: GameBlueprint {
         self.customActionHandlers = customActionHandlers
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
-        self.fuseDefinitions = Dictionary(
+        self.fuses = Dictionary(
             uniqueKeysWithValues: fuseDefinitions.map { ($0.id, $0) }
         )
-        self.daemonDefinitions = Dictionary(
+        self.daemons = Dictionary(
             uniqueKeysWithValues: daemonDefinitions.map { ($0.id, $0) }
         )
         self.itemComputers = itemComputers

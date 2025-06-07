@@ -8,7 +8,7 @@
 /// static let magicSwordComputer = ItemComputer { attributeID, gameState in
 ///     switch attributeID {
 ///     case .description:
-///         let enchantment = gameState.items["magicSword"]?.attributes["enchantmentLevel"]?.toInt ?? 0
+///         let enchantment = try gameState.value(of: .enchantmentLevel, on: .magicSword) ?? 0
 ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
 ///     default:
 ///         return nil

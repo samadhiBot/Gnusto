@@ -82,7 +82,7 @@ public struct DropActionHandler: ActionHandler {
         var lastDroppedItem: Item?
         
         // Get current location for dropping items
-        let currentLocationID = await context.engine.gameState.player.currentLocationID
+        let currentLocationID = await context.engine.playerLocationID
         
         // Process each object individually
         for directObjectRef in context.command.directObjects {

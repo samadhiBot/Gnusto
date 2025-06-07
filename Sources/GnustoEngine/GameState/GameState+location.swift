@@ -9,46 +9,34 @@ extension GameState {
     }
 
     public func value(
-        _ attributeID: AttributeID,
-        on locationID: LocationID,
-        defaultValue: Int? = 0
-    ) throws -> Int {
+        of attributeID: AttributeID,
+        on locationID: LocationID
+    ) throws -> Int? {
         guard let location = locations[locationID] else {
             throw GameStateError.locationNotFound(locationID)
         }
-        switch location.attributes[attributeID] {
-        case .int(let value):
-            return value
-        case .none:
-            if let defaultValue {
-                return defaultValue
-            } else {
-                throw GameStateError.locationAttributeUndefined
-            }
-        default:
-            throw GameStateError.locationAttributeTypeMismatch(locationID, attributeID)
+        guard let stateValue = location.attributes[attributeID] else {
+            return nil
         }
+        guard case .int(let value) = stateValue else {
+            throw GameStateError.locationAttributeTypeMismatch(locationID, attributeID, actual: stateValue)
+        }
+        return value
     }
 
     public func value(
-        _ attributeID: AttributeID,
-        on locationID: LocationID,
-        defaultValue: String? = ""
-    ) throws -> String {
+        of attributeID: AttributeID,
+        on locationID: LocationID
+    ) throws -> String? {
         guard let location = locations[locationID] else {
             throw GameStateError.locationNotFound(locationID)
         }
-        switch location.attributes[attributeID] {
-        case .string(let value):
-            return value
-        case .none:
-            if let defaultValue {
-                return defaultValue
-            } else {
-                throw GameStateError.locationAttributeUndefined
-            }
-        default:
-            throw GameStateError.locationAttributeTypeMismatch(locationID, attributeID)
+        guard let stateValue = location.attributes[attributeID] else {
+            return nil
         }
+        guard case .string(let value) = stateValue else {
+            throw GameStateError.locationAttributeTypeMismatch(locationID, attributeID, actual: stateValue)
+        }
+        return value
     }
 }
