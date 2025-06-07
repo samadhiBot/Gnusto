@@ -27,7 +27,7 @@ public struct OpenActionHandler: ActionHandler {
         if context.command.directObjects.count > 1 {
             throw ActionResponse.prerequisiteNotMet("The OPEN command doesn't support multiple objects.")
         }
-        
+
         // 2. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Open what?")
@@ -84,7 +84,7 @@ public struct OpenActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Check if already open
-        if try await context.engine.attribute(.isOpen, of: targetItem.id) {
+        if try await context.engine.hasFlag(.isOpen, on: targetItem.id) {
             throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 

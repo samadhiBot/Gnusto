@@ -44,7 +44,7 @@ public struct CloseActionHandler: ActionHandler {
         }
 
         // 5. Check if already closed (using dynamic property)
-        guard try await context.engine.attribute(.isOpen, of: targetItemID) else {
+        guard try await context.engine.hasFlag(.isOpen, on: targetItemID) else {
             // Let process handle the specific message "That's already closed."
             return
         }
@@ -79,7 +79,7 @@ public struct CloseActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Handle "already closed" case detected (but not thrown) in validate
-        guard try await context.engine.attribute(.isOpen, of: targetItem.id) else {
+        guard try await context.engine.hasFlag(.isOpen, on: targetItem.id) else {
             return ActionResult(
                 "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
             )

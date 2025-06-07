@@ -41,7 +41,7 @@ struct DynamicPropertyTests {
         }
 
         // Get initial value
-        let initialValue: Int = try await engine.attribute("simpleProp", of: "testItem")
+        let initialValue: Int? = try await engine.attribute("simpleProp", of: "testItem")
         #expect(initialValue == 10)
 
         // Set new value
@@ -55,7 +55,7 @@ struct DynamicPropertyTests {
         #expect(finalItem?.attributes["simpleProp"] == StateValue.int(20))
 
         // Verify getting the value again works
-        let finalValue: Int = try await engine.attribute("simpleProp", of: "testItem")
+        let finalValue: Int? = try await engine.attribute("simpleProp", of: "testItem")
         #expect(finalValue == 20)
     }
 
@@ -96,7 +96,7 @@ struct DynamicPropertyTests {
         )
 
         // Fetch the dynamic description
-        let description: String = try await engine.attribute(.description, of: ItemID("testItem"))
+        let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
         #expect(description == "This sword glows with magic sword energy!")
     }
 
@@ -128,7 +128,7 @@ struct DynamicPropertyTests {
         )
 
         // Fetch the dynamic description
-        let description: String = try await engine.attribute(.description, of: LocationID("testLocation"))
+        let description: String? = try await engine.attribute(.description, of: LocationID("testLocation"))
         #expect(description == "The Magic Chamber sparkles with mystical energy!")
     }
 
@@ -260,10 +260,9 @@ struct DynamicPropertyTests {
 
         // The compute handler throws an error, so it should fall back to stored value
         // Since there's no stored description, it should return nil and then try the stored value
-        // which also doesn't exist, so the attribute fetch should fail
-        await #expect(throws: ActionResponse.self) {
-            let _: String = try await engine.attribute(.description, of: ItemID("testItem"))
-        }
+        // which also doesn't exist, so the attribute fetch should return nil
+        let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
+        #expect(description == nil)
     }
 
     @Test("Non-existent Compute Handler Falls Back to Static")
@@ -292,7 +291,7 @@ struct DynamicPropertyTests {
         )
 
         // Should fall back to static description
-        let description: String = try await engine.attribute(.description, of: ItemID("testItem"))
+        let description: String? = try await engine.attribute(.description, of: ItemID("testItem"))
         #expect(description == "A basic widget.")
     }
 
@@ -327,7 +326,7 @@ struct DynamicPropertyTests {
         #expect(finalLocation?.attributes[.description] == StateValue.string("New dynamic description"))
 
         // Verify via attribute access
-        let desc: String = try await engine.attribute(.description, of: LocationID("testLocation"))
+        let desc: String? = try await engine.attribute(.description, of: LocationID("testLocation"))
         #expect(desc == "New dynamic description")
     }
 }

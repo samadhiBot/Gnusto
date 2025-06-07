@@ -18,9 +18,6 @@ enum InsideHouse {
     static let kitchen = Location(
         id: .kitchen,
         .name("Kitchen"),
-        .description("""
-            You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the north is a small window which is open.
-            """),
         .exits([
             .west: .to(.livingRoom),
             .up: .to(.attic),
@@ -294,4 +291,28 @@ enum InsideHouse {
         .in(.location(.livingRoom))
         // Note: Has action handler FRONT-DOOR-FCN
     )
+}
+
+// MARK: - Computers
+
+extension InsideHouse {
+    static let kitchenComputer = LocationComputer { attributeID, gameState in
+        switch attributeID {
+        case .description:
+            let windowState = if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
+                "open"
+            } else {
+                "slightly ajar"
+            }
+            return .string("""
+                You are in the kitchen of the white house. A table seems to
+                have been used recently for the preparation of food. A passage
+                leads to the west and a dark staircase can be seen leading
+                upward. A dark chimney leads down and to the east is a small
+                window which is \(windowState).                
+                """)
+        default:
+            return nil
+        }
+    }
 }

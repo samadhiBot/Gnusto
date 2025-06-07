@@ -242,7 +242,7 @@ public struct ExamineActionHandler: ActionHandler {
         }
 
         // Check dynamic property for open state
-        let isOpen: Bool = try await engine.attribute(.isOpen, of: targetItem.id)
+        let isOpen = try await engine.hasFlag(.isOpen, on: targetItem.id)
         let isTransparent = targetItem.hasFlag(.isTransparent)
 
         if isOpen || isTransparent {

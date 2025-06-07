@@ -11,25 +11,30 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the string attribute.
     ///   - locationID: The `LocationID` of the location.
-    /// - Returns: The string value of the attribute.
-    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
-    ///           or the location does not exist.
+    /// - Returns: The string value of the attribute, or `nil` if the attribute doesn't exist.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a string,
+    ///           or if the location does not exist.
     public func attribute(
         _ attributeID: AttributeID,
         of locationID: LocationID
-    ) async throws -> String {
+    ) async throws -> String? {
         let result = await fetchStateValue(
             locationID: locationID,
             attributeID: attributeID
         )
         let value = result.value
+
+        guard let value else {
+            return nil
+        }
+
         switch value {
         case .string(let stringValue):
             return stringValue
         default:
             throw ActionResponse.invalidValue("""
                 Cannot fetch string value for \(locationID.rawValue).\(attributeID.rawValue): \
-                \(value ?? .undefined)
+                expected string but got \(value)
                 """)
         }
     }

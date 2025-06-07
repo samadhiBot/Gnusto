@@ -46,12 +46,12 @@ public struct InsertActionHandler: ActionHandler {
             guard await context.engine.playerCanReach(containerID) else {
                 throw ActionResponse.itemNotAccessible(containerID)
             }
-            guard try await context.engine.attribute(.isOpen, of: containerID) else {
+            guard try await context.engine.hasFlag(.isOpen, on: containerID) else {
                 throw ActionResponse.containerIsClosed(containerID)
             }
             return
         }
-        
+
         // 1. Validate Direct and Indirect Objects
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet("Insert what?")
@@ -112,7 +112,7 @@ public struct InsertActionHandler: ActionHandler {
             throw ActionResponse.targetIsNotAContainer(containerID)
         }
         // Check dynamic property for open state
-        guard try await context.engine.attribute(.isOpen, of: containerID) else {
+        guard try await context.engine.hasFlag(.isOpen, on: containerID) else {
             throw ActionResponse.containerIsClosed(containerID)
         }
 
@@ -153,20 +153,20 @@ public struct InsertActionHandler: ActionHandler {
               case .item(let containerID) = indirectObjectRef else {
             return ActionResult("Insert into what?")
         }
-        
+
         let container = try await context.engine.item(containerID)
-        
+
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult("Insert what?")
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var insertedItems: [Item] = []
         var lastInsertedItem: Item?
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             guard case .item(let itemToInsertID) = directObjectRef else {
@@ -176,27 +176,27 @@ public struct InsertActionHandler: ActionHandler {
                     return ActionResult("You can only insert items.")
                 }
             }
-            
+
             do {
                 let itemToInsert = try await context.engine.item(itemToInsertID)
-                
+
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if player has this item
                     guard itemToInsert.parent == .player else {
                         continue // Skip items not held in ALL commands
                     }
-                    
+
                     // Check if item is scenery
                     if itemToInsert.hasFlag(.omitDescription) {
                         continue // Skip scenery items in ALL commands
                     }
-                    
+
                     // Prevent putting item inside/onto itself
                     if itemToInsertID == containerID {
                         continue // Skip self-insertion in ALL commands
                     }
-                    
+
                     // Recursive check: is the target container inside the item we are inserting?
                     var currentParent = container.parent
                     var isCircular = false
@@ -211,7 +211,7 @@ public struct InsertActionHandler: ActionHandler {
                     if isCircular {
                         continue // Skip circular placement in ALL commands
                     }
-                    
+
                     // Capacity Check
                     if container.capacity >= 0 {
                         let itemsInside = await context.engine.items(in: .item(containerID))
@@ -222,7 +222,7 @@ public struct InsertActionHandler: ActionHandler {
                         }
                     }
                 }
-                
+
                 // --- Calculate State Changes for this item ---
                 var itemStateChanges: [StateChange] = []
 
@@ -244,7 +244,7 @@ public struct InsertActionHandler: ActionHandler {
                 allStateChanges.append(contentsOf: itemStateChanges)
                 insertedItems.append(itemToInsert)
                 lastInsertedItem = itemToInsert
-                
+
             } catch {
                 // For ALL commands, skip items that cause errors
                 if !context.command.isAllCommand {
@@ -252,14 +252,14 @@ public struct InsertActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Mark container touched if any items were inserted
         if !insertedItems.isEmpty {
             if let update = await context.engine.setFlag(.isTouched, on: container) {
                 allStateChanges.append(update)
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if let lastItem = lastInsertedItem {
             if insertedItems.count > 1 {
@@ -276,7 +276,7 @@ public struct InsertActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
         let message = if insertedItems.isEmpty {
             context.command.isAllCommand ? "You have nothing to put in the \(container.name)."
@@ -284,7 +284,7 @@ public struct InsertActionHandler: ActionHandler {
         } else {
             "You put \(insertedItems.listWithDefiniteArticles) in the \(container.name)."
         }
-        
+
         return ActionResult(
             message: message,
             stateChanges: allStateChanges

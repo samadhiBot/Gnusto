@@ -11,24 +11,30 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the boolean attribute.
     ///   - itemID: The `ItemID` of the item.
-    /// - Returns: The boolean value of the attribute.
-    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a boolean, does not exist,
-    ///           or the item does not exist.
+    /// - Returns: The boolean value of the attribute, or `nil` if the attribute doesn't exist.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
+    ///           or if the item does not exist.
     public func attribute(
         _ attributeID: AttributeID,
         of itemID: ItemID
-    ) async throws -> Bool {
+    ) async throws -> Bool? {
         let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
+        let value = result.value
+
+        guard let value else {
+            return nil
+        }
+
         switch value {
         case .bool(let boolValue):
             return boolValue
         default:
             throw ActionResponse.invalidValue("""
                 Cannot fetch boolean value for \(itemID.rawValue).\(attributeID.rawValue): \
-                \(value ?? .undefined)
+                expected boolean but got \(value)
                 """)
         }
     }
@@ -41,25 +47,30 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the integer attribute.
     ///   - itemID: The `ItemID` of the item.
-    /// - Returns: The integer value of the attribute.
-    /// - Throws: `ActionResponse.invalidValue` if the attribute is not an integer, does not exist,
-    ///           or the item does not exist.
+    /// - Returns: The integer value of the attribute, or `nil` if the attribute doesn't exist.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not an integer,
+    ///           or if the item does not exist.
     public func attribute(
         _ attributeID: AttributeID,
         of itemID: ItemID
-    ) async throws -> Int {
+    ) async throws -> Int? {
         let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
         let value = result.value
+
+        guard let value else {
+            return nil
+        }
+
         switch value {
         case .int(let intValue):
             return intValue
         default:
             throw ActionResponse.invalidValue("""
                 Cannot fetch integer value for \(itemID.rawValue).\(attributeID.rawValue): \
-                \(value ?? .undefined)
+                expected integer but got \(value)
                 """)
         }
     }
@@ -72,25 +83,30 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the string attribute (e.g., `.description`).
     ///   - itemID: The `ItemID` of the item.
-    /// - Returns: The string value of the attribute.
-    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a string, does not exist,
-    ///           or the item does not exist.
+    /// - Returns: The string value of the attribute, or `nil` if the attribute doesn't exist.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a string,
+    ///           or if the item does not exist.
     public func attribute(
         _ attributeID: AttributeID,
         of itemID: ItemID
-    ) async throws -> String {
+    ) async throws -> String? {
         let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
         let value = result.value
+
+        guard let value else {
+            return nil
+        }
+
         switch value {
         case .string(let stringValue):
             return stringValue
         default:
             throw ActionResponse.invalidValue("""
                 Cannot fetch string value for \(itemID.rawValue).\(attributeID.rawValue): \
-                \(value ?? .undefined)
+                expected string but got \(value)
                 """)
         }
     }
@@ -166,13 +182,18 @@ extension GameEngine {
         }
     }
 
-    /// <#Description#>
+    /// Checks if a boolean flag is set to true for a given item.
+    ///
+    /// This is a convenience method that treats `nil` values as `false`, making it ideal
+    /// for checking boolean flags where the absence of the attribute means the flag is not set.
+    ///
     /// - Parameters:
-    ///   - attributeID: <#attributeID description#>
-    ///   - itemID: <#itemID description#>
-    /// - Returns: <#description#>
+    ///   - attributeID: The `AttributeID` of the boolean attribute to check.
+    ///   - itemID: The `ItemID` of the item.
+    /// - Returns: `true` if the attribute exists and is `true`, `false` otherwise (including when `nil`).
+    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean.
     public func hasFlag(_ attributeID: AttributeID, on itemID: ItemID) async throws -> Bool {
-        try await attribute(attributeID, of: itemID) == true
+        (try await attribute(attributeID, of: itemID)) == true
     }
 
     /// Retrieves an immutable copy (snapshot) of a specific item from the current game state.
