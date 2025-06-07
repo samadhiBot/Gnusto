@@ -77,12 +77,15 @@ struct DynamicPropertyTests {
         let game = MinimalGame(
             locations: [testLocation],
             items: [testItem],
-            itemComputeHandlers: [
-                "testItem": [
-                    .description: { item, gameState in
+            itemComputers: [
+                "testItem": ItemComputer { item, attributeID, gameState in
+                    switch attributeID {
+                    case .description:
                         return .string("This sword glows with magic sword energy!")
+                    default:
+                        throw ComputeError.attributeNotHandled(attributeID)
                     }
-                ]
+                }
             ]
         )
         let mockIO = await MockIOHandler()
@@ -106,12 +109,15 @@ struct DynamicPropertyTests {
 
         let game = MinimalGame(
             locations: [testLocation],
-            locationComputeHandlers: [
-                "testLocation": [
-                    .description: { location, gameState in
+            locationComputers: [
+                "testLocation": LocationComputer { location, attributeID, gameState in
+                    switch attributeID {
+                    case .description:
                         return .string("The Magic Chamber sparkles with mystical energy!")
+                    default:
+                        throw ComputeError.attributeNotHandled(attributeID)
                     }
-                ]
+                }
             ]
         )
         let mockIO = await MockIOHandler()
@@ -148,12 +154,15 @@ struct DynamicPropertyTests {
             player: Player(in: testLocation.id),
             locations: [testLocation],
             items: [testItem],
-            itemComputeHandlers: [
-                "magicSword": [
-                    .description: { item, gameState in
+            itemComputers: [
+                "magicSword": ItemComputer { item, attributeID, gameState in
+                    switch attributeID {
+                    case .description:
                         return .string("The blade shimmers with arcane power.")
+                    default:
+                        throw ComputeError.attributeNotHandled(attributeID)
                     }
-                ]
+                }
             ]
         )
 
@@ -190,12 +199,15 @@ struct DynamicPropertyTests {
         let game = MinimalGame(
             player: Player(in: testLocation.id),
             locations: [testLocation],
-            locationComputeHandlers: [
-                "testLocation": [
-                    .description: { location, gameState in
+            locationComputers: [
+                "testLocation": LocationComputer { location, attributeID, gameState in
+                    switch attributeID {
+                    case .description:
                         return .string("Ethereal mists dance between towering oaks.")
+                    default:
+                        throw ComputeError.attributeNotHandled(attributeID)
                     }
-                ]
+                }
             ]
         )
 
@@ -212,7 +224,7 @@ struct DynamicPropertyTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             — Enchanted Forest —
-            
+
             Ethereal mists dance between towering oaks.
             """)
     }
@@ -235,12 +247,10 @@ struct DynamicPropertyTests {
         let game = MinimalGame(
             locations: [testLocation],
             items: [testItem],
-            itemComputeHandlers: [
-                "testItem": [
-                    .description: { item, gameState in
-                        throw ActionResponse.internalEngineError("Test error")
-                    }
-                ]
+            itemComputers: [
+                "testItem": ItemComputer { item, attributeID, gameState in
+                    throw ActionResponse.internalEngineError("Test error")
+                }
             ]
         )
         let mockIO = await MockIOHandler()
