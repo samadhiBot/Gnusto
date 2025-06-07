@@ -64,12 +64,14 @@ let package = Package(
             name: "FrobozzMagicDemoKit",
             dependencies: ["GnustoEngine"],
             path: "Executables/FrobozzMagicDemoKit",
+            exclude: ["README.md", "Docs/"],
             plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
             name: "Zork1",
             dependencies: ["GnustoEngine"],
             path: "Executables/Zork1",
+            exclude: ["README.md"],
             plugins: ["GnustoAutoWiringPlugin"]
         ),
         .executableTarget(
