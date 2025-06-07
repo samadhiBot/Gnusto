@@ -1013,6 +1013,7 @@ extension GameEngine {
     static var defaultActionHandlers: [VerbID: ActionHandler] {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction
+            .climbOn: ClimbOnActionHandler(),
             .close: CloseActionHandler(),
             .drop: DropActionHandler(),
             .examine: ExamineActionHandler(),
@@ -1023,10 +1024,12 @@ extension GameEngine {
             .listen: ListenActionHandler(),
             .lock: LockActionHandler(),
             .look: LookActionHandler(),
+            .lookUnder: LookUnderActionHandler(),
             .move: MoveActionHandler(),
             .open: OpenActionHandler(),
             .push: PushActionHandler(),
             .putOn: PutOnActionHandler(),
+            .raise: RaiseActionHandler(),
             .read: ReadActionHandler(),
             .remove: RemoveActionHandler(),
             .smell: SmellActionHandler(),

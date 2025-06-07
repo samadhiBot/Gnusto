@@ -9,6 +9,32 @@ alwaysApply: true
 
 Protocol defining how specific game verbs (like "take", "open", "go") are implemented. It encapsulates the logic for performing an action, including validation, processing (which returns an `ActionResult`), and post-processing. [ActionHandler.swift](mdc:Sources/GnustoEngine/Actions/ActionHandler.swift)
 
+**Use for:** Generic verb behavior that applies to most/all items of a certain type (e.g., how "take" works for any takeable item).
+
+## ItemEventHandler
+
+A more targeted approach for item-specific behavior. Instead of creating custom ActionHandlers, use ItemEventHandler to override or extend specific verbs for specific items. This follows the ZIL pattern where individual objects can have custom action routines. [ItemEventHandler.swift](mdc:Sources/GnustoEngine/Actions/ItemEventHandler.swift)
+
+**Use for:** Game-specific item behavior (e.g., the rug in Zork has special behavior for MOVE, RAISE, LOOK UNDER). Register via `GameBlueprint.itemEventHandlers`.
+
+**Example:**
+
+```swift
+static let rugHandler = ItemEventHandler { engine, event in
+    switch event {
+    case .beforeTurn(let command):
+        switch command.verb {
+        case .move:
+            return ActionResult("Special rug behavior...")
+        default:
+            return nil // Use default handler
+        }
+    case .afterTurn:
+        return nil
+    }
+}
+```
+
 ## GameBlueprint
 
 Protocol defining the static structure and game-specific configurations for a game. Implementations of `GameBlueprint` provide the initial game state, vocabulary, custom action handlers, item/location event handlers (for specific object/room behaviors), timed event definitions (via `TimeRegistry`), dynamic attribute providers, and other custom behaviors to the `GameEngine`. [GameBlueprint.swift](mdc:Sources/GnustoEngine/Blueprints/GameBlueprint.swift)
@@ -48,3 +74,38 @@ A repository for game-specific timed event definitions (`FuseDefinition`, `Daemo
 ## Vocabulary
 
 Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. The `Vocabulary` is typically provided by the `GameBlueprint`. [Vocabulary.swift](mdc:Sources/GnustoEngine/Vocabulary/Vocabulary.swift)
+
+## Auto-Wiring Tools
+
+The Gnusto engine includes powerful auto-wiring tools that eliminate boilerplate by automatically generating game setup code:
+
+### GnustoAutoWiringTool
+
+A command-line tool that scans game source files and automatically generates the necessary boilerplate code for registering items, locations, event handlers, computers, etc. with the GameBlueprint. [GnustoAutoWiringTool](mdc:Sources/GnustoAutoWiringTool)
+
+**Key features:**
+
+- Scans Swift files for static item/location definitions
+- Discovers ItemEventHandlers and LocationEventHandlers
+- Generates arrays and dictionaries for GameBlueprint implementation
+- Eliminates the need to manually maintain registration lists
+
+### GnustoAutoWiringPlugin
+
+A Swift Package Manager plugin that integrates the auto-wiring tool into the build process, ensuring generated code stays up-to-date automatically. [GnustoAutoWiringPlugin](mdc:Plugins/GnustoAutoWiringPlugin)
+
+**Usage:** The plugin runs during build to regenerate boilerplate code, making game development more productive by removing manual maintenance overhead.
+
+## Development Patterns
+
+### For Game-Specific Behavior
+
+1. **Prefer ItemEventHandler** over custom ActionHandlers for item-specific behavior
+2. **Use LocationEventHandler** for room-specific behavior (e.g., room descriptions that change based on game state)
+3. **Create custom ActionHandlers** only for new verbs or completely different verb behavior across all items
+
+### For Game Setup
+
+1. **Let auto-wiring handle the boilerplate** - define your items, locations, and handlers as static properties
+2. **Focus on game content** rather than registration mechanics
+3. **Use meaningful static property names** as they're discoverable by the auto-wiring tools

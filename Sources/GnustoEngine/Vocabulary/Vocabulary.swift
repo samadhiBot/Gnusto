@@ -476,6 +476,39 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 )
             ]
         ),
+
+        // Rug-specific verbs
+
+        Verb(
+            id: .raise,
+            synonyms: "lift", "elevate",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .lookUnder,
+            synonyms: "look under", "peek under",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "under"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .climbOn,
+            synonyms: "climb on", "sit on", "stand on",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "on"
+                )
+            ],
+            requiresLight: true
+        ),
     ]
 
     // MARK: - Building Vocabulary

@@ -293,3 +293,95 @@ extension InsideHouse {
         }
     }
 }
+
+// MARK: - Event handlers
+
+extension InsideHouse {
+    /// Handles special rug interactions based on the original ZIL `RUG-FCN`.
+    ///
+    /// This handler manages complex rug behavior including:
+    /// - RAISE: Heavy rug notifications and irregularity hints
+    /// - MOVE/PUSH: Moving the rug to reveal trap door
+    /// - TAKE: Rug is too heavy to carry
+    /// - LOOK UNDER: Temporary trap door revelation
+    /// - CLIMB ON: Irregularity detection and magic carpet joke
+    static let rugHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            // The global flag tracking whether the rug has been moved
+            let rugMovedFlag: GlobalID = "rugMoved"
+
+            let wasRugMoved = try await engine.hasFlag(rugMovedFlag)
+            let trapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
+
+            switch command.verb {
+            case .raise:
+                let baseMessage = "The rug is too heavy to lift"
+
+                if wasRugMoved {
+                    return ActionResult("\(baseMessage).")
+                } else {
+                    return ActionResult("""
+                        \(baseMessage), but in trying to take it you have
+                        noticed an irregularity beneath it.
+                        """)
+                }
+
+            case .move, .push:
+                if wasRugMoved {
+                    return ActionResult("""
+                        Having moved the carpet previously, you find it impossible to move
+                        it again.
+                        """)
+                } else {
+                    // Move the rug and reveal the trap door
+                    let trapDoor = try await engine.item(.trapDoor)
+
+                    let changes: [StateChange] = [
+                        // Mark rug as moved
+                        await engine.setFlag(rugMovedFlag),
+                        // Make trap door visible
+                        await engine.clearFlag(.isInvisible, on: trapDoor)
+                    ].compactMap { $0 }
+
+                    return ActionResult(
+                        message: """
+                            With a great effort, the rug is moved to one side of the room, revealing
+                            the dusty cover of a closed trap door.
+                            """,
+                        stateChanges: changes
+                    )
+                }
+
+            case .take:
+                return ActionResult("The rug is extremely heavy and cannot be carried.")
+
+            case .lookUnder:
+                // Only show trap door if rug hasn't been moved and trap door isn't open
+                if !wasRugMoved && !trapDoorOpen {
+                    return ActionResult("""
+                        Underneath the rug is a closed trap door. As you drop the corner of the
+                        rug, the trap door is once again concealed from view.
+                        """)
+                } else {
+                    return ActionResult("You find nothing of interest.")
+                }
+
+            case .climbOn:
+                if !wasRugMoved && !trapDoorOpen {
+                    return ActionResult("""
+                        As you sit, you notice an irregularity underneath it. Rather than be
+                        uncomfortable, you stand up again.
+                        """)
+                } else {
+                    return ActionResult("I suppose you think it's a magic carpet?")
+                }
+
+            default:
+                return nil // Let other handlers deal with it
+            }
+        case .afterTurn:
+            return nil
+        }
+    }
+}

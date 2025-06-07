@@ -1,0 +1,47 @@
+import Foundation
+
+/// Handles the RAISE verb (synonym: LIFT).
+///
+/// The ZIL equivalent is the `V-RAISE` routine. This action represents the player
+/// attempting to lift or raise an object.
+public struct RaiseActionHandler: ActionHandler {
+    /// Validates that the action can be performed.
+    ///
+    /// - Parameter context: The `ActionContext` containing the command and game state.
+    /// - Returns: An `ActionResult` indicating validation success or failure.
+    public func validate(context: ActionContext) async throws -> ActionResult? {
+        guard let directObjectRef = context.command.directObject else {
+            return ActionResult("Raise what?")
+        }
+
+        guard case .item(let targetItemID) = directObjectRef else {
+            return ActionResult("You can only raise items.")
+        }
+
+        // Check if item exists and is reachable
+        guard (try? await context.engine.item(targetItemID)) != nil else {
+            return ActionResult("I don't see that here.")
+        }
+
+        guard await context.engine.playerCanReach(targetItemID) else {
+            return ActionResult("You can't reach that.")
+        }
+
+        return nil // Validation passed
+    }
+
+    /// Processes the raise action.
+    ///
+    /// - Parameter context: The `ActionContext` containing the command and game state.
+    /// - Returns: An `ActionResult` with the action outcome.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard case .item(let targetItemID) = context.command.directObject else {
+            throw ActionResponse.internalEngineError("Raise: directObject was not an item in process.")
+        }
+
+        let targetItem = try await context.engine.item(targetItemID)
+
+        // Default behavior: You can't raise most things
+        return ActionResult("You can't lift \(targetItem.withDefiniteArticle).")
+    }
+}

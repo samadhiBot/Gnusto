@@ -13,7 +13,7 @@ extension GameEngine {
     }
 
     /// Retrieves the boolean value of a global variable from `gameState.globalState`.
-    /// 
+    ///
     /// - Parameter bool: The `GlobalID` of the global variable.
     /// - Returns: The boolean value if the global variable exists and is a boolean,
     ///            otherwise `nil`. If the variable exists but is not a boolean type,
@@ -41,5 +41,16 @@ extension GameEngine {
     ///            the `toInt` conversion on `StateValue` will determine the result (often `nil`).
     public func global(_ int: GlobalID) -> Int? {
         gameState.globalState[int]?.toInt
+    }
+
+    /// Checks if a boolean flag is set to true in global state.
+    ///
+    /// This is a convenience method that treats `nil` values as `false`, making it ideal
+    /// for checking boolean flags where the absence of the global variable means the flag is not set.
+    ///
+    /// - Parameter globalID: The `GlobalID` of the boolean global variable to check.
+    /// - Returns: `true` if the global variable exists and is `true`, `false` otherwise (including when `nil`).
+    public func hasFlag(_ globalID: GlobalID) -> Bool {
+        global(globalID) == true
     }
 }
