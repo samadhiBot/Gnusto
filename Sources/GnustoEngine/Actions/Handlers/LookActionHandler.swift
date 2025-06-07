@@ -100,24 +100,37 @@ public struct LookActionHandler: ActionHandler {
 
         var stateChanges: [StateChange] = []
 
-        // 1. Get base description using the registry
+        // 1. Get base description
         var descriptionLines: [String] = []
-        let baseDescription = await context.engine.generateDescription(
+        let baseDescription = try await context.engine.generateDescription(
             for: targetItem.id, // Use item ID
-            attributeID: .description, // Specify the key
-            engine: context.engine
+            attributeID: .description
         )
+
+        // Always add base description (even if empty, since that's expected behavior)
         descriptionLines.append(baseDescription)
 
-        // 2. Add container/surface contents
-        // Pass the Item to the helper
-        descriptionLines.append(
-            contentsOf: await describeContents(
-                of: targetItem,
-                engine: context.engine,
-                stateSnapshot: context.stateSnapshot
+        // 2. For surfaces, generate a single combined contents description
+        if targetItem.hasFlag(.isSurface) {
+            let itemsOnSurface = context.stateSnapshot.items.values.filter { $0.parent == .item(targetItem.id) }
+            let itemsToDescribe = itemsOnSurface.filter { $0.id != targetItem.id }
+            if !itemsToDescribe.isEmpty {
+                let isAre = itemsToDescribe.count == 1 ? "is" : "are"
+                descriptionLines.append(
+                    "On the \(targetItem.name) \(isAre) \(itemsToDescribe.sorted().listWithIndefiniteArticles)."
+                )
+            }
+        }
+
+        if targetItem.hasFlag(.isContainer) {
+            descriptionLines.append(
+                contentsOf: await describeContents(
+                    of: targetItem,
+                    engine: context.engine,
+                    stateSnapshot: context.stateSnapshot
+                )
             )
-        )
+        }
 
         // 3. Prepare state change (mark as touched)
         if let update = await context.engine.setFlag(.isTouched, on: targetItem) {

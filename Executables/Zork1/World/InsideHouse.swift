@@ -73,18 +73,6 @@ enum InsideHouse {
         // Note: Has action handler BOTTLE-FUNCTION
     )
 
-    static let brownSack = Item(
-        id: .brownSack,
-        .name("brown sack"),
-        .description("An elongated brown sack, smelling of hot peppers."),
-        .adjectives("brown", "elongated", "smelly"),
-        .synonyms("bag", "sack"),
-        .in(.item(.kitchenTable)),
-        .isTakable,
-        .isContainer,
-        .isOpenable
-    )
-
     static let carpet = Item(
         id: .carpet,
         .name("large oriental rug"),
@@ -309,7 +297,7 @@ extension InsideHouse {
                 have been used recently for the preparation of food. A passage
                 leads to the west and a dark staircase can be seen leading
                 upward. A dark chimney leads down and to the east is a small
-                window which is \(windowState).                
+                window which is \(windowState).
                 """)
         default:
             return nil

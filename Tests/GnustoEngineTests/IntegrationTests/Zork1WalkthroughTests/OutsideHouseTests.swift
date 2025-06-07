@@ -86,9 +86,7 @@ struct OutsideHouseTests {
             \(enterKitchenPlayback)
 
             > examine table
-            The table seems to have been used recently for the preparation
-            of food. The kitchen table contains a glass bottle and a brown
-            sack.
+            The kitchen table contains a glass bottle and a brown sack.
 
             > open sack
             You open the brown sack.

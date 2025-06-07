@@ -130,16 +130,14 @@ extension GameEngine {
     /// - Returns: A formatted description string.
     public func generateDescription(
         for itemID: ItemID,
-        attributeID: AttributeID,
-        engine: GameEngine
-    ) async -> String {
-        if let description: String = try? await engine.attribute(attributeID, of: itemID) {
+        attributeID: AttributeID
+    ) async throws -> String {
+        if let description: String = try? await attribute(attributeID, of: itemID) {
             description.trimmingCharacters(in: .whitespacesAndNewlines)
         } else {
-            await defaultItemDescription(
+            try await defaultItemDescription(
                 for: itemID,
-                attributeID: attributeID,
-                engine: engine
+                attributeID: attributeID
             ).trimmingCharacters(in: .whitespacesAndNewlines)
         }
     }
@@ -157,12 +155,11 @@ extension GameEngine {
     ///   - attributeID: The `AttributeID` indicating the type of description requested.
     ///   - engine: The `GameEngine` instance, used for fetching dynamic values.
     /// - Returns: A tuple containing the formatted description string and a boolean indicating
-    ///           whether a compute handler provided the description.
+    ///            whether a compute handler provided the description.
     public func generateDescriptionWithComputeInfo(
         for itemID: ItemID,
-        attributeID: AttributeID,
-        engine: GameEngine
-    ) async -> (description: String, wasComputed: Bool) {
+        attributeID: AttributeID
+    ) async throws -> (description: String, wasComputed: Bool) {
         let result = await fetchStateValue(itemID: itemID, attributeID: attributeID)
 
         if let value = result.value, case .string(let stringValue) = value {
@@ -172,10 +169,9 @@ extension GameEngine {
             )
         } else {
             return (
-                await defaultItemDescription(
+                try await defaultItemDescription(
                     for: itemID,
-                    attributeID: attributeID,
-                    engine: engine
+                    attributeID: attributeID
                 ).trimmingCharacters(in: .whitespacesAndNewlines),
                 false
             )
@@ -257,23 +253,22 @@ extension GameEngine {
     /// nothing special about the {item}." if `attributeID` is `.description`).
     private func defaultItemDescription(
         for itemID: ItemID,
-        attributeID: AttributeID,
-        engine: GameEngine
-    ) async -> String {
-        let item = try? await engine.item(itemID)
+        attributeID: AttributeID
+    ) async throws -> String {
+        let item = try item(itemID)
         return switch attributeID {
         case .description:
-            "You see nothing special about \(item?.withDefiniteArticle ?? "it")."
+            "You see nothing special about \(item.withDefiniteArticle)."
         case .shortDescription:
-            "\(item?.withIndefiniteArticle.capitalizedFirst ?? "An item")."
+            "\(item.withIndefiniteArticle.capitalizedFirst)."
         case .firstDescription:
-            "There is \(item?.withIndefiniteArticle ?? "something") here."
+            "There is \(item.withIndefiniteArticle) here."
         case .readText:
-            "There is nothing written on \(item?.withDefiniteArticle ?? "it")."
+            "There is nothing written on \(item.withDefiniteArticle)."
         case .readWhileHeldText:
-            "Holding \(item?.withDefiniteArticle ?? "it") reveals nothing special."
+            "Holding \(item.withDefiniteArticle) reveals nothing special."
         default:
-            "\(item?.withDefiniteArticle.capitalizedFirst ?? "It") seems indescribable."
+            "\(item.withDefiniteArticle.capitalizedFirst) seems indescribable."
         }
     }
 

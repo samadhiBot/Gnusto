@@ -109,37 +109,45 @@ public struct ExamineActionHandler: ActionHandler {
                     }
 
                     // --- Determine Message ---
-                    let message: String
+                    var messages = [String]()
+
                     // Priority 1: Readable Text (Check dynamic value)
                     if targetItem.hasFlag(.isReadable),
                        let readText: String = try? await context.engine.attribute(.readText, of: targetItem.id),
                        !readText.isEmpty
                     {
-                        message = readText
+                        messages.append(readText)
                     }
                     // Priority 2: Container/Door Description
-                    else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
-                        message = try await describeContainerOrDoor(
-                            targetItem: targetItem,
-                            engine: context.engine
+                    if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
+                        try messages.append(
+                            await describeContainerOrDoor(
+                                targetItem: targetItem,
+                                engine: context.engine
+                            )
                         )
                     }
                     // Priority 3: Surface Description
-                    else if targetItem.hasFlag(.isSurface) {
-                        message = await describeSurface(
-                            targetItem: targetItem,
-                            engine: context.engine
+                    if targetItem.hasFlag(.isSurface) {
+                        try messages.append(
+                            await describeSurface(
+                                targetItem: targetItem,
+                                engine: context.engine
+                            )
                         )
                     }
                     // Priority 4: Dynamic Long Description
-                    else {
+                    if messages.isEmpty {
                         // Use the registry to generate the description using the item ID and key
-                        message = await context.engine.generateDescription(
-                            for: targetItem.id,
-                            attributeID: .description,
-                            engine: context.engine
+                        try messages.append(
+                            await context.engine.generateDescription(
+                                for: targetItem.id,
+                                attributeID: .description
+                            )
                         )
                     }
+
+                    let message = messages.joined(separator: " ")
 
                     allStateChanges.append(contentsOf: itemStateChanges)
                     examinedItems.append(targetItem)
@@ -229,10 +237,9 @@ public struct ExamineActionHandler: ActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let (baseDescription, wasComputed) = await engine.generateDescriptionWithComputeInfo(
+        let (baseDescription, wasComputed) = try await engine.generateDescriptionWithComputeInfo(
             for: targetItem.id,
-            attributeID: .description,
-            engine: engine
+            attributeID: .description
         )
         descriptionParts.append(baseDescription)
 
@@ -268,12 +275,11 @@ public struct ExamineActionHandler: ActionHandler {
     ///   - targetItem: The surface `Item` to describe.
     ///   - engine: The `GameEngine` instance for accessing item state and utility functions.
     /// - Returns: A string describing the surface and any items on it.
-    private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
+    private func describeSurface(targetItem: Item, engine: GameEngine) async throws -> String {
         // Check if a compute handler provided a custom description
-        let (baseDescription, wasComputed) = await engine.generateDescriptionWithComputeInfo(
+        let (baseDescription, wasComputed) = try await engine.generateDescriptionWithComputeInfo(
             for: targetItem.id,
-            attributeID: .description,
-            engine: engine
+            attributeID: .description
         )
 
         // If a compute handler provided the description, it's complete - don't add more
@@ -289,36 +295,68 @@ public struct ExamineActionHandler: ActionHandler {
             return baseDescription
         }
 
-        // Use enhanced surface description with individual item details
-        var descriptionLines: [String] = []
-
-        for item in contents.sorted() {
-            // Use firstDescription if available, otherwise fall back to name with location
-            if let firstDescription = item.attributes[.firstDescription],
-               case .string(let description) = firstDescription,
-               !description.isEmpty {
-                descriptionLines.append(description)
-            } else {
-                descriptionLines.append("On the \(targetItem.name) is \(item.withIndefiniteArticle).")
+        // Check if any items have firstDescription (indicating enhanced mode)
+        let hasFirstDescriptions = contents.contains { item in
+            guard
+                let firstDescription = item.attributes[.firstDescription],
+                case .string(let description) = firstDescription,
+                !description.isEmpty
+            else {
+                return false
             }
+            return true
+        }
 
-            // If item is a container, show its contents
-            if item.hasFlag(.isContainer) {
-                let isOpen = item.hasFlag(.isOpen)
-                let isTransparent = item.hasFlag(.isTransparent)
+        if hasFirstDescriptions {
+            // Use enhanced surface description with individual item details
+            var descriptionLines: [String] = []
 
-                if isOpen || isTransparent {
-                    let containerContents = await engine.items(in: .item(item.id))
-                    if !containerContents.isEmpty {
-                        descriptionLines.append("""
-                            The \(item.name) contains \
-                            \(containerContents.sorted().listWithIndefiniteArticles).
-                            """)
+            for item in contents.sorted() {
+                // Use firstDescription if available, otherwise fall back to name with location
+                if let firstDescription = item.attributes[.firstDescription],
+                   case .string(let description) = firstDescription,
+                   !description.isEmpty {
+                    descriptionLines.append(description)
+                } else {
+                    descriptionLines.append(
+                        "On the \(targetItem.name) is \(item.withIndefiniteArticle)."
+                    )
+                }
+
+                // If item is a container, show its contents
+                if item.hasFlag(.isContainer) {
+                    let isOpen = item.hasFlag(.isOpen)
+                    let isTransparent = item.hasFlag(.isTransparent)
+
+                    if isOpen || isTransparent {
+                        let containerContents = await engine.items(in: .item(item.id))
+                        if !containerContents.isEmpty {
+                            descriptionLines.append("""
+                                The \(item.name) contains \
+                                \(containerContents.sorted().listWithIndefiniteArticles).
+                                """)
+                        }
                     }
                 }
             }
-        }
 
-        return descriptionLines.joined(separator: "\n")
+            return descriptionLines.joined(separator: " ")
+        } else {
+            // Use simplified surface description (base description + combined contents)
+            var descriptionParts: [String] = []
+
+            // Add base description if not empty
+            if !baseDescription.isEmpty {
+                descriptionParts.append(baseDescription)
+            }
+
+            // Add surface contents as a single combined sentence
+            let sortedContents = contents.sorted()
+            let surfaceItemsList = sortedContents.listWithIndefiniteArticles
+            let isAre = sortedContents.count == 1 ? "is" : "are"
+            descriptionParts.append("On the \(targetItem.name) \(isAre) \(surfaceItemsList).")
+
+            return descriptionParts.joined(separator: " ")
+        }
     }
 }
