@@ -744,7 +744,7 @@ struct LookActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             A shabby wooden table, worn from years of use. On the kitchen
-            table is a dusty book and a lit candle.
+            table are a dusty book and a lit candle.
             """
         )
 

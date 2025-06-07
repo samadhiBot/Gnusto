@@ -109,18 +109,18 @@ public struct ExamineActionHandler: ActionHandler {
                     }
 
                     // --- Determine Message ---
-                    var messages = [String]()
+                    var itemMessages = [String]()
 
                     // Priority 1: Readable Text (Check dynamic value)
                     if targetItem.hasFlag(.isReadable),
                        let readText: String = try? await context.engine.attribute(.readText, of: targetItem.id),
                        !readText.isEmpty
                     {
-                        messages.append(readText)
+                        itemMessages.append(readText)
                     }
                     // Priority 2: Container/Door Description
                     if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
-                        try messages.append(
+                        try itemMessages.append(
                             await describeContainerOrDoor(
                                 targetItem: targetItem,
                                 engine: context.engine
@@ -129,7 +129,7 @@ public struct ExamineActionHandler: ActionHandler {
                     }
                     // Priority 3: Surface Description
                     if targetItem.hasFlag(.isSurface) {
-                        try messages.append(
+                        try itemMessages.append(
                             await describeSurface(
                                 targetItem: targetItem,
                                 engine: context.engine
@@ -137,17 +137,16 @@ public struct ExamineActionHandler: ActionHandler {
                         )
                     }
                     // Priority 4: Dynamic Long Description
-                    if messages.isEmpty {
+                    if itemMessages.isEmpty {
                         // Use the registry to generate the description using the item ID and key
-                        try messages.append(
-                            await context.engine.generateDescription(
-                                for: targetItem.id,
-                                attributeID: .description
-                            )
+                        let description = try await context.engine.generateDescription(
+                            for: targetItem.id,
+                            attributeID: .description
                         )
+                        itemMessages.append(description)
                     }
 
-                    let message = messages.joined(separator: " ")
+                    let message = itemMessages.joined(separator: " ")
 
                     allStateChanges.append(contentsOf: itemStateChanges)
                     examinedItems.append(targetItem)
