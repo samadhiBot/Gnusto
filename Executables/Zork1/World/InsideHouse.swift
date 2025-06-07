@@ -73,19 +73,6 @@ enum InsideHouse {
         // Note: Has action handler BOTTLE-FUNCTION
     )
 
-    static let carpet = Item(
-        id: .carpet,
-        .name("large oriental rug"),
-        .description("""
-            The rug is extremely heavy and cannot be carried. There appears to be something
-            underneath it.
-            """),
-        .adjectives("large", "oriental"),
-        .synonyms("rug", "carpet"),
-        .in(.location(.livingRoom)),
-        .omitDescription
-    )
-
     static let chimney = Item(
         id: .chimney,
         .name("chimney"),
@@ -140,7 +127,8 @@ enum InsideHouse {
         .synonyms("lamp", "lantern", "light"),
         .adjectives("brass"),
         .isTakable,
-        .isLightSource,  // LIGHTBIT
+        .isLightSource,
+        .isDevice,
         .firstDescription("A battery-powered brass lantern is on the trophy case."),
         .description("There is a brass lantern (battery-powered) here."),
         .size(15),
@@ -208,6 +196,7 @@ enum InsideHouse {
         .adjectives("brown", "elongated", "smelly"),
         .isTakable,
         .isContainer,
+        .isOpenable,
         .isFlammable,
         .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
         .capacity(9),

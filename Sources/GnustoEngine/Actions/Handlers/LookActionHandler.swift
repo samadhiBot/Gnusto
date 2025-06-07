@@ -65,8 +65,9 @@ public struct LookActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the description and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` or errors from engine calls if issues occur.
     public func process(context: ActionContext) async throws -> ActionResult {
-        // LOOK (no direct object)
-        guard let directObjectRef = context.command.directObject else {
+        // Check if this is LOOK (no direct object) or LOOK AT [object]
+        if context.command.directObject == nil {
+            // LOOK (no direct object) - describe the room
             // 1. Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
                 return ActionResult("It is pitch black. You can't see a thing.")
@@ -86,134 +87,16 @@ public struct LookActionHandler: ActionHandler {
                     stateSnapshot: context.stateSnapshot
                 )
             )
+        } else {
+            // LOOK AT [Object] - delegate to ExamineActionHandler to avoid code duplication
+            let examineHandler = ExamineActionHandler()
+            return try await examineHandler.process(context: context)
         }
-
-        // EXAMINE [Object] - directObjectRef is non-nil here.
-        // Validate ensures it's an .item, so we can extract targetItemID.
-        guard case .item(let targetItemID) = directObjectRef else {
-            // This should not be reached if validate is correct.
-            throw ActionResponse.internalEngineError("Look: directObject was not an item in process.")
-        }
-
-        // Validation ensures item exists and is reachable
-        let targetItem = try await context.engine.item(targetItemID)
-
-        var stateChanges: [StateChange] = []
-
-        // 1. Get base description
-        var descriptionLines: [String] = []
-        let baseDescription = try await context.engine.generateDescription(
-            for: targetItem.id, // Use item ID
-            attributeID: .description
-        )
-
-        // Always add base description (even if empty, since that's expected behavior)
-        descriptionLines.append(baseDescription)
-
-        // 2. For surfaces, generate a single combined contents description
-        if targetItem.hasFlag(.isSurface) {
-            let itemsOnSurface = context.stateSnapshot.items.values.filter { $0.parent == .item(targetItem.id) }
-            let itemsToDescribe = itemsOnSurface.filter { $0.id != targetItem.id }
-            if !itemsToDescribe.isEmpty {
-                let isAre = itemsToDescribe.count == 1 ? "is" : "are"
-                descriptionLines.append(
-                    "On the \(targetItem.name) \(isAre) \(itemsToDescribe.sorted().listWithIndefiniteArticles)."
-                )
-            }
-        }
-
-        if targetItem.hasFlag(.isContainer) {
-            descriptionLines.append(
-                contentsOf: await describeContents(
-                    of: targetItem,
-                    engine: context.engine,
-                    stateSnapshot: context.stateSnapshot
-                )
-            )
-        }
-
-        // 3. Prepare state change (mark as touched)
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // 4: Update pronoun
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // 5. Combine description lines and return result
-        return ActionResult(
-            message: descriptionLines.joined(separator: "\n"),
-            stateChanges: stateChanges
-        )
     }
 
     // Default postProcess will print the message from ActionResult
 
     // MARK: - Helper Functions
-
-    /// Generates a multi-line string describing the contents of a given item, if it's a
-    /// container or surface.
-    ///
-    /// - For containers, it lists items inside if the container is open or transparent.
-    ///   It states if the container is empty or closed.
-    /// - For surfaces, it lists items on the surface.
-    ///
-    /// - Parameters:
-    ///   - item: The `Item` whose contents are to be described.
-    ///   - engine: The `GameEngine` instance, used for utility functions like list formatting.
-    ///   - stateSnapshot: The `GameState` snapshot to ensure consistent view of item locations.
-    /// - Returns: An array of strings, each representing a line of the contents description.
-    ///            Returns an empty array if the item is not a container/surface or has no describable contents.
-    private func describeContents(
-        of item: Item,
-        engine: GameEngine,
-        stateSnapshot: GameState
-    ) async -> [String] {
-        var lines: [String] = []
-        let itemID = item.id
-
-        // Container contents
-        if item.hasFlag(.isContainer) {
-            // Check current state (open/closed)
-            let isOpen = item.hasFlag(.isOpen)
-            let isTransparent = item.hasFlag(.isTransparent)
-
-            if isOpen || isTransparent {
-                // Get items *inside* the container from the snapshot
-                let contents = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
-                if contents.isEmpty {
-                    lines.append("The \(item.name) is empty.")
-                } else {
-                    lines.append(
-                        // Use engine helper for formatting list
-                        "The \(item.name) contains \(contents.listWithIndefiniteArticles)."
-                    )
-                }
-            } else {
-                // Closed and not transparent
-                lines.append("The \(item.name) is closed.")
-            }
-        }
-
-        // Surface contents - Check flag on item definition
-        if item.hasFlag(.isSurface) { // Use flag()
-            // Get items *on* the surface from the snapshot
-            let itemsOnSurface = stateSnapshot.items.values.filter { $0.parent == .item(itemID) }
-            // Filter out the item itself if it somehow lists itself (e.g., bug)
-            let itemsToDescribe = itemsOnSurface.filter { $0.id != itemID }
-            if !itemsOnSurface.isEmpty {
-                // Use engine helper for formatting
-                let isAre = itemsToDescribe.count == 1 ? "is" : "are"
-                lines.append(
-                    "On the \(item.name) \(isAre) \(itemsToDescribe.listWithIndefiniteArticles)."
-                )
-            }
-            // No message needed if surface is empty
-        }
-        return lines
-    }
 
     /// Generates a comprehensive description of the specified location, including its standard
     /// description and a list of any visible items.

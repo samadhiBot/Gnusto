@@ -13,8 +13,9 @@ struct UndergroundTests {
         "west",
         "take lamp",
         "turn on lamp",
-        "examine trap door",
         "open trap door",
+        "move the rug",
+        "open the trap door",
         "down",
     ]
 
@@ -75,20 +76,14 @@ struct UndergroundTests {
         > turn on lamp
         The brass lantern is now on.
 
-        — Living Room —
-
-        You are in the living room. There is a doorway to the east, a
-        wooden door with strange gothic lettering to the west, which
-        appears to be nailed shut, a trophy case, and a large oriental
-        rug in the center of the room.
-
-        There is a sword here.
-
-        > examine trap door
-        It’s a closed trap door.
-
         > open trap door
-        You open the trap door.
+        You can’t see any such thing.
+
+        > move the rug
+        With a great effort, the rug is moved to one side of the room, revealing the dusty cover of a closed trap door.
+
+        > open the trap door
+        The door reluctantly opens to reveal a rickety staircase descending into darkness.
 
         > down
         — Cellar —

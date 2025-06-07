@@ -287,8 +287,9 @@ extension GameEngine {
         case .success(let command):
             if command.verb == .quit || shouldQuit { return }
 
-            // Store the player's current location before executing the command
+            // Store the player's current location and lighting state before executing the command
             let locationBeforeCommand = playerLocationID
+            let wasLitBeforeCommand = await playerLocationIsLit()
 
             await execute(command: command)
 
@@ -304,8 +305,14 @@ extension GameEngine {
                 shouldDescribe = locationBeforeCommand != locationAfterCommand
                 forceFullDescription = false // Use visit-based logic for movement
             case .turnOn, .turnOff:
-                shouldDescribe = true // Light change commands
-                forceFullDescription = true // Always show full description when light changes
+                // Only describe if lighting state actually changed
+                let isLitAfterCommand = await playerLocationIsLit()
+
+                // Show description only if:
+                // 1. Room went from dark to lit (turning on light), OR
+                // 2. Room went from lit to dark (turning off light)
+                shouldDescribe = wasLitBeforeCommand != isLitAfterCommand
+                forceFullDescription = true // Always show full description when lighting changes
             default:
                 shouldDescribe = false
                 forceFullDescription = false
