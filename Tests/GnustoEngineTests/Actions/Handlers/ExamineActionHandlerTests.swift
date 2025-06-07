@@ -420,6 +420,90 @@ struct ExamineActionHandlerTests {
         let changeHistory = await engine.gameState.changeHistory
         expectNoDifference(changeHistory, expectedChanges)
     }
+
+    @Test("Enhanced surface description with nested containers")
+    func testExamineEnhancedSurface() async throws {
+        // Arrange: Kitchen table with bottle containing water, and brown sack
+        let kitchenTable = Item(
+            id: "kitchenTable",
+            .name("kitchen table"),
+            .description("A wooden table used for food preparation."),
+            .in(.location(.startRoom)),
+            .isSurface
+        )
+        let bottle = Item(
+            id: "bottle",
+            .name("glass bottle"),
+            .adjectives("clear", "glass"),
+            .description("A clear glass bottle."),
+            .firstDescription("A bottle is sitting on the table."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isTransparent,
+            .isContainer
+        )
+        let water = Item(
+            id: "water",
+            .name("quantity of water"),
+            .description("It's just water."),
+            .synonyms("water", "h2o", "liquid"),
+            .in(.item("bottle")),
+            .isTakable
+        )
+        let brownSack = Item(
+            id: "brownSack",
+            .name("elongated brown sack"),
+            .description("An elongated brown sack, smelling of hot peppers."),
+            .adjectives("brown", "elongated", "smelly"),
+            .synonyms("bag", "sack"),
+            .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer,
+            .isOpenable
+        )
+
+        let initialAttributes = kitchenTable.attributes
+
+        let game = MinimalGame(items: [kitchenTable, bottle, water, brownSack])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        #expect(try await engine.item("kitchenTable").hasFlag(.isTouched) == false)
+        #expect(await engine.gameState.changeHistory.isEmpty)
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item("kitchenTable"),
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Debug: Let's see exactly what's being produced
+        let output = await mockIO.flush()
+
+        // Assert: Should show enhanced surface description
+        expectNoDifference(output, """
+            A bottle is sitting on the table. The glass bottle contains a
+            quantity of water. On the table is an elongated brown sack,
+            smelling of hot peppers.
+            """)
+
+        // Assert Final State (Surface marked touched)
+        let finalItemState = try await engine.item("kitchenTable")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
+
+        // Assert Change History
+        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
 }
 
 extension ExamineActionHandlerTests {

@@ -269,30 +269,56 @@ public struct ExamineActionHandler: ActionHandler {
     ///   - engine: The `GameEngine` instance for accessing item state and utility functions.
     /// - Returns: A string describing the surface and any items on it.
     private func describeSurface(targetItem: Item, engine: GameEngine) async -> String {
-        var descriptionParts: [String] = []
-
-        // Start with the item's main description, using the registry with ID and key
+        // Check if a compute handler provided a custom description
         let (baseDescription, wasComputed) = await engine.generateDescriptionWithComputeInfo(
             for: targetItem.id,
             attributeID: .description,
             engine: engine
         )
-        descriptionParts.append(baseDescription)
 
         // If a compute handler provided the description, it's complete - don't add more
         guard !wasComputed else {
             return baseDescription
         }
 
-        // List items on the surface
+        // Get items on the surface
         let contents = await engine.items(in: .item(targetItem.id))
-        if !contents.isEmpty {
-            let itemNames = contents.listWithIndefiniteArticles
-            descriptionParts.append(
-                "On the \(targetItem.name) is \(itemNames)."
-            )
+
+        if contents.isEmpty {
+            // No items on surface, return base description
+            return baseDescription
         }
 
-        return descriptionParts.joined(separator: " ")
+        // Use enhanced surface description with individual item details
+        var descriptionLines: [String] = []
+
+        for item in contents.sorted() {
+            // Use firstDescription if available, otherwise fall back to name with location
+            if let firstDescription = item.attributes[.firstDescription],
+               case .string(let description) = firstDescription,
+               !description.isEmpty {
+                descriptionLines.append(description)
+            } else {
+                descriptionLines.append("On the \(targetItem.name) is \(item.withIndefiniteArticle).")
+            }
+
+            // If item is a container, show its contents
+            if item.hasFlag(.isContainer) {
+                let isOpen = item.hasFlag(.isOpen)
+                let isTransparent = item.hasFlag(.isTransparent)
+
+                if isOpen || isTransparent {
+                    let containerContents = await engine.items(in: .item(item.id))
+                    if !containerContents.isEmpty {
+                        descriptionLines.append("""
+                            The \(item.name) contains \
+                            \(containerContents.sorted().listWithIndefiniteArticles).
+                            """)
+                    }
+                }
+            }
+        }
+
+        return descriptionLines.joined(separator: "\n")
     }
 }
