@@ -37,7 +37,7 @@ public struct ScopeResolver: Sendable {
         }
 
         // 3. Check if the player is carrying an active light source.
-        let playerInventory = gameState.player..items.values.filter { $0.parent == .player }
+        let playerInventory = gameState.items(in: .player)
         let playerHasActiveLight = playerInventory.contains { item in
             item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
         }
