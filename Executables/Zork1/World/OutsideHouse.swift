@@ -203,7 +203,7 @@ extension OutsideHouse {
     static let kitchenWindowComputer = ItemComputer { attributeID, gameState in
         switch attributeID {
         case .description:
-            if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
+            if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
                 return .string("The window is now open wide enough to allow entry.")
             } else {
                 return .string("The window is slightly ajar, but not enough to allow entry.")
