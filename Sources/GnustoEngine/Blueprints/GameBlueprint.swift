@@ -1,18 +1,5 @@
 import Foundation
 
-// MARK: - Compute Handler Errors
-
-/// Errors that can occur during attribute computation.
-public enum ComputeError: Error, Sendable {
-    /// The compute handler doesn't handle the requested attribute.
-    case attributeNotHandled(AttributeID)
-
-    /// A custom computation error with a descriptive message.
-    case computationFailed(String)
-}
-
-// MARK: - Compute Handler Type Aliases
-
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
 /// Implement this protocol to specify all the essential elements for your game, including
@@ -119,7 +106,7 @@ public protocol GameBlueprint: Sendable {
     ///                 let enchantment = gameState.items[.magicSword]?.attributes["enchantmentLevel"]?.toInt ?? 0
     ///                 return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
     ///             default:
-    ///                 throw ComputeError.attributeNotHandled(attributeID)
+    ///                 return nil
     ///             }
     ///         }
     ///     ]
@@ -142,7 +129,7 @@ public protocol GameBlueprint: Sendable {
     ///                 let timeOfDay = gameState.globals["timeOfDay"]?.toString ?? "day"
     ///                 return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
     ///             default:
-    ///                 throw ComputeError.attributeNotHandled(attributeID)
+    ///                 return nil
     ///             }
     ///         }
     ///     ]

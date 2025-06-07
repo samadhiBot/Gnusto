@@ -11,17 +11,18 @@
 ///         let timeOfDay = gameState.globals["timeOfDay"]?.toString ?? "day"
 ///         return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
 ///     default:
-///         throw ComputeError.attributeNotHandled(attributeID)
+///         return nil
 ///     }
 /// }
 /// ```
 public struct LocationComputer: Sendable {
-    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue
+    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue?
 
     /// Creates a new LocationComputer with the given compute function.
     ///
     /// - Parameter compute: The function that computes attribute values for a location.
-    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue) {
+    ///   Returns `nil` if the attribute is not handled by this computer.
+    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue?) {
         self.compute = compute
     }
 }

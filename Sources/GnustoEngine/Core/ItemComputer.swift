@@ -11,17 +11,18 @@
 ///         let enchantment = gameState.items["magicSword"]?.attributes["enchantmentLevel"]?.toInt ?? 0
 ///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
 ///     default:
-///         throw ComputeError.attributeNotHandled(attributeID)
+///         return nil
 ///     }
 /// }
 /// ```
 public struct ItemComputer: Sendable {
-    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue
+    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue?
 
     /// Creates a new ItemComputer with the given compute function.
     ///
     /// - Parameter compute: The function that computes attribute values for an item.
-    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue) {
+    ///   Returns `nil` if the attribute is not handled by this computer.
+    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue?) {
         self.compute = compute
     }
 }

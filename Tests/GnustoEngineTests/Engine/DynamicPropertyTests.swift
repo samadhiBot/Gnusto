@@ -83,7 +83,7 @@ struct DynamicPropertyTests {
                     case .description:
                         return .string("This sword glows with magic sword energy!")
                     default:
-                        throw ComputeError.attributeNotHandled(attributeID)
+                        return nil
                     }
                 }
             ]
@@ -115,7 +115,7 @@ struct DynamicPropertyTests {
                     case .description:
                         return .string("The Magic Chamber sparkles with mystical energy!")
                     default:
-                        throw ComputeError.attributeNotHandled(attributeID)
+                        return nil
                     }
                 }
             ]
@@ -158,7 +158,7 @@ struct DynamicPropertyTests {
                     case .description:
                         return .string("The blade shimmers with arcane power.")
                     default:
-                        throw ComputeError.attributeNotHandled(attributeID)
+                        return nil
                     }
                 }
             ]
@@ -203,7 +203,7 @@ struct DynamicPropertyTests {
                     case .description:
                         return .string("Ethereal mists dance between towering oaks.")
                     default:
-                        throw ComputeError.attributeNotHandled(attributeID)
+                        return nil
                     }
                 }
             ]
@@ -258,7 +258,9 @@ struct DynamicPropertyTests {
             ioHandler: mockIO
         )
 
-        // Attempt to fetch the dynamic description should not throw but return nil internally
+        // The compute handler throws an error, so it should fall back to stored value
+        // Since there's no stored description, it should return nil and then try the stored value
+        // which also doesn't exist, so the attribute fetch should fail
         await #expect(throws: ActionResponse.self) {
             let _: String = try await engine.attribute(.description, of: ItemID("testItem"))
         }

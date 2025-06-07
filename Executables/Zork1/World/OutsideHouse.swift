@@ -105,7 +105,7 @@ extension OutsideHouse {
         .description("A small leaflet is on the ground."),
         .readText("""
             "WELCOME TO ZORK!
-            
+
             ZORK is a game of adventure, danger, and low cunning. In it you
             will explore some of the most amazing territory ever seen by mortals.
             No computer should be without one!"
@@ -145,10 +145,10 @@ extension OutsideHouse {
     static let kitchenWindow = Item(
         id: .kitchenWindow,
         .name("kitchen window"),
-        .description("The window is slightly ajar, but not enough to allow entry."),
         .adjectives("kitchen", "small"),
         .synonyms("window"),
         .in(.location(.eastOfHouse)),
+        .isDoor,
         .isOpenable,
         .omitDescription
     )
@@ -183,17 +183,36 @@ extension OutsideHouse {
 
 extension OutsideHouse {
     static let eastOfHouseComputer = LocationComputer { attributeID, gameState in
-        let windowState = if gameState.items[.kitchenWindow]?.attributes[.isOpen] == true {
-            "open"
-        } else {
-            "slightly ajar"
+        switch attributeID {
+        case .description:
+            let windowState = if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
+                "open"
+            } else {
+                "slightly ajar"
+            }
+            return .string("""
+                You are behind the white house. A path leads into the forest
+                to the east. In one corner of the house there is a small window
+                which is \(windowState).
+                """)
+        default:
+            return nil
         }
-        return .string("""
-            You are behind the white house. A path leads into the forest
-            to the east. In one corner of the house there is a small window
-            which is \(windowState).
-            """)
     }
+
+    static let kitchenWindowComputer = ItemComputer { attributeID, gameState in
+        return switch attributeID {
+        case .description:
+            if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
+                "open"
+            } else {
+                "The window is slightly ajar, but not enough to allow entry."
+            }
+        default:
+            nil
+        }
+    }
+
 }
 
 // MARK: - Event handlers

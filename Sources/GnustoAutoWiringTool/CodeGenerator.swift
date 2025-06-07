@@ -352,7 +352,7 @@ struct CodeGenerator {
                         extensionLines.append("    //                 let item = gameState.items[.\(extractItemID(from: itemProperty))]!")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(item.name)\")")
                         extensionLines.append("    //             default:")
-                        extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
+                        extensionLines.append("    //                 return nil")
                         extensionLines.append("    //             }")
                         extensionLines.append("    //         },")
                     }
@@ -417,7 +417,7 @@ struct CodeGenerator {
                         extensionLines.append("    //                 let location = gameState.locations[.\(extractLocationID(from: locationProperty))]!")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(location.name)\")")
                         extensionLines.append("    //             default:")
-                        extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
+                        extensionLines.append("    //                 return nil")
                         extensionLines.append("    //             }")
                         extensionLines.append("    //         },")
                     }
