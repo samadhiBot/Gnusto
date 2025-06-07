@@ -182,7 +182,7 @@ extension OutsideHouse {
 // MARK: - Computers
 
 extension OutsideHouse {
-    static let eastOfHouseComputer = LocationComputer { location, attributeID, gameState in
+    static let eastOfHouseComputer = LocationComputer { attributeID, gameState in
         let windowState = if gameState.items[.kitchenWindow]?.attributes[.isOpen] == true {
             "open"
         } else {

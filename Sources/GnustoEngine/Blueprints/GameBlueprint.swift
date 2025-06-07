@@ -13,48 +13,6 @@ public enum ComputeError: Error, Sendable {
 
 // MARK: - Compute Handler Type Aliases
 
-/// A compute handler for dynamic item attributes.
-///
-/// Similar to `ItemEventHandler`, this provides a single handler per item that can compute
-/// dynamic values for multiple attributes based on the current game state.
-public struct ItemComputer: Sendable {
-    /// The compute function that calculates attribute values dynamically.
-    ///
-    /// - Parameters:
-    ///   - item: The item whose attribute is being computed
-    ///   - attributeID: The specific attribute being requested
-    ///   - gameState: The current game state for context
-    /// - Returns: The computed value for the attribute, or throws if computation fails
-    public let compute: @Sendable (Item, AttributeID, GameState) async throws -> StateValue
-
-    /// Creates a new item computer with the given compute function.
-    public init(compute: @escaping @Sendable (Item, AttributeID, GameState) async throws -> StateValue) {
-        self.compute = compute
-    }
-}
-
-/// A compute handler for dynamic location attributes.
-///
-/// Similar to `LocationEventHandler`, this provides a single handler per location that can compute
-/// dynamic values for multiple attributes based on the current game state.
-public struct LocationComputer: Sendable {
-    /// The compute function that calculates attribute values dynamically.
-    ///
-    /// - Parameters:
-    ///   - location: The location whose attribute is being computed
-    ///   - attributeID: The specific attribute being requested
-    ///   - gameState: The current game state for context
-    /// - Returns: The computed value for the attribute, or throws if computation fails
-    public let compute: @Sendable (Location, AttributeID, GameState) async throws -> StateValue
-
-    /// Creates a new location computer with the given compute function.
-    public init(compute: @escaping @Sendable (Location, AttributeID, GameState) async throws -> StateValue) {
-        self.compute = compute
-    }
-}
-
-
-
 /// Defines the foundational structure and core components of a Gnusto-powered game.
 ///
 /// Implement this protocol to specify all the essential elements for your game, including
@@ -146,23 +104,20 @@ public protocol GameBlueprint: Sendable {
     /// The default implementation provides an empty dictionary.
     var daemonDefinitions: [DaemonID: DaemonDefinition] { get }
 
-    /// Dynamic compute handlers for item attributes.
+    /// Custom compute handlers for dynamic item attributes.
     ///
-    /// This allows you to define custom logic for computing item attributes at runtime.
-    /// Each handler receives the `Item` instance, the specific `AttributeID` being requested,
-    /// and current `GameState`, returning a computed `StateValue`. This follows the same
-    /// pattern as event handlers - one handler per item that can handle multiple attributes.
+    /// Compute handlers allow items to have attributes that are calculated dynamically
+    /// based on game state rather than stored as static values.
     ///
-    /// Example usage:
+    /// Example:
     /// ```swift
     /// var itemComputers: [ItemID: ItemComputer] {
-    ///     [
-    ///         .magicSword: ItemComputer { item, attributeID, gameState in
+    ///     return [
+    ///         .magicSword: ItemComputer { attributeID, gameState in
     ///             switch attributeID {
     ///             case .description:
-    ///                 let enchantment = item.attributes["enchantmentLevel"]?.toInt ?? 0
-    ///                 let desc = enchantment > 5 ? "A brilliantly glowing sword" : "A faintly shimmering blade"
-    ///                 return .string(desc)
+    ///                 let enchantment = gameState.items[.magicSword]?.attributes["enchantmentLevel"]?.toInt ?? 0
+    ///                 return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
     ///             default:
     ///                 throw ComputeError.attributeNotHandled(attributeID)
     ///             }
@@ -170,27 +125,22 @@ public protocol GameBlueprint: Sendable {
     ///     ]
     /// }
     /// ```
-    ///
-    /// The default implementation provides an empty dictionary.
     var itemComputers: [ItemID: ItemComputer] { get }
 
-    /// Dynamic compute handlers for location attributes.
+    /// Custom compute handlers for dynamic location attributes.
     ///
-    /// This allows you to define custom logic for computing location attributes at runtime.
-    /// Each handler receives the `Location` instance, the specific `AttributeID` being requested,
-    /// and current `GameState`, returning a computed `StateValue`. This follows the same
-    /// pattern as event handlers - one handler per location that can handle multiple attributes.
+    /// Compute handlers allow locations to have attributes that are calculated dynamically
+    /// based on game state rather than stored as static values.
     ///
-    /// Example usage:
+    /// Example:
     /// ```swift
     /// var locationComputers: [LocationID: LocationComputer] {
-    ///     [
-    ///         .magicRoom: LocationComputer { location, attributeID, gameState in
+    ///     return [
+    ///         .enchantedForest: LocationComputer { attributeID, gameState in
     ///             switch attributeID {
     ///             case .description:
-    ///                 let isEnchanted = gameState.globalState["roomEnchanted"] == true
-    ///                 let desc = isEnchanted ? "The room sparkles with magical energy." : "The room appears ordinary."
-    ///                 return .string(desc)
+    ///                 let timeOfDay = gameState.globals["timeOfDay"]?.toString ?? "day"
+    ///                 return .string(timeOfDay == "night" ? "Dark woods loom." : "Sunlight filters through trees.")
     ///             default:
     ///                 throw ComputeError.attributeNotHandled(attributeID)
     ///             }
@@ -198,8 +148,6 @@ public protocol GameBlueprint: Sendable {
     ///     ]
     /// }
     /// ```
-    ///
-    /// The default implementation provides an empty dictionary.
     var locationComputers: [LocationID: LocationComputer] { get }
 }
 

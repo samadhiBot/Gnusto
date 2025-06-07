@@ -316,7 +316,7 @@ struct LookActionHandlerTests {
             player: Player(in: dynamicRoom.id),
             locations: [dynamicRoom],
             locationComputers: [
-                dynamicRoom.id: LocationComputer { location, attributeID, gameState in
+                dynamicRoom.id: LocationComputer { attributeID, gameState in
                     let isFlagOn = gameState.globalState[specialFlag] == true
                     let text = isFlagOn ? "The room *sparkles* brightly via registry." :
                                           "The room seems normal via registry."

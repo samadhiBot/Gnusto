@@ -239,24 +239,20 @@ extension GameEngine {
             return nil
         }
 
-        // Check for compute handler
+        // Try compute handler first
         if let computer = itemComputers[itemID] {
             do {
-                return try await computer.compute(item, attributeID, gameState)
+                return try await computer.compute(attributeID, gameState)
             } catch ComputeError.attributeNotHandled {
-                // The computer doesn't handle this attribute, fall back to stored value
-                return item.attributes[attributeID]
+                // Fall through to stored value
             } catch {
-                logError("""
-                    Error computing dynamic value '\(attributeID.rawValue)' \
-                    for item \(itemID.rawValue): \(error)
-                    """)
-                // Fall through to return stored value on error
+                logError("Error computing dynamic value '\(attributeID.rawValue)' for item \(itemID.rawValue): \(error)")
+                // Fall through to stored value on error
                 return item.attributes[attributeID]
             }
-        } else {
-            // No compute handler, return stored value
-            return item.attributes[attributeID]
         }
+
+        // No compute handler or handler failed, return stored value
+        return item.attributes[attributeID]
     }
 }

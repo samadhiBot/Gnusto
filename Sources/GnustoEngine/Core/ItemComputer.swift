@@ -1,0 +1,27 @@
+/// A sendable compute handler for dynamic item attributes.
+///
+/// `ItemComputer` encapsulates the logic for computing dynamic values for item attributes.
+/// It provides a single compute function that handles multiple attributes through switching.
+///
+/// Example usage:
+/// ```swift
+/// static let magicSwordComputer = ItemComputer { attributeID, gameState in
+///     switch attributeID {
+///     case .description:
+///         let enchantment = gameState.items["magicSword"]?.attributes["enchantmentLevel"]?.toInt ?? 0
+///         return .string(enchantment > 5 ? "Blazing sword!" : "Glowing blade")
+///     default:
+///         throw ComputeError.attributeNotHandled(attributeID)
+///     }
+/// }
+/// ```
+public struct ItemComputer: Sendable {
+    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue
+
+    /// Creates a new ItemComputer with the given compute function.
+    ///
+    /// - Parameter compute: The function that computes attribute values for an item.
+    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue) {
+        self.compute = compute
+    }
+}

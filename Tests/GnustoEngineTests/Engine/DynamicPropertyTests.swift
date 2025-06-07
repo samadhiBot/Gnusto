@@ -78,7 +78,7 @@ struct DynamicPropertyTests {
             locations: [testLocation],
             items: [testItem],
             itemComputers: [
-                "testItem": ItemComputer { item, attributeID, gameState in
+                "testItem": ItemComputer { attributeID, gameState in
                     switch attributeID {
                     case .description:
                         return .string("This sword glows with magic sword energy!")
@@ -110,7 +110,7 @@ struct DynamicPropertyTests {
         let game = MinimalGame(
             locations: [testLocation],
             locationComputers: [
-                "testLocation": LocationComputer { location, attributeID, gameState in
+                "testLocation": LocationComputer { attributeID, gameState in
                     switch attributeID {
                     case .description:
                         return .string("The Magic Chamber sparkles with mystical energy!")
@@ -131,8 +131,6 @@ struct DynamicPropertyTests {
         let description: String = try await engine.attribute(.description, of: LocationID("testLocation"))
         #expect(description == "The Magic Chamber sparkles with mystical energy!")
     }
-
-
 
     // MARK: - Look Action Integration Tests
 
@@ -155,7 +153,7 @@ struct DynamicPropertyTests {
             locations: [testLocation],
             items: [testItem],
             itemComputers: [
-                "magicSword": ItemComputer { item, attributeID, gameState in
+                "magicSword": ItemComputer { attributeID, gameState in
                     switch attributeID {
                     case .description:
                         return .string("The blade shimmers with arcane power.")
@@ -200,7 +198,7 @@ struct DynamicPropertyTests {
             player: Player(in: testLocation.id),
             locations: [testLocation],
             locationComputers: [
-                "testLocation": LocationComputer { location, attributeID, gameState in
+                "testLocation": LocationComputer { attributeID, gameState in
                     switch attributeID {
                     case .description:
                         return .string("Ethereal mists dance between towering oaks.")
@@ -248,7 +246,7 @@ struct DynamicPropertyTests {
             locations: [testLocation],
             items: [testItem],
             itemComputers: [
-                "testItem": ItemComputer { item, attributeID, gameState in
+                "testItem": ItemComputer { attributeID, gameState in
                     throw ActionResponse.internalEngineError("Test error")
                 }
             ]

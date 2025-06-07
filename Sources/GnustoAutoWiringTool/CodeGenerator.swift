@@ -346,9 +346,10 @@ struct CodeGenerator {
                     extensionLines.append("    // var itemComputers: [ItemID: ItemComputer] {")
                     extensionLines.append("    //     [")
                     for itemProperty in gameData.items.sorted().prefix(3) {
-                        extensionLines.append("    //         .\(extractItemID(from: itemProperty)): ItemComputer { item, attributeID, gameState in")
+                        extensionLines.append("    //         .\(extractItemID(from: itemProperty)): ItemComputer { attributeID, gameState in")
                         extensionLines.append("    //             switch attributeID {")
                         extensionLines.append("    //             case .description:")
+                        extensionLines.append("    //                 let item = gameState.items[.\(extractItemID(from: itemProperty))]!")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(item.name)\")")
                         extensionLines.append("    //             default:")
                         extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
@@ -410,9 +411,10 @@ struct CodeGenerator {
                     extensionLines.append("    // var locationComputers: [LocationID: LocationComputer] {")
                     extensionLines.append("    //     [")
                     for locationProperty in gameData.locations.sorted().prefix(3) {
-                        extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): LocationComputer { location, attributeID, gameState in")
+                        extensionLines.append("    //         .\(extractLocationID(from: locationProperty)): LocationComputer { attributeID, gameState in")
                         extensionLines.append("    //             switch attributeID {")
                         extensionLines.append("    //             case .description:")
+                        extensionLines.append("    //                 let location = gameState.locations[.\(extractLocationID(from: locationProperty))]!")
                         extensionLines.append("    //                 return .string(\"Dynamic description for \\(location.name)\")")
                         extensionLines.append("    //             default:")
                         extensionLines.append("    //                 throw ComputeError.attributeNotHandled(attributeID)")
