@@ -201,15 +201,15 @@ extension OutsideHouse {
     }
 
     static let kitchenWindowComputer = ItemComputer { attributeID, gameState in
-        return switch attributeID {
+        switch attributeID {
         case .description:
             if gameState.items[.kitchenWindow]?.hasFlag(.isOpen) == true {
-                "open"
+                return .string("The window is now open wide enough to allow entry.")
             } else {
-                "The window is slightly ajar, but not enough to allow entry."
+                return .string("The window is slightly ajar, but not enough to allow entry.")
             }
         default:
-            nil
+            return nil
         }
     }
 
@@ -234,7 +234,7 @@ extension OutsideHouse {
         case .beforeTurn(let command):
             switch command.verb {
             case .open:
-                if try await engine.attribute(.isOpen, of: .kitchenWindow) == true {
+                if try await engine.hasFlag(.isOpen, on: .kitchenWindow) {
                     return ActionResult("Too late for that, the window is already open.")
                 } else {
                     let kitchenWindow = try await engine.item(.kitchenWindow)

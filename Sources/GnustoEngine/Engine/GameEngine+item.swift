@@ -5,30 +5,26 @@ import Foundation
 extension GameEngine {
     /// Fetches the boolean value of a dynamic or static attribute for a given item.
     ///
-    /// This method first checks if a dynamic computation handler is registered for the
-    /// specified `AttributeID` in the `dynamicAttributeRegistry`. If so, it executes
-    /// the handler to get the value. Otherwise, it retrieves the statically stored value
-    /// from the item's attributes.
+    /// This is used for item flags and properties that are represented as boolean values.
+    /// Dynamic computation handlers are checked first before static properties.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the boolean attribute.
-    ///   - itemID: The `ItemID` of the item whose attribute is to be fetched.
+    ///   - itemID: The `ItemID` of the item.
     /// - Returns: The boolean value of the attribute.
-    /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
-    ///           or if the item does not exist. Returns `false` if the attribute is not set.
+    /// - Throws: `ActionResponse.invalidValue` if the attribute is not a boolean, does not exist,
+    ///           or the item does not exist.
     public func attribute(
         _ attributeID: AttributeID,
         of itemID: ItemID
     ) async throws -> Bool {
-        let value = await fetchStateValue(
+        let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
         switch value {
         case .bool(let boolValue):
             return boolValue
-        case nil:
-            return false
         default:
             throw ActionResponse.invalidValue("""
                 Cannot fetch boolean value for \(itemID.rawValue).\(attributeID.rawValue): \
@@ -39,8 +35,8 @@ extension GameEngine {
 
     /// Fetches the integer value of a dynamic or static attribute for a given item.
     ///
-    /// Similar to the boolean `fetch`, this retrieves an integer value, checking for
-    /// dynamic computation handlers first.
+    /// This method is similar to the boolean fetch but for numeric attributes. It checks
+    /// for dynamic computation handlers first before static properties.
     ///
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the integer attribute.
@@ -52,10 +48,11 @@ extension GameEngine {
         _ attributeID: AttributeID,
         of itemID: ItemID
     ) async throws -> Int {
-        let value = await fetchStateValue(
+        let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
+        let value = result.value
         switch value {
         case .int(let intValue):
             return intValue
@@ -82,10 +79,11 @@ extension GameEngine {
         _ attributeID: AttributeID,
         of itemID: ItemID
     ) async throws -> String {
-        let value = await fetchStateValue(
+        let result = await fetchStateValue(
             itemID: itemID,
             attributeID: attributeID
         )
+        let value = result.value
         switch value {
         case .string(let stringValue):
             return stringValue
@@ -127,6 +125,44 @@ extension GameEngine {
                 attributeID: attributeID,
                 engine: engine
             ).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+    }
+
+    /// Generates a formatted description string for a specific item attribute and indicates
+    /// whether a compute handler provided the description.
+    ///
+    /// This is similar to `generateDescription` but also returns whether a compute handler
+    /// provided the description. This allows callers to determine if additional processing
+    /// should be applied (e.g., adding container state information) or if the compute handler
+    /// provided a complete, final description.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item for which to generate a description.
+    ///   - attributeID: The `AttributeID` indicating the type of description requested.
+    ///   - engine: The `GameEngine` instance, used for fetching dynamic values.
+    /// - Returns: A tuple containing the formatted description string and a boolean indicating
+    ///           whether a compute handler provided the description.
+    public func generateDescriptionWithComputeInfo(
+        for itemID: ItemID,
+        attributeID: AttributeID,
+        engine: GameEngine
+    ) async -> (description: String, wasComputed: Bool) {
+        let result = await fetchStateValue(itemID: itemID, attributeID: attributeID)
+
+        if let value = result.value, case .string(let stringValue) = value {
+            return (
+                stringValue.trimmingCharacters(in: .whitespacesAndNewlines),
+                result.wasComputed
+            )
+        } else {
+            return (
+                await defaultItemDescription(
+                    for: itemID,
+                    attributeID: attributeID,
+                    engine: engine
+                ).trimmingCharacters(in: .whitespacesAndNewlines),
+                false
+            )
         }
     }
 
@@ -226,24 +262,25 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the desired value.
     ///   - itemID: The unique identifier of the item.
-    /// - Returns: The computed or stored `StateValue`, or `nil` if the item or value doesn't exist.
+    /// - Returns: A tuple containing the computed or stored `StateValue` (or `nil` if not found)
+    ///           and a boolean indicating whether a compute handler provided the value.
     private func fetchStateValue(
         itemID: ItemID,
         attributeID: AttributeID
-    ) async -> StateValue? {
+    ) async -> (value: StateValue?, wasComputed: Bool) {
         guard let item = gameState.items[itemID] else {
             logWarning("""
                 Attempted to get dynamic value '\(attributeID.rawValue)' for non-existent item: \
                 \(itemID.rawValue)
                 """)
-            return nil
+            return (nil, false)
         }
 
         // Try compute handler first
         if let computer = itemComputers[itemID] {
             do {
                 if let computedValue = try await computer.compute(attributeID, gameState) {
-                    return computedValue
+                    return (computedValue, true)
                 }
                 // Computer returned nil, fall through to stored value
             } catch {
@@ -253,6 +290,6 @@ extension GameEngine {
         }
 
         // No compute handler or handler failed, return stored value
-        return item.attributes[attributeID]
+        return (item.attributes[attributeID], false)
     }
 }

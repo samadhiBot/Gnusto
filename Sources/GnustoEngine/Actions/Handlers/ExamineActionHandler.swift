@@ -21,17 +21,17 @@ public struct ExamineActionHandler: ActionHandler {
         if context.command.isAllCommand {
             return
         }
-        
+
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.custom("Examine what?")
         }
-        
+
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Examine what?")
         }
-        
+
         switch directObjectRef {
         case .item(let targetItemID):
             // 2. Check if item exists
@@ -77,18 +77,18 @@ public struct ExamineActionHandler: ActionHandler {
                 return ActionResult("You can only examine items.")
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var messages: [String] = []
         var examinedItems: [Item] = []
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             switch directObjectRef {
             case .item(let targetItemID):
                 do {
                     let targetItem = try await context.engine.item(targetItemID)
-                    
+
                     // Validate this specific item for ALL commands
                     if context.command.isAllCommand {
                         // Check if player can reach the item
@@ -96,9 +96,9 @@ public struct ExamineActionHandler: ActionHandler {
                             continue // Skip unreachable items in ALL commands
                         }
                     }
-                    
+
                     var itemStateChanges: [StateChange] = []
-                    
+
                     // Special case: examining 'self' as an item should not record any state changes
                     if targetItem.id != "self" {
                         // --- State Change: Mark as Touched ---
@@ -107,7 +107,7 @@ public struct ExamineActionHandler: ActionHandler {
                         }
                         // Note: Pronoun updates are handled after processing all items
                     }
-                    
+
                     // --- Determine Message ---
                     let message: String
                     // Priority 1: Readable Text (Check dynamic value)
@@ -140,24 +140,24 @@ public struct ExamineActionHandler: ActionHandler {
                             engine: context.engine
                         )
                     }
-                    
+
                     allStateChanges.append(contentsOf: itemStateChanges)
                     examinedItems.append(targetItem)
-                    
+
                     // For multiple objects, prefix with item name
                     if context.command.isAllCommand || context.command.directObjects.count > 1 {
                         messages.append("- \(targetItem.name.capitalizedFirst): \(message)")
                     } else {
                         messages.append(message)
                     }
-                    
+
                 } catch {
                     // For ALL commands, skip items that cause errors
                     if !context.command.isAllCommand {
                         throw error
                     }
                 }
-                
+
             case .player:
                 // Classic Zork response for EXAMINE SELF
                 if context.command.isAllCommand || context.command.directObjects.count > 1 {
@@ -165,7 +165,7 @@ public struct ExamineActionHandler: ActionHandler {
                 } else {
                     messages.append("You are your usual self.")
                 }
-                
+
             default:
                 // For ALL commands, skip non-items
                 if !context.command.isAllCommand {
@@ -173,7 +173,7 @@ public struct ExamineActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if !examinedItems.isEmpty {
             let lastItem = examinedItems.last!
@@ -191,7 +191,7 @@ public struct ExamineActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
         let finalMessage: String
         if context.command.isAllCommand {
@@ -203,7 +203,7 @@ public struct ExamineActionHandler: ActionHandler {
         } else {
             finalMessage = messages.joined(separator: "\n")
         }
-        
+
         return ActionResult(
             message: finalMessage,
             stateChanges: allStateChanges
@@ -229,12 +229,17 @@ public struct ExamineActionHandler: ActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let baseDescription = await engine.generateDescription(
+        let (baseDescription, wasComputed) = await engine.generateDescriptionWithComputeInfo(
             for: targetItem.id,
             attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)
+
+        // If a compute handler provided the description, it's complete - don't add more
+        guard !wasComputed else {
+            return baseDescription
+        }
 
         // Check dynamic property for open state
         let isOpen: Bool = try await engine.attribute(.isOpen, of: targetItem.id)
@@ -267,12 +272,17 @@ public struct ExamineActionHandler: ActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let baseDescription = await engine.generateDescription(
+        let (baseDescription, wasComputed) = await engine.generateDescriptionWithComputeInfo(
             for: targetItem.id,
             attributeID: .description,
             engine: engine
         )
         descriptionParts.append(baseDescription)
+
+        // If a compute handler provided the description, it's complete - don't add more
+        guard !wasComputed else {
+            return baseDescription
+        }
 
         // List items on the surface
         let contents = await engine.items(in: .item(targetItem.id))

@@ -18,10 +18,11 @@ extension GameEngine {
         _ attributeID: AttributeID,
         of locationID: LocationID
     ) async throws -> String {
-        let value = await fetchStateValue(
+        let result = await fetchStateValue(
             locationID: locationID,
             attributeID: attributeID
         )
+        let value = result.value
         switch value {
         case .string(let stringValue):
             return stringValue
@@ -216,24 +217,25 @@ extension GameEngine {
     /// - Parameters:
     ///   - attributeID: The `AttributeID` of the desired value.
     ///   - locationID: The unique identifier of the location.
-    /// - Returns: The computed or stored `StateValue`, or `nil` if the location or value doesn't exist.
+    /// - Returns: A tuple containing the computed or stored `StateValue` (or `nil` if not found)
+    ///           and a boolean indicating whether a compute handler provided the value.
     private func fetchStateValue(
         locationID: LocationID,
         attributeID: AttributeID
-    ) async -> StateValue? {
+    ) async -> (value: StateValue?, wasComputed: Bool) {
         guard let location = gameState.locations[locationID] else {
             logWarning("""
                 Attempted to get dynamic value '\(attributeID.rawValue)' \
                 for non-existent location: \(locationID.rawValue)
                 """)
-            return nil
+            return (nil, false)
         }
 
         // Try compute handler first
         if let computer = locationComputers[locationID] {
             do {
                 if let computedValue = try await computer.compute(attributeID, gameState) {
-                    return computedValue
+                    return (computedValue, true)
                 }
                 // Computer returned nil, fall through to stored value
             } catch {
@@ -243,7 +245,7 @@ extension GameEngine {
         }
 
         // No compute handler or handler failed, return stored value
-        return location.attributes[attributeID]
+        return (location.attributes[attributeID], false)
     }
 
     /// Internal helper method to list items visible to the player in a given location.
