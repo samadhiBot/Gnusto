@@ -99,10 +99,11 @@ struct LookUnderActionHandlerTests {
     @Test("Look under fails with no indirect object")
     func testLookUnderFailsWithNoObject() async throws {
         let game = MinimalGame()
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -111,26 +112,24 @@ struct LookUnderActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Look under what?")
 
         // Assert Error Message
-        expectNoDifference(result?.message, "Look under what?")
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Look under fails with non-item target")
     func testLookUnderFailsWithNonItemTarget() async throws {
         let game = MinimalGame()
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -140,16 +139,12 @@ struct LookUnderActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
 
-        // Assert Error Message
-        expectNoDifference(result?.message, "You can only look under items.")
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can’t look under that.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -169,10 +164,11 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, carpet])
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -182,16 +178,12 @@ struct LookUnderActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
 
-        // Assert Error Message
-        expectNoDifference(result?.message, "You can't reach that.")
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can’t see any such thing.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 

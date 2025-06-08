@@ -53,6 +53,9 @@ public struct RaiseActionHandler: ActionHandler {
         }
 
         // Default behavior: You can't raise most things
-        return ActionResult("You can't lift \(targetItem.withDefiniteArticle).")
+        return ActionResult(
+            message: "You can't lift \(targetItem.withDefiniteArticle).",
+            stateChanges: stateChanges
+        )
     }
 }

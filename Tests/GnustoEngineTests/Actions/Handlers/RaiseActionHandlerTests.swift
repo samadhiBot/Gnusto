@@ -44,7 +44,7 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't lift the heavy book.")
+        expectNoDifference(output, "You can’t lift the heavy book.")
 
         // Assert Change History
         let changeHistory = await engine.gameState.changeHistory
@@ -71,10 +71,11 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [book])
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -99,10 +100,11 @@ struct RaiseActionHandlerTests {
     @Test("Raise fails with no direct object")
     func testRaiseFailsWithNoObject() async throws {
         let game = MinimalGame()
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -111,26 +113,23 @@ struct RaiseActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
 
-        // Assert Error Message
-        expectNoDifference(result?.message, "Raise what?")
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Raise what?")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
     @Test("Raise fails with non-item target")
     func testRaiseFailsWithNonItemTarget() async throws {
         let game = MinimalGame()
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -140,16 +139,12 @@ struct RaiseActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
 
-        // Assert Error Message
-        expectNoDifference(result?.message, "You can only raise items.")
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can only raise items.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -169,10 +164,11 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, book])
+        let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
-            ioHandler: await MockIOHandler()
+            ioHandler: mockIO
         )
 
         let command = Command(
@@ -182,16 +178,12 @@ struct RaiseActionHandlerTests {
         )
 
         // Act
-        let result = try await handler.validate(
-            context: ActionContext(
-                command: command,
-                engine: engine,
-                stateSnapshot: engine.gameState
-            )
-        )
+        await engine.execute(command: command)
 
-        // Assert Error Message
-        expectNoDifference(result?.message, "You can't reach that.")
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can’t see any such thing.")
+
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
 
@@ -223,7 +215,7 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't lift the gold coin.")
+        expectNoDifference(output, "You can’t lift the gold coin.")
 
         // Assert State Change
         let finalCoin = try await engine.item("coin")

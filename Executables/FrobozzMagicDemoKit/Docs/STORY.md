@@ -137,7 +137,7 @@ let butterSoftening = FuseDefinition(id: "butterSoftening", initialTurns: 20) { 
     let change = StateChange(
         entityId: .item("butterCrock"),
         attribute: .hasAttribute("melted"),
-        newValue: .bool(true)
+        newValue: true
     )
     try engine.applyStateChange(change)
 }
@@ -342,9 +342,9 @@ struct CastActionHandler: ActionHandler {
                 discovered something remarkable.
                 """,
             stateChanges: [
-                StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: .bool(true)),
+                StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: true),
                 StateChange(entityId: .item(notebook.id), attribute: .addSpell(spellType), newValue: .int(transferPotency)),
-                StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: .bool(true))
+                StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: true)
             ],
             sideEffects: [
                 SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])

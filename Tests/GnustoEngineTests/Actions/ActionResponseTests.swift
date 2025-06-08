@@ -294,7 +294,7 @@ struct ActionResponseTests {
             entityID: .item(testItemID),
             attribute: .itemAttribute(testAttributeID),
             oldValue: .bool(false),
-            newValue: .bool(true)
+            newValue: true
         )
         let actualOldValue: StateValue = .bool(true)
 
@@ -323,7 +323,7 @@ struct ActionResponseTests {
             entityID: .item(testItemID),
             attribute: .itemAttribute(testAttributeID),
             oldValue: .bool(false),
-            newValue: .bool(true)
+            newValue: true
         )
 
         let response = ActionResponse.stateValidationFailed(

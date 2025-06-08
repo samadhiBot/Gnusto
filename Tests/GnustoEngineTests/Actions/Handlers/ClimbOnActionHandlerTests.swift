@@ -48,7 +48,29 @@ struct ClimbOnActionHandlerTests {
 
         // Assert changes
         let changeHistory = await engine.gameState.changeHistory
-        #expect(changeHistory.count == 1)
+        expectNoDifference(changeHistory, [
+            StateChange(
+                entityID: .item(
+                    ItemID(rawValue: "chair")
+                ),
+                attribute: .itemAttribute(
+                    AttributeID(rawValue: "isTouched")
+                ),
+                newValue: true
+            ),
+            StateChange(
+                entityID: .global,
+                attribute: .pronounReference(pronoun: "it"),
+                newValue: .entityReferenceSet(
+                    Set([
+                        .item(
+                            ItemID(rawValue: "chair")
+                        )
+                    ])
+                )
+            )
+
+        ])
     }
 
     @Test("Climb on fails if item not accessible")
