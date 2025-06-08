@@ -86,7 +86,11 @@ struct OutsideHouseTests {
             \(enterKitchenPlayback)
 
             > examine table
-            The kitchen table contains a glass bottle and a brown sack.
+            You see nothing special about the kitchen table. The kitchen
+            table contains a glass bottle and a brown sack. A bottle is
+            sitting on the table. The glass bottle contains a quantity of
+            water. On the table is an elongated brown sack, smelling of hot
+            peppers.
 
             > open sack
             You open the brown sack.

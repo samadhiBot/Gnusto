@@ -201,15 +201,6 @@ enum GlobalItems {
         // Note: Has action handler SLIDE-FUNCTION
     )
 
-    static let songbird = Item(
-        id: .songbird,
-        .name("songbird"),
-        .synonyms("bird", "songbird"),
-        .adjectives("song"),
-        .omitDescription
-        // Note: Has action handler SONGBIRD-F
-    )
-
     static let stairs = Item(
         id: .stairs,
         .name("stairs"),

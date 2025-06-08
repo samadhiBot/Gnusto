@@ -421,6 +421,253 @@ struct ExamineActionHandlerTests {
         expectNoDifference(changeHistory, expectedChanges)
     }
 
+    @Test("Surface with generic description and items on it")
+    func testExamineSurfaceWithGenericDescription() async throws {
+        // Arrange: Kitchen table with no special description, but items on it
+        let kitchenTable = Item(
+            id: "kitchenTable",
+            .name("kitchen table"),
+            // No custom description - will get generic "You see nothing special about the kitchen table."
+            .in(.location(.startRoom)),
+            .isSurface
+        )
+        let bottle = Item(
+            id: "bottle",
+            .name("glass bottle"),
+            .description("A clear glass bottle."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer,
+            .isTransparent
+        )
+        let brownSack = Item(
+            id: "brownSack",
+            .name("brown sack"),
+            .description("A brown sack."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer
+        )
+
+        let initialAttributes = kitchenTable.attributes
+
+        let game = MinimalGame(items: [kitchenTable, bottle, brownSack])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item("kitchenTable"),
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Should skip generic description and show only what's on the table
+        let output = await mockIO.flush()
+        expectNoDifference(output, "On the kitchen table are a glass bottle and a brown sack.")
+
+        // Assert Final State (Surface marked touched)
+        let finalItemState = try await engine.item("kitchenTable")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
+
+        // Assert Change History
+        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
+    @Test("Empty surface with generic description")
+    func testExamineEmptySurfaceWithGenericDescription() async throws {
+        // Arrange: Kitchen table with no special description and no items on it
+        let kitchenTable = Item(
+            id: "kitchenTable",
+            .name("kitchen table"),
+            // No custom description - will get generic "You see nothing special about the kitchen table."
+            .in(.location(.startRoom)),
+            .isSurface
+        )
+
+        let initialAttributes = kitchenTable.attributes
+
+        let game = MinimalGame(items: [kitchenTable])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item("kitchenTable"),
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Should show generic description since there's nothing on the table
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You see nothing special about the kitchen table.")
+
+        // Assert Final State (Surface marked touched)
+        let finalItemState = try await engine.item("kitchenTable")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
+
+        // Assert Change History
+        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
+    @Test("Surface with custom description and items on it")
+    func testExamineSurfaceWithCustomDescription() async throws {
+        // Arrange: Kitchen table with custom description and items on it
+        let kitchenTable = Item(
+            id: "kitchenTable",
+            .name("kitchen table"),
+            .description("A sturdy wooden table with scratches from years of use."),
+            .in(.location(.startRoom)),
+            .isSurface
+        )
+        let bottle = Item(
+            id: "bottle",
+            .name("glass bottle"),
+            .description("A clear glass bottle."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer,
+            .isTransparent
+        )
+        let brownSack = Item(
+            id: "brownSack",
+            .name("brown sack"),
+            .description("A brown sack."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer
+        )
+
+        let initialAttributes = kitchenTable.attributes
+
+        let game = MinimalGame(items: [kitchenTable, bottle, brownSack])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item("kitchenTable"),
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Should show custom description followed by surface contents
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            A sturdy wooden table with scratches from years of use. On the
+            kitchen table are a glass bottle and a brown sack.
+            """)
+
+        // Assert Final State (Surface marked touched)
+        let finalItemState = try await engine.item("kitchenTable")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
+
+        // Assert Change History
+        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
+    @Test("Enhanced surface with generic description and firstDescription items")
+    func testExamineEnhancedSurfaceWithGenericDescription() async throws {
+        // Arrange: Kitchen table with no special description, but items with firstDescription
+        let kitchenTable = Item(
+            id: "kitchenTable",
+            .name("kitchen table"),
+            // No custom description - will get generic "You see nothing special about the kitchen table."
+            .in(.location(.startRoom)),
+            .isSurface
+        )
+        let bottle = Item(
+            id: "bottle",
+            .name("glass bottle"),
+            .description("A clear glass bottle."),
+            .firstDescription("A bottle is sitting on the table."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer,
+            .isTransparent
+        )
+        let water = Item(
+            id: "water",
+            .name("quantity of water"),
+            .description("It's just water."),
+            .in(.item("bottle")),
+            .isTakable
+        )
+        let brownSack = Item(
+            id: "brownSack",
+            .name("brown sack"),
+            .description("A brown sack."),
+            .firstDescription("On the table is an elongated brown sack, smelling of hot peppers."),
+            .in(.item("kitchenTable")),
+            .isTakable,
+            .isContainer
+        )
+
+        let initialAttributes = kitchenTable.attributes
+
+        let game = MinimalGame(items: [kitchenTable, bottle, water, brownSack])
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+
+        let command = Command(
+            verb: .examine,
+            directObject: .item("kitchenTable"),
+            rawInput: "examine table"
+        )
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Should skip generic description and show only enhanced item descriptions
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            A bottle is sitting on the table. The glass bottle contains a
+            quantity of water. On the table is an elongated brown sack,
+            smelling of hot peppers.
+            """)
+
+        // Assert Final State (Surface marked touched)
+        let finalItemState = try await engine.item("kitchenTable")
+        #expect(finalItemState.hasFlag(.isTouched) == true, "Surface should be marked touched")
+
+        // Assert Change History
+        let expectedChanges = expectedExamineChanges(itemID: "kitchenTable", initialAttributes: initialAttributes)
+        let changeHistory = await engine.gameState.changeHistory
+        expectNoDifference(changeHistory, expectedChanges)
+    }
+
     @Test("Enhanced surface description with nested containers")
     func testExamineEnhancedSurface() async throws {
         // Arrange: Kitchen table with bottle containing water, and brown sack

@@ -36,7 +36,7 @@ enum Forest {
             .up: .blocked("There is no tree here suitable for climbing."),
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+        .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
     static let forest1 = Location(
@@ -53,7 +53,7 @@ enum Forest {
             // Note: UP and WEST exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+        .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
     static let forest2 = Location(
@@ -69,7 +69,7 @@ enum Forest {
             // Note: UP and NORTH exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+        .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
     static let forest3 = Location(
@@ -85,7 +85,7 @@ enum Forest {
             // Note: UP, EAST, and SOUTH exits have custom messages
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+        .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
     static let forestPath = Location(
@@ -104,7 +104,7 @@ enum Forest {
             .west: .to(.forest1)
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .songbird, .whiteHouse, .forest)
+        .localGlobals(.songbird, .whiteHouse, .forest)
     )
 
     static let gratingClearing = Location(
@@ -137,7 +137,7 @@ enum Forest {
             .west: .to(.forest2),
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .whiteHouse)
+        .localGlobals(.whiteHouse)
     )
 
     static let upATree = Location(
@@ -152,7 +152,7 @@ enum Forest {
             // Note: UP exit has custom message
         ]),
         .inherentlyLit,
-        .localGlobals(.tree, .forest, .songbird, .whiteHouse)
+        .localGlobals(.forest, .songbird, .whiteHouse)
     )
 
     // MARK: - Items
@@ -207,6 +207,15 @@ enum Forest {
         .firstDescription("Beside you on the branch is a small bird's nest."),
         .capacity(20),
         .in(.location(.upATree))
+    )
+
+    static let songbird = Item(
+        id: .songbird,
+        .name("songbird"),
+        .synonyms("bird", "songbird"),
+        .adjectives("song"),
+        .omitDescription
+        // Note: Has action handler SONGBIRD-F
     )
 
     static let tree = Item(

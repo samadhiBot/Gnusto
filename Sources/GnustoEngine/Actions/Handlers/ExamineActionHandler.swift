@@ -276,7 +276,7 @@ public struct ExamineActionHandler: ActionHandler {
     /// - Returns: A string describing the surface and any items on it.
     private func describeSurface(targetItem: Item, engine: GameEngine) async throws -> String {
         // Check if a compute handler provided a custom description
-        let (baseDescription, wasComputed) = try await engine.generateDescriptionWithComputeInfo(
+        let (baseDescription, wasComputed, isDefault) = try await engine.generateDescriptionWithSourceInfo(
             for: targetItem.id,
             attributeID: .description
         )
@@ -344,8 +344,8 @@ public struct ExamineActionHandler: ActionHandler {
             // Use simplified surface description (base description + combined contents)
             var descriptionParts: [String] = []
 
-            // Add base description if not empty
-            if !baseDescription.isEmpty {
+            // Add base description only if it's not the generic default message
+            if !baseDescription.isEmpty && !isDefault {
                 descriptionParts.append(baseDescription)
             }
 

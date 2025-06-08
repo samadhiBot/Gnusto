@@ -178,6 +178,46 @@ extension GameEngine {
         }
     }
 
+    /// Generates a formatted description string for a specific item attribute with full
+    /// source information including whether it's a default fallback.
+    ///
+    /// This method provides complete information about the source of a description:
+    /// - Whether it came from a compute handler
+    /// - Whether it's a default fallback (generic message)
+    /// This allows callers to make intelligent decisions about whether to skip or modify
+    /// generic descriptions in favor of more contextual information.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item for which to generate a description.
+    ///   - attributeID: The `AttributeID` indicating the type of description requested.
+    /// - Returns: A tuple containing:
+    ///   - `description`: The formatted description string
+    ///   - `wasComputed`: Whether a compute handler provided the description
+    ///   - `isDefault`: Whether this is a generic fallback description
+    public func generateDescriptionWithSourceInfo(
+        for itemID: ItemID,
+        attributeID: AttributeID
+    ) async throws -> (description: String, wasComputed: Bool, isDefault: Bool) {
+        let result = await fetchStateValue(itemID: itemID, attributeID: attributeID)
+
+        if let value = result.value, case .string(let stringValue) = value {
+            return (
+                stringValue.trimmingCharacters(in: .whitespacesAndNewlines),
+                result.wasComputed,
+                false
+            )
+        } else {
+            return (
+                try await defaultItemDescription(
+                    for: itemID,
+                    attributeID: attributeID
+                ).trimmingCharacters(in: .whitespacesAndNewlines),
+                false,
+                true
+            )
+        }
+    }
+
     /// Checks if a boolean flag is set to true for a given item.
     ///
     /// This is a convenience method that treats `nil` values as `false`, making it ideal

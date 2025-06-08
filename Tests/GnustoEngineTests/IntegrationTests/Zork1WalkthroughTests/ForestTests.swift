@@ -13,8 +13,6 @@ struct ForestTests {
             "examine tree",
             "north",
             "examine trees",
-            "east",
-            "north",
             "examine grating",
             "move leaves",
             "examine grating"
@@ -29,60 +27,56 @@ struct ForestTests {
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
             Zork I: The Great Underground Empire
-
+            
             ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
             1983 Infocom, Inc. All rights reserved. ZORK is a registered
             trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
+            
             — West of House —
-
+            
             You are standing in an open field west of a white house, with a
             boarded front door.
-
+            
             There is a small mailbox here.
-
+            
             > north
             — North of House —
-
+            
             You are facing the north side of a white house. There is no
             door here, and all the windows are boarded up. To the north a
             narrow path winds through the trees.
-
+            
             > north
             — Forest Path —
-
+            
             This is a path winding through a dimly lit forest. The path
             heads north-south here. One particularly large tree with some
             low branches stands at the edge of the path.
-
+            
             > examine tree
             The tree is large and appears to have some low branches. It
             might be climbable.
-
+            
             > north
-            — Forest —
-
-            This is a forest, with trees in all directions. To the east,
-            there appears to be sunlight.
-
+            — Clearing —
+            
+            You are in a clearing, with a forest surrounding you on all
+            sides. A path leads south.
+            
+            There is a pile of leaves here.
+            
             > examine trees
-            The forest is all around you, with trees in every direction.
-
-            > east
-            — West of House —
-
-            > north
-            — North of House —
-
+            You can’t see any ‘trees’ here. // SHOULD GET `forest` DESCRIPTION HERE
+            
+            > examine grating
+            You can’t see any ‘grating’ here. // WRONG MESSAGE, SHOULD BE "can't see any such thing" message
+            
+            > move leaves
+            You can’t see any ‘leaves’ here. // SHOULD BE ABLE TO MOVE LEAVES
+            
             > examine grating
             You can’t see any ‘grating’ here.
-
-            > move leaves
-            << SHOULD BE ABLE TO FIND AND MOVE A PILE OF LEAVES >>
-
-            > examine grating
-            You can't see any 'grating' here.
-
+            
             >
             Goodbye!
             """)
