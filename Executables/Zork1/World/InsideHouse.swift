@@ -311,7 +311,7 @@ extension InsideHouse {
             // The global flag tracking whether the rug has been moved
             let rugMovedFlag: GlobalID = "rugMoved"
 
-            let wasRugMoved = try await engine.hasFlag(rugMovedFlag)
+            let wasRugMoved = await engine.hasFlag(rugMovedFlag)
             let trapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
 
             switch command.verb {

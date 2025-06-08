@@ -356,8 +356,8 @@ struct LookActionHandlerTests {
             StateChange(
                 entityID: .global,
                 attribute: .globalState(attributeID: specialFlag),
-                oldValue: .bool(true),
-                newValue: .bool(false)
+                oldValue: true,
+                newValue: false
             )
         )
         await engine.execute(command: command)
