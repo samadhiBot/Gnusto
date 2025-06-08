@@ -8,26 +8,24 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// Validates that the action can be performed.
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
-    /// - Returns: An `ActionResult` indicating validation success or failure.
-    public func validate(context: ActionContext) async throws -> ActionResult? {
+    /// - Throws: An `ActionResponse` if validation fails.
+    public func validate(context: ActionContext) async throws {
         guard let indirectObjectRef = context.command.indirectObject else {
-            return ActionResult("Climb on what?")
+            throw ActionResponse.prerequisiteNotMet("Climb on what?")
         }
 
         guard case .item(let targetItemID) = indirectObjectRef else {
-            return ActionResult("You can only climb on items.")
+            throw ActionResponse.prerequisiteNotMet("You can't climb on that.")
         }
 
         // Check if item exists and is reachable
         guard (try? await context.engine.item(targetItemID)) != nil else {
-            return ActionResult("I don't see that here.")
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         guard await context.engine.playerCanReach(targetItemID) else {
-            return ActionResult("You can't reach that.")
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
-
-        return nil // Validation passed
     }
 
     /// Processes the climb on action.
@@ -36,12 +34,28 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard case .item(let targetItemID) = context.command.indirectObject else {
-            throw ActionResponse.internalEngineError("ClimbOn: indirectObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "ClimbOn: indirectObject was not an item in process."
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
 
+        // Mark the item as touched and update pronouns
+        var stateChanges: [StateChange] = []
+
+        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(touchedChange)
+        }
+
+        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(pronounChange)
+        }
+
         // Default behavior: You can't climb on most things
-        return ActionResult("You can't climb on \(targetItem.withDefiniteArticle).")
+        return ActionResult(
+            message: "You can't climb on \(targetItem.withDefiniteArticle).",
+            stateChanges: stateChanges
+        )
     }
 }

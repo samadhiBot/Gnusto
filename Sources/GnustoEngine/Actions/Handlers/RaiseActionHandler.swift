@@ -9,25 +9,23 @@ public struct RaiseActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` containing the command and game state.
     /// - Returns: An `ActionResult` indicating validation success or failure.
-    public func validate(context: ActionContext) async throws -> ActionResult? {
+    public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            return ActionResult("Raise what?")
+            throw ActionResponse.prerequisiteNotMet("Raise what?")
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            return ActionResult("You can only raise items.")
+            throw ActionResponse.prerequisiteNotMet("You can only raise items.")
         }
 
         // Check if item exists and is reachable
         guard (try? await context.engine.item(targetItemID)) != nil else {
-            return ActionResult("I don't see that here.")
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
         guard await context.engine.playerCanReach(targetItemID) else {
-            return ActionResult("You can't reach that.")
+            throw ActionResponse.itemNotAccessible(targetItemID)
         }
-
-        return nil // Validation passed
     }
 
     /// Processes the raise action.
@@ -36,10 +34,23 @@ public struct RaiseActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard case .item(let targetItemID) = context.command.directObject else {
-            throw ActionResponse.internalEngineError("Raise: directObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "Raise: directObject was not an item in process."
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
+
+        // Mark the item as touched and update pronouns
+        var stateChanges: [StateChange] = []
+
+        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(touchedChange)
+        }
+
+        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(pronounChange)
+        }
 
         // Default behavior: You can't raise most things
         return ActionResult("You can't lift \(targetItem.withDefiniteArticle).")
