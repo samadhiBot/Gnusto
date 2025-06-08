@@ -66,19 +66,19 @@ struct ForestTests {
             There is a pile of leaves here.
             
             > examine trees
-            You can’t see any ‘trees’ here. // SHOULD GET `forest` DESCRIPTION HERE
+            The forest is all around you, with trees in every direction.
             
             > examine grating
-            You can’t see any ‘grating’ here. // WRONG MESSAGE, SHOULD BE "can't see any such thing" message
+            Which grating do you mean?
             
             > move leaves
-            You can’t see any ‘leaves’ here. // SHOULD BE ABLE TO MOVE LEAVES
+            In disturbing the pile of leaves, a grating is revealed.
             
             > examine grating
-            You can’t see any ‘grating’ here.
+            Which grating do you mean?
             
             >
-            Goodbye!
+            Goodbye!            
             """)
 
     }

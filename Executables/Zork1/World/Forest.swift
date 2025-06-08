@@ -122,7 +122,7 @@ enum Forest {
             // Note: DOWN exit has special condition handling via GRATING-EXIT
         ]),
         .inherentlyLit,
-        .localGlobals(.whiteHouse, .grate)
+        .localGlobals(.whiteHouse, .grate, .forest)
     )
 
     static let mountains = Location(
@@ -181,17 +181,15 @@ enum Forest {
         .omitDescription
     )
 
-    static let leaves = Item(
-        id: .leaves,
-        .name("pile of leaves"),
-        .synonyms("leaves", "leaf", "pile"),
-        .isTakable,
-        .isFlammable,
-        .requiresTryTake,
-        .description("On the ground is a pile of leaves."),
-        .size(25),
-        .in(.location(.gratingClearing))
-        // Note: Has action handler LEAF-PILE
+    static let grating = Item(
+        id: .grating,
+        .name("grating"),
+        .description(
+            "The grating is a large metal framework, securely fastened to the ground."
+        ),
+        .synonyms("gate", "bars"),
+        .in(.location(.gratingClearing)),
+        .isInvisible
     )
 
     static let nest = Item(
@@ -207,6 +205,19 @@ enum Forest {
         .firstDescription("Beside you on the branch is a small bird's nest."),
         .capacity(20),
         .in(.location(.upATree))
+    )
+
+    static let pileOfLeaves = Item(
+        id: .pileOfLeaves,
+        .name("pile of leaves"),
+        .synonyms("leaves", "leaf", "pile"),
+        .isTakable,
+        .isFlammable,
+        .requiresTryTake,
+        .description("On the ground is a pile of leaves."),
+        .size(25),
+        .in(.location(.gratingClearing))
+        // Note: Has action handler LEAF-PILE
     )
 
     static let songbird = Item(
@@ -249,4 +260,30 @@ extension Forest {
             return nil
         }
     }
+
+    static let pileOfLeavesHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            if command.verb == .move {
+                // Check if grating is already revealed
+                let isGratingInvisible = try await engine.hasFlag(.isInvisible, on: .grating)
+
+                if isGratingInvisible {
+                    // Reveal the grating - this is the LEAVES-APPEAR functionality
+                    let grating = try await engine.item(.grating)
+                    let change = await engine.clearFlag(.isInvisible, on: grating)
+                    return ActionResult(
+                        message: "In disturbing the pile of leaves, a grating is revealed.",
+                        stateChange: change
+                    )
+                } else {
+                    return ActionResult("Done.")
+                }
+            }
+            return nil
+        case .afterTurn:
+            return nil
+        }
+    }
+
 }
