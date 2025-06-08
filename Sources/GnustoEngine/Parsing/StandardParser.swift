@@ -1086,7 +1086,9 @@ public struct StandardParser: Parser {
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
             if let location = gameState.locations[currentLocationID] {
                 for itemID in location.localGlobals {
-                    if let globalItem = allItems[itemID], checkItemConditions(globalItem) {
+                    if let globalItem = allItems[itemID], 
+                       checkItemConditions(globalItem),
+                       !globalItem.hasFlag(.isInvisible) {
                         candidates[itemID] = globalItem
                     }
                 }

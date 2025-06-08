@@ -69,13 +69,14 @@ struct ForestTests {
             The forest is all around you, with trees in every direction.
             
             > examine grating
-            Which grating do you mean?
+            You can’t see any such thing.
             
             > move leaves
             In disturbing the pile of leaves, a grating is revealed.
             
             > examine grating
-            Which grating do you mean?
+            The grating is a large metal framework, securely fastened to
+            the ground.
             
             >
             Goodbye!            

@@ -122,7 +122,7 @@ enum Forest {
             // Note: DOWN exit has special condition handling via GRATING-EXIT
         ]),
         .inherentlyLit,
-        .localGlobals(.whiteHouse, .grate, .forest)
+        .localGlobals(.whiteHouse, .forest)
     )
 
     static let mountains = Location(
