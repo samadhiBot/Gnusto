@@ -348,7 +348,7 @@ public struct StandardParser: Parser {
         let words = sanitizedInput.lowercased()
             .components(separatedBy: .whitespacesAndNewlines)
             .filter { !$0.isEmpty }
-        
+
         for word in words {
             if word.contains(",") {
                 // Split words containing commas
@@ -366,7 +366,7 @@ public struct StandardParser: Parser {
                 tokens.append(word)
             }
         }
-        
+
         return tokens
     }
 
@@ -496,25 +496,25 @@ public struct StandardParser: Parser {
         var resolvedDirectObjects: [EntityReference] = []
         var isAllCommandDO = false
         var isMultipleObjectsDO = false
-        
+
         if rule.pattern.contains(.directObject) {
             if directObjectPhrases.isEmpty {
                 return .failure(.badGrammar("Expected a direct object phrase for verb '\(verb)'."))
             }
-            
+
             // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
             if directObjectPhrases.count > 1 && rule.directObjectConditions.contains(.allowsMultiple) {
                 isMultipleObjectsDO = true
             } else if directObjectPhrases.count > 1 {
                 return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple objects."))
             }
-            
+
             // Process each noun phrase
             for (noun, modifiers) in directObjectPhrases {
                 let lowercasedNoun = noun.lowercased()
-                
+
                 // Check if this is an ALL command and the rule allows multiple objects
-                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                if vocabulary.specialKeywords.contains(lowercasedNoun) &&
                    rule.directObjectConditions.contains(.allowsMultiple) {
                     isAllCommandDO = true
                     let allObjectsResult = resolveAllObjects(
@@ -556,25 +556,25 @@ public struct StandardParser: Parser {
         var resolvedIndirectObjects: [EntityReference] = []
         var isAllCommandIO = false
         var isMultipleObjectsIO = false
-        
+
         if rule.pattern.contains(.indirectObject) {
             if indirectObjectPhrases.isEmpty {
                 return .failure(.badGrammar("Expected an indirect object phrase for verb '\(verb)'."))
             }
-            
+
             // Check if we have multiple phrases (conjunctions) and the rule allows multiple objects
             if indirectObjectPhrases.count > 1 && rule.indirectObjectConditions.contains(.allowsMultiple) {
                 isMultipleObjectsIO = true
             } else if indirectObjectPhrases.count > 1 {
                 return .failure(.badGrammar("The verb '\(verb)' doesn't support multiple indirect objects."))
             }
-            
+
             // Process each noun phrase
             for (noun, modifiers) in indirectObjectPhrases {
                 let lowercasedNoun = noun.lowercased()
-                
+
                 // Check if this is an ALL command and the rule allows multiple objects
-                if vocabulary.specialKeywords.contains(lowercasedNoun) && 
+                if vocabulary.specialKeywords.contains(lowercasedNoun) &&
                    rule.indirectObjectConditions.contains(.allowsMultiple) {
                     isAllCommandIO = true
                     let allObjectsResult = resolveAllObjects(
@@ -636,11 +636,11 @@ public struct StandardParser: Parser {
         vocabulary: Vocabulary
     ) -> [(noun: String, modifiers: [String])] {
         guard !tokens.isEmpty else { return [] }
-        
+
         // Split the tokens by conjunctions
         var phrases: [[String]] = []
         var currentPhrase: [String] = []
-        
+
         for token in tokens {
             if vocabulary.conjunctions.contains(token) {
                 // Found a conjunction, save current phrase and start a new one
@@ -652,17 +652,17 @@ public struct StandardParser: Parser {
                 currentPhrase.append(token)
             }
         }
-        
+
         // Add the last phrase
         if !currentPhrase.isEmpty {
             phrases.append(currentPhrase)
         }
-        
+
         // If no conjunctions were found, we have a single phrase
         if phrases.isEmpty && !tokens.isEmpty {
             phrases = [tokens]
         }
-        
+
         // Extract noun and modifiers from each phrase
         let result: [(noun: String, modifiers: [String])] = phrases.compactMap { phrase in
             let (noun, mods) = extractNounAndMods(from: phrase, vocabulary: vocabulary)
@@ -672,7 +672,7 @@ public struct StandardParser: Parser {
             guard let finalNoun = finalNoun else { return nil }
             return (noun: finalNoun, modifiers: mods)
         }
-        
+
         return result
     }
 
@@ -959,14 +959,14 @@ public struct StandardParser: Parser {
             in: gameState,
             requiredConditions: requiredConditions
         )
-        
+
         // Filter candidates based on verb-specific criteria
         var validItems: [Item] = []
-        
+
         for item in itemCandidates.values {
             // Apply verb-specific filtering (similar to Zork's TAKEBIT, etc.)
             var isValidForVerb = false
-            
+
             switch verb {
             case .take:
                 // For TAKE ALL, only include takable items not already held
@@ -981,7 +981,7 @@ public struct StandardParser: Parser {
                 // For other verbs, include all items (let action handler decide)
                 isValidForVerb = true
             }
-            
+
             if isValidForVerb {
                 // Apply modifier filtering if any modifiers are specified
                 if filterCandidates(item: item, modifiers: modifiers) {
@@ -989,7 +989,7 @@ public struct StandardParser: Parser {
                 }
             }
         }
-        
+
         // Sort items for consistent ordering (by name, then by ID)
         validItems.sort { lhs, rhs in
             if lhs.name != rhs.name {
@@ -997,23 +997,23 @@ public struct StandardParser: Parser {
             }
             return lhs.id.rawValue < rhs.id.rawValue
         }
-        
+
         guard !validItems.isEmpty else {
             // Return appropriate error based on context
             if modifiers.isEmpty {
-                            switch verb {
-            case .take:
-                return .failure(.itemNotInScope(noun: "There is nothing here to take."))
-            case .drop:
-                return .failure(.itemNotInScope(noun: "You aren't carrying anything."))
-            default:
-                return .failure(.itemNotInScope(noun: "There is nothing here."))
-            }
+                switch verb {
+                case .take:
+                    return .failure(.badGrammar("There is nothing here to take."))
+                case .drop:
+                    return .failure(.badGrammar("You aren't carrying anything."))
+                default:
+                    return .failure(.badGrammar("There is nothing here."))
+                }
             } else {
                 return .failure(.modifierMismatch(noun: "all", modifiers: modifiers))
             }
         }
-        
+
         // Convert to EntityReferences
         let entityRefs = validItems.map { EntityReference.item($0.id) }
         return .success(entityRefs)
@@ -1086,7 +1086,7 @@ public struct StandardParser: Parser {
         if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
             if let location = gameState.locations[currentLocationID] {
                 for itemID in location.localGlobals {
-                    if let globalItem = allItems[itemID], 
+                    if let globalItem = allItems[itemID],
                        checkItemConditions(globalItem),
                        !globalItem.hasFlag(.isInvisible) {
                         candidates[itemID] = globalItem

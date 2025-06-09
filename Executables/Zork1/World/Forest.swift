@@ -12,7 +12,7 @@ enum Forest {
             You are in a clearing, with a forest surrounding you on all
             sides. A path leads south.
             """),
-        .exits([:]),
+//        .exits([:]),
 //            .down: .blocked("GRATING PUZZLE"),
 //            .east: .to(.forest2),
 //            .south: .to(.forestPath),
@@ -110,10 +110,10 @@ enum Forest {
     static let gratingClearing = Location(
         id: .gratingClearing,
         .name("Clearing"),
-        .description("""
-            You are in a clearing, with a forest surrounding you on all sides.
-            A path leads south.
-            """),
+//        .description("""
+//            You are in a clearing, with a forest surrounding you on all sides.
+//            A path leads south.
+//            """),
         .exits([
             .east: .to(.forest2),
             .west: .to(.forest1),
@@ -259,6 +259,94 @@ extension Forest {
         }
     }
 
+    /*
+    <ROUTINE CLEARING-FCN (RARG)
+         <COND (<EQUAL? .RARG ,M-ENTER>
+            <COND (<NOT ,GRATE-REVEALED>
+                   <FSET ,GRATE ,INVISIBLE>)>)
+               (<EQUAL? .RARG ,M-LOOK>
+            <TELL
+    "You are in a clearing, with a forest surrounding you on all sides. A
+    path leads south.">
+            <COND (<FSET? ,GRATE ,OPENBIT>
+                   <CRLF>
+                   <TELL
+    "There is an open grating, descending into darkness.">)
+                  (,GRATE-REVEALED
+                   <CRLF>
+                   <TELL
+    "There is a grating securely fastened into the ground.">)>
+            <CRLF>)>>
+
+     */
+
+    static let gratingClearingComputer = LocationComputer { attributeID, gameState in
+        switch attributeID {
+        case .description:
+            let isGrateInvisible = try gameState.hasFlag(.isInvisible, on: .grate)
+            let isGrateOpen = try gameState.hasFlag(.isOpen, on: .grate)
+            var description = [
+                """
+                You are in a clearing, with a forest surrounding you on all sides.
+                A path leads south.
+                """
+            ]
+            if !isGrateInvisible {
+                if isGrateOpen {
+                    description.append("There is an open grating, descending into darkness.")
+                } else {
+                    description.append("There is a grating securely fastened into the ground.")
+                }
+            }
+            return .string(description.joined(separator: "\n\n"))
+
+        default:
+            return nil
+        }
+    }
+
+    static let gratingClearingHandler = LocationEventHandler { engine, event in
+        switch event {
+        case .onEnter:
+            // ZIL M-ENTER: If grate is not revealed, set it invisible
+            let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
+            if !isGrateInvisible {
+                // Check if we need to hide it again (this would be unusual but following ZIL)
+                // In ZIL, this sets INVISIBLE if GRATE-REVEALED is false
+                // We'll interpret "not revealed" as "should be invisible"
+                // This logic may need adjustment based on actual game flow
+                return nil
+            }
+            return nil
+
+        case .beforeTurn(let command):
+            if command.verb == .look {
+                // ZIL M-LOOK: Custom description based on grate state
+                let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
+                let isGrateOpen = try await engine.hasFlag(.isOpen, on: .grate)
+
+                var description = """
+                    You are in a clearing, with a forest surrounding you on all sides.
+                    A path leads south.
+                    """
+
+                if !isGrateInvisible {
+                    if isGrateOpen {
+                        description += "\n\nThere is an open grating, descending into darkness."
+                    } else {
+                        description += "\n\nThere is a grating securely fastened into the ground."
+                    }
+                }
+
+                return ActionResult(description)
+            }
+            return nil
+
+        case .afterTurn:
+            return nil
+        }
+    }
+
     static let pileOfLeavesHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
@@ -303,7 +391,7 @@ extension Forest {
                 } else {
                     return ActionResult("The grating is locked.")
                 }
-                
+
             case .lock:
                 let currentLocation = await engine.playerLocationID
                 if currentLocation == .gratingRoom {
@@ -367,14 +455,14 @@ extension Forest {
                     }
                     return nil
                 }
-                
+
                 let currentLocation = await engine.playerLocationID
                 let playerHasKeys = await engine.items(in: .player).contains { $0.id == .keys }
-                
+
                 guard playerHasKeys else {
                     return ActionResult("You don't have the keys.")
                 }
-                
+
                 if currentLocation == .gratingRoom {
                     let changes = await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
                     return ActionResult(message: "The grate is unlocked.", stateChange: changes)
@@ -383,7 +471,7 @@ extension Forest {
                 } else {
                     return nil
                 }
-                
+
             default:
                 return nil
             }

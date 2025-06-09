@@ -135,7 +135,7 @@ struct OutsideHouseTests {
             It is securely anchored.
 
             > open the mailbox
-            You open the small mailbox.
+            Opening the small mailbox reveals a leaflet.
 
             > east
             The door is boarded and you can’t remove the boards.

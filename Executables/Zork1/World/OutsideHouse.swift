@@ -160,9 +160,9 @@ extension OutsideHouse {
         .adjectives("small"),
         .isContainer,
         .requiresTryTake,
+        .isOpenable,
         .capacity(10),
         .in(.location(.westOfHouse))
-        // Note: Has action handler MAILBOX-F
     )
 
     static let whiteHouse = Item(
@@ -185,12 +185,8 @@ extension OutsideHouse {
     static let eastOfHouseComputer = LocationComputer { attributeID, gameState in
         switch attributeID {
         case .description:
-            
-            let windowState = if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
-                "open"
-            } else {
-                "slightly ajar"
-            }
+            let windowState = try gameState
+                .hasFlag(.isOpen, on: .kitchenWindow) ? "open" : "slightly ajar"
             return .string("""
                 You are behind the white house. A path leads into the forest
                 to the east. In one corner of the house there is a small window
@@ -205,15 +201,14 @@ extension OutsideHouse {
         switch attributeID {
         case .description:
             if try gameState.hasFlag(.isOpen, on: .kitchenWindow) {
-                return .string("The window is now open wide enough to allow entry.")
+                .string("The window is now open wide enough to allow entry.")
             } else {
-                return .string("The window is slightly ajar, but not enough to allow entry.")
+                .string("The window is slightly ajar, but not enough to allow entry.")
             }
         default:
-            return nil
+            nil
         }
     }
-
 }
 
 // MARK: - Event handlers
