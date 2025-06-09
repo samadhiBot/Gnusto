@@ -178,7 +178,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .examine,
-            synonyms: "x", "inspect",
+            synonyms: "x", "inspect", "look at",
             syntax: [
                 SyntaxRule(
                     pattern: [.verb, .directObject],
@@ -506,6 +506,24 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "on"
                 )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .find,
+            synonyms: "locate", "search for",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .burn,
+            synonyms: "ignite", "light", "set fire to",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
             ],
             requiresLight: true
         ),

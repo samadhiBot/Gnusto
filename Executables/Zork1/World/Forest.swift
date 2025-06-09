@@ -118,7 +118,7 @@ enum Forest {
             .east: .to(.forest2),
             .west: .to(.forest1),
             .south: .to(.forestPath),
-            // Note: NORTH exit has custom message
+            .north: .blocked("The forest becomes impenetrable to the north."),
             // Note: DOWN exit has special condition handling via GRATING-EXIT
         ]),
         .inherentlyLit,
@@ -258,27 +258,6 @@ extension Forest {
             return nil
         }
     }
-
-    /*
-    <ROUTINE CLEARING-FCN (RARG)
-         <COND (<EQUAL? .RARG ,M-ENTER>
-            <COND (<NOT ,GRATE-REVEALED>
-                   <FSET ,GRATE ,INVISIBLE>)>)
-               (<EQUAL? .RARG ,M-LOOK>
-            <TELL
-    "You are in a clearing, with a forest surrounding you on all sides. A
-    path leads south.">
-            <COND (<FSET? ,GRATE ,OPENBIT>
-                   <CRLF>
-                   <TELL
-    "There is an open grating, descending into darkness.">)
-                  (,GRATE-REVEALED
-                   <CRLF>
-                   <TELL
-    "There is a grating securely fastened into the ground.">)>
-            <CRLF>)>>
-
-     */
 
     static let gratingClearingComputer = LocationComputer { attributeID, gameState in
         switch attributeID {

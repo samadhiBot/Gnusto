@@ -1,0 +1,106 @@
+import Foundation
+
+/// Handles the "BURN" command.
+///
+/// The BURN verb allows players to attempt to set fire to objects.
+/// This handler checks if the target object is flammable and provides
+/// appropriate responses. Most objects cannot be burned, but some specific
+/// items (like paper, wood, etc.) may have special burn behavior.
+public struct BurnActionHandler: ActionHandler {
+    public init() {}
+
+    /// Validates the burn command.
+    ///
+    /// Ensures that:
+    /// - A direct object is specified
+    /// - The target object exists and is accessible
+    /// - There is sufficient light to see the object
+    ///
+    /// - Parameter context: The action context containing the command and engine.
+    /// - Throws: `ActionError` if validation fails.
+        public func validate(context: ActionContext) async throws {
+        guard let targetObjectID = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Burn what?")
+        }
+
+        guard case .item(let itemID) = targetObjectID else {
+            throw ActionResponse.prerequisiteNotMet("You can only burn items.")
+        }
+
+        // Check if the item exists and is accessible
+        guard (try? await context.engine.item(itemID)) != nil else {
+            throw ActionResponse.unknownEntity(targetObjectID)
+        }
+
+        guard await context.engine.playerCanReach(itemID) else {
+            throw ActionResponse.itemNotAccessible(itemID)
+        }
+    }
+
+    /// Processes the "BURN" command.
+    ///
+    /// This action performs the following:
+    /// 1. Retrieves the target item
+    /// 2. Checks if the item has the `.isFlammable` property
+    /// 3. If flammable, removes the item and provides a burn message
+    /// 4. If not flammable, provides an appropriate refusal message
+    /// 5. Sets the `.isTouched` flag on the item
+    /// 6. Updates pronouns to refer to the item
+    ///
+    /// - Parameter context: The action context for the current action.
+    /// - Returns: An `ActionResult` containing the burn result and any state changes.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let targetObjectID = context.command.directObject,
+              case .item(let itemID) = targetObjectID else {
+            return ActionResult("You can't burn that.")
+        }
+
+                let targetItem = try await context.engine.item(itemID)
+
+        var stateChanges: [StateChange] = []
+
+        // Ensure the item is marked as touched
+        if let touchChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(touchChange)
+        }
+
+        // Update pronouns
+        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(pronounChange)
+        }
+
+        // Check if the item is flammable
+        if targetItem.hasFlag(.isFlammable) {
+            // Move the item to nowhere (destroy it)
+            let destroyChange = await context.engine.move(targetItem, to: .nowhere)
+            stateChanges.append(destroyChange)
+
+            return ActionResult(
+                message: "The \(targetItem.name) catches fire and burns to ashes.",
+                stateChanges: stateChanges
+            )
+        } else {
+            // Most items cannot be burned
+            let message = if targetItem.name.lowercased().contains("house") ||
+                             targetItem.name.lowercased().contains("building") {
+                "You must be joking."
+            } else {
+                "You can't burn the \(targetItem.name)."
+            }
+
+            return ActionResult(
+                message: message,
+                stateChanges: stateChanges
+            )
+        }
+    }
+
+    /// Performs any post-processing after the burn action completes.
+    ///
+    /// Currently no post-processing is needed for the burn action.
+    ///
+    /// - Parameter context: The action context for the current action.
+    public func postProcess(context: ActionContext) async throws {
+        // No post-processing needed for burn
+    }
+}

@@ -1013,10 +1013,12 @@ extension GameEngine {
     static var defaultActionHandlers: [VerbID: ActionHandler] {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction
+            .burn: BurnActionHandler(),
             .climbOn: ClimbOnActionHandler(),
             .close: CloseActionHandler(),
             .drop: DropActionHandler(),
             .examine: ExamineActionHandler(),
+            .find: FindActionHandler(),
             .give: GiveActionHandler(),
             .go: GoActionHandler(),
             .insert: InsertActionHandler(),
