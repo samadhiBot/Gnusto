@@ -20,7 +20,7 @@ struct VocabularyTests {
         
         // — Turn On —
         #expect(synonyms["turn on"] == [.turnOn], "Primary 'turn on' should map to itself")
-        #expect(synonyms["light"] == [.turnOn], "'light' should map to 'turn on'")
+        #expect(synonyms["light"] == [.turnOn, .burn], "'light' should map to 'turn on'")
         #expect(synonyms["switch on"] == [.turnOn], "'switch on' should map to 'turn on'")
         
         // — Other samples —

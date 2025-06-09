@@ -64,6 +64,9 @@ public struct LookActionHandler: ActionHandler {
     /// - **LOOK THROUGH [ITEM]:**
     ///   Delegates to look-through behavior implemented in LookThroughActionHandler.
     ///
+    /// - **LOOK IN/INSIDE/WITH [ITEM]:**
+    ///   Delegates to look-inside behavior implemented in LookInsideActionHandler.
+    ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the description and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` or errors from engine calls if issues occur.
@@ -95,6 +98,12 @@ public struct LookActionHandler: ActionHandler {
             // Specific items can override this via ItemEventHandlers (like the kitchen window)
             let examineHandler = ExamineActionHandler()
             return try await examineHandler.process(context: context)
+        } else if context.command.preposition == "in" ||
+                  context.command.preposition == "inside" ||
+                  context.command.preposition == "with" {
+            // LOOK IN/INSIDE/WITH [Object] - delegate to look-inside behavior
+            let lookInsideHandler = LookInsideActionHandler()
+            return try await lookInsideHandler.process(context: context)
         } else {
             // LOOK AT [Object] - delegate to ExamineActionHandler to avoid code duplication
             let examineHandler = ExamineActionHandler()

@@ -188,6 +188,14 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject],
                     directObjectConditions: .allowsMultiple
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "in"
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "on"
                 )
             ],
             requiresLight: true
@@ -498,6 +506,26 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .preposition, .directObject],
                     requiredPreposition: "under"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .lookInside,
+            synonyms: "look in", "look inside", "look with",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "in"
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "inside"
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "with"
                 )
             ],
             requiresLight: true

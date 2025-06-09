@@ -71,6 +71,12 @@ public struct ExamineActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the detailed description and any relevant state changes.
     /// - Throws: Can throw errors from engine calls if issues occur (e.g., item not found during processing).
     public func process(context: ActionContext) async throws -> ActionResult {
+        // Check for EXAMINE IN/ON preposition variants - delegate to look-inside behavior
+        if context.command.preposition == "in" || context.command.preposition == "on" {
+            let lookInsideHandler = LookInsideActionHandler()
+            return try await lookInsideHandler.process(context: context)
+        }
+
         // For ALL commands, empty directObjects is valid (means nothing to examine)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {

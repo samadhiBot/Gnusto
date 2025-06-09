@@ -29,6 +29,7 @@ extension VerbID {
     public static let lock = VerbID("lock")
     public static let look = VerbID("look")
     public static let lookUnder = VerbID("lookUnder")
+    public static let lookInside = VerbID("lookInside")
     public static let move = VerbID("move")
     public static let open = VerbID("open")
     public static let push = VerbID("push")
