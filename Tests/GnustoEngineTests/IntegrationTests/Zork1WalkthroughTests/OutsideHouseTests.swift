@@ -72,7 +72,9 @@ struct OutsideHouseTests {
             enterKitchenSteps,
             "examine table",
             "open sack",
-            "inventory"
+            "inventory",
+            "take all",
+            "inventory",
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -93,10 +95,18 @@ struct OutsideHouseTests {
             peppers.
 
             > open sack
-            You open the brown sack.
+            Opening the brown sack reveals a clove of garlic and a lunch.
 
             > inventory
             You are empty-handed.
+
+            > take all
+            You take the glass bottle and the brown sack.
+
+            > inventory
+            You are carrying:
+            - A glass bottle
+            - A brown sack
 
             >
             Goodbye!
@@ -112,7 +122,7 @@ struct OutsideHouseTests {
             "east",
             "open door",
             "take boards",
-            "look house",
+            "look at the house",
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -156,7 +166,7 @@ struct OutsideHouseTests {
             > take boards
             The boards are securely fastened.
 
-            > look house
+            > look at the house
             The house is a beautiful colonial house which is painted white.
             It is clear that the owners must have been extremely wealthy.
 

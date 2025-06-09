@@ -19,6 +19,8 @@ extension VerbID {
     public static let close = VerbID("close")
     public static let drop = VerbID("drop")
     public static let examine = VerbID("examine")
+    public static let find = VerbID("find")
+    public static let burn = VerbID("burn")
     public static let give = VerbID("give")
     public static let go = VerbID("go")
     public static let insert = VerbID("insert")

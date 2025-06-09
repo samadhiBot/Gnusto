@@ -255,4 +255,88 @@ extension OutsideHouse {
         case .afterTurn: nil
         }
     }
+
+    static let whiteHouseHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            let currentLocation = await engine.playerLocationID
+
+            // Check if player is inside the house
+            let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
+            if insideHouseLocations.contains(currentLocation) {
+                switch command.verb {
+                case VerbID("find"):
+                    return ActionResult("Why not find your brains?")
+                // TODO: Handle WALK-AROUND verb when available
+                default:
+                    return nil
+                }
+            }
+
+            // Check if player is at the house (at one of the four sides)
+            let atHouseLocations: Set<LocationID> = [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse]
+            if !atHouseLocations.contains(currentLocation) {
+                // Player is not at the house
+                switch command.verb {
+                case VerbID("find"):
+                    if currentLocation == .gratingClearing {
+                        return ActionResult("It seems to be to the west.")
+                    } else {
+                        return ActionResult("It was here just a minute ago....")
+                    }
+                default:
+                    return ActionResult("You're not at the house.")
+                }
+            }
+
+            // Player is at the house (at one of the four sides)
+            switch command.verb {
+            case VerbID("find"):
+                return ActionResult("It's right here! Are you blind or something?")
+
+            // TODO: Handle WALK-AROUND verb when available
+
+            case .examine, .look:
+                return ActionResult("""
+                    The house is a beautiful colonial house which is painted white. \
+                    It is clear that the owners must have been extremely wealthy.
+                    """)
+
+            case .open:
+                // Handle THROUGH/OPEN verbs (ZIL combines these)
+                if currentLocation == .eastOfHouse {
+                    let isWindowOpen = try await engine.hasFlag(.isOpen, on: .kitchenWindow)
+                    if isWindowOpen {
+                        // Move player to kitchen
+                        let moveChange = StateChange(
+                            entityID: .player,
+                            attribute: .playerLocation,
+                            oldValue: .locationID(currentLocation),
+                            newValue: .locationID(.kitchen)
+                        )
+                        return ActionResult(stateChange: moveChange)
+                    } else {
+                        // Update pronoun to refer to kitchen window
+                        let kitchenWindow = try await engine.item(.kitchenWindow)
+                        let pronounChange = await engine.updatePronouns(to: kitchenWindow)
+                        return ActionResult(
+                            message: "The window is closed.",
+                            stateChange: pronounChange
+                        )
+                    }
+                } else {
+                    return ActionResult("I can't see how to get in from here.")
+                }
+
+            case VerbID("burn"):
+                return ActionResult("You must be joking.")
+
+            default:
+                return nil
+            }
+
+        case .afterTurn:
+            return nil
+        }
+    }
 }
