@@ -182,7 +182,9 @@ struct OutsideHouseTests {
             "north",
             "take the boards",
             "east",
-            "take the boards",
+            "examine the window",
+            "look through the window",
+            "take the window",
             "south",
             "take the boards",
         )
@@ -224,16 +226,20 @@ struct OutsideHouseTests {
             the east. In one corner of the house there is a small window
             which is slightly ajar.
 
-            > take the boards
-            The boards are securely fastened.
+            > examine the window
+            The window is slightly ajar, but not enough to allow entry.
+
+            > look through the window
+            You can see what appears to be a kitchen.
+
+            > take the window
+            You can’t take the kitchen window.
 
             > south
             — South of House —
 
             You are facing the south side of a white house. There is no
             door here, and all the windows are boarded.
-
-            There is a boarded window here.
 
             > take the boards
             The boards are securely fastened.

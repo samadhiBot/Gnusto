@@ -125,6 +125,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
     /// Default set of common English prepositions.
     public static let defaultPrepositions: Set<String> = [
         "about",
+        "at",
         "behind",
         "down",
         "for",
@@ -171,7 +172,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "l",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "through"
+                )
             ],
             requiresLight: false
         ),

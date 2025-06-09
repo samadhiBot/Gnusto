@@ -61,11 +61,14 @@ public struct LookActionHandler: ActionHandler {
     ///   5. Updates pronouns to refer to the item.
     ///   6. Returns an `ActionResult` with the combined description and state changes.
     ///
+    /// - **LOOK THROUGH [ITEM]:**
+    ///   Delegates to look-through behavior implemented in LookThroughActionHandler.
+    ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the description and any relevant `StateChange`s.
     /// - Throws: `ActionResponse.internalEngineError` or errors from engine calls if issues occur.
     public func process(context: ActionContext) async throws -> ActionResult {
-        // Check if this is LOOK (no direct object) or LOOK AT [object]
+        // Check if this is LOOK (no direct object) or LOOK AT [object] or LOOK THROUGH [object]
         if context.command.directObject == nil {
             // LOOK (no direct object) - describe the room
             // 1. Check for darkness FIRST
@@ -87,6 +90,11 @@ public struct LookActionHandler: ActionHandler {
                     stateSnapshot: context.stateSnapshot
                 )
             )
+        } else if context.command.preposition == "through" {
+            // LOOK THROUGH [Object] - delegate to examine behavior for basic look-through functionality
+            // Specific items can override this via ItemEventHandlers (like the kitchen window)
+            let examineHandler = ExamineActionHandler()
+            return try await examineHandler.process(context: context)
         } else {
             // LOOK AT [Object] - delegate to ExamineActionHandler to avoid code duplication
             let examineHandler = ExamineActionHandler()

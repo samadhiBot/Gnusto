@@ -239,6 +239,13 @@ extension OutsideHouse {
                         stateChange: engine.setFlag(.isOpen, on: kitchenWindow)
                     )
                 }
+            case .look where command.preposition == "through":
+                let currentLocation = await engine.playerLocationID
+                if currentLocation == .kitchen {
+                    return ActionResult("You can see a clear area leading towards a forest.")
+                } else {
+                    return ActionResult("You can see what appears to be a kitchen.")
+                }
             default: return nil
             }
         case .afterTurn: return nil
