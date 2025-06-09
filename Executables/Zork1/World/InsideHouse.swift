@@ -44,9 +44,11 @@ enum InsideHouse {
         .inherentlyLit,
         .localGlobals(.stairs)
     )
+}
 
-    // MARK: - Items
+// MARK: - Items
 
+extension InsideHouse {
     static let atticTable = Item(
         id: .atticTable,
         .name("table"),
@@ -268,6 +270,16 @@ enum InsideHouse {
         .in(.location(.livingRoom))
         // Note: Has action handler FRONT-DOOR-FCN
     )
+
+    static let brokenLamp = Item(
+        id: .brokenLamp,
+        .name("broken lamp"),
+        .synonyms("lamp", "lantern", "light"),
+        .adjectives("broken", "smashed"),
+        .description("There is a broken lamp here."),
+        .size(15),
+        .in(.nowhere)
+    )
 }
 
 // MARK: - Computers
@@ -289,6 +301,81 @@ extension InsideHouse {
                 window which is \(windowState).
                 """)
         default:
+            return nil
+        }
+    }
+
+        /// Handles special lamp interactions based on the original ZIL `LANTERN` routine.
+    ///
+    /// This handler manages lamp behavior including:
+    /// - THROW: Smashes lamp and creates broken lamp
+    /// - TURN ON: Lights lamp (unless burned out)
+    /// - TURN OFF: Extinguishes lamp (unless burned out)
+    /// - EXAMINE: Shows lamp state (burned out, on, or off)
+    static let lampHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            // Flag to track if lamp is burned out (equivalent to ZIL's RMUNGBIT)
+            let burnedOutFlag = AttributeID("isBurnedOut")
+
+            let isBurnedOut = try await engine.hasFlag(burnedOutFlag, on: .lamp)
+            let isOn = try await engine.hasFlag(.isOn, on: .lamp)
+
+            switch command.verb {
+            case VerbID("throw"):
+                let playerLocation = try await engine.playerLocation()
+
+                                let changes: [StateChange] = [
+                    // Turn off the lamp's light source
+                    try await engine.clearFlag(.isOn, on: .lamp),
+                    // Remove the lamp
+                    try await engine.move(.lamp, to: .nowhere),
+                    // Add broken lamp to current location
+                    try await engine.move(.brokenLamp, to: .location(playerLocation.id))
+                ].compactMap { $0 }
+
+                return ActionResult(
+                    message: "The lamp has smashed into the floor, and the light has gone out.",
+                    stateChanges: changes
+                )
+
+            case .turnOn:
+                if isBurnedOut {
+                    return ActionResult("A burned-out lamp won't light.")
+                } else {
+                    let change = try await engine.setFlag(.isOn, on: .lamp)
+                    return ActionResult(
+                        message: "The brass lantern is now on.",
+                        stateChanges: change.map { [$0] } ?? []
+                    )
+                }
+
+            case .turnOff:
+                if isBurnedOut {
+                    return ActionResult("The lamp has already burned out.")
+                } else {
+                    let change = try await engine.clearFlag(.isOn, on: .lamp)
+                    return ActionResult(
+                        message: "The brass lantern is now off.",
+                        stateChanges: change.map { [$0] } ?? []
+                    )
+                }
+
+            case .examine:
+                let statusMessage = if isBurnedOut {
+                    "has burned out."
+                } else if isOn {
+                    "is on."
+                } else {
+                    "is turned off."
+                }
+
+                return ActionResult("The lamp \(statusMessage)")
+
+            default:
+                return nil // Let other handlers deal with it
+            }
+        case .afterTurn:
             return nil
         }
     }

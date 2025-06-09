@@ -32,10 +32,9 @@ struct Zork1WalkthroughTests {
         let mockIO = await MockIOHandler(
             enterKitchenSteps,
             "west",
-            "take lamp",
-            "take sword",
-            "examine lamp",
-            "turn on lamp",
+            "take all",
+            "examine the lamp",
+            "turn on the lamp",
             "inventory",
             "east",
             "up",
@@ -89,27 +88,21 @@ struct Zork1WalkthroughTests {
             appears to be nailed shut, a trophy case, and a large oriental
             rug in the center of the room.
 
-            There are a brass lantern and a sword here.
+            A battery-powered brass lantern is on the trophy case.
 
-            > take lamp
-            Taken.
+            Above the trophy case hangs an elvish sword of great antiquity.
 
-            > take sword
-            Taken.
+            In the trophy case is an ancient parchment which appears to be
+            a map.
 
-            > examine lamp
-            The brass lantern is turned off. The brass lantern contains a
-            clear glass globe which is currently dark.
+            > take all
+            You take the brass lantern and the sword.
 
-            > turn on lamp
+            > examine the lamp
+            The lamp is turned off.
+
+            > turn on the lamp
             The brass lantern is now on.
-
-            — Living Room —
-
-            You are in the living room. There is a doorway to the east, a
-            wooden door with strange gothic lettering to the west, which
-            appears to be nailed shut, a trophy case, and a large oriental
-            rug in the center of the room.
 
             > inventory
             You are carrying:
@@ -124,7 +117,9 @@ struct Zork1WalkthroughTests {
 
             This is the attic. The only exit is a stairway leading down.
 
-            There are a nasty knife and a rope here.
+            A large coil of rope is lying in the corner.
+
+            On a table is a nasty-looking knife.
 
             > take rope
             Taken.
