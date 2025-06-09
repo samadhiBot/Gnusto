@@ -99,17 +99,17 @@ extension GameEngine {
     /// - Returns: An array of `StateChange`s to update both pronouns, or empty array if no changes needed.
     public func updatePronounsForMultipleObjects(lastItem: Item, allItems: [Item]) -> [StateChange] {
         var changes: [StateChange] = []
-        
+
         // Update "it" to refer to the last item
         if let itChange = updatePronouns(to: lastItem) {
             changes.append(itChange)
         }
-        
+
         // Update "them" to refer to all items (if more than one)
         if allItems.count > 1 {
             let allEntityReferences = Set(allItems.map { EntityReference.item($0.id) })
             let oldThemReferences = gameState.pronouns["them"]
-            
+
             if allEntityReferences != oldThemReferences {
                 let themChange = StateChange(
                     entityID: .global,
@@ -120,7 +120,7 @@ extension GameEngine {
                 changes.append(themChange)
             }
         }
-        
+
         return changes
     }
 }
@@ -128,6 +128,21 @@ extension GameEngine {
 // MARK: - Item StateChange factories
 
 extension GameEngine {
+    /// Builds a `StateChange` to clear a boolean attribute (flag) on an item identified by its ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `clearFlag(_:on:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the flag to clear.
+    ///   - itemID: The `ItemID` of the item from which to clear the flag. If `nil`, this method returns `nil`.
+    /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
+    ///            `true` or the itemID is `nil`.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func clearFlag(_ attributeID: AttributeID, on itemID: ItemID?) throws -> StateChange? {
+        try clearFlag(attributeID, on: item(itemID))
+    }
+
     /// Builds a `StateChange` to clear a boolean attribute (flag) on an item, effectively
     /// setting its value to `false`.
     ///
@@ -145,6 +160,20 @@ extension GameEngine {
         } else {
             nil
         }
+    }
+
+    /// Creates a `StateChange` to move an item identified by its ID to a new parent entity.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `move(_:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item to be moved.
+    ///   - newParent: The `ParentEntity` that will be the item's new parent.
+    /// - Returns: A `StateChange` object representing the intended move.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func move(_ itemID: ItemID, to newParent: ParentEntity) throws -> StateChange {
+        try move(item(itemID), to: newParent)
     }
 
     /// Creates a `StateChange` to move an item to a new parent entity.
@@ -167,6 +196,25 @@ extension GameEngine {
             oldValue: .parentEntity(item.parent),
             newValue: .parentEntity(newParent)
         )
+    }
+
+    /// Creates a `StateChange` to set a dynamic attribute on an item identified by its ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - itemID: The `ItemID` of the item instance to modify.
+    ///   - value: The new `StateValue` for the attribute.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on itemID: ItemID,
+        to value: StateValue
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: item(itemID), to: value)
     }
 
     /// Creates a `StateChange` to set a dynamic attribute on an item.
@@ -196,6 +244,21 @@ extension GameEngine {
         )
     }
 
+    /// Builds a `StateChange` to set a boolean attribute (flag) on an item identified by its ID to `true`.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setFlag(_:on:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the flag to set.
+    ///   - itemID: The `ItemID` of the item on which to set the flag. If `nil`, this method returns `nil`.
+    /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
+    ///            `true` or the itemID is `nil`.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setFlag(_ attributeID: AttributeID, on itemID: ItemID?) throws -> StateChange? {
+        try setFlag(attributeID, on: item(itemID))
+    }
+
     /// Builds a `StateChange` to set a boolean attribute (flag) on an item to `true`.
     ///
     /// If the flag is already set to `true` on the item, this method returns `nil`
@@ -218,6 +281,22 @@ extension GameEngine {
 // MARK: - Location StateChange factories
 
 extension GameEngine {
+    /// Builds a `StateChange` to clear a boolean attribute (flag) on a location identified by its ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `clearFlag(_:on:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the flag to clear.
+    ///   - locationID: The `LocationID` of the location from which to clear the flag. If `nil`, this method
+    ///                 returns `nil`.
+    /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
+    ///            `true` or the locationID is `nil`.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func clearFlag(_ attributeID: AttributeID, on locationID: LocationID?) throws -> StateChange? {
+        try clearFlag(attributeID, on: location(locationID))
+    }
+
     /// Builds a `StateChange` to clear a boolean attribute (flag) on a location, effectively
     /// setting its value to `false`.
     ///
@@ -242,6 +321,22 @@ extension GameEngine {
                 newValue: false,
             )
         }
+    }
+
+    /// Builds a `StateChange` to set a boolean attribute (flag) on a location identified by its ID to `true`.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setFlag(_:on:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the flag to set.
+    ///   - locationID: The `LocationID` of the location on which to set the flag. If `nil`, this method
+    ///                 returns `nil`.
+    /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
+    ///            `true` or the locationID is `nil`.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setFlag(_ attributeID: AttributeID, on locationID: LocationID?) throws -> StateChange? {
+        try setFlag(attributeID, on: location(locationID))
     }
 
     /// Builds a `StateChange` to set a boolean attribute (flag) on a location to `true`.
@@ -296,6 +391,25 @@ extension GameEngine {
 
 extension GameEngine {
 
+    /// Creates a `StateChange` to set a dynamic attribute on a location identified by its ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - locationID: The `LocationID` of the location instance to modify.
+    ///   - value: The new `StateValue` for the attribute.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on locationID: LocationID,
+        to value: StateValue
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: location(locationID), to: value)
+    }
+
     /// Creates a `StateChange` to set a dynamic attribute on a location.
     ///
     /// This method creates a `StateChange` that respects the action pipeline and will trigger
@@ -314,7 +428,7 @@ extension GameEngine {
     ) -> StateChange? {
         let currentValue = location.attributes[attributeID]
         guard currentValue != value else { return nil }
-        
+
         return StateChange(
             entityID: .location(location.id),
             attribute: .locationAttribute(attributeID),
@@ -322,9 +436,23 @@ extension GameEngine {
             newValue: value
         )
     }
-    
+
     // MARK: - Convenience builders for common dynamic attributes
-    
+
+    /// Creates a `StateChange` to set an item's description by item ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setDescription(on:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - itemID: The `ItemID` of the item instance to modify.
+    ///   - description: The new description text.
+    /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setDescription(on itemID: ItemID, to description: String) throws -> StateChange? {
+        try setDescription(on: item(itemID), to: description)
+    }
+
     /// Creates a `StateChange` to set an item's description.
     ///
     /// This is a convenience method for the common pattern of dynamically changing
@@ -337,7 +465,21 @@ extension GameEngine {
     public func setDescription(on item: Item, to description: String) -> StateChange? {
         setAttribute(.description, on: item, to: .string(description))
     }
-    
+
+    /// Creates a `StateChange` to set a location's description by location ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setDescription(on:to:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - locationID: The `LocationID` of the location instance to modify.
+    ///   - description: The new description text.
+    /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setDescription(on locationID: LocationID, to description: String) throws -> StateChange? {
+        try setDescription(on: location(locationID), to: description)
+    }
+
     /// Creates a `StateChange` to set a location's description.
     ///
     /// This is a convenience method for the common pattern of dynamically changing
@@ -350,7 +492,26 @@ extension GameEngine {
     public func setDescription(on location: Location, to description: String) -> StateChange? {
         setAttribute(.description, on: location, to: .string(description))
     }
-    
+
+    /// Creates a `StateChange` to set a boolean flag attribute on an item by item ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - flag: The name of the flag attribute to set.
+    ///   - itemID: The `ItemID` of the item instance to modify.
+    ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
+    /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setAttribute(
+        _ flag: AttributeID,
+        on itemID: ItemID,
+        to value: Bool
+    ) throws -> StateChange? {
+        try setAttribute(flag, on: item(itemID), to: value)
+    }
+
     /// Creates a `StateChange` to set a boolean flag attribute on an item.
     ///
     /// This is a convenience method for the common pattern of setting boolean flags,
@@ -368,7 +529,26 @@ extension GameEngine {
     ) -> StateChange? {
         setAttribute(flag, on: item, to: .bool(value))
     }
-    
+
+    /// Creates a `StateChange` to set a boolean flag attribute on a location by location ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - flag: The name of the flag attribute to set.
+    ///   - locationID: The `LocationID` of the location instance to modify.
+    ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
+    /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setAttribute(
+        _ flag: AttributeID,
+        on locationID: LocationID,
+        to value: Bool
+    ) throws -> StateChange? {
+        try setAttribute(flag, on: location(locationID), to: value)
+    }
+
     /// Creates a `StateChange` to set a boolean flag attribute on a location.
     ///
     /// This is a convenience method for the common pattern of setting boolean flags on locations,
@@ -386,7 +566,26 @@ extension GameEngine {
     ) -> StateChange? {
         setAttribute(flag, on: location, to: .bool(value))
     }
-    
+
+    /// Creates a `StateChange` to set an integer attribute on an item by item ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - itemID: The `ItemID` of the item instance to modify.
+    ///   - value: The integer value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on itemID: ItemID,
+        to value: Int
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: item(itemID), to: value)
+    }
+
     /// Creates a `StateChange` to set an integer attribute on an item.
     ///
     /// This is a convenience method for setting numeric attributes on items.
@@ -403,7 +602,26 @@ extension GameEngine {
     ) -> StateChange? {
         setAttribute(attributeID, on: item, to: .int(value))
     }
-    
+
+    /// Creates a `StateChange` to set an integer attribute on a location by location ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - locationID: The `LocationID` of the location instance to modify.
+    ///   - value: The integer value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on locationID: LocationID,
+        to value: Int
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: location(locationID), to: value)
+    }
+
     /// Creates a `StateChange` to set an integer attribute on a location.
     ///
     /// This is a convenience method for setting numeric attributes on locations.
@@ -420,7 +638,26 @@ extension GameEngine {
     ) -> StateChange? {
         setAttribute(attributeID, on: location, to: .int(value))
     }
-    
+
+    /// Creates a `StateChange` to set a string attribute on an item by item ID.
+    ///
+    /// This is a convenience method that looks up the item by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes an `Item` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - itemID: The `ItemID` of the item instance to modify.
+    ///   - value: The string value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on itemID: ItemID,
+        to value: String
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: item(itemID), to: value)
+    }
+
     /// Creates a `StateChange` to set a string attribute on an item.
     ///
     /// This is a convenience method for setting string attributes on items.
@@ -437,7 +674,26 @@ extension GameEngine {
     ) -> StateChange? {
         setAttribute(attributeID, on: item, to: .string(value))
     }
-    
+
+    /// Creates a `StateChange` to set a string attribute on a location by location ID.
+    ///
+    /// This is a convenience method that looks up the location by ID and delegates to the
+    /// `setAttribute(_:on:to:)` method that takes a `Location` object.
+    ///
+    /// - Parameters:
+    ///   - attributeID: The `AttributeID` of the attribute to set.
+    ///   - locationID: The `LocationID` of the location instance to modify.
+    ///   - value: The string value to set.
+    /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
+    /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
+    public func setAttribute(
+        _ attributeID: AttributeID,
+        on locationID: LocationID,
+        to value: String
+    ) throws -> StateChange? {
+        try setAttribute(attributeID, on: location(locationID), to: value)
+    }
+
     /// Creates a `StateChange` to set a string attribute on a location.
     ///
     /// This is a convenience method for setting string attributes on locations.

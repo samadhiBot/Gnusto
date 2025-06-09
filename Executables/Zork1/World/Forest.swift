@@ -122,7 +122,7 @@ enum Forest {
             // Note: DOWN exit has special condition handling via GRATING-EXIT
         ]),
         .inherentlyLit,
-        .localGlobals(.whiteHouse, .forest)
+        .localGlobals(.whiteHouse, .forest, .grate)
     )
 
     static let mountains = Location(
@@ -181,15 +181,13 @@ enum Forest {
         .omitDescription
     )
 
-    static let grating = Item(
-        id: .grating,
+    static let grate = Item(
+        id: .grate,
         .name("grating"),
-        .description(
-            "The grating is a large metal framework, securely fastened to the ground."
-        ),
-        .synonyms("gate", "bars"),
-        .in(.location(.gratingClearing)),
-        .isInvisible
+        .synonyms("grate", "grating"),
+        .isDoor,
+        .isInvisible,
+        .omitDescription
     )
 
     static let nest = Item(
@@ -232,9 +230,9 @@ enum Forest {
     static let tree = Item(
         id: .tree,
         .name("tree"),
-        .description("""
-            The tree is large and appears to have some low branches. It might be climbable.
-            """),
+        .description(
+            "The tree is large and appears to have some low branches. It might be climbable."
+        ),
         .adjectives("large", "storm", "tossed"),
         .synonyms("branch", "branches"),
         .in(.location(.forestPath)),
@@ -265,13 +263,13 @@ extension Forest {
         switch event {
         case .beforeTurn(let command):
             if command.verb == .move {
-                // Check if grating is already revealed
-                let isGratingInvisible = try await engine.hasFlag(.isInvisible, on: .grating)
+                // Check if grate is already revealed
+                let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
 
-                if isGratingInvisible {
-                    // Reveal the grating - this is the LEAVES-APPEAR functionality
-                    let grating = try await engine.item(.grating)
-                    let change = await engine.clearFlag(.isInvisible, on: grating)
+                if isGrateInvisible {
+                    // Reveal the grate - this is the LEAVES-APPEAR functionality
+                    let grate = try await engine.item(.grate)
+                    let change = await engine.clearFlag(.isInvisible, on: grate)
                     return ActionResult(
                         message: "In disturbing the pile of leaves, a grating is revealed.",
                         stateChange: change
@@ -286,4 +284,111 @@ extension Forest {
         }
     }
 
+    static let grateHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+            case .close:
+                let isLocked = try await engine.hasFlag(.isLocked, on: .grate)
+                if !isLocked {
+                    let grate = try await engine.item(.grate)
+                    if grate.hasFlag(.isOpen) {
+                        return ActionResult(
+                            message: "The grating is closed.",
+                            stateChange: try await engine.clearFlag(.isOpen, on: .grate)
+                        )
+                    } else {
+                        return ActionResult("The grating is already closed.")
+                    }
+                } else {
+                    return ActionResult("The grating is locked.")
+                }
+                
+            case .lock:
+                let currentLocation = await engine.playerLocationID
+                if currentLocation == .gratingRoom {
+                    let changes = await engine.setFlag(.isLocked, on: try await engine.item(.grate))
+                    return ActionResult(message: "The grate is locked.", stateChange: changes)
+                } else if currentLocation == .gratingClearing {
+                    return ActionResult("You can't lock it from this side.")
+                } else {
+                    return nil
+                }
+
+            case .open:
+                if let indirectObject = command.indirectObject,
+                   case .item(let keyItemID) = indirectObject,
+                   keyItemID == .keys {
+                    // OPEN GRATE WITH KEYS -> handle as unlock
+                    let currentLocation = await engine.playerLocationID
+                    let playerHasKeys = await engine.items(in: .player).contains { $0.id == .keys }
+
+                    guard playerHasKeys else {
+                        return ActionResult("You don't have the keys.")
+                    }
+
+                    if currentLocation == .gratingRoom {
+                        let changes = await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
+                        return ActionResult(message: "The grate is unlocked.", stateChange: changes)
+                    } else if currentLocation == .gratingClearing {
+                        return ActionResult("You can't reach the lock from here.")
+                    } else {
+                        return nil
+                    }
+                }
+
+                // Check if grate is unlocked before allowing open/close
+                let isLocked = try await engine.hasFlag(.isLocked, on: .grate)
+                let currentLocation = await engine.playerLocationID
+
+                if !isLocked {
+                    let isOpen = try await engine.hasFlag(.isOpen, on: .grate)
+                    if !isOpen {
+                        let changes = await engine.setFlag(.isOpen, on: try await engine.item(.grate))
+                        let message = if currentLocation == .gratingClearing {
+                            "The grating opens."
+                        } else {
+                            "The grating opens to reveal trees above you."
+                        }
+                        return ActionResult(message: message, stateChange: changes)
+                    } else {
+                        return ActionResult("The grating is already open.")
+                    }
+                } else {
+                    return ActionResult("The grating is locked.")
+                }
+
+            case .unlock:
+                guard let indirectObject = command.indirectObject,
+                      case .item(let keyItemID) = indirectObject,
+                      keyItemID == .keys else {
+                    if let indirectObject = command.indirectObject {
+                        return ActionResult("Can you unlock a grating with that?")
+                    }
+                    return nil
+                }
+                
+                let currentLocation = await engine.playerLocationID
+                let playerHasKeys = await engine.items(in: .player).contains { $0.id == .keys }
+                
+                guard playerHasKeys else {
+                    return ActionResult("You don't have the keys.")
+                }
+                
+                if currentLocation == .gratingRoom {
+                    let changes = await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
+                    return ActionResult(message: "The grate is unlocked.", stateChange: changes)
+                } else if currentLocation == .gratingClearing {
+                    return ActionResult("You can't reach the lock from here.")
+                } else {
+                    return nil
+                }
+                
+            default:
+                return nil
+            }
+        case .afterTurn:
+            return nil
+        }
+    }
 }

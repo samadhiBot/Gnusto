@@ -303,16 +303,6 @@ extension Maze {
         .in(.location(.maze5))
     )
 
-    static let grate = Item(
-        id: .grate,
-        .name("grating"),
-        .synonyms("grate", "grating"),
-        .isDoor,
-        .omitDescription,
-        .isInvisible
-        // Note: Has action handler GRATE-FUNCTION
-    )
-
     static let keys = Item(
         id: .keys,
         .name("skeleton key"),
