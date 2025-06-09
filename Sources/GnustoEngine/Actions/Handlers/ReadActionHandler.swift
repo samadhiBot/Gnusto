@@ -48,16 +48,18 @@ public struct ReadActionHandler: ActionHandler {
     ///
     /// Assuming validation has passed, this action:
     /// 1. Retrieves the target item.
-    /// 2. Creates a `StateChange` to set the `.isTouched` flag on the target item, if not already set.
-    /// 3. Updates pronouns to refer to this item.
-    /// 4. Attempts to fetch the readable text from the item's dynamic attributes using
+    /// 2. If the item is takeable and not currently held by the player, automatically takes it first
+    ///    and prepends "(Taken)" to the output message.
+    /// 3. Creates a `StateChange` to set the `.isTouched` flag on the target item, if not already set.
+    /// 4. Updates pronouns to refer to this item.
+    /// 5. Attempts to fetch the readable text from the item's dynamic attributes using
     ///    the `.readText` key via `context.engine.fetch()`.
-    /// 5. If text is found and is not empty, it's returned as the message. Otherwise, a default
+    /// 6. If text is found and is not empty, it's returned as the message. Otherwise, a default
     ///    message indicating nothing is written on the item is used.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the text read from the item (or a default message)
-    ///            and any relevant `StateChange`s (e.g., setting `.isTouched`, updating pronouns).
+    ///            and any relevant `StateChange`s (e.g., auto-taking, setting `.isTouched`, updating pronouns).
     /// - Throws: `ActionResponse.internalEngineError` if the direct object is unexpectedly not an item.
     ///           Can also throw errors from `context.engine.item()` or `context.engine.fetch()`.
     public func process(context: ActionContext) async throws -> ActionResult {
@@ -67,9 +69,22 @@ public struct ReadActionHandler: ActionHandler {
         }
         let targetItem = try await context.engine.item(targetItemID)
 
-        // --- State Change: Mark as Touched ---
+        // --- Auto-Taking Logic ---
         var stateChanges: [StateChange] = []
+        var messageParts: [String] = []
 
+        // Check if item needs to be auto-taken
+        let isHeld = targetItem.parent == .player
+        let isTakeable = targetItem.hasFlag(.isTakable)
+
+        if !isHeld && isTakeable {
+            // Auto-take the item first, following classic IF conventions
+            let takeChange = await context.engine.move(targetItem, to: .player)
+            stateChanges.append(takeChange)
+            messageParts.append("(Taken)")
+        }
+
+        // --- State Change: Mark as Touched ---
         if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
             stateChanges.append(addTouchedFlag)
         }
@@ -79,8 +94,8 @@ public struct ReadActionHandler: ActionHandler {
             stateChanges.append(updatePronoun)
         }
 
-        // --- Determine Message ---
-        let message: String
+        // --- Determine Read Text ---
+        let readText: String
 
         // Fetch text from dynamic values
         do {
@@ -92,21 +107,33 @@ public struct ReadActionHandler: ActionHandler {
             // If we have dynamic text, use it
             if let dynamicText = textToRead {
                 if dynamicText.isEmpty {
-                    message = "There's nothing written on the \(targetItem.name)."
+                    readText = "There's nothing written on the \(targetItem.name)."
                 } else {
-                    message = dynamicText
+                    readText = dynamicText
                 }
             } else {
-                message = "There's nothing written on the \(targetItem.name)."
+                readText = "There's nothing written on the \(targetItem.name)."
             }
         } catch {
             // Dynamic fetch failed, fall through to stored value
-            message = "There's nothing written on the \(targetItem.name)."
+            readText = "There's nothing written on the \(targetItem.name)."
         }
 
+        // Add the read text to the message
+        messageParts.append(readText)
+
         // --- Create Result ---
+        let finalMessage = messageParts.joined(separator: "\n\n")
+//        if messageParts.count > 1 {
+//            // If we have "(Taken)" and read text, put them on the same line
+//            messageParts.joined(separator: " ")
+//        } else {
+//            // Just the read text
+//            messageParts.joined(separator: "\n")
+//        }
+
         return ActionResult(
-            message: message,
+            message: finalMessage,
             stateChanges: stateChanges
         )
     }

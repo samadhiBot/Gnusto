@@ -255,3 +255,19 @@ enum GlobalItems {
         // Note: Has action handler WHITE-HOUSE-F
     )
 }
+
+extension GlobalItems {
+    static let boardHandler = ItemEventHandler { gameEngine, itemEvent in
+        switch itemEvent {
+        case .beforeTurn(let command):
+            switch command.verb {
+            case .examine, .take:
+                ActionResult("The boards are securely fastened.")
+            default:
+                nil
+            }
+        default:
+            nil
+        }
+    }
+}

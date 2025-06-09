@@ -108,6 +108,7 @@ struct OutsideHouseTests {
         let mockIO = await MockIOHandler(
             "take the mailbox",
             "open the mailbox",
+            "read the leaflet",
             "east",
             "open door",
             "take boards",
@@ -137,11 +138,20 @@ struct OutsideHouseTests {
             > open the mailbox
             Opening the small mailbox reveals a leaflet.
 
+            > read the leaflet
+            (Taken)
+
+            “WELCOME TO ZORK!
+
+            ZORK is a game of adventure, danger, and low cunning. In it you
+            will explore some of the most amazing territory ever seen by
+            mortals. No computer should be without one!”
+
             > east
             The door is boarded and you can’t remove the boards.
 
             > open door
-            You can’t open the front door.
+            You can’t open the door.
 
             > take boards
             The boards are securely fastened.
