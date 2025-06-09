@@ -66,8 +66,9 @@ public struct OpenActionHandler: ActionHandler {
     ///    a. Sets the `.isOpen` flag on the item.
     ///    b. Ensures the `.isTouched` flag is set on the item.
     ///    c. Updates pronouns to refer to the opened item.
-    ///    d. Returns an `ActionResult` with a confirmation message (e.g., "You open the chest.")
-    ///       and the state changes.
+    ///    d. Returns an `ActionResult` with a confirmation message that announces any revealed
+    ///       contents if the container has items inside (e.g., "Opening the small mailbox reveals a leaflet."),
+    ///       or a simple confirmation otherwise (e.g., "You open the chest."), and the state changes.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the message and relevant state changes.
@@ -103,9 +104,26 @@ public struct OpenActionHandler: ActionHandler {
             stateChanges.append(update)
         }
 
+        // Check if container has items inside to announce what's revealed
+        let message: String
+        if targetItem.hasFlag(.isContainer) {
+            let itemsInside = await context.engine.items(in: .item(targetItemID))
+            if !itemsInside.isEmpty {
+                // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
+                let itemList = itemsInside.sorted().listWithIndefiniteArticles
+                message = "Opening the \(targetItem.name) reveals \(itemList)."
+            } else {
+                // Container is empty, use simple message
+                message = "You open the \(targetItem.name)."
+            }
+        } else {
+            // Not a container, use simple message
+            message = "You open the \(targetItem.name)."
+        }
+
         // Prepare the result
         return ActionResult(
-            message: "You open the \(targetItem.name).",
+            message: message,
             stateChanges: stateChanges
         )
     }
