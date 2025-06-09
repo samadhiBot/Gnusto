@@ -13,13 +13,13 @@ public struct TurnOnActionHandler: ActionHandler {
     /// 2. The direct object refers to an existing item.
     /// 3. The player can reach the specified item. A special case allows turning on a
     ///    light source that is in the current dark room, even if otherwise unreachable.
-    /// 4. The item has the `.isDevice` flag set (indicating it can be turned on/off).
-    /// 5. The item is not already on (i.e., it currently lacks the `.isOn` flag).
+    /// 4. The item is either a device (can be turned on/off) or flammable (can be burned).
+    /// 5. If it's a device, it's not already on.
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: Various `ActionResponse` errors if validation fails, such as:
     ///           `custom` (for "Turn on what?" or "It's already on."),
-    ///           `prerequisiteNotMet` (if not an item or not a device),
+    ///           `prerequisiteNotMet` (if not an item, not a device, and not flammable),
     ///           `itemNotAccessible`.
     ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
@@ -57,26 +57,33 @@ public struct TurnOnActionHandler: ActionHandler {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 4. Check if the item has the `.device` property.
-        guard targetItem.hasFlag(.isDevice) else {
+        // 4. Check if the item is either a device or flammable.
+        let isDevice = targetItem.hasFlag(.isDevice)
+        let isFlammable = targetItem.hasFlag(.isFlammable)
+
+        guard isDevice || isFlammable else {
             throw ActionResponse.prerequisiteNotMet("You can't turn that on.")
         }
 
-        // 5. Check if the item already has the `.on` property.
-        if targetItem.hasFlag(.isOn) {
+        // 5. If it's a device, check if it's already on.
+        if isDevice && targetItem.hasFlag(.isOn) {
             throw ActionResponse.custom("It's already on.")
         }
     }
 
     /// Processes the "TURN ON" command.
     ///
-    /// Assuming basic validation has passed (the item is a reachable device and is currently off),
-    /// this action performs the following:
+    /// This method intelligently handles both devices and flammable objects:
+    /// - If the item is a device (has `.isDevice`), it turns the device on.
+    /// - If the item is flammable but not a device (has `.isFlammable` but not `.isDevice`),
+    ///   it delegates to burn logic.
+    /// - If both, devices take precedence (lamps can be turned on, not burned).
+    ///
+    /// For devices, this action performs:
     /// 1. Retrieves the target item.
     /// 2. Ensures the `.isTouched` flag is set on the item.
     /// 3. Sets the `.isOn` flag on the item.
-    /// 4. Returns an `ActionResult` with a confirmation message (e.g., "The flashlight is now on.")
-    ///    and the state changes.
+    /// 4. Returns an `ActionResult` with a confirmation message.
     ///
     /// If turning on the item illuminates a dark room, the game engine will automatically handle
     /// printing the room's description after this action completes.
@@ -91,6 +98,16 @@ public struct TurnOnActionHandler: ActionHandler {
             throw ActionResponse.internalEngineError("TurnOn: directObject was not an item in process.")
         }
         let targetItem = try await context.engine.item(targetItemID)
+
+        let isDevice = targetItem.hasFlag(.isDevice)
+        let isFlammable = targetItem.hasFlag(.isFlammable)
+
+        // If it's flammable but not a device, delegate to burn logic
+        if isFlammable && !isDevice {
+            return try await processBurn(targetItem: targetItem, context: context)
+        }
+
+        // Otherwise, proceed with normal turn-on logic for devices
 
         // Check if room was dark before turning on the light
         let wasRoomDark = await context.engine.playerLocationIsLit() == false
@@ -151,5 +168,55 @@ public struct TurnOnActionHandler: ActionHandler {
             message: messageParts.joined(separator: "\n"),
             stateChanges: stateChanges
         )
+    }
+
+    // MARK: - Helper Methods
+
+    /// Processes the burn logic when a flammable (but non-device) item is "turned on".
+    ///
+    /// This method implements the same logic as `BurnActionHandler` for flammable items.
+    /// It's called when the player uses "light" or "turn on" on a flammable object.
+    ///
+    /// - Parameters:
+    ///   - targetItem: The flammable item to burn.
+    ///   - context: The action context.
+    /// - Returns: An `ActionResult` with burn-specific messaging and state changes.
+    private func processBurn(targetItem: Item, context: ActionContext) async throws -> ActionResult {
+        var stateChanges: [StateChange] = []
+
+        // Ensure the item is marked as touched
+        if let touchChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(touchChange)
+        }
+
+        // Update pronouns
+        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(pronounChange)
+        }
+
+        // Check if the item is flammable (should always be true in this context)
+        if targetItem.hasFlag(.isFlammable) {
+            // Move the item to nowhere (destroy it)
+            let destroyChange = await context.engine.move(targetItem, to: .nowhere)
+            stateChanges.append(destroyChange)
+
+            return ActionResult(
+                message: "The \(targetItem.name) catches fire and burns to ashes.",
+                stateChanges: stateChanges
+            )
+        } else {
+            // Fallback message for non-flammable items (shouldn't reach here due to validation)
+            let message = if targetItem.name.lowercased().contains("house") ||
+                             targetItem.name.lowercased().contains("building") {
+                "You must be joking."
+            } else {
+                "You can't burn the \(targetItem.name)."
+            }
+
+            return ActionResult(
+                message: message,
+                stateChanges: stateChanges
+            )
+        }
     }
 }

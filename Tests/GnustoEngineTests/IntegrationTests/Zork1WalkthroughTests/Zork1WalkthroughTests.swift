@@ -222,7 +222,7 @@ struct Zork1WalkthroughTests {
             Taken.
 
             > examine bottle
-            It’s a glass bottle. The glass bottle is closed.
+            The glass bottle contains a quantity of water.
 
             > drink water
             I don’t know the verb ‘drink’.
@@ -230,9 +230,9 @@ struct Zork1WalkthroughTests {
             > inventory
             You are carrying:
             - A glass bottle
-            - A brown sack
             - A clove of garlic
             - A lunch
+            - A brown sack
 
             >
             Goodbye!

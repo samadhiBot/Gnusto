@@ -554,7 +554,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .burn,
-            synonyms: "ignite", "light", "set fire to",
+            synonyms: "ignite", "set fire to",
             syntax: [
                 SyntaxRule(.verb, .directObject)
             ],
