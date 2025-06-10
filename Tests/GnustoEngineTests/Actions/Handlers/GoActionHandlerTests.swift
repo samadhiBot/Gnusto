@@ -41,7 +41,11 @@ struct GoActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
+        expectNoDifference(output, """
+            — end —
+
+            You went there.
+            """)
     }
 
     @Test("GO NORTH prints blocked message when exit is blocked")
@@ -200,10 +204,7 @@ struct GoActionHandlerTests {
             id: "foyer",
             .description("A grand foyer."),
             .exits([
-                .north: Exit(
-                    destination: "vault",
-                    doorID: "vaultDoor"
-                )
+                .north: .to("vault", via: "vaultDoor"),
             ]),
             .inherentlyLit
         )
@@ -214,6 +215,7 @@ struct GoActionHandlerTests {
                 A massive, reinforced steel door dominates one wall of the grand foyer.
                 """),
             .in(.location(foyer.id)),
+            .isDoor,
             .isLocked
         )
         let vault = Location(
@@ -227,7 +229,11 @@ struct GoActionHandlerTests {
             items: [vaultDoor]
         )
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         let command = Command(
             verb: .go,
