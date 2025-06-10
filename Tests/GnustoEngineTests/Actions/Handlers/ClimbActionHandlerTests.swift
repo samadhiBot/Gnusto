@@ -198,7 +198,7 @@ struct ClimbActionHandlerTests {
         // Act
         await engine.execute(command: command)
 
-        // Assert: Should go in first direction found (up)
+        // Assert: Should prioritize up over down (consistent direction ordering)
         let finalPlayerLocation = try await engine.playerLocation()
         #expect(finalPlayerLocation.id == "top")
     }
@@ -564,5 +564,142 @@ struct ClimbActionHandlerTests {
         // Assert: Should default to regular climbing behavior since no exit uses stairs
         let output = await mockIO.flush()
         expectNoDifference(output, "You climb the stairs.")
+    }
+
+    @Test("Climb stairs from lit to dark room shows transition and custom darkness message")
+    func testClimbToDarkRoomWithCustomMessage() async throws {
+        // Arrange: Kitchen (lit) with stairs leading to dark attic
+        let kitchen = Location(
+            id: "kitchen",
+            .name("Kitchen"),
+            .exits([
+                .up: .to("attic", via: "stairs")
+            ]),
+            .inherentlyLit,
+            .localGlobals("stairs")
+        )
+
+        let attic = Location(
+            id: "attic",
+            .name("Attic"),
+            .description("A dark attic.")
+            // No .inherentlyLit, so it's dark
+        )
+
+        let stairs = Item(
+            id: "stairs",
+            .name("stairs"),
+            .isClimbable,
+            .in(.nowhere)
+        )
+
+        // Create game with custom darkness message
+        let customConstants = GameConstants(
+            storyTitle: "Test Game",
+            introduction: "A test",
+            release: "1.0",
+            maximumScore: 10,
+            darknessMessage: "It is pitch black. You are likely to be eaten by a grue."
+        )
+
+        let game = MinimalGame(
+            constants: customConstants,
+            player: Player(in: "kitchen"),
+            locations: [kitchen, attic],
+            items: [stairs]
+        )
+
+        let mockIO = await MockIOHandler()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
+
+        let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
+
+        // Debug: Initial state
+        let initialLocation = try await engine.playerLocation()
+        let kitchenIsLit = await engine.isLocationLit(at: "kitchen")
+        let atticIsLit = await engine.isLocationLit(at: "attic")
+        print("Initial player location: \(initialLocation.id)")
+        print("Kitchen is lit: \(kitchenIsLit)")
+        print("Attic is lit: \(atticIsLit)")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Debug: Check intermediate state
+        let afterLocation = try await engine.playerLocation()
+        print("After player location: \(afterLocation.id)")
+        print("Player moved: \(initialLocation.id != afterLocation.id)")
+
+        // Assert: Player moved to attic
+        let finalPlayerLocation = try await engine.playerLocation()
+        #expect(finalPlayerLocation.id == "attic")
+
+        // Debug: Check what output was actually generated
+        let output = await mockIO.flush()
+
+        // Assert: Output contains both transition and darkness messages
+        expectNoDifference(output, """
+            You have moved into a dark place.
+            
+            It is pitch black. You are likely to be eaten by a grue.
+            """)
+    }
+
+    @Test("Climb stairs from lit to lit room shows normal room description (no transition message)")
+    func testClimbToLitRoomNoTransitionMessage() async throws {
+        // Arrange: Kitchen (lit) with stairs leading to lit living room
+        let kitchen = Location(
+            id: "kitchen",
+            .name("Kitchen"),
+            .exits([
+                .up: .to("livingroom", via: "stairs")
+            ]),
+            .inherentlyLit,
+            .localGlobals("stairs")
+        )
+
+        let livingRoom = Location(
+            id: "livingroom",
+            .name("Living Room"),
+            .description("A cozy living room."),
+            .inherentlyLit
+        )
+
+        let stairs = Item(
+            id: "stairs",
+            .name("stairs"),
+            .isClimbable,
+            .in(.nowhere)
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "kitchen"),
+            locations: [kitchen, livingRoom],
+            items: [stairs]
+        )
+
+        let mockIO = await MockIOHandler()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
+
+        let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
+
+        // Act
+        await engine.execute(command: command)
+
+        // Assert: Player moved to living room
+        let finalPlayerLocation = try await engine.playerLocation()
+        #expect(finalPlayerLocation.id == "livingroom")
+
+        // Assert: Output shows normal room description (no transition message since both rooms are lit)
+        let output = await mockIO.flush()
+        expectNoDifference(output, "— Living Room —\n\nA cozy living room.")
     }
 }

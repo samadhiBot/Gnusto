@@ -74,7 +74,13 @@ public struct ClimbActionHandler: ActionHandler {
         }
 
         // Check if this object enables traversal of any exit in the current location
-        for (direction, exit) in currentLocation.exits {
+        // Sort directions to ensure consistent behavior when multiple exits use the same object
+        // Priority: north, northeast, east, southeast, south, southwest, west, northwest, up, down, inside, outside
+        let sortedExits = currentLocation.exits.sorted { first, second in
+            first.key < second.key
+        }
+
+        for (direction, exit) in sortedExits {
             if exit.doorID == targetItemID {
                 // This object enables traversal in this direction
 

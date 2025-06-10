@@ -299,11 +299,22 @@ extension GameEngine {
             let shouldDescribe: Bool
             let forceFullDescription: Bool
             switch command.verb {
-            case .go:
+            case .go, .climb:
                 // Check if the player actually moved to a different location
                 let locationAfterCommand = playerLocationID
-                shouldDescribe = locationBeforeCommand != locationAfterCommand
+                let playerMoved = locationBeforeCommand != locationAfterCommand
+                shouldDescribe = playerMoved
                 forceFullDescription = false // Use visit-based logic for movement
+
+                // Handle lighting transition messages for movement
+                if playerMoved {
+                    let isLitAfterCommand = await playerLocationIsLit()
+
+                    if wasLitBeforeCommand && !isLitAfterCommand {
+                        // Moved from lit to dark - show transition message
+                        await ioHandler.print("You have moved into a dark place.")
+                    }
+                }
             case .turnOn, .turnOff:
                 // Only describe if lighting state actually changed
                 let isLitAfterCommand = await playerLocationIsLit()
@@ -699,6 +710,9 @@ extension GameEngine {
     ///    c. If no `ActionHandler` is found for the verb, reports an `ActionResponse.unknownVerb` error.
     /// 4. **Item `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` item event handlers.
     /// 5. **Location `afterTurn` Events**: Similar to `beforeTurn`, executes `.afterTurn` location event handlers.
+    /// 6. **Movement and Lighting Detection**: For movement commands (`.go`, `.climb`) and lighting commands
+    ///    (`.turnOn`, `.turnOff`), detects location changes or lighting state changes and automatically
+    ///    describes the current location with appropriate transition messages.
     ///
     /// Any `ActionResponse` errors thrown during this process are caught and reported to the player.
     /// Other errors are logged.
@@ -707,6 +721,10 @@ extension GameEngine {
     public func execute(command: Command) async {
         var actionHandled = false
         var actionResponse: Error? = nil // To store error from object handlers
+
+        // Store the player's current location and lighting state before executing the command
+        let locationBeforeCommand = playerLocationID
+        let wasLitBeforeCommand = await playerLocationIsLit()
 
         // --- Room BeforeTurn Hook ---
         let currentLocationID = playerLocationID
@@ -888,6 +906,83 @@ extension GameEngine {
             }
             // Check if handler quit the game
             if shouldQuit { return }
+        }
+
+        // --- Movement and Lighting Detection ---
+        do {
+            try await handlePostCommandLocationUpdates(
+                command: command,
+                locationBeforeCommand: locationBeforeCommand,
+                wasLitBeforeCommand: wasLitBeforeCommand
+            )
+        } catch {
+            logError("Error handling post-command location updates: \(error)")
+        }
+    }
+
+    /// Handles location description updates after command execution for movement and lighting changes.
+    ///
+    /// This method detects when the player has moved to a different location or when the lighting
+    /// state has changed, and automatically describes the current location with appropriate
+    /// transition messages.
+    ///
+    /// - Parameters:
+    ///   - command: The command that was executed.
+    ///   - locationBeforeCommand: The player's location before the command was executed.
+    ///   - wasLitBeforeCommand: Whether the player's location was lit before the command was executed.
+    private func handlePostCommandLocationUpdates(
+        command: Command,
+        locationBeforeCommand: LocationID,
+        wasLitBeforeCommand: Bool
+    ) async throws {
+        // Handle location description after movement or light change
+        let shouldDescribe: Bool
+        let forceFullDescription: Bool
+
+        switch command.verb {
+        case .go, .climb:
+            // Check if the player actually moved to a different location
+            let locationAfterCommand = playerLocationID
+            let playerMoved = locationBeforeCommand != locationAfterCommand
+
+            // Handle lighting transition messages for movement
+            if playerMoved {
+                let isLitAfterCommand = await playerLocationIsLit()
+
+                if wasLitBeforeCommand && !isLitAfterCommand {
+                    // Moved from lit to dark - show transition message and darkness message combined
+                    let darknessMessage = constants.darknessMessage ?? 
+                        "It is pitch black. You can't see a thing."
+                    await ioHandler.print("""
+                        You have moved into a dark place.
+
+                        \(darknessMessage)
+                        """)
+                    shouldDescribe = false // Don't call describeCurrentLocation since we handled it
+                } else {
+                    shouldDescribe = true // Normal movement, let describeCurrentLocation handle it
+                }
+            } else {
+                shouldDescribe = false // No movement occurred
+            }
+
+            forceFullDescription = false // Use visit-based logic for movement
+        case .turnOn, .turnOff:
+            // Only describe if lighting state actually changed
+            let isLitAfterCommand = await playerLocationIsLit()
+
+            // Show description only if:
+            // 1. Room went from dark to lit (turning on light), OR
+            // 2. Room went from lit to dark (turning off light)
+            shouldDescribe = wasLitBeforeCommand != isLitAfterCommand
+            forceFullDescription = true // Always show full description when lighting changes
+        default:
+            shouldDescribe = false
+            forceFullDescription = false
+        }
+
+        if shouldDescribe {
+            try await describeCurrentLocation(forceFullDescription: forceFullDescription)
         }
     }
 
