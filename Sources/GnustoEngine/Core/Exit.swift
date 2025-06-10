@@ -2,12 +2,12 @@ import CustomDump
 import Foundation
 
 /// Represents a one-way connection from one `Location` to another in a specific `Direction`.
-///  
+///
 /// `Exit` objects are stored in a `Location`'s `exits` dictionary, mapping a `Direction`
 /// (e.g., `.north`, `.east`) to the `Exit` that defines the path in that direction.
 /// An exit can be a simple passage or can be associated with a door (`doorID`)
 /// that might be open, closed, or locked, affecting traversal.
-///  
+///
 /// If `destinationID` is `nil`, the exit is permanently blocked (e.g., "You can't go that way").
 public struct Exit: Codable, Hashable, Sendable {
     /// The `LocationID` of the location this exit leads to, or `nil` if the exit is permanently blocked.
@@ -53,29 +53,31 @@ public struct Exit: Codable, Hashable, Sendable {
     }
 
     /// A factory method for creating a simple exit to another location.
-    ///  
+    ///
     /// This is a shorthand for `Exit(destination: destination)` when you don't need
     /// a custom blocked message or door.
-    ///  
+    ///
     /// Example:
     /// ```swift
     /// .exits([
     ///     .north: .to("garden"),
-    ///     .east: .to("kitchen")
+    ///     .east: .to("kitchen"),
+    ///     .up: .to("attic", via: "stairs")
     /// ])
     /// ```
-    ///  
+    ///
     /// - Parameters:
     ///   - destination: The `LocationID` this exit leads to.
-    ///   - blocked: An optional custom message to display if the player cannot use this exit.
-    ///   - doorID: An optional `ItemID` for an item that acts as a door or barrier for this exit.
+    ///   - via: An optional `ItemID` for an item that enables this traversal (e.g., stairs, ladder, rope).
+    ///          When specified, the player can use "climb <item>" to traverse this exit.
+    ///   - else: An optional custom message to display if the player cannot use this exit.
     /// - Returns: A new `Exit` instance with the specified destination.
     public static func to(
         _ destination: LocationID,
-        via doorID: ItemID? = nil,
+        via itemID: ItemID? = nil,
         else blocked: String? = nil
     ) -> Exit {
-        .init(destination: destination, blockedMessage: blocked, doorID: doorID)
+        .init(destination: destination, blockedMessage: blocked, doorID: itemID)
     }
 
     /// A factory method for creating a permanently blocked exit.

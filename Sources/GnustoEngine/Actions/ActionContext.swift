@@ -19,15 +19,6 @@ public struct ActionContext: Sendable {
     /// properties on `engine` requires `await` due to its actor nature.
     nonisolated public let engine: GameEngine
 
-    /// An immutable snapshot of the `GameState` taken at the beginning of the current
-    /// action's processing.
-    ///
-    /// Handlers should primarily use this snapshot for checks and decisions within a single
-    /// phase (e.g., `validate`) to ensure consistency, as the live `engine.gameState`
-    /// might change due to other concurrent activities (though less common in typical
-    /// turn-based IF).
-    public let stateSnapshot: GameState
-
     /// A dictionary for game-specific or handler-specific additional data that doesn't fit
     /// neatly into the other properties.
     ///

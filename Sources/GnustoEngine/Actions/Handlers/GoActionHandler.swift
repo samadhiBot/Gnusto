@@ -48,9 +48,13 @@ public struct GoActionHandler: ActionHandler {
             throw ActionResponse.directionIsBlocked(staticBlockedMessage)
         }
 
-        // Continue if exit is a door, otherwise validation is done
+        // Continue if exit has a doorID, otherwise validation is done
         guard let doorID = exit.doorID else { return }
         let door = try await context.engine.item(doorID)
+
+        // Only apply door validation if this is actually a door
+        // Non-door objects (like stairs, ladders, ropes) used via ClimbActionHandler don't need to be "open"
+        guard door.hasFlag(.isDoor) else { return }
 
         // Check if the door is locked
         if door.hasFlag(.isLocked) {

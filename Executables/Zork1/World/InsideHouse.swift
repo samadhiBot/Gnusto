@@ -10,7 +10,7 @@ enum InsideHouse {
             This is the attic. The only exit is a stairway leading down.
             """),
         .exits([
-            .down: .to(.kitchen)
+            .down: .to(.kitchen, via: .stairs)
         ]),
         .localGlobals(.stairs)
     )
@@ -20,7 +20,7 @@ enum InsideHouse {
         .name("Kitchen"),
         .exits([
             .west: .to(.livingRoom),
-            .up: .to(.attic),
+            .up: .to(.attic, via: .stairs),
             // Note: EAST and OUT exits to east-of-house conditional on kitchen window being open
             // Note: DOWN exit to studio conditional on FALSE-FLAG
         ]),

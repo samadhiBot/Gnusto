@@ -205,7 +205,8 @@ enum GlobalItems {
         id: .stairs,
         .name("stairs"),
         .synonyms("stairs", "staircase", "stairway", "steps"),
-        .omitDescription
+        .omitDescription,
+        .isClimbable
         // Note: Global scenery object referenced in multiple rooms
     )
 

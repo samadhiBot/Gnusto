@@ -537,6 +537,16 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         ),
 
         Verb(
+            id: .climb,
+            synonyms: "scale",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
             id: .climbOn,
             synonyms: "climb on", "sit on", "stand on",
             syntax: [

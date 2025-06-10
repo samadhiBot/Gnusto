@@ -1014,6 +1014,7 @@ extension GameEngine {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction
             .burn: BurnActionHandler(),
+            .climb: ClimbActionHandler(),
             .climbOn: ClimbOnActionHandler(),
             .close: CloseActionHandler(),
             .drop: DropActionHandler(),

@@ -617,9 +617,7 @@ struct GameEngineTests {
 
             func process(context: ActionContext) async throws -> ActionResult {
                 // Use snapshot for checks
-                guard let item = context.stateSnapshot.items[itemIDToModify] else {
-                    throw ActionResponse.internalEngineError("Test item missing")
-                }
+                let item = try await context.engine.item(itemIDToModify)
 
                 // Define multiple changes
                 let change1 = StateChange(

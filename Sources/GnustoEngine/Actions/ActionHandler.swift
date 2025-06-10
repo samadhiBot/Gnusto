@@ -24,7 +24,7 @@ public protocol ActionHandler: Sendable {
     ///
     /// This method should check all prerequisites for the action (e.g., is the target item held?
     /// Is the door unlocked? Does the player have the required tool?). It should *not* make
-    /// any changes to the game state (`context.stateSnapshot` provides an immutable view for checks).
+    /// any changes to the game state.
     ///
     /// If validation fails, this method should throw an appropriate `ActionResponse` (e.g.,
     /// `.itemNotHeld(itemID)`, `.itemIsLocked(itemID)`). If validation passes, it should return normally.
