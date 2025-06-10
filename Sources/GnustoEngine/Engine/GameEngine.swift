@@ -287,51 +287,7 @@ extension GameEngine {
         case .success(let command):
             if command.verb == .quit || shouldQuit { return }
 
-            // Store the player's current location and lighting state before executing the command
-            let locationBeforeCommand = playerLocationID
-            let wasLitBeforeCommand = await playerLocationIsLit()
-
             await execute(command: command)
-
-            if command.verb == .quit || shouldQuit { return }
-
-            // Handle location description after movement or light change
-            let shouldDescribe: Bool
-            let forceFullDescription: Bool
-            switch command.verb {
-            case .go, .climb:
-                // Check if the player actually moved to a different location
-                let locationAfterCommand = playerLocationID
-                let playerMoved = locationBeforeCommand != locationAfterCommand
-                shouldDescribe = playerMoved
-                forceFullDescription = false // Use visit-based logic for movement
-
-                // Handle lighting transition messages for movement
-                if playerMoved {
-                    let isLitAfterCommand = await playerLocationIsLit()
-
-                    if wasLitBeforeCommand && !isLitAfterCommand {
-                        // Moved from lit to dark - show transition message
-                        await ioHandler.print("You have moved into a dark place.")
-                    }
-                }
-            case .turnOn, .turnOff:
-                // Only describe if lighting state actually changed
-                let isLitAfterCommand = await playerLocationIsLit()
-
-                // Show description only if:
-                // 1. Room went from dark to lit (turning on light), OR
-                // 2. Room went from lit to dark (turning off light)
-                shouldDescribe = wasLitBeforeCommand != isLitAfterCommand
-                forceFullDescription = true // Always show full description when lighting changes
-            default:
-                shouldDescribe = false
-                forceFullDescription = false
-            }
-
-            if shouldDescribe {
-                try await describeCurrentLocation(forceFullDescription: forceFullDescription)
-            }
 
         case .failure(let error):
             await report(parseError: error)
@@ -951,7 +907,7 @@ extension GameEngine {
 
                 if wasLitBeforeCommand && !isLitAfterCommand {
                     // Moved from lit to dark - show transition message and darkness message combined
-                    let darknessMessage = constants.darknessMessage ?? 
+                    let darknessMessage = constants.darknessMessage ??
                         "It is pitch black. You can't see a thing."
                     await ioHandler.print("""
                         You have moved into a dark place.
