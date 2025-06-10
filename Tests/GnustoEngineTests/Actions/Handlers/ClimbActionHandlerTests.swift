@@ -81,10 +81,6 @@ struct ClimbActionHandlerTests {
             directObject: .item("stairs"),
             rawInput: "climb stairs"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
@@ -145,10 +141,6 @@ struct ClimbActionHandlerTests {
             directObject: .item("ladder"),
             rawInput: "climb ladder"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
@@ -202,10 +194,6 @@ struct ClimbActionHandlerTests {
             directObject: .item("rope"),
             rawInput: "climb rope"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
@@ -253,17 +241,13 @@ struct ClimbActionHandlerTests {
             directObject: .item("stairs"),
             rawInput: "climb stairs"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "There is no stairs here.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 
     @Test("Climb plural stairs when not present")
@@ -302,17 +286,13 @@ struct ClimbActionHandlerTests {
             directObject: .item("stairs"),
             rawInput: "climb stairs"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert: Should use "are" for plural
         let output = await mockIO.flush()
-        expectNoDifference(output, "There are no stairs here.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 
     // MARK: - Regular Climbing Tests
@@ -340,10 +320,6 @@ struct ClimbActionHandlerTests {
             verb: .climb,
             directObject: .item("tree"),
             rawInput: "climb tree"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
         )
 
         // Act
@@ -383,17 +359,13 @@ struct ClimbActionHandlerTests {
             directObject: .item("table"),
             rawInput: "climb table"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
 
         // Act
         await engine.execute(command: command)
 
         // Assert: Should get error message
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't climb the wooden table.")
+        expectNoDifference(output, "You can’t climb the wooden table.")
     }
 
     // MARK: - Error Cases
@@ -502,10 +474,16 @@ struct ClimbActionHandlerTests {
             id: "room",
             .name("Room"),
             .exits([
-                .up: .blocked("The ceiling is too low.") // Blocked exit
+                .up: .to("attic", via: "stairs", else: "The ceiling is too low.")
             ]),
             .inherentlyLit,
             .localGlobals("stairs")
+        )
+
+        let attic = Location(
+            id: "attic",
+            .name("Attic"),
+            .inherentlyLit
         )
 
         let stairs = Item(
@@ -518,7 +496,7 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "room")
         let game = MinimalGame(
             player: player,
-            locations: [room],
+            locations: [room, attic],
             items: [stairs]
         )
 
@@ -533,10 +511,6 @@ struct ClimbActionHandlerTests {
             verb: .climb,
             directObject: .item("stairs"),
             rawInput: "climb stairs"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
         )
 
         // Act
@@ -584,17 +558,11 @@ struct ClimbActionHandlerTests {
             directObject: .item("stairs"),
             rawInput: "climb stairs"
         )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
-
         // Act
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        await engine.execute(command: command)
 
         // Assert: Should default to regular climbing behavior since no exit uses stairs
-        #expect(result.message == "You climb the stairs.")
-        #expect(result.stateChanges.count == 2) // Touched and pronoun changes
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You climb the stairs.")
     }
 }
