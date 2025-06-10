@@ -4,7 +4,7 @@ import Testing
 
 @testable import Zork1
 
-struct Zork1WalkthroughTests {
+struct ItemMechanicsTests {
     let enterKitchenSteps = [
         "north",
         "east",
@@ -25,6 +25,33 @@ struct Zork1WalkthroughTests {
         boarded front door.
 
         There is a small mailbox here.
+
+        > north
+        — North of House —
+
+        You are facing the north side of a white house. There is no
+        door here, and all the windows are boarded up. To the north a
+        narrow path winds through the trees.
+
+        > east
+        — Behind House —
+
+        You are behind the white house. A path leads into the forest to
+        the east. In one corner of the house there is a small window
+        which is slightly ajar.
+
+        > open window
+        With great effort, you open the window far enough to allow
+        entry.
+
+        > west
+        — Kitchen —
+
+        You are in the kitchen of the white house. A table seems to
+        have been used recently for the preparation of food. A passage
+        leads to the west and a dark staircase can be seen leading
+        upward. A dark chimney leads down and to the east is a small
+        window which is open.
         """
 
     @Test("Lamp and basic items collection")
@@ -52,33 +79,6 @@ struct Zork1WalkthroughTests {
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
             \(enterKitchenPlayback)
-
-            > north
-            — North of House —
-
-            You are facing the north side of a white house. There is no
-            door here, and all the windows are boarded up. To the north a
-            narrow path winds through the trees.
-
-            > east
-            — Behind House —
-
-            You are behind the white house. A path leads into the forest to
-            the east. In one corner of the house there is a small window
-            which is slightly ajar.
-
-            > open window
-            With great effort, you open the window far enough to allow
-            entry.
-
-            > west
-            — Kitchen —
-
-            You are in the kitchen of the white house. A table seems to
-            have been used recently for the preparation of food. A passage
-            leads to the west and a dark staircase can be seen leading
-            upward. A dark chimney leads down and to the east is a small
-            window which is open.
 
             > west
             — Living Room —
@@ -148,8 +148,8 @@ struct Zork1WalkthroughTests {
             "examine sack",
             "open sack",
             "examine sack",
-            "take lunch",
-            "take garlic",
+            "get lunch",
+            "take garlic from sack",
             "take bottle",
             "examine bottle",
             "drink water",
@@ -166,56 +166,28 @@ struct Zork1WalkthroughTests {
         expectNoDifference(transcript, """
             \(enterKitchenPlayback)
 
-            > north
-            — North of House —
-
-            You are facing the north side of a white house. There is no
-            door here, and all the windows are boarded up. To the north a
-            narrow path winds through the trees.
-
-            > east
-            — Behind House —
-
-            You are behind the white house. A path leads into the forest to
-            the east. In one corner of the house there is a small window
-            which is slightly ajar.
-
-            > open window
-            With great effort, you open the window far enough to allow
-            entry.
-
-            > west
-            — Kitchen —
-
-            You are in the kitchen of the white house. A table seems to
-            have been used recently for the preparation of food. A passage
-            leads to the west and a dark staircase can be seen leading
-            upward. A dark chimney leads down and to the east is a small
-            window which is open.
-
             > examine table
-            The table seems to have been used recently for the preparation
-            of food. The kitchen table contains a glass bottle and a brown
-            sack.
+            The kitchen table contains a glass bottle and a brown sack. A
+            bottle is sitting on the table. The glass bottle contains a
+            quantity of water. On the table is an elongated brown sack,
+            smelling of hot peppers.
 
             > take sack
             Taken.
 
             > examine sack
-            An elongated brown sack, smelling of hot peppers. The brown
-            sack is closed.
+            The brown sack is closed.
 
             > open sack
-            You open the brown sack.
+            Opening the brown sack reveals a clove of garlic and a lunch.
 
             > examine sack
-            An elongated brown sack, smelling of hot peppers. The brown
-            sack contains a clove of garlic and a lunch.
+            The brown sack contains a clove of garlic and a lunch.
 
-            > take lunch
+            > get lunch
             Taken.
 
-            > take garlic
+            > take garlic from sack
             Taken.
 
             > take bottle
@@ -244,10 +216,12 @@ struct Zork1WalkthroughTests {
         let mockIO = await MockIOHandler(
             enterKitchenSteps,
             "west",
-            "take lamp",
-            "examine lamp",
-            "turn on lamp",
-            "inventory"
+            "take the lamp",
+            "examine it",
+            "go east",
+            "climb the stairs",
+            "light the lamp",
+            "extinguish the lamp"
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -260,33 +234,6 @@ struct Zork1WalkthroughTests {
         expectNoDifference(transcript, """
             \(enterKitchenPlayback)
 
-            > north
-            — North of House —
-
-            You are facing the north side of a white house. There is no
-            door here, and all the windows are boarded up. To the north a
-            narrow path winds through the trees.
-
-            > east
-            — Behind House —
-
-            You are behind the white house. A path leads into the forest to
-            the east. In one corner of the house there is a small window
-            which is slightly ajar.
-
-            > open window
-            With great effort, you open the window far enough to allow
-            entry.
-
-            > west
-            — Kitchen —
-
-            You are in the kitchen of the white house. A table seems to
-            have been used recently for the preparation of food. A passage
-            leads to the west and a dark staircase can be seen leading
-            upward. A dark chimney leads down and to the east is a small
-            window which is open.
-
             > west
             — Living Room —
 
@@ -295,30 +242,21 @@ struct Zork1WalkthroughTests {
             appears to be nailed shut, a trophy case, and a large oriental
             rug in the center of the room.
 
-            There are a brass lantern and a sword here.
+            A battery-powered brass lantern is on the trophy case.
 
-            > take lamp
+            Above the trophy case hangs an elvish sword of great antiquity.
+
+            In the trophy case is an ancient parchment which appears to be
+            a map.
+
+            > take the lamp
             Taken.
 
-            > examine lamp
-            The brass lantern is turned off. The brass lantern contains a
-            clear glass globe which is currently dark.
+            > examine it
+            The lamp is turned off.
 
-            > turn on lamp
-            The brass lantern is now on.
-
-            — Living Room —
-
-            You are in the living room. There is a doorway to the east, a
-            wooden door with strange gothic lettering to the west, which
-            appears to be nailed shut, a trophy case, and a large oriental
-            rug in the center of the room.
-
-            There is a sword here.
-
-            > inventory
-            You are carrying:
-            - A brass lantern
+            > go east
+            — Kitchen —
 
             >
             Goodbye!

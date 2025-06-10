@@ -30,12 +30,12 @@ public struct TakeActionHandler: ActionHandler {
         if context.command.isAllCommand {
             return
         }
-        
+
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet("Take what?")
         }
-        
+
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet("Take what?")
@@ -47,7 +47,22 @@ public struct TakeActionHandler: ActionHandler {
         // 2. Check if item exists
         let targetItem = try await context.engine.item(targetItemID)
 
-        // 3. Check if player already has the item
+        // 3. If this is a "take X from Y" command, validate the indirect object
+        if let indirectObjectRef = context.command.indirectObject {
+            guard case .item(let containerID) = indirectObjectRef else {
+                throw ActionResponse.prerequisiteNotMet("You can only take items from other items.")
+            }
+
+            let container = try await context.engine.item(containerID)
+
+            // Check if the target item is actually in the specified container
+            guard case .item(let actualParentID) = targetItem.parent,
+                  actualParentID == containerID else {
+                throw ActionResponse.prerequisiteNotMet("The \(targetItem.name) is not in the \(container.name).")
+            }
+        }
+
+        // 4. Check if player already has the item
         if targetItem.parent == .player {
             // Can't throw error here, need to report specific message.
             // Let process handle returning a specific ActionResult for this.
@@ -55,7 +70,7 @@ public struct TakeActionHandler: ActionHandler {
             return
         }
 
-        // 4. Check if item is inside something invalid (non-container/non-surface)
+        // 5. Check if item is inside something invalid (non-container/non-surface)
         if case .item(let parentID) = targetItem.parent {
             let parentItem = try await context.engine.item(parentID)
 
@@ -69,7 +84,7 @@ public struct TakeActionHandler: ActionHandler {
             }
         }
 
-        // 5. Handle specific container closed errors before general unreachability
+        // 6. Handle specific container closed errors before general unreachability
         if case .item(let parentID) = targetItem.parent {
             let container = try await context.engine.item(parentID)
             if container.hasFlag(.isContainer) && !container.hasFlag(.isOpen) {
@@ -81,17 +96,17 @@ public struct TakeActionHandler: ActionHandler {
             }
         }
 
-        // 6. Check reachability using ScopeResolver (general check)
+        // 7. Check reachability using ScopeResolver (general check)
         guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }
 
-        // 7. Check if the item is takable
+        // 8. Check if the item is takable
         guard targetItem.hasFlag(.isTakable) else {
             throw ActionResponse.itemNotTakable(targetItemID)
         }
 
-        // 8. Check capacity <-- Check added here
+        // 9. Check capacity
         guard await context.engine.playerCanCarry(targetItem) else {
             throw ActionResponse.playerCannotCarryMore
         }
@@ -122,12 +137,12 @@ public struct TakeActionHandler: ActionHandler {
                 throw ActionResponse.internalEngineError("Take: no direct objects in process.")
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var messages: [String] = []
         var takenItems: [Item] = []
         var lastTakenItem: Item?
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
@@ -137,10 +152,10 @@ public struct TakeActionHandler: ActionHandler {
                     throw ActionResponse.internalEngineError("Take: directObject was not an item in process.")
                 }
             }
-            
+
             do {
                 let targetItem = try await context.engine.item(targetItemID)
-                
+
                 // Check if player already has this item
                 if targetItem.parent == .player {
                     if context.command.isAllCommand {
@@ -149,19 +164,19 @@ public struct TakeActionHandler: ActionHandler {
                         return ActionResult("You already have that.")
                     }
                 }
-                
+
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if item is takable
                     guard targetItem.hasFlag(.isTakable) else {
                         continue // Skip non-takable items in ALL commands
                     }
-                    
+
                     // Check if player can reach the item
                     guard await context.engine.playerCanReach(targetItemID) else {
                         continue // Skip unreachable items in ALL commands
                     }
-                    
+
                     // Check capacity
                     guard await context.engine.playerCanCarry(targetItem) else {
                         if takenItems.isEmpty {
@@ -170,7 +185,7 @@ public struct TakeActionHandler: ActionHandler {
                         break // Stop processing if capacity is exceeded
                     }
                 }
-                
+
                 // --- Calculate State Changes for this item ---
                 var itemStateChanges: [StateChange] = []
 
@@ -186,7 +201,7 @@ public struct TakeActionHandler: ActionHandler {
                 allStateChanges.append(contentsOf: itemStateChanges)
                 takenItems.append(targetItem)
                 lastTakenItem = targetItem
-                
+
             } catch {
                 // For ALL commands, skip items that cause errors
                 if !context.command.isAllCommand {
@@ -194,7 +209,7 @@ public struct TakeActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if let lastItem = lastTakenItem {
             if takenItems.count > 1 {
@@ -211,7 +226,7 @@ public struct TakeActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
         let message = if context.command.isAllCommand {
             if takenItems.isEmpty {
@@ -222,7 +237,7 @@ public struct TakeActionHandler: ActionHandler {
         } else {
             "Taken."
         }
-        
+
         return ActionResult(
             message: message,
             stateChanges: allStateChanges

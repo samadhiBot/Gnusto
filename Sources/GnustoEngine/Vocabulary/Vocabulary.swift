@@ -252,6 +252,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(
                     pattern: [.verb, .directObject],
                     directObjectConditions: .allowsMultiple
+                ),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    directObjectConditions: .allowsMultiple,
+                    requiredPreposition: "from"
                 )
             ]
         ),

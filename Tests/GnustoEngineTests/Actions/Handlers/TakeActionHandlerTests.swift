@@ -877,11 +877,157 @@ struct TakeActionHandlerTests {
         let finalItemState = try await engine.item("shield")
         #expect(finalItemState.parent == .location(.startRoom), "Shield should still be in the room")
     }
-}
 
-// Helper to sort StateChange arrays for comparison
-extension Array where Element == StateChange {
-    func sorted() -> [StateChange] {
-        sorted(by: { $0 < $1 })
+    @Test("Take item from container using 'from' syntax")
+    func testTakeItemFromContainerWithFromSyntax() async throws {
+        // Arrange: Create a container with an item inside it
+        let container = Item(
+            id: "bag",
+            .name("leather bag"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen,
+            .isTakable
+        )
+
+        let coin = Item(
+            id: "coin",
+            .name("gold coin"),
+            .in(.item("bag")),
+            .isTakable
+        )
+
+        let player = Player(in: .startRoom)
+        let game = MinimalGame(player: player, items: [container, coin])
+        let mockIO = await MockIOHandler()
+        let parser = StandardParser()
+        let engine = await GameEngine(blueprint: game, parser: parser, ioHandler: mockIO)
+
+        // Act: Parse and execute "take coin from bag"
+        let vocabulary = Vocabulary.build(items: [container, coin])
+        let gameState = await engine.gameState
+
+        let parseResult = parser.parse(
+            input: "take coin from bag",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
+
+        guard case .success(let command) = parseResult else {
+            Issue.record("Failed to parse 'take coin from bag': \(parseResult)")
+            return
+        }
+
+        await engine.execute(command: command)
+
+        // Assert: Coin should be taken from bag and moved to player
+        let finalCoinState = try await engine.item("coin")
+        #expect(finalCoinState.parent == .player)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Taken.")
+    }
+
+    @Test("Take item from wrong container fails with appropriate message")
+    func testTakeItemFromWrongContainerFails() async throws {
+        // Arrange: Create a container with an item, and another empty container
+        let bag = Item(
+            id: "bag",
+            .name("leather bag"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen,
+            .isTakable
+        )
+
+        let box = Item(
+            id: "box",
+            .name("wooden box"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
+        )
+
+        let coin = Item(
+            id: "coin",
+            .name("gold coin"),
+            .in(.item("bag")),
+            .isTakable
+        )
+
+        let player = Player(in: .startRoom)
+        let game = MinimalGame(player: player, items: [bag, box, coin])
+        let mockIO = await MockIOHandler()
+        let parser = StandardParser()
+        let engine = await GameEngine(blueprint: game, parser: parser, ioHandler: mockIO)
+
+        // Act: Try to parse and execute "take coin from box" (coin is in bag, not box)
+        let vocabulary = Vocabulary.build(items: [bag, box, coin])
+        let gameState = await engine.gameState
+
+        let parseResult = parser.parse(
+            input: "take coin from box",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
+
+        guard case .success(let command) = parseResult else {
+            Issue.record("Failed to parse 'take coin from box': \(parseResult)")
+            return
+        }
+
+        await engine.execute(command: command)
+
+        // Assert: Should get error message
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The gold coin is not in the wooden box.")
+    }
+
+    @Test("Take item from container parses correctly")
+    func testTakeFromContainerParsingStructure() async throws {
+        // Arrange: Create a simple setup
+        let bag = Item(
+            id: "bag",
+            .name("leather bag"),
+            .in(.location(.startRoom)),
+            .isContainer,
+            .isOpen
+        )
+
+        let coin = Item(
+            id: "coin",
+            .name("gold coin"),
+            .in(.item("bag")),
+            .isTakable
+        )
+
+        let player = Player(in: .startRoom)
+        let vocabulary = Vocabulary.build(items: [bag, coin])
+        let gameState = GameState(
+            locations: [Location(id: .startRoom, .name("Start Room"))],
+            items: [bag, coin],
+            player: player,
+            vocabulary: vocabulary
+        )
+        let parser = StandardParser()
+
+        // Act: Parse "take coin from bag"
+        let result = parser.parse(
+            input: "take coin from bag",
+            vocabulary: vocabulary,
+            gameState: gameState
+        )
+
+        // Assert: Should parse successfully with correct structure
+        switch result {
+        case .success(let command):
+            #expect(command.verb == .take)
+            #expect(command.directObject == .item("coin"))
+            #expect(command.indirectObject == .item("bag"))
+            #expect(command.preposition == "from")
+            #expect(command.rawInput == "take coin from bag")
+        case .failure(let error):
+            Issue.record("Expected successful parsing but got error: \(error)")
+        }
     }
 }

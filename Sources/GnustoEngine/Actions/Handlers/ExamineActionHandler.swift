@@ -145,10 +145,12 @@ public struct ExamineActionHandler: ActionHandler {
                     // Priority 4: Dynamic Long Description
                     if itemMessages.isEmpty {
                         // Use the registry to generate the description using the item ID and key
-                        let description = try await context.engine.generateDescription(
+                        let (description, _, _) = try await context.engine.generateDescriptionWithSourceInfo(
                             for: targetItem.id,
                             attributeID: .description
                         )
+                        // Always add the description for simple items, even if it's the default
+                        // The "nothing special" filtering only applies to containers/surfaces that have additional info
                         itemMessages.append(description)
                     }
 
@@ -242,11 +244,15 @@ public struct ExamineActionHandler: ActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let (baseDescription, wasComputed) = try await engine.generateDescriptionWithComputeInfo(
+        let (baseDescription, wasComputed, isDefault) = try await engine.generateDescriptionWithSourceInfo(
             for: targetItem.id,
             attributeID: .description
         )
-        descriptionParts.append(baseDescription)
+
+        // Only add the base description if it's not a default "nothing special" message
+        if !isDefault {
+            descriptionParts.append(baseDescription)
+        }
 
         // If a compute handler provided the description, it's complete - don't add more
         guard !wasComputed else {
@@ -268,6 +274,12 @@ public struct ExamineActionHandler: ActionHandler {
         } else {
             descriptionParts.append("The \(targetItem.name) is closed.")
         }
+
+        // If we have no meaningful description parts, fall back to the base description
+        if descriptionParts.isEmpty {
+            descriptionParts.append(baseDescription)
+        }
+
         return descriptionParts.joined(separator: " ")
     }
 

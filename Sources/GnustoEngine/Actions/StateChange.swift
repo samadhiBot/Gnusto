@@ -10,7 +10,7 @@ import Foundation
 /// These `StateChange` objects are then processed by the `GameEngine`, which validates them
 /// (often using the `oldValue`) and applies them to the `GameState`. Each successful change
 /// is also recorded in the `GameState.changeHistory`.
-public struct StateChange: Codable, Sendable {
+public struct StateChange: Codable, Comparable, Sendable {
     /// The unique identifier of the game entity (e.g., an item, location, the player, or a global
     /// context) that this state change targets.
     public let entityID: EntityID
