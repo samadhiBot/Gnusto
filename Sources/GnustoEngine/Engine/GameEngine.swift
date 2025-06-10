@@ -820,9 +820,7 @@ extension GameEngine {
                     // Create the context for this action using a snapshot
                     let context = ActionContext(
                         command: command,
-                        engine: self,
-                        stateSnapshot: gameState.snapshot
-                        // contextData is empty by default
+                        engine: self
                     )
 
                     // Directly use the enhanced handler pipeline

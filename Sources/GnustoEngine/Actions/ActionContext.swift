@@ -35,17 +35,14 @@ public struct ActionContext: Sendable {
     /// - Parameters:
     ///   - command: The `Command` being executed.
     ///   - engine: The `GameEngine` instance.
-    ///   - stateSnapshot: An immutable snapshot of the `GameState`.
     ///   - contextData: Optional game-specific data for the handler.
     public init(
         command: Command,
         engine: GameEngine,
-        stateSnapshot: GameState,
         contextData: [ContextID: StateValue] = [:]
     ) {
         self.command = command
         self.engine = engine
-        self.stateSnapshot = stateSnapshot
         self.contextData = contextData
     }
 }
@@ -69,9 +66,8 @@ public protocol ActionContextProvider: Sendable {
     /// action and incorporate it into the `ActionContext`. You can use the provided
     /// `context` to access the current `Command`, `GameEngine`, and `GameState` snapshot.
     ///
-    /// - Parameter context: The initial `ActionContext` provided by the engine.
-    ///   This context contains the `command` being processed, a reference to the
-    ///   `engine`, and a `stateSnapshot`.
+    /// - Parameter context: The initial `ActionContext` provided by the engine. This context
+    ///                      contains the `command` being processed, a reference to the `engine`.
     /// - Returns: An `ActionContext`, which may be the original context augmented with
     ///   new `contextData`, or an entirely new `ActionContext` instance if necessary.
     /// - Throws: An error if the required contextual information cannot be generated.

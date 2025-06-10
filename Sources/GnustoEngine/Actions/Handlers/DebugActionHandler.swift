@@ -60,18 +60,14 @@ public struct DebugActionHandler: ActionHandler {
 
         switch directObjectRef {
         case .player:
-            customDump(context.stateSnapshot.player, to: &target)
+            await customDump(context.engine.gameState.player, to: &target)
 
         case .item(let itemID):
-            guard let item = context.stateSnapshot.items[itemID] else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
+            let item = try await context.engine.item(itemID)
             customDump(item, to: &target)
 
         case .location(let locationID):
-            guard let location = context.stateSnapshot.locations[locationID] else {
-                throw ActionResponse.unknownEntity(directObjectRef)
-            }
+            let location = try await context.engine.location(locationID)
             customDump(location, to: &target)
         }
         return ActionResult("""

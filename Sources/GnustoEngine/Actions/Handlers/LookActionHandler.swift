@@ -89,8 +89,7 @@ public struct LookActionHandler: ActionHandler {
                 await locationDescription(
                     try context.engine.playerLocation(),
                     engine: context.engine,
-                    showVerbose: true,
-                    stateSnapshot: context.stateSnapshot
+                    showVerbose: true
                 )
             )
         } else if context.command.preposition == "through" {
@@ -127,8 +126,7 @@ public struct LookActionHandler: ActionHandler {
     private func locationDescription(
         _ location: Location,
         engine: GameEngine,
-        showVerbose: Bool,
-        stateSnapshot: GameState
+        showVerbose: Bool
     ) async -> String {
         var description: [String] = [
             await engine.generateDescription(
@@ -137,6 +135,8 @@ public struct LookActionHandler: ActionHandler {
                 engine: engine
             )
         ]
+
+        let stateSnapshot = await engine.gameState
 
         // Use the correct ScopeResolver method
         let visibleItemIDs = await engine.scopeResolver.visibleItemsIn(locationID: location.id)

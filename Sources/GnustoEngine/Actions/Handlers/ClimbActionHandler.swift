@@ -98,8 +98,7 @@ public struct ClimbActionHandler: ActionHandler {
                 let goHandler = GoActionHandler()
                 let goContext = ActionContext(
                     command: goCommand,
-                    engine: context.engine,
-                    stateSnapshot: context.stateSnapshot
+                    engine: context.engine
                 )
 
                 do {
