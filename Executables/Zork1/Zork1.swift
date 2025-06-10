@@ -14,8 +14,7 @@ struct Zork1: GameBlueprint {
             Revision 88 / Serial number 840726
             """,
         release: "88",
-        maximumScore: 350,
-        darknessMessage: "It is pitch black. You are likely to be eaten by a grue."
+        maximumScore: 350
     )
 
     var player: Player {

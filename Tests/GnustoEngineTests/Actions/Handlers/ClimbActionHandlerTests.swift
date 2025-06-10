@@ -593,13 +593,12 @@ struct ClimbActionHandlerTests {
             .in(.nowhere)
         )
 
-        // Create game with custom darkness message
+        // Create game with standard constants
         let customConstants = GameConstants(
             storyTitle: "Test Game",
             introduction: "A test",
             release: "1.0",
-            maximumScore: 10,
-            darknessMessage: "It is pitch black. You are likely to be eaten by a grue."
+            maximumScore: 10
         )
 
         let game = MinimalGame(
@@ -644,7 +643,7 @@ struct ClimbActionHandlerTests {
         // Assert: Output contains both transition and darkness messages
         expectNoDifference(output, """
             You have moved into a dark place.
-            
+
             It is pitch black. You are likely to be eaten by a grue.
             """)
     }

@@ -21,14 +21,6 @@ public struct GameConstants: Sendable {
     /// and can be used by the game to determine if the player has "won".
     public let maximumScore: Int
 
-    /// The default message displayed to the player when their character dies or the game
-    /// ends in a non-winning state for which no specific message is provided.
-    public let deathMessage: String
-
-    /// The message displayed when the player is in a dark location.
-    /// If nil, uses the engine's default darkness message.
-    public let darknessMessage: String?
-
     /// Initializes a new set of game constants.
     ///
     /// - Parameters:
@@ -36,21 +28,15 @@ public struct GameConstants: Sendable {
     ///   - introduction: The introductory text, premise, or byline.
     ///   - release: A version or release identifier.
     ///   - maximumScore: The maximum achievable score.
-    ///   - deathMessage: The default message for game over. Defaults to "You have lost.".
-    ///   - darknessMessage: Custom message for dark locations. If nil, uses engine default.
     public init(
         storyTitle: String,
         introduction: String,
         release: String,
-        maximumScore: Int,
-        deathMessage: String = "You have lost.",
-        darknessMessage: String? = nil
+        maximumScore: Int
     ) {
         self.storyTitle = storyTitle
         self.introduction = introduction
         self.release = release
         self.maximumScore = maximumScore
-        self.deathMessage = deathMessage
-        self.darknessMessage = darknessMessage
     }
 }
