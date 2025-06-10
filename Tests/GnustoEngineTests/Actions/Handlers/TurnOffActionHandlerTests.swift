@@ -44,7 +44,11 @@ struct TurnOffActionHandlerTests {
         await engine.execute(command: command)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The lamp is now off. You are plunged into darkness.")
+        expectNoDifference(output, """
+            The lamp is now off. You are plunged into darkness.
+
+            It is pitch black. You can’t see a thing.
+            """)
         let finalItemState = try await engine.item("lamp")
         #expect(finalItemState.hasFlag(.isOn) == false)
         #expect(finalItemState.hasFlag(.isTouched) == true)
@@ -214,7 +218,11 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
+        expectNoDifference(output, """
+            The brass lantern is now off. You are plunged into darkness.
+
+            It is pitch black. You can’t see a thing.
+            """)
 
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: darkRoom.id)
         #expect(finallyLit == false)
@@ -388,7 +396,11 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
+        expectNoDifference(output, """
+            The brass lantern is now off. You are plunged into darkness.
+
+            It is pitch black. You can’t see a thing.
+            """)
     }
 
     @Test("Blow Out alias works correctly")
@@ -436,6 +448,10 @@ struct TurnOffActionHandlerTests {
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "The brass lantern is now off. You are plunged into darkness.")
+        expectNoDifference(output, """
+            The brass lantern is now off. You are plunged into darkness.
+
+            It is pitch black. You can’t see a thing.
+            """)
     }
 }
