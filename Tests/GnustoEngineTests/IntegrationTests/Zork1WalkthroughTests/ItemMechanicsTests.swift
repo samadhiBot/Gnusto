@@ -258,6 +258,26 @@ struct ItemMechanicsTests {
             > go east
             — Kitchen —
 
+            > climb the stairs
+            You have moved into a dark place.
+            It is pitch black. You are likely to be eaten by a grue.
+
+            > light the lamp
+            The brass lantern is now on.
+
+            — Attic —
+
+            This is the attic. The only exit is a stairway leading down.
+
+            A large coil of rope is lying in the corner.
+
+            On a table is a nasty-looking knife.
+
+            > extinguish the lamp
+            The brass lantern is now off.
+
+            It is pitch black. You can’t see a thing.
+
             >
             Goodbye!
             """)

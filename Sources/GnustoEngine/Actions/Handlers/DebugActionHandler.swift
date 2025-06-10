@@ -63,11 +63,15 @@ public struct DebugActionHandler: ActionHandler {
             await customDump(context.engine.gameState.player, to: &target)
 
         case .item(let itemID):
-            let item = try await context.engine.item(itemID)
+            guard let item = await context.engine.gameState.items[itemID] else {
+                throw ActionResponse.unknownEntity(directObjectRef)
+            }
             customDump(item, to: &target)
 
         case .location(let locationID):
-            let location = try await context.engine.location(locationID)
+            guard let location = await context.engine.gameState.locations[locationID] else {
+                throw ActionResponse.unknownEntity(directObjectRef)
+            }
             customDump(location, to: &target)
         }
         return ActionResult("""
