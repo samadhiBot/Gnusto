@@ -54,6 +54,10 @@ public actor GameEngine: Sendable {
     /// derived from the `GameBlueprint` used to initialize the engine.
     public let constants: GameConstants
 
+    /// The message provider for localized and customizable game text.
+    /// Derived from the `GameBlueprint` used to initialize the engine.
+    public let messageProvider: MessageProvider
+
     /// Definitions for timed events (fuses) that trigger after a set number of turns.
     /// These are derived from the `GameBlueprint` used to initialize the engine.
     public let fuseDefinitions: [FuseID: FuseDefinition]
@@ -120,6 +124,7 @@ public actor GameEngine: Sendable {
         ioHandler: IOHandler
     ) async {
         self.constants = blueprint.constants
+        self.messageProvider = blueprint.messageProvider
         self.fuseDefinitions = blueprint.fuses
         self.daemonDefinitions = blueprint.daemons
 
@@ -302,87 +307,89 @@ extension GameEngine {
     /// It also logs more detailed information for certain critical errors like
     /// `.internalEngineError` or `.stateValidationFailed`.
     private func report(_ response: ActionResponse) async {
-        // Determine the user-facing message
-        let message = switch response {
+        // Determine the user-facing message using MessageProvider
+        let messageKey: MessageKey = switch response {
         case .containerIsClosed(let item):
-            "\(theThat(item).capitalizedFirst) is closed."
+            .containerIsClosed(item: theThat(item))
         case .containerIsOpen(let item):
-            "\(theThat(item).capitalizedFirst) is already open."
+            .containerIsOpen(item: theThat(item))
         case .custom(let message):
-            message
+            .custom(message: message)
         case .directionIsBlocked(let reason):
-            reason ?? "Something is blocking the way."
+            .directionIsBlocked(reason: reason)
         case .internalEngineError:
-            "A strange buzzing sound indicates something is wrong."
+            .internalEngineError
         case .invalidDirection:
-            "You can't go that way."
+            .invalidDirection
         case .invalidIndirectObject(let objectName):
-            "You can't use \(theThat(objectName)) for that."
+            .invalidIndirectObject(object: theThat(objectName))
         case .invalidValue:
-            "A strange buzzing sound indicates something is wrong."
+            .internalEngineError // Use general internal error for invalid value
         case .itemAlreadyClosed(let item):
-            "\(theThat(item).capitalizedFirst) is already closed."
+            .itemAlreadyClosed(item: theThat(item))
         case .itemAlreadyOpen(let item):
-            "\(theThat(item).capitalizedFirst) is already open."
+            .itemAlreadyOpen(item: theThat(item))
         case .itemIsAlreadyWorn(let item):
-            "You are already wearing \(theThat(item))."
+            .itemIsAlreadyWorn(item: theThat(item))
         case .itemIsLocked(let item):
-            "\(theThat(item).capitalizedFirst) is locked."
+            .itemIsLocked(item: theThat(item))
         case .itemIsNotWorn(let item):
-            "You are not wearing \(theThat(item))."
+            .itemIsNotWorn(item: theThat(item))
         case .itemIsUnlocked(let item):
-            "\(theThat(item).capitalizedFirst) is already unlocked."
+            .itemIsUnlocked(item: theThat(item))
         case .itemNotAccessible(let item):
-            "You can't see \(anySuch(item))."
+            .itemNotAccessible(item: anySuch(item))
         case .itemNotClosable(let item):
-            "\(theThat(item).capitalizedFirst) is not something you can close."
+            .itemNotClosable(item: theThat(item))
         case .itemNotDroppable(let item):
-            "You can't drop \(theThat(item))."
+            .itemNotDroppable(item: theThat(item))
         case .itemNotEdible(let item):
-            "You can't eat \(theThat(item))."
+            .itemNotEdible(item: theThat(item))
         case .itemNotHeld(let item):
-            "You aren't holding \(theThat(item))."
+            .itemNotHeld(item: theThat(item))
         case .itemNotInContainer(item: let item, container: let container):
-            "\(theThat(item).capitalizedFirst) isn't in \(theThat(container))."
+            .itemNotInContainer(item: theThat(item), container: theThat(container))
         case .itemNotLockable(let item):
-            "You can't lock \(theThat(item))."
+            .itemNotLockable(item: theThat(item))
         case .itemNotOnSurface(item: let item, surface: let surface):
-            "\(theThat(item).capitalizedFirst) isn't on \(theThat(surface))."
+            .itemNotOnSurface(item: theThat(item), surface: theThat(surface))
         case .itemNotOpenable(let item):
-            "You can't open \(theThat(item))."
+            .itemNotOpenable(item: theThat(item))
         case .itemNotReadable(let item):
-            "\(theThat(item).capitalizedFirst) isn't something you can read."
+            .itemNotReadable(item: theThat(item))
         case .itemNotRemovable(let item):
-            "You can't remove \(theThat(item))."
+            .itemNotRemovable(item: theThat(item))
         case .itemNotTakable(let item):
-            "You can't take \(theThat(item))."
+            .itemNotTakable(item: theThat(item))
         case .itemNotUnlockable(let item):
-            "You can't unlock \(theThat(item))."
+            .itemNotUnlockable(item: theThat(item))
         case .itemNotWearable(let item):
-            "You can't wear \(theThat(item))."
+            .itemNotWearable(item: theThat(item))
         case .itemTooLargeForContainer(item: let item, container: let container):
-            "\(theThat(item).capitalizedFirst) won't fit in \(theThat(container))."
+            .itemTooLargeForContainer(item: theThat(item), container: theThat(container))
         case .playerCannotCarryMore:
-            "Your hands are full."
+            .playerCannotCarryMore
         case .prerequisiteNotMet(let customMessage):
-            customMessage.isEmpty ? "You can't do that." : customMessage
+            .prerequisiteNotMet(message: customMessage)
         case .roomIsDark:
-            "It is pitch black. You can't see a thing."
+            .roomIsDark
         case .stateValidationFailed:
-            "A strange buzzing sound indicates something is wrong with the state validation."
+            .stateValidationFailed
         case .targetIsNotAContainer(let item):
-            "You can't put things in \(theThat(item))."
+            .targetIsNotAContainer(item: theThat(item))
         case .targetIsNotASurface(let item):
-            "You can't put things on \(theThat(item))."
+            .targetIsNotASurface(item: theThat(item))
         case .toolMissing(let tool):
-            "You need \(tool) for that."
+            .toolMissing(tool: tool)
         case .unknownEntity:
-            "You can't see any such thing."
+            .unknownEntity
         case .unknownVerb(let verb):
-            "I don't know how to \"\(verb)\" something."
+            .unknownVerb(verb: verb)
         case .wrongKey(keyID: let keyID, lockID: let lockID):
-            "\(theThat(keyID).capitalizedFirst) doesn't fit \(theThat(lockID))."
+            .wrongKey(key: theThat(keyID), lock: theThat(lockID))
         }
+
+        let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
 
         // Log detailed errors separately
@@ -410,28 +417,32 @@ extension GameEngine {
     /// into textual feedback for the player when their input cannot be understood.
     /// For `.internalError` cases, it also logs detailed information.
     private func report(parseError: ParseError) async {
-        let message = switch parseError {
+        let messageKey: MessageKey = switch parseError {
         case .emptyInput:
-            "I beg your pardon?"
+            .emptyInput
         case .unknownVerb(let verb):
-            "I don't know the verb '\(verb)'."
+            .parseUnknownVerb(verb: verb)
         case .unknownNoun(let noun):
-            "I don't see any '\(noun)' here."
+            .unknownNoun(noun: noun)
         case .itemNotInScope(let noun):
-            "You can't see any '\(noun)' here."
+            .itemNotInScope(noun: noun)
         case .modifierMismatch(let noun, let modifiers):
-            "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
-        case .ambiguity(let text), .ambiguousPronounReference(let text):
-            text
+            .modifierMismatch(noun: noun, modifiers: modifiers)
+        case .ambiguity(let text):
+            .ambiguity(text: text)
+        case .ambiguousPronounReference(let text):
+            .ambiguousPronounReference(text: text)
         case .badGrammar(let text):
-            text
+            .badGrammar(text: text)
         case .pronounNotSet(let pronoun):
-            "I don't know what '\(pronoun)' refers to."
+            .pronounNotSet(pronoun: pronoun)
         case .pronounRefersToOutOfScopeItem(let pronoun):
-            "You can't see what '\(pronoun)' refers to right now."
+            .pronounRefersToOutOfScopeItem(pronoun: pronoun)
         case .internalError:
-            "A strange buzzing sound indicates something is wrong."
+            .internalParseError
         }
+
+        let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
         if case .internalError(let details) = parseError {
             logError("ParseError: \(details)")
@@ -907,10 +918,10 @@ extension GameEngine {
 
                 if wasLitBeforeCommand && !isLitAfterCommand {
                     // Moved from lit to dark - show transition message and darkness message combined
-                    let darknessMessage = constants.darknessMessage ??
-                        "It is pitch black. You can't see a thing."
+                    let darknessMessage = messageProvider.message(for: .roomIsDark)
+                    let transitionMessage = messageProvider.message(for: .nowDark)
                     await ioHandler.print("""
-                        You have moved into a dark place.
+                        \(transitionMessage)
 
                         \(darknessMessage)
                         """)

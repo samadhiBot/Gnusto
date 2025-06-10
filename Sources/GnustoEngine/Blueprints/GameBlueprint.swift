@@ -37,6 +37,27 @@ public protocol GameBlueprint: Sendable {
     /// build the initial `GameState`.
     var locations: [Location] { get }
 
+    /// The message provider for game text localization and customization.
+    ///
+    /// This provider supplies all user-facing messages throughout the game, including
+    /// action responses, parse errors, and system messages. Games can provide custom
+    /// implementations to:
+    /// - Support multiple languages (internationalization)
+    /// - Customize the tone and style of responses
+    /// - Override specific messages while inheriting sensible defaults
+    ///
+    /// If not specified, the engine will use `StandardMessageProvider` with traditional
+    /// English interactive fiction responses.
+    ///
+    /// Example:
+    /// ```swift
+    /// var messageProvider: MessageProvider {
+    ///     // Custom provider for a horror-themed game
+    ///     HorrorMessageProvider()
+    /// }
+    /// ```
+    var messageProvider: MessageProvider { get }
+
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
     ///
@@ -147,6 +168,10 @@ extension GameBlueprint {
 
     public var locations: [Location] {
         []
+    }
+
+    public var messageProvider: MessageProvider {
+        StandardMessageProvider()
     }
 
     public var customActionHandlers: [VerbID: ActionHandler] {
