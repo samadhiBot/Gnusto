@@ -33,8 +33,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should throw validation error for missing direct object
@@ -112,8 +111,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should throw validation error for location
@@ -136,8 +134,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - thinking about self is valid
@@ -170,8 +167,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - reachable items are valid
@@ -189,8 +185,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -227,8 +222,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -437,8 +431,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate
@@ -477,8 +470,7 @@ struct ThinkAboutActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should throw validation error for unreachable item

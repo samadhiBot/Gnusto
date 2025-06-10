@@ -57,8 +57,7 @@ struct DebugActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -78,8 +77,7 @@ struct DebugActionHandlerTests {
         try await handler.validate(
             context: ActionContext(
                 command: command,
-                engine: engine,
-                stateSnapshot: await engine.gameState
+                engine: engine
             )
         )
     }
@@ -98,8 +96,7 @@ struct DebugActionHandlerTests {
         try await handler.validate(
             context: ActionContext(
                 command: command,
-                engine: engine,
-                stateSnapshot: await engine.gameState
+                engine: engine
             )
         )
     }
@@ -118,8 +115,7 @@ struct DebugActionHandlerTests {
         try await handler.validate(
             context: ActionContext(
                 command: command,
-                engine: engine,
-                stateSnapshot: await engine.gameState
+                engine: engine
             )
         )
     }
@@ -139,8 +135,7 @@ struct DebugActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -161,8 +156,7 @@ struct DebugActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -250,8 +244,7 @@ struct DebugActionHandlerTests {
             try await handler.process(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -272,8 +265,7 @@ struct DebugActionHandlerTests {
             try await handler.process(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -294,8 +286,7 @@ struct DebugActionHandlerTests {
             try await handler.process(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -314,8 +305,7 @@ struct DebugActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate
@@ -341,8 +331,7 @@ struct DebugActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate
@@ -368,8 +357,7 @@ struct DebugActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate
@@ -397,8 +385,7 @@ struct DebugActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         let result = try await handler.process(context: context)
@@ -424,8 +411,7 @@ struct DebugActionHandlerTests {
         )
         let itemContext = ActionContext(
             command: itemCommand,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         let itemResult = try await handler.process(context: itemContext)
         
@@ -440,8 +426,7 @@ struct DebugActionHandlerTests {
         )
         let locationContext = ActionContext(
             command: locationCommand,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         let locationResult = try await handler.process(context: locationContext)
         
@@ -584,8 +569,7 @@ struct DebugActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         var validationError: ActionResponse?

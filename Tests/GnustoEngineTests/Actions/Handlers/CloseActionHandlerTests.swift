@@ -133,8 +133,7 @@ struct CloseActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -168,8 +167,7 @@ struct CloseActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -195,8 +193,7 @@ struct CloseActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
+                    engine: engine
                 )
             )
         }

@@ -85,8 +85,7 @@ struct SmellActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should throw validation error for non-item
@@ -124,8 +123,7 @@ struct SmellActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - items are valid for smelling
@@ -142,8 +140,7 @@ struct SmellActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - smelling the environment is valid
@@ -160,8 +157,7 @@ struct SmellActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -199,8 +195,7 @@ struct SmellActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly

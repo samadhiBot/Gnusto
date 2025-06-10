@@ -51,8 +51,7 @@ struct QuitActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -74,8 +73,7 @@ struct QuitActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - QUIT has no validation requirements
@@ -92,8 +90,7 @@ struct QuitActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Initially should not be quitting
@@ -137,8 +134,7 @@ struct QuitActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate

@@ -55,8 +55,7 @@ struct XyzzyActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -78,8 +77,7 @@ struct XyzzyActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - XYZZY has no validation requirements
@@ -114,8 +112,7 @@ struct XyzzyActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate

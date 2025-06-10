@@ -21,8 +21,7 @@ struct ClimbActionHandlerTests {
         let command = Command(verb: .climb, rawInput: "climb")
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -84,8 +83,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -149,8 +147,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -207,8 +204,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -259,8 +255,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -309,8 +304,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -349,8 +343,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -392,8 +385,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -431,8 +423,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act & Assert: Should fail validation
@@ -461,8 +452,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act & Assert: Should fail validation
@@ -491,8 +481,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act & Assert: Should fail validation
@@ -547,8 +536,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act
@@ -598,8 +586,7 @@ struct ClimbActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState.snapshot
+            engine: engine
         )
 
         // Act

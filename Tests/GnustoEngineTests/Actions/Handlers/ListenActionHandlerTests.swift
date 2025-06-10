@@ -51,8 +51,7 @@ struct ListenActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Process the command directly
@@ -74,8 +73,7 @@ struct ListenActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
 
         // Should not throw - LISTEN has no validation requirements
@@ -92,8 +90,7 @@ struct ListenActionHandlerTests {
         )
         let context = ActionContext(
             command: command,
-            engine: engine,
-            stateSnapshot: await engine.gameState
+            engine: engine
         )
         
         // Validate

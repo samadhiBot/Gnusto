@@ -1230,7 +1230,10 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(throws: ActionResponse.itemNotHeld("coin")) { // Correct error type
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
@@ -1266,7 +1269,10 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(throws: ActionResponse.itemNotAccessible("distantBox")) { // Correct error type
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
@@ -1299,7 +1305,10 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(throws: ActionResponse.targetIsNotAContainer("statue")) {
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
@@ -1334,7 +1343,10 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(throws: ActionResponse.containerIsClosed("closedBox")) { // Correct error type
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
@@ -1372,7 +1384,10 @@ struct InsertActionHandlerTests {
         // Act & Assert Error
         await #expect(throws: ActionResponse.itemTooLargeForContainer(item: "boulder", container: "box")) { // Correct error type
             try await handler.validate(
-                context: ActionContext(command: command, engine: engine, stateSnapshot: engine.gameState) // Use instance engine
+                context: ActionContext(
+                    command: command,
+                    engine: engine
+                )
             )
         }
         #expect(await engine.gameState.changeHistory.isEmpty) // Use instance engine
@@ -1411,8 +1426,7 @@ struct InsertActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: engine.gameState
+                    engine: engine
                 )
             )
         }
@@ -1467,8 +1481,7 @@ struct InsertActionHandlerTests {
             try await handler.validate(
                 context: ActionContext(
                     command: command,
-                    engine: engine,
-                    stateSnapshot: await engine.gameState
+                    engine: engine
                 )
             )
         }
