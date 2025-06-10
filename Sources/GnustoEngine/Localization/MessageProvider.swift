@@ -50,9 +50,3 @@ public protocol MessageProvider: Sendable {
     /// The language/locale identifier for this provider (e.g., "en", "es", "fr")
     var languageCode: String { get }
 }
-
-extension MessageProvider {
-    var languageCode: String {
-        "en"
-    }
-}

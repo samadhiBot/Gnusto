@@ -36,6 +36,11 @@ struct MessageProviderTests {
     }
 
     struct TestMessageProvider: MessageProvider {
+        let languageCode = "en"
+
+        /// Standard provider for fallback to default messages
+        private let standard = StandardMessageProvider()
+
         func message(for key: MessageKey) -> String {
             switch key {
             case .roomIsDark:
@@ -45,7 +50,7 @@ struct MessageProviderTests {
             case .itemNotTakable(let item):
                 "You cannot pick up \(item)."
             default:
-                StandardMessageProvider().message(for: key)
+                standard.message(for: key)
             }
         }
     }
@@ -67,6 +72,9 @@ struct MessageProviderTests {
     struct SpanishMessageProvider: MessageProvider {
         let languageCode = "es"
 
+        /// Standard provider for fallback to default messages
+        private let standard = StandardMessageProvider()
+
         func message(for key: MessageKey) -> String {
             switch key {
             case .roomIsDark:
@@ -87,7 +95,7 @@ struct MessageProviderTests {
                 message
             default:
                 // Fallback to English for unimplemented messages
-                StandardMessageProvider().message(for: key)
+                standard.message(for: key)
             }
         }
     }

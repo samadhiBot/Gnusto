@@ -20,4 +20,8 @@ struct Zork1: GameBlueprint {
     var player: Player {
         Player(in: .westOfHouse)
     }
+
+    var messageProvider: MessageProvider {
+        ZorkMessageProvider()
+    }
 }

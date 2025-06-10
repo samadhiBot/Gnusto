@@ -7,6 +7,11 @@ import Testing
 @Suite("MessageProvider Integration Tests")
 struct MessageProviderIntegrationTests {
     struct TestMessageProvider: MessageProvider {
+        let languageCode = "en"
+
+        /// Standard provider for fallback to default messages
+        private let standard = StandardMessageProvider()
+
         func message(for key: MessageKey) -> String {
             switch key {
             case .roomIsDark:
@@ -14,7 +19,7 @@ struct MessageProviderIntegrationTests {
             case .emptyInput:
                 "TEST: Custom empty input message"
             default:
-                StandardMessageProvider().message(for: key)
+                standard.message(for: key)
             }
         }
     }

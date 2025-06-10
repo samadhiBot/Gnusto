@@ -642,9 +642,9 @@ struct ClimbActionHandlerTests {
 
         // Assert: Output contains both transition and darkness messages
         expectNoDifference(output, """
-            You have moved into a dark place.
+            You are plunged into darkness.
 
-            It is pitch black. You are likely to be eaten by a grue.
+            It is pitch black. You can’t see a thing.
             """)
     }
 

@@ -12,6 +12,8 @@
 public struct StandardMessageProvider: MessageProvider, Sendable {
     public let languageCode = "en"
 
+    public init() {}
+
     public func message(for key: MessageKey) -> String {
         switch key {
         case .ambiguity(let text):
