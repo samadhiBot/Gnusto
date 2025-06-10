@@ -340,26 +340,10 @@ extension InsideHouse {
                 )
 
             case .turnOn:
-                if isBurnedOut {
-                    return ActionResult("A burned-out lamp won't light.")
-                } else {
-                    let change = try await engine.setFlag(.isOn, on: .lamp)
-                    return ActionResult(
-                        message: "The brass lantern is now on.",
-                        stateChanges: change.map { [$0] } ?? []
-                    )
-                }
+                return isBurnedOut ? ActionResult("A burned-out lamp won't light.") : nil
 
             case .turnOff:
-                if isBurnedOut {
-                    return ActionResult("The lamp has already burned out.")
-                } else {
-                    let change = try await engine.clearFlag(.isOn, on: .lamp)
-                    return ActionResult(
-                        message: "The brass lantern is now off.",
-                        stateChanges: change.map { [$0] } ?? []
-                    )
-                }
+                return isBurnedOut ? ActionResult("The lamp has already burned out.") : nil
 
             case .examine:
                 let statusMessage = if isBurnedOut {

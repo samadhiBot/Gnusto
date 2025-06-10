@@ -264,7 +264,7 @@ struct ItemMechanicsTests {
             It is pitch black. You are likely to be eaten by a grue.
 
             > light the lamp
-            The brass lantern is now on.
+            The brass lantern is now on. You can see your surroundings now.
 
             — Attic —
 
@@ -275,9 +275,9 @@ struct ItemMechanicsTests {
             On a table is a nasty-looking knife.
 
             > extinguish the lamp
-            The brass lantern is now off.
+            The brass lantern is now off. You are plunged into darkness.
 
-            It is pitch black. You can’t see a thing.
+            It is pitch black. You are likely to be eaten by a grue.
 
             >
             Goodbye!

@@ -167,7 +167,8 @@ extension GameEngine {
         // 1. Check for light
         guard await playerLocationIsLit() else {
             // It's dark!
-            await ioHandler.print("It is pitch black. You can't see a thing.")
+            let darknessMessage = constants.darknessMessage ?? "It is pitch black. You can't see a thing."
+            await ioHandler.print(darknessMessage)
             return
         }
 
