@@ -96,10 +96,15 @@ struct TurnOnActionHandlerTests {
 
         let output = await mockIO.flush()
         // Assert: Only expect the direct handler message
-        expectNoDifference(
-            output,
-            "The brass lantern is now on. You can see your surroundings now."
-        )
+        expectNoDifference(output, """
+            The brass lantern is now on. You can see your surroundings now.
+
+            — Dark Room —
+
+            This is a dark room that should now be lit.
+
+            There is a brass lantern here.
+            """)
 
         // Assert: Verify the room is now lit
         let finallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")

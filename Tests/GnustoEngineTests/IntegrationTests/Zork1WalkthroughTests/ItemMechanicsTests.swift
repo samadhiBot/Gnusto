@@ -260,6 +260,7 @@ struct ItemMechanicsTests {
 
             > climb the stairs
             You have moved into a dark place.
+
             It is pitch black. You are likely to be eaten by a grue.
 
             > light the lamp
