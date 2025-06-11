@@ -5,14 +5,10 @@ import Testing
 @testable import Zork1
 
 struct UndergroundTests {
-
-
-
     @Test("Underground access via trap door")
     func testUndergroundAccess() async throws {
         let mockIO = await MockIOHandler(
             Moves.enterUnderground,
-            "look",
             "north"
         )
         let engine = await GameEngine(
@@ -24,14 +20,7 @@ struct UndergroundTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterUnderground)
-
-            > look
-            — Cellar —
-
-            You are in a dark and damp cellar with a narrow passageway
-            leading north, and a crawlway to the south. On the west is the
-            bottom of a steep metal ramp which is unclimbable.
+            \(Playback.enterUnderground)
 
             > north
             — Troll Room —
@@ -69,7 +58,7 @@ struct UndergroundTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterUnderground)
+            \(Playback.enterUnderground)
 
             > north
             — Troll Room —

@@ -29,7 +29,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > west
             — Living Room —
@@ -115,7 +115,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -182,7 +182,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > west
             — Living Room —

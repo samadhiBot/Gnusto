@@ -58,7 +58,7 @@ struct FormattingTests {
 
         // Check that visited locations show brief output (just name)
         expectNoDifference(transcript, """
-            \(Stub.zork1Intro)
+            \(Playback.zork1Intro)
 
             > north
             — North of House —

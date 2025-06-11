@@ -455,4 +455,64 @@ extension InsideHouse {
             return nil
         }
     }
+
+    /// Handles trap door interactions based on the original ZIL `TRAP-DOOR-FCN`.
+    ///
+    /// This handler manages the trap door's behavior depending on the player's location
+    /// (Living Room vs. Cellar) and the state of the door.
+    /// - **Living Room**: Allows opening, closing, and looking under the door with custom messages.
+    /// - **Cellar**: Prevents opening from below and has special behavior for closing.
+    /// - **Raise**: Treats `RAISE` as an alias for `OPEN`.
+    static let trapDoorHandler = ItemEventHandler { engine, event in
+        guard case .beforeTurn(let command) = event else { return nil }
+
+        let location = await engine.playerLocationID
+        let isTrapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
+
+        switch command.verb {
+        case .open, .raise:
+            if isTrapDoorOpen {
+                return ActionResult("The trap door is already open.")
+            }
+            if location == .cellar {
+                return ActionResult("The door is locked from above.")
+            }
+            return ActionResult(
+                message: """
+                    The door reluctantly opens to reveal a rickety staircase
+                    descending into darkness.
+                    """,
+                stateChanges: [
+                    try await engine.setFlag(.isOpen, on: .trapDoor)
+                ]
+            )
+
+        case .close:
+            if !isTrapDoorOpen {
+                return ActionResult("The trap door is already closed.")
+            }
+            if location == .cellar {
+                return ActionResult("You can't close the trap door from below.")
+            }
+            return ActionResult(
+                message: "The door swings shut and closes.",
+                stateChanges: [
+                    try await engine.clearFlag(.isOpen, on: .trapDoor)
+                ]
+            )
+
+        case .lookUnder:
+            if location == .cellar { break }
+            if isTrapDoorOpen {
+                return ActionResult("You see a rickety staircase descending into darkness.")
+            } else {
+                return ActionResult("It's closed.")
+            }
+
+        default:
+            break
+        }
+
+        return nil
+    }
 }

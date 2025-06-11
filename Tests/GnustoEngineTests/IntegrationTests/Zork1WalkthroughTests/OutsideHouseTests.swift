@@ -24,7 +24,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -70,7 +70,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.zork1Intro)
+            \(Playback.zork1Intro)
 
             > take the mailbox
             It is securely anchored.
@@ -127,7 +127,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.zork1Intro)
+            \(Playback.zork1Intro)
 
             > take the boards
             The boards are securely fastened.
@@ -197,7 +197,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > west
             — Living Room —
@@ -286,7 +286,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.enterKitchen)
+            \(Playback.enterKitchen)
 
             > examine table
             A bottle is sitting on the table. The glass bottle contains a

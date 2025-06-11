@@ -27,7 +27,7 @@ struct ForestTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(Stub.zork1Intro)
+            \(Playback.zork1Intro)
 
             > north
             — North of House —
