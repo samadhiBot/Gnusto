@@ -5,71 +5,10 @@ import Testing
 @testable import Zork1
 
 struct OutsideHouseTests {
-    let enterKitchenSteps = [
-        "north",
-        "east",
-        "examine window",
-        "open window",
-        "west",
-    ]
-
-    let introPlayback = """
-        Zork I: The Great Underground Empire
-
-        ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-        1983 Infocom, Inc. All rights reserved. ZORK is a registered
-        trademark of Infocom, Inc. Revision 88 / Serial number 840726
-        """
-
-    let enterKitchenPlayback = """
-        Zork I: The Great Underground Empire
-
-        ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-        1983 Infocom, Inc. All rights reserved. ZORK is a registered
-        trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-        — West of House —
-
-        You are standing in an open field west of a white house, with a
-        boarded front door.
-
-        There is a small mailbox here.
-
-        > north
-        — North of House —
-
-        You are facing the north side of a white house. There is no
-        door here, and all the windows are boarded up. To the north a
-        narrow path winds through the trees.
-
-        > east
-        — Behind House —
-
-        You are behind the white house. A path leads into the forest to
-        the east. In one corner of the house there is a small window
-        which is slightly ajar.
-
-        > examine window
-        The window is slightly ajar, but not enough to allow entry.
-
-        > open window
-        With great effort, you open the window far enough to allow
-        entry.
-
-        > west
-        — Kitchen —
-
-        You are in the kitchen of the white house. A table seems to
-        have been used recently for the preparation of food. A passage
-        leads to the west and a dark staircase can be seen leading
-        upward. A dark chimney leads down and to the east is a small
-        window which is open.
-        """
-
     @Test("Basic house entry via kitchen window")
     func testHouseEntry() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "examine table",
             "open sack",
             "inventory",
@@ -85,7 +24,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -131,14 +70,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introPlayback)
-
-            — West of House —
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
+            \(Stub.zork1Intro)
 
             > take the mailbox
             It is securely anchored.
@@ -195,14 +127,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(introPlayback)
-
-            — West of House —
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
+            \(Stub.zork1Intro)
 
             > take the boards
             The boards are securely fastened.
@@ -250,7 +175,7 @@ struct OutsideHouseTests {
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "west",
             "take lamp",
             "take sword",
@@ -272,7 +197,7 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > west
             — Living Room —
@@ -282,7 +207,12 @@ struct OutsideHouseTests {
             appears to be nailed shut, a trophy case, and a large oriental
             rug in the center of the room.
 
-            There are a brass lantern and a sword here.
+            A battery-powered brass lantern is on the trophy case.
+
+            Above the trophy case hangs an elvish sword of great antiquity.
+
+            In the trophy case is an ancient parchment which appears to be
+            a map.
 
             > take lamp
             Taken.
@@ -291,18 +221,10 @@ struct OutsideHouseTests {
             Taken.
 
             > examine lamp
-            The brass lantern is turned off. The brass lantern contains a
-            clear glass globe which is currently dark.
+            The lamp is turned off.
 
             > turn on lamp
             The brass lantern is now on.
-
-            — Living Room —
-
-            You are in the living room. There is a doorway to the east, a
-            wooden door with strange gothic lettering to the west, which
-            appears to be nailed shut, a trophy case, and a large oriental
-            rug in the center of the room.
 
             > inventory
             You are carrying:
@@ -317,7 +239,9 @@ struct OutsideHouseTests {
 
             This is the attic. The only exit is a stairway leading down.
 
-            There are a nasty knife and a rope here.
+            A large coil of rope is lying in the corner.
+
+            On a table is a nasty-looking knife.
 
             > take rope
             Taken.
@@ -340,7 +264,7 @@ struct OutsideHouseTests {
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "examine table",
             "take sack",
             "examine sack",
@@ -362,26 +286,24 @@ struct OutsideHouseTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > examine table
-            The table seems to have been used recently for the preparation
-            of food. The kitchen table contains a glass bottle and a brown
-            sack.
+            A bottle is sitting on the table. The glass bottle contains a
+            quantity of water. On the table is an elongated brown sack,
+            smelling of hot peppers.
 
             > take sack
             Taken.
 
             > examine sack
-            An elongated brown sack, smelling of hot peppers. The brown
-            sack is closed.
+            The brown sack is closed.
 
             > open sack
-            You open the brown sack.
+            Opening the brown sack reveals a clove of garlic and a lunch.
 
             > examine sack
-            An elongated brown sack, smelling of hot peppers. The brown
-            sack contains a clove of garlic and a lunch.
+            The brown sack contains a clove of garlic and a lunch.
 
             > take lunch
             Taken.
@@ -393,7 +315,7 @@ struct OutsideHouseTests {
             Taken.
 
             > examine bottle
-            It’s a glass bottle. The glass bottle is closed.
+            The glass bottle contains a quantity of water.
 
             > drink water
             I don’t know the verb ‘drink’.
@@ -401,9 +323,9 @@ struct OutsideHouseTests {
             > inventory
             You are carrying:
             - A glass bottle
-            - A brown sack
             - A clove of garlic
             - A lunch
+            - A brown sack
 
             >
             Goodbye!

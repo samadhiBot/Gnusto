@@ -27,18 +27,7 @@ struct ForestTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            Zork I: The Great Underground Empire
-
-            ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-            1983 Infocom, Inc. All rights reserved. ZORK is a registered
-            trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-            — West of House —
-
-            You are standing in an open field west of a white house, with a
-            boarded front door.
-
-            There is a small mailbox here.
+            \(Stub.zork1Intro)
 
             > north
             — North of House —

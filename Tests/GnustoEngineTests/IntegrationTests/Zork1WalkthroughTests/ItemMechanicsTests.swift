@@ -5,59 +5,10 @@ import Testing
 @testable import Zork1
 
 struct ItemMechanicsTests {
-    let enterKitchenSteps = [
-        "north",
-        "east",
-        "open window",
-        "west",
-    ]
-
-    let enterKitchenPlayback = """
-        Zork I: The Great Underground Empire
-
-        ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
-        1983 Infocom, Inc. All rights reserved. ZORK is a registered
-        trademark of Infocom, Inc. Revision 88 / Serial number 840726
-
-        — West of House —
-
-        You are standing in an open field west of a white house, with a
-        boarded front door.
-
-        There is a small mailbox here.
-
-        > north
-        — North of House —
-
-        You are facing the north side of a white house. There is no
-        door here, and all the windows are boarded up. To the north a
-        narrow path winds through the trees.
-
-        > east
-        — Behind House —
-
-        You are behind the white house. A path leads into the forest to
-        the east. In one corner of the house there is a small window
-        which is slightly ajar.
-
-        > open window
-        With great effort, you open the window far enough to allow
-        entry.
-
-        > west
-        — Kitchen —
-
-        You are in the kitchen of the white house. A table seems to
-        have been used recently for the preparation of food. A passage
-        leads to the west and a dark staircase can be seen leading
-        upward. A dark chimney leads down and to the east is a small
-        window which is open.
-        """
-
     @Test("Lamp and basic items collection")
     func testBasicItemCollection() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "west",
             "take all",
             "examine the lamp",
@@ -78,7 +29,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > west
             — Living Room —
@@ -142,7 +93,7 @@ struct ItemMechanicsTests {
     @Test("Container interactions (brown sack and bottle)")
     func testContainerInteractions() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "examine table",
             "take sack",
             "examine sack",
@@ -164,7 +115,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > examine table
             A bottle is sitting on the table. The glass bottle contains a
@@ -213,7 +164,7 @@ struct ItemMechanicsTests {
     @Test("Lamp mechanics")
     func testLampMechanics() async throws {
         let mockIO = await MockIOHandler(
-            enterKitchenSteps,
+            Moves.enterKitchen,
             "west",
             "take the lamp",
             "examine it",
@@ -231,7 +182,7 @@ struct ItemMechanicsTests {
 
         let transcript = await mockIO.flush()
         expectNoDifference(transcript, """
-            \(enterKitchenPlayback)
+            \(Stub.enterKitchen)
 
             > west
             — Living Room —
