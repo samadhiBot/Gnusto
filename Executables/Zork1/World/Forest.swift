@@ -212,7 +212,6 @@ enum Forest {
         .isTakable,
         .isFlammable,
         .requiresTryTake,
-        .description("On the ground is a pile of leaves."),
         .size(25),
         .in(.location(.gratingClearing))
         // Note: Has action handler LEAF-PILE
@@ -299,26 +298,8 @@ extension Forest {
             return nil
 
         case .beforeTurn(let command):
-            if command.verb == .look {
-                // ZIL M-LOOK: Custom description based on grate state
-                let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
-                let isGrateOpen = try await engine.hasFlag(.isOpen, on: .grate)
-
-                var description = """
-                    You are in a clearing, with a forest surrounding you on all sides.
-                    A path leads south.
-                    """
-
-                if !isGrateInvisible {
-                    if isGrateOpen {
-                        description += "\n\nThere is an open grating, descending into darkness."
-                    } else {
-                        description += "\n\nThere is a grating securely fastened into the ground."
-                    }
-                }
-
-                return ActionResult(description)
-            }
+            // Removed custom LOOK handling - let normal location description flow handle it
+            // The gratingClearingComputer already provides the proper description including grating state
             return nil
 
         case .afterTurn:
@@ -333,17 +314,32 @@ extension Forest {
                 // Check if grate is already revealed
                 let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
 
+                var stateChanges: [StateChange] = []
+
                 if isGrateInvisible {
                     // Reveal the grate - this is the LEAVES-APPEAR functionality
                     let grate = try await engine.item(.grate)
-                    let change = await engine.clearFlag(.isInvisible, on: grate)
-                    return ActionResult(
-                        message: "In disturbing the pile of leaves, a grating is revealed.",
-                        stateChange: change
-                    )
-                } else {
-                    return ActionResult("Done.")
+                    if let grateChange = await engine.clearFlag(.isInvisible, on: grate) {
+                        stateChanges.append(grateChange)
+                    }
                 }
+
+                // Update the leaves description to show they've been disturbed
+                let leaves = try await engine.item(.pileOfLeaves)
+                if let leavesChange = await engine.setAttribute(.firstDescription, on: leaves, to: .string("On the ground is a pile of leaves.")) {
+                    stateChanges.append(leavesChange)
+                }
+
+                let message = if isGrateInvisible {
+                    "In disturbing the pile of leaves, a grating is revealed."
+                } else {
+                    "Done."
+                }
+
+                return ActionResult(
+                    message: message,
+                    stateChanges: stateChanges
+                )
             }
             return nil
         case .afterTurn:

@@ -247,6 +247,6 @@ public struct LookActionHandler: ActionHandler {
             description.append(descriptionLines.joined(separator: "\n"))
         }
 
-        return description.joined(separator: "\n")
+        return description.joined(separator: "\n\n")
     }
 }

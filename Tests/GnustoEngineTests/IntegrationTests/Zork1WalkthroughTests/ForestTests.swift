@@ -76,14 +76,17 @@ struct ForestTests {
             In disturbing the pile of leaves, a grating is revealed.
 
             > look
+            — Clearing —
+
             You are in a clearing, with a forest surrounding you on all
             sides. A path leads south.
 
             There is a grating securely fastened into the ground.
 
+            On the ground is a pile of leaves.
+
             > examine grating
-            The grating is a large metal framework, securely fastened to
-            the ground.
+            The grating is closed.
 
             >
             Goodbye!

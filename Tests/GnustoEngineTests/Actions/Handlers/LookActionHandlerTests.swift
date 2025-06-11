@@ -89,8 +89,10 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Bright Room —
 
-            A brightly lit room. There are a modern looking chair, a woven
-            rug, and a wooden table here.
+            A brightly lit room.
+            
+            There are a modern looking chair, a woven rug, and a wooden
+            table here.
             """
         )
         // Assert No State Change
@@ -151,8 +153,9 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Test Room —
 
-            A basic room. There are an apple, a banana, an orange, and a
-            pear here.
+            A basic room.
+            
+            There are an apple, a banana, an orange, and a pear here.
             """
         )
 
@@ -253,7 +256,9 @@ struct LookActionHandlerTests {
         expectNoDifference(output, """
             — Dark Room —
 
-            A dark, damp room. There is a wooden table here.
+            A dark, damp room.
+            
+            There is a wooden table here.
             """
         )
         // Assert No State Change
