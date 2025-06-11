@@ -124,8 +124,40 @@ public struct ExamineActionHandler: ActionHandler {
                     {
                         itemMessages.append(readText)
                     }
-                    // Priority 2: Container/Door Description
-                    if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
+
+                    // Smart handling for items that are both containers and surfaces
+                    if targetItem.hasFlag(.isContainer) && targetItem.hasFlag(.isSurface) {
+                        // Check if surface items have meaningful firstDescriptions
+                        let contents = await context.engine.items(in: .item(targetItem.id))
+                        let hasFirstDescriptions = contents.contains { item in
+                            if let firstDescription = item.attributes[.firstDescription],
+                               case .string(let description) = firstDescription,
+                               !description.isEmpty {
+                                return true
+                            }
+                            return false
+                        }
+
+                        if hasFirstDescriptions {
+                            // Use surface description (which includes container info when needed)
+                            try itemMessages.append(
+                                await describeSurface(
+                                    targetItem: targetItem,
+                                    engine: context.engine
+                                )
+                            )
+                        } else {
+                            // Use container description
+                            try itemMessages.append(
+                                await describeContainerOrDoor(
+                                    targetItem: targetItem,
+                                    engine: context.engine
+                                )
+                            )
+                        }
+                    }
+                    // Priority 2: Container/Door Description (only if not also surface)
+                    else if targetItem.hasFlag(.isContainer) || targetItem.hasFlag(.isDoor) {
                         try itemMessages.append(
                             await describeContainerOrDoor(
                                 targetItem: targetItem,
@@ -133,8 +165,8 @@ public struct ExamineActionHandler: ActionHandler {
                             )
                         )
                     }
-                    // Priority 3: Surface Description
-                    if targetItem.hasFlag(.isSurface) {
+                    // Priority 3: Surface Description (only if not also container)
+                    else if targetItem.hasFlag(.isSurface) {
                         try itemMessages.append(
                             await describeSurface(
                                 targetItem: targetItem,
@@ -143,7 +175,7 @@ public struct ExamineActionHandler: ActionHandler {
                         )
                     }
                     // Priority 4: Dynamic Long Description
-                    if itemMessages.isEmpty {
+                    else {
                         // Use the registry to generate the description using the item ID and key
                         let (description, _, _) = try await context.engine.generateDescriptionWithSourceInfo(
                             for: targetItem.id,
@@ -312,35 +344,43 @@ public struct ExamineActionHandler: ActionHandler {
             return baseDescription
         }
 
-        // Check if any items have firstDescription (indicating enhanced mode)
-        let hasFirstDescriptions = contents.contains { item in
-            guard
-                let firstDescription = item.attributes[.firstDescription],
-                case .string(let description) = firstDescription,
-                !description.isEmpty
-            else {
-                return false
+        // Analyze items to determine description strategy
+        var itemsWithFirstDescription: [Item] = []
+        var itemsWithoutFirstDescription: [Item] = []
+        var allFirstDescriptionsEstablishContext = true
+
+        for item in contents {
+            if let firstDescription = item.attributes[.firstDescription],
+               case .string(let description) = firstDescription,
+               !description.isEmpty {
+                itemsWithFirstDescription.append(item)
+
+                // Check if firstDescription mentions the parent surface (smart context detection)
+                let parentKeywords = [targetItem.name.lowercased(), "table", "surface", "on the"]
+                let establishesContext = parentKeywords.contains(where: { description.lowercased().contains($0) })
+
+                // If any firstDescription doesn't establish context, we can't rely on them alone
+                if !establishesContext {
+                    allFirstDescriptionsEstablishContext = false
+                }
+            } else {
+                itemsWithoutFirstDescription.append(item)
+                // If any item lacks firstDescription, we can't rely on firstDescriptions alone
+                allFirstDescriptionsEstablishContext = false
             }
-            return true
         }
 
-        if hasFirstDescriptions {
-            // Use enhanced surface description with individual item details
+        // Strategy 1: All items have contextual firstDescriptions - use only those
+        if itemsWithoutFirstDescription.isEmpty && allFirstDescriptionsEstablishContext {
             var descriptionLines: [String] = []
 
-            for item in contents.sorted() {
-                // Use firstDescription if available, otherwise fall back to name with location
+            for item in itemsWithFirstDescription.sorted() {
                 if let firstDescription = item.attributes[.firstDescription],
-                   case .string(let description) = firstDescription,
-                   !description.isEmpty {
+                   case .string(let description) = firstDescription {
                     descriptionLines.append(description)
-                } else {
-                    descriptionLines.append(
-                        "On the \(targetItem.name) is \(item.withIndefiniteArticle)."
-                    )
                 }
 
-                // If item is a container, show its contents
+                // Add container contents if applicable
                 if item.hasFlag(.isContainer) {
                     let isOpen = item.hasFlag(.isOpen)
                     let isTransparent = item.hasFlag(.isTransparent)
@@ -358,8 +398,53 @@ public struct ExamineActionHandler: ActionHandler {
             }
 
             return descriptionLines.joined(separator: " ")
-        } else {
-            // Use simplified surface description (base description + combined contents)
+        }
+
+        // Strategy 2: Mixed items or non-contextual firstDescriptions - combine approaches
+        else if !itemsWithFirstDescription.isEmpty {
+            var descriptionParts: [String] = []
+
+            // Include base description only if items don't establish full context
+            if !allFirstDescriptionsEstablishContext && !isDefault {
+                descriptionParts.append(baseDescription)
+            }
+
+            // Add items without firstDescription as a combined listing
+            if !itemsWithoutFirstDescription.isEmpty {
+                let surfaceItemsList = itemsWithoutFirstDescription.sorted().listWithIndefiniteArticles
+                let isAre = itemsWithoutFirstDescription.count == 1 ? "is" : "are"
+                descriptionParts.append("On the \(targetItem.name) \(isAre) \(surfaceItemsList).")
+            }
+
+            // Add individual firstDescriptions
+            for item in itemsWithFirstDescription.sorted() {
+                if let firstDescription = item.attributes[.firstDescription],
+                   case .string(let description) = firstDescription {
+                    descriptionParts.append(description)
+                }
+
+                // Add container contents if applicable
+                if item.hasFlag(.isContainer) {
+                    let isOpen = item.hasFlag(.isOpen)
+                    let isTransparent = item.hasFlag(.isTransparent)
+
+                    if isOpen || isTransparent {
+                        let containerContents = await engine.items(in: .item(item.id))
+                        if !containerContents.isEmpty {
+                            descriptionParts.append("""
+                                The \(item.name) contains \
+                                \(containerContents.sorted().listWithIndefiniteArticles).
+                                """)
+                        }
+                    }
+                }
+            }
+
+            return descriptionParts.joined(separator: " ")
+        }
+
+        // Strategy 3: No firstDescriptions - use traditional surface description
+        else {
             var descriptionParts: [String] = []
 
             // Add base description only if it's not the generic default message

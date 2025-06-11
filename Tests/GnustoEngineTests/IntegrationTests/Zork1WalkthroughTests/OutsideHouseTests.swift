@@ -15,7 +15,7 @@ struct OutsideHouseTests {
 
     let introPlayback = """
         Zork I: The Great Underground Empire
-        
+
         ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
         1983 Infocom, Inc. All rights reserved. ZORK is a registered
         trademark of Infocom, Inc. Revision 88 / Serial number 840726
@@ -23,7 +23,7 @@ struct OutsideHouseTests {
 
     let enterKitchenPlayback = """
         Zork I: The Great Underground Empire
-        
+
         ZORK I: The Great Underground Empire Copyright (c) 1981, 1982,
         1983 Infocom, Inc. All rights reserved. ZORK is a registered
         trademark of Infocom, Inc. Revision 88 / Serial number 840726
@@ -88,11 +88,9 @@ struct OutsideHouseTests {
             \(enterKitchenPlayback)
 
             > examine table
-            You see nothing special about the kitchen table. The kitchen
-            table contains a glass bottle and a brown sack. A bottle is
-            sitting on the table. The glass bottle contains a quantity of
-            water. On the table is an elongated brown sack, smelling of hot
-            peppers.
+            A bottle is sitting on the table. The glass bottle contains a
+            quantity of water. On the table is an elongated brown sack,
+            smelling of hot peppers.
 
             > open sack
             Opening the brown sack reveals a clove of garlic and a lunch.
