@@ -26,11 +26,11 @@ class GameDataCollector {
             processEnumDecl(enumDecl)
         } else if let extensionDecl = node.as(ExtensionDeclSyntax.self) {
             currentAreaType = extensionDecl.extendedType.trimmedDescription
-            processExtensionDecl(extensionDecl)
+            // Note: We are not processing extensions for GlobalID anymore, per the new strategy
         } else if let varDecl = node.as(VariableDeclSyntax.self) {
             processVariableDecl(varDecl)
         } else if let functionCall = node.as(FunctionCallExprSyntax.self) {
-            processGlobalIDUsage(functionCall)
+            processFunctionCallExpr(functionCall)
         }
 
         // Recursively walk children
@@ -65,10 +65,43 @@ class GameDataCollector {
         gameData.gameAreaTypes.insert(enumDecl.name.text)
     }
 
-    private func processExtensionDecl(_ extensionDecl: ExtensionDeclSyntax) {
-        // Extensions don't define new game area types, they extend existing ones.
-        // The currentAreaType is already set to the extended type name.
-        // No additional processing needed here - the walk will handle the contents.
+    private func processFunctionCallExpr(_ functionCall: FunctionCallExprSyntax) {
+        // We are looking for engine calls that use GlobalIDs implicitly,
+        // like `engine.hasFlag(.someGlobalFlag)`
+        guard
+            let calledExpression = functionCall.calledExpression.as(MemberAccessExprSyntax.self)
+        else { return }
+
+        let functionName = calledExpression.declName.baseName.text
+        let globalIDFunctions = [
+            "adjustGlobal",
+            "clearFlag",
+            "global",
+            "globalState",
+            "hasFlag",
+            "setFlag",
+            "toggleFlag",
+            "value",
+        ]
+
+        guard globalIDFunctions.contains(functionName) else { return }
+
+        // These functions can be called on an item or globally on the engine.
+        // A global call has one argument: `hasFlag(.someFlag)`.
+        // An item call has two: `hasFlag(.someFlag, on: .someItem)`.
+        // We only care about calls that are potentially global.
+        guard let firstArgument = functionCall.arguments.first?.expression else { return }
+
+        // We are looking for a dot-prefixed member access, like `.myFlag`.
+        if let memberAccess = firstArgument.as(MemberAccessExprSyntax.self), memberAccess.base == nil {
+            let globalIDName = memberAccess.declName.baseName.text
+
+            // To distinguish from an Item property, we check the number of arguments.
+            // A global flag call will have exactly one argument.
+            if functionCall.arguments.count == 1 {
+                gameData.globalIDs.insert(globalIDName)
+            }
+        }
     }
 
     private func processVariableDecl(_ varDecl: VariableDeclSyntax) {
@@ -104,8 +137,6 @@ class GameDataCollector {
                         }
                     }
                 }
-
-
 
                 // Handle computed properties with accessors (getters)
                 if let accessorBlock = binding.accessorBlock {
@@ -178,8 +209,6 @@ class GameDataCollector {
             }
         }
     }
-
-
 
     private func extractLocationData(
         from functionCall: FunctionCallExprSyntax,
@@ -264,27 +293,6 @@ class GameDataCollector {
         // Filter out common method names that aren't IDs
         let methodNames = ["name", "description", "location", "in", "to", "exits", "adjectives"]
         return !methodNames.contains(memberName)
-    }
-
-    private func processGlobalIDUsage(_ functionCall: FunctionCallExprSyntax) {
-        // Check if this is a call to engine.global() or engine.adjustGlobal()
-        if let memberAccess = functionCall.calledExpression.as(MemberAccessExprSyntax.self) {
-            let methodName = memberAccess.declName.baseName.text
-
-            // Check if the base is 'engine' and method is 'global' or 'adjustGlobal'
-            if let base = memberAccess.base?.trimmedDescription,
-               base == "engine" || base.hasSuffix(".engine") {
-
-                if methodName == "global" || methodName == "adjustGlobal" {
-                    // Look for the first argument which should be the GlobalID
-                    if let firstArg = functionCall.arguments.first,
-                       let memberAccessArg = firstArg.expression.as(MemberAccessExprSyntax.self) {
-                        let globalIDName = memberAccessArg.declName.baseName.text
-                        gameData.globalIDs.insert(globalIDName)
-                    }
-                }
-            }
-        }
     }
 
     private func extractPlayerLocationData(from functionCall: FunctionCallExprSyntax) {
