@@ -379,16 +379,12 @@ extension InsideHouse {
     static let rugHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
-            // The global flag tracking whether the rug has been moved
-            let rugMovedFlag: GlobalID = "rugMoved"
-
-            let wasRugMoved = await engine.hasFlag(rugMovedFlag)
+            let wasRugMoved = await engine.hasFlag(.rugMoved)
             let trapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
 
             switch command.verb {
             case .raise:
                 let baseMessage = "The rug is too heavy to lift"
-
                 if wasRugMoved {
                     return ActionResult("\(baseMessage).")
                 } else {
@@ -407,20 +403,17 @@ extension InsideHouse {
                 } else {
                     // Move the rug and reveal the trap door
                     let trapDoor = try await engine.item(.trapDoor)
-
-                    let changes: [StateChange] = [
-                        // Mark rug as moved
-                        await engine.setFlag(rugMovedFlag),
-                        // Make trap door visible
-                        await engine.clearFlag(.isInvisible, on: trapDoor)
-                    ].compactMap { $0 }
-
                     return ActionResult(
                         message: """
-                            With a great effort, the rug is moved to one side of the room, revealing
-                            the dusty cover of a closed trap door.
+                            With a great effort, the rug is moved to one side of the room,
+                            revealing the dusty cover of a closed trap door.
                             """,
-                        stateChanges: changes
+                        stateChanges: [
+                            // Mark rug as moved
+                            await engine.setFlag(.rugMoved),
+                            // Make trap door visible
+                            await engine.clearFlag(.isInvisible, on: trapDoor)
+                        ]
                     )
                 }
 

@@ -5,7 +5,7 @@ import GnustoEngine
 enum Underground {
     // MARK: - Locations
 
-    static let cellar = Location(
+    static let cellar: Location = Location(
         id: .cellar,
         .name("Cellar"),
         .description("""
@@ -219,4 +219,34 @@ enum Underground {
         .omitDescription,
         .isClimbable
     )
+}
+
+// MARK: - Event Handlers
+
+extension Underground {
+    /// Handles the cellar-specific logic, primarily the automatic closing of the trap door upon first entry.
+    ///
+    /// This is based on the ZIL `CELLAR-FCN` routine. When the player enters the cellar for the
+    /// first time while the trap door is open, the door slams shut and is barred, preventing
+    /// an easy return. This is controlled by a custom flag.
+    static let cellarHandler = LocationEventHandler { engine, event in
+        switch event {
+        case .onEnter:
+            let isTrapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
+            let isTrapDoorBarred = await engine.hasFlag(.trapDoorBarred)
+
+            if isTrapDoorOpen, !isTrapDoorBarred {
+                return ActionResult(
+                    message: "The trap door crashes shut, and you hear someone barring it.",
+                    stateChanges: [
+                        try await engine.clearFlag(.isOpen, on: .trapDoor),
+                        await engine.setFlag(.trapDoorBarred),
+                    ]
+                )
+            }
+            return nil
+        default:
+            return nil
+        }
+    }
 }
