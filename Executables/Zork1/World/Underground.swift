@@ -12,7 +12,7 @@ enum Underground {
             unclimbable.
             """),
         .exits([
-            .north: .to(.troll),
+            .north: .to(.trollRoom),
             .south: .to(.eastOfChasm),
             .west: .to(.steepRamp),
             .up: .to(.livingRoom, via: .trapDoor, else: "The trap door is locked from above."),
@@ -59,7 +59,7 @@ enum Underground {
             """),
         .exits([
             .east: .to(.roundRoom),
-            .west: .to(.troll),
+            .west: .to(.trollRoom),
             .down: .to(.reservoir),
         ])
     )
@@ -82,7 +82,7 @@ enum Underground {
         .name("Maze"),
         .description("This is part of a maze of twisty little passages, all alike."),
         .exits([
-            .east: .to(.troll),
+            .east: .to(.trollRoom),
         ])
     )
 
@@ -190,8 +190,8 @@ enum Underground {
         ])
     )
 
-    static let troll = Location(
-        id: .troll,
+    static let trollRoom = Location(
+        id: .trollRoom,
         .name("Troll Room"),
         .description("""
             This is a small room with passages to the east and south and a forbidding hole
@@ -218,6 +218,35 @@ extension Underground {
         .in(.location(.cellar)),
         .omitDescription,
         .isClimbable
+    )
+
+    /*
+     <OBJECT TROLL
+     (IN TROLL-ROOM)
+     (SYNONYM TROLL)
+     (ADJECTIVE NASTY)
+     (DESC "troll")
+     (FLAGS ACTORBIT OPENBIT TRYTAKEBIT)
+     (ACTION TROLL-FCN)
+     (LDESC
+     "A nasty-looking troll, brandishing a bloody axe, blocks all passages
+     out of the room.")
+     (STRENGTH 2)>
+     */
+
+    static let troll = Item(
+        id: .troll,
+        .name("troll"),
+        .synonyms("troll"),
+        .adjectives("nasty"),
+        .description("""
+            A nasty-looking troll, brandishing a bloody axe,
+            blocks all passages out of the room.
+            """),
+        .isCharacter,
+        .isOpen,
+        .requiresTryTake,
+        .in(.location(.trollRoom))
     )
 }
 

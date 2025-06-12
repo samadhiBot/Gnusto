@@ -519,26 +519,6 @@ extension InsideHouse {
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
-            case .take:
-                // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-                return ActionResult(
-                    message: "Taken.",
-                    sideEffects: [
-                        .runDaemon("swordDaemon")
-//                        SideEffect(type: .runDaemon, targetID: .daemon(.swordDaemon))
-                    ]
-                )
-
-            case .drop:
-                // Disable sword glow daemon when dropped
-                return ActionResult(
-                    message: "Dropped.",
-                    sideEffects: [
-                        .stopDaemon("swordDaemon")
-//                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordDaemon))
-                    ]
-                )
-
             case .examine:
                 // Show glow message based on current glow level (like SWORD-FCN in ZIL)
                 let glowLevel = await engine.global(.swordGlowLevel) ?? 0
@@ -557,8 +537,24 @@ extension InsideHouse {
                 return nil
             }
 
-        case .afterTurn:
-            return nil
+        case .afterTurn(let command):
+            switch command.verb {
+            case .take:
+                print("🎾 Enable sword glow daemon")
+                // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
+                return ActionResult(
+                    effects: .runDaemon("swordDaemon")
+                )
+
+            case .drop:
+                // Disable sword glow daemon when dropped
+                print("🎾 Disable sword glow daemon")
+                return ActionResult(
+                    effects: .stopDaemon("swordDaemon")
+                )
+            default:
+                return nil
+            }
         }
     }
 
@@ -570,8 +566,6 @@ extension InsideHouse {
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
     static let swordDaemon = DaemonDefinition { engine in
-        print("🎾 swordGlowDaemon")
-
         let currentLocation = try await engine.playerLocation()
         var newGlowLevel = 0
 
