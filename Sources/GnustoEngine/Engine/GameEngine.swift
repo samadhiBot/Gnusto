@@ -607,7 +607,7 @@ extension GameEngine {
                 let restartChange = StateChange(
                     entityID: .global,
                     attribute: .addActiveFuse(
-                        fuseID: fuseToExecute.definition.id,
+                        fuseID: fuseToExecute.id,
                         initialTurns: fuseToExecute.definition.initialTurns
                     ),
                     oldValue: nil,

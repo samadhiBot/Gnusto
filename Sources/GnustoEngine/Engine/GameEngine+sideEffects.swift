@@ -40,10 +40,10 @@ extension GameEngine {
             let addChange = StateChange(
                 entityID: .global,
                 attribute: .addActiveFuse(
-                    fuseID: definition.id,
+                    fuseID: fuseID,
                     initialTurns: initialTurns
                 ),
-                oldValue: gameState.activeFuses[definition.id].map { .int($0) },
+                oldValue: gameState.activeFuses[fuseID].map { .int($0) },
                 newValue: .int(initialTurns)
             )
             try await applyWithDynamicValidation(addChange)

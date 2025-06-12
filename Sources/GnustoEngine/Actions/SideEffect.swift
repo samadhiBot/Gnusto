@@ -20,22 +20,87 @@ public struct SideEffect: Sendable, Equatable {
     /// this side effect. The keys are `String`s and values are `StateValue`s.
     /// For example, a `.startFuse` effect might include a parameter for the fuse's duration.
     public let parameters: [String: StateValue]
+}
 
-    /// Creates a new `SideEffect` instance.
+extension SideEffect {
+    /// Creates a new `SideEffect` instance with type `.startFuse`.
     ///
     /// - Parameters:
-    ///   - type: The `SideEffectType` categorizing this side effect.
-    ///   - targetID: The `EntityID` of the entity primarily affected or involved.
-    ///   - parameters: Optional. A dictionary of additional `String`-keyed `StateValue`
-    ///                 parameters needed for this specific side effect. Defaults to an empty dictionary.
-    public init(
-        type: SideEffectType,
-        targetID: EntityID,
+    ///   - fuseID: The `FuseID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func startFuse(
+        _ fuseID: FuseID,
         parameters: [String: StateValue] = [:]
-    ) {
-        self.type = type
-        self.targetID = targetID
-        self.parameters = parameters
+    ) -> SideEffect {
+        .init(
+            type: .startFuse,
+            targetID: .fuse(fuseID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.stopFuse`.
+    ///
+    /// - Parameters:
+    ///   - fuseID: The `FuseID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func stopFuse(
+        _ fuseID: FuseID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        .init(
+            type: .stopFuse,
+            targetID: .fuse(fuseID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.runDaemon`.
+    ///
+    /// - Parameters:
+    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func runDaemon(
+        _ daemonID: DaemonID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        .init(
+            type: .runDaemon,
+            targetID: .daemon(daemonID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.stopDaemon`.
+    ///
+    /// - Parameters:
+    ///   - daemonID: The `DaemonID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func stopDaemon(
+        _ daemonID: DaemonID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        .init(
+            type: .stopDaemon,
+            targetID: .daemon(daemonID),
+            parameters: parameters
+        )
+    }
+
+    /// Creates a new `SideEffect` instance with type `.scheduleEvent`.
+    ///
+    /// - Parameters:
+    ///   - targetID: The `EntityID` of the entity primarily affected or involved.
+    ///   - parameters: An optional dictionary of additional parameters.
+    public static func scheduleEvent(
+        _ targetID: EntityID,
+        parameters: [String: StateValue] = [:]
+    ) -> SideEffect {
+        .init(
+            type: .scheduleEvent,
+            targetID: targetID,
+            parameters: parameters
+        )
     }
 }
 

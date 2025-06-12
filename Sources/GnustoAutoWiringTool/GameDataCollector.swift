@@ -70,7 +70,11 @@ class GameDataCollector {
         // like `engine.hasFlag(.someGlobalFlag)`
         guard
             let calledExpression = functionCall.calledExpression.as(MemberAccessExprSyntax.self)
-        else { return }
+        else {
+            // Also check for SideEffect convenience methods like .runDaemon("daemonName")
+            processConvenienceSideEffects(functionCall)
+            return
+        }
 
         let functionName = calledExpression.declName.baseName.text
         let globalIDFunctions = [
@@ -100,6 +104,36 @@ class GameDataCollector {
             // A global flag call will have exactly one argument.
             if functionCall.arguments.count == 1 {
                 gameData.globalIDs.insert(globalIDName)
+            }
+        }
+    }
+
+    private func processConvenienceSideEffects(_ functionCall: FunctionCallExprSyntax) {
+        // Look for convenience side effect methods like .runDaemon("daemonName") and .stopDaemon("daemonName")
+        guard let memberAccess = functionCall.calledExpression.as(MemberAccessExprSyntax.self),
+              memberAccess.base == nil else { return }
+
+        let functionName = memberAccess.declName.baseName.text
+
+        // Check for daemon convenience methods
+        if functionName == "runDaemon" || functionName == "stopDaemon" {
+            // Look for string literal argument
+            if let firstArg = functionCall.arguments.first?.expression,
+               let stringLiteral = firstArg.as(StringLiteralExprSyntax.self),
+               let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self) {
+                let daemonID = segment.content.text
+                gameData.daemonIDs.insert(daemonID)
+            }
+        }
+
+        // Check for fuse convenience methods (if they exist)
+        if functionName == "startFuse" || functionName == "stopFuse" {
+            // Look for string literal argument
+            if let firstArg = functionCall.arguments.first?.expression,
+               let stringLiteral = firstArg.as(StringLiteralExprSyntax.self),
+               let segment = stringLiteral.segments.first?.as(StringSegmentSyntax.self) {
+                let fuseID = segment.content.text
+                gameData.fuseIDs.insert(fuseID)
             }
         }
     }
@@ -316,20 +350,15 @@ class GameDataCollector {
         propertyName: String,
         isStatic: Bool
     ) {
-        // Look for id: .fuseName pattern
-        guard let arguments = functionCall.arguments.first else { return }
+        // Since FuseDefinition no longer takes an ID parameter, we derive the ID from the property name
+        // e.g., "explodingFuse" -> "explodingFuse"
+        gameData.fuseIDs.insert(propertyName)
+        gameData.fuseDefinitions.insert(propertyName)
 
-        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
-           arguments.label?.text == "id" {
-            let fuseID = memberAccess.declName.baseName.text
-            gameData.fuseIDs.insert(fuseID)
-            gameData.fuseDefinitions.insert(propertyName)
-
-            // Map this fuse definition to its area type
-            if let areaType = currentAreaType {
-                gameData.handlerToAreaMap[propertyName] = areaType
-                gameData.propertyIsStatic[propertyName] = isStatic
-            }
+        // Map this fuse definition to its area type
+        if let areaType = currentAreaType {
+            gameData.handlerToAreaMap[propertyName] = areaType
+            gameData.propertyIsStatic[propertyName] = isStatic
         }
     }
 
@@ -338,20 +367,15 @@ class GameDataCollector {
         propertyName: String,
         isStatic: Bool
     ) {
-        // Look for id: .daemonName pattern
-        guard let arguments = functionCall.arguments.first else { return }
+        // Since DaemonDefinition no longer takes an ID parameter, we derive the ID from the property name
+        // e.g., "swordDaemon" -> "swordDaemon"
+        gameData.daemonIDs.insert(propertyName)
+        gameData.daemonDefinitions.insert(propertyName)
 
-        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
-           arguments.label?.text == "id" {
-            let daemonID = memberAccess.declName.baseName.text
-            gameData.daemonIDs.insert(daemonID)
-            gameData.daemonDefinitions.insert(propertyName)
-
-            // Map this daemon definition to its area type
-            if let areaType = currentAreaType {
-                gameData.handlerToAreaMap[propertyName] = areaType
-                gameData.propertyIsStatic[propertyName] = isStatic
-            }
+        // Map this daemon definition to its area type
+        if let areaType = currentAreaType {
+            gameData.handlerToAreaMap[propertyName] = areaType
+            gameData.propertyIsStatic[propertyName] = isStatic
         }
     }
 }

@@ -524,7 +524,8 @@ extension InsideHouse {
                 return ActionResult(
                     message: "Taken.",
                     sideEffects: [
-                        SideEffect(type: .runDaemon, targetID: .daemon(.swordDaemon))
+                        .runDaemon("swordDaemon")
+//                        SideEffect(type: .runDaemon, targetID: .daemon(.swordDaemon))
                     ]
                 )
 
@@ -533,7 +534,8 @@ extension InsideHouse {
                 return ActionResult(
                     message: "Dropped.",
                     sideEffects: [
-                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordDaemon))
+                        .stopDaemon("swordDaemon")
+//                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordDaemon))
                     ]
                 )
 
