@@ -19,11 +19,11 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
 
     /// A dictionary holding the current state of all attributes for this location.
     ///
-    /// Each key is an `AttributeID` (e.g., `.name`, `.description`, `.isLit`, `.exits`)
+    /// Each key is a `LocationAttributeID` (e.g., `.name`, `.description`, `.isLit`, `.exits`)
     /// and the value is a `StateValue` wrapper containing the actual typed data for that attribute.
     /// Game logic typically interacts with these attributes via convenience accessors on `Location`
     /// (for reading) or through `GameEngine` methods (for modifications).
-    public var attributes: [AttributeID: StateValue]
+    public var attributes: [LocationAttributeID: StateValue]
 
     // MARK: - Initializer
 
@@ -74,7 +74,7 @@ public struct Location: Codable, Identifiable, Equatable, Sendable {
     ///
     /// - Parameter id: The `AttributeID` of the flag to check (e.g., `.isLit`, `.isVisited`).
     /// - Returns: `true` if the flag attribute exists and is `true`, `false` otherwise.
-    public func hasFlag(_ id: AttributeID) -> Bool {
+    public func hasFlag(_ id: LocationAttributeID) -> Bool {
         attributes[id] == true
     }
 

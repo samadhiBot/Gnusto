@@ -15,7 +15,7 @@ struct ActionResponseTests {
     let testKeyID: ItemID = "testKey"
     let testLockID: ItemID = "testLock"
     let testLocationID: LocationID = "testLocation"
-    let testAttributeID: AttributeID = "testAttribute"
+    let testAttributeID: ItemAttributeID = "testAttribute"
     let testGlobalID: GlobalID = "testGlobal"
 
     // MARK: - CustomStringConvertible Tests

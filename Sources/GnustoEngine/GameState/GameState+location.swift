@@ -10,7 +10,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist, or
     ///           `GameStateError.locationAttributeTypeMismatch` if the attribute exists but is not a boolean.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         of locationID: LocationID
     ) throws -> Bool? {
         guard let value = try fetchStateValue(
@@ -34,7 +34,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist, or
     ///           `GameStateError.locationAttributeTypeMismatch` if the attribute exists but is not an integer.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         of locationID: LocationID
     ) throws -> Int? {
         guard let value = try fetchStateValue(
@@ -58,7 +58,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist, or
     ///           `GameStateError.locationAttributeTypeMismatch` if the attribute exists but is not a string.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         of locationID: LocationID
     ) throws -> String? {
         guard let value = try fetchStateValue(
@@ -86,7 +86,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist, or
     ///           `GameStateError.locationAttributeTypeMismatch` if the attribute exists but is not a string.
     public func generateDescription(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         for locationID: LocationID,
     ) throws -> String {
         if let description: String = try attribute(attributeID, of: locationID) {
@@ -111,7 +111,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist, or
     ///           `GameStateError.locationAttributeTypeMismatch` if the attribute exists but is not a boolean.
     public func hasFlag(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on locationID: LocationID
     ) throws -> Bool {
         (try attribute(attributeID, of: locationID)) == true
@@ -145,7 +145,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist.
     private func defaultLocationDescription(
         for locationID: LocationID,
-        attributeID: AttributeID
+        attributeID: LocationAttributeID
     ) throws -> String {
         let location = try location(locationID)
         return switch attributeID {
@@ -155,10 +155,6 @@ extension GameState {
             "The \(location.name)."
         case .firstDescription:
             "There is \(location.name) here."
-        case .readText:
-            "There is nothing written on \(location.name)."
-        case .readWhileHeldText:
-            "Holding \(location.name) reveals nothing special."
         default:
             "\(location.name.capitalizedFirst) seems indescribable."
         }
@@ -176,7 +172,7 @@ extension GameState {
     /// - Throws: `GameStateError.locationNotFound` if the location doesn't exist.
     private func fetchStateValue(
         locationID: LocationID,
-        attributeID: AttributeID
+        attributeID: LocationAttributeID
     ) throws -> StateValue? {
         try location(locationID).attributes[attributeID]
     }

@@ -9,13 +9,13 @@ extension GameEngine {
     /// Useful for dynamic location descriptions.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the string attribute.
+    ///   - attributeID: The `LocationAttributeID` of the string attribute.
     ///   - locationID: The `LocationID` of the location.
     /// - Returns: The string value of the attribute, or `nil` if the attribute doesn't exist.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a string,
     ///           or if the location does not exist.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         of locationID: LocationID
     ) async throws -> String? {
         let result = await fetchStateValue(
@@ -49,13 +49,13 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - locationID: The `LocationID` of the location.
-    ///   - attributeID: The `AttributeID` for the desired description (typically `.description`).
+    ///   - attributeID: The `LocationAttributeID` for the desired description (typically `.description`).
     ///   - engine: The `GameEngine` instance, used for fetching dynamic values.
     ///             (Note: This parameter is often the same instance the method is called on).
     /// - Returns: A formatted description string.
     public func generateDescription(
         for locationID: LocationID,
-        attributeID: AttributeID,
+        attributeID: LocationAttributeID,
         engine: GameEngine
     ) async -> String {
         if let actualDescription = try? await engine.attribute(attributeID, of: locationID) {
@@ -190,13 +190,13 @@ extension GameEngine {
     /// This method is kept for compatibility during the transition.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the attribute being validated.
+    ///   - attributeID: The `LocationAttributeID` of the attribute being validated.
     ///   - locationID: The unique identifier of the location.
     ///   - newValue: The proposed new `StateValue`.
     /// - Returns: Always `true` since validation handlers are not implemented yet.
     func validateStateValue(
         locationID: LocationID,
-        attributeID: AttributeID,
+        attributeID: LocationAttributeID,
         newValue: StateValue
     ) async throws -> Bool {
         // Validation handlers removed for now, always allow changes
@@ -211,7 +211,7 @@ extension GameEngine {
     /// isn't found. This internal helper is called by the public `generateDescription` for locations.
     private func defaultDescription(
         for locationID: LocationID,
-        attributeID: AttributeID,
+        attributeID: LocationAttributeID,
         engine: GameEngine
     ) async -> String {
         // Consider fetching location name
@@ -230,13 +230,13 @@ extension GameEngine {
     /// Checks for a compute handler first, then returns the stored value if no handler exists.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the desired value.
+    ///   - attributeID: The `LocationAttributeID` of the desired value.
     ///   - locationID: The unique identifier of the location.
     /// - Returns: A tuple containing the computed or stored `StateValue` (or `nil` if not found)
     ///           and a boolean indicating whether a compute handler provided the value.
     private func fetchStateValue(
         locationID: LocationID,
-        attributeID: AttributeID
+        attributeID: LocationAttributeID
     ) async -> (value: StateValue?, wasComputed: Bool) {
         guard let location = gameState.locations[locationID] else {
             logWarning("""

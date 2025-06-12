@@ -22,12 +22,12 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.clearFlag(.testFlag, on: item.id)
+        let change = try await engine.clearFlag(.testItemFlag, on: item.id)
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .item("testItem"))
-        #expect(change?.attribute == .itemAttribute(.testFlag))
+        #expect(change?.attribute == .itemAttribute(.testItemFlag))
         #expect(change?.oldValue == true)
         #expect(change?.newValue == false)
     }
@@ -44,7 +44,7 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.clearFlag(.testFlag, on: item.id)
+        let change = try await engine.clearFlag(.testItemFlag, on: item.id)
 
         // Then
         #expect(change == nil)
@@ -62,7 +62,7 @@ struct GameEngineStateChangesIDVariantsTests {
 
         // Then
         await #expect(throws: ActionResponse.self) {
-            try await engine.clearFlag(.testFlag, on: nilItemID)
+            try await engine.clearFlag(.testItemFlag, on: nilItemID)
         }
     }
 
@@ -75,7 +75,7 @@ struct GameEngineStateChangesIDVariantsTests {
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
-            try await engine.clearFlag(.testFlag, on: ItemID("nonexistentItem"))
+            try await engine.clearFlag(.testItemFlag, on: ItemID("nonexistentItem"))
         }
     }
 
@@ -126,12 +126,12 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.setAttribute(.testCounter, on: item.id, to: .int(42))
+        let change = try await engine.setAttribute(.testItemCounter, on: item.id, to: .int(42))
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .item("testItem"))
-        #expect(change?.attribute == .itemAttribute(.testCounter))
+        #expect(change?.attribute == .itemAttribute(.testItemCounter))
         #expect(change?.newValue == .int(42))
     }
 
@@ -147,12 +147,12 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.setAttribute(.testFlag, on: item.id, to: true)
+        let change = try await engine.setAttribute(.testItemFlag, on: item.id, to: true)
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .item("testItem"))
-        #expect(change?.attribute == .itemAttribute(.testFlag))
+        #expect(change?.attribute == .itemAttribute(.testItemFlag))
         #expect(change?.newValue == true)
     }
 
@@ -168,7 +168,7 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.setFlag(.testFlag, on: item.id)
+        let change = try await engine.setFlag(.testItemFlag, on: item.id)
 
         // Then
         #expect(change != nil)
@@ -187,7 +187,7 @@ struct GameEngineStateChangesIDVariantsTests {
 
         // Then
         await #expect(throws: ActionResponse.self) {
-            try await engine.clearFlag(.testFlag, on: nilItemID)
+            try await engine.clearFlag(.testItemFlag, on: nilItemID)
         }
     }
 
@@ -225,12 +225,12 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.clearFlag(.testFlag, on: LocationID("testLocation"))
+        let change = try await engine.clearFlag(.testLocationFlag, on: LocationID("testLocation"))
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .location("testLocation"))
-        #expect(change?.attribute == .locationAttribute(.testFlag))
+        #expect(change?.attribute == .locationAttribute(.testLocationFlag))
         #expect(change?.oldValue == true)
         #expect(change?.newValue == false)
     }
@@ -244,7 +244,7 @@ struct GameEngineStateChangesIDVariantsTests {
 
         // When/Then
         await #expect(throws: ActionResponse.self) {
-            try await engine.clearFlag(.testFlag, on: LocationID("nonexistentLocation"))
+            try await engine.clearFlag(.testLocationFlag, on: LocationID("nonexistentLocation"))
         }
     }
 
@@ -260,34 +260,42 @@ struct GameEngineStateChangesIDVariantsTests {
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
 
         // When
-        let change = try await engine.setFlag(.testFlag, on: LocationID("testLocation"))
+        let change = try await engine.setFlag(.testLocationFlag, on: LocationID("testLocation"))
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .location("testLocation"))
-        #expect(change?.attribute == .locationAttribute(.testFlag))
+        #expect(change?.attribute == .locationAttribute(.testLocationFlag))
         #expect(change?.newValue == true)
     }
 
     @Test("setAttribute with LocationID - StateValue variant")
     func testSetAttributeLocationIDStateValue() async throws {
         // Given
-        let testCounter = AttributeID("testCounter")
+        let testLocationCounter = LocationAttributeID("testLocationCounter")
         let location = Location(
             id: "testLocation",
             .name("Test Location")
         )
         let game = MinimalGame(locations: [location])
         let mockIO = await MockIOHandler()
-        let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         // When
-        let change = try await engine.setAttribute(.testCounter, on: LocationID("testLocation"), to: .int(42))
+        let change = try await engine.setAttribute(
+            .testLocationCounter,
+            on: LocationID("testLocation"),
+            to: .int(42)
+        )
 
         // Then
         #expect(change != nil)
         #expect(change?.entityID == .location("testLocation"))
-        #expect(change?.attribute == .locationAttribute(testCounter))
+        #expect(change?.attribute == .locationAttribute(testLocationCounter))
         #expect(change?.newValue == .int(42))
     }
 
@@ -326,19 +334,19 @@ struct GameEngineStateChangesIDVariantsTests {
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(.testFlag, on: nonexistentID, to: .bool(true))
+            try await engine.setAttribute(.testItemFlag, on: nonexistentID, to: .bool(true))
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(.testFlag, on: nonexistentID, to: true)
+            try await engine.setAttribute(.testItemFlag, on: nonexistentID, to: true)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(AttributeID("testCounter"), on: nonexistentID, to: 42)
+            try await engine.setAttribute(ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(AttributeID("testName"), on: nonexistentID, to: "test")
+            try await engine.setAttribute(ItemAttributeID("testName"), on: nonexistentID, to: "test")
         }
 
         await #expect(throws: ActionResponse.self) {
@@ -352,23 +360,23 @@ struct GameEngineStateChangesIDVariantsTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(blueprint: game, parser: MockParser(), ioHandler: mockIO)
-        let nonexistentID: LocationID = "nonexistent"
+        let nonexistentID: ItemID = "nonexistent"
 
         // When/Then - Test all variants that should throw
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(.testFlag, on: nonexistentID, to: .bool(true))
+            try await engine.setAttribute(.testItemFlag, on: nonexistentID, to: .bool(true))
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(.testFlag, on: nonexistentID, to: true)
+            try await engine.setAttribute(.testItemFlag, on: nonexistentID, to: true)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(AttributeID("testCounter"), on: nonexistentID, to: 42)
+            try await engine.setAttribute(ItemAttributeID("testItemCounter"), on: nonexistentID, to: 42)
         }
 
         await #expect(throws: ActionResponse.self) {
-            try await engine.setAttribute(AttributeID("testName"), on: nonexistentID, to: "test")
+            try await engine.setAttribute(ItemAttributeID("testName"), on: nonexistentID, to: "test")
         }
 
         await #expect(throws: ActionResponse.self) {
@@ -381,15 +389,20 @@ private extension ItemID {
     static let item = ItemID(rawValue: "item")
 }
 
-private extension AttributeID {
-    static let testFlag = AttributeID("testFlag")
-    static let testCounter = AttributeID("testCounter")
+private extension ItemAttributeID {
+    static let testItemFlag = ItemAttributeID("testItemFlag")
+    static let testItemCounter = ItemAttributeID("testItemCounter")
+}
+
+private extension LocationAttributeID {
+    static let testLocationFlag = LocationAttributeID("testLocationFlag")
+    static let testLocationCounter = LocationAttributeID("testLocationCounter")
 }
 
 private extension ItemAttribute {
-    static let testItemAttrFlag = ItemAttribute(id: .testFlag, rawValue: true)
+    static let testItemAttrFlag = ItemAttribute(id: .testItemFlag, rawValue: true)
 }
 
 private extension LocationAttribute {
-    static let testLocationAttrFlag = LocationAttribute(id: .testFlag, rawValue: true)
+    static let testLocationAttrFlag = LocationAttribute(id: .testLocationFlag, rawValue: true)
 }

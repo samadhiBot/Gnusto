@@ -9,13 +9,13 @@ extension GameEngine {
     /// Dynamic computation handlers are checked first before static properties.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the boolean attribute.
+    ///   - attributeID: The `ItemAttributeID` of the boolean attribute.
     ///   - itemID: The `ItemID` of the item.
     /// - Returns: The boolean value of the attribute, or `nil` if the attribute doesn't exist.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean,
     ///           or if the item does not exist.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) async throws -> Bool? {
         let result = await fetchStateValue(
@@ -45,13 +45,13 @@ extension GameEngine {
     /// for dynamic computation handlers first before static properties.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the integer attribute.
+    ///   - attributeID: The `ItemAttributeID` of the integer attribute.
     ///   - itemID: The `ItemID` of the item.
     /// - Returns: The integer value of the attribute, or `nil` if the attribute doesn't exist.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not an integer,
     ///           or if the item does not exist.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) async throws -> Int? {
         let result = await fetchStateValue(
@@ -81,13 +81,13 @@ extension GameEngine {
     /// dynamic computation handlers first. This is often used for dynamic descriptions.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the string attribute (e.g., `.description`).
+    ///   - attributeID: The `ItemAttributeID` of the string attribute (e.g., `.description`).
     ///   - itemID: The `ItemID` of the item.
     /// - Returns: The string value of the attribute, or `nil` if the attribute doesn't exist.
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a string,
     ///           or if the item does not exist.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) async throws -> String? {
         let result = await fetchStateValue(
@@ -123,14 +123,14 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item for which to generate a description.
-    ///   - attributeID: The `AttributeID` indicating the type of description requested (e.g.,
+    ///   - attributeID: The `ItemAttributeID` indicating the type of description requested (e.g.,
     ///          `.description`, `.shortDescription`, `.readText`).
     ///   - engine: The `GameEngine` instance, used for fetching dynamic values.
     ///             (Note: This parameter is often the same instance the method is called on).
     /// - Returns: A formatted description string.
     public func generateDescription(
         for itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) async throws -> String {
         if let description: String = try? await attribute(attributeID, of: itemID) {
             description.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -152,13 +152,13 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item for which to generate a description.
-    ///   - attributeID: The `AttributeID` indicating the type of description requested.
+    ///   - attributeID: The `ItemAttributeID` indicating the type of description requested.
     ///   - engine: The `GameEngine` instance, used for fetching dynamic values.
     /// - Returns: A tuple containing the formatted description string and a boolean indicating
     ///            whether a compute handler provided the description.
     public func generateDescriptionWithComputeInfo(
         for itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) async throws -> (description: String, wasComputed: Bool) {
         let result = await fetchStateValue(itemID: itemID, attributeID: attributeID)
 
@@ -189,14 +189,14 @@ extension GameEngine {
     ///
     /// - Parameters:
     ///   - itemID: The `ItemID` of the item for which to generate a description.
-    ///   - attributeID: The `AttributeID` indicating the type of description requested.
+    ///   - attributeID: The `ItemAttributeID` indicating the type of description requested.
     /// - Returns: A tuple containing:
     ///   - `description`: The formatted description string
     ///   - `wasComputed`: Whether a compute handler provided the description
     ///   - `isDefault`: Whether this is a generic fallback description
     public func generateDescriptionWithSourceInfo(
         for itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) async throws -> (description: String, wasComputed: Bool, isDefault: Bool) {
         let result = await fetchStateValue(itemID: itemID, attributeID: attributeID)
 
@@ -224,11 +224,14 @@ extension GameEngine {
     /// for checking boolean flags where the absence of the attribute means the flag is not set.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the boolean attribute to check.
+    ///   - attributeID: The `ItemAttributeID` of the boolean attribute to check.
     ///   - itemID: The `ItemID` of the item.
     /// - Returns: `true` if the attribute exists and is `true`, `false` otherwise (including when `nil`).
     /// - Throws: `ActionResponse.invalidValue` if the attribute exists but is not a boolean.
-    public func hasFlag(_ attributeID: AttributeID, on itemID: ItemID) async throws -> Bool {
+    public func hasFlag(
+        _ attributeID: ItemAttributeID,
+        on itemID: ItemID
+    ) async throws -> Bool {
         (try await attribute(attributeID, of: itemID)) == true
     }
 
@@ -268,13 +271,13 @@ extension GameEngine {
     /// This method is kept for compatibility during the transition.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the attribute being validated.
+    ///   - attributeID: The `ItemAttributeID` of the attribute being validated.
     ///   - itemID: The unique identifier of the item.
     ///   - newValue: The proposed new `StateValue`.
     /// - Returns: Always `true` since validation handlers are not implemented yet.
     func validateStateValue(
         itemID: ItemID,
-        attributeID: AttributeID,
+        attributeID: ItemAttributeID,
         newValue: StateValue
     ) async throws -> Bool {
         // Validation handlers removed for now, always allow changes
@@ -293,7 +296,7 @@ extension GameEngine {
     /// nothing special about the {item}." if `attributeID` is `.description`).
     private func defaultItemDescription(
         for itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) async throws -> String {
         let item = try item(itemID)
         return switch attributeID {
@@ -316,13 +319,13 @@ extension GameEngine {
     /// Checks for a compute handler first, then returns the stored value if no handler exists.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the desired value.
+    ///   - attributeID: The `ItemAttributeID` of the desired value.
     ///   - itemID: The unique identifier of the item.
     /// - Returns: A tuple containing the computed or stored `StateValue` (or `nil` if not found)
     ///           and a boolean indicating whether a compute handler provided the value.
     private func fetchStateValue(
         itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) async -> (value: StateValue?, wasComputed: Bool) {
         guard let item = gameState.items[itemID] else {
             logWarning("""

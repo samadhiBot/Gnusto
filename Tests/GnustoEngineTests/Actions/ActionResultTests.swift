@@ -233,7 +233,7 @@ struct ActionResultTests {
     // Helper to create a simple item change for testing ActionResult merging
     private func createTestItemChange(
         id: ItemID,
-        attributeID: AttributeID,
+        attributeID: ItemAttributeID,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {
@@ -248,7 +248,7 @@ struct ActionResultTests {
     // Helper to create a simple location change for testing ActionResult merging
     private func createTestLocationChange(
         id: LocationID,
-        attributeID: AttributeID,
+        attributeID: LocationAttributeID,
         oldValue: StateValue? = nil,
         newValue: StateValue
     ) -> StateChange {

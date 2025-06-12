@@ -20,7 +20,7 @@ struct GameStateApplyTests {
             Issue.record("Test setup failure: Lantern item not found.")
             return
         }
-        let attributeID: AttributeID = .isOn // Assume AttributeID.isOn exists
+        let attributeID: ItemAttributeID = .isOn // Assume AttributeID.isOn exists
         let oldAttributeValue = initialItem.attributes[attributeID]
         let newAttributeValue: StateValue = true
 
@@ -51,7 +51,7 @@ struct GameStateApplyTests {
             Issue.record("Test setup failure: Lantern item not found.")
             return
         }
-        let attributeID: AttributeID = .isOn
+        let attributeID: ItemAttributeID = .isOn
         let actualOldValue = initialItem.attributes[attributeID]
         // Ensure incorrectOldValue is different from actualOldValue
         let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true
@@ -561,7 +561,7 @@ struct GameStateApplyTests {
             return
         }
         // Let's change the .isLit attribute (assuming it exists)
-        let attributeID: AttributeID = .isLit
+        let attributeID: LocationAttributeID = .isLit
         let oldAttributeValue = initialLocation.attributes[attributeID]
         let newAttributeValue: StateValue = true
 
@@ -590,7 +590,7 @@ struct GameStateApplyTests {
             return
         }
         // Let's try to change the .isLit attribute
-        let attributeID: AttributeID = .isLit
+        let attributeID: LocationAttributeID = .isLit
         let actualOldValue = initialLocation.attributes[attributeID]
         // Ensure incorrectOldValue is different
         let incorrectOldValue: StateValue = (actualOldValue == true) ? false : true

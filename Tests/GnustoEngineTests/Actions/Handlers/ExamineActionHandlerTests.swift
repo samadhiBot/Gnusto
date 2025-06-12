@@ -756,7 +756,7 @@ struct ExamineActionHandlerTests {
 extension ExamineActionHandlerTests {
     private func expectedExamineChanges(
         itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]
+        initialAttributes: [ItemAttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 

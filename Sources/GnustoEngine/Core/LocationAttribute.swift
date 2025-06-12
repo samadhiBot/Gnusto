@@ -2,11 +2,11 @@ import Foundation
 
 /// Represents an attribute of a `Location`.
 public struct LocationAttribute: Attribute {
-    public let id: AttributeID
+    public let id: LocationAttributeID
     public let rawValue: StateValue
 
     public init(
-        id: AttributeID,
+        id: LocationAttributeID,
         rawValue: StateValue
     ) {
         self.id = id

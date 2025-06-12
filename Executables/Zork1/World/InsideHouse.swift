@@ -316,7 +316,7 @@ extension InsideHouse {
         switch event {
         case .beforeTurn(let command):
             // Flag to track if lamp is burned out (equivalent to ZIL's RMUNGBIT)
-            let burnedOutFlag = AttributeID("isBurnedOut")
+            let burnedOutFlag = ItemAttributeID("isBurnedOut")
 
             let isBurnedOut = try await engine.hasFlag(burnedOutFlag, on: .lamp)
             let isOn = try await engine.hasFlag(.isOn, on: .lamp)

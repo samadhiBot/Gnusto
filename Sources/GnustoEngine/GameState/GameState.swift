@@ -586,8 +586,8 @@ public struct GameState: Codable, Equatable, Sendable {
 
 enum GameStateError: Error {
     case globalTypeMismatch(GlobalID, actual: StateValue)
-    case itemAttributeTypeMismatch(ItemID, AttributeID, actual: StateValue)
+    case itemAttributeTypeMismatch(ItemID, ItemAttributeID, actual: StateValue)
     case itemNotFound(ItemID)
-    case locationAttributeTypeMismatch(LocationID, AttributeID, actual: StateValue)
+    case locationAttributeTypeMismatch(LocationID, LocationAttributeID, actual: StateValue)
     case locationNotFound(LocationID)
 }

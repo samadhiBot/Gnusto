@@ -54,7 +54,7 @@ struct ClimbOnActionHandlerTests {
                     ItemID(rawValue: "chair")
                 ),
                 attribute: .itemAttribute(
-                    AttributeID(rawValue: "isTouched")
+                    ItemAttributeID(rawValue: "isTouched")
                 ),
                 newValue: true
             ),

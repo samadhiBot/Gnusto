@@ -2,10 +2,7 @@ import Foundation
 
 /// Represents an attribute of a game object.
 public protocol Attribute: Codable, Equatable, Identifiable, Sendable {
-    var id: AttributeID { get }
     var rawValue: StateValue { get }
-
-    init(id: AttributeID, rawValue: StateValue)
 }
 
 // MARK: - Explicit getters

@@ -25,7 +25,7 @@ public struct Item: Codable, Identifiable, Sendable {
     /// While direct access is possible, game logic typically interacts with these attributes
     /// via convenience accessors on `Item` (for reading) or through `GameEngine` methods
     /// (for modifications, which generate `StateChange`s).
-    public var attributes: [AttributeID: StateValue]
+    public var attributes: [ItemAttributeID: StateValue]
 
     /// Creates a new `Item` instance with a given ID and initial attributes.
     ///
@@ -86,7 +86,7 @@ public struct Item: Codable, Identifiable, Sendable {
     ///
     /// - Parameter id: The `AttributeID` of the flag to check (e.g., `.isTakable`, `.isOpen`).
     /// - Returns: `true` if the flag attribute exists and is `true`, `false` otherwise.
-    public func hasFlag(_ id: AttributeID) -> Bool {
+    public func hasFlag(_ id: ItemAttributeID) -> Bool {
         attributes[id] == true
     }
 

@@ -10,7 +10,7 @@ struct LookActionHandlerTests {
     // Helper to create the expected StateChange array for examining an item
     private func expectedLookChanges(
         itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]
+        initialAttributes: [ItemAttributeID: StateValue]
     ) -> [StateChange] {
         // Only expect a change if .isTouched wasn't already true
         guard initialAttributes[.isTouched] != true else { return [] }

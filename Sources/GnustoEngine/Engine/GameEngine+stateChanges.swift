@@ -139,7 +139,10 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true` or the itemID is `nil`.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
-    public func clearFlag(_ attributeID: AttributeID, on itemID: ItemID?) throws -> StateChange? {
+    public func clearFlag(
+        _ attributeID: ItemAttributeID,
+        on itemID: ItemID?
+    ) throws -> StateChange? {
         try clearFlag(attributeID, on: item(itemID))
     }
 
@@ -154,7 +157,10 @@ extension GameEngine {
     ///   - item: The `Item` instance from which to clear the flag. If `nil`, this method returns `nil`.
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true` or the item is `nil`.
-    public func clearFlag(_ attributeID: AttributeID, on item: Item?) -> StateChange? {
+    public func clearFlag(
+        _ attributeID: ItemAttributeID,
+        on item: Item?
+    ) -> StateChange? {
         if let item, item.attributes[attributeID] == true {
             setAttribute(attributeID, on: item, to: false)
         } else {
@@ -210,7 +216,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on itemID: ItemID,
         to value: StateValue
     ) throws -> StateChange? {
@@ -229,7 +235,7 @@ extension GameEngine {
     ///   - value: The new `StateValue` for the attribute.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on item: Item,
         to value: StateValue
     ) -> StateChange? {
@@ -255,7 +261,10 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true` or the itemID is `nil`.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
-    public func setFlag(_ attributeID: AttributeID, on itemID: ItemID?) throws -> StateChange? {
+    public func setFlag(
+        _ attributeID: ItemAttributeID,
+        on itemID: ItemID?
+    ) throws -> StateChange? {
         try setFlag(attributeID, on: item(itemID))
     }
 
@@ -269,7 +278,10 @@ extension GameEngine {
     ///   - item: The `Item` instance on which to set the flag. If `nil`, this method returns `nil`.
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true` or the item is `nil`.
-    public func setFlag(_ attributeID: AttributeID, on item: Item?) -> StateChange? {
+    public func setFlag(
+        _ attributeID: ItemAttributeID,
+        on item: Item?
+    ) -> StateChange? {
         if let item {
             setAttribute(attributeID, on: item, to: true)
         } else {
@@ -293,7 +305,10 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true` or the locationID is `nil`.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
-    public func clearFlag(_ attributeID: AttributeID, on locationID: LocationID?) throws -> StateChange? {
+    public func clearFlag(
+        _ attributeID: LocationAttributeID,
+        on locationID: LocationID?
+    ) throws -> StateChange? {
         try clearFlag(attributeID, on: location(locationID))
     }
 
@@ -304,12 +319,15 @@ extension GameEngine {
     /// or not set), this method returns `nil` as no change is needed.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the flag to clear.
+    ///   - attributeID: The `LocationAttributeID` of the flag to clear.
     ///   - location: The `Location` instance from which to clear the flag. If `nil`, this method
     ///               returns `nil`.
     /// - Returns: A `StateChange` to set the flag to `false`, or `nil` if the flag is not currently
     ///            `true` or the location is `nil`.
-    public func clearFlag(_ attributeID: AttributeID, on location: Location?) -> StateChange? {
+    public func clearFlag(
+        _ attributeID: LocationAttributeID,
+        on location: Location?
+    ) -> StateChange? {
         guard let location else { return nil }
         return if location.attributes[attributeID] != true {
             nil
@@ -329,13 +347,16 @@ extension GameEngine {
     /// `setFlag(_:on:)` method that takes a `Location` object.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the flag to set.
+    ///   - attributeID: The `LocationAttributeID` of the flag to set.
     ///   - locationID: The `LocationID` of the location on which to set the flag. If `nil`, this method
     ///                 returns `nil`.
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true` or the locationID is `nil`.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
-    public func setFlag(_ attributeID: AttributeID, on locationID: LocationID?) throws -> StateChange? {
+    public func setFlag(
+        _ attributeID: LocationAttributeID,
+        on locationID: LocationID?
+    ) throws -> StateChange? {
         try setFlag(attributeID, on: location(locationID))
     }
 
@@ -345,12 +366,15 @@ extension GameEngine {
     /// as no change is needed.
     ///
     /// - Parameters:
-    ///   - attributeID: The `AttributeID` of the flag to set.
+    ///   - attributeID: The `LocationAttributeID` of the flag to set.
     ///   - location: The `Location` instance on which to set the flag. If `nil`, this method
     ///               returns `nil`.
     /// - Returns: A `StateChange` to set the flag to `true`, or `nil` if the flag is already
     ///            `true` or the location is `nil`.
-    public func setFlag(_ attributeID: AttributeID, on location: Location?) -> StateChange? {
+    public func setFlag(
+        _ attributeID: LocationAttributeID,
+        on location: Location?
+    ) -> StateChange? {
         guard let location else { return nil }
         return if location.attributes[attributeID] == true {
             nil
@@ -403,7 +427,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on locationID: LocationID,
         to value: StateValue
     ) throws -> StateChange? {
@@ -422,7 +446,7 @@ extension GameEngine {
     ///   - value: The new `StateValue` for the attribute.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if the value wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on location: Location,
         to value: StateValue
     ) -> StateChange? {
@@ -505,7 +529,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
     public func setAttribute(
-        _ flag: AttributeID,
+        _ flag: ItemAttributeID,
         on itemID: ItemID,
         to value: Bool
     ) throws -> StateChange? {
@@ -523,7 +547,7 @@ extension GameEngine {
     ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ flag: AttributeID,
+        _ flag: ItemAttributeID,
         on item: Item,
         to value: Bool
     ) -> StateChange? {
@@ -542,7 +566,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
     public func setAttribute(
-        _ flag: AttributeID,
+        _ flag: LocationAttributeID,
         on locationID: LocationID,
         to value: Bool
     ) throws -> StateChange? {
@@ -560,7 +584,7 @@ extension GameEngine {
     ///   - value: The boolean value to set (`true` to set the flag, `false` to clear it).
     /// - Returns: A `StateChange` to set the flag, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ flag: AttributeID,
+        _ flag: LocationAttributeID,
         on location: Location,
         to value: Bool
     ) -> StateChange? {
@@ -579,7 +603,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on itemID: ItemID,
         to value: Int
     ) throws -> StateChange? {
@@ -596,7 +620,7 @@ extension GameEngine {
     ///   - value: The integer value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on item: Item,
         to value: Int
     ) -> StateChange? {
@@ -615,7 +639,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on locationID: LocationID,
         to value: Int
     ) throws -> StateChange? {
@@ -632,7 +656,7 @@ extension GameEngine {
     ///   - value: The integer value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on location: Location,
         to value: Int
     ) -> StateChange? {
@@ -651,7 +675,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the item with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on itemID: ItemID,
         to value: String
     ) throws -> StateChange? {
@@ -668,7 +692,7 @@ extension GameEngine {
     ///   - value: The string value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on item: Item,
         to value: String
     ) -> StateChange? {
@@ -687,7 +711,7 @@ extension GameEngine {
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on locationID: LocationID,
         to value: String
     ) throws -> StateChange? {
@@ -704,7 +728,7 @@ extension GameEngine {
     ///   - value: The string value to set.
     /// - Returns: A `StateChange` to set the attribute, or `nil` if it wouldn't change.
     public func setAttribute(
-        _ attributeID: AttributeID,
+        _ attributeID: LocationAttributeID,
         on location: Location,
         to value: String
     ) -> StateChange? {

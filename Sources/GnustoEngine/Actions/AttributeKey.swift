@@ -53,14 +53,14 @@ public enum AttributeKey: Codable, Sendable, Hashable {
     // MARK: - Custom Game-Defined Attributes
 
     /// A custom, game-defined attribute for an item.
-    /// `AttributeID` is a unique identifier you define for game-specific item properties
+    /// `ItemAttributeID` is a unique identifier you define for game-specific item properties
     /// (e.g., an item's "magicCharge" or "fuelLevel").
-    case itemAttribute(AttributeID)
+    case itemAttribute(ItemAttributeID)
 
     /// A custom, game-defined attribute for a location.
-    /// `AttributeID` is a unique identifier you define for game-specific location properties
-    /// (e.g., a location's "ambientLightLevel" or "hasMagicAura").
-    case locationAttribute(AttributeID)
+    /// `LocationAttributeID` is a unique identifier you define for game-specific location
+    /// properties (e.g., a location's "ambientLightLevel" or "hasMagicAura").
+    case locationAttribute(LocationAttributeID)
 
     // MARK: - Player Properties
 

@@ -12,8 +12,8 @@ struct TakeActionHandlerTests {
         itemID: ItemID,
         initialParent: ParentEntity,
         finalParent: ParentEntity = .player, // Default final parent is player
-        initialAttributes: [AttributeID: StateValue], // Use initial attributes map
-        finalAttributes: [AttributeID: StateValue]? = nil // Optional final attributes map
+        initialAttributes: [ItemAttributeID: StateValue], // Use initial attributes map
+        finalAttributes: [ItemAttributeID: StateValue]? = nil // Optional final attributes map
     ) -> [StateChange] {
         var changes = [
             // Parent change

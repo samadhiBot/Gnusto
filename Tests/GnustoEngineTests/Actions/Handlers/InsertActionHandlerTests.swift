@@ -1537,8 +1537,8 @@ extension InsertActionHandlerTests {
         itemToInsertID: ItemID,
         containerID: ItemID,
         initialParent: ParentEntity,
-        initialItemAttributes: [AttributeID: StateValue],
-        initialContainerAttributes: [AttributeID: StateValue]
+        initialItemAttributes: [ItemAttributeID: StateValue],
+        initialContainerAttributes: [ItemAttributeID: StateValue]
     ) -> [StateChange] {
         var changes: [StateChange] = []
 

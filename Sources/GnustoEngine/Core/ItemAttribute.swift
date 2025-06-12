@@ -2,11 +2,11 @@ import Foundation
 
 /// Represents an attribute of an `Item`.
 public struct ItemAttribute: Attribute {
-    public let id: AttributeID
+    public let id: ItemAttributeID
     public let rawValue: StateValue
 
     public init(
-        id: AttributeID,
+        id: ItemAttributeID,
         rawValue: StateValue
     ) {
         self.id = id

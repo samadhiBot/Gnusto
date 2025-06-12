@@ -10,7 +10,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist, or
     ///           `GameStateError.itemAttributeTypeMismatch` if the attribute exists but is not a boolean.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) throws -> Bool? {
         guard let value = try fetchStateValue(
@@ -34,7 +34,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist, or
     ///           `GameStateError.itemAttributeTypeMismatch` if the attribute exists but is not an integer.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) throws -> Int? {
         guard let value = try fetchStateValue(
@@ -58,7 +58,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist, or
     ///           `GameStateError.itemAttributeTypeMismatch` if the attribute exists but is not a string.
     public func attribute(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         of itemID: ItemID
     ) throws -> String? {
         guard let value = try fetchStateValue(
@@ -86,7 +86,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist, or
     ///           `GameStateError.itemAttributeTypeMismatch` if the attribute exists but is not a string.
     public func generateDescription(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         for itemID: ItemID,
     ) throws -> String {
         if let description: String = try attribute(attributeID, of: itemID) {
@@ -111,7 +111,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist, or
     ///           `GameStateError.itemAttributeTypeMismatch` if the attribute exists but is not a boolean.
     public func hasFlag(
-        _ attributeID: AttributeID,
+        _ attributeID: ItemAttributeID,
         on itemID: ItemID
     ) throws -> Bool {
         (try attribute(attributeID, of: itemID)) == true
@@ -153,7 +153,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist.
     private func defaultItemDescription(
         for itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) throws -> String {
         let item = try item(itemID)
         return switch attributeID {
@@ -184,7 +184,7 @@ extension GameState {
     /// - Throws: `GameStateError.itemNotFound` if the item doesn't exist.
     private func fetchStateValue(
         itemID: ItemID,
-        attributeID: AttributeID
+        attributeID: ItemAttributeID
     ) throws -> StateValue? {
         try item(itemID).attributes[attributeID]
     }

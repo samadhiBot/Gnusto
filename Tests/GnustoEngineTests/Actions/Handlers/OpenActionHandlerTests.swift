@@ -8,7 +8,7 @@ struct OpenActionHandlerTests {
     // Helper function for expected state changes during a successful open
     private func expectedOpenChanges(
         itemID: ItemID,
-        initialAttributes: [AttributeID: StateValue]?
+        initialAttributes: [ItemAttributeID: StateValue]?
     ) -> [StateChange] {
         var changes: [StateChange] = []
 

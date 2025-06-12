@@ -16,13 +16,13 @@
 /// }
 /// ```
 public struct ItemComputer: Sendable {
-    public let compute: @Sendable (AttributeID, GameState) async throws -> StateValue?
+    public let compute: @Sendable (ItemAttributeID, GameState) async throws -> StateValue?
 
     /// Creates a new ItemComputer with the given compute function.
     ///
     /// - Parameter compute: The function that computes attribute values for an item.
     ///   Returns `nil` if the attribute is not handled by this computer.
-    public init(compute: @escaping @Sendable (AttributeID, GameState) async throws -> StateValue?) {
+    public init(compute: @escaping @Sendable (ItemAttributeID, GameState) async throws -> StateValue?) {
         self.compute = compute
     }
 }
