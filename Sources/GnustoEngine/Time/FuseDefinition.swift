@@ -12,10 +12,7 @@ import Foundation
 /// To start a timed event, you would then use a game command or side effect to activate
 /// the fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.
 /// When the turn counter for an active fuse reaches zero, its `action` is executed.
-public struct FuseDefinition: Identifiable, Sendable {
-    /// The unique ID of this fuse definition.
-    public let id: FuseID
-
+public struct FuseDefinition: Sendable {
     /// The initial number of game turns from when the fuse is activated until it triggers.
     /// This must be a positive integer.
     public let initialTurns: Int
@@ -41,35 +38,18 @@ public struct FuseDefinition: Identifiable, Sendable {
     /// Initializes a new fuse definition.
     ///
     /// - Parameters:
-    ///   - id: The unique `FuseID` for this fuse definition.
     ///   - initialTurns: The number of turns from activation until the fuse triggers (must be > 0).
     ///   - repeats: Whether the fuse reactivates itself after triggering. Defaults to `false`.
     ///   - action: The closure to execute when the fuse triggers. It receives the `GameEngine`
     ///             instance and can return an `ActionResult` with a message and side effects.
     public init(
-        id: ID,
         initialTurns: Int,
         repeats: Bool = false,
         action: @escaping @Sendable (GameEngine) async -> ActionResult?
     ) {
         precondition(initialTurns > 0, "Fuse must have a positive initial turn count.")
-        self.id = id
         self.initialTurns = initialTurns
         self.repeats = repeats
         self.action = action
-    }
-}
-
-// MARK: - Equatable and Hashable
-
-extension FuseDefinition: Equatable {
-    public static func == (lhs: FuseDefinition, rhs: FuseDefinition) -> Bool {
-        lhs.id == rhs.id // Equality based on ID only
-    }
-}
-
-extension FuseDefinition: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(id) // Hashing based on ID only
     }
 }

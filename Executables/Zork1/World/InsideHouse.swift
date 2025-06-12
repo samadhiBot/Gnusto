@@ -524,7 +524,7 @@ extension InsideHouse {
                 return ActionResult(
                     message: "Taken.",
                     sideEffects: [
-                        SideEffect(type: .runDaemon, targetID: .daemon(.swordGlow))
+                        SideEffect(type: .runDaemon, targetID: .daemon(.swordDaemon))
                     ]
                 )
 
@@ -533,7 +533,7 @@ extension InsideHouse {
                 return ActionResult(
                     message: "Dropped.",
                     sideEffects: [
-                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordGlow))
+                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordDaemon))
                     ]
                 )
 
@@ -567,7 +567,7 @@ extension InsideHouse {
     /// - Level 0: No monsters nearby (no glow)
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
-    static let swordDaemon = DaemonDefinition(id: .swordDaemon) { engine in
+    static let swordDaemon = DaemonDefinition { engine in
         print("🎾 swordGlowDaemon")
 
         let currentLocation = try await engine.playerLocation()
