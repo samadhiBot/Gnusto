@@ -698,10 +698,7 @@ extension GameEngine {
         if let locationHandler = locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, pass command using correct enum case syntax
-                if let result = try await locationHandler.handle(
-                    self,
-                    LocationEvent.beforeTurn(command)
-                ) {
+                if let result = try await locationHandler.handle(self, .beforeTurn(command)) {
                     // Room handler returned a result, process it
                     if try await processActionResult(result) {
                         return // Room handler handled everything
@@ -863,10 +860,7 @@ extension GameEngine {
         if let locationHandler = locationEventHandlers[currentLocationID] {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
-                if let result = try await locationHandler.handle(
-                    self,
-                    LocationEvent.afterTurn(command)
-                ),
+                if let result = try await locationHandler.handle(self, .afterTurn(command)),
                    try await processActionResult(result) { return }
             } catch {
                 logWarning("Error in room afterTurn handler: \(error)")
@@ -912,8 +906,23 @@ extension GameEngine {
             let locationAfterCommand = playerLocationID
             let playerMoved = locationBeforeCommand != locationAfterCommand
 
-            // Handle lighting transition messages for movement
+            // Handle .onEnter event for new location
             if playerMoved {
+                // Trigger .onEnter event for the new location
+                if let locationHandler = locationEventHandlers[locationAfterCommand] {
+                    do {
+                        if let result = try await locationHandler.handle(self, .onEnter) {
+                            // Location onEnter handler returned a result, process it
+                            _ = try await processActionResult(result)
+                        }
+                    } catch {
+                        logWarning("Error in location onEnter handler: \(error)")
+                    }
+                    // Check if handler quit the game
+                    if shouldQuit { return }
+                }
+
+                // Handle lighting transition messages for movement
                 let isLitAfterCommand = await playerLocationIsLit()
 
                 if wasLitBeforeCommand && !isLitAfterCommand {

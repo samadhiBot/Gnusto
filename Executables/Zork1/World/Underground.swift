@@ -1,10 +1,8 @@
 import GnustoEngine
 
-// MARK: - Underground Area
+// MARK: - Locations
 
 enum Underground {
-    // MARK: - Locations
-
     static let cellar: Location = Location(
         id: .cellar,
         .name("Cellar"),
@@ -206,9 +204,11 @@ enum Underground {
             .west: .to(.maze1),
         ])
     )
+}
 
-    // MARK: - Items
+// MARK: - Items
 
+extension Underground {
     static let steepRampItem = Item(
         id: .steepRampItem,
         .name("steep metal ramp"),
@@ -230,23 +230,21 @@ extension Underground {
     /// first time while the trap door is open, the door slams shut and is barred, preventing
     /// an easy return. This is controlled by a custom flag.
     static let cellarHandler = LocationEventHandler { engine, event in
-        switch event {
-        case .onEnter:
-            let isTrapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
-            let isTrapDoorBarred = await engine.hasFlag(.trapDoorBarred)
+        guard case .onEnter = event else { return nil }
 
-            if isTrapDoorOpen, !isTrapDoorBarred {
-                return ActionResult(
-                    message: "The trap door crashes shut, and you hear someone barring it.",
-                    stateChanges: [
-                        try await engine.clearFlag(.isOpen, on: .trapDoor),
-                        await engine.setFlag(.trapDoorBarred),
-                    ]
-                )
-            }
-            return nil
-        default:
-            return nil
+        let isTrapDoorOpen = try await engine.hasFlag(.isOpen, on: .trapDoor)
+        let isTrapDoorBarred = await engine.hasFlag(.trapDoorBarred)
+
+        if isTrapDoorOpen, !isTrapDoorBarred {
+            return ActionResult(
+                message: "The trap door crashes shut, and you hear someone barring it.",
+                stateChanges: [
+                    try await engine.clearFlag(.isOpen, on: .trapDoor),
+                    await engine.setFlag(.trapDoorBarred),
+                ]
+            )
         }
+
+        return nil
     }
 }
