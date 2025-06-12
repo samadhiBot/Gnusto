@@ -23,6 +23,24 @@ public protocol GameBlueprint: Sendable {
     /// score, location, etc.
     var player: Player { get }
 
+    /// A function that generates random numbers between 0 and 1.
+    ///
+    /// This function is used throughout the game for various randomization needs,
+    /// such as determining random events, NPC behaviors, or game mechanics.
+    /// The default implementation uses the system's random number generator.
+    ///
+    /// For testing purposes, you can provide a custom implementation that returns
+    /// predetermined values to ensure consistent test results.
+    ///
+    /// Example:
+    /// ```swift
+    /// var randomizer: () -> Double {
+    ///     // For testing: return a fixed value
+    ///     { 0.5 }
+    /// }
+    /// ```
+    var randomizer: () -> Double { get }
+
     /// All items in the game world.
     ///
     /// This array defines all items that exist in the game, including their properties,
@@ -162,6 +180,10 @@ public protocol GameBlueprint: Sendable {
 // MARK: - Default implementations
 
 extension GameBlueprint {
+    public var randomizer: () -> Double {
+        { Double.random(in: 0...1) }
+    }
+
     public var items: [Item] {
         []
     }
