@@ -32,7 +32,7 @@ public struct DaemonDefinition: Identifiable, Sendable {
     ///
     /// - Parameter engine: The `GameEngine` instance, providing access to game state and mutation methods.
     /// - Returns: An optional `ActionResult` containing a message and/or side effects, or `nil` for silent execution.
-    public var action: @Sendable (GameEngine) async -> ActionResult?
+    public var action: @Sendable (GameEngine) async throws -> ActionResult?
 
     /// Initializes a new daemon definition.
     ///
@@ -44,7 +44,7 @@ public struct DaemonDefinition: Identifiable, Sendable {
     public init(
         id: ID,
         frequency: Int = 1,
-        action: @escaping @Sendable (GameEngine) async -> ActionResult?
+        action: @escaping @Sendable (GameEngine) async throws -> ActionResult?
     ) {
         precondition(frequency >= 1, "Daemon frequency must be 1 or greater.")
         self.id = id

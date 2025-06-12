@@ -19,6 +19,20 @@ alwaysApply: true
 - The cleanest code is no code. Minimize boilerplate. The presence of the Gnusto Interactive Fiction Engine should be as unobtrusive as possible, so developers can focus on their game worlds. It should make game creation as easy, fun and intuitive as possible.
 - **Respect the action pipeline.** All state mutations should flow through the established action handler pipeline via `StateChange` objects. Avoid direct state mutation methods that bypass validation, event handlers, and proper sequencing. Use `StateChange` builders in `GameEngine+stateChanges.swift` to create changes that respect the pipeline.
 
+## Auto-Wiring System
+
+- **GlobalIDs, ItemIDs, LocationIDs, FuseIDs, DaemonIDs, and VerbIDs are automatically generated** by the GnustoAutoWiringTool and GnustoAutoWiringPlugin
+- The auto-wiring system scans Swift source files and discovers ID patterns:
+  - `engine.hasKey(.someGlobalID)` or global state usage → `GlobalID.someGlobalID`
+  - `engine.item(.someItemID)` → `ItemID.someItemID`
+  - `engine.location(.someLocationID)` → `LocationID.someLocationID`
+  - `FuseDefinition(id: .someFuseID, ...)` → `FuseID.someFuseID`
+  - `DaemonDefinition(id: .someDaemonID, ...)` → `DaemonID.someDaemonID`
+  - Custom `VerbID("verb")` patterns → `VerbID.verb`
+- **Never manually define ID constants** - just use them in your code and the auto-wiring system will generate the extensions
+- The build system automatically generates `GeneratedIDs.swift` in Derived Data with all discovered ID constants
+- Event handlers, game setup boilerplate, and other patterns are also auto-discovered
+
 ## Foundational Rules
 
 - ALWAYS refer to `Sources/GnustoEngine` and `Tests/GnustoEngineTests` before making changes, to ensure you follow existing conventions and APIs.

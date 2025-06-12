@@ -134,6 +134,10 @@ class GameDataCollector {
                             extractComputeHandlerData(from: propertyName, type: .location, isStatic: isStatic)
                         } else if functionName == "Player" {
                             extractPlayerLocationData(from: functionCall)
+                        } else if functionName == "FuseDefinition" {
+                            extractFuseDefinitionData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                        } else if functionName == "DaemonDefinition" {
+                            extractDaemonDefinitionData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
                         }
                     }
                 }
@@ -303,6 +307,50 @@ class GameDataCollector {
                     let locationID = memberAccess.declName.baseName.text
                     gameData.locationIDs.insert(locationID)
                 }
+            }
+        }
+    }
+
+    private func extractFuseDefinitionData(
+        from functionCall: FunctionCallExprSyntax,
+        propertyName: String,
+        isStatic: Bool
+    ) {
+        // Look for id: .fuseName pattern
+        guard let arguments = functionCall.arguments.first else { return }
+
+        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
+           arguments.label?.text == "id" {
+            let fuseID = memberAccess.declName.baseName.text
+            gameData.fuseIDs.insert(fuseID)
+            gameData.fuseDefinitions.insert(propertyName)
+
+            // Map this fuse definition to its area type
+            if let areaType = currentAreaType {
+                gameData.handlerToAreaMap[propertyName] = areaType
+                gameData.propertyIsStatic[propertyName] = isStatic
+            }
+        }
+    }
+
+    private func extractDaemonDefinitionData(
+        from functionCall: FunctionCallExprSyntax,
+        propertyName: String,
+        isStatic: Bool
+    ) {
+        // Look for id: .daemonName pattern
+        guard let arguments = functionCall.arguments.first else { return }
+
+        if let memberAccess = arguments.expression.as(MemberAccessExprSyntax.self),
+           arguments.label?.text == "id" {
+            let daemonID = memberAccess.declName.baseName.text
+            gameData.daemonIDs.insert(daemonID)
+            gameData.daemonDefinitions.insert(propertyName)
+
+            // Map this daemon definition to its area type
+            if let areaType = currentAreaType {
+                gameData.handlerToAreaMap[propertyName] = areaType
+                gameData.propertyIsStatic[propertyName] = isStatic
             }
         }
     }

@@ -636,12 +636,12 @@ extension GameEngine {
             // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
                 // Execute the daemon's action
-                if let actionResult = await definition.action(self) {
-                    do {
+                do {
+                    if let actionResult = try await definition.action(self) {
                         _ = try await processActionResult(actionResult)
-                    } catch {
-                        logError("Error processing daemon '\(daemonID)' action result: \(error)")
                     }
+                } catch {
+                    logError("Error processing daemon '\(daemonID)' action result: \(error)")
                 }
                 if shouldQuit { return }
             }

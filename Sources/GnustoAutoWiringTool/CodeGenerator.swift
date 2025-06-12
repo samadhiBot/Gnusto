@@ -137,7 +137,7 @@ struct CodeGenerator {
             }
 
             // Only generate extension if there's content
-            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || !gameData.itemComputeHandlers.isEmpty || !gameData.locationComputeHandlers.isEmpty || hasComputeHandlersToGenerate(gameData) {
+            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || !gameData.itemComputeHandlers.isEmpty || !gameData.locationComputeHandlers.isEmpty || !gameData.daemonDefinitions.isEmpty || !gameData.fuseDefinitions.isEmpty || hasComputeHandlersToGenerate(gameData) {
                 output.append("extension \(gameBlueprintType) {")
 
                 // Generate items property
@@ -153,7 +153,9 @@ struct CodeGenerator {
                         extensionLines.append("")
                     }
 
-                    extensionLines.append("        return [")
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
+                    extensionLines.append("        \(returnStatement)[")
 
                     for itemProperty in gameData.items.sorted() {
                         if let areaType = gameData.itemToAreaMap[itemProperty] {
@@ -187,7 +189,9 @@ struct CodeGenerator {
                         extensionLines.append("")
                     }
 
-                    extensionLines.append("        return [")
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
+                    extensionLines.append("        \(returnStatement)[")
 
                     for locationProperty in gameData.locations.sorted() {
                         if let areaType = gameData.locationToAreaMap[locationProperty] {
@@ -226,10 +230,12 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
                     if mappedHandlers.isEmpty {
-                        extensionLines.append("        return [:]")
+                        extensionLines.append("        \(returnStatement)[:]")
                     } else {
-                        extensionLines.append("        return [")
+                        extensionLines.append("        \(returnStatement)[")
 
                         for itemHandler in gameData.itemEventHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[itemHandler] {
@@ -270,10 +276,12 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
                     if mappedHandlers.isEmpty {
-                        extensionLines.append("        return [:]")
+                        extensionLines.append("        \(returnStatement)[:]")
                     } else {
-                        extensionLines.append("        return [")
+                        extensionLines.append("        \(returnStatement)[")
 
                         for locationHandler in gameData.locationEventHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[locationHandler] {
@@ -286,6 +294,104 @@ struct CodeGenerator {
                                 }
                             } else {
                                 extensionLines.append("            // .\(locationHandler): SomeArea.\(locationHandler)Handler, // Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                }
+
+                // Generate daemons property
+                if !gameData.daemonDefinitions.isEmpty {
+                    extensionLines.append("    var daemons: [DaemonID: DaemonDefinition] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    // Check if we have any mapped daemon definitions before generating the return statement
+                    let mappedDaemons = gameData.daemonDefinitions.filter { daemon in
+                        gameData.handlerToAreaMap[daemon] != nil
+                    }
+
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
+                    if mappedDaemons.isEmpty {
+                        extensionLines.append("        \(returnStatement)[:]")
+                    } else {
+                        extensionLines.append("        \(returnStatement)[")
+
+                        for daemonProperty in gameData.daemonDefinitions.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[daemonProperty] {
+                                let isStatic = gameData.propertyIsStatic[daemonProperty] ?? true
+                                // Extract daemon ID from property name - convert "swordGlowDaemon" to "swordGlow"
+                                let daemonID = daemonProperty.hasSuffix("Daemon") ?
+                                    String(daemonProperty.dropLast("Daemon".count)) : daemonProperty
+
+                                if isStatic {
+                                    extensionLines.append("            .\(daemonID): \(areaType).\(daemonProperty),")
+                                } else {
+                                    extensionLines.append("            .\(daemonID): \(areaType.lowercased()).\(daemonProperty),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(daemonProperty): SomeArea.\(daemonProperty), // Area mapping unknown - please add manually")
+                            }
+                        }
+
+                        extensionLines.append("        ]")
+                    }
+
+                    extensionLines.append("    }")
+                    extensionLines.append("")
+                }
+
+                // Generate fuses property
+                if !gameData.fuseDefinitions.isEmpty {
+                    extensionLines.append("    var fuses: [FuseID: FuseDefinition] {")
+
+                    // Create area instances within this property if needed
+                    for areaType in areaInstances.sorted() {
+                        extensionLines.append("        let \(areaType.lowercased()) = \(areaType)()")
+                    }
+
+                    if !areaInstances.isEmpty {
+                        extensionLines.append("")
+                    }
+
+                    // Check if we have any mapped fuse definitions before generating the return statement
+                    let mappedFuses = gameData.fuseDefinitions.filter { fuse in
+                        gameData.handlerToAreaMap[fuse] != nil
+                    }
+
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
+                    if mappedFuses.isEmpty {
+                        extensionLines.append("        \(returnStatement)[:]")
+                    } else {
+                        extensionLines.append("        \(returnStatement)[")
+
+                        for fuseProperty in gameData.fuseDefinitions.sorted() {
+                            if let areaType = gameData.handlerToAreaMap[fuseProperty] {
+                                let isStatic = gameData.propertyIsStatic[fuseProperty] ?? true
+                                // Extract fuse ID from property name - convert "dynamiteFuse" to "dynamite"
+                                let fuseID = fuseProperty.hasSuffix("Fuse") ?
+                                    String(fuseProperty.dropLast("Fuse".count)) : fuseProperty
+
+                                if isStatic {
+                                    extensionLines.append("            .\(fuseID): \(areaType).\(fuseProperty),")
+                                } else {
+                                    extensionLines.append("            .\(fuseID): \(areaType.lowercased()).\(fuseProperty),")
+                                }
+                            } else {
+                                extensionLines.append("            // .\(fuseProperty): SomeArea.\(fuseProperty), // Area mapping unknown - please add manually")
                             }
                         }
 
@@ -314,10 +420,12 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
                     if mappedHandlers.isEmpty {
-                        extensionLines.append("        return [:]")
+                        extensionLines.append("        \(returnStatement)[:]")
                     } else {
-                        extensionLines.append("        return [")
+                        extensionLines.append("        \(returnStatement)[")
 
                         for itemHandler in gameData.itemComputeHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[itemHandler] {
@@ -379,10 +487,12 @@ struct CodeGenerator {
                         gameData.handlerToAreaMap[handler] != nil
                     }
 
+                    let returnStatement = areaInstances.isEmpty ? "" : "return "
+
                     if mappedHandlers.isEmpty {
-                        extensionLines.append("        return [:]")
+                        extensionLines.append("        \(returnStatement)[:]")
                     } else {
-                        extensionLines.append("        return [")
+                        extensionLines.append("        \(returnStatement)[")
 
                         for locationHandler in gameData.locationComputeHandlers.sorted() {
                             if let areaType = gameData.handlerToAreaMap[locationHandler] {

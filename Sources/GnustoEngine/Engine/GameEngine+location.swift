@@ -81,6 +81,14 @@ extension GameEngine {
     public func isLocationLit(at locationID: LocationID) async -> Bool {
         await scopeResolver.isLocationLit(locationID: locationID)
     }
+    
+    /// <#Description#>
+    /// - Parameter locationID: <#locationID description#>
+    /// - Returns: <#description#>
+    public func itemsInLocation(_ locationID: LocationID) async throws -> [Item] {
+        let visibleItemIDs = await scopeResolver.visibleItemsIn(locationID: locationID)
+        return try visibleItemIDs.compactMap(item(_:))
+    }
 
     /// Retrieves an immutable copy (snapshot) of a specific location from the current game state.
     ///

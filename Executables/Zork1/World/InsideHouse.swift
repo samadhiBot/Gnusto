@@ -508,4 +508,110 @@ extension InsideHouse {
 
         return nil
     }
+
+    /// Handles sword glow functionality based on the ZIL `SWORD-FCN` and `I-SWORD` routines.
+    ///
+    /// This handler manages:
+    /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
+    /// - EXAMINE: Shows appropriate glow messages based on current glow state
+    /// - Daemon activation: Checks current location and adjacent locations for monsters
+    static let swordHandler = ItemEventHandler { engine, event in
+        switch event {
+        case .beforeTurn(let command):
+            switch command.verb {
+//            case .take:
+//                // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
+//                let enableDaemon = await engine.setFlag(.swordGlowDaemonEnabled)
+//                var stateChanges: [StateChange] = []
+//
+//                if let daemon = enableDaemon {
+//                    stateChanges.append(daemon)
+//                }
+//
+//                return ActionResult(message: "Taken.", stateChanges: stateChanges)
+
+            case .examine:
+                // Show glow message based on current glow level (like SWORD-FCN in ZIL)
+                let glowLevel = await engine.global(.swordGlowLevel) ?? 0
+                let baseDescription = "Your sword is glowing"
+
+                switch glowLevel {
+                case 1:
+                    return ActionResult("\(baseDescription) with a faint blue glow.")
+                case 2:
+                    return ActionResult("\(baseDescription) very brightly.")
+                default:
+                    return ActionResult("It's just a sword.")
+                }
+
+            default:
+                return nil
+            }
+
+        case .afterTurn:
+            return nil
+        }
+    }
+
+    /// Sword glow daemon based on the ZIL `I-SWORD` interrupt routine.
+    ///
+    /// This daemon runs every turn when enabled and updates the sword glow level based on
+    /// the presence of monsters in the current location or adjacent locations.
+    /// - Level 0: No monsters nearby (no glow)
+    /// - Level 1: Monster in adjacent location (faint blue glow)
+    /// - Level 2: Monster in current location (very bright glow)
+    static let swordGlow = DaemonDefinition(id: .swordGlow) { engine in
+        print("🎾 swordGlowDaemon")
+        // Only run if daemon is enabled and sword is held by player
+        guard
+//            await engine.hasFlag(.swordGlowDaemonEnabled),
+            await engine.playerIsHolding(.sword)
+        else { return nil }
+
+        let currentLocation = try await engine.playerLocation()
+        var newGlowLevel = 0
+
+        // Check for monsters in current location (highest priority)
+        let currentLocationItems = try await engine.itemsInLocation(currentLocation.id)
+        let monstersInCurrentLocation = currentLocationItems.filter { $0.isMonster }
+
+        if !monstersInCurrentLocation.isEmpty {
+            newGlowLevel = 2 // Very bright glow
+        } else {
+            // Check adjacent locations for monsters
+            for exit in currentLocation.exits.values {
+                guard let destination = exit.destinationID else { continue }
+                let adjacentLocationItems = try await engine.itemsInLocation(destination)
+                let monstersInAdjacentLocation = adjacentLocationItems.filter { $0.isMonster }
+
+                if !monstersInAdjacentLocation.isEmpty {
+                    newGlowLevel = 1 // Faint blue glow
+                    break
+                }
+            }
+        }
+
+        // Update glow level if changed
+        let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
+        if newGlowLevel != currentGlowLevel {
+            let glowChange = StateChange(
+                entityID: .global,
+                attribute: .globalState(attributeID: .swordGlowLevel),
+                oldValue: currentGlowLevel == 0 ? nil : .int(currentGlowLevel),
+                newValue: .int(newGlowLevel)
+            )
+            return ActionResult(stateChanges: [glowChange])
+        }
+
+        return nil
+    }
+}
+
+private extension Item {
+    var isMonster: Bool {
+        switch id {
+        case .troll, .thief, .cyclops, .bat, .ghosts: true
+        default: false
+        }
+    }
 }
