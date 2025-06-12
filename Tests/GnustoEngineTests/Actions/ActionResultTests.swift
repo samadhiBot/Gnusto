@@ -171,10 +171,7 @@ struct ActionResultTests {
 
     @Test("SideEffect Initialization - Defaults")
     func testSideEffectInitializationWithDefaultParameters() {
-        let effect = SideEffect(
-            type: .stopDaemon,
-            targetID: .daemon("clock")
-        )
+        let effect = SideEffect.stopDaemon("clock")
 
         #expect(effect.type == .stopDaemon)
         #expect(effect.targetID == .daemon("clock"))

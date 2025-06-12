@@ -57,13 +57,13 @@ struct GameEngineSideEffectsTests {
         }
 
         let gameBlueprint = MinimalGame(
-            fuseDefinitions: [
-                testFuseDefinition,
-                anotherFuseDefinition
+            fuses: [
+                testFuseID: testFuseDefinition,
+                anotherFuseID: anotherFuseDefinition
             ],
-            daemonDefinitions: [
-                testDaemonDefinition,
-                anotherDaemonDefinition
+            daemons: [
+                testDaemonID: testDaemonDefinition,
+                anotherDaemonID: anotherDaemonDefinition
             ]
         )
         let mockIO = await MockIOHandler()

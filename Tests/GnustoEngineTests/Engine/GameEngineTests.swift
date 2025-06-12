@@ -793,7 +793,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
-        let fuseDef = FuseDefinition(id: "testFuse", initialTurns: 2) { gameEngineParameter in
+        let fuseDef = FuseDefinition(initialTurns: 2) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
             // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
 
@@ -804,24 +804,37 @@ struct GameEngineTests {
             return ActionResult("Fuse triggered!")
         }
 
-        // Initialize game with fuse definition
+                // Initialize game with fuse definition and start fuse
         let game = MinimalGame(
-            fuseDefinitions: [fuseDef]
-            // TODO: Need initial state setup for activeFuses
+            fuses: ["testFuse": fuseDef]
         )
 
-        let _ = await GameEngine( // Use _ for unused engine
+        let engine = await GameEngine(
             blueprint: game,
+            activeFuses: ["testFuse": 2], // Start with 2 turns remaining
             parser: mockParser,
             ioHandler: mockIO
         )
-        /*
-        // Cannot start fuse from test setup currently
-        // Act: Run engine for 3 turns (look, look, quit)
-        ...
-        // Assert
-        ...
-        */
+
+        // Act: Simulate 3 turns to trigger the fuse (turn 1: countdown to 1, turn 2: countdown to 0 and trigger)
+        try await engine.apply(StateChange(
+            entityID: .player,
+            attribute: .playerMoves,
+            oldValue: .int(0),
+            newValue: .int(1)
+        ))
+        await engine.tickClock() // Turn 1: fuse goes from 2 to 1
+
+        try await engine.apply(StateChange(
+            entityID: .player,
+            attribute: .playerMoves,
+            oldValue: .int(1),
+            newValue: .int(2)
+        ))
+        await engine.tickClock() // Turn 2: fuse goes from 1 to 0 and triggers
+
+        // Assert: Fuse should have triggered
+        #expect(await stateHolder.getFlag() == true)
     }
 
     @Test("Daemon executes at correct frequency")
@@ -830,30 +843,38 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testDaemonDef = DaemonDefinition(id: "testDaemon", frequency: 3) { gameEngineParameter in
+        let testDaemonDef = DaemonDefinition(frequency: 3) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
             await stateHolder.increment()
 
             // Return ActionResult with message instead of printing directly
             return ActionResult("Daemon ran!")
         }
-        // Initialize game with daemon definition
+        // Initialize game with daemon definition and start daemon
         let game = MinimalGame(
-            daemonDefinitions: [testDaemonDef]
-            // TODO: Need initial state setup for activeDaemons
+            daemons: ["testDaemon": testDaemonDef]
         )
-        let _ = await GameEngine( // Use _ for unused engine
+        let engine = await GameEngine(
             blueprint: game,
+            activeDaemons: ["testDaemon"], // Start daemon immediately
             parser: mockParser,
             ioHandler: mockIO
         )
-        /*
-        // Cannot start daemon from test setup currently
-        // Act: Run engine for 7 turns (look x 7, quit)
-        ...
-        // Assert
-        ...
-        */
+
+        // Act: Run engine for 7 turns to test daemon frequency (every 3 turns)
+        // Turns 0,1,2: no daemon run, Turn 3: daemon runs (1st time), Turn 6: daemon runs (2nd time)
+        for turn in 1...7 {
+            try await engine.apply(StateChange(
+                entityID: .player,
+                attribute: .playerMoves,
+                oldValue: .int(turn - 1),
+                newValue: .int(turn)
+            ))
+            await engine.tickClock()
+        }
+
+        // Assert: Daemon should have run 2 times (turns 3 and 6)
+        #expect(await stateHolder.getCount() == 2)
     }
 
     @Test("Fuse and Daemon Interaction")
@@ -862,34 +883,48 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testFuse = FuseDefinition(id: "testFuse", initialTurns: 3) { _ in
+        let testFuse = FuseDefinition(initialTurns: 3) { _ in
             await stateHolder.markFlag()
             return ActionResult("Fuse! [\(await stateHolder.getFlag())]")
         }
-        let testDaemon = DaemonDefinition(id: "testDaemon", frequency: 2) { _ in
+        let testDaemon = DaemonDefinition(frequency: 2) { _ in
             await stateHolder.increment()
             return ActionResult("Daemon! [\(await stateHolder.getCount())]")
         }
 
-        // Initialize game with definitions
+        // Initialize game with definitions and start both timers
         let game = MinimalGame(
-            fuseDefinitions: [testFuse],
-            daemonDefinitions: [testDaemon]
-            // TODO: Need initial state setup for active timers
+            fuses: ["testFuse": testFuse],
+            daemons: ["testDaemon": testDaemon]
         )
 
-        let _ = await GameEngine( // Use _ for unused engine
+        let engine = await GameEngine(
             blueprint: game,
+            activeFuses: ["testFuse": 3], // Start fuse with 3 turns
+            activeDaemons: ["testDaemon"], // Start daemon immediately
             parser: mockParser,
             ioHandler: mockIO
         )
-        /*
-        // Cannot start timers from test setup currently
+
         // Act: Run for 6 turns
-        ...
-        // Assert
-        ...
-        */
+        // Turn 0: Initial state
+        // Turn 2: Daemon runs (1st time)
+        // Turn 3: Fuse triggers
+        // Turn 4: Daemon runs (2nd time)
+        // Turn 6: Daemon runs (3rd time)
+        for turn in 1...6 {
+            try await engine.apply(StateChange(
+                entityID: .player,
+                attribute: .playerMoves,
+                oldValue: .int(turn - 1),
+                newValue: .int(turn)
+            ))
+            await engine.tickClock()
+        }
+
+        // Assert: Fuse should have triggered and daemon should have run 3 times
+        #expect(await stateHolder.getFlag() == true, "Fuse should have triggered")
+        #expect(await stateHolder.getCount() == 3, "Daemon should have run 3 times (turns 2, 4, 6)")
     }
 
     // MARK: - Helper Functions & Error Tests
