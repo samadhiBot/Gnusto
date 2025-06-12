@@ -33,6 +33,9 @@ public extension ItemAttributeID {
     /// An item's size, influencing carrying capacity and container limits.
     static let size = ItemAttributeID("size")
 
+    /// An item's strength, influencing fighting ability.
+    static let strength = ItemAttributeID("strength")
+
     /// Synonyms for an item (e.g., "lamp", "light").
     static let synonyms = ItemAttributeID("synonyms")
 
@@ -88,6 +91,9 @@ public extension ItemAttributeID {
 
     /// FEMALEBIT: Grammatically female.
     static let isFemale = ItemAttributeID("isFemale")
+
+    /// FIGHTBIT: Is fighting.
+    static let isFighting = ItemAttributeID("isFighting")
 
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = ItemAttributeID("isFlammable")

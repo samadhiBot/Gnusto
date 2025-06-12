@@ -58,6 +58,16 @@ public actor GameEngine: Sendable {
     /// Derived from the `GameBlueprint` used to initialize the engine.
     public let messageProvider: MessageProvider
 
+    /// A function that generates random numbers between 0 and 1.
+    ///
+    /// This function is used throughout the game for various randomization needs,
+    /// such as determining random events, NPC behaviors, or game mechanics.
+    /// The default implementation uses the system's random number generator.
+    ///
+    /// For testing purposes, you can provide a custom implementation that returns
+    /// predetermined values to ensure consistent test results.
+    public let randomizer: () -> Double
+
     /// Definitions for timed events (fuses) that trigger after a set number of turns.
     /// These are derived from the `GameBlueprint` used to initialize the engine.
     public let fuseDefinitions: [FuseID: FuseDefinition]
@@ -125,6 +135,7 @@ public actor GameEngine: Sendable {
     ) async {
         self.constants = blueprint.constants
         self.messageProvider = blueprint.messageProvider
+        self.randomizer = blueprint.randomizer
         self.fuseDefinitions = blueprint.fuses
         self.daemonDefinitions = blueprint.daemons
 

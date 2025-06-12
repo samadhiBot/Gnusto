@@ -138,6 +138,17 @@ extension ItemAttribute {
         )
     }
 
+    /// An item's strength, influencing fighting ability.
+    ///
+    /// - Parameter strength: An item's strength.
+    /// - Returns: A .strength attribute.
+    public static func strength(_ strength: Int) -> ItemAttribute {
+        ItemAttribute(
+            id: .strength,
+            rawValue: .int(strength)
+        )
+    }
+
     /// Synonyms for an item (e.g., "lamp", "light").
     ///
     /// - Parameter synonyms: Synonyms associated with an item.
