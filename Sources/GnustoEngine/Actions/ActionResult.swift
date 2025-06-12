@@ -47,6 +47,24 @@ public struct ActionResult: Sendable {
         self.sideEffects = sideEffects.compactMap(\.self)
     }
 
+    /// Creates a new `ActionResult` with arrays of state changes and side effects.
+    /// 
+    /// - Parameters:
+    ///   - message: An optional message to display to the player.
+    ///   - changes: An array of `StateChange`s to be applied.
+    ///   - effects: An array of `SideEffect`s to be triggered.
+    public init(
+        message: String? = nil,
+        changes: StateChange?...,
+        effects: SideEffect?...
+    ) {
+        self = .init(
+            message: message,
+            stateChanges: changes,
+            sideEffects: effects
+        )
+    }
+
     /// Creates a new `ActionResult` with optional single state change and side effect.
     ///
     /// This is a convenience initializer for common cases where an action results in at most

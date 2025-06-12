@@ -16,22 +16,16 @@ struct GameEngineSideEffectsTests {
     // MARK: - Helper Methods
 
     private func createTestEngine() async -> GameEngine {
-        let testFuseDefinition = FuseDefinition(
-            id: testFuseID,
-            initialTurns: 3
-        ) { engine in
+        let testFuseDefinition = FuseDefinition(initialTurns: 3) { engine in
             // Test fuse action - return ActionResult with side effect to set flag
-            let sideEffect = SideEffect(
-                type: .scheduleEvent,
-                targetID: .global,
+            let sideEffect = SideEffect.scheduleEvent(
+                .global,
                 parameters: ["flag": .string("fuseExploded")]
             )
             return ActionResult(message: "The fuse exploded!", sideEffects: [sideEffect])
         }
 
-        let testDaemonDefinition = DaemonDefinition(
-            id: testDaemonID
-        ) { engine in
+        let testDaemonDefinition = DaemonDefinition() { engine in
             // Test daemon action - increment a counter using state changes
             let change = await engine.adjustGlobal("daemonTicks", by: 1)
             return ActionResult(
@@ -40,10 +34,7 @@ struct GameEngineSideEffectsTests {
             )
         }
 
-        let anotherFuseDefinition = FuseDefinition(
-            id: anotherFuseID,
-            initialTurns: 5
-        ) { engine in
+        let anotherFuseDefinition = FuseDefinition(initialTurns: 5) { engine in
             // Another test fuse action - return state change via ActionResult
             if let change = await engine.setFlag("messageDelivered") {
                 return ActionResult(
@@ -54,9 +45,7 @@ struct GameEngineSideEffectsTests {
             return nil
         }
 
-        let anotherDaemonDefinition = DaemonDefinition(
-            id: anotherDaemonID
-        ) { engine in
+        let anotherDaemonDefinition = DaemonDefinition() { engine in
             // Another test daemon action - return state change via ActionResult
             if let change = await engine.setFlag("musicPlaying") {
                 return ActionResult(
@@ -97,10 +86,7 @@ struct GameEngineSideEffectsTests {
         #expect(initialState.activeFuses[testFuseID] == nil)
 
         // Create and process start fuse side effect
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let sideEffect = SideEffect.startFuse(testFuseID)
 
         try await engine.processSideEffects([sideEffect])
 
@@ -115,11 +101,7 @@ struct GameEngineSideEffectsTests {
 
         // Create side effect with custom turns
         let customTurns = 7
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID),
-            parameters: ["turns": .int(customTurns)]
-        )
+        let sideEffect = SideEffect.startFuse(testFuseID, parameters: ["turns": .int(customTurns)])
 
         try await engine.processSideEffects([sideEffect])
 
@@ -133,10 +115,7 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         let undefinedFuseID: FuseID = "nonExistentFuse"
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(undefinedFuseID)
-        )
+        let sideEffect = SideEffect.startFuse(undefinedFuseID)
 
         await #expect(throws: ActionResponse.self) {
             try await engine.processSideEffects([sideEffect])
@@ -148,10 +127,8 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         // Start fuse with default turns
-        let firstEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let firstEffect = SideEffect.startFuse(testFuseID)
+
         try await engine.processSideEffects([firstEffect])
 
         // Verify first start
@@ -159,11 +136,8 @@ struct GameEngineSideEffectsTests {
         #expect(midState.activeFuses[testFuseID] == 3)
 
         // Start same fuse with different turns
-        let secondEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID),
-            parameters: ["turns": .int(10)]
-        )
+        let secondEffect = SideEffect.startFuse(testFuseID, parameters: ["turns": .int(10)])
+
         try await engine.processSideEffects([secondEffect])
 
         // Verify overwrite
@@ -178,10 +152,8 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         // Start a fuse first
-        let startEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let startEffect = SideEffect.startFuse(testFuseID)
+
         try await engine.processSideEffects([startEffect])
 
         // Verify fuse is active
@@ -189,10 +161,7 @@ struct GameEngineSideEffectsTests {
         #expect(midState.activeFuses[testFuseID] == 3)
 
         // Stop the fuse
-        let stopEffect = SideEffect(
-            type: .stopFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let stopEffect = SideEffect.stopFuse(testFuseID)
         try await engine.processSideEffects([stopEffect])
 
         // Verify fuse is no longer active
@@ -209,10 +178,7 @@ struct GameEngineSideEffectsTests {
         #expect(initialState.activeFuses[testFuseID] == nil)
 
         // Stop the non-active fuse (should not throw)
-        let stopEffect = SideEffect(
-            type: .stopFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let stopEffect = SideEffect.stopFuse(testFuseID)
 
         try await engine.processSideEffects([stopEffect])
 
@@ -232,10 +198,7 @@ struct GameEngineSideEffectsTests {
         #expect(!initialState.activeDaemons.contains(testDaemonID))
 
         // Run daemon
-        let sideEffect = SideEffect(
-            type: .runDaemon,
-            targetID: .daemon(testDaemonID)
-        )
+        let sideEffect = SideEffect.runDaemon(testDaemonID)
 
         try await engine.processSideEffects([sideEffect])
 
@@ -249,10 +212,7 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         let undefinedDaemonID: DaemonID = "nonExistentDaemon"
-        let sideEffect = SideEffect(
-            type: .runDaemon,
-            targetID: .daemon(undefinedDaemonID)
-        )
+        let sideEffect = SideEffect.runDaemon(undefinedDaemonID)
 
         await #expect(throws: ActionResponse.self) {
             try await engine.processSideEffects([sideEffect])
@@ -264,10 +224,7 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         // Run daemon first time
-        let sideEffect = SideEffect(
-            type: .runDaemon,
-            targetID: .daemon(testDaemonID)
-        )
+        let sideEffect = SideEffect.runDaemon(testDaemonID)
         try await engine.processSideEffects([sideEffect])
 
         // Verify daemon is active
@@ -290,10 +247,7 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         // Start daemon first
-        let startEffect = SideEffect(
-            type: .runDaemon,
-            targetID: .daemon(testDaemonID)
-        )
+        let startEffect = SideEffect.runDaemon(testDaemonID)
         try await engine.processSideEffects([startEffect])
 
         // Verify daemon is active
@@ -301,10 +255,7 @@ struct GameEngineSideEffectsTests {
         #expect(midState.activeDaemons.contains(testDaemonID))
 
         // Stop daemon
-        let stopEffect = SideEffect(
-            type: .stopDaemon,
-            targetID: .daemon(testDaemonID)
-        )
+        let stopEffect = SideEffect.stopDaemon(testDaemonID)
         try await engine.processSideEffects([stopEffect])
 
         // Verify daemon is no longer active
@@ -321,10 +272,7 @@ struct GameEngineSideEffectsTests {
         #expect(!initialState.activeDaemons.contains(testDaemonID))
 
         // Stop the non-active daemon (should not throw)
-        let stopEffect = SideEffect(
-            type: .stopDaemon,
-            targetID: .daemon(testDaemonID)
-        )
+        let stopEffect = SideEffect.stopDaemon(testDaemonID)
 
         try await engine.processSideEffects([stopEffect])
 
@@ -339,9 +287,8 @@ struct GameEngineSideEffectsTests {
     func testScheduleEventSideEffect() async throws {
         let engine = await createTestEngine()
 
-        let sideEffect = SideEffect(
-            type: .scheduleEvent,
-            targetID: .global,
+        let sideEffect = SideEffect.scheduleEvent(
+            .global,
             parameters: [
                 "event": .string("delayed_message"),
                 "delay": .int(5)
@@ -363,10 +310,10 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         let sideEffects = [
-            SideEffect(type: .startFuse, targetID: .fuse(testFuseID)),
-            SideEffect(type: .startFuse, targetID: .fuse(anotherFuseID)),
-            SideEffect(type: .runDaemon, targetID: .daemon(testDaemonID)),
-            SideEffect(type: .runDaemon, targetID: .daemon(anotherDaemonID))
+            SideEffect.startFuse(testFuseID),
+            SideEffect.startFuse(anotherFuseID),
+            SideEffect.runDaemon(testDaemonID),
+            SideEffect.runDaemon(anotherDaemonID),
         ]
 
         try await engine.processSideEffects(sideEffects)
@@ -384,9 +331,9 @@ struct GameEngineSideEffectsTests {
         let engine = await createTestEngine()
 
         let sideEffects = [
-            SideEffect(type: .startFuse, targetID: .fuse(testFuseID)), // Valid
-            SideEffect(type: .runDaemon, targetID: .daemon(testDaemonID)), // Valid
-            SideEffect(type: .startFuse, targetID: .fuse("invalidFuse")) // Invalid
+            SideEffect.startFuse(testFuseID), // Valid
+            SideEffect.runDaemon(testDaemonID), // Valid
+            SideEffect.startFuse("invalidFuse"), // Invalid
         ]
 
         // Should throw on the invalid side effect
@@ -411,8 +358,8 @@ struct GameEngineSideEffectsTests {
         let actionResult = ActionResult(
             message: "The bomb timer starts ticking...",
             sideEffects: [
-                SideEffect(type: .startFuse, targetID: .fuse(testFuseID)),
-                SideEffect(type: .runDaemon, targetID: .daemon(testDaemonID))
+                SideEffect.startFuse(testFuseID),
+                SideEffect.runDaemon(testDaemonID),
             ]
         )
 
@@ -428,29 +375,13 @@ struct GameEngineSideEffectsTests {
 
     // MARK: - Error Cases Tests
 
-    @Test("Invalid EntityID for side effect throws error")
-    func testInvalidEntityIDForSideEffect() async throws {
-        let engine = await createTestEngine()
-
-        // Try to start a fuse with a daemon ID (wrong entity type)
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .daemon(testDaemonID) // Wrong! Should be .fuse
-        )
-
-        await #expect(throws: ActionResponse.self) {
-            try await engine.processSideEffects([sideEffect])
-        }
-    }
-
     @Test("Invalid parameter types are handled gracefully")
     func testInvalidParameterTypes() async throws {
         let engine = await createTestEngine()
 
         // Start fuse with invalid parameter type for turns
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID),
+        let sideEffect = SideEffect.startFuse(
+            testFuseID,
             parameters: ["turns": .string("not_a_number")] // Invalid type
         )
 
@@ -467,10 +398,7 @@ struct GameEngineSideEffectsTests {
     func testSideEffectsCreateStateChanges() async throws {
         let engine = await createTestEngine()
 
-        let sideEffect = SideEffect(
-            type: .startFuse,
-            targetID: .fuse(testFuseID)
-        )
+        let sideEffect = SideEffect.startFuse(testFuseID)
 
         try await engine.processSideEffects([sideEffect])
 

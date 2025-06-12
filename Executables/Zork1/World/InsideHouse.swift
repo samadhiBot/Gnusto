@@ -598,13 +598,14 @@ extension InsideHouse {
         // Update glow level if changed
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
         if newGlowLevel != currentGlowLevel {
-            let glowChange = StateChange(
-                entityID: .global,
-                attribute: .globalState(attributeID: .swordGlowLevel),
-                oldValue: currentGlowLevel == 0 ? nil : .int(currentGlowLevel),
-                newValue: .int(newGlowLevel)
+            return ActionResult(
+                changes: StateChange(
+                    entityID: .global,
+                    attribute: .globalState(attributeID: .swordGlowLevel),
+                    oldValue: currentGlowLevel == 0 ? nil : .int(currentGlowLevel),
+                    newValue: .int(newGlowLevel)
+                )
             )
-            return ActionResult(stateChanges: [glowChange])
         }
 
         return nil

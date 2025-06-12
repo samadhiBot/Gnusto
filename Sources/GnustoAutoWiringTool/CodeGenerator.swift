@@ -332,9 +332,8 @@ struct CodeGenerator {
                         for daemonProperty in gameData.daemonDefinitions.sorted() {
                             if let areaType = gameData.handlerToAreaMap[daemonProperty] {
                                 let isStatic = gameData.propertyIsStatic[daemonProperty] ?? true
-                                // Extract daemon ID from property name - convert "swordGlowDaemon" to "swordGlow"
-                                let daemonID = daemonProperty.hasSuffix("Daemon") ?
-                                    String(daemonProperty.dropLast("Daemon".count)) : daemonProperty
+                                // Use property name directly as daemon ID (since DaemonDefinition no longer has embedded ID)
+                                let daemonID = daemonProperty
 
                                 if isStatic {
                                     extensionLines.append("            .\(daemonID): \(areaType).\(daemonProperty),")
@@ -381,9 +380,8 @@ struct CodeGenerator {
                         for fuseProperty in gameData.fuseDefinitions.sorted() {
                             if let areaType = gameData.handlerToAreaMap[fuseProperty] {
                                 let isStatic = gameData.propertyIsStatic[fuseProperty] ?? true
-                                // Extract fuse ID from property name - convert "dynamiteFuse" to "dynamite"
-                                let fuseID = fuseProperty.hasSuffix("Fuse") ?
-                                    String(fuseProperty.dropLast("Fuse".count)) : fuseProperty
+                                // Use property name directly as fuse ID (since FuseDefinition no longer has embedded ID)
+                                let fuseID = fuseProperty
 
                                 if isStatic {
                                     extensionLines.append("            .\(fuseID): \(areaType).\(fuseProperty),")
