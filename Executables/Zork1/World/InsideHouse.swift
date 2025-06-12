@@ -519,16 +519,23 @@ extension InsideHouse {
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
-//            case .take:
-//                // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
-//                let enableDaemon = await engine.setFlag(.swordGlowDaemonEnabled)
-//                var stateChanges: [StateChange] = []
-//
-//                if let daemon = enableDaemon {
-//                    stateChanges.append(daemon)
-//                }
-//
-//                return ActionResult(message: "Taken.", stateChanges: stateChanges)
+            case .take:
+                // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
+                return ActionResult(
+                    message: "Taken.",
+                    sideEffects: [
+                        SideEffect(type: .runDaemon, targetID: .daemon(.swordGlow))
+                    ]
+                )
+
+            case .drop:
+                // Disable sword glow daemon when dropped
+                return ActionResult(
+                    message: "Dropped.",
+                    sideEffects: [
+                        SideEffect(type: .stopDaemon, targetID: .daemon(.swordGlow))
+                    ]
+                )
 
             case .examine:
                 // Show glow message based on current glow level (like SWORD-FCN in ZIL)
@@ -560,13 +567,8 @@ extension InsideHouse {
     /// - Level 0: No monsters nearby (no glow)
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
-    static let swordGlow = DaemonDefinition(id: .swordGlow) { engine in
+    static let swordDaemon = DaemonDefinition(id: .swordDaemon) { engine in
         print("🎾 swordGlowDaemon")
-        // Only run if daemon is enabled and sword is held by player
-        guard
-//            await engine.hasFlag(.swordGlowDaemonEnabled),
-            await engine.playerIsHolding(.sword)
-        else { return nil }
 
         let currentLocation = try await engine.playerLocation()
         var newGlowLevel = 0
