@@ -111,7 +111,7 @@ public struct CloseActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            message: context.message(.closed(item: targetItem.withDefiniteArticle)),
+            message: context.message(.closed),
             stateChanges: stateChanges
         )
     }

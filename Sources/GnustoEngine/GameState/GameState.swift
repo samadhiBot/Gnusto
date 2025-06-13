@@ -367,7 +367,11 @@ public struct GameState: Codable, Equatable, Sendable {
             guard change.entityID == .global else {
                 throw ActionResponse.internalEngineError("EntityID mismatch for globalState: expected .global, got \(change.entityID)")
             }
-             globalState[key] = change.newValue
+            if case .undefined = change.newValue {
+                globalState.removeValue(forKey: key)
+            } else {
+                globalState[key] = change.newValue
+            }
 
         case .pronounReference(let pronoun):
             // Expecting .entityReferenceSet

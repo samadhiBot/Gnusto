@@ -105,7 +105,7 @@ public struct InsertActionHandler: ActionHandler {
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCantDoThat)
+                "You can't put something inside itself."
             )
         }
 

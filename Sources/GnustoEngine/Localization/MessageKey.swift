@@ -195,8 +195,11 @@ public enum MessageKey: Hashable, Sendable {
     /// Opening a container reveals its contents
     case openingRevealsContents(container: String, contents: String)
 
-    /// Simple confirmation for closing something
-    case closed(item: String)
+    /// Simple "Closed." confirmation
+    case closed
+
+    /// Detailed confirmation for closing something
+    case closedItem(item: String)
 
     /// "You are empty-handed." for empty inventory
     case youAreEmptyHanded
@@ -228,7 +231,7 @@ public enum MessageKey: Hashable, Sendable {
     /// "Give to whom?" for missing indirect object in give command
     case giveToWhom
 
-    /// "Insert what?" for missing direct object in insert command  
+    /// "Insert what?" for missing direct object in insert command
     case insertWhat
 
     /// "Insert into what?" for missing indirect object in insert command
@@ -252,6 +255,6 @@ public enum MessageKey: Hashable, Sendable {
     /// Door is locked (blocking movement)
     case doorIsLocked(door: String)
 
-    /// Door is closed (blocking movement)  
+    /// Door is closed (blocking movement)
     case doorIsClosed(direction: String)
 }

@@ -131,9 +131,9 @@ extension GameEngine {
 
         return StateChange(
             entityID: .global,
-            attribute: .clearFlag(globalID),
+            attribute: .globalState(attributeID: globalID),
             oldValue: oldValue,
-            newValue: StateValue.bool(false)
+            newValue: .undefined
         )
     }
 }

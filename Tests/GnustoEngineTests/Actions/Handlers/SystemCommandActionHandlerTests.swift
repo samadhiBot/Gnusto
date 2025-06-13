@@ -13,7 +13,7 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -40,7 +40,7 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -62,7 +62,7 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -73,7 +73,7 @@ struct SystemCommandActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // Ensure scripting is not initially active
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == false)
+        #expect(await engine.hasGlobal(.isScripting) == false)
 
         // When
         try await handler.validate(context: context)
@@ -88,7 +88,7 @@ struct SystemCommandActionHandlerTests {
         #expect(result.message != nil)
         #expect(result.message!.contains("file name"))
         #expect(result.message!.contains("transcript"))
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == true)
+        #expect(await engine.hasGlobal(.isScripting) == true)
         #expect(result.stateChanges.count == 1)
     }
 
@@ -98,14 +98,14 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Set scripting flag to true
-        let scriptingChange = await engine.setGlobal(GlobalID.isScripting, to: true)
+        let scriptingChange = await engine.setGlobal(.isScripting, to: true)
         try await engine.apply(scriptingChange)
 
         let handler = ScriptActionHandler()
@@ -133,16 +133,16 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Set scripting flag to true first
-        let scriptingChange = await engine.setGlobal(GlobalID.isScripting, to: true)
+        let scriptingChange = await engine.setGlobal(.isScripting, to: true)
         try await engine.apply(scriptingChange)
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == true)
+        #expect(await engine.hasGlobal(.isScripting) == true)
 
         let handler = UnscriptActionHandler()
         let command = Command(verb: .unscript, rawInput: "unscript")
@@ -160,7 +160,7 @@ struct SystemCommandActionHandlerTests {
         // Then
         #expect(result.message != nil)
         #expect(result.message!.contains("ended"))
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == false)
+        #expect(await engine.hasGlobal(.isScripting) == false)
         #expect(result.stateChanges.count == 1)
     }
 
@@ -170,14 +170,14 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
 
         // Ensure scripting is not active
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == false)
+        #expect(await engine.hasGlobal(.isScripting) == false)
 
         let handler = UnscriptActionHandler()
         let command = Command(verb: .unscript, rawInput: "unscript")
@@ -204,7 +204,7 @@ struct SystemCommandActionHandlerTests {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        let engine = GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -214,7 +214,7 @@ struct SystemCommandActionHandlerTests {
         let unscriptHandler = UnscriptActionHandler()
 
         // Initially not scripting
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == false)
+        #expect(await engine.hasGlobal(.isScripting) == false)
 
         // When - Start scripting
         let scriptCommand = Command(verb: .script, rawInput: "script")
@@ -228,7 +228,7 @@ struct SystemCommandActionHandlerTests {
         }
 
         // Then - Should be scripting
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == true)
+        #expect(await engine.hasGlobal(.isScripting) == true)
 
         // When - Stop scripting
         let unscriptCommand = Command(verb: .unscript, rawInput: "unscript")
@@ -242,6 +242,6 @@ struct SystemCommandActionHandlerTests {
         }
 
         // Then - Should not be scripting
-        #expect(await engine.hasGlobal(GlobalID.isScripting) == false)
+        #expect(await engine.hasGlobal(.isScripting) == false)
     }
 }

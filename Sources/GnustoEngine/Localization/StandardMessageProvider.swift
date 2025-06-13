@@ -201,7 +201,10 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .openingRevealsContents(let container, let contents):
             "Opening \(container) reveals \(contents)."
 
-        case .closed(let item):
+        case .closed:
+            "Closed."
+
+        case .closedItem(let item):
             "You close \(item)."
 
         case .youAreEmptyHanded:

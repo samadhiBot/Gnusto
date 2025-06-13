@@ -121,14 +121,14 @@ public struct OpenActionHandler: ActionHandler {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
                 let itemList = itemsInside.sorted().listWithIndefiniteArticles
                 message = context.message(
-                    .openingRevealsContents(container: targetItem.name, contents: itemList))
+                    .openingRevealsContents(container: targetItem.withDefiniteArticle, contents: itemList))
             } else {
                 // Container is empty, use simple message
-                message = context.message(.opened(item: targetItem.name))
+                message = context.message(.opened(item: targetItem.withDefiniteArticle))
             }
         } else {
             // Not a container, use simple message
-            message = context.message(.opened(item: targetItem.name))
+            message = context.message(.opened(item: targetItem.withDefiniteArticle))
         }
 
         // Prepare the result
