@@ -1,417 +1,102 @@
-# Gnusto Interactive Fiction Engine
+# Gnusto Interactive Fiction Engine - Core Rules
 
-- The Gnusto Interactive Fiction Engine enables faithful **player-facing experiences** replicating the original ZIL-based interactive fiction classics, accurately recreating the original gameplay mechanics and stories.
-- It provides a clean, elegant and ergonomic foundation for creating new works of interactive fiction **built on modern Swift principles**.
-- It adheres to the highest standards of software craftsmanship, with clean, SOLID, modular, maintainable code.
-- All of the Gnusto Interactive Fiction Engine's code is well-tested, with 80-90% coverage **required for pull requests**.
-- It is easy customize and extend ANY and ALL of the built-in functionality.
-- It utilizes modern Swift standards, features and optimizations under the hood.
-- `Docs/References/Zork 1` is ALWAYS the definitive reference for ZIL **player-facing behavior, mechanics, and nostalgic phrases.**
+## Mission
+Create faithful **player-facing experiences** replicating ZIL-based IF classics using modern Swift principles. Honor the nostalgia while building on a clean, SOLID, maintainable foundation.
 
-## Design principles
+## Critical Rules
 
-- Common operations should have simple, direct APIs. Any need for workarounds in client game code shows that the current engine design isn't fully considering the client game developer's experience.
-- The cleanest code is no code. Minimize boilerplate. The presence of the Gnusto Interactive Fiction Engine should be as unobtrusive as possible, so developers can focus on their game worlds. It should make game creation as easy, fun and intuitive as possible.
-- **Respect the action pipeline.** All state mutations should flow through the established action handler pipeline via `StateChange` objects. Avoid direct state mutation methods that bypass validation, event handlers, and proper sequencing. Use `StateChange` builders in `GameEngine+stateChanges.swift` to create changes that respect the pipeline.
+### ZIL References & Nostalgia
+- `Docs/References/Zork 1` is the definitive source for player-facing behavior and phrases
+- Use classic phrases like "It is pitch black. You are likely to be eaten by a grue."
+- Honor the *spirit* and *player effect* of originals, not exact ZIL implementation
+- When ZIL seems overly complex, discuss modern alternatives that preserve player experience
 
-## Foundational Rules
+### State Management Pipeline
+- **ALL state mutations flow through `StateChange` objects** via the action handler pipeline
+- Use `StateChange` builders in `GameEngine+stateChanges.swift`
+- Never bypass validation, event handlers, or sequencing with direct mutations
 
-- ALWAYS refer to `Sources/GnustoEngine` and `Tests/GnustoEngineTests` before making changes, to ensure you follow existing conventions and APIs.
-- When adding, modifying or reviewing functionality, ALWAYS refer to the original ZIL source code in `Docs/References` **for inspiration and player-experience guidance**.
-  - Use `Docs/References/Cloak of Darkness` to quickly learn the fundamentals of how some functionality was handled in ZIL.
-  - Use `Docs/References/Zork 1` for the canonical mechanics and phrases, e.g. "It is pitch black. You are likely to be eaten by a grue."
-  - Nostalgia is the heart of the Gnusto engine, so ALWAYS honor the past by using phrases and response from the classics.
-  - Use `Docs/References/Hitchhikers Guide to the Galaxy` to study more advanced puzzles and techniques.
-  - Use `Docs/References/A Mind Forever Voyaging` to study the later state of the art in the classical era of ZIL programming.
-- **If ZIL implementation details seem overly complexn best practices, RAISE this for discussion.** Propose modern solutions that preserve the *spirit* and *player effect* of the original. **Prioritize modern, SOLID Swift code over exact ZIL implementation.**
-- ALWAYS provide comprehensive tests (`Swift Testing`, 80-90% coverage) **before a pull request is considered complete**. Iterative development allows flexibility at the commit level.
-- NEVER resort to `@unchecked Sendable`.
+### Testing Requirements
+- 80-90% test coverage using `Swift Testing` **required for pull requests**
+- Use `mockIO.flush()` and `expectNoDifference()` for output testing
+- **IGNORE quote/apostrophe differences in test failures** (Markdown rendering artifact)
 
-## Current Sprint
+### Code Quality
+- Modern Swift 6 concurrency, SOLID principles
+- Organize logically (properties → initializers → functions), then alphabetize within groups
+- Use `///` docs for public APIs, `//` comments only for non-obvious *why*
+- Never use `@unchecked Sendable`
 
-- The next development sprint is based on `Docs/ROADMAP.md`.
-  - The first epic in the next sprint is detailed in `Docs/ENHANCED_ACTION_HANDLING.md`. See `Implementation Phases` for next steps.
-- **Roadmaps and plans are guides.** Both user and AI share the responsibility to question and refine them if they seem misguided or incomplete.
-- We will follow the plan diligently, **using it as a guide but remaining open to purposeful deviation ("with gnusto") if deemed crucial after discussion.**
+## Architecture Quick Reference
 
-# AI Collaboration Guidelines (Aisq Persona)
+### For Game Behavior
+- **ItemEventHandler**: Item-specific behavior (preferred for custom object actions)
+- **ActionHandler**: Generic verb behavior across item types
+- **LocationEventHandler**: Room-specific behavior
 
-This document summarizes the key discussion points and clarifications regarding the collaboration between the user and the AI assistant (persona: Aisq), aimed at optimizing effectiveness and synergy.
+### Core Components
+- **GameEngine**: Central orchestrator, manages game loop and state
+- **GameState**: Single source of truth for all mutable game data
+- **StateChange**: All mutations flow through this pipeline
+- **GameBlueprint**: Defines game structure and configurations
 
-## Core Principles & Priorities
+### Auto-Wiring
+- Use auto-wiring tools to eliminate boilerplate
+- Define items/locations as static properties for auto-discovery
 
-1.  **Modern Practices Over ZIL Implementation:** When replicating classic ZIL games, prioritize modern Swift best practices (Swift 6 concurrency, SOLID principles, clean architecture) over mimicking the _exact_ ZIL implementation details. The goal is faithful _player-facing behavior_ and nostalgia, built on a robust, modern foundation.
-2.  **Inquisitive Skepticism ("First Principles"):** Embody genuine intellectual curiosity and skepticism. Question assumptions (in code, training data, user statements, ZIL references, AI suggestions), strive for clarity and accuracy, and explore alternatives. This means engaging with the _why_ behind decisions, not just executing instructions.
-3.  **Honoring vs. Replicating ZIL:** Use ZIL references (Zork 1, CoD) for mechanics, phrases, and nostalgic feel. However, if a ZIL mechanic seems overly complex, illogical, or buggy by modern standards, raise it for discussion. Propose streamlined modern interpretations that preserve the intended player experience, rather than blindly replicating potentially outdated implementations. Honor the original genius by building upon it with better tools.
-
-## Development Workflow
-
-1.  **Testing Rigor:** Aim for 80-90% test coverage using `Swift Testing`. While individual commits during exploratory phases can be flexible, **every pull request** must include comprehensive test coverage for the changes made. Strive for robust testing in the final product without fail. (`XCTest` is not relevant as this is a new codebase).
-2.  **File Organization:**
-    - Prefer nested types (`Item.Strength`) to minimize namespaces and keep related code together.
-    - Keep nested types within the parent type's file (`Item.swift`) by default.
-    - Consider extracting a nested type into its own file (e.g., `Item+Strength.swift`) if the parent file becomes large (e.g., over ~300 lines) or the nested type itself is substantial (e.g., ~200 lines), to maintain manageability while preserving context. Avoid overly large, unwieldy files.
-3.  **Code Ordering & Alphabetization:**
-    - Organize types logically: Properties -> Initializers -> Computed Properties -> Public Functions -> Private Functions, etc. Use `// MARK: -` comments and `extension`s to structure these sections.
-    - **Within** these logical groupings, alphabetize elements (properties, functions, cases).
-    - **Exception:** Override alphabetization when a different order is clearly more logical, such as a natural sequence (e.g., `winter, spring, summer, autumn`) or a process flow (e.g., `validate, process, postProcess`).
-4.  **Documentation & Comments:**
-    - Use standard Swift `///` documentation comments for all public/important types, functions, properties, and enum cases. Ensure proper grammar and formatting.
-    - Use `//` comments sparingly. Avoid comments that merely state _what_ changed (Git history covers this). Focus `//` comments on explaining the _why_ behind non-obvious code or design choices.
-5.  **Roadmap & Planning:**
-    - Use `STATE_REFACTOR_PLAN.md`, `Docs/ROADMAP.md`, etc., as guiding context.
-    - Be mindful of the current sprint's focus but feel empowered to deviate _purposefully_ ("with gnusto") if crucial for the project's health or long-term goals (after discussion).
-    - Proactively question the plan if it seems misguided or incomplete. Responsibility for refining the plan is shared.
-
-## Communication
-
-- When encountering ambiguities, conflicts between principles, or potentially suboptimal ZIL patterns, pause and discuss with the user before proceeding.
-
-# Engine Architecture Overview
-
-## ActionHandler
-
-Protocol defining how specific game verbs (like "take", "open", "go") are implemented. It encapsulates the logic for performing an action, including validation, processing (which returns an `ActionResult`), and post-processing. [ActionHandler.swift](mdc:Sources/GnustoEngine/Actions/ActionHandler.swift)
-
-**Use for:** Generic verb behavior that applies to most/all items of a certain type (e.g., how "take" works for any takeable item).
-
-## ItemEventHandler
-
-A more targeted approach for item-specific behavior. Instead of creating custom ActionHandlers, use ItemEventHandler to override or extend specific verbs for specific items. This follows the ZIL pattern where individual objects can have custom action routines. [ItemEventHandler.swift](mdc:Sources/GnustoEngine/Actions/ItemEventHandler.swift)
-
-**Use for:** Game-specific item behavior (e.g., the rug in Zork has special behavior for MOVE, RAISE, LOOK UNDER). Register via `GameBlueprint.itemEventHandlers`.
-
-**Example:**
+## Style Guide Essentials
 
 ```swift
-static let rugHandler = ItemEventHandler { engine, event in
-    switch event {
-    case .beforeTurn(let command):
-        switch command.verb {
-        case .move:
-            return ActionResult("Special rug behavior...")
-        default:
-            return nil // Use default handler
-        }
-    case .afterTurn:
-        return nil
-    }
-}
-```
-
-## GameBlueprint
-
-Protocol defining the static structure and game-specific configurations for a game. Implementations of `GameBlueprint` provide the initial game state, vocabulary, custom action handlers, item/location event handlers (for specific object/room behaviors), timed event definitions (via `TimeRegistry`), dynamic attribute providers, and other custom behaviors to the `GameEngine`. [GameBlueprint.swift](mdc:Sources/GnustoEngine/Blueprints/GameBlueprint.swift)
-
-## GameEngine
-
-The central orchestrator. Manages the main game loop, interacts with the Parser and IOHandler, holds the GameState, dispatches commands to ActionHandlers (obtained from the `GameBlueprint` or engine defaults), processes timed events (from the `TimeRegistry`), and provides helper methods for common state access and mutation. `GameEngine` is `Sendable`. [GameEngine.swift](mdc:Sources/GnustoEngine/Engine/GameEngine.swift)
-
-## GameState
-
-The single source of truth for the current state of the game world. It holds all mutable data like item locations/properties, player status, location states, flags, active timers, etc. Any operation that needs to know what is currently true in the game consults or modifies GameState (usually via `GameEngine` helpers). `GameState` is `Codable` and `Sendable`. [GameState.swift](mdc:Sources/GnustoEngine/Core/GameState.swift)
-
-## IOHandler
-
-Defines the interface for all input/output operations: reading player commands, printing game responses, displaying the status line, etc. This abstraction allows different frontends (console, GUI). [IOHandler.swift](mdc:Sources/GnustoEngine/IO/IOHandler.swift)
-
-## Item / Location
-
-The core model structs representing entities in the game world. They hold relatively static definition data (like ID, name) and mutable state (like attributes, parent). Each is `Codable` and `Sendable`. [Item.swift](mdc:Sources/GnustoEngine/Core/Item.swift) [Location.swift](mdc:Sources/GnustoEngine/Core/Location.swift)
-
-## Parser
-
-Defines the interface for turning raw player input strings into structured `Command` objects. Concrete implementations handle grammar, vocabulary lookup, and disambiguation. [Parser.swift](mdc:Sources/GnustoEngine/Parsing/Parser.swift)
-
-## ScopeResolver
-
-Centralizes logic for determining what the player can see and interact with based on location, light, container state, etc. [ScopeResolver.swift](mdc:Sources/GnustoEngine/Core/ScopeResolver.swift)
-
-## StateChange
-
-The fundamental mechanism for all game state mutations. `StateChange` objects describe proposed modifications to the game world (e.g., moving items, setting flags, updating scores) without immediately applying them. This pattern preserves the action pipeline by ensuring all state changes flow through proper validation, event handlers, and sequencing. Factory methods in `GameEngine+stateChanges.swift` provide convenient builders for common state changes. [StateChange.swift](mdc:Sources/GnustoEngine/Actions/StateChange.swift)
-
-## TimeRegistry
-
-A repository for game-specific timed event definitions (`FuseDefinition`, `DaemonDefinition`). The `GameEngine` consults this registry (defined in `DefinitionRegistry.swift`) for fuse and daemon behaviors. It's typically configured via the `GameBlueprint`. [DefinitionRegistry.swift](mdc:Sources/GnustoEngine/Time/DefinitionRegistry.swift)
-
-## Vocabulary
-
-Stores the recognized words (verbs, nouns, adjectives, directions, prepositions) for the game, enabling the Parser to understand input. The `Vocabulary` is typically provided by the `GameBlueprint`. [Vocabulary.swift](mdc:Sources/GnustoEngine/Vocabulary/Vocabulary.swift)
-
-## Auto-Wiring Tools
-
-The Gnusto engine includes powerful auto-wiring tools that eliminate boilerplate by automatically generating game setup code:
-
-### GnustoAutoWiringTool
-
-A command-line tool that scans game source files and automatically generates the necessary boilerplate code for registering items, locations, event handlers, computers, etc. with the GameBlueprint. [GnustoAutoWiringTool](mdc:Sources/GnustoAutoWiringTool)
-
-**Key features:**
-
-- Scans Swift files for static item/location definitions
-- Discovers ItemEventHandlers and LocationEventHandlers
-- Generates arrays and dictionaries for GameBlueprint implementation
-- Eliminates the need to manually maintain registration lists
-
-### GnustoAutoWiringPlugin
-
-A Swift Package Manager plugin that integrates the auto-wiring tool into the build process, ensuring generated code stays up-to-date automatically. [GnustoAutoWiringPlugin](mdc:Plugins/GnustoAutoWiringPlugin)
-
-**Usage:** The plugin runs during build to regenerate boilerplate code, making game development more productive by removing manual maintenance overhead.
-
-## Development Patterns
-
-### For Game-Specific Behavior
-
-1. **Prefer ItemEventHandler** over custom ActionHandlers for item-specific behavior
-2. **Use LocationEventHandler** for room-specific behavior (e.g., room descriptions that change based on game state)
-3. **Create custom ActionHandlers** only for new verbs or completely different verb behavior across all items
-
-### For Game Setup
-
-1. **Let auto-wiring handle the boilerplate** - define your items, locations, and handlers as static properties
-2. **Focus on game content** rather than registration mechanics
-3. **Use meaningful static property names** as they're discoverable by the auto-wiring tools
-
-# Style Guide
-
-- Break up multiline strings with heredocs and backslashes:
-
-```swift
-// Wrong:
-let cloakroom = Location(
-    id: "cloakroom",
-    .name("Cloakroom"),
-    .description("The walls of this small room were clearly once lined with hooks, though now only one remains. The exit is a door to the east."),
-    .exits([.east: Exit(destination: "foyer")])
-)
-
-// Right:
-let cloakroom = Location(
-    id: "cloakroom",
-    .name("Cloakroom"),
-    // 💡 Break up long text before the 100th column
-    .description("""
-        The walls of this small room were clearly once lined with hooks, though now only one
-        remains. The exit is a door to the east.
-        """),
-    .exits([
-        // 💡 Use trailing commas in lists
-        .east: Exit(destination: "foyer"),
-    ])
-)
-```
-
-- Two or more arguments should go on multiple lines when defining and calling functions an initializers, unless the full method signature is less than 80 characters.
-
-```swift
-// Wrong:
-init(id: ID, turns: Int, action: @escaping @MainActor (GameEngine) async -> Void) {...}
-
-func debugAddItem(id: ItemID, name: String, properties: Set<ItemProperty> = [], size: Int = 5, parent: ParentEntity = .nowhere) {...}
-
-engine.debugAddItem(id: testItem.id, name: testItem.name, properties: testItem.properties, parent: .player)
-
-// Right:
-init(
-    id: ID,
-    turns: Int,
-    action: @escaping @MainActor (GameEngine) async -> Void
-) {...}
-
+// Multi-line function signatures (>80 chars or 2+ args)
 func debugAddItem(
     id: ItemID,
     name: String,
-    properties: Set<ItemProperty> = [],
-    size: Int = 5,
-    parent: ParentEntity = .nowhere
-) {...}
+    properties: Set<ItemProperty> = []
+) { }
 
-engine.debugAddItem(
-    id: testItem.id,
-    name: testItem.name,
-    properties: testItem.properties,
-    parent: .player
-)
-
-// 💡 Exception for short two-argument method signatures
-func print(_ text: String, style: TextStyle)
-
-// 💡 Exception for unnamed parameters, when call still fits on one line
-ioHandler.ioHandler.print("You are likely to be eaten by a grue.", style: .normal)
-```
-
-- Multi-condition if's and guards
-
-```swift
-// Wrong:
-if significantTokens.count == 1, let directionWord = significantTokens.first, let direction = vocabulary.directions[directionWord] {...}
-
-guard let targetItem = await engine.itemSnapshot(with: targetItemID),
-      targetItem.parent == .player else {...}
-
-// Right:
-if significantTokens.count == 1,
-   let directionWord = significantTokens.first,
-   let direction = vocabulary.directions[directionWord]
-{
-    ...
-}
-
+// Multi-condition guards/ifs
 guard
     let targetItem = await engine.itemSnapshot(with: targetItemID),
     targetItem.parent == .player
-else {
-    ...
-}
+else { }
 
-guard let targetItemID = command.directObject else {...}
+// Long strings with heredocs
+.description("""
+    The walls of this small room were clearly once lined with hooks, though now only one
+    remains. The exit is a door to the east.
+    """)
+
+// Variadic arguments for simple collections
+public init(name: String, properties: LocationProperty...) { }
+
+// No redundant type annotations
+let change = StateChange(entityId: .global, propertyKey: .gameSpecificState(key: key))
 ```
 
-- Public functions should use variadic arguments for simple collections
+## Testing Patterns
 
 ```swift
-// Wrong:
-public init(
-    name: String,
-    exits: [Direction : Exit] = [:],
-    properties: Set<LocationProperty> = [],
-    globals: [ItemID] = []
-) {...}
-
-// Right:
-public init(
-    name: String,
-    exits: [Direction : Exit] = [:],
-    properties: LocationProperty...,
-    globals: ItemID...
-) {...}
-```
-
-- NEVER add redundant type annotations
-
-```swift
-// Wrong:
-let change: StateChange = StateChange(  // Redundant type annotation
-    entityId: EntityID.global,  // Type already specified in function signature
-    propertyKey: StatePropertyKey.gameSpecificState(key: key),  // Type already specified in function signature
-    newValue: value
-)
-
-// Right:
-let change = StateChange(
-    entityId: .global,
-    propertyKey: .gameSpecificState(key: key),
-    newValue: value
-)
-```
-
-# Tests
-
-- Always use `Swift Testing`
-- @MainActor-isolated tests calling other @MainActor-isolated functions or properties within that scope should omit the explicit `await` to avoid compiler redundancy warning
-
-## Testing Game Output:
-
-```swift
-// Wrong:
-let output = await mockIO.recordedOutput
-#expect(output.contains { $0.text == "You can't take things out of the stone statue." }, "Expected non-container message")
-#expect(output.count == 1)
-
-// Right:
-let output = await mockIO.flush()  // 💡 Use `flush()` rather than `output.contains` and `output.count`
-expectNoDifference(output, "You can't take things out of the stone statue.")
-```
-
-## CRITICAL: Quote and Apostrophe Handling in Tests
-
-**🚨 NEVER ATTEMPT TO "FIX" QUOTE OR APOSTROPHE DIFFERENCES IN TESTS 🚨**
-
-- **YOU CANNOT VISUALLY DISTINGUISH** between straight quotes (`'` `"`) and curly quotes (`'` `'` `"` `"`)
-- **ALL quote/apostrophe differences in test failures should be IGNORED COMPLETELY**
-- The Gnusto engine uses Markdown rendering which converts straight quotes to curly quotes
-- When you see test failures like:
-  ```
-  - "You can't take the pebble."
-  + "You can’t take the pebble."
-  ```
-  **This is NOT a real failure** - it's just a visual artifact of quote rendering
-- **NEVER modify MarkdownParser, IOHandler, or any engine code to "fix" quotes**
-- **NEVER update test expectations to change quote formats**
-- **ALWAYS skip/ignore any test failures that only involve quote/apostrophe differences**
-- If a test failure appears to be only about quotes, **treat the test as passing**
-
-### Action Items for Quote-Related Test Failures:
-1. **SKIP COMPLETELY** - Do not attempt any fixes
-2. **FOCUS ON OTHER TESTS** - Work on actual functionality issues
-3. **ASK USER** - If unclear whether a failure is quote-related, ask for clarification
-
-## Mocks
-
-- Use [MinimalGame.swift](mdc:Tests/GnustoEngineTests/Support/MinimalGame.swift) for a simple `GameBlueprint`
-- Use [MockIOHandler.swift](mdc:Tests/GnustoEngineTests/Mocks/MockIOHandler.swift) for a mock `IOHandler`
-  - Use `mockIO.flush()` and `expectNoDifference(...)` to test engine output
-- Use @MockParser.swift for a mock `Parser`
-
-```swift
-@Test("Examine simple object (held)")
-func testExamineSimpleObjectHeld() async throws {
-    // Given
-    let key = Item(
-        id: "key",
-        name: "brass key",
-        longDescription: "A small brass key.",
-        properties: .takable,
-        parent: .player
-    )
-
-    let game = MinimalGame(items: [key])
+// Use Swift Testing with @MainActor tests
+@Test("Test description")
+func testSomething() async throws {
+    let game = MinimalGame(items: [item])
     let mockIO = await MockIOHandler()
-    let mockParser = MockParser()
-    let engine = GameEngine(
-        game: game,
-        parser: mockParser,
-        ioHandler: mockIO
-    )
-
-    let command = Command(verbID: "examine", directObject: "key", rawInput: "examine key")
+    let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 
     // When
     try await handler.perform(command: command, engine: engine)
 
     // Then
-    let finalItemState = engine.itemSnapshot(with: "key")
-    #expect(finalItemState?.hasProperty(ItemProperty.touched) == true)
-
     let output = await mockIO.flush()
-    expectNoDifference(output, "A small brass key.")
+    expectNoDifference(output, "Expected output text")
+
+    // Use Issue.record for error reporting
+    Issue.record("Specific error description")
 }
 ```
 
-## Reporting Errors:
-
-- Use `Issue.record` instead of `#expect(Bool(false), ...)`
-
-```swift
-// Wrong:
-do {
-    try gameState.apply(change)
-    #expect(Bool(false), "Expected apply to throw an error, but it succeeded.")
-} catch { ... }
-
-if errorWasActionError { ... } else {
-    #expect(Bool(false), "Thrown error was not an ActionError: \(thrownError)")
-}
-
-// Right:
-do {
-    try gameState.apply(change)
-    Issue.record("Expected apply to throw an error, but it succeeded.")
-} catch { ... }
-
-if errorWasActionError { ... } else {
-    Issue.record("Thrown error was not an ActionError: \(thrownError)")
-}
-```
+## AI Collaboration (Aisq)
+- Question assumptions and strive for first principles
+- Discuss conflicts between ZIL patterns and modern best practices
+- Focus on Truth, Beauty, and clarity in code
+- Roadmaps are guides - deviate purposefully when crucial ("with gnusto")
