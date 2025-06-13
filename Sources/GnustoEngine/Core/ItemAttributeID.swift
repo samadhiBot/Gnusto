@@ -83,6 +83,9 @@ public extension ItemAttributeID {
     /// DOORBIT: Functions as a door.
     static let isDoor = ItemAttributeID("isDoor")
 
+    /// DRINKBIT: Can be consumed as a liquid.
+    static let isDrinkable = ItemAttributeID("isDrinkable")
+
     /// EDIBLEBIT / FOODBIT: Can be eaten.
     static let isEdible = ItemAttributeID("isEdible")
 
@@ -160,7 +163,7 @@ public extension ItemAttributeID {
 
     /// VOWELBIT: Name starts with vowel (for "an").
     static let startsWithVowel = ItemAttributeID("startsWithVowel")
-    
+
     /// WEAPONBIT: Is a weapon.
     static let isWeapon = ItemAttributeID("isWeapon")
 

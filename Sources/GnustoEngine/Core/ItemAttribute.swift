@@ -60,7 +60,7 @@ extension ItemAttribute {
             rawValue: .string(description)
         )
     }
-    
+
     /// The item's parent entity (ZIL `IN`).
     ///
     /// - Parameter parent: The item's parent entity.
@@ -193,6 +193,11 @@ extension ItemAttribute {
     /// DOORBIT: Functions as a door.
     public static var isDoor: ItemAttribute {
         ItemAttribute(id: .isDoor, rawValue: true)
+    }
+
+    /// DRINKBIT: Can be consumed as a liquid.
+    public static var isDrinkable: ItemAttribute {
+        ItemAttribute(id: .isDrinkable, rawValue: true)
     }
 
     /// EDIBLEBIT / FOODBIT: Can be eaten.

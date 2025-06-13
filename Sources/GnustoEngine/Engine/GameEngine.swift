@@ -1093,12 +1093,19 @@ extension GameEngine {
     static var defaultActionHandlers: [VerbID: ActionHandler] {
         var handlers: [VerbID: ActionHandler] = [
             // Movement & World Interaction
+            .attack: AttackActionHandler(),
+            .breathe: BreatheActionHandler(),
             .burn: BurnActionHandler(),
             .climb: ClimbActionHandler(),
             .climbOn: ClimbOnActionHandler(),
             .close: CloseActionHandler(),
+            .cut: CutActionHandler(),
+            .dig: DigActionHandler(),
+            .drink: DrinkActionHandler(),
             .drop: DropActionHandler(),
+            .eat: EatActionHandler(),
             .examine: ExamineActionHandler(),
+            .fill: FillActionHandler(),
             .find: FindActionHandler(),
             .give: GiveActionHandler(),
             .go: GoActionHandler(),
@@ -1120,6 +1127,7 @@ extension GameEngine {
             .take: TakeActionHandler(),
             .taste: TasteActionHandler(),
             .thinkAbout: ThinkAboutActionHandler(),
+            .throwItem: ThrowActionHandler(),
             .touch: TouchActionHandler(),
             .turnOff: TurnOffActionHandler(),
             .turnOn: TurnOnActionHandler(),

@@ -100,8 +100,8 @@ public struct SyntaxRule: Sendable, Equatable, Codable {
         if !pattern.contains(.preposition) && requiredPreposition != nil {
              assertionFailure("SyntaxRule created with requiredPreposition but no .preposition in pattern: \(pattern)")
         }
-         if pattern.contains(.preposition) && requiredPreposition == nil {
-             assertionFailure("SyntaxRule created with .preposition in pattern but no requiredPreposition string: \(pattern)")
+        if pattern.contains(.preposition) && requiredPreposition == nil {
+            assertionFailure("SyntaxRule created with .preposition in pattern but no requiredPreposition string: \(pattern)")
         }
     }
 }

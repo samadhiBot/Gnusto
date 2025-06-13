@@ -1,0 +1,116 @@
+import Foundation
+
+/// Handles the "ATTACK" command and its synonyms (e.g., "FIGHT", "HIT", "KILL").
+/// Implements combat mechanics following ZIL patterns for violence against actors and objects.
+public struct AttackActionHandler: ActionHandler {
+    public init() {}
+
+    /// Validates the "ATTACK" command.
+    ///
+    /// This method ensures that:
+    /// 1. A direct object is specified (what to attack).
+    /// 2. The target item exists and is reachable.
+    /// 3. If an indirect object (weapon) is specified, it exists and is held.
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Throws: Various `ActionResponse` errors if validation fails.
+    public func validate(context: ActionContext) async throws {
+        // Attack requires a direct object (what to attack)
+        guard let directObjectRef = context.command.directObject else {
+            throw ActionResponse.prerequisiteNotMet("Attack what?")
+        }
+        guard case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.prerequisiteNotMet("You can't attack that.")
+        }
+
+        // Check if target exists and is reachable
+        _ = try await context.engine.item(targetItemID)
+        guard await context.engine.playerCanReach(targetItemID) else {
+            throw ActionResponse.itemNotAccessible(targetItemID)
+        }
+
+        // If weapon is specified, validate it
+        if let indirectObjectRef = context.command.indirectObject {
+            guard case .item(let weaponItemID) = indirectObjectRef else {
+                throw ActionResponse.prerequisiteNotMet("You can't attack with that.")
+            }
+
+            let weaponItem = try await context.engine.item(weaponItemID)
+            guard weaponItem.parent == .player else {
+                throw ActionResponse.itemNotHeld(weaponItemID)
+            }
+        }
+    }
+
+    /// Processes the "ATTACK" command.
+    ///
+    /// Handles different attack scenarios:
+    /// - Attacking actors (characters, creatures)
+    /// - Attacking objects with/without weapons
+    /// - Provides ZIL-accurate combat responses
+    ///
+    /// - Parameter context: The `ActionContext` for the current action.
+    /// - Returns: An `ActionResult` with appropriate combat message and state changes.
+    public func process(context: ActionContext) async throws -> ActionResult {
+        guard let directObjectRef = context.command.directObject,
+              case .item(let targetItemID) = directObjectRef else {
+            throw ActionResponse.internalEngineError("AttackActionHandler: directObject was not an item in process.")
+        }
+
+        let targetItem = try await context.engine.item(targetItemID)
+        var stateChanges: [StateChange] = []
+
+        // Mark target as touched
+        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
+            stateChanges.append(touchedChange)
+        }
+
+        // Update pronouns to refer to the target
+        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
+            stateChanges.append(pronounChange)
+        }
+
+
+
+        // Handle different target types and weapons
+        let message: String
+
+        // Check if using weapon
+        if let indirectObjectRef = context.command.indirectObject,
+           case .item(let weaponItemID) = indirectObjectRef {
+            let weaponItem = try await context.engine.item(weaponItemID)
+
+            if targetItem.hasFlag(.isCharacter) {
+                // Attacking character with weapon
+                if weaponItem.hasFlag(.isWeapon) {
+                    message = "You attack the \(targetItem.name) with the \(weaponItem.name), but nothing happens."
+                } else {
+                    message = "Trying to attack the \(targetItem.name) with a \(weaponItem.name) is suicidal."
+                }
+            } else {
+                // Attacking object with weapon
+                message = "You attack the \(targetItem.name) with the \(weaponItem.name), but nothing happens."
+            }
+        } else {
+            // Bare-handed attack
+            if targetItem.hasFlag(.isCharacter) {
+                message = "Trying to attack a \(targetItem.name) with your bare hands is suicidal."
+            } else {
+                message = "I've known strange people, but fighting a \(targetItem.name)?"
+            }
+        }
+
+        return ActionResult(message: message, stateChanges: stateChanges)
+    }
+
+    /// Performs any post-processing after the attack action completes.
+    ///
+    /// Currently no post-processing is needed for basic attack behavior.
+    /// Game-specific implementations might override this for combat consequences.
+    ///
+    /// - Parameter context: The action context for the current action.
+    public func postProcess(context: ActionContext) async throws {
+        // No post-processing needed for basic attack
+        // Game-specific combat systems would override this
+    }
+}

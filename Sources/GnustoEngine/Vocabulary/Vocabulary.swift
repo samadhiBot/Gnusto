@@ -575,6 +575,198 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             ],
             requiresLight: true
         ),
+
+        // Priority 1: Core Interaction Verbs
+
+        Verb(
+            id: .attack,
+            synonyms: "fight", "hit", "kill", "slay",
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                ),
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .breathe,
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .cut,
+            synonyms: "slice", "chop",
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .dig,
+            synonyms: "excavate",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .drink,
+            synonyms: "sip", "quaff",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .eat,
+            synonyms: "consume", "devour",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .fill,
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .kick,
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .kiss,
+            synonyms: "embrace", "hug",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .knock,
+            synonyms: "rap", "tap",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .pourOn,
+            synonyms: "pour on", "spill on",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "on"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .rub,
+            synonyms: "polish", "clean",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .shake,
+            synonyms: "rattle",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .squeeze,
+            synonyms: "compress", "press",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .throwItem,
+            synonyms: "hurl", "toss",
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "at"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .tie,
+            synonyms: "bind", "fasten",
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "to"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .turn,
+            synonyms: "rotate", "twist",
+            syntax: [
+                SyntaxRule(.verb, .directObject),
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "with"
+                )
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .wave,
+            synonyms: "brandish",
+            syntax: [
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
     ]
 
     // MARK: - Building Vocabulary
