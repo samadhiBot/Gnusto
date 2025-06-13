@@ -932,6 +932,50 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             ],
             requiresLight: false
         ),
+
+        Verb(
+            id: .blow,
+            synonyms: "breathe on", "blow on",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .deflate,
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .empty,
+            synonyms: "pour out", "dump out",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .inflate,
+            synonyms: "blow up",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .press,
+            synonyms: "push", "depress",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .pull,
+            synonyms: "yank", "drag",
+            syntax: [SyntaxRule(.verb, .directObject)],
+            requiresLight: true
+        ),
     ]
 
     // MARK: - Building Vocabulary

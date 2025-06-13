@@ -225,6 +225,16 @@ extension ItemAttribute {
         ItemAttribute(id: .isFlammable, rawValue: true)
     }
 
+    /// Can be inflated (like balloons, rafts, etc.).
+    public static var isInflatable: ItemAttribute {
+        ItemAttribute(id: .isInflatable, rawValue: true)
+    }
+
+    /// Is currently inflated.
+    public static var isInflated: ItemAttribute {
+        ItemAttribute(id: .isInflated, rawValue: true)
+    }
+
     /// INVISIBLE: Not normally seen (object is invisible).
     public static var isInvisible: ItemAttribute {
         ItemAttribute(id: .isInvisible, rawValue: true)
@@ -278,6 +288,16 @@ extension ItemAttribute {
     /// PLURALBIT: Grammatically plural.
     public static var isPlural: ItemAttribute {
         ItemAttribute(id: .isPlural, rawValue: true)
+    }
+
+    /// Can be pressed (like buttons, switches).
+    public static var isPressable: ItemAttribute {
+        ItemAttribute(id: .isPressable, rawValue: true)
+    }
+
+    /// Can be pulled.
+    public static var isPullable: ItemAttribute {
+        ItemAttribute(id: .isPullable, rawValue: true)
     }
 
     /// READBIT: Can be read (implies text content).

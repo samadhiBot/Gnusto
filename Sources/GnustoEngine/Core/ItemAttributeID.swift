@@ -104,6 +104,12 @@ public extension ItemAttributeID {
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = ItemAttributeID("isFlammable")
 
+    /// Can be inflated (like balloons, rafts, etc.).
+    static let isInflatable = ItemAttributeID("isInflatable")
+
+    /// Is currently inflated.
+    static let isInflated = ItemAttributeID("isInflated")
+
     /// INVISIBLE: Not normally seen (object is invisible).
     static let isInvisible = ItemAttributeID("isInvisible")
 
@@ -136,6 +142,12 @@ public extension ItemAttributeID {
 
     /// PLURALBIT: Grammatically plural.
     static let isPlural = ItemAttributeID("isPlural")
+
+    /// Can be pressed (like buttons, switches).
+    static let isPressable = ItemAttributeID("isPressable")
+
+    /// Can be pulled.
+    static let isPullable = ItemAttributeID("isPullable")
 
     /// READBIT: Can be read (implies text content).
     static let isReadable = ItemAttributeID("isReadable")
