@@ -23,24 +23,6 @@ public protocol GameBlueprint: Sendable {
     /// score, location, etc.
     var player: Player { get }
 
-    /// A function that generates random numbers between 0 and 1.
-    ///
-    /// This function is used throughout the game for various randomization needs,
-    /// such as determining random events, NPC behaviors, or game mechanics.
-    /// The default implementation uses the system's random number generator.
-    ///
-    /// For testing purposes, you can provide a custom implementation that returns
-    /// predetermined values to ensure consistent test results.
-    ///
-    /// Example:
-    /// ```swift
-    /// var randomizer: () -> Double {
-    ///     // For testing: return a fixed value
-    ///     { 0.5 }
-    /// }
-    /// ```
-    var randomizer: () -> Double { get }
-
     /// All items in the game world.
     ///
     /// This array defines all items that exist in the game, including their properties,
@@ -54,27 +36,6 @@ public protocol GameBlueprint: Sendable {
     /// descriptions, exits, and properties. The `GameEngine` uses this to
     /// build the initial `GameState`.
     var locations: [Location] { get }
-
-    /// The message provider for game text localization and customization.
-    ///
-    /// This provider supplies all user-facing messages throughout the game, including
-    /// action responses, parse errors, and system messages. Games can provide custom
-    /// implementations to:
-    /// - Support multiple languages (internationalization)
-    /// - Customize the tone and style of responses
-    /// - Override specific messages while inheriting sensible defaults
-    ///
-    /// If not specified, the engine will use `StandardMessageProvider` with traditional
-    /// English interactive fiction responses.
-    ///
-    /// Example:
-    /// ```swift
-    /// var messageProvider: MessageProvider {
-    ///     // Custom provider for a horror-themed game
-    ///     HorrorMessageProvider()
-    /// }
-    /// ```
-    var messageProvider: MessageProvider { get }
 
     /// Optional closures to provide custom action handlers for specific verbs,
     /// overriding the default engine handlers.
@@ -175,25 +136,56 @@ public protocol GameBlueprint: Sendable {
     /// }
     /// ```
     var locationComputers: [LocationID: LocationComputer] { get }
+
+    /// The message provider for game text localization and customization.
+    ///
+    /// This provider supplies all user-facing messages throughout the game, including
+    /// action responses, parse errors, and system messages. Games can provide custom
+    /// implementations to:
+    /// - Support multiple languages (internationalization)
+    /// - Customize the tone and style of responses
+    /// - Override specific messages while inheriting sensible defaults
+    ///
+    /// If not specified, the engine will use `StandardMessageProvider` with traditional
+    /// English interactive fiction responses.
+    ///
+    /// Example:
+    /// ```swift
+    /// var messageProvider: MessageProvider {
+    ///     // Custom provider for a horror-themed game
+    ///     HorrorMessageProvider()
+    /// }
+    /// ```
+    var messageProvider: MessageProvider { get }
+
+    /// A random number generator used throughout the game for various randomization needs.
+    ///
+    /// This generator is used for determining random events, NPC behaviors, game mechanics,
+    /// and other probabilistic elements. The default implementation uses the system's
+    /// random number generator.
+    ///
+    /// For testing purposes, you can provide a custom implementation that returns
+    /// predetermined values to ensure consistent test results.
+    ///
+    /// Example:
+    /// ```swift
+    /// var randomNumberGenerator: any RandomNumberGenerator {
+    ///     // For testing: return a fixed value generator
+    ///     FixedRandomNumberGenerator(value: 0.5)
+    /// }
+    /// ```
+    var randomNumberGenerator: any RandomNumberGenerator { get }
 }
 
 // MARK: - Default implementations
 
 extension GameBlueprint {
-    public var randomizer: () -> Double {
-        { Double.random(in: 0...1) }
-    }
-
     public var items: [Item] {
         []
     }
 
     public var locations: [Location] {
         []
-    }
-
-    public var messageProvider: MessageProvider {
-        StandardMessageProvider()
     }
 
     public var customActionHandlers: [VerbID: ActionHandler] {
@@ -222,5 +214,13 @@ extension GameBlueprint {
 
     public var locationComputers: [LocationID: LocationComputer] {
         [:]
+    }
+
+    public var messageProvider: MessageProvider {
+        StandardMessageProvider()
+    }
+
+    public var randomNumberGenerator: any RandomNumberGenerator {
+        SystemRandomNumberGenerator()
     }
 }

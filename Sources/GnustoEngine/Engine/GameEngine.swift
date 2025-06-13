@@ -58,15 +58,15 @@ public actor GameEngine: Sendable {
     /// Derived from the `GameBlueprint` used to initialize the engine.
     public let messageProvider: MessageProvider
 
-    /// A function that generates random numbers between 0 and 1.
+    /// A random number generator used throughout the game for various randomization needs.
     ///
-    /// This function is used throughout the game for various randomization needs,
-    /// such as determining random events, NPC behaviors, or game mechanics.
-    /// The default implementation uses the system's random number generator.
+    /// This generator is used for determining random events, NPC behaviors, game mechanics,
+    /// and other probabilistic elements. The default implementation uses the system's
+    /// random number generator.
     ///
     /// For testing purposes, you can provide a custom implementation that returns
     /// predetermined values to ensure consistent test results.
-    public let randomizer: () -> Double
+    public var randomNumberGenerator: any RandomNumberGenerator
 
     /// Definitions for timed events (fuses) that trigger after a set number of turns.
     /// These are derived from the `GameBlueprint` used to initialize the engine.
@@ -135,7 +135,7 @@ public actor GameEngine: Sendable {
     ) async {
         self.constants = blueprint.constants
         self.messageProvider = blueprint.messageProvider
-        self.randomizer = blueprint.randomizer
+        self.randomNumberGenerator = blueprint.randomNumberGenerator
         self.fuseDefinitions = blueprint.fuses
         self.daemonDefinitions = blueprint.daemons
 
@@ -1111,6 +1111,9 @@ extension GameEngine {
             .go: GoActionHandler(),
             .insert: InsertActionHandler(),
             .inventory: InventoryActionHandler(),
+            .kick: KickActionHandler(),
+            .kiss: KissActionHandler(),
+            .knock: KnockActionHandler(),
             .listen: ListenActionHandler(),
             .lock: LockActionHandler(),
             .look: LookActionHandler(),
@@ -1118,20 +1121,27 @@ extension GameEngine {
             .lookUnder: LookUnderActionHandler(),
             .move: MoveActionHandler(),
             .open: OpenActionHandler(),
+            .pourOn: PourOnActionHandler(),
             .push: PushActionHandler(),
             .putOn: PutOnActionHandler(),
             .raise: RaiseActionHandler(),
             .read: ReadActionHandler(),
             .remove: RemoveActionHandler(),
+            .rub: RubActionHandler(),
+            .shake: ShakeActionHandler(),
             .smell: SmellActionHandler(),
+            .squeeze: SqueezeActionHandler(),
             .take: TakeActionHandler(),
             .taste: TasteActionHandler(),
             .thinkAbout: ThinkAboutActionHandler(),
             .throwItem: ThrowActionHandler(),
+            .tie: TieActionHandler(),
             .touch: TouchActionHandler(),
+            .turn: TurnActionHandler(),
             .turnOff: TurnOffActionHandler(),
             .turnOn: TurnOnActionHandler(),
             .unlock: UnlockActionHandler(),
+            .wave: WaveActionHandler(),
             .wear: WearActionHandler(),
             .xyzzy: XyzzyActionHandler(),
 
@@ -1170,6 +1180,32 @@ extension GameEngine {
                 stringLiteral: message.multiline()
             )
         )
+    }
+}
+
+// MARK: - Random Number Generation
+
+extension GameEngine {
+    /// Generates a random Double value between 0.0 and 1.0.
+    ///
+    /// This is a convenience method that provides the same interface as the original
+    /// randomizer closure, making it easy to migrate existing code that expects
+    /// a 0.0-1.0 range Double value.
+    ///
+    /// - Returns: A random Double between 0.0 and 1.0 (inclusive of 0.0, exclusive of 1.0).
+    public func randomDouble() -> Double {
+        Double.random(in: 0.0..<1.0, using: &randomNumberGenerator)
+    }
+
+    /// Generates a random integer between 0 and 100 (inclusive).
+    ///
+    /// This method provides a convenient way to generate random percentages, where 0 represents
+    /// 0% and 100 represents 100%. This is useful for probability-based game mechanics and
+    /// random events.
+    ///
+    /// - Returns: A random integer between 0 and 100 (inclusive).
+    public func randomPercentage() -> Int {
+        Int.random(in: 0...100, using: &randomNumberGenerator)
     }
 }
 

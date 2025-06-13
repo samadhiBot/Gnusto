@@ -25,7 +25,8 @@ public struct PourOnActionHandler: ActionHandler {
 
         // Pour requires an indirect object (what to pour on)
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Pour the \(sourceItemID) on what?")
+            let sourceItem = try await context.engine.item(sourceItemID)
+            throw ActionResponse.prerequisiteNotMet("Pour the \(sourceItem.name) on what?")
         }
         guard case .item(let targetItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet("You can't pour something on that.")

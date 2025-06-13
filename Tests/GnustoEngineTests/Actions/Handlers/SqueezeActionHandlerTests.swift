@@ -71,7 +71,7 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the toothpaste tube and some contents ooze out."))
+        #expect(result.message!.contains("You squeeze the toothpaste tube and some of its contents ooze out."))
     }
 
     @Test("Squeeze bottle shows ooze message")
@@ -96,7 +96,7 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the plastic bottle and some contents ooze out."))
+        #expect(result.message!.contains("You squeeze the plastic bottle and some of its contents ooze out."))
     }
 
     @Test("Squeeze pillow shows soft message")
@@ -121,7 +121,7 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the soft pillow. It's soft and squishy."))
+        #expect(result.message!.contains("You squeeze the soft pillow. It feels soft and yielding."))
     }
 
     @Test("Squeeze cushion shows soft message")
@@ -146,7 +146,7 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the cushion. It's soft and squishy."))
+        #expect(result.message!.contains("You squeeze the cushion as hard as you can, but it doesn't give."))
     }
 
     @Test("Squeeze hard object shows appropriate message")
@@ -171,7 +171,7 @@ struct SqueezeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You squeeze the hard rock, but it doesn't give at all."))
+        #expect(result.message!.contains("You squeeze the hard rock as hard as you can, but it doesn't give."))
     }
 
     @Test("Squeeze updates state correctly")

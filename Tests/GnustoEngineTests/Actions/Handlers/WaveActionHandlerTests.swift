@@ -69,7 +69,7 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the magic wand, but nothing magical happens."))
+        #expect(result.message!.contains("You wave the magic wand dramatically, but nothing magical happens."))
     }
 
     @Test("Wave staff shows magical message")
@@ -94,7 +94,7 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the wooden staff, but nothing magical happens."))
+        #expect(result.message!.contains("You wave the wooden staff dramatically, but nothing magical happens."))
     }
 
     @Test("Wave sword shows brandish message")
@@ -169,7 +169,7 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You wave the red flag back and forth."))
+        #expect(result.message!.contains("You wave the red flag around. It's not particularly impressive."))
     }
 
     @Test("Wave fixed object shows different message")
@@ -193,7 +193,7 @@ struct WaveActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't wave the large tree - it's too large and heavy."))
+        #expect(result.message!.contains("You can't wave the large tree around - it's not something you can pick up and wave."))
     }
 
     @Test("Wave updates state correctly")

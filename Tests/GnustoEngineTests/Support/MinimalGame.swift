@@ -5,6 +5,7 @@ import GnustoEngine
 public struct MinimalGame: GameBlueprint {
     public var constants: GameConstants
     public var player: Player
+    public var randomNumberGenerator: any RandomNumberGenerator { fixedGenerator }
     public var items: [Item]
     public var locations: [Location]
     public var customActionHandlers: [VerbID: ActionHandler]
@@ -15,6 +16,8 @@ public struct MinimalGame: GameBlueprint {
     public var itemComputers: [ItemID: ItemComputer]
     public var locationComputers: [LocationID: LocationComputer]
 
+    private var fixedGenerator: FixedRandomNumberGenerator
+
     public init(
         constants: GameConstants = GameConstants(
             storyTitle: "Minimal Game",
@@ -23,6 +26,7 @@ public struct MinimalGame: GameBlueprint {
             maximumScore: 10
         ),
         player: Player = Player(in: LocationID("startRoom")),
+        fixedRandomValue: Double = 0.5,
         locations: [Location] = [
             Location(
                 id: LocationID("startRoom"),
@@ -56,6 +60,7 @@ public struct MinimalGame: GameBlueprint {
     ) {
         self.constants = constants
         self.player = player
+        self.fixedGenerator = FixedRandomNumberGenerator(value: fixedRandomValue)
         self.items = items
         self.locations = locations
         self.customActionHandlers = customActionHandlers

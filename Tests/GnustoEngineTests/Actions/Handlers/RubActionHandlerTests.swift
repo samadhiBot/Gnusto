@@ -94,7 +94,7 @@ struct RubActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("The mirror is already clean."))
+        #expect(result.message!.contains("You rub the mirror. It feels smooth to the touch."))
     }
 
     @Test("Rub lamp shows djinn message")

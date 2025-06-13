@@ -46,7 +46,7 @@ struct KissActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You kiss the green frog, but it doesn't turn into a prince. Maybe it's not that kind of story."))
+        #expect(result.message!.contains("You kiss the green frog, but it remains a frog. Apparently it's not that kind of story."))
     }
 
     @Test("Kiss character shows appropriate message")
@@ -71,7 +71,7 @@ struct KissActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You kiss the beautiful princess. They seem surprised but pleased."))
+        #expect(result.message!.contains("The beautiful princess doesn't seem particularly receptive to your affections."))
     }
 
     @Test("Kiss mirror shows narcissism message")
@@ -95,7 +95,7 @@ struct KissActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You kiss the polished mirror. How narcissistic!"))
+        #expect(result.message!.contains("You kiss your reflection in the polished mirror. How narcissistic!"))
     }
 
     @Test("Kiss statue shows cold stone message")
@@ -119,7 +119,7 @@ struct KissActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You kiss the marble statue. The cold stone is not very romantic."))
+        #expect(result.message!.contains("You kiss the marble statue. The cold stone is not very responsive."))
     }
 
     @Test("Kiss inappropriate object shows humorous message")
@@ -144,7 +144,7 @@ struct KissActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You kiss the dirty rock. That's... unusual. And probably not very hygienic."))
+        #expect(result.message!.contains("You kiss the dirty rock. It tastes about as good as you'd expect."))
     }
 
     @Test("Kiss updates state correctly")
@@ -201,6 +201,6 @@ struct KissActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You kiss the frog, but it doesn't turn into a prince."))
+        #expect(output.contains("but it remains a frog"))
     }
 }

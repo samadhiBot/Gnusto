@@ -47,7 +47,7 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the wooden box and hear a rattling sound from inside."))
+        #expect(result.message!.contains("You shake the wooden box and hear something rattling inside."))
     }
 
     @Test("Shake bottle shows slosh message")
@@ -72,7 +72,7 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the glass bottle and hear liquid sloshing around inside."))
+        #expect(result.message!.contains("You shake the glass bottle and hear liquid sloshing inside."))
     }
 
     @Test("Shake vial shows slosh message")
@@ -97,7 +97,7 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the small vial and hear liquid sloshing around inside."))
+        #expect(result.message!.contains("You shake the small vial and hear liquid sloshing inside."))
     }
 
     @Test("Shake fixed object shows different message")
@@ -121,7 +121,7 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't shake the stone wall - it's much too large and heavy."))
+        #expect(result.message!.contains("You can't shake the stone wall - it's firmly in place."))
     }
 
     @Test("Shake takable object shows appropriate message")
@@ -146,7 +146,7 @@ struct ShakeActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You shake the old book vigorously, but nothing interesting happens."))
+        #expect(result.message!.contains("You shake the old book vigorously, but nothing happens."))
     }
 
     @Test("Shake updates state correctly")

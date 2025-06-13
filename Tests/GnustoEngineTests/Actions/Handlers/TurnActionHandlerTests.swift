@@ -45,7 +45,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the metal dial. *click*"))
+        #expect(result.message!.contains("You turn the metal dial. It clicks into a new position."))
     }
 
     @Test("Turn knob shows clicking message")
@@ -69,7 +69,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the brass knob. *click*"))
+        #expect(result.message!.contains("You turn the brass knob. It clicks into a new position."))
     }
 
     @Test("Turn wheel shows grinding message")
@@ -93,7 +93,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the large wheel with effort. *grinding noise*"))
+        #expect(result.message!.contains("You turn the large wheel. It rotates with some effort."))
     }
 
     @Test("Turn handle shows appropriate message")
@@ -117,7 +117,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You turn the door handle, but nothing happens."))
+        #expect(result.message!.contains("You turn the door handle. It moves with a grinding sound."))
     }
 
     @Test("Turn key shows guidance message")
@@ -142,7 +142,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You need to use the brass key with something, like a lock."))
+        #expect(result.message!.contains("You can't just turn the brass key by itself. You need to use it with something."))
     }
 
     @Test("Turn character shows prevention message")
@@ -167,7 +167,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't turn the fluffy cat like that."))
+        #expect(result.message!.contains("You can't turn the fluffy cat around like an object."))
     }
 
     @Test("Turn regular object shows default message")
@@ -192,7 +192,7 @@ struct TurnActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't turn the old book in any meaningful way."))
+        #expect(result.message!.contains("You turn the old book around in your hands, but nothing happens."))
     }
 
     @Test("Turn integration test")

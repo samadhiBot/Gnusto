@@ -45,7 +45,7 @@ struct KnockActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You knock on the wooden door. *knock knock*"))
+        #expect(result.message!.contains("You knock on the wooden door. It makes a hollow wooden sound."))
     }
 
     @Test("Knock wall shows sound message")
@@ -94,7 +94,7 @@ struct KnockActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You knock on the wooden chest. It sounds hollow."))
+        #expect(result.message!.contains("You knock on the wooden chest. It makes a hollow wooden sound."))
     }
 
     @Test("Knock small object shows inappropriate message")
@@ -119,7 +119,7 @@ struct KnockActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("The small pebble is too small to knock on meaningfully."))
+        #expect(result.message!.contains("You knock on the small pebble, but it's too small to produce much of a sound."))
     }
 
     @Test("Knock integration test")

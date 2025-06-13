@@ -78,7 +78,7 @@ enum Troll {
 //
 //            // Handle weapons
 //            if [.knife, .sword, .axe].contains(object) {
-//                if engine.randomizer() <= 0.2 {
+//                if engine.randomPercentage() <= 20 {
 //                    try await engine.item(.troll).handleMode(.dead)
 //                    try await engine.setFlag(.trollFlag)
 //                    return ActionResult(
@@ -122,7 +122,7 @@ enum Troll {
 //
 //        case .listen:
 //            return ActionResult("""
-//                Every so often the troll says something, probably 
+//                Every so often the troll says something, probably
 //                uncomplimentary, in his guttural tongue.
 //                """)
 //
@@ -143,7 +143,7 @@ FUNCTION TROLL_FCN(MODE = null)
     IF current_verb == TELL THEN
         SET global P_CONT = false
         PRINT "The troll isn't much of a conversationalist."
-        
+
     ELSE IF MODE == F_BUSY THEN
         IF AXE is in TROLL's inventory THEN
             RETURN false
@@ -157,19 +157,19 @@ FUNCTION TROLL_FCN(MODE = null)
             RETURN true
         ELSE
             RETURN true
-            
+
         IF TROLL is in current room THEN
             SET TROLL.LDESC = "A pathetically babbling troll is here."
             PRINT "The troll, disarmed, cowers in terror, pleading for his life in the guttural tongue of the trolls."
             RETURN true
-            
+
     ELSE IF MODE == F_DEAD THEN
         IF AXE is in TROLL's inventory THEN
             MOVE AXE to current room
             SET AXE.NDESCBIT = false
             SET AXE.WEAPONBIT = true
         SET global TROLL_FLAG = true
-        
+
     ELSE IF MODE == F_UNCONSCIOUS THEN
         SET TROLL.FIGHTBIT = false
         IF AXE is in TROLL's inventory THEN
@@ -178,12 +178,12 @@ FUNCTION TROLL_FCN(MODE = null)
             SET AXE.WEAPONBIT = true
         SET TROLL.LDESC = "An unconscious troll is sprawled on the floor. All passages out of the room are open."
         SET global TROLL_FLAG = true
-        
+
     ELSE IF MODE == F_CONSCIOUS THEN
         IF TROLL is in current room THEN
             SET TROLL.FIGHTBIT = true
             PRINT "The troll stirs, quickly resuming a fighting stance."
-            
+
         IF AXE is in TROLL's inventory THEN
             SET TROLL.LDESC = "A nasty-looking troll, brandishing a bloody axe, blocks all passages out of the room."
         ELSE IF AXE is in TROLL_ROOM THEN
@@ -193,23 +193,23 @@ FUNCTION TROLL_FCN(MODE = null)
             SET TROLL.LDESC = "A nasty-looking troll, brandishing a bloody axe, blocks all passages out of the room."
         ELSE
             SET TROLL.LDESC = "A troll is here."
-            
+
         SET global TROLL_FLAG = false
-        
+
     ELSE IF MODE == F_FIRST THEN
         IF random_chance(33) THEN
             SET TROLL.FIGHTBIT = true
             SET global P_CONT = false
             RETURN true
-            
+
     ELSE IF MODE is null THEN
         IF current_verb == EXAMINE THEN
             PRINT TROLL.LDESC
-            
+
         ELSE IF (current_verb == THROW OR GIVE) AND direct_object exists AND indirect_object == TROLL
                 OR current_verb == TAKE OR MOVE OR MUNG THEN
             CALL AWAKEN(TROLL)
-            
+
             IF current_verb == THROW OR GIVE THEN
                 IF direct_object == AXE AND AXE is in player's inventory THEN
                     PRINT "The troll scratches his head in confusion, then takes the axe."
@@ -219,12 +219,12 @@ FUNCTION TROLL_FCN(MODE = null)
                 ELSE IF direct_object == TROLL OR AXE THEN
                     PRINT "You would have to get the " + direct_object + " first, and that seems unlikely."
                     RETURN true
-                    
+
                 IF current_verb == THROW THEN
                     PRINT "The troll, who is remarkably coordinated, catches the " + direct_object
                 ELSE
                     PRINT "The troll, who is not overly proud, graciously accepts the gift"
-                    
+
                 IF random_chance(20) AND (direct_object == KNIFE OR SWORD OR AXE) THEN
                     REMOVE direct_object
                     PRINT " and eats it hungrily. Poor troll, he dies from an internal hemorrhage and his carcass disappears in a sinister black fog."
@@ -238,20 +238,20 @@ FUNCTION TROLL_FCN(MODE = null)
                 ELSE
                     PRINT " and not having the most discriminating tastes, gleefully eats it."
                     REMOVE direct_object
-                    
+
             ELSE IF current_verb == TAKE OR MOVE THEN
                 PRINT "The troll spits in your face, grunting \"Better luck next time\" in a rather barbarous accent."
-                
+
             ELSE IF current_verb == MUNG THEN
                 PRINT "The troll laughs at your puny gesture."
-                
+
         ELSE IF current_verb == LISTEN THEN
             PRINT "Every so often the troll says something, probably uncomplimentary, in his guttural tongue."
-            
+
         ELSE IF TROLL_FLAG is true AND current_verb == HELLO THEN
             PRINT "Unfortunately, the troll can't hear you."
 END FUNCTION
- 
+
  */
 //    // MARK: - Troll Mode Handlers
 //
