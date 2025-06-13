@@ -1207,6 +1207,18 @@ extension GameEngine {
     public func randomPercentage() -> Int {
         Int.random(in: 0...100, using: &randomNumberGenerator)
     }
+    
+    /// Returns a random element from the given collection.
+    ///
+    /// This method provides a convenient way to select a random element from any collection
+    /// using the engine's seeded random number generator, ensuring reproducible randomness
+    /// across game sessions.
+    ///
+    /// - Parameter collection: The collection to select a random element from.
+    /// - Returns: A random element from the collection, or `nil` if the collection is empty.
+    public func randomElement<T>(in collection: some Collection<T>) -> T? {
+        collection.randomElement(using: &randomNumberGenerator)
+    }
 }
 
 #if DEBUG
