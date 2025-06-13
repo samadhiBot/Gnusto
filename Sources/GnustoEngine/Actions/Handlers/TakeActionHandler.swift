@@ -33,15 +33,21 @@ public struct TakeActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Take what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.whatQuestion(verb: "take"))
+            )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Take what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.whatQuestion(verb: "take"))
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only take items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "take"))
+            )
         }
 
         // 2. Check if item exists
@@ -50,15 +56,19 @@ public struct TakeActionHandler: ActionHandler {
         // 3. If this is a "take X from Y" command, validate the indirect object
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let containerID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only take items from other items.")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.youCanOnlyActOnItems(verb: "take"))
+                )
             }
 
             let container = try await context.engine.item(containerID)
 
             // Check if the target item is actually in the specified container
             guard case .item(let actualParentID) = targetItem.parent,
-                  actualParentID == containerID else {
-                throw ActionResponse.prerequisiteNotMet("The \(targetItem.name) is not in the \(container.name).")
+                actualParentID == containerID
+            else {
+                throw ActionResponse.prerequisiteNotMet(
+                    "The \(targetItem.name) is not in the \(container.name).")
             }
         }
 
@@ -80,7 +90,8 @@ public struct TakeActionHandler: ActionHandler {
             let isSurface = parentItem.hasFlag(.isSurface)
             if !isContainer && !isSurface {
                 // Custom message similar to Zork's, using the plain name.
-                throw ActionResponse.prerequisiteNotMet("You can't take things out of the \(parentItem.name).")
+                throw ActionResponse.prerequisiteNotMet(
+                    "You can't take things out of the \(parentItem.name).")
             }
         }
 
@@ -134,7 +145,9 @@ public struct TakeActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to take)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                throw ActionResponse.internalEngineError("Take: no direct objects in process.")
+                throw ActionResponse.internalEngineError(
+                    context.message(.internalEngineError)
+                )
             }
         }
 
@@ -147,9 +160,11 @@ public struct TakeActionHandler: ActionHandler {
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
-                    throw ActionResponse.internalEngineError("Take: directObject was not an item in process.")
+                    throw ActionResponse.internalEngineError(
+                        context.message(.internalEngineError)
+                    )
                 }
             }
 
@@ -159,9 +174,11 @@ public struct TakeActionHandler: ActionHandler {
                 // Check if player already has this item
                 if targetItem.parent == .player {
                     if context.command.isAllCommand {
-                        continue // Skip items already held in ALL commands
+                        continue  // Skip items already held in ALL commands
                     } else {
-                        return ActionResult("You already have that.")
+                        return ActionResult(
+                            context.message(.youAlreadyHaveThat)
+                        )
                     }
                 }
 
@@ -169,20 +186,22 @@ public struct TakeActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     // Check if item is takable
                     guard targetItem.hasFlag(.isTakable) else {
-                        continue // Skip non-takable items in ALL commands
+                        continue  // Skip non-takable items in ALL commands
                     }
 
                     // Check if player can reach the item
                     guard await context.engine.playerCanReach(targetItemID) else {
-                        continue // Skip unreachable items in ALL commands
+                        continue  // Skip unreachable items in ALL commands
                     }
 
                     // Check capacity
                     guard await context.engine.playerCanCarry(targetItem) else {
                         if takenItems.isEmpty {
-                            messages.append("Your hands are full.")
+                            messages.append(
+                                context.message(.playerCannotCarryMore)
+                            )
                         }
-                        break // Stop processing if capacity is exceeded
+                        break  // Stop processing if capacity is exceeded
                     }
                 }
 
@@ -228,15 +247,17 @@ public struct TakeActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message = if context.command.isAllCommand {
-            if takenItems.isEmpty {
-                "There is nothing here to take."
+        let message =
+            if context.command.isAllCommand {
+                if takenItems.isEmpty {
+                    context.message(.thereIsNothingHereToTake)
+                } else {
+                    context.message(
+                        .youTakeMultipleItems(items: takenItems.listWithDefiniteArticles))
+                }
             } else {
-                "You take \(takenItems.listWithDefiniteArticles)."
+                context.message(.taken)
             }
-        } else {
-            "Taken."
-        }
 
         return ActionResult(
             message: message,

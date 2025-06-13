@@ -23,17 +23,23 @@ public struct OpenActionHandler: ActionHandler {
     ///           `itemIsLocked` (if item is locked).
     ///           Can also throw errors from `context.engine.item()`.
     public func validate(context: ActionContext) async throws {
-        // 1. Check for multiple objects (not supported by OPEN)
+        // Check for multiple objects (not supported by OPEN)
         if context.command.directObjects.count > 1 {
-            throw ActionResponse.prerequisiteNotMet("The OPEN command doesn't support multiple objects.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.multipleObjectsNotSupported(verb: "open"))
+            )
         }
 
         // 2. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Open what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.whatQuestion(verb: "open"))
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only open items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "open"))
+            )
         }
 
         // 3. Check if item exists and is accessible using ScopeResolver
@@ -77,9 +83,12 @@ public struct OpenActionHandler: ActionHandler {
     ///           is already open, or errors from `context.engine` calls.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
+            case .item(let targetItemID) = directObjectRef
+        else {
             // Should not be reached if validate is correct.
-            throw ActionResponse.internalEngineError("Open: directObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                context.message(.internalEngineError)
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -111,14 +120,15 @@ public struct OpenActionHandler: ActionHandler {
             if !itemsInside.isEmpty {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
                 let itemList = itemsInside.sorted().listWithIndefiniteArticles
-                message = "Opening the \(targetItem.name) reveals \(itemList)."
+                message = context.message(
+                    .openingRevealsContents(container: targetItem.name, contents: itemList))
             } else {
                 // Container is empty, use simple message
-                message = "You open the \(targetItem.name)."
+                message = context.message(.opened(item: targetItem.name))
             }
         } else {
             // Not a container, use simple message
-            message = "You open the \(targetItem.name)."
+            message = context.message(.opened(item: targetItem.name))
         }
 
         // Prepare the result

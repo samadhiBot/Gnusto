@@ -168,6 +168,98 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .wrongKey(let key, let lock):
             "\(key.capitalizedFirst) doesn't fit \(lock)."
+
+        // MARK: - Common Action Messages
+
+        case .taken:
+            "Taken."
+
+        case .alreadyHeld(let item):
+            "You already have \(item)."
+
+        case .dropped:
+            "Dropped."
+
+        case .droppedItem(let item):
+            "You drop \(item)."
+
+        case .youAlreadyHaveThat:
+            "You already have that."
+
+        case .youArentHoldingThat:
+            "You aren't holding that."
+
+        case .nothingToTakeHere:
+            "Nothing to take here."
+
+        case .thereIsNothingHereToTake:
+            "There is nothing here to take."
+
+        case .opened(let item):
+            "You open \(item)."
+
+        case .openingRevealsContents(let container, let contents):
+            "Opening \(container) reveals \(contents)."
+
+        case .closed(let item):
+            "You close \(item)."
+
+        case .youAreEmptyHanded:
+            "You are empty-handed."
+
+        case .youAreCarrying:
+            "You are carrying:"
+
+        case .youCantDoThat:
+            "You can't do that."
+
+        case .goWhere:
+            "Go where?"
+
+        case .whatQuestion(let verb):
+            "\(verb.capitalizedFirst) what?"
+
+        case .nothingSpecialAbout(let item):
+            "You see nothing special about \(item)."
+
+        case .youCanOnlyActOnItems(let verb):
+            "You can only \(verb) items."
+
+        case .multipleObjectsNotSupported(let verb):
+            "The \(verb.uppercased()) command doesn't support multiple objects."
+
+        case .giveWhat:
+            "Give what?"
+
+        case .giveToWhom:
+            "Give to whom?"
+
+        case .insertWhat:
+            "Insert what?"
+
+        case .insertIntoWhat:
+            "Insert into what?"
+
+        case .youTakeMultipleItems(let items):
+            "You take \(items)."
+
+        case .youDropMultipleItems(let items):
+            "You drop \(items)."
+
+        case .itemGivenTo(let item, let recipient):
+            "You give \(item) to \(recipient)."
+
+        case .itemInsertedInto(let item, let container):
+            "You put \(item) into \(container)."
+
+        case .youDontHaveThat:
+            "You don't have that."
+
+        case .doorIsLocked(let door):
+            "The \(door) is locked."
+
+        case .doorIsClosed(let direction):
+            "The \(direction) door is closed."
         }
     }
 }

@@ -1148,13 +1148,18 @@ extension GameEngine {
             .xyzzy: XyzzyActionHandler(),
 
             // Meta Actions
-//            .brief: BriefActionHandler(),
-//            .help: HelpActionHandler(),
+            .ask: AskActionHandler(),
+            .brief: BriefActionHandler(),
+            .help: HelpActionHandler(),
             .quit: QuitActionHandler(),
-//            .restore: RestoreActionHandler(),
-//            .save: SaveActionHandler(),
+            .restart: RestartActionHandler(),
+            .restore: RestoreActionHandler(),
+            .save: SaveActionHandler(),
             .score: ScoreActionHandler(),
-//            .verbose: VerboseActionHandler(),
+            .script: ScriptActionHandler(),
+            .tell: TellActionHandler(),
+            .unscript: UnscriptActionHandler(),
+            .verbose: VerboseActionHandler(),
             .wait: WaitActionHandler(),
         ]
 
@@ -1220,6 +1225,44 @@ extension GameEngine {
     /// - Returns: A random element from the collection, or `nil` if the collection is empty.
     public func randomElement<T>(in collection: some Collection<T>) -> T? {
         collection.randomElement(using: &randomNumberGenerator)
+    }
+}
+
+// MARK: - Save/Restore Game
+
+extension GameEngine {
+    /// Saves the current game state.
+    ///
+    /// This is a placeholder implementation that will be enhanced with actual
+    /// file system persistence in future versions. Currently throws an error
+    /// indicating the feature is not yet implemented.
+    ///
+    /// - Throws: An error indicating save functionality is not yet implemented.
+    public func saveGame() async throws {
+        // TODO: Implement actual save functionality
+        // This would typically serialize the gameState to a file
+        throw NSError(
+            domain: "GnustoEngine",
+            code: 1001,
+            userInfo: [NSLocalizedDescriptionKey: "Save functionality not yet implemented."]
+        )
+    }
+
+    /// Restores a previously saved game state.
+    ///
+    /// This is a placeholder implementation that will be enhanced with actual
+    /// file system persistence in future versions. Currently throws an error
+    /// indicating the feature is not yet implemented.
+    ///
+    /// - Throws: An error indicating restore functionality is not yet implemented.
+    public func restoreGame() async throws {
+        // TODO: Implement actual restore functionality
+        // This would typically deserialize gameState from a file
+        throw NSError(
+            domain: "GnustoEngine",
+            code: 1002,
+            userInfo: [NSLocalizedDescriptionKey: "Restore functionality not yet implemented."]
+        )
     }
 }
 

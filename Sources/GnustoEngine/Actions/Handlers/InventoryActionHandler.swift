@@ -25,7 +25,9 @@ public struct InventoryActionHandler: ActionHandler {
 
         // 2. Construct the message
         if inventoryItems.isEmpty {
-            return ActionResult("You are empty-handed.")
+            return ActionResult(
+                context.message(.youAreEmptyHanded)
+            )
         } else {
             // 3. List Items
             let itemList = inventoryItems.sorted().map {
@@ -33,7 +35,7 @@ public struct InventoryActionHandler: ActionHandler {
             }.joined(separator: "\n")
             return ActionResult(
                 """
-                You are carrying:
+                \(context.message(.youAreCarrying))
                 \(itemList.indent())
                 """
             )

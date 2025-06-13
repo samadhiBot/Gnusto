@@ -162,4 +162,96 @@ public enum MessageKey: Hashable, Sendable {
 
     /// Wrong key for lock
     case wrongKey(key: String, lock: String)
+
+    // MARK: - Common Action Messages
+
+    /// Simple "Taken." confirmation
+    case taken
+
+    /// Item is already held by the player
+    case alreadyHeld(item: String)
+
+    /// Simple "Dropped." confirmation
+    case dropped
+
+    /// Item successfully dropped with details
+    case droppedItem(item: String)
+
+    /// "You already have that." when trying to take held item
+    case youAlreadyHaveThat
+
+    /// "You aren't holding that." when trying to drop unheld item
+    case youArentHoldingThat
+
+    /// "Nothing to take here." for TAKE ALL with no takeable items
+    case nothingToTakeHere
+
+    /// "There is nothing here to take." alternative phrasing
+    case thereIsNothingHereToTake
+
+    /// Simple confirmation for opening something
+    case opened(item: String)
+
+    /// Opening a container reveals its contents
+    case openingRevealsContents(container: String, contents: String)
+
+    /// Simple confirmation for closing something
+    case closed(item: String)
+
+    /// "You are empty-handed." for empty inventory
+    case youAreEmptyHanded
+
+    /// "You are carrying:" prefix for inventory list
+    case youAreCarrying
+
+    /// Generic "You can't do that." response
+    case youCantDoThat
+
+    /// "Go where?" when direction is missing
+    case goWhere
+
+    /// Generic "what?" response for missing direct object
+    case whatQuestion(verb: String)
+
+    /// "You see nothing special about X."
+    case nothingSpecialAbout(item: String)
+
+    /// "You can only X items." for type restrictions
+    case youCanOnlyActOnItems(verb: String)
+
+    /// Multiple objects not supported for this action
+    case multipleObjectsNotSupported(verb: String)
+
+    /// "Give what?" for missing direct object in give command
+    case giveWhat
+
+    /// "Give to whom?" for missing indirect object in give command
+    case giveToWhom
+
+    /// "Insert what?" for missing direct object in insert command  
+    case insertWhat
+
+    /// "Insert into what?" for missing indirect object in insert command
+    case insertIntoWhat
+
+    /// Success message for taking multiple items
+    case youTakeMultipleItems(items: String)
+
+    /// Success message for dropping multiple items
+    case youDropMultipleItems(items: String)
+
+    /// Item successfully given to recipient
+    case itemGivenTo(item: String, recipient: String)
+
+    /// Item successfully inserted into container
+    case itemInsertedInto(item: String, container: String)
+
+    /// "You don't have that." when trying to give unheld item
+    case youDontHaveThat
+
+    /// Door is locked (blocking movement)
+    case doorIsLocked(door: String)
+
+    /// Door is closed (blocking movement)  
+    case doorIsClosed(direction: String)
 }

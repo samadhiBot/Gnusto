@@ -15,6 +15,7 @@ public struct VerbID: GnustoID {
 // MARK: - Interactive verbs
 
 extension VerbID {
+    public static let ask = VerbID("ask")
     public static let attack = VerbID("attack")
     public static let breathe = VerbID("breathe")
     public static let climb = VerbID("climb")
@@ -55,6 +56,7 @@ extension VerbID {
     public static let squeeze = VerbID("squeeze")
     public static let take = VerbID("take")
     public static let taste = VerbID("taste")
+    public static let tell = VerbID("tell")
     public static let thinkAbout = VerbID("thinkAbout")
     public static let throwItem = VerbID("throw")
     public static let tie = VerbID("tie")
@@ -93,9 +95,12 @@ extension VerbID {
     public static let brief = VerbID("brief")
     public static let help = VerbID("help")
     public static let quit = VerbID("quit")
+    public static let restart = VerbID("restart")
     public static let restore = VerbID("restore")
     public static let save = VerbID("save")
     public static let score = VerbID("score")
+    public static let script = VerbID("script")
+    public static let unscript = VerbID("unscript")
     public static let verbose = VerbID("verbose")
     public static let wait = VerbID("wait")
 }

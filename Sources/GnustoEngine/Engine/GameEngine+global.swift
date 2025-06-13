@@ -53,4 +53,87 @@ extension GameEngine {
     public func hasFlag(_ globalID: GlobalID) -> Bool {
         global(globalID) == true
     }
+
+    /// Checks if a global variable exists in the global state.
+    ///
+    /// - Parameter globalID: The `GlobalID` of the global variable to check.
+    /// - Returns: `true` if the global variable exists (regardless of its value), `false` otherwise.
+    public func hasGlobal(_ globalID: GlobalID) -> Bool {
+        gameState.globalState[globalID] != nil
+    }
+}
+
+// MARK: - Global state setters
+
+extension GameEngine {
+    /// Sets a global variable to a boolean value.
+    ///
+    /// - Parameters:
+    ///   - globalID: The `GlobalID` of the global variable to set.
+    ///   - value: The boolean value to set.
+    /// - Returns: A `StateChange` representing this modification.
+    public func setGlobal(_ globalID: GlobalID, to value: Bool) -> StateChange {
+        let oldValue = gameState.globalState[globalID]
+        let newValue = StateValue.bool(value)
+
+        return StateChange(
+            entityID: .global,
+            attribute: .globalState(attributeID: globalID),
+            oldValue: oldValue,
+            newValue: newValue
+        )
+    }
+
+    /// Sets a global variable to an integer value.
+    ///
+    /// - Parameters:
+    ///   - globalID: The `GlobalID` of the global variable to set.
+    ///   - value: The integer value to set.
+    /// - Returns: A `StateChange` representing this modification.
+    public func setGlobal(_ globalID: GlobalID, to value: Int) -> StateChange {
+        let oldValue = gameState.globalState[globalID]
+        let newValue = StateValue.int(value)
+
+        return StateChange(
+            entityID: .global,
+            attribute: .globalState(attributeID: globalID),
+            oldValue: oldValue,
+            newValue: newValue
+        )
+    }
+
+    /// Sets a global variable to a string value.
+    ///
+    /// - Parameters:
+    ///   - globalID: The `GlobalID` of the global variable to set.
+    ///   - value: The string value to set.
+    /// - Returns: A `StateChange` representing this modification.
+    public func setGlobal(_ globalID: GlobalID, to value: String) -> StateChange {
+        let oldValue = gameState.globalState[globalID]
+        let newValue = StateValue.string(value)
+
+        return StateChange(
+            entityID: .global,
+            attribute: .globalState(attributeID: globalID),
+            oldValue: oldValue,
+            newValue: newValue
+        )
+    }
+
+    /// Clears a global variable (removes it from global state).
+    ///
+    /// - Parameter globalID: The `GlobalID` of the global variable to clear.
+    /// - Returns: A `StateChange` representing this modification, or `nil` if the variable doesn't exist.
+    public func clearGlobal(_ globalID: GlobalID) -> StateChange? {
+        guard let oldValue = gameState.globalState[globalID] else {
+            return nil // Variable doesn't exist, nothing to clear
+        }
+
+        return StateChange(
+            entityID: .global,
+            attribute: .clearFlag(globalID),
+            oldValue: oldValue,
+            newValue: StateValue.bool(false)
+        )
+    }
 }

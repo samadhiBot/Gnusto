@@ -33,10 +33,14 @@ public struct InsertActionHandler: ActionHandler {
         if context.command.isAllCommand {
             // Still need an indirect object (container)
             guard let indirectObjectRef = context.command.indirectObject else {
-                throw ActionResponse.prerequisiteNotMet("Insert into what?")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.insertIntoWhat)
+                )
             }
             guard case .item(let containerID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only insert items into other items (that are containers).")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.youCanOnlyActOnItems(verb: "insert"))
+                )
             }
             // Check if container exists and is a container
             let containerItem = try await context.engine.item(containerID)
@@ -54,22 +58,30 @@ public struct InsertActionHandler: ActionHandler {
 
         // 1. Validate Direct and Indirect Objects
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Insert what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.insertWhat)
+            )
         }
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Insert what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.insertWhat)
+            )
         }
         guard case .item(let itemToInsertID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only insert items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "insert"))
+            )
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
-            // Fetch item name for a more informative message if indirect object is missing.
-            let itemName = (try? await context.engine.item(itemToInsertID))?.name ?? itemToInsertID.rawValue
-            throw ActionResponse.prerequisiteNotMet("Where do you want to insert the \(itemName)?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.insertIntoWhat)
+            )
         }
         guard case .item(let containerID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only insert items into other items (that are containers).")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "insert"))
+            )
         }
 
         // 2. Get Items (existence validated by directObjectRef/indirectObjectRef checks if entities exist)
@@ -87,12 +99,14 @@ public struct InsertActionHandler: ActionHandler {
         }
 
         guard await context.engine.playerCanReach(containerID) else {
-             throw ActionResponse.itemNotAccessible(containerID)
+            throw ActionResponse.itemNotAccessible(containerID)
         }
 
         // Prevent putting item inside/onto itself
         if itemToInsertID == containerID {
-             throw ActionResponse.prerequisiteNotMet("You can't put something inside itself.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCantDoThat)
+            )
         }
 
         // Recursive check: is the target container inside the item we are inserting?
@@ -150,7 +164,8 @@ public struct InsertActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Get the container
         guard let indirectObjectRef = context.command.indirectObject,
-              case .item(let containerID) = indirectObjectRef else {
+            case .item(let containerID) = indirectObjectRef
+        else {
             return ActionResult("Insert into what?")
         }
 
@@ -171,7 +186,7 @@ public struct InsertActionHandler: ActionHandler {
         for directObjectRef in context.command.directObjects {
             guard case .item(let itemToInsertID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult("You can only insert items.")
                 }
@@ -184,17 +199,17 @@ public struct InsertActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     // Check if player has this item
                     guard itemToInsert.parent == .player else {
-                        continue // Skip items not held in ALL commands
+                        continue  // Skip items not held in ALL commands
                     }
 
                     // Check if item is scenery
                     if itemToInsert.hasFlag(.omitDescription) {
-                        continue // Skip scenery items in ALL commands
+                        continue  // Skip scenery items in ALL commands
                     }
 
                     // Prevent putting item inside/onto itself
                     if itemToInsertID == containerID {
-                        continue // Skip self-insertion in ALL commands
+                        continue  // Skip self-insertion in ALL commands
                     }
 
                     // Recursive check: is the target container inside the item we are inserting?
@@ -209,7 +224,7 @@ public struct InsertActionHandler: ActionHandler {
                         currentParent = parentItem.parent
                     }
                     if isCircular {
-                        continue // Skip circular placement in ALL commands
+                        continue  // Skip circular placement in ALL commands
                     }
 
                     // Capacity Check
@@ -218,7 +233,7 @@ public struct InsertActionHandler: ActionHandler {
                         let currentLoad = itemsInside.reduce(0) { $0 + $1.size }
                         let itemSize = itemToInsert.size
                         if currentLoad + itemSize > container.capacity {
-                            continue // Skip items that won't fit in ALL commands
+                            continue  // Skip items that won't fit in ALL commands
                         }
                     }
                 }
@@ -229,12 +244,13 @@ public struct InsertActionHandler: ActionHandler {
                 // Change 1: Update item parent
                 let oldParent = itemToInsert.parent
                 let newParent: ParentEntity = .item(containerID)
-                itemStateChanges.append(StateChange(
-                    entityID: .item(itemToInsertID),
-                    attribute: .itemParent,
-                    oldValue: .parentEntity(oldParent),
-                    newValue: .parentEntity(newParent)
-                ))
+                itemStateChanges.append(
+                    StateChange(
+                        entityID: .item(itemToInsertID),
+                        attribute: .itemParent,
+                        oldValue: .parentEntity(oldParent),
+                        newValue: .parentEntity(newParent)
+                    ))
 
                 // Change 2: Mark item touched
                 if let update = await context.engine.setFlag(.isTouched, on: itemToInsert) {
@@ -278,12 +294,14 @@ public struct InsertActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message = if insertedItems.isEmpty {
-            context.command.isAllCommand ? "You have nothing to put in the \(container.name)."
-                                         : "Insert what?"
-        } else {
-            "You put \(insertedItems.listWithDefiniteArticles) in the \(container.name)."
-        }
+        let message =
+            if insertedItems.isEmpty {
+                context.command.isAllCommand
+                    ? "You have nothing to put in the \(container.name)."
+                    : "Insert what?"
+            } else {
+                "You put \(insertedItems.listWithDefiniteArticles) in the \(container.name)."
+            }
 
         return ActionResult(
             message: message,

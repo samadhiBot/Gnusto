@@ -801,25 +801,11 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         ),
 
         Verb(
-            id: .jumpOff,
-            synonyms: "jump off", "leap off",
+            id: .climbDown,
+            synonyms: "climb down", "go down",
             syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "off"
-                )
-            ],
-            requiresLight: false
-        ),
-
-        Verb(
-            id: .jumpOut,
-            synonyms: "jump out", "leap out",
-            syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "out"
-                )
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
             ],
             requiresLight: false
         ),
@@ -831,27 +817,15 @@ public struct Vocabulary: Codable, Equatable, Sendable {
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
             ],
-            requiresLight: true
-        ),
-
-        Verb(
-            id: .climbDown,
-            synonyms: "climb down", "go down",
-            syntax: [
-                SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
-            ],
-            requiresLight: true
+            requiresLight: false
         ),
 
         Verb(
             id: .getOff,
             synonyms: "get off", "climb off",
             syntax: [
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "off"
-                )
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
             ],
             requiresLight: false
         ),
@@ -861,30 +835,55 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             synonyms: "get out", "climb out",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(
-                    pattern: [.verb, .preposition, .directObject],
-                    requiredPreposition: "of"
-                )
+                SyntaxRule(.verb, .directObject)
             ],
             requiresLight: false
         ),
 
         Verb(
-            id: .lookUp,
-            synonyms: "look up",
+            id: .jumpOff,
+            synonyms: "jump off", "leap off",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
             ],
-            requiresLight: true
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .jumpOut,
+            synonyms: "jump out", "leap out",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .leave,
+            synonyms: "depart",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
         ),
 
         Verb(
             id: .lookDown,
             synonyms: "look down",
             syntax: [
-                SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .lookUp,
+            synonyms: "look up",
+            syntax: [
+                SyntaxRule(.verb)
             ],
             requiresLight: true
         ),
@@ -900,21 +899,36 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .walk,
-            synonyms: "stroll", "march",
+            synonyms: "stroll", "hike",
             syntax: [
                 SyntaxRule(.verb),
-                SyntaxRule(.verb, .direction),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(.verb, .direction)
+            ],
+            requiresLight: false
+        ),
+
+        // Priority 4: Communication & Meta Verbs
+
+        Verb(
+            id: .ask,
+            synonyms: "question", "inquire",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "about"
+                )
             ],
             requiresLight: false
         ),
 
         Verb(
-            id: .leave,
-            synonyms: "depart",
+            id: .tell,
+            synonyms: "inform", "say to",
             syntax: [
-                SyntaxRule(.verb),
-                SyntaxRule(.verb, .directObject)
+                SyntaxRule(
+                    pattern: [.verb, .directObject, .preposition, .indirectObject],
+                    requiredPreposition: "about"
+                )
             ],
             requiresLight: false
         ),

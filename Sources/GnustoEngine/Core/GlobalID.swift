@@ -21,3 +21,16 @@ public struct GlobalID: GnustoID {
         self.rawValue = rawValue
     }
 }
+
+// MARK: - Standard Global IDs
+
+extension GlobalID {
+    /// Flag indicating brief mode is enabled (show location descriptions only on first visit)
+    public static let isBriefMode = GlobalID("isBriefMode")
+
+    /// Flag indicating transcript recording is currently active
+    public static let isScripting = GlobalID("isScripting")
+
+    /// Flag indicating verbose mode is enabled (show full location descriptions every time)
+    public static let isVerboseMode = GlobalID("isVerboseMode")
+}

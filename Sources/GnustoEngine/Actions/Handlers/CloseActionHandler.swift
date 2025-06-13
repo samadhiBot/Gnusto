@@ -21,10 +21,14 @@ public struct CloseActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Close what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.whatQuestion(verb: "close"))
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't close that.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "close"))
+            )
         }
 
         // 2. Check if item exists
@@ -73,7 +77,9 @@ public struct CloseActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         else {
             // This case should ideally be caught by the validate function.
-            return ActionResult("You can't close that.")
+            return ActionResult(
+                context.message(.youCantDoThat)
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -81,7 +87,7 @@ public struct CloseActionHandler: ActionHandler {
         // Handle "already closed" case detected (but not thrown) in validate
         guard try await context.engine.hasFlag(.isOpen, on: targetItem.id) else {
             return ActionResult(
-                "\(targetItem.withDefiniteArticle.capitalizedFirst) is already closed."
+                context.message(.itemAlreadyClosed(item: targetItem.withDefiniteArticle))
             )
         }
 
@@ -105,7 +111,7 @@ public struct CloseActionHandler: ActionHandler {
 
         // --- Prepare Result ---
         return ActionResult(
-            message: "Closed.", // Standard Zork message
+            message: context.message(.closed(item: targetItem.withDefiniteArticle)),
             stateChanges: stateChanges
         )
     }

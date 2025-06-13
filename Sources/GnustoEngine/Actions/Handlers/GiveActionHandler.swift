@@ -18,52 +18,72 @@ public struct GiveActionHandler: ActionHandler {
         if context.command.isAllCommand {
             // Still need an indirect object (recipient)
             guard let indirectObjectRef = context.command.indirectObject else {
-                throw ActionResponse.prerequisiteNotMet("Give to whom?")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.giveToWhom)
+                )
             }
             guard case .item(let recipientID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only give things to people.")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.youCanOnlyActOnItems(verb: "give"))
+                )
             }
             // Check if recipient exists and is an actor
             let recipient = try await context.engine.item(recipientID)
             guard recipient.hasFlag(.isCharacter) else {
-                throw ActionResponse.prerequisiteNotMet("You can only give things to people.")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.youCanOnlyActOnItems(verb: "give"))
+                )
             }
             return
         }
-        
+
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Give what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.giveWhat)
+            )
         }
-        
+
         // 2. Ensure we have an indirect object
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Give to whom?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.giveToWhom)
+            )
         }
-        
+
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Give what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.giveWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only give items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "give"))
+            )
         }
         guard case .item(let recipientID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only give things to people.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "give"))
+            )
         }
 
         // 3. Check if item exists and player has it
         let targetItem = try await context.engine.item(targetItemID)
         guard targetItem.parent == .player else {
-            throw ActionResponse.prerequisiteNotMet("You don't have that.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youDontHaveThat)
+            )
         }
 
         // 4. Check if recipient exists and is an actor
         let recipient = try await context.engine.item(recipientID)
         guard recipient.hasFlag(.isCharacter) else {
-            throw ActionResponse.prerequisiteNotMet("You can only give things to people.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyActOnItems(verb: "give"))
+            )
         }
-        
+
         // 5. Check if recipient is reachable
         guard await context.engine.playerCanReach(recipientID) else {
             throw ActionResponse.itemNotAccessible(recipientID)
@@ -83,45 +103,54 @@ public struct GiveActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Get the recipient
         guard let indirectObjectRef = context.command.indirectObject,
-              case .item(let recipientID) = indirectObjectRef else {
-            return ActionResult("Give to whom?")
+            case .item(let recipientID) = indirectObjectRef
+        else {
+            return ActionResult(
+                context.message(.giveToWhom)
+            )
         }
-        
+
         let recipient = try await context.engine.item(recipientID)
-        
+
         // For ALL commands, empty directObjects is valid (means nothing to give)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult("Give what?")
+                return ActionResult(
+                    context.message(.giveWhat)
+                )
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var givenItems: [Item] = []
         var lastGivenItem: Item?
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult("You can only give items.")
+                    return ActionResult(
+                        context.message(.youCanOnlyActOnItems(verb: "give"))
+                    )
                 }
             }
-            
+
             do {
                 let targetItem = try await context.engine.item(targetItemID)
-                
+
                 // Check if player has this item
                 guard targetItem.parent == .player else {
                     if context.command.isAllCommand {
-                        continue // Skip items not held in ALL commands
+                        continue  // Skip items not held in ALL commands
                     } else {
-                        return ActionResult("You don't have that.")
+                        return ActionResult(
+                            context.message(.youDontHaveThat)
+                        )
                     }
                 }
-                
+
                 // --- Calculate State Changes for this item ---
                 var itemStateChanges: [StateChange] = []
 
@@ -137,7 +166,7 @@ public struct GiveActionHandler: ActionHandler {
                 allStateChanges.append(contentsOf: itemStateChanges)
                 givenItems.append(targetItem)
                 lastGivenItem = targetItem
-                
+
             } catch {
                 // For ALL commands, skip items that cause errors
                 if !context.command.isAllCommand {
@@ -145,7 +174,7 @@ public struct GiveActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if let lastItem = lastGivenItem {
             if givenItems.count > 1 {
@@ -162,17 +191,24 @@ public struct GiveActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
-        let message = if givenItems.isEmpty {
-            context.command.isAllCommand ? "You have nothing to give." : "You don't have that."
-        } else {
-            "You give \(givenItems.listWithDefiniteArticles) to the \(recipient.name)."
-        }
-        
+        let message =
+            if givenItems.isEmpty {
+                if context.command.isAllCommand {
+                    "You have nothing to give."
+                } else {
+                    context.message(.youDontHaveThat)
+                }
+            } else {
+                context.message(
+                    .itemGivenTo(
+                        item: givenItems.listWithDefiniteArticles, recipient: recipient.name))
+            }
+
         return ActionResult(
             message: message,
             stateChanges: allStateChanges
         )
     }
-} 
+}

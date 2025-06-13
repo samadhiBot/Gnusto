@@ -23,7 +23,9 @@ public struct GoActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Identify Direction
         guard let direction = context.command.direction else {
-            throw ActionResponse.prerequisiteNotMet("Go where?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.goWhere)
+            )
         }
 
         // 2. Get Current Location data
@@ -32,7 +34,7 @@ public struct GoActionHandler: ActionHandler {
 
         // 3. Find Exit
         guard let exit = currentLocation.exits[direction] else {
-            throw ActionResponse.invalidDirection // Standard message: "You can't go that way."
+            throw ActionResponse.invalidDirection  // Standard message: "You can't go that way."
         }
 
         // 4. Check Exit Conditions
@@ -58,12 +60,16 @@ public struct GoActionHandler: ActionHandler {
 
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
-            throw ActionResponse.directionIsBlocked("The \(door.name) is locked.")
+            throw ActionResponse.directionIsBlocked(
+                context.message(.doorIsLocked(door: door.name))
+            )
         }
 
         // Check if the door is open
         if !door.hasFlag(.isOpen) {
-            throw ActionResponse.directionIsBlocked("The \(direction.rawValue) door is closed.")
+            throw ActionResponse.directionIsBlocked(
+                context.message(.doorIsClosed(direction: direction.rawValue))
+            )
         }
     }
 
@@ -93,7 +99,7 @@ public struct GoActionHandler: ActionHandler {
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError(
-                "Exit disappeared or became blocked between validate and process for GO context.command."
+                context.message(.internalEngineError)
             )
         }
 

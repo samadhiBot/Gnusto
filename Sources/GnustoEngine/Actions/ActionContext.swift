@@ -13,10 +13,9 @@ public struct ActionContext: Sendable {
 
     /// A non-isolated reference to the `GameEngine` instance.
     ///
-    /// Through this, action handlers can query the current game state (though using
-    /// `stateSnapshot` is often preferred for consistency within a single handler phase),
-    /// create `StateChange` objects, or call other engine utilities. Accessing methods or
-    /// properties on `engine` requires `await` due to its actor nature.
+    /// Through this, action handlers can query the current game state, create `StateChange`
+    /// objects, or call other engine utilities. Accessing methods or properties on `engine`
+    /// requires `await` due to its actor nature.
     nonisolated public let engine: GameEngine
 
     /// A dictionary for game-specific or handler-specific additional data that doesn't fit
@@ -44,6 +43,12 @@ public struct ActionContext: Sendable {
         self.command = command
         self.engine = engine
         self.contextData = contextData
+    }
+}
+
+extension ActionContext {
+    public func message(_ key: MessageKey) -> String {
+        engine.messageProvider.message(for: key)
     }
 }
 
