@@ -35,7 +35,7 @@ public struct ThrowActionHandler: ActionHandler {
                 throw ActionResponse.prerequisiteNotMet("You can't throw at that.")
             }
 
-            let targetItem = try await context.engine.item(targetItemID)
+            _ = try await context.engine.item(targetItemID)
             guard await context.engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }

@@ -35,11 +35,12 @@ public struct BreatheActionHandler: ActionHandler {
         let responses = [
             "You breathe in deeply, feeling refreshed.",
             "You take a slow, calming breath.",
-            "The air fills your lungs.",
-            "You inhale deeply, then exhale slowly."
+            "The air fills your lungs. You're glad that you can breathe.",
+            "You inhale deeply, then exhale slowly.",
+            "You breathe in the love... and blow out the jive.",
         ]
 
-        let selectedResponse = responses.randomElement() ?? responses[0]
+        let selectedResponse = await context.engine.randomElement(in: responses) ?? responses[0]
         return ActionResult(selectedResponse)
     }
 

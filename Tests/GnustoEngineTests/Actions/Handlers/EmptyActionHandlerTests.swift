@@ -45,7 +45,180 @@ struct EmptyActionHandlerTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
 
-        return GameEngine(
+        return await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+    }
+
+    private func createTestEngineWithEmptyBox() async -> GameEngine {
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .isContainer,
+            .isOpen,
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing empty commands.")
+        )
+
+        let game = MinimalGame(
+            locations: [testRoom],
+            items: [box, coin, gem]
+        )
+
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+
+        return await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+    }
+
+    private func createTestEngineWithNonContainer() async -> GameEngine {
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .isContainer,
+            .isOpen,
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let looseCoin = Item(
+            id: "looseCoin",
+            .name("loose coin"),
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing empty commands.")
+        )
+
+        let game = MinimalGame(
+            locations: [testRoom],
+            items: [box, looseCoin]
+        )
+
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+
+        return await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+    }
+
+    private func createTestEngineWithClosedBox() async -> GameEngine {
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .isContainer,
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .isTakable,
+            .in(.item("box"))
+        )
+
+        let gem = Item(
+            id: "gem",
+            .name("gem"),
+            .isTakable,
+            .in(.item("box"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing empty commands.")
+        )
+
+        let game = MinimalGame(
+            locations: [testRoom],
+            items: [box, coin, gem]
+        )
+
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+
+        return await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+    }
+
+    private func createTestEngineWithDistantBox() async -> GameEngine {
+        let box = Item(
+            id: "box",
+            .name("box"),
+            .isContainer,
+            .isOpen,
+            .isTakable,
+            .in(.location("testRoom"))
+        )
+
+        let distantBox = Item(
+            id: "distantBox",
+            .name("distant box"),
+            .isContainer,
+            .isOpen,
+            .isTakable,
+            .in(.location("anotherRoom"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing empty commands.")
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .description("A distant room.")
+        )
+
+        let game = MinimalGame(
+            locations: [testRoom, anotherRoom],
+            items: [box, distantBox]
+        )
+
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+
+        return await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
@@ -58,7 +231,7 @@ struct EmptyActionHandlerTests {
     func testEmptyCommand() async throws {
         let engine = await createTestEngine()
         let handler = EmptyActionHandler()
-        let command = Command(verb: .empty, directObject: "box", rawInput: "empty box")
+        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
         let context = ActionContext(command: command, engine: engine)
 
         // Should validate successfully
@@ -81,25 +254,9 @@ struct EmptyActionHandlerTests {
 
     @Test("EMPTY command on empty container")
     func testEmptyEmptyContainer() async throws {
-        let engine = await createTestEngine()
-
-        // First empty the box by moving items out
-        try await engine.apply(StateChange(
-            entityID: .item("coin"),
-            attribute: .parentEntity,
-            oldValue: .parentEntity(.item("box")),
-            newValue: .parentEntity(.location("testRoom"))
-        ))
-
-        try await engine.apply(StateChange(
-            entityID: .item("gem"),
-            attribute: .parentEntity,
-            oldValue: .parentEntity(.item("box")),
-            newValue: .parentEntity(.location("testRoom"))
-        ))
-
+        let engine = await createTestEngineWithEmptyBox()
         let handler = EmptyActionHandler()
-        let command = Command(verb: .empty, directObject: "box", rawInput: "empty box")
+        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
         let context = ActionContext(command: command, engine: engine)
 
         // Should validate successfully
@@ -132,25 +289,9 @@ struct EmptyActionHandlerTests {
 
     @Test("EMPTY command on non-container")
     func testEmptyNonContainer() async throws {
-        let engine = await createTestEngine()
-
-        // Add a non-container item
-        let coin = Item(
-            id: "looseCoin",
-            .name("loose coin"),
-            .isTakable,
-            .in(.location("testRoom"))
-        )
-
-        try await engine.apply(StateChange(
-            entityID: .global,
-            attribute: .addItem(coin),
-            oldValue: nil,
-            newValue: true
-        ))
-
+        let engine = await createTestEngineWithNonContainer()
         let handler = EmptyActionHandler()
-        let command = Command(verb: .empty, directObject: "looseCoin", rawInput: "empty loose coin")
+        let command = Command(verb: .empty, directObject: .item("looseCoin"), rawInput: "empty loose coin")
         let context = ActionContext(command: command, engine: engine)
 
         // Should fail validation
@@ -168,18 +309,9 @@ struct EmptyActionHandlerTests {
 
     @Test("EMPTY command on closed container")
     func testEmptyClosedContainer() async throws {
-        let engine = await createTestEngine()
-
-        // Close the box
-        try await engine.apply(StateChange(
-            entityID: .item("box"),
-            attribute: .clearFlag(.isOpen),
-            oldValue: true,
-            newValue: nil
-        ))
-
+        let engine = await createTestEngineWithClosedBox()
         let handler = EmptyActionHandler()
-        let command = Command(verb: .empty, directObject: "box", rawInput: "empty box")
+        let command = Command(verb: .empty, directObject: .item("box"), rawInput: "empty box")
         let context = ActionContext(command: command, engine: engine)
 
         // Should fail validation
@@ -197,40 +329,9 @@ struct EmptyActionHandlerTests {
 
     @Test("EMPTY command on inaccessible container")
     func testEmptyInaccessibleContainer() async throws {
-        let engine = await createTestEngine()
-
-        // Add a container in another location
-        let distantBox = Item(
-            id: "distantBox",
-            .name("distant box"),
-            .isContainer,
-            .isOpen,
-            .isTakable,
-            .in(.location("anotherRoom"))
-        )
-
-        let anotherRoom = Location(
-            id: "anotherRoom",
-            .name("Another Room"),
-            .description("A distant room.")
-        )
-
-        try await engine.apply(StateChange(
-            entityID: .global,
-            attribute: .addLocation(anotherRoom),
-            oldValue: nil,
-            newValue: true
-        ))
-
-        try await engine.apply(StateChange(
-            entityID: .global,
-            attribute: .addItem(distantBox),
-            oldValue: nil,
-            newValue: true
-        ))
-
+        let engine = await createTestEngineWithDistantBox()
         let handler = EmptyActionHandler()
-        let command = Command(verb: .empty, directObject: "distantBox", rawInput: "empty distant box")
+        let command = Command(verb: .empty, directObject: .item("distantBox"), rawInput: "empty distant box")
         let context = ActionContext(command: command, engine: engine)
 
         // Should fail validation due to item not being accessible

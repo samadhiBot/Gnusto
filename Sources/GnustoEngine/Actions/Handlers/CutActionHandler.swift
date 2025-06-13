@@ -27,7 +27,7 @@ public struct CutActionHandler: ActionHandler {
         }
 
         // Check if target exists and is reachable
-        let targetItem = try await context.engine.item(targetItemID)
+        _ = try await context.engine.item(targetItemID)
         guard await context.engine.playerCanReach(targetItemID) else {
             throw ActionResponse.itemNotAccessible(targetItemID)
         }

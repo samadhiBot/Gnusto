@@ -45,7 +45,7 @@ public struct FillActionHandler: ActionHandler {
                 throw ActionResponse.prerequisiteNotMet("You can't fill from that.")
             }
 
-            let sourceItem = try await context.engine.item(sourceItemID)
+            _ = try await context.engine.item(sourceItemID)
             guard await context.engine.playerCanReach(sourceItemID) else {
                 throw ActionResponse.itemNotAccessible(sourceItemID)
             }
