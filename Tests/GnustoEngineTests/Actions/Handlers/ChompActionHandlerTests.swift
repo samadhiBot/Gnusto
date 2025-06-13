@@ -1,0 +1,65 @@
+import Testing
+@testable import GnustoEngine
+
+/// Tests for the ChompActionHandler.
+@Suite("ChompActionHandler Tests")
+struct ChompActionHandlerTests {
+
+    // MARK: - Test Setup
+
+    func createTestEngine() async -> (GameEngine, MockIOHandler) {
+        let game = MinimalGame()
+        let mockIO = await MockIOHandler()
+        let mockParser = MockParser()
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: mockParser,
+            ioHandler: mockIO
+        )
+        return (engine, mockIO)
+    }
+
+    // MARK: - Tests
+
+    @Test("CHOMP without object")
+    func testChompWithoutObject() async throws {
+        let (engine, mockIO) = await createTestEngine()
+        let handler = ChompActionHandler()
+        let command = Command(verb: .chomp, rawInput: "chomp")
+        let context = ActionContext(command: command, engine: engine)
+
+        let result = try await handler.process(context: context)
+
+        #expect(result.message != nil)
+        #expect(result.message!.contains("chomp") || result.message!.contains("bite") || result.message!.contains("gnash"))
+    }
+
+    @Test("CHOMP with object")
+    func testChompWithObject() async throws {
+        let (engine, mockIO) = await createTestEngine()
+        let handler = ChompActionHandler()
+
+        let command = Command(
+            verb: .chomp,
+            directObject: .item("apple"),
+            rawInput: "chomp apple"
+        )
+        let context = ActionContext(command: command, engine: engine)
+
+        let result = try await handler.process(context: context)
+
+        #expect(result.message != nil)
+        #expect(result.message!.contains("apple"))
+    }
+
+    @Test("CHOMP validation passes without object")
+    func testChompValidationWithoutObject() async throws {
+        let (engine, mockIO) = await createTestEngine()
+        let handler = ChompActionHandler()
+        let command = Command(verb: .chomp, rawInput: "chomp")
+        let context = ActionContext(command: command, engine: engine)
+
+        // Should not throw
+        try await handler.validate(context: context)
+    }
+}

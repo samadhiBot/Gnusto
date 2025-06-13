@@ -976,6 +976,77 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [SyntaxRule(.verb, .directObject)],
             requiresLight: true
         ),
+
+        // Priority 7: Humorous & Atmospheric Commands
+
+        Verb(
+            id: .chomp,
+            synonyms: "bite", "gnaw", "chew",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .cry,
+            synonyms: "weep", "sob", "bawl",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .curse,
+            synonyms: "swear", "cuss", "damn",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .dance,
+            synonyms: "boogie", "jig",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .giggle,
+            synonyms: "chuckle", "snicker", "titter",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .laugh,
+            synonyms: "guffaw", "chortle", "cackle",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .scream,
+            synonyms: "shriek", "screech", "howl",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .sing,
+            synonyms: "hum", "warble", "croon",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .yell,
+            synonyms: "shout", "holler", "bellow",
+            syntax: [SyntaxRule(.verb)],
+            requiresLight: false
+        ),
     ]
 
     // MARK: - Building Vocabulary

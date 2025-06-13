@@ -76,6 +76,20 @@ extension VerbID {
     public static let xyzzy = VerbID("xyzzy")
 }
 
+// MARK: - Priority 7: Humorous & Atmospheric verbs
+
+extension VerbID {
+    public static let chomp = VerbID("chomp")
+    public static let cry = VerbID("cry")
+    public static let curse = VerbID("curse")
+    public static let dance = VerbID("dance")
+    public static let giggle = VerbID("giggle")
+    public static let laugh = VerbID("laugh")
+    public static let scream = VerbID("scream")
+    public static let sing = VerbID("sing")
+    public static let yell = VerbID("yell")
+}
+
 // MARK: - Priority 2: Movement & Navigation verbs
 
 extension VerbID {

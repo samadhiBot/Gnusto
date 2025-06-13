@@ -1153,6 +1153,17 @@ extension GameEngine {
             .wear: WearActionHandler(),
             .xyzzy: XyzzyActionHandler(),
 
+            // Priority 7: Humorous & Atmospheric Commands
+            .chomp: ChompActionHandler(),
+            .cry: CryActionHandler(),
+            .curse: CurseActionHandler(),
+            .dance: DanceActionHandler(),
+            .giggle: GiggleActionHandler(),
+            .laugh: LaughActionHandler(),
+            .scream: ScreamActionHandler(),
+            .sing: SingActionHandler(),
+            .yell: YellActionHandler(),
+
             // Meta Actions
             .ask: AskActionHandler(),
             .brief: BriefActionHandler(),
