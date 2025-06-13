@@ -229,6 +229,6 @@ struct SqueezeActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You squeeze the tube and some contents ooze out."))
+        expectNoDifference(output, "You squeeze the tube and some of its contents ooze out.")
     }
 }

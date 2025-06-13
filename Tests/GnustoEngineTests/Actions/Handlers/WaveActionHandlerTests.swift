@@ -251,6 +251,6 @@ struct WaveActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You wave the staff, but nothing magical happens."))
+        expectNoDifference(output, "You wave the staff dramatically, but nothing magical happens.")
     }
 }

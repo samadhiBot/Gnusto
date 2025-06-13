@@ -192,6 +192,6 @@ struct KickActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("Kicking the box doesn't accomplish much."))
+        expectNoDifference(output, "Kicking the box doesn’t accomplish much.")
     }
 }

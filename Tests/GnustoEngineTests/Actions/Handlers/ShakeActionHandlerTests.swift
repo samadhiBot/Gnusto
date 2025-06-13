@@ -206,6 +206,6 @@ struct ShakeActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You shake the container and hear a rattling sound from inside."))
+        expectNoDifference(output, "You shake the container and hear something rattling inside.")
     }
 }
