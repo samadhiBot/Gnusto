@@ -15,7 +15,10 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
     public init() {}
 
     public func message(for key: MessageKey) -> String {
-        switch key {
+        switch key {  // IMPORTANT: Keep cases alphabetized
+        case .alreadyHeld(let item):
+            "You already have \(item)."
+
         case .ambiguity(let text):
             text
 
@@ -24,6 +27,12 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .badGrammar(let text):
             text
+
+        case .closed:
+            "Closed."
+
+        case .closedItem(let item):
+            "You close \(item)."
 
         case .containerIsClosed(let item):
             "\(item.capitalizedFirst) is closed."
@@ -37,13 +46,37 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
 
+        case .doorIsClosed(let direction):
+            "The \(direction) door is closed."
+
+        case .doorIsLocked(let door):
+            "The \(door) is locked."
+
+        case .dropped:
+            "Dropped."
+
+        case .droppedItem(let item):
+            "You drop \(item)."
+
         case .emptyInput:
             "I beg your pardon?"
 
-        case .internalEngineError:
-            "A strange buzzing sound indicates something is wrong."
+        case .giveToWhom:
+            "Give to whom?"
 
-        case .internalParseError:
+        case .giveWhat:
+            "Give what?"
+
+        case .goWhere:
+            "Go where?"
+
+        case .insertIntoWhat:
+            "Insert into what?"
+
+        case .insertWhat:
+            "Insert what?"
+
+        case .internalEngineError, .internalParseError:
             "A strange buzzing sound indicates something is wrong."
 
         case .invalidDirection:
@@ -57,6 +90,12 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .itemAlreadyOpen(let item):
             "\(item.capitalizedFirst) is already open."
+
+        case .itemGivenTo(let item, let recipient):
+            "You give \(item) to \(recipient)."
+
+        case .itemInsertedInto(let item, let container):
+            "You put \(item) into \(container)."
 
         case .itemIsAlreadyWorn(let item):
             "You are already wearing \(item)."
@@ -121,11 +160,26 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .modifierMismatch(let noun, let modifiers):
             "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
 
+        case .multipleObjectsNotSupported(let verb):
+            "The \(verb.uppercased()) command doesn't support multiple objects."
+
+        case .nothingSpecialAbout(let item):
+            "You see nothing special about \(item)."
+
+        case .nothingToTakeHere:
+            "Nothing to take here."
+
         case .nowDark:
             "You are plunged into darkness."
 
         case .nowLit:
             "You can see your surroundings now."
+
+        case .opened(let item):
+            "You open \(item)."
+
+        case .openingRevealsContents(let container, let contents):
+            "Opening \(container) reveals \(contents)."
 
         case .parseUnknownVerb(let verb):
             "I don't know the verb '\(verb)'."
@@ -148,11 +202,17 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .stateValidationFailed:
             "A strange buzzing sound indicates something is wrong with the state validation."
 
+        case .taken:
+            "Taken."
+
         case .targetIsNotAContainer(let item):
             "You can't put things in \(item)."
 
         case .targetIsNotASurface(let item):
             "You can't put things on \(item)."
+
+        case .thereIsNothingHereToTake:
+            "There is nothing here to take."
 
         case .toolMissing(let tool):
             "You need \(tool) for that."
@@ -166,103 +226,38 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .unknownVerb(let verb):
             "I don't know how to \"\(verb)\" something."
 
+        case .whatQuestion(let verb):
+            "\(verb.capitalizedFirst) what?"
+
         case .wrongKey(let key, let lock):
             "\(key.capitalizedFirst) doesn't fit \(lock)."
-
-        // MARK: - Common Action Messages
-
-        case .taken:
-            "Taken."
-
-        case .alreadyHeld(let item):
-            "You already have \(item)."
-
-        case .dropped:
-            "Dropped."
-
-        case .droppedItem(let item):
-            "You drop \(item)."
 
         case .youAlreadyHaveThat:
             "You already have that."
 
-        case .youArentHoldingThat:
-            "You aren't holding that."
-
-        case .nothingToTakeHere:
-            "Nothing to take here."
-
-        case .thereIsNothingHereToTake:
-            "There is nothing here to take."
-
-        case .opened(let item):
-            "You open \(item)."
-
-        case .openingRevealsContents(let container, let contents):
-            "Opening \(container) reveals \(contents)."
-
-        case .closed:
-            "Closed."
-
-        case .closedItem(let item):
-            "You close \(item)."
+        case .youAreCarrying:
+            "You are carrying:"
 
         case .youAreEmptyHanded:
             "You are empty-handed."
 
-        case .youAreCarrying:
-            "You are carrying:"
-
-        case .youCantDoThat:
-            "You can't do that."
-
-        case .goWhere:
-            "Go where?"
-
-        case .whatQuestion(let verb):
-            "\(verb.capitalizedFirst) what?"
-
-        case .nothingSpecialAbout(let item):
-            "You see nothing special about \(item)."
+        case .youArentHoldingThat:
+            "You aren't holding that."
 
         case .youCanOnlyActOnItems(let verb):
             "You can only \(verb) items."
 
-        case .multipleObjectsNotSupported(let verb):
-            "The \(verb.uppercased()) command doesn't support multiple objects."
-
-        case .giveWhat:
-            "Give what?"
-
-        case .giveToWhom:
-            "Give to whom?"
-
-        case .insertWhat:
-            "Insert what?"
-
-        case .insertIntoWhat:
-            "Insert into what?"
-
-        case .youTakeMultipleItems(let items):
-            "You take \(items)."
-
-        case .youDropMultipleItems(let items):
-            "You drop \(items)."
-
-        case .itemGivenTo(let item, let recipient):
-            "You give \(item) to \(recipient)."
-
-        case .itemInsertedInto(let item, let container):
-            "You put \(item) into \(container)."
+        case .youCantDoThat:
+            "You can't do that."
 
         case .youDontHaveThat:
             "You don't have that."
 
-        case .doorIsLocked(let door):
-            "The \(door) is locked."
+        case .youDropMultipleItems(let items):
+            "You drop \(items)."
 
-        case .doorIsClosed(let direction):
-            "The \(direction) door is closed."
+        case .youTakeMultipleItems(let items):
+            "You take \(items)."
         }
     }
 }

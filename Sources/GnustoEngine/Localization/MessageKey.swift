@@ -9,7 +9,10 @@
 /// - **Parse Error Messages**: Communication when input cannot be understood
 /// - **System Messages**: Core engine communications (darkness, game state, etc.)
 /// - **Status Messages**: Game progress and meta-information
-public enum MessageKey: Hashable, Sendable {
+public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabetized
+    /// Item is already held by the player
+    case alreadyHeld(item: String)
+
     /// Ambiguous input requiring clarification
     case ambiguity(text: String)
 
@@ -18,6 +21,12 @@ public enum MessageKey: Hashable, Sendable {
 
     /// Grammar error in input
     case badGrammar(text: String)
+
+    /// Simple "Closed." confirmation
+    case closed
+
+    /// Detailed confirmation for closing something
+    case closedItem(item: String)
 
     /// Container is closed (preventing access to contents)
     case containerIsClosed(item: String)
@@ -31,8 +40,35 @@ public enum MessageKey: Hashable, Sendable {
     /// Movement direction is blocked
     case directionIsBlocked(reason: String?)
 
+    /// Door is closed (blocking movement)
+    case doorIsClosed(direction: String)
+
+    /// Door is locked (blocking movement)
+    case doorIsLocked(door: String)
+
+    /// Simple "Dropped." confirmation
+    case dropped
+
+    /// Item successfully dropped with details
+    case droppedItem(item: String)
+
     /// Input was empty or contained only noise words
     case emptyInput
+
+    /// "Give to whom?" for missing indirect object in give command
+    case giveToWhom
+
+    /// "Give what?" for missing direct object in give command
+    case giveWhat
+
+    /// "Go where?" when direction is missing
+    case goWhere
+
+    /// "Insert into what?" for missing indirect object in insert command
+    case insertIntoWhat
+
+    /// "Insert what?" for missing direct object in insert command
+    case insertWhat
 
     /// Generic internal engine error message
     case internalEngineError
@@ -51,6 +87,12 @@ public enum MessageKey: Hashable, Sendable {
 
     /// Item is already open
     case itemAlreadyOpen(item: String)
+
+    /// Item successfully given to recipient
+    case itemGivenTo(item: String, recipient: String)
+
+    /// Item successfully inserted into container
+    case itemInsertedInto(item: String, container: String)
 
     /// Item is already being worn
     case itemIsAlreadyWorn(item: String)
@@ -115,11 +157,26 @@ public enum MessageKey: Hashable, Sendable {
     /// Modifier mismatch (adjective + noun combination not found)
     case modifierMismatch(noun: String, modifiers: [String])
 
+    /// Multiple objects not supported for this action
+    case multipleObjectsNotSupported(verb: String)
+
+    /// "You see nothing special about X."
+    case nothingSpecialAbout(item: String)
+
+    /// "Nothing to take here." for TAKE ALL with no takeable items
+    case nothingToTakeHere
+
     /// Message displayed when the player moves from light to darkness
     case nowDark
 
     /// Message displayed when the player moves from darkness to light
     case nowLit
+
+    /// Simple confirmation for opening something
+    case opened(item: String)
+
+    /// Opening a container reveals its contents
+    case openingRevealsContents(container: String, contents: String)
 
     /// Unknown verb in input
     case parseUnknownVerb(verb: String)
@@ -142,11 +199,17 @@ public enum MessageKey: Hashable, Sendable {
     /// State validation failure message
     case stateValidationFailed
 
+    /// Simple "Taken." confirmation
+    case taken
+
     /// Target is not a container
     case targetIsNotAContainer(item: String)
 
     /// Target is not a surface
     case targetIsNotASurface(item: String)
+
+    /// "There is nothing here to take." alternative phrasing
+    case thereIsNothingHereToTake
 
     /// Tool is missing for the action
     case toolMissing(tool: String)
@@ -160,101 +223,36 @@ public enum MessageKey: Hashable, Sendable {
     /// Unknown verb
     case unknownVerb(verb: String)
 
+    /// Generic "what?" response for missing direct object
+    case whatQuestion(verb: String)
+
     /// Wrong key for lock
     case wrongKey(key: String, lock: String)
-
-    // MARK: - Common Action Messages
-
-    /// Simple "Taken." confirmation
-    case taken
-
-    /// Item is already held by the player
-    case alreadyHeld(item: String)
-
-    /// Simple "Dropped." confirmation
-    case dropped
-
-    /// Item successfully dropped with details
-    case droppedItem(item: String)
 
     /// "You already have that." when trying to take held item
     case youAlreadyHaveThat
 
-    /// "You aren't holding that." when trying to drop unheld item
-    case youArentHoldingThat
-
-    /// "Nothing to take here." for TAKE ALL with no takeable items
-    case nothingToTakeHere
-
-    /// "There is nothing here to take." alternative phrasing
-    case thereIsNothingHereToTake
-
-    /// Simple confirmation for opening something
-    case opened(item: String)
-
-    /// Opening a container reveals its contents
-    case openingRevealsContents(container: String, contents: String)
-
-    /// Simple "Closed." confirmation
-    case closed
-
-    /// Detailed confirmation for closing something
-    case closedItem(item: String)
+    /// "You are carrying:" prefix for inventory list
+    case youAreCarrying
 
     /// "You are empty-handed." for empty inventory
     case youAreEmptyHanded
 
-    /// "You are carrying:" prefix for inventory list
-    case youAreCarrying
-
-    /// Generic "You can't do that." response
-    case youCantDoThat
-
-    /// "Go where?" when direction is missing
-    case goWhere
-
-    /// Generic "what?" response for missing direct object
-    case whatQuestion(verb: String)
-
-    /// "You see nothing special about X."
-    case nothingSpecialAbout(item: String)
+    /// "You aren't holding that." when trying to drop unheld item
+    case youArentHoldingThat
 
     /// "You can only X items." for type restrictions
     case youCanOnlyActOnItems(verb: String)
 
-    /// Multiple objects not supported for this action
-    case multipleObjectsNotSupported(verb: String)
-
-    /// "Give what?" for missing direct object in give command
-    case giveWhat
-
-    /// "Give to whom?" for missing indirect object in give command
-    case giveToWhom
-
-    /// "Insert what?" for missing direct object in insert command
-    case insertWhat
-
-    /// "Insert into what?" for missing indirect object in insert command
-    case insertIntoWhat
-
-    /// Success message for taking multiple items
-    case youTakeMultipleItems(items: String)
-
-    /// Success message for dropping multiple items
-    case youDropMultipleItems(items: String)
-
-    /// Item successfully given to recipient
-    case itemGivenTo(item: String, recipient: String)
-
-    /// Item successfully inserted into container
-    case itemInsertedInto(item: String, container: String)
+    /// Generic "You can't do that." response
+    case youCantDoThat
 
     /// "You don't have that." when trying to give unheld item
     case youDontHaveThat
 
-    /// Door is locked (blocking movement)
-    case doorIsLocked(door: String)
+    /// Success message for dropping multiple items
+    case youDropMultipleItems(items: String)
 
-    /// Door is closed (blocking movement)
-    case doorIsClosed(direction: String)
+    /// Success message for taking multiple items
+    case youTakeMultipleItems(items: String)
 }
