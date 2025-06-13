@@ -49,8 +49,9 @@ public struct JumpActionHandler: ActionHandler {
                 "You bounce up and down."
             ]
 
-            let selectedResponse = responses.randomElement() ?? responses[0]
-            return ActionResult(selectedResponse)
+            return ActionResult(
+                try await context.engine.randomElement(in: responses)
+            )
         }
 
         guard case .item(let targetItemID) = directObjectRef else {

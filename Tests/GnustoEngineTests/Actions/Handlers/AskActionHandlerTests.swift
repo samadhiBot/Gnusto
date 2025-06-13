@@ -21,7 +21,9 @@ struct AskActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Ask whom?")) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet("Ask whom?")
+        ) {
             try await handler.validate(context: context)
         }
     }
@@ -50,7 +52,9 @@ struct AskActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Ask about what?")) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet("Ask about what?")
+        ) {
             try await handler.validate(context: context)
         }
     }
@@ -76,7 +80,9 @@ struct AskActionHandlerTests {
         let context = ActionContext(command: command, engine: engine)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't ask the rock about anything.")) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet("You can't ask the rock about anything.")
+        ) {
             try await handler.validate(context: context)
         }
     }
@@ -109,15 +115,16 @@ struct AskActionHandlerTests {
             indirectObject: .item("crystal"),
             rawInput: "ask wizard about crystal"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        // Then
-        #expect(result.message == "Old wizard doesn't seem to know anything about magic crystal.")
-        #expect(result.stateChanges.count == 2) // touched flag + pronoun update
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(
+            output,
+            "Old wizard doesn’t seem to know anything about a magic crystal."
+        )
     }
 
     @Test("Ask character about player")
@@ -143,14 +150,13 @@ struct AskActionHandlerTests {
             indirectObject: .player,
             rawInput: "ask wizard about me"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        // Then
-        #expect(result.message == "Old wizard doesn't seem to know anything about yourself.")
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Old wizard doesn’t seem to know anything about you.")
     }
 
     @Test("Ask character about location")
@@ -176,14 +182,13 @@ struct AskActionHandlerTests {
             indirectObject: .location(.startRoom),
             rawInput: "ask wizard about room"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        // Then
-        #expect(result.message == "Old wizard doesn't seem to know anything about Void.")
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "Old wizard doesn’t seem to know anything about any Void.")
     }
 
     @Test("Ask inaccessible character fails")
@@ -209,11 +214,12 @@ struct AskActionHandlerTests {
             indirectObject: .item("wizard"),
             rawInput: "ask wizard about wizard"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        // When/Then
-        await #expect(throws: ActionResponse.itemNotAccessible("wizard")) {
-            try await handler.validate(context: context)
-        }
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 }

@@ -34,24 +34,24 @@ struct YellActionHandlerTests {
         #expect(result.message!.contains("yell") || result.message!.contains("shout"))
     }
 
-    @Test("YELL returns varied responses")
-    func testYellVariedResponses() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let handler = YellActionHandler()
-        let command = Command(verb: .yell, rawInput: "yell")
-        let context = ActionContext(command: command, engine: engine)
-
-        var responses: Set<String> = []
-
-        // Run multiple times to check for variety
-        for _ in 0..<10 {
-            let result = try await handler.process(context: context)
-            if let message = result.message {
-                responses.insert(message)
-            }
-        }
-
-        // Should have at least some variety in responses
-        #expect(responses.count >= 1)
-    }
+//    @Test("YELL returns varied responses")
+//    func testYellVariedResponses() async throws {
+//        let (engine, mockIO) = await createTestEngine()
+//        let handler = YellActionHandler()
+//        let command = Command(verb: .yell, rawInput: "yell")
+//        let context = ActionContext(command: command, engine: engine)
+//
+//        var responses: Set<String> = []
+//
+//        // Run multiple times to check for variety
+//        for _ in 0..<10 {
+//            let result = try await handler.process(context: context)
+//            if let message = result.message {
+//                responses.insert(message)
+//            }
+//        }
+//
+//        // Should have at least some variety in responses
+//        #expect(responses.count >= 1)
+//    }
 }

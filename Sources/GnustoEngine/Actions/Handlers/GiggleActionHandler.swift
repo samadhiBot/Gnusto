@@ -23,6 +23,8 @@ public struct GiggleActionHandler: ActionHandler {
             "You giggle like a maniac. Very therapeutic."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

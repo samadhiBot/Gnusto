@@ -1238,10 +1238,21 @@ extension GameEngine {
     /// using the engine's seeded random number generator, ensuring reproducible randomness
     /// across game sessions.
     ///
+    /// The implementation uses direct calls to `randomNumberGenerator.next()` and modulo
+    /// arithmetic to avoid actor isolation issues with inout references.
+    ///
     /// - Parameter collection: The collection to select a random element from.
-    /// - Returns: A random element from the collection, or `nil` if the collection is empty.
-    public func randomElement<T>(in collection: some Collection<T>) -> T? {
-        collection.randomElement(using: &randomNumberGenerator)
+    /// - Returns: A random element from the collection.
+    /// - Throws: `ActionResponse.internalEngineError` if the collection is empty.
+    public func randomElement<T>(in collection: some Collection<T>) throws -> T {
+        guard !collection.isEmpty else {
+            throw ActionResponse.internalEngineError(
+                "Attempted to select a random element from an empty collection"
+            )
+        }
+        let randomValue = randomNumberGenerator.next()
+        let randomIndex = Int(randomValue % UInt64(collection.count))
+        return collection[collection.index(collection.startIndex, offsetBy: randomIndex)]
     }
 }
 

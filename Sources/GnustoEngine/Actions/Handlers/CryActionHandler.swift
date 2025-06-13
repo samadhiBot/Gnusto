@@ -23,6 +23,8 @@ public struct CryActionHandler: ActionHandler {
             "You cry softly. The world seems a little brighter now."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

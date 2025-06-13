@@ -44,7 +44,9 @@ public struct CurseActionHandler: ActionHandler {
                 "You curse \(targetItem.name) with words that would make a sailor blush."
             ]
 
-            return ActionResult(responses.randomElement()!)
+            return ActionResult(
+                try await context.engine.randomElement(in: responses)
+            )
         } else {
             // General cursing
             let responses = [
@@ -58,7 +60,9 @@ public struct CurseActionHandler: ActionHandler {
                 "You swear with the passion of a thousand frustrated adventurers."
             ]
 
-            return ActionResult(responses.randomElement()!)
+            return ActionResult(
+                try await context.engine.randomElement(in: responses)
+            )
         }
     }
 }

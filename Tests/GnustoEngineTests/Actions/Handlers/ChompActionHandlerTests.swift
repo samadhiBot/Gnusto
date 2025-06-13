@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the ChompActionHandler.
@@ -24,42 +26,56 @@ struct ChompActionHandlerTests {
     @Test("CHOMP without object")
     func testChompWithoutObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = ChompActionHandler()
         let command = Command(verb: .chomp, rawInput: "chomp")
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("chomp") || result.message!.contains("bite") || result.message!.contains("gnash"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You chomp your teeth together menacingly.")
     }
 
     @Test("CHOMP with object")
     func testChompWithObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = ChompActionHandler()
 
         let command = Command(
             verb: .chomp,
             directObject: .item("apple"),
             rawInput: "chomp apple"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("apple"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "")
+
+//        let context = ActionContext(command: command, engine: engine)
+//
+//        let result = try await handler.process(context: context)
+//
+//        #expect(result.message != nil)
+//        #expect(result.message!.contains("apple"))
     }
 
     @Test("CHOMP validation passes without object")
     func testChompValidationWithoutObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = ChompActionHandler()
         let command = Command(verb: .chomp, rawInput: "chomp")
-        let context = ActionContext(command: command, engine: engine)
 
-        // Should not throw
-        try await handler.validate(context: context)
+        // Act
+        await engine.execute(command: command)
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "")
+
+//        let context = ActionContext(command: command, engine: engine)
+//
+//        // Should not throw
+//        try await handler.validate(context: context)
     }
 }

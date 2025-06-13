@@ -24,6 +24,8 @@ public struct DanceActionHandler: ActionHandler {
             "You dance with wild abandon. Bravo!"
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

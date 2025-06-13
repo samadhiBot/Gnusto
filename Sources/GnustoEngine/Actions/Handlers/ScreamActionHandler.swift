@@ -23,6 +23,8 @@ public struct ScreamActionHandler: ActionHandler {
             "You scream so loudly that birds flee from nearby trees."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

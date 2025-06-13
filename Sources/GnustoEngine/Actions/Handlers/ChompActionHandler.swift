@@ -41,7 +41,9 @@ public struct ChompActionHandler: ActionHandler {
                 "Your chomping echoes through the area.",
                 "You practice your chomping technique."
             ]
-            return ActionResult(responses.randomElement()!)
+            return ActionResult(
+                try await context.engine.randomElement(in: responses)
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -68,7 +70,7 @@ public struct ChompActionHandler: ActionHandler {
                 "You gnaw on \(targetItem.name) briefly before giving up.",
                 "You take a bite of \(targetItem.name). It's not very appetizing."
             ]
-            message = responses.randomElement()!
+            message = try await context.engine.randomElement(in: responses)
         }
 
         // Mark item as touched and update pronouns

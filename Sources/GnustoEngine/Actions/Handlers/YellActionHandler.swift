@@ -23,6 +23,8 @@ public struct YellActionHandler: ActionHandler {
             "You shout so loudly that distant mountains echo back."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

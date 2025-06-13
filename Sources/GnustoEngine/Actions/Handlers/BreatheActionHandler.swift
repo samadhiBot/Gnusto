@@ -40,8 +40,9 @@ public struct BreatheActionHandler: ActionHandler {
             "You breathe in the love... and blow out the jive.",
         ]
 
-        let selectedResponse = await context.engine.randomElement(in: responses) ?? responses[0]
-        return ActionResult(selectedResponse)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 
     /// Performs any post-processing after the "BREATHE" command.

@@ -68,12 +68,12 @@ public struct AskActionHandler: ActionHandler {
         switch indirectObjectRef {
         case .item(let topicItemID):
             let topicItem = try await context.engine.item(topicItemID)
-            topicDescription = topicItem.name
+            topicDescription = topicItem.withIndefiniteArticle
         case .player:
-            topicDescription = "yourself"
+            topicDescription = "you"
         case .location(let locationID):
             let location = try await context.engine.location(locationID)
-            topicDescription = location.name
+            topicDescription = "any \(location.name)"
         }
 
         // Default response - games can override with ItemEventHandlers

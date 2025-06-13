@@ -23,6 +23,8 @@ public struct LaughActionHandler: ActionHandler {
             "You laugh so hard you nearly fall over."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

@@ -23,6 +23,8 @@ public struct SingActionHandler: ActionHandler {
             "You sing so beautifully that birds gather to listen."
         ]
 
-        return ActionResult(responses.randomElement()!)
+        return ActionResult(
+            try await context.engine.randomElement(in: responses)
+        )
     }
 }

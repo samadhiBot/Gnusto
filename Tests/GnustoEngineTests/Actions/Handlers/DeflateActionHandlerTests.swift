@@ -137,7 +137,7 @@ struct DeflateActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("deflate what") || output.contains("What do you want to deflate"))
+        expectNoDifference(output, "Deflate what?")
     }
 
     @Test("DEFLATE command on inflated object")
