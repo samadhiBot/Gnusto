@@ -128,8 +128,8 @@ struct AttackActionHandlerTests {
         }
     }
 
-    @Test("Attack rock with bare hands")
-    func testAttackRockWithBareHands() async throws {
+    @Test("Attack non-character object")
+    func testAttackNonCharacterObject() async throws {
         // Given
         let rock = Item(
             id: "rock",
@@ -231,7 +231,7 @@ struct AttackActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You attack the goblin with the sword, but nothing happens."))
+        #expect(result.message!.contains("You can't."))
     }
 
     @Test("Attack character with inappropriate weapon")

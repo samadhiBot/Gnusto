@@ -44,63 +44,59 @@ public struct AttackActionHandler: ActionHandler {
 
     /// Processes the "ATTACK" command.
     ///
-    /// Handles different attack scenarios:
-    /// - Attacking actors (characters, creatures)
-    /// - Attacking objects with/without weapons
-    /// - Provides ZIL-accurate combat responses
+    /// Handles different attack scenarios following ZIL V-ATTACK logic:
+    /// 1. Non-characters: "I've known strange people, but fighting a [object]?"
+    /// 2. Bare-handed attacks on characters: "Trying to attack a [character] with your bare hands is suicidal."
+    /// 3. Non-weapon attacks on characters: "Trying to attack the [character] with a [item] is suicidal."
+    /// 4. Weapon attacks: "You can't." (placeholder for combat system)
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate combat message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("AttackActionHandler: directObject was not an item in process.")
+        guard
+            let directObjectRef = context.command.directObject,
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "AttackActionHandler: directObject was not an item in process."
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
 
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
-
-
-        // Handle different target types and weapons
+        // Follow ZIL V-ATTACK logic exactly
         let message: String
 
-        // Check if using weapon
-        if let indirectObjectRef = context.command.indirectObject,
-           case .item(let weaponItemID) = indirectObjectRef {
+        // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
+        if !targetItem.hasFlag(.isCharacter) {
+            message = "I've known strange people, but fighting a \(targetItem.name)?"
+        }
+        // Second check: No weapon specified OR weapon is hands (bare-handed attack)
+        else if context.command.indirectObject == nil {
+            message = "Trying to attack a \(targetItem.name) with your bare hands is suicidal."
+        }
+        // We have a weapon - check if it's a real weapon
+        else if let indirectObjectRef = context.command.indirectObject,
+                case .item(let weaponItemID) = indirectObjectRef {
             let weaponItem = try await context.engine.item(weaponItemID)
-
-            if targetItem.hasFlag(.isCharacter) {
-                // Attacking character with weapon
-                if weaponItem.hasFlag(.isWeapon) {
-                    message = "You attack the \(targetItem.name) with the \(weaponItem.name), but nothing happens."
-                } else {
-                    message = "Trying to attack the \(targetItem.name) with a \(weaponItem.name) is suicidal."
-                }
+            
+            if !weaponItem.hasFlag(.isWeapon) {
+                message = "Trying to attack the \(targetItem.name) with a \(weaponItem.name) is suicidal."
             } else {
-                // Attacking object with weapon
-                message = "You attack the \(targetItem.name) with the \(weaponItem.name), but nothing happens."
+                // Real weapon attack - placeholder for combat system
+                message = "You can't."
             }
         } else {
-            // Bare-handed attack
-            if targetItem.hasFlag(.isCharacter) {
-                message = "Trying to attack a \(targetItem.name) with your bare hands is suicidal."
-            } else {
-                message = "I've known strange people, but fighting a \(targetItem.name)?"
-            }
+            // Fallback case
+            message = "You can't."
         }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            changes:
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem)
+        )
     }
 
     /// Performs any post-processing after the attack action completes.
