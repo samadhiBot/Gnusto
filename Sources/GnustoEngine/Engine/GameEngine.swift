@@ -1104,6 +1104,7 @@ extension GameEngine {
             .drink: DrinkActionHandler(),
             .drop: DropActionHandler(),
             .eat: EatActionHandler(),
+            .enter: EnterActionHandler(),
             .examine: ExamineActionHandler(),
             .fill: FillActionHandler(),
             .find: FindActionHandler(),
@@ -1111,6 +1112,7 @@ extension GameEngine {
             .go: GoActionHandler(),
             .insert: InsertActionHandler(),
             .inventory: InventoryActionHandler(),
+            .jump: JumpActionHandler(),
             .kick: KickActionHandler(),
             .kiss: KissActionHandler(),
             .knock: KnockActionHandler(),
@@ -1207,7 +1209,7 @@ extension GameEngine {
     public func randomPercentage() -> Int {
         Int.random(in: 0...100, using: &randomNumberGenerator)
     }
-    
+
     /// Returns a random element from the given collection.
     ///
     /// This method provides a convenient way to select a random element from any collection

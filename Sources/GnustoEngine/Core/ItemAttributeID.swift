@@ -89,6 +89,9 @@ public extension ItemAttributeID {
     /// EDIBLEBIT / FOODBIT: Can be eaten.
     static let isEdible = ItemAttributeID("isEdible")
 
+    /// Can be entered (e.g., buildings, vehicles).
+    static let isEnterable = ItemAttributeID("isEnterable")
+
     /// Can be equipped (e.g., weapon, shield).
     static let isEquippable = ItemAttributeID("isEquippable")
 

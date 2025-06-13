@@ -767,6 +767,157 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             ],
             requiresLight: true
         ),
+
+        // Priority 2: Movement & Navigation Verbs
+
+        Verb(
+            id: .enter,
+            synonyms: "go in", "get in",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .exit,
+            synonyms: "go out", "get out", "leave",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .jump,
+            synonyms: "leap", "hop",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .jumpOff,
+            synonyms: "jump off", "leap off",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "off"
+                )
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .jumpOut,
+            synonyms: "jump out", "leap out",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "out"
+                )
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .climbUp,
+            synonyms: "climb up", "go up",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .climbDown,
+            synonyms: "climb down", "go down",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .getOff,
+            synonyms: "get off", "climb off",
+            syntax: [
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "off"
+                )
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .getOut,
+            synonyms: "get out", "climb out",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "of"
+                )
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .lookUp,
+            synonyms: "look up",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .lookDown,
+            synonyms: "look down",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: true
+        ),
+
+        Verb(
+            id: .swim,
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .walk,
+            synonyms: "stroll", "march",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .direction),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
+
+        Verb(
+            id: .leave,
+            synonyms: "depart",
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(.verb, .directObject)
+            ],
+            requiresLight: false
+        ),
     ]
 
     // MARK: - Building Vocabulary

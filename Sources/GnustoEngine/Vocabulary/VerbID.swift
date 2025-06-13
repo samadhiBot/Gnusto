@@ -68,6 +68,25 @@ extension VerbID {
     public static let xyzzy = VerbID("xyzzy")
 }
 
+// MARK: - Priority 2: Movement & Navigation verbs
+
+extension VerbID {
+    public static let climbDown = VerbID("climbDown")
+    public static let climbUp = VerbID("climbUp")
+    public static let enter = VerbID("enter")
+    public static let exit = VerbID("exit")
+    public static let getOff = VerbID("getOff")
+    public static let getOut = VerbID("getOut")
+    public static let jump = VerbID("jump")
+    public static let jumpOff = VerbID("jumpOff")
+    public static let jumpOut = VerbID("jumpOut")
+    public static let leave = VerbID("leave")
+    public static let lookDown = VerbID("lookDown")
+    public static let lookUp = VerbID("lookUp")
+    public static let swim = VerbID("swim")
+    public static let walk = VerbID("walk")
+}
+
 // MARK: - Meta verbs
 
 extension VerbID {

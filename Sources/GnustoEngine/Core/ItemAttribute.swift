@@ -205,6 +205,11 @@ extension ItemAttribute {
         ItemAttribute(id: .isEdible, rawValue: true)
     }
 
+    /// Can be entered (e.g., buildings, vehicles).
+    public static var isEnterable: ItemAttribute {
+        ItemAttribute(id: .isEnterable, rawValue: true)
+    }
+
     /// Can be equipped (e.g., weapon, shield).
     public static var isEquippable: ItemAttribute {
         ItemAttribute(id: .isEquippable, rawValue: true)
