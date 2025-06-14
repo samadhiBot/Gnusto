@@ -97,7 +97,11 @@ struct MessageProviderRandomTests {
     func testGameEngineRandomMessageSingleLine() async throws {
         let game = MinimalGame()
         let mockIO = MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         let message = await engine.randomMessage(for: .taken)
         #expect(message == "Taken.")
@@ -107,7 +111,11 @@ struct MessageProviderRandomTests {
     func testGameEngineRandomMessageMultiLine() async throws {
         let game = MinimalGame()
         let mockIO = MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         let possibleResponses = [
             "You breathe in deeply, feeling refreshed.",
@@ -133,7 +141,11 @@ struct MessageProviderRandomTests {
     func testGameEngineRandomMessageWithParameters() async throws {
         let game = MinimalGame()
         let mockIO = MockIOHandler()
-        let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: MockParser(),
+            ioHandler: mockIO
+        )
 
         let itemName = "the rusty sword"
         let message = await engine.randomMessage(for: .curseTargetResponses(item: itemName))
