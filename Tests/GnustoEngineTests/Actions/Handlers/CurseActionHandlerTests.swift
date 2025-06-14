@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the CurseActionHandler.
@@ -24,36 +26,44 @@ struct CurseActionHandlerTests {
     @Test("CURSE without object")
     func testCurseWithoutObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = CurseActionHandler()
         let command = Command(verb: .curse, rawInput: "curse")
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
+        await engine.execute(command: command)
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("curse") || result.message!.contains("swear"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You damn everything in sight. You feel better now.
+
+            You swear like a sailor. Very cathartic.
+
+            You curse fluently in several languages.
+            """)
     }
 
     @Test("CURSE with object")
     func testCurseWithObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = CurseActionHandler()
         let command = Command(
             verb: .curse,
-            directObject: .item("door"),
-            rawInput: "curse door"
+            directObject: .item(.startItem),
+            rawInput: "curse the pebble"
         )
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("door"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You damn the pebble to the seven hells.")
     }
 
     @Test("CURSE validation passes without object")
     func testCurseValidationWithoutObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let handler = CurseActionHandler()
         let command = Command(verb: .curse, rawInput: "curse")
         let context = ActionContext(command: command, engine: engine)

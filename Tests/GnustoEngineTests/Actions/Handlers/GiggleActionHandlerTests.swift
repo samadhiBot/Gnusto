@@ -1,5 +1,6 @@
+import CustomDump
+import GnustoEngine
 import Testing
-@testable import GnustoEngine
 
 /// Tests for the GiggleActionHandler.
 @Suite("GiggleActionHandler Tests")
@@ -24,34 +25,34 @@ struct GiggleActionHandlerTests {
     @Test("GIGGLE command")
     func testGiggle() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = GiggleActionHandler()
         let command = Command(verb: .giggle, rawInput: "giggle")
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("giggle") || result.message!.contains("chuckle"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You chortle with delight.")
     }
 
     @Test("GIGGLE returns varied responses")
     func testGiggleVariedResponses() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = GiggleActionHandler()
         let command = Command(verb: .giggle, rawInput: "giggle")
-        let context = ActionContext(command: command, engine: engine)
 
-        var responses: Set<String> = []
+        // Act
+        await engine.execute(command: command)
+        await engine.execute(command: command)
+        await engine.execute(command: command)
 
-        // Run multiple times to check for variety
-        for _ in 0..<10 {
-            let result = try await handler.process(context: context)
-            if let message = result.message {
-                responses.insert(message)
-            }
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You chortle with delight.
 
-        // Should have at least some variety in responses
-        #expect(responses.count >= 1)
+            You giggle uncontrollably. How embarrassing!
+
+            You snicker quietly. How mischievous!
+            """)
     }
 }

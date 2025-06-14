@@ -33,7 +33,7 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chomp at the air for everyone to see.")
+        expectNoDifference(output, "You clench your fists and gnash your teeth.")
     }
 
     @Test("CHOMP with object")
@@ -51,7 +51,10 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You gnaw on the pebble briefly before giving up.")
+        expectNoDifference(output, """
+            You bite the pebble. Your teeth don’t make much of an
+            impression.
+            """)
     }
 
     @Test("CHOMP validation passes without object")
@@ -64,6 +67,6 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chomp at the air for everyone to see.")
+        expectNoDifference(output, "You clench your fists and gnash your teeth.")
     }
 }

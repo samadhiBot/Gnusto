@@ -117,6 +117,7 @@ public enum MessageKey: Hashable, Sendable {
     case inflateSuccess(item: String)
     case inflateWhat
     case insertIntoWhat
+    case insertWhere(item: String)
     case insertWhat
     case internalEngineError
     case internalParseError

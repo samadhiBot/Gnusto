@@ -240,7 +240,9 @@ struct DebugActionHandlerTests {
         )
 
         // Act & Assert Error
-        await #expect(throws: ActionResponse.prerequisiteNotMet("DEBUG requires a direct object.")) {
+        await #expect(
+            throws: ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
+        ) {
             try await handler.process(
                 context: ActionContext(
                     command: command,

@@ -29,7 +29,7 @@ public struct MinimalGame: GameBlueprint {
         randomNumberGeneratorValues: [Double] = [0.5, 0.25, 0.75, 0, 1],
         locations: [Location] = [
             Location(
-                id: LocationID("startRoom"),
+                id: .startRoom,
                 .name("Void"),
                 .description("An empty void."),
                 .inherentlyLit
@@ -37,7 +37,7 @@ public struct MinimalGame: GameBlueprint {
         ],
         items: [Item] = [
             Item(
-                id: ItemID("startItem"),
+                id: .startItem,
                 .name("pebble"),
                 .in(.location(LocationID("startRoom"))),
                 .isTakable

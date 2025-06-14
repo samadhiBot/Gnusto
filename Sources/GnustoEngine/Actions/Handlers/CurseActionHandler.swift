@@ -39,7 +39,7 @@ public struct CurseActionHandler: ActionHandler {
             let targetItem = try await context.engine.item(targetItemID)
 
             let message = await context.engine.randomMessage(
-                for: .curseTargetResponses(item: targetItem.name))
+                for: .curseTargetResponses(item: targetItem.withDefiniteArticle))
             return ActionResult(message)
         } else {
             // General cursing (no object)

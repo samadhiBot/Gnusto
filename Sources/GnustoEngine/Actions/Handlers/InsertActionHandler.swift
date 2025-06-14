@@ -67,7 +67,10 @@ public struct InsertActionHandler: ActionHandler {
                 context.message(.insertWhat)
             )
         }
-        guard case .item(let itemToInsertID) = directObjectRef else {
+        guard
+            case .item(let itemToInsertID) = directObjectRef,
+            let itemToInsert = try? await context.engine.item(itemToInsertID)
+        else {
             throw ActionResponse.prerequisiteNotMet(
                 context.message(.youCanOnlyActOnItems(verb: "insert"))
             )
@@ -75,7 +78,9 @@ public struct InsertActionHandler: ActionHandler {
 
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.insertIntoWhat)
+                context.message(
+                    .insertWhere(item: itemToInsert.withDefiniteArticle)
+                )
             )
         }
         guard case .item(let containerID) = indirectObjectRef else {
@@ -85,7 +90,6 @@ public struct InsertActionHandler: ActionHandler {
         }
 
         // 2. Get Items (existence validated by directObjectRef/indirectObjectRef checks if entities exist)
-        let itemToInsert = try await context.engine.item(itemToInsertID)
         let containerItem = try await context.engine.item(containerID)
 
         // 3. Perform Basic Checks

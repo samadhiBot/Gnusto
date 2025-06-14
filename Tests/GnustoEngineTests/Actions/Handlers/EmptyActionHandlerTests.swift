@@ -1,7 +1,7 @@
 import CustomDump
-import Foundation
-import GnustoEngine
 import Testing
+
+import GnustoEngine
 
 @Suite("EmptyActionHandler")
 struct EmptyActionHandlerTests {
@@ -191,7 +191,7 @@ struct EmptyActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("You empty the box") && output.contains("coin") && output.contains("falls to the ground"))
+        expectNoDifference(output, "You empty the box, and a coin falls to the ground.")
     }
 
     @Test("EMPTY command on empty container")

@@ -64,7 +64,9 @@ public struct CutActionHandler: ActionHandler {
         else {
             let message = context.message(
                 .actionHandlerInternalError(
-                    handler: "CutActionHandler", details: "directObject was not an item in process")
+                    handler: "CutActionHandler",
+                    details: "directObject was not an item in process"
+                )
             )
             throw ActionResponse.internalEngineError(message)
         }
@@ -84,12 +86,17 @@ public struct CutActionHandler: ActionHandler {
                 // Successfully cut with appropriate tool
                 message = context.message(
                     .cutWithTool(
-                        item: targetItem.withDefiniteArticle, tool: toolItem.withDefiniteArticle))
+                        item: targetItem.withDefiniteArticle,
+                        tool: toolItem.withDefiniteArticle
+                    )
+                )
             } else {
                 // Using an inappropriate implement
-                message =
-                    context
-                    .message(.cutToolNotSharp(tool: toolItem.withDefiniteArticle.capitalizedFirst))
+                message = context.message(
+                    .cutToolNotSharp(
+                        tool: toolItem.withDefiniteArticle.capitalizedFirst
+                    )
+                )
             }
 
         } else {
@@ -103,7 +110,11 @@ public struct CutActionHandler: ActionHandler {
                 let firstTool = cuttingTools.first!
                 // Auto-cut with available tool
                 message = context.message(
-                    .cutWithAutoTool(item: targetItem.name, tool: firstTool.name))
+                    .cutWithAutoTool(
+                        item: targetItem.withDefiniteArticle,
+                        tool: firstTool.withDefiniteArticle
+                    )
+                )
             } else {
                 message = context.message(.cutNoSuitableTool)
             }

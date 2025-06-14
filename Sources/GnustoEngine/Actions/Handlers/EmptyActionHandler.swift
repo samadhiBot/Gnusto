@@ -66,13 +66,11 @@ public struct EmptyActionHandler: ActionHandler {
         var contentMoveChanges: [StateChange?] = []
 
         if contents.isEmpty {
-            message =
-                context
-                .message(
-                    .containerAlreadyEmpty(
-                        container: targetItem.withDefiniteArticle.capitalizedFirst
-                    )
+            message = context.message(
+                .containerAlreadyEmpty(
+                    container: targetItem.withDefiniteArticle.capitalizedFirst
                 )
+            )
         } else {
             // Get current location to move items to
             let currentLocationID = await context.engine.playerLocationID
@@ -80,12 +78,17 @@ public struct EmptyActionHandler: ActionHandler {
             // Collect move changes for all contents
             for item in contents {
                 contentMoveChanges.append(
-                    await context.engine.move(item, to: .location(currentLocationID)))
+                    await context.engine.move(item, to: .location(currentLocationID))
+                )
             }
 
-            let itemNames = contents.listWithDefiniteArticles
             message = context.message(
-                .emptySuccess(container: targetItem.name, items: itemNames, count: contents.count))
+                .emptySuccess(
+                    container: targetItem.withDefiniteArticle,
+                    items: contents.listWithIndefiniteArticles,
+                    count: contents.count
+                )
+            )
         }
 
         return ActionResult(
@@ -95,14 +98,5 @@ public struct EmptyActionHandler: ActionHandler {
                 await context.engine.updatePronouns(to: targetItem),
             ] + contentMoveChanges
         )
-    }
-
-    /// Performs any post-processing after the empty action completes.
-    ///
-    /// Currently no post-processing is needed for basic emptying.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for empty
     }
 }

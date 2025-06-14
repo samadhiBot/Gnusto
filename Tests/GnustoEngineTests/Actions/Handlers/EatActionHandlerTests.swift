@@ -177,7 +177,7 @@ struct EatActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("There's nothing edible in the empty box."))
+        #expect(result.message!.contains("There's nothing to eat in the empty box."))
     }
 
     @Test("Eat item and check state changes")

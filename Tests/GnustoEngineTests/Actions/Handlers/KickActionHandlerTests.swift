@@ -111,7 +111,7 @@ struct KickActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("Kicking the ball doesn't accomplish much."))
+        #expect(result.message!.contains("Ouch! You hurt your foot kicking the ball."))
     }
 
     @Test("Kick fixed object shows hurt foot message")
@@ -192,6 +192,6 @@ struct KickActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Kicking the box doesn’t accomplish much.")
+        expectNoDifference(output, "Ouch! You hurt your foot kicking the box.")
     }
 }

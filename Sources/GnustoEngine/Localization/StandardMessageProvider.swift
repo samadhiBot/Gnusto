@@ -351,7 +351,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "I beg your pardon?"
 
         case .emptySuccess(let container, let items, let count):
-            "You empty \(container). \(items) \(count == 1 ? "falls" : "fall") to the ground."
+            "You empty \(container), and \(items) \(count == 1 ? "falls" : "fall") to the ground."
 
         case .emptyWhat:
             "Empty what?"
@@ -1000,6 +1000,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .insertIntoWhat:
             "Insert into what?"
+        case .insertWhere(let item):
+            "Where do you want to insert \(item)?"
 
         case .insertHaveNothingToPut(let container):
             "You have nothing to put in the \(container)."

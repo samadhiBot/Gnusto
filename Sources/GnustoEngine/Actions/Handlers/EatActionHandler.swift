@@ -72,20 +72,21 @@ public struct EatActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
+        guard
+            let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "EatActionHandler: directObject was not an item in process.")
+                "EatActionHandler: directObject was not an item in process."
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
 
         // Handle direct edible item
         if targetItem.hasFlag(.isEdible) {
-            let message = context.message(.eatSuccess(item: targetItem.withDefiniteArticle))
             return ActionResult(
-                message: message,
+                message: context.message(.eatSuccess(item: targetItem.withDefiniteArticle)),
                 changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
@@ -100,20 +101,20 @@ public struct EatActionHandler: ActionHandler {
             if let firstEdible = edibleContents.first {
                 // For closed containers, can't eat from them
                 if !targetItem.hasFlag(.isOpen) {
-                    let message = context.message(
-                        .cannotEatFromClosed(container: targetItem.withDefiniteArticle))
                     return ActionResult(
-                        message: message,
-                        changes: [
-                            await context.engine.setFlag(.isTouched, on: targetItem)
-                        ]
+                        context.message(
+                            .cannotEatFromClosed(container: targetItem.withDefiniteArticle)
+                        ),
+                        change: await context.engine.setFlag(.isTouched, on: targetItem)
                     )
                 } else {
-                    let message = context.message(
-                        .eatFromContainer(food: firstEdible.name, container: targetItem.name)
-                    )
                     return ActionResult(
-                        message: message,
+                        message: context.message(
+                            .eatFromContainer(
+                                food: firstEdible.withDefiniteArticle,
+                                container: targetItem.withDefiniteArticle
+                            )
+                        ),
                         changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem),
                             await context.engine.move(firstEdible, to: .nowhere),
@@ -122,33 +123,21 @@ public struct EatActionHandler: ActionHandler {
                     )
                 }
             } else {
-                let message = context.message(
-                    .nothingToEatIn(container: targetItem.withDefiniteArticle))
                 return ActionResult(
-                    message: message,
-                    changes: [
-                        await context.engine.setFlag(.isTouched, on: targetItem)
-                    ]
+                    context.message(
+                        .nothingToEatIn(container: targetItem.withDefiniteArticle)
+                    ),
+                    change: await context.engine.setFlag(.isTouched, on: targetItem)
                 )
             }
         } else {
             // This shouldn't happen after validation, but handle it
-            let message = context.message(.cannotEat(item: targetItem.withDefiniteArticle))
             return ActionResult(
-                message: message,
-                changes: [
-                    await context.engine.setFlag(.isTouched, on: targetItem)
-                ]
+                context.message(
+                    .cannotEat(item: targetItem.withDefiniteArticle)
+                ),
+                change: await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }
-    }
-
-    /// Performs any post-processing after the eat/drink action completes.
-    ///
-    /// Currently no post-processing is needed for consumption.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for eat/drink
     }
 }

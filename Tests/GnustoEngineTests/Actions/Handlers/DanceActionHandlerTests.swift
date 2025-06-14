@@ -26,36 +26,21 @@ struct DanceActionHandlerTests {
     @Test("DANCE command")
     func testDance() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = DanceActionHandler()
         let command = Command(verb: .dance, rawInput: "dance")
 
         // Act
         await engine.execute(command: command)
+        await engine.execute(command: command)
+        await engine.execute(command: command)
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
-    }
+        expectNoDifference(output, """
+            You cut a rug with style and panache.
 
-    @Test("DANCE includes classic ZIL response")
-    func testDanceClassicResponse() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let handler = DanceActionHandler()
-        let command = Command(verb: .dance, rawInput: "dance")
-        let context = ActionContext(command: command, engine: engine)
+            You boogie down with surprising grace.
 
-        var foundClassicResponse = false
-
-        // Run multiple times to check if classic response appears
-        for _ in 0..<20 {
-            let result = try await handler.process(context: context)
-            if let message = result.message, message.contains("Dancing is forbidden") {
-                foundClassicResponse = true
-                break
-            }
-        }
-
-        // The classic response should appear at least once in 20 tries
-        #expect(foundClassicResponse, "Should include the classic 'Dancing is forbidden' response")
+            You break into spontaneous choreography.
+            """)
     }
 }
