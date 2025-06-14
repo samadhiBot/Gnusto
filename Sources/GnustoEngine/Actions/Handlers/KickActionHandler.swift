@@ -64,10 +64,10 @@ public struct KickActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Kicking characters is generally not advisable
-            message = context.message(.kickCharacter(character: targetItem.name))
+            message = context.message(.kickCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic kicking response for objects
-            message = context.message(.kickLargeObject(item: targetItem.name))
+            message = context.message(.kickLargeObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

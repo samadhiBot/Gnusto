@@ -64,10 +64,10 @@ public struct TurnActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Can't turn characters
-            message = context.message(.turnCharacter(character: targetItem.name))
+            message = context.message(.turnCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic turning response for objects
-            message = context.message(.turnFixedObject(item: targetItem.name))
+            message = context.message(.turnFixedObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

@@ -64,10 +64,10 @@ public struct KissActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Kissing characters
-            message = context.message(.kissCharacter(character: targetItem.name))
+            message = context.message(.kissCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Kissing objects - generic response
-            message = context.message(.kissLargeObject(item: targetItem.name))
+            message = context.message(.kissLargeObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

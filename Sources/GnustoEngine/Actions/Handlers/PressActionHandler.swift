@@ -64,11 +64,11 @@ public struct PressActionHandler: ActionHandler {
         // Check if item is pressable
         let message: String
         if targetItem.hasFlag(.isPressable) {
-            message = context.message(.pressSuccess(item: targetItem.name))
+            message = context.message(.pressSuccess(item: targetItem.withDefiniteArticle))
             // Note: Specific press behavior should be handled by ItemEventHandlers
         } else {
             // Default behavior: most things can't be pressed effectively
-            message = context.message(.cannotPress(item: targetItem.name))
+            message = context.message(.cannotPress(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

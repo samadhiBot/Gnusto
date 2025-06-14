@@ -141,7 +141,7 @@ public struct LockActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        let message = context.message(.lockSuccess(item: targetItem.name))
+        let message = context.message(.lockSuccess(item: targetItem.withDefiniteArticle))
 
         return ActionResult(
             message: message,

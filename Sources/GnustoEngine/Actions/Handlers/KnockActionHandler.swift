@@ -73,10 +73,10 @@ public struct KnockActionHandler: ActionHandler {
             }
         } else if targetItem.hasFlag(.isContainer) {
             // Knocking on containers
-            message = context.message(.knockOnContainer(container: targetItem.name))
+            message = context.message(.knockOnContainer(container: targetItem.withDefiniteArticle))
         } else {
             // Generic knocking response for objects
-            message = context.message(.knockOnGenericObject(item: targetItem.name))
+            message = context.message(.knockOnGenericObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

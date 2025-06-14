@@ -74,7 +74,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
             if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
                 stateChanges.append(updatePronoun)
             }
-            message = context.message(.thinkAboutItem(item: targetItem.name))
+            message = context.message(.thinkAboutItem(item: targetItem.withDefiniteArticle))
         case .location(_):
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.

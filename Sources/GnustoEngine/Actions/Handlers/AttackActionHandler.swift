@@ -72,11 +72,12 @@ public struct AttackActionHandler: ActionHandler {
 
         // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
         if !targetItem.hasFlag(.isCharacter) {
-            message = context.message(.attackNonCharacter(item: targetItem.name))
+            message = context.message(.attackNonCharacter(item: targetItem.withIndefiniteArticle))
         }
         // Second check: No weapon specified OR weapon is hands (bare-handed attack)
         else if context.command.indirectObject == nil {
-            message = context.message(.attackWithBareHands(character: targetItem.name))
+            message = context.message(
+                .attackWithBareHands(character: targetItem.withIndefiniteArticle))
         }
         // We have a weapon - check if it's a real weapon
         else if let indirectObjectRef = context.command.indirectObject,
@@ -86,7 +87,9 @@ public struct AttackActionHandler: ActionHandler {
 
             if !weaponItem.hasFlag(.isWeapon) {
                 message = context.message(
-                    .attackWithNonWeapon(character: targetItem.name, weapon: weaponItem.name))
+                    .attackWithNonWeapon(
+                        character: targetItem.withDefiniteArticle,
+                        weapon: weaponItem.withIndefiniteArticle))
             } else {
                 // Real weapon attack - placeholder for combat system
                 message = context.message(.attackWithWeapon)

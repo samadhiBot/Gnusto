@@ -64,10 +64,10 @@ public struct WaveActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Waving at characters
-            message = context.message(.waveCharacter(character: targetItem.name))
+            message = context.message(.waveCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic waving response for objects
-            message = context.message(.waveFixedObject(item: targetItem.name))
+            message = context.message(.waveFixedObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

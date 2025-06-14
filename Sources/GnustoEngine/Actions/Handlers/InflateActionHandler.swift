@@ -33,7 +33,7 @@ public struct InflateActionHandler: ActionHandler {
 
         // Check if item is inflatable
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message(.cannotInflate(item: targetItem.name))
+            let message = context.message(.cannotInflate(item: targetItem.withDefiniteArticle))
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -75,14 +75,14 @@ public struct InflateActionHandler: ActionHandler {
 
         let message: String
         if isAlreadyInflated {
-            message = context.message(.itemAlreadyInflated(item: targetItem.name))
+            message = context.message(.itemAlreadyInflated(item: targetItem.withDefiniteArticle))
         } else {
             // Inflate the item
             if let inflateChange = await context.engine.setFlag(.isInflated, on: targetItem) {
                 stateChanges.append(inflateChange)
             }
 
-            message = context.message(.inflateSuccess(item: targetItem.name))
+            message = context.message(.inflateSuccess(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

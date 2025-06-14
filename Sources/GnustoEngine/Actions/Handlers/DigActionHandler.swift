@@ -72,7 +72,7 @@ public struct DigActionHandler: ActionHandler {
                 stateChanges.append(pronounChange)
             }
 
-            message = context.message(.cannotDig(item: targetItem.name))
+            message = context.message(.cannotDig(item: targetItem.withDefiniteArticle))
 
         } else {
             // General digging (no specific target)
@@ -83,9 +83,11 @@ public struct DigActionHandler: ActionHandler {
                 let toolItem = try await context.engine.item(toolItemID)
 
                 if toolItem.hasFlag(.isTool) {
-                    message = context.message(.digWithToolNothing(tool: toolItem.name))
+                    message = context.message(
+                        .digWithToolNothing(tool: toolItem.withDefiniteArticle))
                 } else {
-                    message = context.message(.toolNotSuitableForDigging(tool: toolItem.name))
+                    message = context.message(
+                        .toolNotSuitableForDigging(tool: toolItem.withDefiniteArticle))
                 }
 
             } else {

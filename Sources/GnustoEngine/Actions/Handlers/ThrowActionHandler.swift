@@ -104,15 +104,19 @@ public struct ThrowActionHandler: ActionHandler {
 
             if targetItem.hasFlag(.isCharacter) {
                 message = context.message(
-                    .throwAtCharacter(item: itemToThrow.name, character: targetItem.name))
+                    .throwAtCharacter(
+                        item: itemToThrow.withDefiniteArticle,
+                        character: targetItem.withDefiniteArticle))
             } else {
                 message = context.message(
-                    .throwAtObject(item: itemToThrow.name, target: targetItem.name))
+                    .throwAtObject(
+                        item: itemToThrow.withDefiniteArticle,
+                        target: targetItem.withDefiniteArticle))
             }
 
         } else {
             // General throwing - no specific target
-            message = context.message(.throwGeneral(item: itemToThrow.name))
+            message = context.message(.throwGeneral(item: itemToThrow.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

@@ -67,10 +67,10 @@ public struct JumpActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Can't jump characters
-            message = context.message(.jumpCharacter(character: targetItem.name))
+            message = context.message(.jumpCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic jumping response for objects
-            message = context.message(.jumpLargeObject(item: targetItem.name))
+            message = context.message(.jumpLargeObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

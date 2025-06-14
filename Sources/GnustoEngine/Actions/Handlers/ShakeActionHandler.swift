@@ -63,18 +63,20 @@ public struct ShakeActionHandler: ActionHandler {
         let message: String
 
         if targetItem.hasFlag(.isCharacter) {
-            // Shaking characters - not advisable
-            message = context.message(.shakeCharacter(character: targetItem.name))
+            // Shaking characters might not be appropriate
+            message = context.message(.shakeCharacter(character: targetItem.withDefiniteArticle))
         } else if targetItem.hasFlag(.isContainer) {
             // Shaking containers might reveal contents
             if targetItem.hasFlag(.isOpen) {
-                message = context.message(.shakeOpenContainer(container: targetItem.name))
+                message = context.message(
+                    .shakeOpenContainer(container: targetItem.withDefiniteArticle))
             } else {
-                message = context.message(.shakeClosedContainer(container: targetItem.name))
+                message = context.message(
+                    .shakeClosedContainer(container: targetItem.withDefiniteArticle))
             }
         } else {
             // Generic shaking response for objects
-            message = context.message(.shakeFixedObject(item: targetItem.name))
+            message = context.message(.shakeFixedObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

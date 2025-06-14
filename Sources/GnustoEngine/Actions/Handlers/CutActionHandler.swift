@@ -93,10 +93,13 @@ public struct CutActionHandler: ActionHandler {
 
             if toolItem.hasFlag(.isWeapon) || toolItem.hasFlag(.isTool) {
                 // Successfully cut with appropriate tool
-                message = context.message(.cutWithTool(item: targetItem.name, tool: toolItem.name))
+                message = context.message(
+                    .cutWithTool(
+                        item: targetItem.withDefiniteArticle, tool: toolItem.withDefiniteArticle))
             } else {
                 // Using an inappropriate implement
-                message = context
+                message =
+                    context
                     .message(.cutToolNotSharp(tool: toolItem.withDefiniteArticle.capitalizedFirst))
             }
 

@@ -41,7 +41,7 @@ public struct EnterActionHandler: ActionHandler {
 
         // Check if item is enterable
         guard targetItem.hasFlag(.isEnterable) else {
-            let message = context.message(.cannotEnter(item: targetItem.name))
+            let message = context.message(.cannotEnter(item: targetItem.withDefiniteArticle))
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }

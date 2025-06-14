@@ -88,7 +88,7 @@ public struct BurnActionHandler: ActionHandler {
             )
         } else {
             // Most items cannot be burned
-            let message = context.message(.burnCannotBurn(item: targetItem.name))
+            let message = context.message(.burnCannotBurn(item: targetItem.withDefiniteArticle))
 
             return ActionResult(
                 message: message,

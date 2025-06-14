@@ -60,12 +60,12 @@ public struct BlowActionHandler: ActionHandler {
             let message: String
             if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
                 // Blowing on lit light sources might extinguish them
-                message = context.message(.blowOnLightSource(item: targetItem.name))
+                message = context.message(.blowOnLightSource(item: targetItem.withDefiniteArticle))
                 // Note: Specific extinguishing behavior should use TurnOffActionHandler or custom logic
             } else if targetItem.hasFlag(.isFlammable) {
-                message = context.message(.blowOnFlammable(item: targetItem.name))
+                message = context.message(.blowOnFlammable(item: targetItem.withDefiniteArticle))
             } else {
-                message = context.message(.blowOnGeneric(item: targetItem.name))
+                message = context.message(.blowOnGeneric(item: targetItem.withDefiniteArticle))
             }
 
             return ActionResult(message: message, stateChanges: stateChanges)

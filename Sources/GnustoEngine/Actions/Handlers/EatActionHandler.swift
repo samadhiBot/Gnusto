@@ -53,7 +53,8 @@ public struct EatActionHandler: ActionHandler {
             let edibleContents = containerContents.filter { $0.hasFlag(.isEdible) }
 
             guard !edibleContents.isEmpty else {
-                let message = context.message(.nothingToEatIn(container: targetItem.name))
+                let message = context.message(
+                    .nothingToEatIn(container: targetItem.withDefiniteArticle))
                 throw ActionResponse.prerequisiteNotMet(message)
             }
             return
@@ -93,7 +94,7 @@ public struct EatActionHandler: ActionHandler {
             let removeChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(removeChange)
 
-            message = context.message(.eatSuccess(item: targetItem.name))
+            message = context.message(.eatSuccess(item: targetItem.withDefiniteArticle))
         }
         // Handle container with edible contents
         else if targetItem.hasFlag(.isContainer) {
@@ -103,7 +104,8 @@ public struct EatActionHandler: ActionHandler {
             if let firstEdible = edibleContents.first {
                 // For closed containers, can't eat from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = context.message(.cannotEatFromClosed(container: targetItem.name))
+                    message = context.message(
+                        .cannotEatFromClosed(container: targetItem.withDefiniteArticle))
                 } else {
                     // Remove the first edible item from the container
                     let consumeChange = await context.engine.move(firstEdible, to: .nowhere)
@@ -119,11 +121,12 @@ public struct EatActionHandler: ActionHandler {
                     )
                 }
             } else {
-                message = context.message(.nothingToEatIn(container: targetItem.name))
+                message = context.message(
+                    .nothingToEatIn(container: targetItem.withDefiniteArticle))
             }
         } else {
             // This shouldn't happen after validation, but handle it
-            message = context.message(.cannotEat(item: targetItem.name))
+            message = context.message(.cannotEat(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

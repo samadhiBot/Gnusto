@@ -64,10 +64,10 @@ public struct SqueezeActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Squeezing characters - not advisable
-            message = context.message(.squeezeCharacter(character: targetItem.name))
+            message = context.message(.squeezeCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic squeezing response for objects
-            message = context.message(.squeezeHardObject(item: targetItem.name))
+            message = context.message(.squeezeHardObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

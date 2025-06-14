@@ -64,10 +64,10 @@ public struct RubActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Rubbing characters might not be appropriate
-            message = context.message(.rubCharacter(character: targetItem.name))
+            message = context.message(.rubCharacter(character: targetItem.withDefiniteArticle))
         } else {
             // Generic rubbing response for objects
-            message = context.message(.rubGenericObject(item: targetItem.name))
+            message = context.message(.rubGenericObject(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

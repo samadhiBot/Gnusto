@@ -33,7 +33,7 @@ public struct DeflateActionHandler: ActionHandler {
 
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message(.cannotDeflate(item: targetItem.name))
+            let message = context.message(.cannotDeflate(item: targetItem.withDefiniteArticle))
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -75,14 +75,14 @@ public struct DeflateActionHandler: ActionHandler {
 
         let message: String
         if !isCurrentlyInflated {
-            message = context.message(.itemNotInflated(item: targetItem.name))
+            message = context.message(.itemNotInflated(item: targetItem.withDefiniteArticle))
         } else {
             // Deflate the item
             if let deflateChange = await context.engine.clearFlag(.isInflated, on: targetItem) {
                 stateChanges.append(deflateChange)
             }
 
-            message = context.message(.deflateSuccess(item: targetItem.name))
+            message = context.message(.deflateSuccess(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

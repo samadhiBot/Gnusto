@@ -54,14 +54,15 @@ public struct DrinkActionHandler: ActionHandler {
             let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) }
 
             guard !drinkableContents.isEmpty else {
-                let message = context.message(.nothingToDrinkIn(container: targetItem.name))
+                let message = context.message(
+                    .nothingToDrinkIn(container: targetItem.withDefiniteArticle))
                 throw ActionResponse.prerequisiteNotMet(message)
             }
             return
         }
 
         // Item is neither drinkable nor a container with drinkables
-        let message = context.message(.cannotDrink(item: targetItem.name))
+        let message = context.message(.cannotDrink(item: targetItem.withDefiniteArticle))
         throw ActionResponse.prerequisiteNotMet(message)
     }
 
@@ -97,7 +98,8 @@ public struct DrinkActionHandler: ActionHandler {
             if let firstDrinkable = drinkableContents.first {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = context.message(.cannotDrinkFromClosed(container: targetItem.name))
+                    message = context.message(
+                        .cannotDrinkFromClosed(container: targetItem.withDefiniteArticle))
                 } else {
                     // Remove the first drinkable item from the container
                     let consumeChange = await context.engine.move(firstDrinkable, to: .nowhere)
@@ -113,7 +115,8 @@ public struct DrinkActionHandler: ActionHandler {
                     )
                 }
             } else {
-                message = context.message(.nothingToDrinkIn(container: targetItem.name))
+                message = context.message(
+                    .nothingToDrinkIn(container: targetItem.withDefiniteArticle))
             }
         }
         // Handle direct drinkable item
@@ -122,10 +125,10 @@ public struct DrinkActionHandler: ActionHandler {
             let removeChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(removeChange)
 
-            message = context.message(.drinkSuccess(item: targetItem.name))
+            message = context.message(.drinkSuccess(item: targetItem.withDefiniteArticle))
         } else {
             // This shouldn't happen after validation, but handle it
-            message = context.message(.cannotDrink(item: targetItem.name))
+            message = context.message(.cannotDrink(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

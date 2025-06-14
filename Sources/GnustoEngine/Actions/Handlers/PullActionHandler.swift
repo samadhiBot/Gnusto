@@ -64,10 +64,10 @@ public struct PullActionHandler: ActionHandler {
         // Check if item is specifically pullable
         let message: String
         if targetItem.hasFlag(.isPullable) {
-            message = context.message(.pullSuccess(item: targetItem.name))
+            message = context.message(.pullSuccess(item: targetItem.withDefiniteArticle))
         } else {
             // Default behavior: most things can't be pulled effectively
-            message = context.message(.cannotPull(item: targetItem.name))
+            message = context.message(.cannotPull(item: targetItem.withDefiniteArticle))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

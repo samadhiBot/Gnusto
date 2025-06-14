@@ -184,7 +184,7 @@ public actor GameEngine: Sendable {
         self.locationEventHandlers = blueprint.locationEventHandlers
 
         #if DEBUG
-        self.actionHandlers[.debug] = DebugActionHandler()
+            self.actionHandlers[.debug] = DebugActionHandler()
         #endif
     }
 }
@@ -264,7 +264,7 @@ extension GameEngine {
         // --- Tick the Clock (Fuses & Daemons) ---
         await tickClock()
 
-        if shouldQuit { return } // Clock tick might trigger quit
+        if shouldQuit { return }  // Clock tick might trigger quit
 
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
@@ -319,86 +319,87 @@ extension GameEngine {
     /// `.internalEngineError` or `.stateValidationFailed`.
     private func report(_ response: ActionResponse) async {
         // Determine the user-facing message using MessageProvider
-        let messageKey: MessageKey = switch response {
-        case .containerIsClosed(let item):
-            .containerIsClosed(item: theThat(item))
-        case .containerIsOpen(let item):
-            .containerIsOpen(item: theThat(item))
-        case .custom(let message):
-            .custom(message: message)
-        case .directionIsBlocked(let reason):
-            .directionIsBlocked(reason: reason)
-        case .internalEngineError:
-            .internalEngineError
-        case .invalidDirection:
-            .invalidDirection
-        case .invalidIndirectObject(let objectName):
-            .invalidIndirectObject(object: theThat(objectName))
-        case .invalidValue:
-            .internalEngineError // Use general internal error for invalid value
-        case .itemAlreadyClosed(let item):
-            .itemAlreadyClosed(item: theThat(item))
-        case .itemAlreadyOpen(let item):
-            .itemAlreadyOpen(item: theThat(item))
-        case .itemIsAlreadyWorn(let item):
-            .itemIsAlreadyWorn(item: theThat(item))
-        case .itemIsLocked(let item):
-            .itemIsLocked(item: theThat(item))
-        case .itemIsNotWorn(let item):
-            .itemIsNotWorn(item: theThat(item))
-        case .itemIsUnlocked(let item):
-            .itemIsUnlocked(item: theThat(item))
-        case .itemNotAccessible(let item):
-            .itemNotAccessible(item: anySuch(item))
-        case .itemNotClosable(let item):
-            .itemNotClosable(item: theThat(item))
-        case .itemNotDroppable(let item):
-            .itemNotDroppable(item: theThat(item))
-        case .itemNotEdible(let item):
-            .itemNotEdible(item: theThat(item))
-        case .itemNotHeld(let item):
-            .itemNotHeld(item: theThat(item))
-        case .itemNotInContainer(item: let item, container: let container):
-            .itemNotInContainer(item: theThat(item), container: theThat(container))
-        case .itemNotLockable(let item):
-            .itemNotLockable(item: theThat(item))
-        case .itemNotOnSurface(item: let item, surface: let surface):
-            .itemNotOnSurface(item: theThat(item), surface: theThat(surface))
-        case .itemNotOpenable(let item):
-            .itemNotOpenable(item: theThat(item))
-        case .itemNotReadable(let item):
-            .itemNotReadable(item: theThat(item))
-        case .itemNotRemovable(let item):
-            .itemNotRemovable(item: theThat(item))
-        case .itemNotTakable(let item):
-            .itemNotTakable(item: theThat(item))
-        case .itemNotUnlockable(let item):
-            .itemNotUnlockable(item: theThat(item))
-        case .itemNotWearable(let item):
-            .itemNotWearable(item: theThat(item))
-        case .itemTooLargeForContainer(item: let item, container: let container):
-            .itemTooLargeForContainer(item: theThat(item), container: theThat(container))
-        case .playerCannotCarryMore:
-            .playerCannotCarryMore
-        case .prerequisiteNotMet(let customMessage):
-            .prerequisiteNotMet(message: customMessage)
-        case .roomIsDark:
-            .roomIsDark
-        case .stateValidationFailed:
-            .stateValidationFailed
-        case .targetIsNotAContainer(let item):
-            .targetIsNotAContainer(item: theThat(item))
-        case .targetIsNotASurface(let item):
-            .targetIsNotASurface(item: theThat(item))
-        case .toolMissing(let tool):
-            .toolMissing(tool: tool)
-        case .unknownEntity:
-            .unknownEntity
-        case .unknownVerb(let verb):
-            .unknownVerb(verb: verb)
-        case .wrongKey(keyID: let keyID, lockID: let lockID):
-            .wrongKey(key: theThat(keyID), lock: theThat(lockID))
-        }
+        let messageKey: MessageKey =
+            switch response {
+            case .containerIsClosed(let item):
+                .containerIsClosed(item: TheItem(item))
+            case .containerIsOpen(let item):
+                .containerIsOpen(item: TheItem(item))
+            case .custom(let message):
+                .custom(message: message)
+            case .directionIsBlocked(let reason):
+                .directionIsBlocked(reason: reason)
+            case .internalEngineError:
+                .internalEngineError
+            case .invalidDirection:
+                .invalidDirection
+            case .invalidIndirectObject(let objectName):
+                .invalidIndirectObject(object: theThat(objectName))
+            case .invalidValue:
+                .internalEngineError  // Use general internal error for invalid value
+            case .itemAlreadyClosed(let item):
+                .itemAlreadyClosed(item: TheItem(item))
+            case .itemAlreadyOpen(let item):
+                .itemAlreadyOpen(item: TheItem(item))
+            case .itemIsAlreadyWorn(let item):
+                .itemIsAlreadyWorn(item: theThat(item))
+            case .itemIsLocked(let item):
+                .itemIsLocked(item: TheItem(item))
+            case .itemIsNotWorn(let item):
+                .itemIsNotWorn(item: theThat(item))
+            case .itemIsUnlocked(let item):
+                .itemIsUnlocked(item: TheItem(item))
+            case .itemNotAccessible(let item):
+                .itemNotAccessible(item: anySuch(item))
+            case .itemNotClosable(let item):
+                .itemNotClosable(item: TheItem(item))
+            case .itemNotDroppable(let item):
+                .itemNotDroppable(item: theThat(item))
+            case .itemNotEdible(let item):
+                .itemNotEdible(item: theThat(item))
+            case .itemNotHeld(let item):
+                .itemNotHeld(item: theThat(item))
+            case .itemNotInContainer(let item, let container):
+                .itemNotInContainer(item: TheItem(item), container: theThat(container))
+            case .itemNotLockable(let item):
+                .itemNotLockable(item: theThat(item))
+            case .itemNotOnSurface(let item, let surface):
+                .itemNotOnSurface(item: TheItem(item), surface: theThat(surface))
+            case .itemNotOpenable(let item):
+                .itemNotOpenable(item: theThat(item))
+            case .itemNotReadable(let item):
+                .itemNotReadable(item: TheItem(item))
+            case .itemNotRemovable(let item):
+                .itemNotRemovable(item: theThat(item))
+            case .itemNotTakable(let item):
+                .itemNotTakable(item: theThat(item))
+            case .itemNotUnlockable(let item):
+                .itemNotUnlockable(item: theThat(item))
+            case .itemNotWearable(let item):
+                .itemNotWearable(item: theThat(item))
+            case .itemTooLargeForContainer(let item, let container):
+                .itemTooLargeForContainer(item: TheItem(item), container: theThat(container))
+            case .playerCannotCarryMore:
+                .playerCannotCarryMore
+            case .prerequisiteNotMet(let customMessage):
+                .prerequisiteNotMet(message: customMessage)
+            case .roomIsDark:
+                .roomIsDark
+            case .stateValidationFailed:
+                .stateValidationFailed
+            case .targetIsNotAContainer(let item):
+                .targetIsNotAContainer(item: theThat(item))
+            case .targetIsNotASurface(let item):
+                .targetIsNotASurface(item: theThat(item))
+            case .toolMissing(let tool):
+                .toolMissing(tool: tool)
+            case .unknownEntity:
+                .unknownEntity
+            case .unknownVerb(let verb):
+                .unknownVerb(verb: verb)
+            case .wrongKey(let keyID, let lockID):
+                .wrongKey(key: TheItem(keyID), lock: theThat(lockID))
+            }
 
         let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
@@ -409,7 +410,7 @@ extension GameEngine {
             logError("ActionResponse: Internal Engine Error: \(msg)")
         case .invalidValue(let msg):
             logError("ActionResponse: Invalid Value: \(msg)")
-        case .stateValidationFailed(change: let change, actualOldValue: let actualOldValue):
+        case .stateValidationFailed(let change, let actualOldValue):
             // Construct the log string first
             let logDetail = """
                 State Validation Failed!
@@ -419,7 +420,7 @@ extension GameEngine {
                 """
             logError("ActionResponse: \(logDetail)")
         default:
-            break // No detailed logging needed for other handled errors
+            break  // No detailed logging needed for other handled errors
         }
     }
 
@@ -428,30 +429,31 @@ extension GameEngine {
     /// into textual feedback for the player when their input cannot be understood.
     /// For `.internalError` cases, it also logs detailed information.
     private func report(parseError: ParseError) async {
-        let messageKey: MessageKey = switch parseError {
-        case .emptyInput:
-            .emptyInput
-        case .unknownVerb(let verb):
-            .parseUnknownVerb(verb: verb)
-        case .unknownNoun(let noun):
-            .unknownNoun(noun: noun)
-        case .itemNotInScope(let noun):
-            .itemNotInScope(noun: noun)
-        case .modifierMismatch(let noun, let modifiers):
-            .modifierMismatch(noun: noun, modifiers: modifiers)
-        case .ambiguity(let text):
-            .ambiguity(text: text)
-        case .ambiguousPronounReference(let text):
-            .ambiguousPronounReference(text: text)
-        case .badGrammar(let text):
-            .badGrammar(text: text)
-        case .pronounNotSet(let pronoun):
-            .pronounNotSet(pronoun: pronoun)
-        case .pronounRefersToOutOfScopeItem(let pronoun):
-            .pronounRefersToOutOfScopeItem(pronoun: pronoun)
-        case .internalError:
-            .internalParseError
-        }
+        let messageKey: MessageKey =
+            switch parseError {
+            case .emptyInput:
+                .emptyInput
+            case .unknownVerb(let verb):
+                .parseUnknownVerb(verb: verb)
+            case .unknownNoun(let noun):
+                .unknownNoun(noun: noun)
+            case .itemNotInScope(let noun):
+                .itemNotInScope(noun: noun)
+            case .modifierMismatch(let noun, let modifiers):
+                .modifierMismatch(noun: noun, modifiers: modifiers)
+            case .ambiguity(let text):
+                .ambiguity(text: text)
+            case .ambiguousPronounReference(let text):
+                .ambiguousPronounReference(text: text)
+            case .badGrammar(let text):
+                .badGrammar(text: text)
+            case .pronounNotSet(let pronoun):
+                .pronounNotSet(pronoun: pronoun)
+            case .pronounRefersToOutOfScopeItem(let pronoun):
+                .pronounRefersToOutOfScopeItem(pronoun: pronoun)
+            case .internalError:
+                .internalParseError
+            }
 
         let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
@@ -517,6 +519,23 @@ extension GameEngine {
             alternate
         }
     }
+
+    /// Returns the capitalized definite article form of an item for sentence beginnings.
+    ///
+    /// - Parameters:
+    ///   - itemID: The item ID.
+    ///   - alternate: An alternate reference to the item.
+    /// - Returns: `The {name}` of an item (capitalized), or alternate if name is unknown.
+    private func TheItem(
+        _ itemID: ItemID,
+        alternate: String = "That"
+    ) -> String {
+        if let item = try? item(itemID) {
+            item.withDefiniteArticle.capitalizedFirst
+        } else {
+            alternate
+        }
+    }
 }
 
 // MARK: - Clock Tick Logic
@@ -547,7 +566,8 @@ extension GameEngine {
         // --- Process Fuses ---
         // Explicitly define the action type to match FuseDefinition.action
         typealias FuseActionType = @Sendable (GameEngine) async -> ActionResult?
-        var expiredFuseIDsToExecute: [(id: FuseID, action: FuseActionType, definition: FuseDefinition)] = []
+        var expiredFuseIDsToExecute:
+            [(id: FuseID, action: FuseActionType, definition: FuseDefinition)] = []
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -573,7 +593,9 @@ extension GameEngine {
 
             if newTurns <= 0 {
                 guard let definition = fuseDefinitions[fuseID] else {
-                    print("TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute.")
+                    print(
+                        "TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute."
+                    )
                     let removeChangeOnError = StateChange(
                         entityID: .global,
                         attribute: .removeActiveFuse(fuseID: fuseID),
@@ -583,11 +605,14 @@ extension GameEngine {
                     do {
                         try gameState.apply(removeChangeOnError)
                     } catch {
-                        print("TickClock Error: Failed to apply fuse removal (on definition error) for \(fuseID): \(error)")
+                        print(
+                            "TickClock Error: Failed to apply fuse removal (on definition error) for \(fuseID): \(error)"
+                        )
                     }
                     continue
                 }
-                expiredFuseIDsToExecute.append((id: fuseID, action: definition.action, definition: definition))
+                expiredFuseIDsToExecute.append(
+                    (id: fuseID, action: definition.action, definition: definition))
 
                 let removeChange = StateChange(
                     entityID: .global,
@@ -627,7 +652,9 @@ extension GameEngine {
                 do {
                     try gameState.apply(restartChange)
                 } catch {
-                    logError("TickClock Error: Failed to restart repeating fuse \(fuseToExecute.id): \(error)")
+                    logError(
+                        "TickClock Error: Failed to restart repeating fuse \(fuseToExecute.id): \(error)"
+                    )
                 }
             }
 
@@ -639,7 +666,8 @@ extension GameEngine {
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
             guard let definition = daemonDefinitions[daemonID] else {
-                print("Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
+                print(
+                    "Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
             }
 
@@ -698,7 +726,7 @@ extension GameEngine {
     /// - Parameter command: The `Command` object to execute.
     public func execute(command: Command) async {
         var actionHandled = false
-        var actionResponse: Error? = nil // To store error from object handlers
+        var actionResponse: Error? = nil  // To store error from object handlers
 
         // Store the player's current location and lighting state before executing the command
         let locationBeforeCommand = playerLocationID
@@ -712,7 +740,7 @@ extension GameEngine {
                 if let result = try await locationHandler.handle(self, .beforeTurn(command)) {
                     // Room handler returned a result, process it
                     if try await processActionResult(result) {
-                        return // Room handler handled everything
+                        return  // Room handler handled everything
                     }
                 }
             } catch {
@@ -728,33 +756,33 @@ extension GameEngine {
 
         // 1. Check Direct Object Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = itemEventHandlers[doItemID]
+            let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 // Pass the engine and the event to the handler
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
-                        return // Object handler handled everything
+                        return  // Object handler handled everything
                     }
                 }
             } catch let response {
                 actionResponse = response
-                actionHandled = true // Treat error as handled to prevent default handler
+                actionHandled = true  // Treat error as handled to prevent default handler
             }
         }
 
         // 2. Check Indirect Object Handler (only if DO didn't handle it and no error occurred)
         // ZIL precedence: Often, if a DO routine handled it (or errored), the IO routine wasn't called.
         if !actionHandled, actionResponse == nil,
-           case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = itemEventHandlers[ioItemID]
+            case .item(let ioItemID) = command.indirectObject,
+            let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
                     // Object handler returned a result, process it
                     if try await processActionResult(result) {
-                        return // Object handler handled everything
+                        return  // Object handler handled everything
                     }
                 }
             } catch let response {
@@ -771,7 +799,8 @@ extension GameEngine {
                 await report(specificResponse)
             } else {
                 logWarning("An unexpected error occurred in an object handler: \(response)")
-                await ioHandler.print("Sorry, something went wrong performing that action on the specific item.")
+                await ioHandler.print(
+                    "Sorry, something went wrong performing that action on the specific item.")
             }
         } else if !actionHandled {
             // No object handler took charge, check for darkness before running default verb handler
@@ -783,7 +812,8 @@ extension GameEngine {
             // Correct: Look up the Verb definition directly
             guard let verb = gameState.vocabulary.verbDefinitions[command.verb] else {
                 // This case should ideally not be reached if parser validates verbs
-                logWarning("""
+                logWarning(
+                    """
                     Internal Error: Unknown verb ID \
                     '\(command.verb.rawValue)' reached execution. \
                     If you encounter this error during testing, make sure to use \
@@ -800,7 +830,8 @@ extension GameEngine {
                 // Room is lit OR verb doesn't require light, proceed with default handler execution.
                 guard let verbHandler = actionHandlers[command.verb] else {
                     // No handler registered for this verb (should match vocabulary definition)
-                    logWarning("""
+                    logWarning(
+                        """
                         Internal Error: No ActionHandler registered for verb ID \
                         '\(command.verb.rawValue)'.
                         """)
@@ -843,11 +874,14 @@ extension GameEngine {
 
         // 1. Check Direct Object AfterTurn Handler
         if case .item(let doItemID) = command.directObject,
-           let itemHandler = itemEventHandlers[doItemID]
+            let itemHandler = itemEventHandlers[doItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                   try await processActionResult(result) { return }
+                    try await processActionResult(result)
+                {
+                    return
+                }
             } catch {
                 logWarning("Error in direct object afterTurn handler: \(error)")
             }
@@ -856,11 +890,14 @@ extension GameEngine {
 
         // 2. Check Indirect Object AfterTurn Handler
         if case .item(let ioItemID) = command.indirectObject,
-           let itemHandler = itemEventHandlers[ioItemID]
+            let itemHandler = itemEventHandlers[ioItemID]
         {
             do {
                 if let result = try await itemHandler.handle(self, .afterTurn(command)),
-                   try await processActionResult(result) { return }
+                    try await processActionResult(result)
+                {
+                    return
+                }
             } catch {
                 logWarning("Error in indirect object afterTurn handler: \(error)")
             }
@@ -872,7 +909,10 @@ extension GameEngine {
             do {
                 // Call handler, ignore return value, use correct enum case syntax
                 if let result = try await locationHandler.handle(self, .afterTurn(command)),
-                   try await processActionResult(result) { return }
+                    try await processActionResult(result)
+                {
+                    return
+                }
             } catch {
                 logWarning("Error in room afterTurn handler: \(error)")
             }
@@ -940,20 +980,21 @@ extension GameEngine {
                     // Moved from lit to dark - show transition message and darkness message combined
                     let darknessMessage = messageProvider.message(for: .roomIsDark)
                     let transitionMessage = messageProvider.message(for: .nowDark)
-                    await ioHandler.print("""
+                    await ioHandler.print(
+                        """
                         \(transitionMessage)
 
                         \(darknessMessage)
                         """)
-                    shouldDescribe = false // Don't call describeCurrentLocation since we handled it
+                    shouldDescribe = false  // Don't call describeCurrentLocation since we handled it
                 } else {
-                    shouldDescribe = true // Normal movement, let describeCurrentLocation handle it
+                    shouldDescribe = true  // Normal movement, let describeCurrentLocation handle it
                 }
             } else {
-                shouldDescribe = false // No movement occurred
+                shouldDescribe = false  // No movement occurred
             }
 
-            forceFullDescription = false // Use visit-based logic for movement
+            forceFullDescription = false  // Use visit-based logic for movement
         case .turnOn, .turnOff:
             // Only describe if lighting state actually changed
             let isLitAfterCommand = await playerLocationIsLit()
@@ -962,7 +1003,7 @@ extension GameEngine {
             // 1. Room went from dark to lit (turning on light), OR
             // 2. Room went from lit to dark (turning off light)
             shouldDescribe = wasLitBeforeCommand != isLitAfterCommand
-            forceFullDescription = true // Always show full description when lighting changes
+            forceFullDescription = true  // Always show full description when lighting changes
         default:
             shouldDescribe = false
             forceFullDescription = false
@@ -991,12 +1032,13 @@ extension GameEngine {
             do {
                 try await applyWithDynamicValidation(change)
             } catch {
-                logError("""
+                logError(
+                    """
                     Failed to apply state change during processActionResult:
                        - \(error)
                        - Change: \(change.description.multiline(2))
                     """)
-                throw error // Re-throw the error to be caught by execute()
+                throw error  // Re-throw the error to be caught by execute()
             }
         }
 
@@ -1005,7 +1047,8 @@ extension GameEngine {
             do {
                 try await processSideEffects(result.sideEffects)
             } catch {
-                logError("""
+                logError(
+                    """
                     Failed to process side effects during processActionResult:
                        - \(error)
                        - Side Effects: \(result.sideEffects)
@@ -1049,7 +1092,8 @@ extension GameEngine {
             )
 
             if !isValid {
-                throw ActionResponse.invalidValue("""
+                throw ActionResponse.invalidValue(
+                    """
                     Dynamic validation failed for item attribute '\(key.rawValue)' \
                     on \(itemID.rawValue): \(change.newValue)
                     """)
@@ -1069,7 +1113,8 @@ extension GameEngine {
             )
 
             if !isValid {
-                throw ActionResponse.invalidValue("""
+                throw ActionResponse.invalidValue(
+                    """
                     Dynamic validation failed for location attribute '\(key.rawValue)' \
                     on \(locationID.rawValue): \(change.newValue)
                     """)
@@ -1180,9 +1225,9 @@ extension GameEngine {
             .wait: WaitActionHandler(),
         ]
 
-    #if DEBUG
-        handlers[.debug] = DebugActionHandler()
-    #endif
+        #if DEBUG
+            handlers[.debug] = DebugActionHandler()
+        #endif
         return handlers
     }
 }
@@ -1296,42 +1341,42 @@ extension GameEngine {
 
 #if DEBUG
 
-// MARK: - Internal State Mutation (Testing & Engine Use Only)
+    // MARK: - Internal State Mutation (Testing & Engine Use Only)
 
-extension GameEngine {
-    /// Applies a `StateChange` directly to the game state.
-    ///
-    /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
-    ///   operations and testing scenarios where direct state manipulation is necessary. Game
-    ///   developers should use the action handler system (`ActionResult.stateChanges`) rather
-    ///   than calling this method directly.
-    ///
-    /// This method bypasses the normal action handler pipeline, including:
-    /// - Before/after turn event handlers
-    /// - Action validation
-    /// - Side effect processing
-    ///
-    /// Use this method only when:
-    /// - Setting up test scenarios that require specific game states
-    /// - Internal engine operations that need direct state access
-    /// - Implementing low-level engine functionality
-    ///
-    /// - Parameter change: The `StateChange` to apply to the game state.
-    /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
-    func apply(_ change: StateChange) async throws {
-        try await applyWithDynamicValidation(change)
-    }
+    extension GameEngine {
+        /// Applies a `StateChange` directly to the game state.
+        ///
+        /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
+        ///   operations and testing scenarios where direct state manipulation is necessary. Game
+        ///   developers should use the action handler system (`ActionResult.stateChanges`) rather
+        ///   than calling this method directly.
+        ///
+        /// This method bypasses the normal action handler pipeline, including:
+        /// - Before/after turn event handlers
+        /// - Action validation
+        /// - Side effect processing
+        ///
+        /// Use this method only when:
+        /// - Setting up test scenarios that require specific game states
+        /// - Internal engine operations that need direct state access
+        /// - Implementing low-level engine functionality
+        ///
+        /// - Parameter change: The `StateChange` to apply to the game state.
+        /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
+        func apply(_ change: StateChange) async throws {
+            try await applyWithDynamicValidation(change)
+        }
 
-    /// Retrieves the complete history of all `StateChange`s applied to the `gameState`
-    /// since the game started or the state was last loaded.
-    ///
-    /// This can be useful for debugging or advanced game mechanics that need to inspect
-    /// past state transitions.
-    ///
-    /// - Returns: An array of `StateChange` objects, in the order they were applied.
-    func changeHistory() -> [StateChange] {
-        gameState.changeHistory
+        /// Retrieves the complete history of all `StateChange`s applied to the `gameState`
+        /// since the game started or the state was last loaded.
+        ///
+        /// This can be useful for debugging or advanced game mechanics that need to inspect
+        /// past state transitions.
+        ///
+        /// - Returns: An array of `StateChange` objects, in the order they were applied.
+        func changeHistory() -> [StateChange] {
+            gameState.changeHistory
+        }
     }
-}
 
 #endif
