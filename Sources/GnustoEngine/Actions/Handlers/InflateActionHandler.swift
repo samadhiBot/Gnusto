@@ -87,13 +87,4 @@ public struct InflateActionHandler: ActionHandler {
 
         return ActionResult(message: message, stateChanges: stateChanges)
     }
-
-    /// Performs any post-processing after the inflate action completes.
-    ///
-    /// Currently no post-processing is needed for basic inflation.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for inflate
-    }
 }

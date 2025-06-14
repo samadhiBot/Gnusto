@@ -1,13 +1,13 @@
 import CustomDump
-import Foundation
-import GnustoEngine
 import Testing
+
+import GnustoEngine
 
 @Suite("InflateActionHandler")
 struct InflateActionHandlerTests {
     // MARK: - Test Helpers
 
-    private func createTestEngine() async -> GameEngine {
+    private func createTestEngine() async -> (GameEngine, MockIOHandler) {
         let balloon = Item(
             id: "balloon",
             .name("balloon"),
@@ -16,30 +16,8 @@ struct InflateActionHandlerTests {
             .in(.player)
         )
 
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .description("A room for testing inflate commands.")
-        )
-
-        let game = MinimalGame(
-            locations: [testRoom],
-            items: [balloon]
-        )
-
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-
-        return await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-    }
-
-    private func createTestEngineWithInflatedBalloon() async -> GameEngine {
-        let balloon = Item(
-            id: "balloon",
+        let inflatedBalloon = Item(
+            id: "inflatedBalloon",
             .name("balloon"),
             .isInflatable,
             .isTakable,
@@ -47,68 +25,80 @@ struct InflateActionHandlerTests {
             .in(.player)
         )
 
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .description("A room for testing inflate commands.")
+        let coin = Item(
+            id: "coin",
+            .name("coin"),
+            .isTakable,
+            .in(.player)
         )
 
         let game = MinimalGame(
-            locations: [testRoom],
-            items: [balloon]
+            items: [balloon, inflatedBalloon, coin]
         )
 
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
 
-        return await GameEngine(
+        let engine = await GameEngine(
             blueprint: game,
             parser: mockParser,
             ioHandler: mockIO
         )
+
+        return (engine, mockIO)
     }
 
     // MARK: - Tests
 
     @Test("INFLATE command on inflatable item")
     func testInflateCommand() async throws {
-        let engine = await createTestEngine()
-        let handler = InflateActionHandler()
-        let command = Command(verb: .inflate, directObject: .item("balloon"), rawInput: "inflate balloon")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await createTestEngine()
+        let command = Command(
+            verb: .inflate,
+            directObject: .item("balloon"),
+            rawInput: "inflate balloon"
+        )
 
-        // Should validate successfully
-        try await handler.validate(context: context)
+        // Check initial state
+        let initialState = try await engine.hasFlag(.isInflated, on: "balloon")
+        print("Initial inflate state: \(initialState)")
 
-        // Should inflate the balloon
-        let result = try await handler.process(context: context)
-        #expect(result.message == "You inflate the balloon.")
+        // Execute the command through the engine to properly apply state changes
+        await engine.execute(command: command)
+
+        // Check output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You inflate the balloon.")
 
         // Verify balloon is now inflated
-        #expect(try await engine.hasFlag(.isInflated, on: "balloon"))
+        #expect(try await engine.hasFlag(.isInflated, on: "balloon") == true)
     }
 
     @Test("INFLATE command on already inflated item")
     func testInflateAlreadyInflatedItem() async throws {
-        let engine = await createTestEngineWithInflatedBalloon()
+        let (engine, mockIO) = await createTestEngine()
+        let command = Command(
+            verb: .inflate,
+            directObject: .item("inflatedBalloon"),
+            rawInput: "inflate balloon"
+        )
 
-        let handler = InflateActionHandler()
-        let command = Command(verb: .inflate, directObject: .item("balloon"), rawInput: "inflate balloon")
-        let context = ActionContext(command: command, engine: engine)
+        // Execute the command through the engine to properly apply state changes
+        await engine.execute(command: command)
 
-        // Should validate successfully
-        try await handler.validate(context: context)
-
-        // Should provide "already inflated" message
-        let result = try await handler.process(context: context)
-        #expect(result.message == "The balloon is already inflated.")
+        // Check output
+        let output = await mockIO.flush()
+        expectNoDifference(output, "The balloon is already inflated.")
     }
 
     @Test("INFLATE command without direct object")
     func testInflateWithoutObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let handler = InflateActionHandler()
-        let command = Command(verb: .inflate, rawInput: "inflate")
+        let command = Command(
+            verb: .inflate,
+            rawInput: "inflate"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // Should fail validation
@@ -126,42 +116,13 @@ struct InflateActionHandlerTests {
 
     @Test("INFLATE command on non-inflatable item")
     func testInflateNonInflatableItem() async throws {
-        let balloon = Item(
-            id: "balloon",
-            .name("balloon"),
-            .isInflatable,
-            .isTakable,
-            .in(.player)
-        )
-
-        let coin = Item(
-            id: "coin",
-            .name("coin"),
-            .isTakable,
-            .in(.player)
-        )
-
-        let testRoom = Location(
-            id: "testRoom",
-            .name("Test Room"),
-            .description("A room for testing inflate commands.")
-        )
-
-        let game = MinimalGame(
-            locations: [testRoom],
-            items: [balloon, coin]
-        )
-
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(
-            blueprint: game,
-            parser: mockParser,
-            ioHandler: mockIO
-        )
-
+        let (engine, _) = await createTestEngine()
         let handler = InflateActionHandler()
-        let command = Command(verb: .inflate, directObject: .item("coin"), rawInput: "inflate coin")
+        let command = Command(
+            verb: .inflate,
+            directObject: .item("coin"),
+            rawInput: "inflate coin"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // Should fail validation
