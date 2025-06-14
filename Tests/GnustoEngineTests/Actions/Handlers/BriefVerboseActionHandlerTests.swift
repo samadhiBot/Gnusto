@@ -26,7 +26,10 @@ struct BriefVerboseActionHandlerTests {
         let result = try await briefHandler.process(context: context)
 
         // Then
-        #expect(result.message == "Brief mode is now on. Location descriptions will be shown only when you first enter a location.")
+        expectNoDifference(result.message, """
+            Brief mode is now on. Location descriptions will be
+            shown only when you first enter a location.
+            """)
         #expect(result.changes.count == 1) // Should set brief mode
         #expect(result.effects.isEmpty)
     }
@@ -54,7 +57,10 @@ struct BriefVerboseActionHandlerTests {
         let result = try await briefHandler.process(context: context)
 
         // Then
-        #expect(result.message == "Brief mode is now on. Location descriptions will be shown only when you first enter a location.")
+        expectNoDifference(result.message, """
+            Brief mode is now on. Location descriptions will be
+            shown only when you first enter a location.
+            """)
         #expect(result.changes.count == 2) // Should set brief mode and clear verbose mode
     }
 
@@ -77,7 +83,10 @@ struct BriefVerboseActionHandlerTests {
         let result = try await verboseHandler.process(context: context)
 
         // Then
-        #expect(result.message == "Verbose mode is now on. Full location descriptions will be shown every time you enter a location.")
+        #expect(result.message == """
+            Maximum verbosity. Full location descriptions \
+            will be shown every time you enter a location.
+            """)
         #expect(result.changes.count == 1) // Should set verbose mode
         #expect(result.effects.isEmpty)
     }
@@ -105,7 +114,10 @@ struct BriefVerboseActionHandlerTests {
         let result = try await verboseHandler.process(context: context)
 
         // Then
-        #expect(result.message == "Verbose mode is now on. Full location descriptions will be shown every time you enter a location.")
+        #expect(result.message == """
+            Maximum verbosity. Full location descriptions \
+            will be shown every time you enter a location.
+            """)
         #expect(result.changes.count == 2) // Should set verbose mode and clear brief mode
     }
 

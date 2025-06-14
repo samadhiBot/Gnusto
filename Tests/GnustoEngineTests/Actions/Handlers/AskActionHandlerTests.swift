@@ -81,7 +81,7 @@ struct AskActionHandlerTests {
 
         // When/Then
         await #expect(
-            throws: ActionResponse.prerequisiteNotMet("You can't ask the rock about anything.")
+            throws: ActionResponse.prerequisiteNotMet("You can't ask the rock about that.")
         ) {
             try await handler.validate(context: context)
         }

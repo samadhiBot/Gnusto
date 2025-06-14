@@ -42,6 +42,7 @@ public enum MessageKey: Hashable, Sendable {
     case canOnlyUseItemAsKey
     case cannotActOnThat(verb: String)
     case cannotActWithThat(verb: String)
+    case cannotAskAboutThat(item: String)
     case cannotDeflate(item: String)
     case cannotDig(item: String)
     case cannotDrink(item: String)

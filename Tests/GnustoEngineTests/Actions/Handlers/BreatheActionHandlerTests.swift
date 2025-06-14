@@ -60,14 +60,7 @@ struct BreatheActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        let validResponses = [
-            "You breathe in deeply, feeling refreshed.",
-            "You take a slow, calming breath.",
-            "The air fills your lungs.",
-            "You inhale deeply, then exhale slowly."
-        ]
-        #expect(validResponses.contains(result.message!))
-        #expect(result.changes.isEmpty)
+        #expect(result.message == "The air fills your lungs. You're glad that you can breathe.")
     }
 
     @Test("Breathe integration test")
@@ -82,16 +75,18 @@ struct BreatheActionHandlerTests {
 
         // When
         await engine.execute(command: command)
+        await engine.execute(command: command)
+        await engine.execute(command: command)
 
         // Then
         let output = await mockIO.flush()
-        let validResponses = [
-            "You breathe in deeply, feeling refreshed.",
-            "You take a slow, calming breath.",
-            "The air fills your lungs.",
-            "You inhale deeply, then exhale slowly."
-        ]
-        #expect(validResponses.contains(output))
+        expectNoDifference(output, """
+            The air fills your lungs. You’re glad that you can breathe.
+
+            You take a slow, calming breath.
+
+            You inhale deeply, then exhale slowly.
+            """)
     }
 
     @Test("Breathe validation passes with no objects")

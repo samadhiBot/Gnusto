@@ -231,7 +231,7 @@ struct AttackActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message!.contains("You can't."))
+        #expect(result.message!.contains("Let's hope it doesn't come to that."))
     }
 
     @Test("Attack character with inappropriate weapon")

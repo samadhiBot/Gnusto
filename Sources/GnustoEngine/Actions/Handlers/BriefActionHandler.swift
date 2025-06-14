@@ -5,12 +5,6 @@ import Foundation
 public struct BriefActionHandler: ActionHandler {
     public init() {}
 
-    /// Validates the "BRIEF" command.
-    /// Brief requires no specific validation and always proceeds.
-    public func validate(context: ActionContext) async throws {
-        // No validation needed for BRIEF
-    }
-
     /// Processes the "BRIEF" command.
     ///
     /// Sets the game to brief mode, where location descriptions are only shown

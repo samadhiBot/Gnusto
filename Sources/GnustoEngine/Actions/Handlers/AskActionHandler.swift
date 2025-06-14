@@ -33,7 +33,9 @@ public struct AskActionHandler: ActionHandler {
         // Check if character exists and is reachable
         let character = try await context.engine.item(characterID)
         guard character.hasFlag(.isCharacter) else {
-            let message = context.message(.cannotActOnThat(verb: "ask \(character.name)"))
+            let message = context.message(
+                .cannotAskAboutThat(item: character.withDefiniteArticle)
+            )
             throw ActionResponse.prerequisiteNotMet(message)
         }
 

@@ -95,6 +95,9 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .cannotActWithThat(let verb):
             "You can't \(verb) with that."
 
+        case .cannotAskAboutThat(let item):
+            "You can't ask \(item) about that."
+
         case .cannotDeflate(let item):
             "You can't deflate \(item)."
 
@@ -551,7 +554,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "Look under what?"
 
         case .maximumVerbosity:
-            "Maximum verbosity."
+            "Maximum verbosity. Full location descriptions will be shown every time you enter a location."
 
         case .modifierMismatch(let noun, let modifiers):
             "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
