@@ -28,8 +28,8 @@ struct SaveRestoreActionHandlerTests {
         // Then
         // Since save functionality is not yet implemented, it should return an error message
         #expect(result.message == "Save failed: Save functionality not yet implemented.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("Restore attempts to restore game")
@@ -53,8 +53,8 @@ struct SaveRestoreActionHandlerTests {
         // Then
         // Since restore functionality is not yet implemented, it should return an error message
         #expect(result.message == "Restore failed: Restore functionality not yet implemented.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("Save and restore require no validation")

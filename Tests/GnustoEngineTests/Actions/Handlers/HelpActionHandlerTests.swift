@@ -31,8 +31,8 @@ struct HelpActionHandlerTests {
         #expect(result.message!.contains("LOOK"))
         #expect(result.message!.contains("TAKE"))
         #expect(result.message!.contains("INVENTORY"))
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("Help requires no validation")

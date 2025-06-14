@@ -139,7 +139,7 @@ public struct TurnOnActionHandler: ActionHandler {
 
         return ActionResult(
             message: messageParts.joined(separator: "\n"),
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.setFlag(.isOn, on: targetItem),
             ]
@@ -163,7 +163,7 @@ public struct TurnOnActionHandler: ActionHandler {
         if targetItem.hasFlag(.isFlammable) {
             return ActionResult(
                 message: "The \(targetItem.name) catches fire and burns to ashes.",
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.updatePronouns(to: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
@@ -173,7 +173,7 @@ public struct TurnOnActionHandler: ActionHandler {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
             return ActionResult(
                 message: "You can't burn the \(targetItem.name).",
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.updatePronouns(to: targetItem),
                 ]

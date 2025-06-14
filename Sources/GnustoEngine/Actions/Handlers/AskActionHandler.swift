@@ -83,7 +83,7 @@ public struct AskActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: character),
                 await context.engine.updatePronouns(to: character),
             ]

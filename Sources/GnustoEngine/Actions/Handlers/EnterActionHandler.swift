@@ -68,7 +68,7 @@ public struct EnterActionHandler: ActionHandler {
 
             return ActionResult(
                 message: "You enter the \(firstEnterable.name).",
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: firstEnterable),
                     await context.engine.updatePronouns(to: firstEnterable),
                 ]
@@ -105,10 +105,10 @@ public struct EnterActionHandler: ActionHandler {
                     // Combine state changes from enter (touch/pronouns) with go result
                     return ActionResult(
                         message: goResult.message,
-                        stateChanges: [
+                        changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem),
                             await context.engine.updatePronouns(to: targetItem),
-                        ] + goResult.stateChanges
+                        ] + goResult.changes
                     )
                 } catch {
                     // If movement fails, handle the error
@@ -120,7 +120,7 @@ public struct EnterActionHandler: ActionHandler {
         // No movement enabled - basic enter behavior
         return ActionResult(
             message: "You enter the \(targetItem.name).",
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
             ]

@@ -67,7 +67,7 @@ struct BreatheActionHandlerTests {
             "You inhale deeply, then exhale slowly."
         ]
         #expect(validResponses.contains(result.message!))
-        #expect(result.stateChanges.isEmpty)
+        #expect(result.changes.isEmpty)
     }
 
     @Test("Breathe integration test")

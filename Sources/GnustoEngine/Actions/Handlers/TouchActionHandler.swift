@@ -63,7 +63,7 @@ public struct TouchActionHandler: ActionHandler {
 
         return ActionResult(
             message: "You feel nothing special.",
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem)
             ]
         )

@@ -950,9 +950,6 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .unlockAlreadyUnlocked(let item):
             "The \(item) is already unlocked."
 
-        case .wearWhat:
-            "Wear what?"
-
         case .youCanOnlyMoveItems:
             "You can only move items."
 
@@ -998,15 +995,11 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .youCannotTakeFromNonContainer(let container):
             "You can't take things out of the \(container)."
 
-        case .insertWhat:
-            "Insert what?"
-
         case .insertIntoWhat:
             "Insert into what?"
 
         case .insertHaveNothingToPut(let container):
             "You have nothing to put in the \(container)."
-
         }
     }
 }

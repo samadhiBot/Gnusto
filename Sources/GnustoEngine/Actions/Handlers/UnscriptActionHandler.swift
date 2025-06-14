@@ -33,7 +33,7 @@ public struct UnscriptActionHandler: ActionHandler {
 
         return ActionResult(
             message: "[Transcript recording ended]",
-            stateChanges: [
+            changes: [
                 await context.engine.clearGlobal(.isScripting)
             ]
         )

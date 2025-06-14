@@ -190,7 +190,7 @@ struct FillOutActionHandler: ActionHandler {
         // Each page requires different information
         return ActionResult(
             message: "You begin the tedious process of form completion...",
-            stateChanges: [
+            changes: [
                 StateChange(
                     entityId: .item("bureaucraticForm"),
                     attribute: .hasAttribute("progress"),
@@ -341,12 +341,12 @@ struct CastActionHandler: ActionHandler {
                 The magical writings glow softly for a moment, then settle into the page. You have
                 discovered something remarkable.
                 """,
-            stateChanges: [
+            changes: [
                 StateChange(entityId: .item(scrollID), attribute: .removeFromGame, newValue: true),
                 StateChange(entityId: .item(notebook.id), attribute: .addSpell(spellType), newValue: .int(transferPotency)),
                 StateChange(entityId: .global, attribute: .setFlag("discoveredSpellTransfer"), newValue: true)
             ],
-            sideEffects: [
+            effects: [
                 SideEffect(type: .scheduleEvent, targetID: .global, parameters: ["message": "Berzio emerges from the workshop, drawn by the unusual magical resonance."])
             ]
         )

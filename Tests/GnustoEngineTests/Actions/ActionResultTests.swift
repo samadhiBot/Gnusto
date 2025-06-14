@@ -48,8 +48,8 @@ struct ActionResultTests {
     private var testResult: ActionResult {
         ActionResult(
             message: "Test message", // Message as String
-            stateChanges: [change1, change2, change3] // Use instance properties
-            // sideEffects: [] // Add if needed
+            changes: [change1, change2, change3] // Use instance properties
+            // effects: [] // Add if needed
         )
     }
 
@@ -75,15 +75,15 @@ struct ActionResultTests {
     func testActionResultFullInitialization() {
         let result = ActionResult(
             message: "The lamp is now on.",
-            stateChanges: [simpleChange],
-            sideEffects: [simpleEffect]
+            changes: [simpleChange],
+            effects: [simpleEffect]
         )
 
         #expect(result.message == "The lamp is now on.")
-        #expect(result.stateChanges.count == 1)
-        #expect(result.sideEffects.count == 1)
-        #expect(result.stateChanges.first == simpleChange)
-        #expect(result.sideEffects.first == simpleEffect)
+        #expect(result.changes.count == 1)
+        #expect(result.effects.count == 1)
+        #expect(result.changes.first == simpleChange)
+        #expect(result.effects.first == simpleEffect)
     }
 
     @Test("ActionResult Initialization - Defaults")
@@ -91,8 +91,8 @@ struct ActionResultTests {
         let result = ActionResult("You can’t do that.")
 
         #expect(result.message == "You can’t do that.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("StateChange Initialization - Full")
@@ -289,18 +289,18 @@ struct ActionResultTests {
         // Initialize here where self.change1, self.change2 etc. are accessible
         let resultWithChangesAndEffects = ActionResult(
             message: "Action succeeded.",
-            stateChanges: [change1, change2], // Using the corrected change1/change2
-            sideEffects: [sideEffect1]      // Using the corrected sideEffect1
+            changes: [change1, change2], // Using the corrected change1/change2
+            effects: [sideEffect1]      // Using the corrected sideEffect1
         )
 
         #expect(resultWithChangesAndEffects.message == "Action succeeded.")
-        #expect(resultWithChangesAndEffects.stateChanges.count == 2)
-        #expect(resultWithChangesAndEffects.stateChanges.contains(change1))
-        #expect(resultWithChangesAndEffects.stateChanges.contains(change2))
-        #expect(resultWithChangesAndEffects.sideEffects.count == 1)
+        #expect(resultWithChangesAndEffects.changes.count == 2)
+        #expect(resultWithChangesAndEffects.changes.contains(change1))
+        #expect(resultWithChangesAndEffects.changes.contains(change2))
+        #expect(resultWithChangesAndEffects.effects.count == 1)
 
         // Check if the side effect is the correct type and has params
-        let effect = resultWithChangesAndEffects.sideEffects.first
+        let effect = resultWithChangesAndEffects.effects.first
         #expect(effect?.type == .scheduleEvent)
         #expect(effect?.targetID == .fuse("fuse"))
         #expect(effect?.parameters["turns"] == .int(5))

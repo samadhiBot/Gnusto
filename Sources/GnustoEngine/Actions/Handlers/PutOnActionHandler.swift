@@ -122,7 +122,7 @@ public struct PutOnActionHandler: ActionHandler {
 
         return ActionResult(
             message: "You put the \(itemToPut.name) on the \(surface.name).",
-            stateChanges: [
+            changes: [
                 await context.engine.move(itemToPut, to: .item(surface.id)),
                 await context.engine.setFlag(.isTouched, on: itemToPut),
                 await context.engine.setFlag(.isTouched, on: surface),

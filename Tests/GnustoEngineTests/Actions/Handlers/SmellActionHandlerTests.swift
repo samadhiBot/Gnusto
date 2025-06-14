@@ -165,8 +165,8 @@ struct SmellActionHandlerTests {
         
         // Verify result
         #expect(result.message == "You smell nothing unusual.")
-        #expect(result.stateChanges.isEmpty) // SMELL should not modify state
-        #expect(result.sideEffects.isEmpty) // SMELL should not have side effects
+        #expect(result.changes.isEmpty) // SMELL should not modify state
+        #expect(result.effects.isEmpty) // SMELL should not have side effects
     }
 
     @Test("SMELL produces correct ActionResult for item")
@@ -203,8 +203,8 @@ struct SmellActionHandlerTests {
         
         // Verify result
         #expect(result.message == "That smells about average.")
-        #expect(result.stateChanges.isEmpty) // SMELL should not modify state
-        #expect(result.sideEffects.isEmpty) // SMELL should not have side effects
+        #expect(result.changes.isEmpty) // SMELL should not modify state
+        #expect(result.effects.isEmpty) // SMELL should not have side effects
     }
 
     @Test("SMELL does not affect game state")

@@ -24,7 +24,7 @@ public struct BriefActionHandler: ActionHandler {
                 Brief mode is now on. Location descriptions will be
                 shown only when you first enter a location.
                 """,
-            stateChanges: [
+            changes: [
                 await context.engine.setGlobal(.isBriefMode, to: true),
                 await context.engine.clearGlobal(.isVerboseMode),
             ]

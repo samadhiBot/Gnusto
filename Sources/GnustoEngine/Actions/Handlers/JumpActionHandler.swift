@@ -64,7 +64,7 @@ public struct JumpActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
             ]

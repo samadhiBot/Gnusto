@@ -150,6 +150,6 @@ struct EnterActionHandlerTests {
 
         // Then
         #expect(result.message == "You enter the phone booth.")
-        #expect(result.stateChanges.count >= 1) // Should have touch/pronoun updates
+        #expect(result.changes.count >= 1) // Should have touch/pronoun updates
     }
 }

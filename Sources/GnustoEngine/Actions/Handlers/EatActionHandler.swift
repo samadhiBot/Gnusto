@@ -86,7 +86,7 @@ public struct EatActionHandler: ActionHandler {
             let message = context.message(.eatSuccess(item: targetItem.withDefiniteArticle))
             return ActionResult(
                 message: message,
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
                 ]
@@ -104,7 +104,7 @@ public struct EatActionHandler: ActionHandler {
                         .cannotEatFromClosed(container: targetItem.withDefiniteArticle))
                     return ActionResult(
                         message: message,
-                        stateChanges: [
+                        changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem)
                         ]
                     )
@@ -114,7 +114,7 @@ public struct EatActionHandler: ActionHandler {
                     )
                     return ActionResult(
                         message: message,
-                        stateChanges: [
+                        changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem),
                             await context.engine.move(firstEdible, to: .nowhere),
                             await context.engine.updatePronouns(to: firstEdible),
@@ -126,7 +126,7 @@ public struct EatActionHandler: ActionHandler {
                     .nothingToEatIn(container: targetItem.withDefiniteArticle))
                 return ActionResult(
                     message: message,
-                    stateChanges: [
+                    changes: [
                         await context.engine.setFlag(.isTouched, on: targetItem)
                     ]
                 )
@@ -136,7 +136,7 @@ public struct EatActionHandler: ActionHandler {
             let message = context.message(.cannotEat(item: targetItem.withDefiniteArticle))
             return ActionResult(
                 message: message,
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem)
                 ]
             )

@@ -314,20 +314,20 @@ extension Forest {
                 // Check if grate is already revealed
                 let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
 
-                var stateChanges: [StateChange] = []
+                var changes: [StateChange] = []
 
                 if isGrateInvisible {
                     // Reveal the grate - this is the LEAVES-APPEAR functionality
                     let grate = try await engine.item(.grate)
                     if let grateChange = await engine.clearFlag(.isInvisible, on: grate) {
-                        stateChanges.append(grateChange)
+                        changes.append(grateChange)
                     }
                 }
 
                 // Update the leaves description to show they've been disturbed
                 let leaves = try await engine.item(.pileOfLeaves)
                 if let leavesChange = await engine.setAttribute(.firstDescription, on: leaves, to: .string("On the ground is a pile of leaves.")) {
-                    stateChanges.append(leavesChange)
+                    changes.append(leavesChange)
                 }
 
                 let message = if isGrateInvisible {
@@ -336,7 +336,7 @@ extension Forest {
                     "Done."
                 }
 
-                return ActionResult(message: message, stateChanges: stateChanges)
+                return ActionResult(message: message, changes: changes)
             }
             return nil
         case .afterTurn:

@@ -6,7 +6,7 @@ import Foundation
 /// including any message to be displayed to the player, any changes to the game state,
 /// and any side effects that need to be triggered by the `GameEngine`.
 ///
-/// At least one of `message`, `stateChanges`, or `sideEffects` must be non-empty for an
+/// At least one of `message`, `changes`, or `effects` must be non-empty for an
 /// `ActionResult` to be valid, enforced by an assertion in the initializers.
 public struct ActionResult: Sendable {
     /// An optional message to be displayed to the player as a direct result of the action.
@@ -21,30 +21,30 @@ public struct ActionResult: Sendable {
     ///
     /// The `GameEngine` will attempt to apply these changes to the `GameState` after the
     /// `process` method of the `ActionHandler` returns.
-    public let stateChanges: [StateChange]
+    public let changes: [StateChange]
 
     /// An array of `SideEffect` objects that should be triggered by the `GameEngine`
     /// after the action is processed (e.g., starting a fuse, activating a daemon).
-    public let sideEffects: [SideEffect]
+    public let effects: [SideEffect]
 
     /// Creates a new `ActionResult` with arrays of state changes and side effects.
     ///
     /// - Parameters:
     ///   - message: An optional message to display to the player.
-    ///   - stateChanges: An array of `StateChange`s to be applied.
-    ///   - sideEffects: An array of `SideEffect`s to be triggered.
+    ///   - changes: An array of `StateChange`s to be applied.
+    ///   - effects: An array of `SideEffect`s to be triggered.
     public init(
         message: String? = nil,
-        stateChanges: [StateChange?] = [],
-        sideEffects: [SideEffect?] = []
+        changes: [StateChange?] = [],
+        effects: [SideEffect?] = []
     ) {
         assert(
-            message != nil || !stateChanges.isEmpty || !sideEffects.isEmpty,
+            message != nil || !changes.isEmpty || !effects.isEmpty,
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
-        self.stateChanges = stateChanges.compactMap(\.self)
-        self.sideEffects = sideEffects.compactMap(\.self)
+        self.changes = changes.compactMap(\.self)
+        self.effects = effects.compactMap(\.self)
     }
 
     /// Creates a new `ActionResult` with optional single state change and side effect.
@@ -66,8 +66,8 @@ public struct ActionResult: Sendable {
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
-        self.stateChanges = if let change { [change] } else { [] }
-        self.sideEffects = if let effect { [effect] } else { [] }
+        self.changes = if let change { [change] } else { [] }
+        self.effects = if let effect { [effect] } else { [] }
     }
 
     /// Creates a new `ActionResult` that only contains a message for the player,
@@ -76,7 +76,7 @@ public struct ActionResult: Sendable {
     /// - Parameter message: The message to display to the player.
     public init(_ message: String) {
         self.message = message
-        self.stateChanges = []
-        self.sideEffects = []
+        self.changes = []
+        self.effects = []
     }
 }

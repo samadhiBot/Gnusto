@@ -139,14 +139,14 @@ enum OperaHouse {
 //            }
 //            switch command.verb {
 //            case .drop, .putOn:
-//                var stateChanges = [StateChange]()
+//                var changes = [StateChange]()
 //                if await engine.playerScore < 1 {
-//                    stateChanges.append(await engine.updatePlayerScore(by: 1))
+//                    changes.append(await engine.updatePlayerScore(by: 1))
 //                }
 //                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
-//                    stateChanges.append(lightenBar)
+//                    changes.append(lightenBar)
 //                }
-//                return ActionResult(stateChanges: stateChanges)
+//                return ActionResult(changes: changes)
 //            case .take:
 //                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(.bar)) {
 //                    return ActionResult(darkenBar)

@@ -22,7 +22,7 @@ struct GameEngineSideEffectsTests {
                 .global,
                 parameters: ["flag": .string("fuseExploded")]
             )
-            return ActionResult(message: "The fuse exploded!", sideEffects: [sideEffect])
+            return ActionResult(message: "The fuse exploded!", effects: [sideEffect])
         }
 
         let testDaemonDefinition = DaemonDefinition() { engine in
@@ -30,7 +30,7 @@ struct GameEngineSideEffectsTests {
             let change = await engine.adjustGlobal("daemonTicks", by: 1)
             return ActionResult(
                 message: "Daemon tick",
-                stateChanges: [change]
+                changes: [change]
             )
         }
 
@@ -39,7 +39,7 @@ struct GameEngineSideEffectsTests {
             if let change = await engine.setFlag("messageDelivered") {
                 return ActionResult(
                     message: "Message delivered!",
-                    stateChanges: [change]
+                    changes: [change]
                 )
             }
             return nil
@@ -50,7 +50,7 @@ struct GameEngineSideEffectsTests {
             if let change = await engine.setFlag("musicPlaying") {
                 return ActionResult(
                     message: "Music is playing",
-                    stateChanges: [change]
+                    changes: [change]
                 )
             }
             return nil
@@ -309,14 +309,14 @@ struct GameEngineSideEffectsTests {
     func testMultipleSideEffects() async throws {
         let engine = await createTestEngine()
 
-        let sideEffects = [
+        let effects = [
             SideEffect.startFuse(testFuseID),
             SideEffect.startFuse(anotherFuseID),
             SideEffect.runDaemon(testDaemonID),
             SideEffect.runDaemon(anotherDaemonID),
         ]
 
-        try await engine.processSideEffects(sideEffects)
+        try await engine.processSideEffects(effects)
 
         // Verify all side effects were processed
         let finalState = await engine.gameState
@@ -330,7 +330,7 @@ struct GameEngineSideEffectsTests {
     func testMixedSideEffects() async throws {
         let engine = await createTestEngine()
 
-        let sideEffects = [
+        let effects = [
             SideEffect.startFuse(testFuseID), // Valid
             SideEffect.runDaemon(testDaemonID), // Valid
             SideEffect.startFuse("invalidFuse"), // Invalid
@@ -338,7 +338,7 @@ struct GameEngineSideEffectsTests {
 
         // Should throw on the invalid side effect
         await #expect(throws: ActionResponse.self) {
-            try await engine.processSideEffects(sideEffects)
+            try await engine.processSideEffects(effects)
         }
 
         // Verify that valid side effects before the failure were processed
@@ -357,7 +357,7 @@ struct GameEngineSideEffectsTests {
         // Create an ActionResult with side effects
         let actionResult = ActionResult(
             message: "The bomb timer starts ticking...",
-            sideEffects: [
+            effects: [
                 SideEffect.startFuse(testFuseID),
                 SideEffect.runDaemon(testDaemonID),
             ]

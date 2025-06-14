@@ -100,7 +100,7 @@ public struct ReadActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: [
+            changes: [
                 needsAutoTake ? await context.engine.move(targetItem, to: .player) : nil,
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),

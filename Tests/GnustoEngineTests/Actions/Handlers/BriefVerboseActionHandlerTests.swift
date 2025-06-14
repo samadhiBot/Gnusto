@@ -27,8 +27,8 @@ struct BriefVerboseActionHandlerTests {
 
         // Then
         #expect(result.message == "Brief mode is now on. Location descriptions will be shown only when you first enter a location.")
-        #expect(result.stateChanges.count == 1) // Should set brief mode
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.count == 1) // Should set brief mode
+        #expect(result.effects.isEmpty)
     }
 
     @Test("Brief clears verbose mode if set")
@@ -55,7 +55,7 @@ struct BriefVerboseActionHandlerTests {
 
         // Then
         #expect(result.message == "Brief mode is now on. Location descriptions will be shown only when you first enter a location.")
-        #expect(result.stateChanges.count == 2) // Should set brief mode and clear verbose mode
+        #expect(result.changes.count == 2) // Should set brief mode and clear verbose mode
     }
 
     @Test("Verbose sets verbose mode")
@@ -78,8 +78,8 @@ struct BriefVerboseActionHandlerTests {
 
         // Then
         #expect(result.message == "Verbose mode is now on. Full location descriptions will be shown every time you enter a location.")
-        #expect(result.stateChanges.count == 1) // Should set verbose mode
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.count == 1) // Should set verbose mode
+        #expect(result.effects.isEmpty)
     }
 
     @Test("Verbose clears brief mode if set")
@@ -106,7 +106,7 @@ struct BriefVerboseActionHandlerTests {
 
         // Then
         #expect(result.message == "Verbose mode is now on. Full location descriptions will be shown every time you enter a location.")
-        #expect(result.stateChanges.count == 2) // Should set verbose mode and clear brief mode
+        #expect(result.changes.count == 2) // Should set verbose mode and clear brief mode
     }
 
     @Test("Brief and verbose require no validation")

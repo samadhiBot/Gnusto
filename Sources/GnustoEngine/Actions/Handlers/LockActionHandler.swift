@@ -118,7 +118,7 @@ public struct LockActionHandler: ActionHandler {
 
         return ActionResult(
             message: context.message(.lockSuccess(item: targetItem.withDefiniteArticle)),
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isLocked, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: keyItem),

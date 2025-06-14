@@ -30,7 +30,7 @@ struct ClimbActionHandlerTests {
 
         // Assert
         #expect(result.message == "Climb what?")
-        #expect(result.stateChanges.isEmpty)
+        #expect(result.changes.isEmpty)
     }
 
     // MARK: - Exit Traversal Tests

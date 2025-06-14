@@ -107,7 +107,7 @@ public struct GoActionHandler: ActionHandler {
         // Movement itself doesn't usually print a message; the new location description suffices.
         // The context.engine's run loop will trigger describeCurrentLocation after state changes.
         return ActionResult(
-            stateChanges: [
+            changes: [
                 StateChange(
                     entityID: .player,
                     attribute: .playerLocation,

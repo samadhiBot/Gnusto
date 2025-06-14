@@ -16,7 +16,7 @@ import Logging
 ///   various accessor methods and properties available in `GameEngine` extensions
 ///   (e.g., `GameEngine+stateQuery.swift`, `GameEngine+playerQuery.swift`).
 /// - Initiate changes to the `GameState` by creating `StateChange` objects (often via
-///   factory methods in `GameEngine+stateChanges.swift`) and then applying them,
+///   factory methods in `GameEngine+changes.swift`) and then applying them,
 ///   or by using higher-level convenience mutation methods (e.g., in
 ///   `GameEngine+stateMutation.swift`).
 /// - Access game-wide `GameConstants`.
@@ -1028,7 +1028,7 @@ extension GameEngine {
     func processActionResult(_ result: ActionResult) async throws -> Bool {
         // 1. Apply State Changes
         // Errors during apply will propagate up.
-        for change in result.stateChanges {
+        for change in result.changes {
             do {
                 try await applyWithDynamicValidation(change)
             } catch {
@@ -1043,15 +1043,15 @@ extension GameEngine {
         }
 
         // 2. Process Side Effects
-        if !result.sideEffects.isEmpty {
+        if !result.effects.isEmpty {
             do {
-                try await processSideEffects(result.sideEffects)
+                try await processSideEffects(result.effects)
             } catch {
                 logError(
                     """
                     Failed to process side effects during processActionResult:
                        - \(error)
-                       - Side Effects: \(result.sideEffects)
+                       - Side Effects: \(result.effects)
                     """)
                 throw error
             }
@@ -1348,7 +1348,7 @@ extension GameEngine {
         ///
         /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
         ///   operations and testing scenarios where direct state manipulation is necessary. Game
-        ///   developers should use the action handler system (`ActionResult.stateChanges`) rather
+        ///   developers should use the action handler system (`ActionResult.changes`) rather
         ///   than calling this method directly.
         ///
         /// This method bypasses the normal action handler pipeline, including:

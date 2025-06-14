@@ -22,7 +22,7 @@
 
 ### 1.2 State Change Ergonomics
 
-- [ ] Expand `GameEngine+stateChanges.swift` helper methods
+- [ ] Expand `GameEngine+changes.swift` helper methods
   - Add helpers for common state change patterns
   - Support batch state changes
   - Add validation helpers

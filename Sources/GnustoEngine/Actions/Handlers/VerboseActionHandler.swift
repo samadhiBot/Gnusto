@@ -21,7 +21,7 @@ public struct VerboseActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
             message: context.message(.maximumVerbosity),
-            stateChanges: [
+            changes: [
                 await context.engine.setGlobal(.isVerboseMode, to: true),
                 await context.engine.clearGlobal(.isBriefMode),
             ]

@@ -304,10 +304,10 @@ struct AttackActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.stateChanges.count >= 1)
+        #expect(result.changes.count >= 1)
 
         // Find the state change that marks the goblin as touched
-        let touchedStateChange = result.stateChanges.first { change in
+        let touchedStateChange = result.changes.first { change in
             change.attribute == .itemAttribute(.isTouched)
         }
         #expect(touchedStateChange != nil)

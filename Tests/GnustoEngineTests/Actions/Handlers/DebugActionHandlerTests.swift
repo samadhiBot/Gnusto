@@ -316,8 +316,8 @@ struct DebugActionHandlerTests {
         
         // Verify result
         #expect(result.message?.contains("```") == true)
-        #expect(result.stateChanges.isEmpty) // DEBUG should not modify state
-        #expect(result.sideEffects.isEmpty) // DEBUG should not have side effects
+        #expect(result.changes.isEmpty) // DEBUG should not modify state
+        #expect(result.effects.isEmpty) // DEBUG should not have side effects
     }
     
     @Test("DEBUG command full workflow for item")
@@ -342,8 +342,8 @@ struct DebugActionHandlerTests {
         
         // Verify result
         #expect(result.message?.contains("```") == true)
-        #expect(result.stateChanges.isEmpty) // DEBUG should not modify state
-        #expect(result.sideEffects.isEmpty) // DEBUG should not have side effects
+        #expect(result.changes.isEmpty) // DEBUG should not modify state
+        #expect(result.effects.isEmpty) // DEBUG should not have side effects
     }
     
     @Test("DEBUG command full workflow for location")
@@ -368,8 +368,8 @@ struct DebugActionHandlerTests {
         
         // Verify result
         #expect(result.message?.contains("```") == true)
-        #expect(result.stateChanges.isEmpty) // DEBUG should not modify state
-        #expect(result.sideEffects.isEmpty) // DEBUG should not have side effects
+        #expect(result.changes.isEmpty) // DEBUG should not modify state
+        #expect(result.effects.isEmpty) // DEBUG should not have side effects
     }
     
     // MARK: - Output Format Tests

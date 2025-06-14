@@ -46,7 +46,7 @@ public struct LookUnderActionHandler: ActionHandler {
         // Default behavior: You can't see anything of interest under most things
         return ActionResult(
             message: "You find nothing of interest under \(targetItem.withDefiniteArticle).",
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
             ]

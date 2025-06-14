@@ -257,7 +257,7 @@ public struct ExamineActionHandler: ActionHandler {
 
         return ActionResult(
             message: finalMessage,
-            stateChanges: allStateChanges
+            changes: allStateChanges
         )
     }
 

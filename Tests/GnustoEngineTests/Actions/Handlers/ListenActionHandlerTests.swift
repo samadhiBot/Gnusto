@@ -59,8 +59,8 @@ struct ListenActionHandlerTests {
         
         // Verify result
         #expect(result.message == "You hear nothing unusual.")
-        #expect(result.stateChanges.isEmpty) // LISTEN should not modify state
-        #expect(result.sideEffects.isEmpty) // LISTEN should not have side effects
+        #expect(result.changes.isEmpty) // LISTEN should not modify state
+        #expect(result.effects.isEmpty) // LISTEN should not have side effects
     }
 
     @Test("LISTEN validation always succeeds")
@@ -101,8 +101,8 @@ struct ListenActionHandlerTests {
         
         // Verify complete workflow
         #expect(result.message == "You hear nothing unusual.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("LISTEN does not affect game state")

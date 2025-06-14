@@ -15,10 +15,10 @@ extension GameEngine {
     /// This method is called by the main action processing pipeline to handle any side effects
     /// that were generated as part of an action's execution.
     ///
-    /// - Parameter sideEffects: An array of `SideEffect` objects to process.
+    /// - Parameter effects: An array of `SideEffect` objects to process.
     /// - Throws: An error if any side effect cannot be processed.
-    func processSideEffects(_ sideEffects: [SideEffect]) async throws {
-        for effect in sideEffects {
+    func processSideEffects(_ effects: [SideEffect]) async throws {
+        for effect in effects {
             try await processSideEffect(effect)
         }
     }

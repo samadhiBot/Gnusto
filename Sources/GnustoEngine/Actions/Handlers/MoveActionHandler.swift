@@ -156,7 +156,7 @@ public struct MoveActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: allStateChanges
+            changes: allStateChanges
         )
     }
 

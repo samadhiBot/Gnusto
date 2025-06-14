@@ -35,7 +35,7 @@ public struct ScriptActionHandler: ActionHandler {
                 Default is "transcript":
                 [Transcript recording started]
                 """,
-            stateChanges: [
+            changes: [
                 await context.engine.setGlobal(.isScripting, to: true)
             ]
         )

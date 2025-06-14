@@ -114,7 +114,7 @@ public struct UnlockActionHandler: ActionHandler {
 
         return ActionResult(
             message: "The \(targetItem.name) is now unlocked.",
-            stateChanges: [
+            changes: [
                 await context.engine.clearFlag(.isLocked, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: keyItem),

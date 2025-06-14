@@ -59,8 +59,8 @@ struct QuitActionHandlerTests {
         
         // Verify result
         #expect(result.message == "Goodbye!")
-        #expect(result.stateChanges.isEmpty) // QUIT should not modify state directly
-        #expect(result.sideEffects.isEmpty) // QUIT should not have side effects
+        #expect(result.changes.isEmpty) // QUIT should not modify state directly
+        #expect(result.effects.isEmpty) // QUIT should not have side effects
     }
 
     @Test("QUIT validation always succeeds")
@@ -145,8 +145,8 @@ struct QuitActionHandlerTests {
         
         // Verify complete workflow
         #expect(result.message == "Goodbye!")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
         #expect(await engine.shouldQuit)
     }
 

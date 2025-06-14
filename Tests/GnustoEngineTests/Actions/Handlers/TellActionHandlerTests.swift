@@ -117,7 +117,7 @@ struct TellActionHandlerTests {
 
         // Then
         #expect(result.message == "Old wizard listens politely to what you say about magic crystal.")
-        #expect(result.stateChanges.count == 2) // touched flag + pronoun update
+        #expect(result.changes.count == 2) // touched flag + pronoun update
     }
 
     @Test("Tell character about player")

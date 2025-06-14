@@ -67,7 +67,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
             let targetItem = try await context.engine.item(targetItemID)
             return ActionResult(
                 message: context.message(.thinkAboutItem(item: targetItem.withDefiniteArticle)),
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.updatePronouns(to: targetItem),
                 ]

@@ -154,7 +154,7 @@ public struct RemoveActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: allStateChanges
+            changes: allStateChanges
         )
     }
 }

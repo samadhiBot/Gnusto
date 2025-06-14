@@ -193,7 +193,7 @@ struct ThinkAboutActionHandlerTests {
         
         // Verify result
         #expect(result.message == "Yes, yes, you're very important.")
-        #expect(result.stateChanges.isEmpty) // THINK ABOUT SELF should not modify state
+        #expect(result.changes.isEmpty) // THINK ABOUT SELF should not modify state
     }
 
     @Test("THINK ABOUT produces correct ActionResult for item")
@@ -230,7 +230,7 @@ struct ThinkAboutActionHandlerTests {
         
         // Verify result
         #expect(result.message == "You contemplate the ornate mirror for a bit, but nothing fruitful comes to mind.")
-        #expect(!result.stateChanges.isEmpty) // THINK ABOUT item should set isTouched and update pronouns
+        #expect(!result.changes.isEmpty) // THINK ABOUT item should set isTouched and update pronouns
     }
 
     @Test("THINK ABOUT SELF does not modify game state")
@@ -442,7 +442,7 @@ struct ThinkAboutActionHandlerTests {
         
         // Verify complete workflow
         #expect(result.message == "You contemplate the magic crystal for a bit, but nothing fruitful comes to mind.")
-        #expect(!result.stateChanges.isEmpty) // Should set touched flag and pronouns
+        #expect(!result.changes.isEmpty) // Should set touched flag and pronouns
     }
 
     @Test("THINK ABOUT rejects unreachable items")

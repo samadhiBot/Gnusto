@@ -112,10 +112,10 @@ public struct ClimbActionHandler: ActionHandler {
                 // Combine state changes from climb (touch/pronouns) with go result
                 return ActionResult(
                     message: goResult.message,
-                    stateChanges: [
+                    changes: [
                         await context.engine.setFlag(.isTouched, on: targetItem),
                         await context.engine.updatePronouns(to: targetItem),
-                    ] + goResult.stateChanges
+                    ] + goResult.changes
                 )
             } catch {
                 // If movement fails, let the engine handle the error
@@ -136,7 +136,7 @@ public struct ClimbActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
             ]

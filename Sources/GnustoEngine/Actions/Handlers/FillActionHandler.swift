@@ -95,7 +95,7 @@ public struct FillActionHandler: ActionHandler {
 
             return ActionResult(
                 message: message,
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: containerItem),
                     await context.engine.updatePronouns(to: containerItem),
                 ]
@@ -117,7 +117,7 @@ public struct FillActionHandler: ActionHandler {
 
             return ActionResult(
                 message: message,
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: containerItem),
                     await context.engine.updatePronouns(to: containerItem),
                 ]

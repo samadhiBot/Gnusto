@@ -121,7 +121,7 @@ public struct OpenActionHandler: ActionHandler {
         // Prepare the result
         return ActionResult(
             message: message,
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isOpen, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),
@@ -130,7 +130,7 @@ public struct OpenActionHandler: ActionHandler {
     }
 
     // Rely on default postProcess to print the message.
-    // Engine's execute method handles applying the stateChanges.
+    // Engine's execute method handles applying the changes.
 }
 
 // TODO: Add/verify ActionResponse cases: .itemNotOpenable, .itemAlreadyOpen, .itemIsLocked

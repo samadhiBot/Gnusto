@@ -94,7 +94,7 @@ public struct ThrowActionHandler: ActionHandler {
 
             return ActionResult(
                 message: message,
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: itemToThrow),
                     await context.engine.updatePronouns(to: itemToThrow),
                     await context.engine.move(itemToThrow, to: .location(currentLocationID)),
@@ -105,7 +105,7 @@ public struct ThrowActionHandler: ActionHandler {
             // General throwing - no specific target
             return ActionResult(
                 message: context.message(.throwGeneral(item: itemToThrow.withDefiniteArticle)),
-                stateChanges: [
+                changes: [
                     await context.engine.setFlag(.isTouched, on: itemToThrow),
                     await context.engine.updatePronouns(to: itemToThrow),
                     await context.engine.move(itemToThrow, to: .location(currentLocationID)),

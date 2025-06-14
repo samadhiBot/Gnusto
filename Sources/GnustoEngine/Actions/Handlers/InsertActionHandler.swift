@@ -308,7 +308,7 @@ public struct InsertActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            stateChanges: allStateChanges
+            changes: allStateChanges
         )
     }
 }

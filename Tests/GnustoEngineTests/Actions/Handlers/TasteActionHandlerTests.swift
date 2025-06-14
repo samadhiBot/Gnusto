@@ -168,8 +168,8 @@ struct TasteActionHandlerTests {
         
         // Verify result
         #expect(result.message == "That tastes about average.")
-        #expect(result.stateChanges.isEmpty) // TASTE should not modify state
-        #expect(result.sideEffects.isEmpty) // TASTE should not have side effects
+        #expect(result.changes.isEmpty) // TASTE should not modify state
+        #expect(result.effects.isEmpty) // TASTE should not have side effects
     }
 
     @Test("TASTE does not affect game state")
@@ -401,8 +401,8 @@ struct TasteActionHandlerTests {
         
         // Verify complete workflow
         #expect(result.message == "That tastes about average.")
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("TASTE works with different item types")

@@ -353,7 +353,7 @@ struct Act1Area {
                 slips out, dashing between your ankles and into the lane. Overjoyed to have
                 company, she skitters about wriggling this way and that.
                 """,
-            stateChanges: [
+            changes: [
                 await engine.setFlag(.gnustoEscaped),
                 await engine.move(gnusto, to: .location(.berziosGate)),
             ]

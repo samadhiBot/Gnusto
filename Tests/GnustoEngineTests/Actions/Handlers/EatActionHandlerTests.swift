@@ -202,12 +202,12 @@ struct EatActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Apply the state changes to the engine
-        for change in result.stateChanges {
+        for change in result.changes {
             try await engine.apply(change)
         }
 
         // Then - Check that the item was removed (moved to .nowhere) and touched
-        #expect(result.stateChanges.count >= 2)
+        #expect(result.changes.count >= 2)
 
         // Check that apple was consumed (removed from game)
         let finalApple = try await engine.item("apple")

@@ -63,8 +63,8 @@ struct XyzzyActionHandlerTests {
         
         // Verify result
         #expect(result.message == expectedMarkdown)
-        #expect(result.stateChanges.isEmpty) // XYZZY should not modify state
-        #expect(result.sideEffects.isEmpty) // XYZZY should not have side effects
+        #expect(result.changes.isEmpty) // XYZZY should not modify state
+        #expect(result.effects.isEmpty) // XYZZY should not have side effects
     }
 
     @Test("XYZZY validation always succeeds")
@@ -123,8 +123,8 @@ struct XyzzyActionHandlerTests {
         
         // Verify complete workflow
         #expect(result.message == expectedMarkdown)
-        #expect(result.stateChanges.isEmpty)
-        #expect(result.sideEffects.isEmpty)
+        #expect(result.changes.isEmpty)
+        #expect(result.effects.isEmpty)
     }
 
     @Test("XYZZY does not affect game state")

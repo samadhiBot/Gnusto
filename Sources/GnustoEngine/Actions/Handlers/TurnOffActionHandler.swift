@@ -112,7 +112,7 @@ public struct TurnOffActionHandler: ActionHandler {
 
         return ActionResult(
             message: messageParts.joined(separator: "\n"),
-            stateChanges: [
+            changes: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.clearFlag(.isOn, on: targetItem),
             ]

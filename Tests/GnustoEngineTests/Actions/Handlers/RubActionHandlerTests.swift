@@ -218,10 +218,10 @@ struct RubActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.stateChanges.count >= 1)
+        #expect(result.changes.count >= 1)
 
         // Should have touched the item
-        let hasTouchedChange = result.stateChanges.contains(where: { change in
+        let hasTouchedChange = result.changes.contains(where: { change in
             change.entityID == .item("orb") &&
             change.attribute == .itemAttribute(.isTouched) &&
             change.newValue == true

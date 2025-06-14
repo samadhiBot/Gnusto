@@ -18,8 +18,8 @@ public struct XyzzyActionHandler: ActionHandler {
         // doesn't lead to game time advancement.
         return ActionResult(
             message: "A hollow voice says \"Fool.\"",
-            stateChanges: [],
-            sideEffects: []
+            changes: [],
+            effects: []
         )
     }
 }

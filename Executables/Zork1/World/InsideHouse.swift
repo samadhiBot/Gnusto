@@ -336,7 +336,7 @@ extension InsideHouse {
 
                 return ActionResult(
                     message: "The lamp has smashed into the floor, and the light has gone out.",
-                    stateChanges: changes
+                    changes: changes
                 )
 
             case .turnOn:
@@ -408,7 +408,7 @@ extension InsideHouse {
                             With a great effort, the rug is moved to one side of the room,
                             revealing the dusty cover of a closed trap door.
                             """,
-                        stateChanges: [
+                        changes: [
                             // Mark rug as moved
                             await engine.setFlag(.rugMoved),
                             // Make trap door visible
@@ -475,7 +475,7 @@ extension InsideHouse {
                     The door reluctantly opens to reveal a rickety staircase
                     descending into darkness.
                     """,
-                stateChanges: [
+                changes: [
                     try await engine.setFlag(.isOpen, on: .trapDoor)
                 ]
             )
@@ -489,7 +489,7 @@ extension InsideHouse {
             }
             return ActionResult(
                 message: "The door swings shut and closes.",
-                stateChanges: [
+                changes: [
                     try await engine.clearFlag(.isOpen, on: .trapDoor)
                 ]
             )
@@ -593,7 +593,7 @@ extension InsideHouse {
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
         if newGlowLevel != currentGlowLevel {
             return ActionResult(
-                changes: StateChange(
+                StateChange(
                     entityID: .global,
                     attribute: .globalState(attributeID: .swordGlowLevel),
                     oldValue: currentGlowLevel == 0 ? nil : .int(currentGlowLevel),

@@ -337,10 +337,10 @@ struct ThrowActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.stateChanges.count >= 1)
+        #expect(result.changes.count >= 1)
 
         // Check that the ball was moved from player to current location
-        let moveChange = result.stateChanges.first { change in
+        let moveChange = result.changes.first { change in
             change.attribute == .itemParent
         }
         #expect(moveChange != nil)

@@ -80,7 +80,7 @@ struct SystemCommandActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Apply state changes to verify flag is set
-        for change in result.stateChanges {
+        for change in result.changes {
             try await engine.apply(change)
         }
 
@@ -89,7 +89,7 @@ struct SystemCommandActionHandlerTests {
         #expect(result.message!.contains("file name"))
         #expect(result.message!.contains("transcript"))
         #expect(await engine.hasGlobal(.isScripting) == true)
-        #expect(result.stateChanges.count == 1)
+        #expect(result.changes.count == 1)
     }
 
     @Test("SCRIPT validation fails when already scripting")
@@ -153,7 +153,7 @@ struct SystemCommandActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Apply state changes to verify flag is cleared
-        for change in result.stateChanges {
+        for change in result.changes {
             try await engine.apply(change)
         }
 
@@ -161,7 +161,7 @@ struct SystemCommandActionHandlerTests {
         #expect(result.message != nil)
         #expect(result.message!.contains("ended"))
         #expect(await engine.hasGlobal(.isScripting) == false)
-        #expect(result.stateChanges.count == 1)
+        #expect(result.changes.count == 1)
     }
 
     @Test("UNSCRIPT validation fails when not scripting")
@@ -223,7 +223,7 @@ struct SystemCommandActionHandlerTests {
         try await scriptHandler.validate(context: scriptContext)
         let scriptResult = try await scriptHandler.process(context: scriptContext)
 
-        for change in scriptResult.stateChanges {
+        for change in scriptResult.changes {
             try await engine.apply(change)
         }
 
@@ -237,7 +237,7 @@ struct SystemCommandActionHandlerTests {
         try await unscriptHandler.validate(context: unscriptContext)
         let unscriptResult = try await unscriptHandler.process(context: unscriptContext)
 
-        for change in unscriptResult.stateChanges {
+        for change in unscriptResult.changes {
             try await engine.apply(change)
         }
 
