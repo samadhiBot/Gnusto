@@ -389,9 +389,6 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .inflateWhat:
             "Inflate what?"
 
-        case .insertIntoWhat:
-            "Insert into what?"
-
         case .insertWhat:
             "Insert what?"
 
@@ -825,6 +822,190 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .youTakeMultipleItems(let items):
             "You take \(items)."
+
+        // Additional action handler messages
+        case .examineWhat:
+            "Examine what?"
+
+        case .moveWhat:
+            "Move what?"
+
+        case .pourWhat:
+            "Pour what?"
+
+        case .pourOn(let item, let target):
+            "Pour the \(item) on what?"
+
+        case .pourCannotPourThat:
+            "You can't pour that."
+
+        case .pourCannotPourOnThat:
+            "You can't pour something on that."
+
+        case .pourCannotPourItself(let item):
+            "You can't pour the \(item) on itself."
+
+        case .pourNotLiquid(let item):
+            "You can't pour the \(item) - it's not a liquid."
+
+        case .pourOnCharacter(let item, let character):
+            "You pour the \(item) on the \(character). They are not pleased with this treatment."
+
+        case .pourOnDevice(let item, let device):
+            "You pour the \(item) on the \(device). This probably wasn't a good idea - electronic devices and liquids don't mix well."
+
+        case .pourOnGeneric(let item, let target):
+            "You pour the \(item) on the \(target). It drips off without much effect."
+
+        case .putWhat:
+            "Put what?"
+
+        case .putOnWhat(let item):
+            "Put the \(item) on what?"
+
+        case .putCannotPutOnSelf:
+            "You can't put something on itself."
+
+        case .putCannotPutCircular(let item, let container, let preposition):
+            "You can't put the \(item) on the \(container) because the \(container) is \(preposition) the \(item)."
+
+        case .raiseWhat:
+            "Raise what?"
+
+        case .raiseCannotLift(let item):
+            "You can't lift \(item)."
+
+        case .readWhat:
+            "Read what?"
+
+        case .scriptAlreadyOn:
+            "Scripting is already on."
+
+        case .scriptNotOn:
+            "Scripting is not currently on."
+
+        case .smellCanOnlySmellItems:
+            "You can only smell items directly."
+
+        case .tellWhom:
+            "Tell whom?"
+
+        case .tellAboutWhat:
+            "Tell about what?"
+
+        case .tellCanOnlyTellCharacters:
+            "You can only tell characters about things."
+
+        case .tellCannotTellAbout(let character):
+            "You can't tell the \(character) about anything."
+
+        case .tieWhat:
+            "Tie what?"
+
+        case .tieCannotTieThat:
+            "You can't tie that."
+
+        case .tieCannotTieToThat:
+            "You can't tie something to that."
+
+        case .tieCannotTieToSelf(let item):
+            "You can't tie the \(item) to itself."
+
+        case .tieCannotTieLivingBeings:
+            "You can't tie living beings together like that."
+
+        case .tieNeedsSomethingToTieWith(let item):
+            "You can't tie the \(item) without something to tie it with."
+
+        case .tieNeedsSomethingToTieCharacterWith(let character):
+            "You can't tie up the \(character) without something to tie them with."
+
+        case .touchWhat:
+            "Touch what?"
+
+        case .turnOffWhat:
+            "Turn off what?"
+
+        case .turnOnWhat:
+            "Turn on what?"
+
+        case .alreadyOff:
+            "It's already off."
+
+        case .alreadyOn:
+            "It's already on."
+
+        case .cannotTurnOff:
+            "You can't turn that off."
+
+        case .cannotTurnOn:
+            "You can't turn that on."
+
+        case .unlockWhat:
+            "Unlock what?"
+
+        case .unlockWithWhat:
+            "Unlock it with what?"
+
+        case .unlockAlreadyUnlocked(let item):
+            "The \(item) is already unlocked."
+
+        case .wearWhat:
+            "Wear what?"
+
+        case .youCanOnlyMoveItems:
+            "You can only move items."
+
+        case .youCanOnlyPutItemsOnThings:
+            "You can only put items on things."
+
+        case .youCanOnlyPutThingsOnSurfaces:
+            "You can only put things on items (that are surfaces)."
+
+        case .youCanOnlyRaiseItems:
+            "You can only raise items."
+
+        case .youCanOnlyReadItems:
+            "You can only read items."
+
+        case .youCanOnlySmellItems:
+            "You can only smell items directly."
+
+        case .youCanOnlyTasteItems:
+            "You can only taste items."
+
+        case .youCanOnlyTellCharacters:
+            "You can only tell characters about things."
+
+        case .youCanOnlyTouchItems:
+            "You can only touch items."
+
+        case .youCanOnlyTurnOffItems:
+            "You can only turn off items."
+
+        case .youCanOnlyTurnOnItems:
+            "You can only turn on items."
+
+        case .youCanOnlyUnlockItems:
+            "You can only unlock items."
+
+        case .youCanOnlyUseItemAsKey:
+            "You can only use an item as a key."
+
+        case .youCanOnlyWearItems:
+            "You can only wear items."
+
+        case .youCannotTakeFromNonContainer(let container):
+            "You can't take things out of the \(container)."
+
+        case .insertWhat:
+            "Insert what?"
+
+        case .insertIntoWhat:
+            "Insert into what?"
+
+        case .insertHaveNothingToPut(let container):
+            "You have nothing to put in the \(container)."
 
         }
     }

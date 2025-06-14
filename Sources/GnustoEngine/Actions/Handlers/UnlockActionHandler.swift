@@ -25,17 +25,25 @@ public struct UnlockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Unlock what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.unlockWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only unlock items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyUnlockItems)
+            )
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Unlock it with what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.unlockWithWhat)
+            )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only use an item as a key.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyUseItemAsKey)
+            )
         }
 
         // 2. Get item snapshots
@@ -57,7 +65,9 @@ public struct UnlockActionHandler: ActionHandler {
         }
 
         guard targetItem.hasFlag(.isLocked) else {
-            throw ActionResponse.prerequisiteNotMet("The \(targetItem.name) is already unlocked.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.unlockAlreadyUnlocked(item: targetItem.name))
+            )
         }
 
         // 5. Check if it's the correct key

@@ -336,10 +336,7 @@ extension Forest {
                     "Done."
                 }
 
-                return ActionResult(
-                    message: message,
-                    stateChanges: stateChanges
-                )
+                return ActionResult(message: message, stateChanges: stateChanges)
             }
             return nil
         case .afterTurn:
@@ -347,7 +344,9 @@ extension Forest {
         }
     }
 
-    static let grateHandler = ItemEventHandler { engine, event in
+    static let grateHandler = ItemEventHandler {
+        engine,
+        event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -357,8 +356,8 @@ extension Forest {
                     let grate = try await engine.item(.grate)
                     if grate.hasFlag(.isOpen) {
                         return ActionResult(
-                            message: "The grating is closed.",
-                            stateChange: try await engine.clearFlag(.isOpen, on: .grate)
+                            "The grating is closed.",
+                            try await engine.clearFlag(.isOpen, on: .grate)
                         )
                     } else {
                         return ActionResult("The grating is already closed.")
@@ -370,8 +369,10 @@ extension Forest {
             case .lock:
                 let currentLocation = await engine.playerLocationID
                 if currentLocation == .gratingRoom {
-                    let changes = await engine.setFlag(.isLocked, on: try await engine.item(.grate))
-                    return ActionResult(message: "The grate is locked.", stateChange: changes)
+                    return ActionResult(
+                        "The grate is locked.",
+                        await engine.setFlag(.isLocked, on: try await engine.item(.grate))
+                    )
                 } else if currentLocation == .gratingClearing {
                     return ActionResult("You can't lock it from this side.")
                 } else {
@@ -391,8 +392,10 @@ extension Forest {
                     }
 
                     if currentLocation == .gratingRoom {
-                        let changes = await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
-                        return ActionResult(message: "The grate is unlocked.", stateChange: changes)
+                        return ActionResult(
+                            "The grate is unlocked.",
+                            await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
+                        )
                     } else if currentLocation == .gratingClearing {
                         return ActionResult("You can't reach the lock from here.")
                     } else {
@@ -407,13 +410,15 @@ extension Forest {
                 if !isLocked {
                     let isOpen = try await engine.hasFlag(.isOpen, on: .grate)
                     if !isOpen {
-                        let changes = await engine.setFlag(.isOpen, on: try await engine.item(.grate))
                         let message = if currentLocation == .gratingClearing {
                             "The grating opens."
                         } else {
                             "The grating opens to reveal trees above you."
                         }
-                        return ActionResult(message: message, stateChange: changes)
+                        return ActionResult(
+                            message,
+                            await engine.setFlag(.isOpen, on: try await engine.item(.grate))
+                        )
                     } else {
                         return ActionResult("The grating is already open.")
                     }
@@ -440,7 +445,7 @@ extension Forest {
 
                 if currentLocation == .gratingRoom {
                     let changes = await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
-                    return ActionResult(message: "The grate is unlocked.", stateChange: changes)
+                    return ActionResult("The grate is unlocked.", changes)
                 } else if currentLocation == .gratingClearing {
                     return ActionResult("You can't reach the lock from here.")
                 } else {

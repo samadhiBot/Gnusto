@@ -29,15 +29,15 @@ public struct MoveActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Move what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.moveWhat))
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Move what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.moveWhat))
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only move items.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyMoveItems))
         }
 
         // 2. Check if item exists
@@ -83,9 +83,10 @@ public struct MoveActionHandler: ActionHandler {
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
-                    throw ActionResponse.internalEngineError("Move: directObject was not an item in process.")
+                    throw ActionResponse.internalEngineError(
+                        "Move: directObject was not an item in process.")
                 }
             }
 
@@ -96,7 +97,7 @@ public struct MoveActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     // Check if player can reach the item
                     guard await context.engine.playerCanReach(targetItemID) else {
-                        continue // Skip unreachable items in ALL commands
+                        continue  // Skip unreachable items in ALL commands
                     }
                 }
 
@@ -141,16 +142,17 @@ public struct MoveActionHandler: ActionHandler {
         }
 
         // Generate appropriate message
-        let message = if context.command.isAllCommand {
-            if movedItems.isEmpty {
-                "There is nothing here to move."
+        let message =
+            if context.command.isAllCommand {
+                if movedItems.isEmpty {
+                    "There is nothing here to move."
+                } else {
+                    "You move \(movedItems.listWithDefiniteArticles)."
+                }
             } else {
-                "You move \(movedItems.listWithDefiniteArticles)."
+                // Default behavior: most things can't be meaningfully moved
+                "Moving the \(movedItems.first?.name ?? "item") doesn't accomplish anything."
             }
-        } else {
-            // Default behavior: most things can't be meaningfully moved
-            "Moving the \(movedItems.first?.name ?? "item") doesn't accomplish anything."
-        }
 
         return ActionResult(
             message: message,

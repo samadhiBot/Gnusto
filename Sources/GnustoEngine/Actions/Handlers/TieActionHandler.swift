@@ -17,10 +17,14 @@ public struct TieActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Tie requires a direct object (what to tie)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Tie what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.tieWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't tie that.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.tieCannotTieThat)
+            )
         }
 
         // Check if target exists and is reachable
@@ -32,7 +36,9 @@ public struct TieActionHandler: ActionHandler {
         // If there's an indirect object, validate it too
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let indirectItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't tie something to that.")
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message(.tieCannotTieToThat)
+                )
             }
 
             _ = try await context.engine.item(indirectItemID)
@@ -81,7 +87,7 @@ public struct TieActionHandler: ActionHandler {
             )
         } else {
             // Just "TIE X" - tie the object by itself
-            let message = handleTyingAlone(targetItem: targetItem)
+            let message = handleTyingAlone(targetItem: targetItem, context: context)
 
             return ActionResult(
                 message: message,
@@ -101,24 +107,30 @@ public struct TieActionHandler: ActionHandler {
     ) async throws -> String {
         // Check if we're trying to tie something to itself
         if targetItem.id == indirectItem.id {
-            return "You can't tie the \(targetItem.name) to itself."
+            return context.message(.tieCannotTieToSelf(item: targetItem.name))
         }
 
         // General tying attempts
         if targetItem.hasFlag(.isCharacter) || indirectItem.hasFlag(.isCharacter) {
-            return "You can't tie living beings together like that."
+            return context.message(.tieCannotTieLivingBeings)
         }
 
-        return
-            "You don't have anything suitable to tie the \(targetItem.name) to the \(indirectItem.name) with."
+        return context.message(.tieNeedsSomethingToTieWith(item: targetItem.name))
     }
 
     /// Handles tying a single object.
-    private func handleTyingAlone(targetItem: Item) -> String {
+    private func handleTyingAlone(
+        targetItem: Item,
+        context: ActionContext
+    ) -> String {
         if targetItem.hasFlag(.isCharacter) {
-            return "You can't tie up the \(targetItem.name) without something to tie them with."
+            return context.message(
+                .tieNeedsSomethingToTieCharacterWith(character: targetItem.name)
+            )
         } else {
-            return "You can't tie the \(targetItem.name) without something to tie it with."
+            return context.message(
+                .tieNeedsSomethingToTieWith(item: targetItem.name)
+            )
         }
     }
 

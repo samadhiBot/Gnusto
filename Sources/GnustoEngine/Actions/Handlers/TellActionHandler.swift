@@ -17,14 +17,20 @@ public struct TellActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // TELL requires both direct object (who) and indirect object (what about)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Tell whom?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.tellWhom)
+            )
         }
         guard context.command.indirectObject != nil else {
-            throw ActionResponse.prerequisiteNotMet("Tell about what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.tellAboutWhat)
+            )
         }
 
         guard case .item(let characterID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only tell characters about things.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.tellCanOnlyTellCharacters)
+            )
         }
 
         // Check if character exists and is reachable

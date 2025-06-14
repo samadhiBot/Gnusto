@@ -47,24 +47,6 @@ public struct ActionResult: Sendable {
         self.sideEffects = sideEffects.compactMap(\.self)
     }
 
-    /// Creates a new `ActionResult` with arrays of state changes and side effects.
-    /// 
-    /// - Parameters:
-    ///   - message: An optional message to display to the player.
-    ///   - changes: An array of `StateChange`s to be applied.
-    ///   - effects: An array of `SideEffect`s to be triggered.
-    public init(
-        message: String? = nil,
-        changes: StateChange?...,
-        effects: SideEffect?...
-    ) {
-        self = .init(
-            message: message,
-            stateChanges: changes,
-            sideEffects: effects
-        )
-    }
-
     /// Creates a new `ActionResult` with optional single state change and side effect.
     ///
     /// This is a convenience initializer for common cases where an action results in at most
@@ -72,20 +54,20 @@ public struct ActionResult: Sendable {
     ///
     /// - Parameters:
     ///   - message: An optional message to display to the player.
-    ///   - stateChange: An optional single `StateChange` to be applied.
-    ///   - sideEffect: An optional single `SideEffect` to be triggered.
+    ///   - change: An optional single `StateChange` to be applied.
+    ///   - effect: An optional single `SideEffect` to be triggered.
     public init(
-        message: String? = nil,
-        stateChange: StateChange? = nil,
-        sideEffect: SideEffect? = nil
+        _ message: String? = nil,
+        _ change: StateChange? = nil,
+        _ effect: SideEffect? = nil
     ) {
         assert(
-            message != nil || stateChange != nil || sideEffect != nil,
+            message != nil || change != nil || effect != nil,
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
-        self.stateChanges = if let stateChange { [stateChange] } else { [] }
-        self.sideEffects = if let sideEffect { [sideEffect] } else { [] }
+        self.stateChanges = if let change { [change] } else { [] }
+        self.sideEffects = if let effect { [effect] } else { [] }
     }
 
     /// Creates a new `ActionResult` that only contains a message for the player,

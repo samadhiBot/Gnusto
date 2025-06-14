@@ -81,53 +81,52 @@ public struct ClimbActionHandler: ActionHandler {
                 // This object enables traversal in this direction
 
                 // For global objects like stairs, verify they're actually present
-                if targetItem.parent == .nowhere {
-                    guard currentLocation.localGlobals.contains(targetItemID) else {
-                        return ActionResult(
-                            message:
-                                "There \(targetItem.hasFlag(.isPlural) ? "are" : "is") no \(targetItem.name) here.",
-                            stateChanges: stateChanges
-                        )
-                    }
-                }
-
-                // Execute movement in the appropriate direction
-                let goCommand = Command(
-                    verb: .go,
-                    direction: direction,
-                    rawInput: "go \(direction.rawValue)"
-                )
-
-                let goHandler = GoActionHandler()
-                let goContext = ActionContext(
-                    command: goCommand,
-                    engine: context.engine
-                )
-
-                do {
-                    try await goHandler.validate(context: goContext)
-                    let goResult = try await goHandler.process(context: goContext)
-
-                    // Combine state changes from climb (touch/pronouns) with go result
+                if targetItem.parent == .nowhere,
+                   currentLocation.localGlobals.contains(targetItemID) == false {
                     return ActionResult(
-                        message: goResult.message,
-                        stateChanges: [
-                            await context.engine.setFlag(.isTouched, on: targetItem),
-                            await context.engine.updatePronouns(to: targetItem),
-                        ] + goResult.stateChanges
+                        message: """
+                                There \(targetItem.hasFlag(.isPlural) ? "are" : "is")
+                                no \(targetItem.name) here.
+                                """
                     )
-                } catch {
-                    // If movement fails, let the engine handle the error
-                    throw error
                 }
+            }
+
+            // Execute movement in the appropriate direction
+            let goCommand = Command(
+                verb: .go,
+                direction: direction,
+                rawInput: "go \(direction.rawValue)"
+            )
+
+            let goHandler = GoActionHandler()
+            let goContext = ActionContext(
+                command: goCommand,
+                engine: context.engine
+            )
+
+            do {
+                try await goHandler.validate(context: goContext)
+                let goResult = try await goHandler.process(context: goContext)
+
+                // Combine state changes from climb (touch/pronouns) with go result
+                return ActionResult(
+                    message: goResult.message,
+                    stateChanges: [
+                        await context.engine.setFlag(.isTouched, on: targetItem),
+                        await context.engine.updatePronouns(to: targetItem),
+                    ] + goResult.stateChanges
+                )
+            } catch {
+                // If movement fails, let the engine handle the error
+                throw error
             }
         }
 
         // No exit uses this object, so handle as regular climbing
 
         // Check if the item is climbable
-        let message =
-            if targetItem.hasFlag(.isClimbable) {
+        let message = if targetItem.hasFlag(.isClimbable) {
                 // Default climbable behavior - can be overridden by specific item handlers
                 context.message(.climbSuccess(item: targetItem.withDefiniteArticle))
             } else {

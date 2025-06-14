@@ -25,10 +25,14 @@ public struct TurnOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom("Turn on what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.turnOnWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only turn on items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyTurnOnItems)
+            )
         }
 
         // 2. Fetch the item snapshot.
@@ -62,12 +66,16 @@ public struct TurnOnActionHandler: ActionHandler {
         let isFlammable = targetItem.hasFlag(.isFlammable)
 
         guard isDevice || isFlammable else {
-            throw ActionResponse.prerequisiteNotMet("You can't turn that on.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.cannotTurnOn)
+            )
         }
 
         // 5. If it's a device, check if it's already on.
         if isDevice && targetItem.hasFlag(.isOn) {
-            throw ActionResponse.custom("It's already on.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.alreadyOn)
+            )
         }
     }
 

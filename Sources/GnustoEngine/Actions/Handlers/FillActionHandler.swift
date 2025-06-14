@@ -106,15 +106,14 @@ public struct FillActionHandler: ActionHandler {
             let locationItems = await context.engine.items(in: .location(currentLocationID))
             let waterSources = locationItems.filter { $0.hasFlag(.isDrinkable) }
 
-            let message =
-                if !waterSources.isEmpty {
-                    let firstSource = waterSources.first!
-                    context.message(
-                        .fillSuccess(container: containerItem.name, source: firstSource.name))
-                    // TODO: In a full implementation, you might create a new liquid item in the container
-                } else {
-                    context.message(.noLiquidSourceAvailable)
-                }
+            let message = if waterSources.isEmpty {
+                context.message(.noLiquidSourceAvailable)
+            } else {
+                context.message(
+                    .fillSuccess(container: containerItem.name, source: waterSources[0].name)
+                )
+                // TODO: In a full implementation, you might create a new liquid item in the container
+            }
 
             return ActionResult(
                 message: message,

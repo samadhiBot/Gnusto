@@ -224,9 +224,10 @@ extension Underground {
         if isTrapDoorOpen, !isTrapDoorBarred {
             return ActionResult(
                 message: "The trap door crashes shut, and you hear someone barring it.",
-                changes:
+                stateChanges: [
                     try await engine.clearFlag(.isOpen, on: .trapDoor),
-                    await engine.setFlag(.trapDoorBarred)
+                    await engine.setFlag(.trapDoorBarred),
+                ]
             )
         }
 

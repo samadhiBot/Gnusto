@@ -40,36 +40,36 @@ public struct LookInsideActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
 
         // Determine the message based on whether item is a container
-        let message =
-            if targetItem.hasFlag(.isContainer) {
-                // For containers, provide container-specific messaging
-                let isOpen = try await context.engine.hasFlag(.isOpen, on: targetItem.id)
+        let message: String
+        if targetItem.hasFlag(.isContainer) {
+            // For containers, provide container-specific messaging
+            let isOpen = try await context.engine.hasFlag(.isOpen, on: targetItem.id)
 
-                if !isOpen {
-                    "The \(targetItem.name) is closed."
-                } else {
-                    // Show container contents
-                    let items = await context.engine.items(in: .item(targetItem.id))
-                    if items.isEmpty {
-                        "The \(targetItem.name) is empty."
-                    } else {
-                        let itemListing = items.listWithIndefiniteArticles
-                        "In the \(targetItem.name) you see \(itemListing)."
-                    }
-                }
+            if !isOpen {
+                message = "The \(targetItem.name) is closed."
             } else {
-                // For non-containers, delegate to examine behavior
-                let description = try await context.engine.generateDescription(
-                    for: targetItem.id,
-                    attributeID: .description
-                )
-
-                if !description.isEmpty {
-                    description
+                // Show container contents
+                let items = await context.engine.items(in: .item(targetItem.id))
+                if items.isEmpty {
+                    message = "The \(targetItem.name) is empty."
                 } else {
-                    "You see nothing special inside the \(targetItem.name)."
+                    let itemListing = items.listWithIndefiniteArticles
+                    message = "In the \(targetItem.name) you see \(itemListing)."
                 }
             }
+        } else {
+            // For non-containers, delegate to examine behavior
+            let description = try await context.engine.generateDescription(
+                for: targetItem.id,
+                attributeID: .description
+            )
+
+            if !description.isEmpty {
+                message = description
+            } else {
+                message = "You see nothing special inside the \(targetItem.name)."
+            }
+        }
 
         return ActionResult(
             message: message,

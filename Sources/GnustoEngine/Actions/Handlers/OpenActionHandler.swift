@@ -99,23 +99,24 @@ public struct OpenActionHandler: ActionHandler {
         }
 
         // Check if container has items inside to announce what's revealed
-        let message =
-            if targetItem.hasFlag(.isContainer) {
-                let itemsInside = await context.engine.items(in: .item(targetItemID))
-                if !itemsInside.isEmpty {
-                    // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
-                    let itemList = itemsInside.sorted().listWithIndefiniteArticles
-                    context.message(
-                        .openingRevealsContents(
-                            container: targetItem.withDefiniteArticle, contents: itemList))
-                } else {
-                    // Container is empty, use simple message
-                    context.message(.opened(item: targetItem.withDefiniteArticle))
-                }
+        let message: String
+        if targetItem.hasFlag(.isContainer) {
+            let itemsInside = await context.engine.items(in: .item(targetItemID))
+            if !itemsInside.isEmpty {
+                // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
+                let itemList = itemsInside.sorted().listWithIndefiniteArticles
+                message = context.message(
+                    .openingRevealsContents(
+                        container: targetItem.withDefiniteArticle, contents: itemList)
+                )
             } else {
-                // Not a container, use simple message
-                context.message(.opened(item: targetItem.withDefiniteArticle))
+                // Container is empty, use simple message
+                message = context.message(.opened(item: targetItem.withDefiniteArticle))
             }
+        } else {
+            // Not a container, use simple message
+            message = context.message(.opened(item: targetItem.withDefiniteArticle))
+        }
 
         // Prepare the result
         return ActionResult(

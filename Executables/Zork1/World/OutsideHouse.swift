@@ -22,7 +22,8 @@ enum OutsideHouse {
     static let northOfHouse = Location(
         id: .northOfHouse,
         .name("North of House"),
-        .description("""
+        .description(
+            """
             You are facing the north side of a white house. There is no door here,
             and all the windows are boarded up. To the north a narrow path winds
             through the trees.
@@ -33,7 +34,7 @@ enum OutsideHouse {
             .west: .to(.westOfHouse),
             .east: .to(.eastOfHouse),
             .north: .to(.forestPath),
-            .south: .blocked("The windows are all boarded.")
+            .south: .blocked("The windows are all boarded."),
         ]),
         .inherentlyLit,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
@@ -42,7 +43,8 @@ enum OutsideHouse {
     static let southOfHouse = Location(
         id: .southOfHouse,
         .name("South of House"),
-        .description("""
+        .description(
+            """
             You are facing the south side of a white house. There is no door here,
             and all the windows are boarded.
             """),
@@ -52,7 +54,7 @@ enum OutsideHouse {
             .northeast: .to(.eastOfHouse),
             .northwest: .to(.westOfHouse),
             .south: .to(.forest3),
-            .north: .blocked("The windows are all boarded.")
+            .north: .blocked("The windows are all boarded."),
         ]),
         .inherentlyLit,
         .localGlobals(.boardedWindow, .board, .whiteHouse, .forest)
@@ -61,7 +63,8 @@ enum OutsideHouse {
     static let stoneBarrow = Location(
         id: .stoneBarrow,
         .name("Stone Barrow"),
-        .description("""
+        .description(
+            """
             You are standing in front of a massive barrow of stone. In the east face
             is a huge stone door which is open. You cannot see into the dark of the tomb.
             """),
@@ -74,7 +77,8 @@ enum OutsideHouse {
     static let westOfHouse = Location(
         id: .westOfHouse,
         .name("West of House"),
-        .description("""
+        .description(
+            """
             You are standing in an open field west of a white house, with a boarded front door.
             """),
         .exits([
@@ -103,7 +107,8 @@ extension OutsideHouse {
         .isTakable,
         .isFlammable,
         .description("A small leaflet is on the ground."),
-        .readText("""
+        .readText(
+            """
             "WELCOME TO ZORK!
 
             ZORK is a game of adventure, danger, and low cunning. In it you
@@ -168,7 +173,8 @@ extension OutsideHouse {
     static let whiteHouse = Item(
         id: .whiteHouse,
         .name("white house"),
-        .description("""
+        .description(
+            """
             The house is a beautiful colonial house which is painted white.
             It is clear that the owners must have been extremely wealthy.
             """),
@@ -185,9 +191,11 @@ extension OutsideHouse {
     static let eastOfHouseComputer = LocationComputer { attributeID, gameState in
         switch attributeID {
         case .description:
-            let windowState = try gameState
+            let windowState =
+                try gameState
                 .hasFlag(.isOpen, on: .kitchenWindow) ? "open" : "slightly ajar"
-            return .string("""
+            return .string(
+                """
                 You are behind the white house. A path leads into the forest
                 to the east. In one corner of the house there is a small window
                 which is \(windowState).
@@ -235,8 +243,8 @@ extension OutsideHouse {
                 } else {
                     let kitchenWindow = try await engine.item(.kitchenWindow)
                     return await ActionResult(
-                        message: "With great effort, you open the window far enough to allow entry.",
-                        stateChange: engine.setFlag(.isOpen, on: kitchenWindow)
+                        "With great effort, you open the window far enough to allow entry.",
+                        engine.setFlag(.isOpen, on: kitchenWindow)
                     )
                 }
             case .look where command.preposition == "through":
@@ -263,87 +271,89 @@ extension OutsideHouse {
         }
     }
 
-    static let whiteHouseHandler = ItemEventHandler { engine, event in
-        switch event {
-        case .beforeTurn(let command):
-            let currentLocation = await engine.playerLocationID
-
-            // Check if player is inside the house
-            let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
-            if insideHouseLocations.contains(currentLocation) {
-                switch command.verb {
-                case VerbID("find"):
-                    return ActionResult("Why not find your brains?")
-                // TODO: Handle WALK-AROUND verb when available
-                default:
-                    return nil
-                }
-            }
-
-            // Check if player is at the house (at one of the four sides)
-            let atHouseLocations: Set<LocationID> = [.eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse]
-            if !atHouseLocations.contains(currentLocation) {
-                // Player is not at the house
-                switch command.verb {
-                case VerbID("find"):
-                    if currentLocation == .gratingClearing {
-                        return ActionResult("It seems to be to the west.")
-                    } else {
-                        return ActionResult("It was here just a minute ago....")
-                    }
-                default:
-                    return ActionResult("You're not at the house.")
-                }
-            }
-
-            // Player is at the house (at one of the four sides)
-            switch command.verb {
-            case VerbID("find"):
-                return ActionResult("It's right here! Are you blind or something?")
-
-            // TODO: Handle WALK-AROUND verb when available
-
-            case .examine, .look:
-                return ActionResult("""
-                    The house is a beautiful colonial house which is painted white. \
-                    It is clear that the owners must have been extremely wealthy.
-                    """)
-
-            case .open:
-                // Handle THROUGH/OPEN verbs (ZIL combines these)
-                if currentLocation == .eastOfHouse {
-                    let isWindowOpen = try await engine.hasFlag(.isOpen, on: .kitchenWindow)
-                    if isWindowOpen {
-                        // Move player to kitchen
-                        let moveChange = StateChange(
-                            entityID: .player,
-                            attribute: .playerLocation,
-                            oldValue: .locationID(currentLocation),
-                            newValue: .locationID(.kitchen)
-                        )
-                        return ActionResult(stateChange: moveChange)
-                    } else {
-                        // Update pronoun to refer to kitchen window
-                        let kitchenWindow = try await engine.item(.kitchenWindow)
-                        let pronounChange = await engine.updatePronouns(to: kitchenWindow)
-                        return ActionResult(
-                            message: "The window is closed.",
-                            stateChange: pronounChange
-                        )
-                    }
-                } else {
-                    return ActionResult("I can't see how to get in from here.")
-                }
-
-            case VerbID("burn"):
-                return ActionResult("You must be joking.")
-
-            default:
-                return nil
-            }
-
-        case .afterTurn:
-            return nil
-        }
-    }
+//    static let whiteHouseHandler = ItemEventHandler { engine, event in
+//        switch event {
+//        case .beforeTurn(let command):
+//            let currentLocation = await engine.playerLocationID
+//
+//            // Check if player is inside the house
+//            let insideHouseLocations: Set<LocationID> = [.kitchen, .livingRoom, .attic]
+//            if insideHouseLocations.contains(currentLocation) {
+//                switch command.verb {
+//                case VerbID("find"):
+//                    return ActionResult("Why not find your brains?")
+//                // TODO: Handle WALK-AROUND verb when available
+//                default:
+//                    return nil
+//                }
+//            }
+//
+//            // Check if player is at the house (at one of the four sides)
+//            let atHouseLocations: Set<LocationID> = [
+//                .eastOfHouse, .westOfHouse, .northOfHouse, .southOfHouse,
+//            ]
+//            if !atHouseLocations.contains(currentLocation) {
+//                // Player is not at the house
+//                switch command.verb {
+//                case VerbID("find"):
+//                    if currentLocation == .gratingClearing {
+//                        return ActionResult("It seems to be to the west.")
+//                    } else {
+//                        return ActionResult("It was here just a minute ago....")
+//                    }
+//                default:
+//                    return ActionResult("You're not at the house.")
+//                }
+//            }
+//
+//            // Player is at the house (at one of the four sides)
+//            switch command.verb {
+//            case VerbID("find"):
+//                return ActionResult("It's right here! Are you blind or something?")
+//
+//            // TODO: Handle WALK-AROUND verb when available
+//
+//            case .examine, .look:
+//                return ActionResult(
+//                    """
+//                    The house is a beautiful colonial house which is painted white. \
+//                    It is clear that the owners must have been extremely wealthy.
+//                    """)
+//
+//            case .open:
+//                // Handle THROUGH/OPEN verbs (ZIL combines these)
+//                if currentLocation == .eastOfHouse {
+//                    let isWindowOpen = try await engine.hasFlag(.isOpen, on: .kitchenWindow)
+//                    if isWindowOpen {
+//                        // Move player to kitchen
+//                        let moveChange = StateChange(
+//                            entityID: .player,
+//                            attribute: .playerLocation,
+//                            oldValue: .locationID(currentLocation),
+//                            newValue: .locationID(.kitchen)
+//                        )
+//                        return ActionResult(moveChange)
+//                    } else {
+//                        // Update pronoun to refer to kitchen window
+//                        let kitchenWindow = try await engine.item(.kitchenWindow)
+//                        return ActionResult(
+//                            "The window is closed.",
+//                            await engine.updatePronouns(to: kitchenWindow)
+//                        )
+//                    }
+//                } else {
+//                    return ActionResult("I can't see how to get in from here.")
+//                }
+//
+//            case VerbID("burn"):
+//                return ActionResult("You must be joking.")
+//
+//            default:
+//                return nil
+//            }
+//
+//        case .afterTurn:
+//            return nil
+//        }
+//    }
 }

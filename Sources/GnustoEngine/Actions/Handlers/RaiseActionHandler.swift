@@ -11,11 +11,11 @@ public struct RaiseActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` indicating validation success or failure.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Raise what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.raiseWhat))
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only raise items.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyRaiseItems))
         }
 
         // Check if item exists and is reachable
@@ -43,7 +43,7 @@ public struct RaiseActionHandler: ActionHandler {
 
         // Default behavior: You can't raise most things
         return ActionResult(
-            message: "You can't lift \(targetItem.withDefiniteArticle).",
+            message: context.message(.raiseCannotLift(item: targetItem.withDefiniteArticle)),
             stateChanges: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem),

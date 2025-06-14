@@ -17,18 +17,24 @@ public struct WearActionHandler: ActionHandler {
         if context.command.isAllCommand {
             return
         }
-        
+
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Wear what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.wearWhat)
+            )
         }
-        
+
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Wear what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.wearWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only wear items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyWearItems)
+            )
         }
 
         // 2. Check if the item exists and is held by the player
@@ -64,45 +70,45 @@ public struct WearActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to wear)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult("Wear what?")
+                return ActionResult(context.message(.wearWhat))
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var wornItems: [Item] = []
         var lastWornItem: Item?
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult("You can only wear items.")
+                    return ActionResult(context.message(.youCanOnlyWearItems))
                 }
             }
-            
+
             do {
                 let targetItem = try await context.engine.item(targetItemID)
-                
+
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if player is holding the item
                     guard await context.engine.playerIsHolding(targetItemID) else {
-                        continue // Skip items not held in ALL commands
+                        continue  // Skip items not held in ALL commands
                     }
-                    
+
                     // Check if item is wearable
                     guard targetItem.hasFlag(.isWearable) else {
-                        continue // Skip non-wearable items in ALL commands
+                        continue  // Skip non-wearable items in ALL commands
                     }
-                    
+
                     // Check if already worn
                     guard !targetItem.hasFlag(.isWorn) else {
-                        continue // Skip already worn items in ALL commands
+                        continue  // Skip already worn items in ALL commands
                     }
                 }
-                
+
                 // --- Calculate State Changes for this item ---
                 var itemStateChanges: [StateChange] = []
 
@@ -119,7 +125,7 @@ public struct WearActionHandler: ActionHandler {
                 allStateChanges.append(contentsOf: itemStateChanges)
                 wornItems.append(targetItem)
                 lastWornItem = targetItem
-                
+
             } catch {
                 // For ALL commands, skip items that cause errors
                 if !context.command.isAllCommand {
@@ -127,7 +133,7 @@ public struct WearActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if let lastItem = lastWornItem {
             if wornItems.count > 1 {
@@ -144,13 +150,16 @@ public struct WearActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
-        let message = if wornItems.isEmpty {
-            context.command.isAllCommand ? "You have nothing to wear." : "Wear what?"
-        } else {
-            "You put on \(wornItems.listWithDefiniteArticles)."
-        }
+        let message =
+            if wornItems.isEmpty {
+                context.command.isAllCommand
+                    ? context.message(.nothingHereToWear)
+                    : context.message(.wearWhat)
+            } else {
+                "You put on \(wornItems.listWithDefiniteArticles)."
+            }
 
         return ActionResult(
             message: message,

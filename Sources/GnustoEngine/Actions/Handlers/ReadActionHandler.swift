@@ -19,10 +19,10 @@ public struct ReadActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom("Read what?")
+            throw ActionResponse.custom(context.message(.readWhat))
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only read items.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyReadItems))
         }
 
         // 2. Check if item exists

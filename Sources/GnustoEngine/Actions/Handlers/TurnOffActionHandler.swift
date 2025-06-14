@@ -21,10 +21,14 @@ public struct TurnOffActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom("Turn off what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.turnOffWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only turn off items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyTurnOffItems)
+            )
         }
 
         // 2. Fetch the item snapshot.
@@ -37,12 +41,16 @@ public struct TurnOffActionHandler: ActionHandler {
 
         // 4. Check if the item has the `.device` property.
         guard targetItem.hasFlag(.isDevice) else {
-            throw ActionResponse.prerequisiteNotMet("You can't turn that off.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.cannotTurnOff)
+            )
         }
 
         // 5. Check if the item is already off (lacks `.on`).
         guard targetItem.hasFlag(.isOn) else {
-            throw ActionResponse.custom("It's already off.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.alreadyOff)
+            )
         }
     }
 

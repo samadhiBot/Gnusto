@@ -221,7 +221,6 @@ public enum MessageKey: Hashable, Sendable {
     case taken
     case targetIsNotAContainer(item: String)
     case targetIsNotASurface(item: String)
-    case tasteWhat
     case tastesAverage
     case thereIsNothingHereToTake
     case thinkAboutItem(item: String)
@@ -260,4 +259,65 @@ public enum MessageKey: Hashable, Sendable {
     case youHearNothingUnusual
     case youRemoveMultipleItems(items: String)
     case youTakeMultipleItems(items: String)
+
+    // Additional action handler messages
+    case examineWhat
+    case moveWhat
+    case pourWhat
+    case pourOn(item: String, target: String)
+    case pourCannotPourThat
+    case pourCannotPourOnThat
+    case pourCannotPourItself(item: String)
+    case pourNotLiquid(item: String)
+    case pourOnCharacter(item: String, character: String)
+    case pourOnDevice(item: String, device: String)
+    case pourOnGeneric(item: String, target: String)
+    case putWhat
+    case putOnWhat(item: String)
+    case putCannotPutOnSelf
+    case putCannotPutCircular(item: String, container: String, preposition: String)
+    case raiseWhat
+    case raiseCannotLift(item: String)
+    case readWhat
+    case scriptAlreadyOn
+    case scriptNotOn
+    case smellCanOnlySmellItems
+    case tasteWhat
+    case tellWhom
+    case tellAboutWhat
+    case tellCanOnlyTellCharacters
+    case tellCannotTellAbout(character: String)
+    case tieWhat
+    case tieCannotTieThat
+    case tieCannotTieToThat
+    case tieCannotTieToSelf(item: String)
+    case tieCannotTieLivingBeings
+    case tieNeedsSomethingToTieWith(item: String)
+    case tieNeedsSomethingToTieCharacterWith(character: String)
+    case touchWhat
+    case turnOffWhat
+    case turnOnWhat
+    case alreadyOff
+    case alreadyOn
+    case cannotTurnOff
+    case cannotTurnOn
+    case unlockWhat
+    case unlockWithWhat
+    case unlockAlreadyUnlocked(item: String)
+    case youCanOnlyMoveItems
+    case youCanOnlyPutItemsOnThings
+    case youCanOnlyPutThingsOnSurfaces
+    case youCanOnlyRaiseItems
+    case youCanOnlyReadItems
+    case youCanOnlySmellItems
+    case youCanOnlyTasteItems
+    case youCanOnlyTellCharacters
+    case youCanOnlyTouchItems
+    case youCanOnlyTurnOffItems
+    case youCanOnlyTurnOnItems
+    case youCanOnlyUnlockItems
+    case youCanOnlyUseItemAsKey
+    case youCanOnlyWearItems
+    case youCannotTakeFromNonContainer(container: String)
+    case insertHaveNothingToPut(container: String)
 }

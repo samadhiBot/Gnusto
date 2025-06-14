@@ -20,7 +20,7 @@ public struct SmellActionHandler: ActionHandler {
         // If a direct object is provided, it should be an item.
         if let directObjectRef = context.command.directObject {
             guard case .item(_) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only smell items directly.")
+                throw ActionResponse.prerequisiteNotMet(context.message(.smellCanOnlySmellItems))
             }
             // Further validation (existence, reachability) could be added if desired,
             // but default SMELL is often lenient.
@@ -40,18 +40,18 @@ public struct SmellActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default smell-related message.
     public func process(context: ActionContext) async throws -> ActionResult {
-        let message =
-            if let directObjectRef = context.command.directObject {
-                guard case .item(_) = directObjectRef else {
-                    // This case should ideally be caught by validate.
-                    context.message(.cannotSmellThat)
-                }
+        let message = if let directObjectRef = context.command.directObject {
+            if case .item(_) = directObjectRef {
                 // If smelling a specific item, give a generic response.
                 // Specific items could be handled by ItemEventHandler or custom handlers.
                 context.message(.smellsAverage)
             } else {
-                context.message(.smellNothingUnusual)
+                // This case should ideally be caught by validate.
+                context.message(.cannotSmellThat)
             }
+        } else {
+            context.message(.smellNothingUnusual)
+        }
 
         return ActionResult(message)
     }

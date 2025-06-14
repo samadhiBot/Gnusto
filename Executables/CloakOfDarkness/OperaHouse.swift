@@ -103,60 +103,60 @@ enum OperaHouse {
                 nil
             } else {
                 ActionResult(
-                    message: "Blundering around in the dark isn't a good idea!",
-                    stateChange: await engine.adjustGlobal(.barMessageDisturbances, by: 2)
+                    "Blundering around in the dark isn't a good idea!",
+                    await engine.adjustGlobal(.barMessageDisturbances, by: 2)
                 )
             }
         case .look, .inventory:
             nil
         default:
             ActionResult(
-                message: "In the dark? You could easily disturb something!",
-                stateChange: await engine.adjustGlobal(.barMessageDisturbances, by: 1)
+                "In the dark? You could easily disturb something!",
+                await engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
         }
     }
 
     // MARK: - Item event handlers
 
-    static let cloakHandler = ItemEventHandler { engine, event in
-        switch event {
-        case .beforeTurn(let command):
-            switch command.verb {
-            case .drop, .putOn:
-                guard await engine.playerLocationID == .cloakroom else {
-                    throw ActionResponse.prerequisiteNotMet(
-                        "This isn't the best place to leave a smart cloak lying around."
-                    )
-                }
-            default:
-                break
-            }
-
-        case .afterTurn(let command):
-            guard await engine.playerLocationID == .cloakroom else {
-                return nil
-            }
-            switch command.verb {
-            case .drop, .putOn:
-                var stateChanges = [StateChange]()
-                if await engine.playerScore < 1 {
-                    stateChanges.append(await engine.updatePlayerScore(by: 1))
-                }
-                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
-                    stateChanges.append(lightenBar)
-                }
-                return ActionResult(stateChanges: stateChanges)
-            case .take:
-                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(.bar)) {
-                    return ActionResult(stateChange: darkenBar)
-                }
-            default:
-                break
-            }
-        }
-        return nil
-    }
+//    static let cloakHandler = ItemEventHandler { engine, event in
+//        switch event {
+//        case .beforeTurn(let command):
+//            switch command.verb {
+//            case .drop, .putOn:
+//                guard await engine.playerLocationID == .cloakroom else {
+//                    throw ActionResponse.prerequisiteNotMet(
+//                        "This isn't the best place to leave a smart cloak lying around."
+//                    )
+//                }
+//            default:
+//                break
+//            }
+//
+//        case .afterTurn(let command):
+//            guard await engine.playerLocationID == .cloakroom else {
+//                return nil
+//            }
+//            switch command.verb {
+//            case .drop, .putOn:
+//                var stateChanges = [StateChange]()
+//                if await engine.playerScore < 1 {
+//                    stateChanges.append(await engine.updatePlayerScore(by: 1))
+//                }
+//                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
+//                    stateChanges.append(lightenBar)
+//                }
+//                return ActionResult(stateChanges: stateChanges)
+//            case .take:
+//                if let darkenBar = try await engine.clearFlag(.isLit, on: engine.location(.bar)) {
+//                    return ActionResult(darkenBar)
+//                }
+//            default:
+//                break
+//            }
+//        }
+//        return nil
+//    }
 
     static let hookHandler = ItemEventHandler { engine, event in
         guard case .beforeTurn(let command) = event, command.verb == .examine else {
@@ -189,12 +189,12 @@ enum OperaHouse {
         await engine.requestQuit()
         if disturbedCount < 2 {
             return ActionResult(
-                message: """
-                    The message, neatly marked in the sawdust, reads...
-
-                    "You win."
-                    """,
-                stateChanges: [await engine.updatePlayerScore(by: 1)]
+                """
+                The message, neatly marked in the sawdust, reads...
+                
+                "You win."
+                """,
+                await engine.updatePlayerScore(by: 1)
             )
 
         } else {

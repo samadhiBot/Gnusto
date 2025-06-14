@@ -11,7 +11,9 @@ public struct UnscriptActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Check if scripting is currently active
         if !(await context.engine.hasGlobal(.isScripting)) {
-            throw ActionResponse.prerequisiteNotMet("Scripting is not currently on.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.scriptNotOn)
+            )
         }
     }
 

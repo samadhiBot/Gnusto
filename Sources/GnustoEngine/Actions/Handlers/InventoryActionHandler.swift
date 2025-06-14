@@ -24,18 +24,19 @@ public struct InventoryActionHandler: ActionHandler {
         let inventoryItems = await context.engine.items(in: .player)
 
         // Construct the message
-        let message =
+        var message: String {
             if inventoryItems.isEmpty {
-                context.message(.youAreEmptyHanded)
+                return context.message(.youAreEmptyHanded)
             } else {
                 let itemList = inventoryItems.sorted().map {
                     "- \($0.withIndefiniteArticle.capitalizedFirst)"
                 }.joined(separator: "\n")
-                """
-                \(context.message(.youAreCarrying))
-                \(itemList.indent())
-                """
+                return """
+                    \(context.message(.youAreCarrying))
+                    \(itemList.indent())
+                    """
             }
+        }
 
         return ActionResult(message)
     }

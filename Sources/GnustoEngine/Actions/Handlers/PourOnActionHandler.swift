@@ -17,19 +17,20 @@ public struct PourOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Pour requires a direct object (what to pour)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Pour what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.pourWhat))
         }
         guard case .item(let sourceItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't pour that.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.pourCannotPourThat))
         }
 
         // Pour requires an indirect object (what to pour on)
         guard let indirectObjectRef = context.command.indirectObject else {
             let sourceItem = try await context.engine.item(sourceItemID)
-            throw ActionResponse.prerequisiteNotMet("Pour the \(sourceItem.name) on what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.pourOn(item: sourceItem.name, target: "")))
         }
         guard case .item(let targetItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't pour something on that.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.pourCannotPourOnThat))
         }
 
         // Check if source exists and is reachable
@@ -90,29 +91,27 @@ public struct PourOnActionHandler: ActionHandler {
     ) async throws -> String {
         // Check if we're trying to pour something on itself
         if sourceItem.id == targetItem.id {
-            return "You can't pour the \(sourceItem.name) on itself."
+            return context.message(.pourCannotPourItself(item: sourceItem.name))
         }
 
         // Check if the source is actually pourable
         if !sourceItem.hasFlag(.isDrinkable) {
-            return "You can't pour the \(sourceItem.name) - it's not a liquid."
+            return context.message(.pourNotLiquid(item: sourceItem.name))
         }
 
         // Special cases for characters as targets
         if targetItem.hasFlag(.isCharacter) {
-            return
-                "You pour the \(sourceItem.name) on the \(targetItem.name). They are not pleased with this treatment."
+            return context.message(
+                .pourOnCharacter(item: sourceItem.name, character: targetItem.name))
         }
 
         // Special cases for sensitive objects
         if targetItem.hasFlag(.isDevice) {
-            return
-                "You pour the \(sourceItem.name) on the \(targetItem.name). This probably wasn't a good idea - electronic devices and liquids don't mix well."
+            return context.message(.pourOnDevice(item: sourceItem.name, device: targetItem.name))
         }
 
         // General pouring response
-        return
-            "You pour the \(sourceItem.name) on the \(targetItem.name). It drips off without much effect."
+        return context.message(.pourOnGeneric(item: sourceItem.name, target: targetItem.name))
     }
 
     /// Performs any post-processing after the pour action completes.

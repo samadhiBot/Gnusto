@@ -11,7 +11,7 @@ public struct ScriptActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Check if scripting is already active
         if await context.engine.hasGlobal(.isScripting) {
-            throw ActionResponse.prerequisiteNotMet("Scripting is already on.")
+            throw ActionResponse.prerequisiteNotMet(context.message(.scriptAlreadyOn))
         }
     }
 

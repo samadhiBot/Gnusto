@@ -18,10 +18,14 @@ public struct TouchActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom("Touch what?")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.touchWhat)
+            )
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only touch items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.youCanOnlyTouchItems)
+            )
         }
 
         // 2. Check if item exists (engine.item() will throw if not found)

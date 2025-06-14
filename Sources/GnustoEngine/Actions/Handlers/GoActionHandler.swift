@@ -103,17 +103,18 @@ public struct GoActionHandler: ActionHandler {
             )
         }
 
-        // Create state change for player movement
-        let movePlayerChange = StateChange(
-            entityID: .player,
-            attribute: .playerLocation,
-            oldValue: .locationID(currentLocation.id),
-            newValue: .locationID(destinationID)
-        )
-
         // --- Create Result ---
         // Movement itself doesn't usually print a message; the new location description suffices.
         // The context.engine's run loop will trigger describeCurrentLocation after state changes.
-        return ActionResult(stateChange: movePlayerChange)
+        return ActionResult(
+            stateChanges: [
+                StateChange(
+                    entityID: .player,
+                    attribute: .playerLocation,
+                    oldValue: .locationID(currentLocation.id),
+                    newValue: .locationID(destinationID)
+                )
+            ]
+        )
     }
 }
