@@ -33,7 +33,7 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chomp your teeth together menacingly.")
+        expectNoDifference(output, "You chomp at the air for everyone to see.")
     }
 
     @Test("CHOMP with object")
@@ -42,8 +42,8 @@ struct ChompActionHandlerTests {
 
         let command = Command(
             verb: .chomp,
-            directObject: .item("apple"),
-            rawInput: "chomp apple"
+            directObject: .item(.startItem),
+            rawInput: "chomp the pebble"
         )
 
         // Act
@@ -51,14 +51,7 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
-
-//        let context = ActionContext(command: command, engine: engine)
-//
-//        let result = try await handler.process(context: context)
-//
-//        #expect(result.message != nil)
-//        #expect(result.message!.contains("apple"))
+        expectNoDifference(output, "You gnaw on the pebble briefly before giving up.")
     }
 
     @Test("CHOMP validation passes without object")
@@ -71,11 +64,6 @@ struct ChompActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
-
-//        let context = ActionContext(command: command, engine: engine)
-//
-//        // Should not throw
-//        try await handler.validate(context: context)
+        expectNoDifference(output, "You chomp at the air for everyone to see.")
     }
 }

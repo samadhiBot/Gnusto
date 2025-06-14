@@ -26,7 +26,7 @@ public struct MinimalGame: GameBlueprint {
             maximumScore: 10
         ),
         player: Player = Player(in: LocationID("startRoom")),
-        fixedRandomValue: Double = 0.5,
+        randomNumberGeneratorValues: [Double] = [0.5, 0.25, 0.75, 0, 1],
         locations: [Location] = [
             Location(
                 id: LocationID("startRoom"),
@@ -60,7 +60,7 @@ public struct MinimalGame: GameBlueprint {
     ) {
         self.constants = constants
         self.player = player
-        self.fixedGenerator = FixedRandomNumberGenerator(value: fixedRandomValue)
+        self.fixedGenerator = FixedRandomNumberGenerator(values: randomNumberGeneratorValues)
         self.items = items
         self.locations = locations
         self.customActionHandlers = customActionHandlers

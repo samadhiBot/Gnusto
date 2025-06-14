@@ -45,7 +45,8 @@ public struct FixedRandomNumberGenerator: RandomNumberGenerator, Sendable {
     public init(value: Double = 0.5) {
         // Convert the double to UInt64 for the RandomNumberGenerator protocol
         // We scale the 0.0-1.0 range to the full UInt64 range
-        let scaled = UInt64(value * Double(UInt64.max))
+        // Use UInt64.max - 1 to safely handle the 1.0 edge case
+        let scaled = UInt64(min(value, 1.0 - Double.ulpOfOne) * Double(UInt64.max))
         self.values = [scaled]
     }
 
@@ -57,7 +58,9 @@ public struct FixedRandomNumberGenerator: RandomNumberGenerator, Sendable {
     ///
     /// - Parameter values: The sequence of probability values to cycle through (each 0.0 to 1.0).
     public init(values: [Double]) {
-        self.values = values.map { UInt64($0 * Double(UInt64.max)) }
+        self.values = values.map {
+            UInt64(min($0, 1.0 - Double.ulpOfOne) * Double(UInt64.max))
+        }
     }
 
     /// Returns the next `UInt64` value in the predetermined sequence.

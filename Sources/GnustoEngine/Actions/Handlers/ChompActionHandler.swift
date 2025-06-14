@@ -36,10 +36,11 @@ public struct ChompActionHandler: ActionHandler {
               case .item(let targetItemID) = directObjectRef else {
             let responses = [
                 "You chomp your teeth together menacingly.",
-                "You gnash your teeth with determination.",
-                "You bite the air with gusto.",
-                "Your chomping echoes through the area.",
-                "You practice your chomping technique."
+                "You clench your fists and gnash your teeth.",
+                "You chomp at the air for everyone to see.",
+                "Sounds of your chomping echo around you.",
+                "You practice your chomping technique.",
+                "It feels good to get some chomping done.",
             ]
             return ActionResult(
                 try await context.engine.randomElement(in: responses)
@@ -52,9 +53,9 @@ public struct ChompActionHandler: ActionHandler {
         let message: String
 
         if targetItem.hasFlag(.isEdible) {
-            message = "You take a big bite. Delicious!"
+            message = "You take a bite. It tastes like \(targetItem.withIndefiniteArticle)."
         } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
-            message = "That would be rather rude, not to mention dangerous."
+            message = "That would be rude, not to mention dangerous."
         } else if targetItem.hasFlag(.isWearable) {
             message = "Chewing on clothing is not recommended for your dental health."
         } else if targetItem.hasFlag(.isContainer) {
@@ -63,12 +64,13 @@ public struct ChompActionHandler: ActionHandler {
             message = "That seems like a good way to hurt yourself."
         } else {
             // Generic responses for other objects
+            let theItem = targetItem.withDefiniteArticle
             let responses = [
-                "You give \(targetItem.name) a tentative nibble. It tastes terrible.",
-                "You chomp on \(targetItem.name) experimentally. Not very satisfying.",
-                "You bite \(targetItem.name). Your teeth don't make much of an impression.",
-                "You gnaw on \(targetItem.name) briefly before giving up.",
-                "You take a bite of \(targetItem.name). It's not very appetizing."
+                "You give \(theItem) a tentative nibble. It tastes terrible.",
+                "You chomp on \(theItem) experimentally. Not very satisfying.",
+                "You bite \(theItem). Your teeth don't make much of an impression.",
+                "You gnaw on \(theItem) briefly before giving up.",
+                "You take a bite of \(theItem). It's not very appetizing."
             ]
             message = try await context.engine.randomElement(in: responses)
         }

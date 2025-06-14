@@ -1,4 +1,6 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the DanceActionHandler.
@@ -26,12 +28,13 @@ struct DanceActionHandlerTests {
         let (engine, mockIO) = await createTestEngine()
         let handler = DanceActionHandler()
         let command = Command(verb: .dance, rawInput: "dance")
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("danc") || result.message!.contains("forbidden"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "")
     }
 
     @Test("DANCE includes classic ZIL response")

@@ -21,7 +21,8 @@ public struct DanceActionHandler: ActionHandler {
             "You dance the dance of your people.",
             "You waltz around the area with imaginary partners.",
             "You break into spontaneous choreography.",
-            "You dance with wild abandon. Bravo!"
+            "You dance with wild abandon. Bravo!",
+            "Let all the children boogie.",
         ]
 
         return ActionResult(

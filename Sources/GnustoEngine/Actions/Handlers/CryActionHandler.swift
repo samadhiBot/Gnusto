@@ -13,14 +13,14 @@ public struct CryActionHandler: ActionHandler {
         let responses = [
             "You shed a tear for the futility of it all.",
             "You weep quietly to yourself.",
-            "You sob dramatically. You feel a little better.",
-            "You cry a bit. There, there.",
-            "You bawl your eyes out. Very cathartic.",
+            "You sob dramatically, and feel a little better.",
+            "You cry a bit. There, there now.",
+            "You bawl your eyes out, which is somewhat cathartic.",
             "You weep with the passion of a thousand sorrows.",
             "You cry like a baby. How embarrassing.",
             "You shed crocodile tears. Very convincing.",
-            "You weep bitter tears of frustration.",
-            "You cry softly. The world seems a little brighter now."
+            "You weep bitter tears.",
+            "You break down and cry. After a bit the world seems a little brighter."
         ]
 
         return ActionResult(
