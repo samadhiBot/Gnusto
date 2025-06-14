@@ -154,6 +154,15 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// Multiple responses for jumping without target (one per line for random selection)
     case jumpResponses
 
+    /// "Push what?" when direct object is missing in push command
+    case pushWhat
+
+    /// "Remove what?" when direct object is missing in remove command
+    case removeWhat
+
+    /// "Listen to what?" when direct object is missing in listen command
+    case listenWhat
+
     /// "Insert into what?" for missing indirect object in insert command
     case insertIntoWhat
 
@@ -456,4 +465,25 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Cannot jump large immovable objects
     case jumpLargeObject(item: String)
+
+    /// "You have it." for find command when item is in inventory
+    case youHaveIt
+
+    /// "It's right here!" for find command when item is visible
+    case itsRightHere
+
+    /// "You hear nothing unusual." for listen command
+    case youHearNothingUnusual
+
+    /// "Goodbye!" for quit command
+    case goodbye
+
+    /// "Game saved." for save command
+    case gameSaved
+
+    /// "Game restored." for restore command
+    case gameRestored
+
+    /// Item is already locked
+    case alreadyLocked(item: String)
 }

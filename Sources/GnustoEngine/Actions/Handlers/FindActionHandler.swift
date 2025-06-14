@@ -37,12 +37,14 @@ public struct FindActionHandler: ActionHandler {
         guard let targetObjectID = context.command.directObject,
             case .item(let itemID) = targetObjectID
         else {
-            return ActionResult("You can't see any such thing here.")
+            let message = context.message(.unknownEntity)
+            return ActionResult(message)
         }
 
         // Check if the item exists in the game
         guard let targetItem = try? await context.engine.item(itemID) else {
-            return ActionResult("You can't see any such thing here.")
+            let message = context.message(.unknownEntity)
+            return ActionResult(message)
         }
 
         // Check if the player is holding it
@@ -56,11 +58,13 @@ public struct FindActionHandler: ActionHandler {
         let itemsInScope = await scopeResolver.itemsInScopeFor(locationID: currentLocation)
 
         if itemsInScope.contains(itemID) {
-            return ActionResult("It's right here!")
+            let message = context.message(.itsRightHere)
+            return ActionResult(message)
         }
 
         // Item exists but isn't visible
-        return ActionResult("You can't see any such thing here.")
+        let message = context.message(.unknownEntity)
+        return ActionResult(message)
     }
 
     /// Performs any post-processing after the find action completes.

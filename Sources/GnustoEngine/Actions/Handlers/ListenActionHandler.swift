@@ -22,6 +22,7 @@ struct ListenActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default message.
     func process(context: ActionContext) async throws -> ActionResult {
-        return ActionResult("You hear nothing unusual.")
+        let message = context.message(.youHearNothingUnusual)
+        return ActionResult(message)
     }
 }

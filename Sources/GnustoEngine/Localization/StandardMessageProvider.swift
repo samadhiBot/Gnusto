@@ -572,6 +572,38 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .jumpLargeObject(let item):
             "You can't jump the \(item)."
+
+        case .pushWhat:
+            "Push what?"
+
+        case .removeWhat:
+            "Remove what?"
+
+        case .listenWhat:
+            "Listen to what?"
+
+        // MARK: - Basic action responses
+
+        case .youHaveIt:
+            "You have it."
+
+        case .itsRightHere:
+            "It's right here!"
+
+        case .youHearNothingUnusual:
+            "You hear nothing unusual."
+
+        case .goodbye:
+            "Goodbye!"
+
+        case .gameSaved:
+            "Game saved."
+
+        case .gameRestored:
+            "Game restored."
+
+        case .alreadyLocked(let item):
+            "The \(item) is already locked."
         }
     }
 }

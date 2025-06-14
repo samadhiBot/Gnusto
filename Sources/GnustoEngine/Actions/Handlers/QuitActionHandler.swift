@@ -21,6 +21,7 @@ struct QuitActionHandler: ActionHandler {
     func process(context: ActionContext) async throws -> ActionResult {
         await context.engine.requestQuit()
 
-        return ActionResult("Goodbye!")
+        let message = context.message(.goodbye)
+        return ActionResult(message)
     }
 }
