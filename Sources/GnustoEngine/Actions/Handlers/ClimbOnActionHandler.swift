@@ -11,11 +11,13 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Throws: An `ActionResponse` if validation fails.
     public func validate(context: ActionContext) async throws {
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Climb on what?")
+            let message = context.message(.climbOnWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let targetItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't climb on that.")
+            let message = context.message(.cannotActOnThat(verb: "climb on"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists and is reachable
@@ -34,9 +36,11 @@ public struct ClimbOnActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with the action outcome.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard case .item(let targetItemID) = context.command.indirectObject else {
-            throw ActionResponse.internalEngineError(
-                "ClimbOn: indirectObject was not an item in process."
-            )
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "ClimbOnActionHandler",
+                    details: "indirectObject was not an item in process"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -53,8 +57,9 @@ public struct ClimbOnActionHandler: ActionHandler {
         }
 
         // Default behavior: You can't climb on most things
+        let message = context.message(.climbOnFailure(item: targetItem.withDefiniteArticle))
         return ActionResult(
-            message: "You can't climb on \(targetItem.withDefiniteArticle).",
+            message: message,
             stateChanges: stateChanges
         )
     }

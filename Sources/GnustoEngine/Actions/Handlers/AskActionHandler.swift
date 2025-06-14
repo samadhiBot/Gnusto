@@ -17,24 +17,24 @@ public struct AskActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // ASK requires both direct object (who) and indirect object (what about)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Ask whom?")
+            let message = context.message(.askWhom)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard context.command.indirectObject != nil else {
-            throw ActionResponse.prerequisiteNotMet("Ask about what?")
+            let message = context.message(.askAboutWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let characterID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(
-                "You can only ask other characters about things."
-            )
+            let message = context.message(.canOnlyActOnCharacters(verb: "ask"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if character exists and is reachable
         let character = try await context.engine.item(characterID)
         guard character.hasFlag(.isCharacter) else {
-            throw ActionResponse.prerequisiteNotMet(
-                "You can't ask the \(character.name) about anything."
-            )
+            let message = context.message(.cannotActOnThat(verb: "ask \(character.name)"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard await context.engine.playerCanReach(characterID) else {
@@ -56,9 +56,8 @@ public struct AskActionHandler: ActionHandler {
             case .item(let characterID) = directObjectRef,
             let indirectObjectRef = context.command.indirectObject
         else {
-            throw ActionResponse.internalEngineError(
-                "AskActionHandler: missing required objects in process."
-            )
+            let message = context.message(.actionHandlerMissingObjects(handler: "AskActionHandler"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let character = try await context.engine.item(characterID)
@@ -86,7 +85,7 @@ public struct AskActionHandler: ActionHandler {
             message: message,
             changes:
                 await context.engine.setFlag(.isTouched, on: character),
-                await context.engine.updatePronouns(to: character)
+            await context.engine.updatePronouns(to: character)
         )
     }
 }

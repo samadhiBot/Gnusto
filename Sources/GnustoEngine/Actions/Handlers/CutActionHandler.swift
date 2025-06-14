@@ -20,10 +20,12 @@ public struct CutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Cut requires a direct object (what to cut)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Cut what?")
+            let message = context.message(.cutWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't cut that.")
+            let message = context.message(.cannotActOnThat(verb: "cut"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -35,7 +37,8 @@ public struct CutActionHandler: ActionHandler {
         // If cutting tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't cut with that.")
+                let message = context.message(.cannotActWithThat(verb: "cut"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             let toolItem = try await context.engine.item(toolItemID)
@@ -57,8 +60,13 @@ public struct CutActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate cutting message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("CutActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "CutActionHandler", details: "directObject was not an item in process")
+            )
+            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -78,29 +86,33 @@ public struct CutActionHandler: ActionHandler {
         let message: String
 
         if let indirectObjectRef = context.command.indirectObject,
-           case .item(let toolItemID) = indirectObjectRef {
+            case .item(let toolItemID) = indirectObjectRef
+        {
 
             let toolItem = try await context.engine.item(toolItemID)
 
             if toolItem.hasFlag(.isWeapon) || toolItem.hasFlag(.isTool) {
                 // Successfully cut with appropriate tool
-                message = "You cut the \(targetItem.name) with the \(toolItem.name)."
+                message = context.message(.cutWithTool(item: targetItem.name, tool: toolItem.name))
             } else {
                 // Using an inappropriate implement
-                message = "The \(toolItem.name) isn't sharp enough to cut anything."
+                message = context.message(.cutToolNotSharp(tool: toolItem.name))
             }
 
         } else {
             // No tool specified - check if player has cutting implements
             let playerInventory = await context.engine.playerInventory
-            let cuttingTools = playerInventory.filter { $0.hasFlag(.isWeapon) || $0.hasFlag(.isTool) }
+            let cuttingTools = playerInventory.filter {
+                $0.hasFlag(.isWeapon) || $0.hasFlag(.isTool)
+            }
 
             if !cuttingTools.isEmpty {
                 let firstTool = cuttingTools.first!
                 // Auto-cut with available tool
-                message = "You cut the \(targetItem.name) with the \(firstTool.name)."
+                message = context.message(
+                    .cutWithAutoTool(item: targetItem.name, tool: firstTool.name))
             } else {
-                message = "You have no suitable cutting tool."
+                message = context.message(.cutNoSuitableTool)
             }
         }
 

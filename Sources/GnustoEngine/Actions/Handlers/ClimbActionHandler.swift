@@ -26,7 +26,8 @@ public struct ClimbActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't climb that.")
+            let message = context.message(.cannotActOnThat(verb: "climb"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if the target exists
@@ -53,11 +54,16 @@ public struct ClimbActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Handle CLIMB with no object
         guard let directObjectRef = context.command.directObject else {
-            return ActionResult("Climb what?")
+            let message = context.message(.climbWhat)
+            return ActionResult(message)
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Climb: directObject was not an item in process.")
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "ClimbActionHandler",
+                    details: "directObject was not an item in process"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -88,7 +94,8 @@ public struct ClimbActionHandler: ActionHandler {
                 if targetItem.parent == .nowhere {
                     guard currentLocation.localGlobals.contains(targetItemID) else {
                         return ActionResult(
-                            message: "There \(targetItem.hasFlag(.isPlural) ? "are" : "is") no \(targetItem.name) here.",
+                            message:
+                                "There \(targetItem.hasFlag(.isPlural) ? "are" : "is") no \(targetItem.name) here.",
                             stateChanges: stateChanges
                         )
                     }
@@ -128,14 +135,16 @@ public struct ClimbActionHandler: ActionHandler {
         // Check if the item is climbable
         if targetItem.hasFlag(.isClimbable) {
             // Default climbable behavior - can be overridden by specific item handlers
+            let message = context.message(.climbSuccess(item: targetItem.withDefiniteArticle))
             return ActionResult(
-                message: "You climb \(targetItem.withDefiniteArticle).",
+                message: message,
                 stateChanges: stateChanges
             )
         } else {
             // Not climbable
+            let message = context.message(.climbFailure(item: targetItem.withDefiniteArticle))
             return ActionResult(
-                message: "You can't climb \(targetItem.withDefiniteArticle).",
+                message: message,
                 stateChanges: stateChanges
             )
         }

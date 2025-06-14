@@ -11,22 +11,8 @@ public struct DanceActionHandler: ActionHandler {
     public func process(
         context: ActionContext
     ) async throws -> ActionResult {
-        let responses = [
-            "Dancing is forbidden.", // Classic ZIL response from Cloak of Darkness
-            "You dance an adorable little jig.",
-            "You boogie down with surprising grace.",
-            "You perform a modern interpretive dance.",
-            "You dance like nobody's watching (which they aren't).",
-            "You cut a rug with style and panache.",
-            "You dance the dance of your people.",
-            "You waltz around the area with imaginary partners.",
-            "You break into spontaneous choreography.",
-            "You dance with wild abandon. Bravo!",
-            "Let all the children boogie.",
-        ]
-
-        return ActionResult(
-            try await context.engine.randomElement(in: responses)
-        )
+        // Get random response from message provider
+        let message = await context.engine.randomMessage(for: .danceResponses)
+        return ActionResult(message)
     }
 }

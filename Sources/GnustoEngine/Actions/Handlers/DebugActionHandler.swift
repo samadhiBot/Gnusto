@@ -23,12 +23,13 @@ public struct DebugActionHandler: ActionHandler {
     ///           or `ActionResponse.unknownEntity` if the direct object does not exist.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object to examine.")
+            let message = context.message(.debugRequiresObject)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         switch directObjectRef {
         case .player:
-            return // Player is always a valid entity for DEBUG.
+            return  // Player is always a valid entity for DEBUG.
         case .item(let itemID):
             guard (try? await context.engine.item(itemID)) != nil else {
                 throw ActionResponse.unknownEntity(directObjectRef)
@@ -53,7 +54,8 @@ public struct DebugActionHandler: ActionHandler {
     ///           if the entity does not exist in the snapshot.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("DEBUG requires a direct object.")
+            let message = context.message(.debugRequiresObject)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         var target = ""
@@ -74,7 +76,8 @@ public struct DebugActionHandler: ActionHandler {
             }
             customDump(location, to: &target)
         }
-        return ActionResult("""
+        return ActionResult(
+            """
             ```
             \(target)
             ```

@@ -17,10 +17,12 @@ public struct DeflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Deflate requires a direct object (what to deflate)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Deflate what?")
+            let message = context.message(.deflateWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only deflate objects.")
+            let message = context.message(.canOnlyActOnItems(verb: "deflate"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -45,8 +47,10 @@ public struct DeflateActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate deflate message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("DeflateActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "DeflateActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)

@@ -7,7 +7,7 @@ import Foundation
 public struct ChompActionHandler: ActionHandler {
     public init() {}
 
-        public func validate(
+    public func validate(
         context: ActionContext
     ) async throws {
         // CHOMP without object is always valid (general chomping)
@@ -16,7 +16,8 @@ public struct ChompActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only chomp on items.")
+            let message = context.message(.canOnlyActOnItems(verb: "chomp"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists (engine.item() will throw if not found)
@@ -33,46 +34,32 @@ public struct ChompActionHandler: ActionHandler {
     ) async throws -> ActionResult {
         // Handle general chomping (no object)
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            let responses = [
-                "You chomp your teeth together menacingly.",
-                "You clench your fists and gnash your teeth.",
-                "You chomp at the air for everyone to see.",
-                "Sounds of your chomping echo around you.",
-                "You practice your chomping technique.",
-                "It feels good to get some chomping done.",
-            ]
-            return ActionResult(
-                try await context.engine.randomElement(in: responses)
-            )
+            case .item(let targetItemID) = directObjectRef
+        else {
+            // Get random response from message provider
+            let message = await context.engine.randomMessage(for: .chompResponses)
+            return ActionResult(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)
 
-                // Special responses for different types of items
+        // Special responses for different types of items
         let message: String
 
         if targetItem.hasFlag(.isEdible) {
-            message = "You take a bite. It tastes like \(targetItem.withIndefiniteArticle)."
+            message = context.message(.chompEdible(item: targetItem.withIndefiniteArticle))
         } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
-            message = "That would be rude, not to mention dangerous."
+            message = context.message(.chompPerson)
         } else if targetItem.hasFlag(.isWearable) {
-            message = "Chewing on clothing is not recommended for your dental health."
+            message = context.message(.chompWearable)
         } else if targetItem.hasFlag(.isContainer) {
-            message = "You'd probably break your teeth on that."
+            message = context.message(.chompContainer)
         } else if targetItem.hasFlag(.isWeapon) {
-            message = "That seems like a good way to hurt yourself."
+            message = context.message(.chompWeapon)
         } else {
             // Generic responses for other objects
             let theItem = targetItem.withDefiniteArticle
-            let responses = [
-                "You give \(theItem) a tentative nibble. It tastes terrible.",
-                "You chomp on \(theItem) experimentally. Not very satisfying.",
-                "You bite \(theItem). Your teeth don't make much of an impression.",
-                "You gnaw on \(theItem) briefly before giving up.",
-                "You take a bite of \(theItem). It's not very appetizing."
-            ]
-            message = try await context.engine.randomElement(in: responses)
+            message = await context.engine.randomMessage(for: .chompTargetResponses(item: theItem))
         }
 
         // Mark item as touched and update pronouns
@@ -80,7 +67,7 @@ public struct ChompActionHandler: ActionHandler {
             message: message,
             changes:
                 await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem)
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

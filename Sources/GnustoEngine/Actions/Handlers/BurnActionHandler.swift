@@ -18,13 +18,15 @@ public struct BurnActionHandler: ActionHandler {
     ///
     /// - Parameter context: The action context containing the command and engine.
     /// - Throws: `ActionError` if validation fails.
-        public func validate(context: ActionContext) async throws {
+    public func validate(context: ActionContext) async throws {
         guard let targetObjectID = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Burn what?")
+            let message = context.message(.burnWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let itemID) = targetObjectID else {
-            throw ActionResponse.prerequisiteNotMet("You can only burn items.")
+            let message = context.message(.canOnlyActOnItems(verb: "burn"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if the item exists and is accessible
@@ -51,11 +53,13 @@ public struct BurnActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the burn result and any state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetObjectID = context.command.directObject,
-              case .item(let itemID) = targetObjectID else {
-            return ActionResult("You can't burn that.")
+            case .item(let itemID) = targetObjectID
+        else {
+            let message = context.message(.cannotActOnThat(verb: "burn"))
+            return ActionResult(message)
         }
 
-                let targetItem = try await context.engine.item(itemID)
+        let targetItem = try await context.engine.item(itemID)
 
         var stateChanges: [StateChange] = []
 
@@ -75,18 +79,21 @@ public struct BurnActionHandler: ActionHandler {
             let destroyChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(destroyChange)
 
+            let message = context.message(.burnToCatchFire(item: targetItem.name))
             return ActionResult(
-                message: "The \(targetItem.name) catches fire and burns to ashes.",
+                message: message,
                 stateChanges: stateChanges
             )
         } else {
             // Most items cannot be burned
-            let message = if targetItem.name.lowercased().contains("house") ||
-                             targetItem.name.lowercased().contains("building") {
-                "You must be joking."
-            } else {
-                "You can't burn the \(targetItem.name)."
-            }
+            let message =
+                if targetItem.name.lowercased().contains("house")
+                    || targetItem.name.lowercased().contains("building")
+                {
+                    context.message(.burnJokingResponse)
+                } else {
+                    context.message(.burnCannotBurn(item: targetItem.name))
+                }
 
             return ActionResult(
                 message: message,

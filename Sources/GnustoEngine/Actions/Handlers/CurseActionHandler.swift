@@ -12,11 +12,12 @@ public struct CurseActionHandler: ActionHandler {
     ) async throws {
         // If there's a direct object, validate it exists and is reachable
         guard let directObjectRef = context.command.directObject else {
-            return // General cursing is always valid
+            return  // General cursing is always valid
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only curse at items.")
+            let message = context.message(.canOnlyActOnItems(verb: "curse"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists
@@ -33,36 +34,17 @@ public struct CurseActionHandler: ActionHandler {
     ) async throws -> ActionResult {
         // Handle cursing at a specific object
         if let directObjectRef = context.command.directObject,
-           case .item(let targetItemID) = directObjectRef {
+            case .item(let targetItemID) = directObjectRef
+        {
             let targetItem = try await context.engine.item(targetItemID)
 
-            let responses = [
-                "You curse \(targetItem.name) roundly. You feel a bit better.",
-                "You let loose a string of expletives at \(targetItem.name).",
-                "You damn \(targetItem.name) to the seven hells.",
-                "You swear colorfully at \(targetItem.name). How therapeutic!",
-                "You curse \(targetItem.name) with words that would make a sailor blush."
-            ]
-
-            return ActionResult(
-                try await context.engine.randomElement(in: responses)
-            )
+            let message = await context.engine.randomMessage(
+                for: .curseTargetResponses(item: targetItem.name))
+            return ActionResult(message)
         } else {
-            // General cursing
-            let responses = [
-                "You curse under your breath.",
-                "You let out a string of colorful expletives.",
-                "You swear like a sailor. Very cathartic.",
-                "You curse the fates that brought you here.",
-                "You damn everything in sight. You feel better now.",
-                "You use language that would make your mother wash your mouth out with soap.",
-                "You curse fluently in several languages.",
-                "You swear with the passion of a thousand frustrated adventurers."
-            ]
-
-            return ActionResult(
-                try await context.engine.randomElement(in: responses)
-            )
+            // General cursing (no object)
+            let message = await context.engine.randomMessage(for: .curseResponses)
+            return ActionResult(message)
         }
     }
 }

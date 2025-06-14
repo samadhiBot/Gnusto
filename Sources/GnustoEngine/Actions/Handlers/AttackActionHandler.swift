@@ -17,10 +17,12 @@ public struct AttackActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Attack requires a direct object (what to attack)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Attack what?")
+            let message = context.message(.attackWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't attack that.")
+            let message = context.message(.cannotActOnThat(verb: "attack"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -32,7 +34,8 @@ public struct AttackActionHandler: ActionHandler {
         // If weapon is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let weaponItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't attack with that.")
+                let message = context.message(.cannotActWithThat(verb: "attack"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             let weaponItem = try await context.engine.item(weaponItemID)
@@ -69,33 +72,35 @@ public struct AttackActionHandler: ActionHandler {
 
         // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
         if !targetItem.hasFlag(.isCharacter) {
-            message = "I've known strange people, but fighting a \(targetItem.name)?"
+            message = context.message(.attackNonCharacter(item: targetItem.name))
         }
         // Second check: No weapon specified OR weapon is hands (bare-handed attack)
         else if context.command.indirectObject == nil {
-            message = "Trying to attack a \(targetItem.name) with your bare hands is suicidal."
+            message = context.message(.attackWithBareHands(character: targetItem.name))
         }
         // We have a weapon - check if it's a real weapon
         else if let indirectObjectRef = context.command.indirectObject,
-                case .item(let weaponItemID) = indirectObjectRef {
+            case .item(let weaponItemID) = indirectObjectRef
+        {
             let weaponItem = try await context.engine.item(weaponItemID)
-            
+
             if !weaponItem.hasFlag(.isWeapon) {
-                message = "Trying to attack the \(targetItem.name) with a \(weaponItem.name) is suicidal."
+                message = context.message(
+                    .attackWithNonWeapon(character: targetItem.name, weapon: weaponItem.name))
             } else {
                 // Real weapon attack - placeholder for combat system
-                message = "Let's hope it doesn't come to that."
+                message = context.message(.attackWithWeapon)
             }
         } else {
             // Fallback case
-            message = "Let's hope it doesn't come to that."
+            message = context.message(.attackWithWeapon)
         }
 
         return ActionResult(
             message: message,
             changes:
                 await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem)
+            await context.engine.updatePronouns(to: targetItem)
         )
     }
 }

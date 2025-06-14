@@ -10,21 +10,8 @@ public struct CryActionHandler: ActionHandler {
     public func process(
         context: ActionContext
     ) async throws -> ActionResult {
-        let responses = [
-            "You shed a tear for the futility of it all.",
-            "You weep quietly to yourself.",
-            "You sob dramatically, and feel a little better.",
-            "You cry a bit. There, there now.",
-            "You bawl your eyes out, which is somewhat cathartic.",
-            "You weep with the passion of a thousand sorrows.",
-            "You cry like a baby. How embarrassing.",
-            "You shed crocodile tears. Very convincing.",
-            "You weep bitter tears.",
-            "You break down and cry. After a bit the world seems a little brighter."
-        ]
-
-        return ActionResult(
-            try await context.engine.randomElement(in: responses)
-        )
+        // Get random response from message provider
+        let message = await context.engine.randomMessage(for: .cryResponses)
+        return ActionResult(message)
     }
 }

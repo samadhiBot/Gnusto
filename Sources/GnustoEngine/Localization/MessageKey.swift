@@ -64,6 +64,51 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Go where?" when direction is missing
     case goWhere
 
+    /// "Ask about what?" when indirect object is missing in ask command
+    case askAboutWhat
+
+    /// "Ask whom?" when direct object is missing in ask command
+    case askWhom
+
+    /// "Attack what?" when direct object is missing in attack command
+    case attackWhat
+
+    /// Multiple responses for breathing (one per line for random selection)
+    case breatheResponses
+
+    /// "Burn what?" when direct object is missing in burn command
+    case burnWhat
+
+    /// Multiple responses for chomping without target (one per line for random selection)
+    case chompResponses
+
+    /// Multiple responses for chomping with target (one per line for random selection)
+    case chompTargetResponses(item: String)
+
+    /// "Climb on what?" when indirect object is missing in climb on command
+    case climbOnWhat
+
+    /// "Climb what?" when direct object is missing in climb command
+    case climbWhat
+
+    /// Multiple responses for crying (one per line for random selection)
+    case cryResponses
+
+    /// "Cut what?" when direct object is missing in cut command
+    case cutWhat
+
+    /// Multiple responses for cursing without target (one per line for random selection)
+    case curseResponses
+
+    /// Multiple responses for cursing with target (one per line for random selection)
+    case curseTargetResponses(item: String)
+
+    /// Multiple responses for dancing (one per line for random selection)
+    case danceResponses
+
+    /// "Deflate what?" when direct object is missing in deflate command
+    case deflateWhat
+
     /// "Insert into what?" for missing indirect object in insert command
     case insertIntoWhat
 
@@ -251,8 +296,57 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     case youDontHaveThat
 
     /// Success message for dropping multiple items
+    /// "You drop multiple items."
     case youDropMultipleItems(items: String)
 
     /// Success message for taking multiple items
     case youTakeMultipleItems(items: String)
+
+    // MARK: - Action-specific messages
+
+    /// Attack responses for different scenarios
+    case attackNonCharacter(item: String)
+    case attackWithBareHands(character: String)
+    case attackWithNonWeapon(character: String, weapon: String)
+    case attackWithWeapon
+
+    /// Blowing responses
+    case blowOnLightSource(item: String)
+    case blowOnFlammable(item: String)
+    case blowOnGeneric(item: String)
+    case blowGeneral
+
+    /// Burning responses
+    case burnToCatchFire(item: String)
+    case burnJokingResponse
+    case burnCannotBurn(item: String)
+
+    /// Chomping responses - edible item
+    case chompEdible(item: String)
+    case chompPerson
+    case chompWearable
+    case chompContainer
+    case chompWeapon
+
+    /// Climbing responses
+    case climbSuccess(item: String)
+    case climbFailure(item: String)
+    case climbOnFailure(item: String)
+
+    /// Cutting responses
+    case cutWithTool(item: String, tool: String)
+    case cutToolNotSharp(tool: String)
+    case cutWithAutoTool(item: String, tool: String)
+    case cutNoSuitableTool
+
+    /// Generic validation messages
+    case canOnlyActOnCharacters(verb: String)
+    case canOnlyActOnItems(verb: String)
+    case cannotActOnThat(verb: String)
+    case cannotActWithThat(verb: String)
+    case debugRequiresObject
+
+    /// Engine error messages
+    case actionHandlerMissingObjects(handler: String)
+    case actionHandlerInternalError(handler: String, details: String)
 }

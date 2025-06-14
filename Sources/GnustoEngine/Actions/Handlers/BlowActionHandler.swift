@@ -17,7 +17,8 @@ public struct BlowActionHandler: ActionHandler {
         // Blow can be used without an object (general blowing) or with an object
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can only blow on objects.")
+                let message = context.message(.canOnlyActOnItems(verb: "blow"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             // Check if target exists and is reachable
@@ -40,7 +41,8 @@ public struct BlowActionHandler: ActionHandler {
 
         // Handle blowing on a specific object
         if let directObjectRef = context.command.directObject,
-           case .item(let targetItemID) = directObjectRef {
+            case .item(let targetItemID) = directObjectRef
+        {
 
             let targetItem = try await context.engine.item(targetItemID)
 
@@ -58,18 +60,19 @@ public struct BlowActionHandler: ActionHandler {
             let message: String
             if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
                 // Blowing on lit light sources might extinguish them
-                message = "You blow on the \(targetItem.name), but it doesn't go out."
+                message = context.message(.blowOnLightSource(item: targetItem.name))
                 // Note: Specific extinguishing behavior should use TurnOffActionHandler or custom logic
             } else if targetItem.hasFlag(.isFlammable) {
-                message = "Blowing on the \(targetItem.name) has no effect."
+                message = context.message(.blowOnFlammable(item: targetItem.name))
             } else {
-                message = "You blow on the \(targetItem.name). Nothing happens."
+                message = context.message(.blowOnGeneric(item: targetItem.name))
             }
 
             return ActionResult(message: message, stateChanges: stateChanges)
         } else {
             // General blowing without a target
-            return ActionResult("You blow air around. Nothing happens.")
+            let message = context.message(.blowGeneral)
+            return ActionResult(message)
         }
     }
 }

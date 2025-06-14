@@ -14,12 +14,14 @@ public struct BreatheActionHandler: ActionHandler {
     /// - Throws: `ActionResponse.prerequisiteNotMet` if objects are specified.
     public func validate(context: ActionContext) async throws {
         // Breathe should not take any objects
-        if let _ = context.command.directObject {
-            throw ActionResponse.prerequisiteNotMet("You can't breathe that.")
+        if context.command.directObject != nil {
+            let message = context.message(.cannotActOnThat(verb: "breathe"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
-        if let _ = context.command.indirectObject {
-            throw ActionResponse.prerequisiteNotMet("You can't breathe that.")
+        if context.command.indirectObject != nil {
+            let message = context.message(.cannotActOnThat(verb: "breathe"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -31,18 +33,9 @@ public struct BreatheActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with an atmospheric message.
     public func process(context: ActionContext) async throws -> ActionResult {
-        // Provide varied responses for atmospheric effect
-        let responses = [
-            "You breathe in deeply, feeling refreshed.",
-            "You take a slow, calming breath.",
-            "The air fills your lungs. You're glad that you can breathe.",
-            "You inhale deeply, then exhale slowly.",
-            "You breathe in the love... and blow out the jive.",
-        ]
-
-        return ActionResult(
-            try await context.engine.randomElement(in: responses)
-        )
+        // Get random response from message provider
+        let message = await context.engine.randomMessage(for: .breatheResponses)
+        return ActionResult(message)
     }
 
     /// Performs any post-processing after the "BREATHE" command.

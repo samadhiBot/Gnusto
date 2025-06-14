@@ -258,6 +258,206 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .youTakeMultipleItems(let items):
             "You take \(items)."
+
+        // MARK: - Question prompts for missing objects
+
+        case .askAboutWhat:
+            "Ask about what?"
+
+        case .askWhom:
+            "Ask whom?"
+
+        case .attackWhat:
+            "Attack what?"
+
+        case .burnWhat:
+            "Burn what?"
+
+        case .chompResponses:
+            """
+            You chomp your teeth together menacingly.
+            You clench your fists and gnash your teeth.
+            You chomp at the air for everyone to see.
+            Sounds of your chomping echo around you.
+            You practice your chomping technique.
+            It feels good to get some chomping done.
+            """
+
+        case .chompTargetResponses(let item):
+            """
+            You give \(item) a tentative nibble. It tastes terrible.
+            You chomp on \(item) experimentally. Not very satisfying.
+            You bite \(item). Your teeth don't make much of an impression.
+            You gnaw on \(item) briefly before giving up.
+            You take a bite of \(item). It's not very appetizing.
+            """
+
+        case .climbOnWhat:
+            "Climb on what?"
+
+        case .climbWhat:
+            "Climb what?"
+
+        case .cryResponses:
+            """
+            You shed a tear for the futility of it all.
+            You weep quietly to yourself.
+            You sob dramatically, and feel a little better.
+            You cry a bit. There, there now.
+            You bawl your eyes out, which is somewhat cathartic.
+            You weep with the passion of a thousand sorrows.
+            You cry like a baby. How embarrassing.
+            You shed crocodile tears. Very convincing.
+            You weep bitter tears.
+            You break down and cry. After a bit the world seems a little brighter.
+            """
+
+        case .cutWhat:
+            "Cut what?"
+
+        case .curseResponses:
+            """
+            You curse under your breath.
+            You let out a string of colorful expletives.
+            You swear like a sailor. Very cathartic.
+            You curse the fates that brought you here.
+            You damn everything in sight. You feel better now.
+            You use language that would make your mother wash your mouth out with soap.
+            You curse fluently in several languages.
+            You swear with the passion of a thousand frustrated adventurers.
+            """
+
+        case .curseTargetResponses(let item):
+            """
+            You curse \(item) roundly. You feel a bit better.
+            You let loose a string of expletives at \(item).
+            You damn \(item) to the seven hells.
+            You swear colorfully at \(item). How therapeutic!
+            You curse \(item) with words that would make a sailor blush.
+            """
+
+        case .danceResponses:
+            """
+            Dancing is forbidden.
+            You dance an adorable little jig.
+            You boogie down with surprising grace.
+            You perform a modern interpretive dance.
+            You dance like nobody's watching (which they aren't).
+            You cut a rug with style and panache.
+            You dance the dance of your people.
+            You waltz around the area with imaginary partners.
+            You break into spontaneous choreography.
+            You dance with wild abandon. Bravo!
+            Let all the children boogie.
+            """
+
+        case .deflateWhat:
+            "Deflate what?"
+
+        case .breatheResponses:
+            """
+            You breathe in deeply, feeling refreshed.
+            You take a slow, calming breath.
+            The air fills your lungs. You're glad that you can breathe.
+            You inhale deeply, then exhale slowly.
+            You breathe in the love... and blow out the jive.
+            """
+
+        // MARK: - Action-specific responses
+
+        case .attackNonCharacter(let item):
+            "I've known strange people, but fighting a \(item)?"
+
+        case .attackWithBareHands(let character):
+            "Trying to attack a \(character) with your bare hands is suicidal."
+
+        case .attackWithNonWeapon(let character, let weapon):
+            "Trying to attack the \(character) with a \(weapon) is suicidal."
+
+        case .attackWithWeapon:
+            "Let's hope it doesn't come to that."
+
+        case .blowOnLightSource(let item):
+            "You blow on the \(item), but it doesn't go out."
+
+        case .blowOnFlammable(let item):
+            "Blowing on the \(item) has no effect."
+
+        case .blowOnGeneric(let item):
+            "You blow on the \(item). Nothing happens."
+
+        case .blowGeneral:
+            "You blow air around. Nothing happens."
+
+        case .burnToCatchFire(let item):
+            "The \(item) catches fire and burns to ashes."
+
+        case .burnJokingResponse:
+            "You must be joking."
+
+        case .burnCannotBurn(let item):
+            "You can't burn the \(item)."
+
+        case .chompEdible(let item):
+            "You take a bite. It tastes like \(item)."
+
+        case .chompPerson:
+            "That would be rude, not to mention dangerous."
+
+        case .chompWearable:
+            "Chewing on clothing is not recommended for your dental health."
+
+        case .chompContainer:
+            "You'd probably break your teeth on that."
+
+        case .chompWeapon:
+            "That seems like a good way to hurt yourself."
+
+        case .climbSuccess(let item):
+            "You climb \(item)."
+
+        case .climbFailure(let item):
+            "You can't climb \(item)."
+
+        case .climbOnFailure(let item):
+            "You can't climb on \(item)."
+
+        case .cutWithTool(let item, let tool):
+            "You cut the \(item) with the \(tool)."
+
+        case .cutToolNotSharp(let tool):
+            "The \(tool) isn't sharp enough to cut anything."
+
+        case .cutWithAutoTool(let item, let tool):
+            "You cut the \(item) with the \(tool)."
+
+        case .cutNoSuitableTool:
+            "You have no suitable cutting tool."
+
+        // MARK: - Generic validation messages
+
+        case .canOnlyActOnCharacters(let verb):
+            "You can only \(verb) other characters."
+
+        case .canOnlyActOnItems(let verb):
+            "You can only \(verb) items."
+
+        case .cannotActOnThat(let verb):
+            "You can't \(verb) that."
+
+        case .cannotActWithThat(let verb):
+            "You can't \(verb) with that."
+
+        case .debugRequiresObject:
+            "DEBUG requires a direct object to examine."
+
+        // MARK: - Engine error messages
+
+        case .actionHandlerMissingObjects(let handler):
+            "A strange buzzing sound indicates something is wrong with \(handler)."
+
+        case .actionHandlerInternalError(let handler, let details):
+            "A strange buzzing sound indicates something is wrong with \(handler): \(details)"
         }
     }
 }
