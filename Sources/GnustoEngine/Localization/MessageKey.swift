@@ -178,6 +178,9 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Wave what?" when direct object is missing in wave command
     case waveWhat
 
+    /// "Turn what?" when direct object is missing in turn command
+    case turnWhat
+
     /// "Listen to what?" when direct object is missing in listen command
     case listenWhat
 
@@ -705,6 +708,27 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Wave fixed object response
     case waveFixedObject(item: String)
+
+    /// Turn dial/knob response
+    case turnDial(item: String)
+
+    /// Turn wheel response
+    case turnWheel(item: String)
+
+    /// Turn handle/crank response
+    case turnHandle(item: String)
+
+    /// Turn key response
+    case turnKey(item: String)
+
+    /// Turn character response
+    case turnCharacter(character: String)
+
+    /// Turn small object response
+    case turnSmallObject(item: String)
+
+    /// Turn fixed object response
+    case turnFixedObject(item: String)
 
     /// Cannot jump across dangerous gaps
     case jumpDangerous

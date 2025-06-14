@@ -778,6 +778,27 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .waveFixedObject(let item):
             "You can't wave the \(item) around - it's not something you can pick up and wave."
 
+        case .turnDial(let item):
+            "You turn the \(item). It clicks into a new position."
+
+        case .turnWheel(let item):
+            "You turn the \(item). It rotates with some effort."
+
+        case .turnHandle(let item):
+            "You turn the \(item). It moves with a grinding sound."
+
+        case .turnKey(let item):
+            "You can't just turn the \(item) by itself. You need to use it with something."
+
+        case .turnCharacter(let character):
+            "You can't turn the \(character) around like an object."
+
+        case .turnSmallObject(let item):
+            "You turn the \(item) around in your hands, but nothing happens."
+
+        case .turnFixedObject(let item):
+            "The \(item) doesn't seem to be designed to be turned."
+
         case .jumpResponses:
             """
             You jump on the spot, fruitlessly.
@@ -824,6 +845,9 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .waveWhat:
             "Wave what?"
+
+        case .turnWhat:
+            "Turn what?"
 
         case .listenWhat:
             "Listen to what?"

@@ -16,10 +16,12 @@ public struct TurnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Turn requires a direct object (what to turn)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Turn what?")
+            let message = context.message(.turnWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't turn that.")
+            let message = context.message(.cannotActOnThat(verb: "turn"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct TurnActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate turning message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("TurnActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "TurnActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -58,27 +62,31 @@ public struct TurnActionHandler: ActionHandler {
         // Determine appropriate response based on object type
         let message: String
 
-        if targetItem.name.lowercased().contains("dial") || targetItem.name.lowercased().contains("knob") {
+        if targetItem.name.lowercased().contains("dial")
+            || targetItem.name.lowercased().contains("knob")
+        {
             // Turning dials and knobs - might have mechanical effects
-            message = "You turn the \(targetItem.name). It clicks into a new position."
+            message = context.message(.turnDial(item: targetItem.name))
         } else if targetItem.name.lowercased().contains("wheel") {
             // Turning wheels
-            message = "You turn the \(targetItem.name). It rotates with some effort."
-        } else if targetItem.name.lowercased().contains("handle") || targetItem.name.lowercased().contains("crank") {
+            message = context.message(.turnWheel(item: targetItem.name))
+        } else if targetItem.name.lowercased().contains("handle")
+            || targetItem.name.lowercased().contains("crank")
+        {
             // Turning handles and cranks
-            message = "You turn the \(targetItem.name). It moves with a grinding sound."
+            message = context.message(.turnHandle(item: targetItem.name))
         } else if targetItem.name.lowercased().contains("key") {
             // Turning keys - should probably use with something
-            message = "You can't just turn the \(targetItem.name) by itself. You need to use it with something."
+            message = context.message(.turnKey(item: targetItem.name))
         } else if targetItem.hasFlag(.isCharacter) {
             // Can't turn characters
-            message = "You can't turn the \(targetItem.name) around like an object."
+            message = context.message(.turnCharacter(character: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Turning small objects
-            message = "You turn the \(targetItem.name) around in your hands, but nothing happens."
+            message = context.message(.turnSmallObject(item: targetItem.name))
         } else {
             // Can't turn large/fixed objects
-            message = "The \(targetItem.name) doesn't seem to be designed to be turned."
+            message = context.message(.turnFixedObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)
