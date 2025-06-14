@@ -16,10 +16,12 @@ public struct KissActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Kiss what?")
+            let message = context.message(.kissWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't kiss that.")
+            let message = context.message(.cannotActOnThat(verb: "kiss"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct KissActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate kissing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("KissActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "KissActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -62,15 +66,19 @@ public struct KissActionHandler: ActionHandler {
             // Kissing characters - context matters
             if targetItem.name.lowercased().contains("frog") {
                 // Fairy tale reference
-                message = "You kiss the \(targetItem.name), but it remains a frog. Apparently it's not that kind of story."
+                message =
+                    "You kiss the \(targetItem.name), but it remains a frog. Apparently it's not that kind of story."
             } else {
                 // Other characters
-                message = "The \(targetItem.name) doesn't seem particularly receptive to your affections."
+                message =
+                    "The \(targetItem.name) doesn't seem particularly receptive to your affections."
             }
         } else if targetItem.name.lowercased().contains("mirror") {
             // Kissing mirrors
             message = "You kiss your reflection in the \(targetItem.name). How narcissistic!"
-        } else if targetItem.name.lowercased().contains("statue") || targetItem.name.lowercased().contains("sculpture") {
+        } else if targetItem.name.lowercased().contains("statue")
+            || targetItem.name.lowercased().contains("sculpture")
+        {
             // Kissing art
             message = "You kiss the \(targetItem.name). The cold stone is not very responsive."
         } else if targetItem.hasFlag(.isTakable) {

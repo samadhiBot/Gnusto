@@ -109,6 +109,48 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Deflate what?" when direct object is missing in deflate command
     case deflateWhat
 
+    /// "Dig what?" when direct object is missing in dig command
+    case digWhat
+
+    /// "Drink what?" when direct object is missing in drink command
+    case drinkWhat
+
+    /// "Eat what?" when direct object is missing in eat command
+    case eatWhat
+
+    /// "Empty what?" when direct object is missing in empty command
+    case emptyWhat
+
+    /// "Fill what?" when direct object is missing in fill command
+    case fillWhat
+
+    /// "Find what?" when direct object is missing in find command
+    case findWhat
+
+    /// "Inflate what?" when direct object is missing in inflate command
+    case inflateWhat
+
+    /// "Kick what?" when direct object is missing in kick command
+    case kickWhat
+
+    /// "Kiss what?" when direct object is missing in kiss command
+    case kissWhat
+
+    /// "Knock on what?" when direct object is missing in knock command
+    case knockOnWhat
+
+    /// "Lock what?" when direct object is missing in lock command
+    case lockWhat
+
+    /// "Lock it with what?" when indirect object is missing in lock command
+    case lockWithWhat
+
+    /// "Look inside what?" when direct object is missing in look inside command
+    case lookInsideWhat
+
+    /// "Look under what?" when indirect object is missing in look under command
+    case lookUnderWhat
+
     /// "Insert into what?" for missing indirect object in insert command
     case insertIntoWhat
 
@@ -349,4 +391,51 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// Engine error messages
     case actionHandlerMissingObjects(handler: String)
     case actionHandlerInternalError(handler: String, details: String)
+
+    // MARK: - Specific validation messages
+
+    /// Cannot deflate this item
+    case cannotDeflate(item: String)
+
+    /// Cannot inflate this item
+    case cannotInflate(item: String)
+
+    /// Cannot enter this item
+    case cannotEnter(item: String)
+
+    /// Nothing drinkable in this container
+    case nothingToDrinkIn(container: String)
+
+    /// Cannot drink this item
+    case cannotDrink(item: String)
+
+    /// Nothing edible in this container
+    case nothingToEatIn(container: String)
+
+    /// Cannot eat this item
+    case cannotEat(item: String)
+
+    /// Nothing here to enter
+    case nothingHereToEnter
+
+    /// Cannot fill from this source
+    case cannotFillFrom(source: String)
+
+    /// Can only use item as key
+    case canOnlyUseItemAsKey
+
+    /// Can only look at items this way
+    case canOnlyLookAtItems
+
+    /// Can only look inside items
+    case canOnlyLookInsideItems
+
+    /// Can only drink liquids
+    case canOnlyDrinkLiquids
+
+    /// Can only eat food
+    case canOnlyEatFood
+
+    /// Can only empty containers
+    case canOnlyEmptyContainers
 }

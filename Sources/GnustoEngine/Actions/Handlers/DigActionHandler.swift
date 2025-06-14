@@ -17,7 +17,8 @@ public struct DigActionHandler: ActionHandler {
         // If a direct object is specified, validate it
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't dig that.")
+                let message = context.message(.cannotActOnThat(verb: "dig"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             _ = try await context.engine.item(targetItemID)
@@ -29,7 +30,8 @@ public struct DigActionHandler: ActionHandler {
         // If digging tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't dig with that.")
+                let message = context.message(.cannotActWithThat(verb: "dig"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             let toolItem = try await context.engine.item(toolItemID)
@@ -55,7 +57,8 @@ public struct DigActionHandler: ActionHandler {
 
         // Handle direct object if specified
         if let directObjectRef = context.command.directObject,
-           case .item(let targetItemID) = directObjectRef {
+            case .item(let targetItemID) = directObjectRef
+        {
 
             let targetItem = try await context.engine.item(targetItemID)
 
@@ -74,7 +77,8 @@ public struct DigActionHandler: ActionHandler {
         } else {
             // General digging (no specific target)
             if let indirectObjectRef = context.command.indirectObject,
-               case .item(let toolItemID) = indirectObjectRef {
+                case .item(let toolItemID) = indirectObjectRef
+            {
 
                 let toolItem = try await context.engine.item(toolItemID)
 

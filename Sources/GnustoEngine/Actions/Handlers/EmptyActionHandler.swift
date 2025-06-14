@@ -17,10 +17,12 @@ public struct EmptyActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Empty what?")
+            let message = context.message(.emptyWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only empty containers.")
+            let message = context.message(.canOnlyEmptyContainers)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -49,8 +51,10 @@ public struct EmptyActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate empty message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("EmptyActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "EmptyActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -83,7 +87,8 @@ public struct EmptyActionHandler: ActionHandler {
             }
 
             let itemNames = contents.listWithDefiniteArticles
-            message = "You empty the \(targetItem.name). \(itemNames.capitalizedFirst) \(contents.count == 1 ? "falls" : "fall") to the ground."
+            message =
+                "You empty the \(targetItem.name). \(itemNames.capitalizedFirst) \(contents.count == 1 ? "falls" : "fall") to the ground."
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

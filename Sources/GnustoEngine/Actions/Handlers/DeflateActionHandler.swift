@@ -33,7 +33,8 @@ public struct DeflateActionHandler: ActionHandler {
 
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
-            throw ActionResponse.prerequisiteNotMet("You can't deflate the \(targetItem.name).")
+            let message = context.message(.cannotDeflate(item: targetItem.name))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -49,8 +50,11 @@ public struct DeflateActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            throw ActionResponse.internalEngineError(
-                "DeflateActionHandler: directObject was not an item in process.")
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "DeflateActionHandler",
+                    details: "directObject was not an item in process"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)

@@ -34,7 +34,8 @@ struct MessageProviderActionTests {
             id: "food",
             .name("bread"),
             .isEdible,
-            .isTakable
+            .isTakable,
+            .omitArticle
         )
         let character = Item(
             id: "guard",

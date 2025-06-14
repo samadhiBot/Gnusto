@@ -458,6 +458,97 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .actionHandlerInternalError(let handler, let details):
             "A strange buzzing sound indicates something is wrong with \(handler): \(details)"
+
+        // MARK: - Additional question prompts
+
+        case .digWhat:
+            "Dig what?"
+
+        case .drinkWhat:
+            "Drink what?"
+
+        case .eatWhat:
+            "Eat what?"
+
+        case .emptyWhat:
+            "Empty what?"
+
+        case .fillWhat:
+            "Fill what?"
+
+        case .findWhat:
+            "Find what?"
+
+        case .inflateWhat:
+            "Inflate what?"
+
+        case .kickWhat:
+            "Kick what?"
+
+        case .kissWhat:
+            "Kiss what?"
+
+        case .knockOnWhat:
+            "Knock on what?"
+
+        case .lockWhat:
+            "Lock what?"
+
+        case .lockWithWhat:
+            "Lock it with what?"
+
+        case .lookInsideWhat:
+            "Look inside what?"
+
+        case .lookUnderWhat:
+            "Look under what?"
+
+        // MARK: - Specific validation messages
+
+        case .cannotDeflate(let item):
+            "You can't deflate the \(item)."
+
+        case .cannotInflate(let item):
+            "You can't inflate the \(item)."
+
+        case .cannotEnter(let item):
+            "You can't enter the \(item)."
+
+        case .nothingToDrinkIn(let container):
+            "There's nothing to drink in the \(container)."
+
+        case .cannotDrink(let item):
+            "You can't drink the \(item)."
+
+        case .nothingToEatIn(let container):
+            "There's nothing to eat in the \(container)."
+
+        case .cannotEat(let item):
+            "You can't eat the \(item)."
+
+        case .nothingHereToEnter:
+            "There's nothing here to enter."
+
+        case .cannotFillFrom(let source):
+            "You can't fill from that."
+
+        case .canOnlyUseItemAsKey:
+            "You can only use an item as a key."
+
+        case .canOnlyLookAtItems:
+            "You can only look at items this way."
+
+        case .canOnlyLookInsideItems:
+            "You can only look inside items."
+
+        case .canOnlyDrinkLiquids:
+            "You can only drink liquids."
+
+        case .canOnlyEatFood:
+            "You can only eat food."
+
+        case .canOnlyEmptyContainers:
+            "You can only empty containers."
         }
     }
 }

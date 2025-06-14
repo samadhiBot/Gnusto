@@ -17,10 +17,12 @@ public struct DrinkActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Drink what?")
+            let message = context.message(.drinkWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only drink liquids.")
+            let message = context.message(.canOnlyDrinkLiquids)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists
@@ -52,13 +54,15 @@ public struct DrinkActionHandler: ActionHandler {
             let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) }
 
             guard !drinkableContents.isEmpty else {
-                throw ActionResponse.prerequisiteNotMet("There's nothing to drink in the \(targetItem.name).")
+                let message = context.message(.nothingToDrinkIn(container: targetItem.name))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
             return
         }
 
         // Item is neither drinkable nor a container with drinkables
-        throw ActionResponse.prerequisiteNotMet("You can't drink the \(targetItem.name).")
+        let message = context.message(.cannotDrink(item: targetItem.name))
+        throw ActionResponse.prerequisiteNotMet(message)
     }
 
     /// Processes the "DRINK" command.
@@ -70,8 +74,10 @@ public struct DrinkActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("DrinkActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "DrinkActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -102,7 +108,8 @@ public struct DrinkActionHandler: ActionHandler {
                         stateChanges.append(pronounChange)
                     }
 
-                    message = "You drink the \(firstDrinkable.name) from the \(targetItem.name). Refreshing!"
+                    message =
+                        "You drink the \(firstDrinkable.name) from the \(targetItem.name). Refreshing!"
                 }
             } else {
                 message = "There's nothing to drink in the \(targetItem.name)."
@@ -115,8 +122,7 @@ public struct DrinkActionHandler: ActionHandler {
             stateChanges.append(removeChange)
 
             message = "You drink the \(targetItem.name). It's quite refreshing."
-        }
-        else {
+        } else {
             // This shouldn't happen after validation, but handle it
             message = "You can't drink the \(targetItem.name)."
         }

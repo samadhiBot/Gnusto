@@ -17,10 +17,12 @@ public struct InflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Inflate requires a direct object (what to inflate)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Inflate what?")
+            let message = context.message(.inflateWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only inflate objects.")
+            let message = context.message(.canOnlyActOnItems(verb: "inflate"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -31,7 +33,8 @@ public struct InflateActionHandler: ActionHandler {
 
         // Check if item is inflatable
         guard targetItem.hasFlag(.isInflatable) else {
-            throw ActionResponse.prerequisiteNotMet("You can't inflate the \(targetItem.name).")
+            let message = context.message(.cannotInflate(item: targetItem.name))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -45,8 +48,13 @@ public struct InflateActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate inflate message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("InflateActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "InflateActionHandler",
+                    details: "directObject was not an item in process"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let targetItem = try await context.engine.item(targetItemID)

@@ -16,10 +16,12 @@ public struct EatActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Eat what?")
+            let message = context.message(.eatWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only eat food.")
+            let message = context.message(.canOnlyEatFood)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists
@@ -51,7 +53,8 @@ public struct EatActionHandler: ActionHandler {
             let edibleContents = containerContents.filter { $0.hasFlag(.isEdible) }
 
             guard !edibleContents.isEmpty else {
-                throw ActionResponse.prerequisiteNotMet("There's nothing to eat in the \(targetItem.name).")
+                let message = context.message(.nothingToEatIn(container: targetItem.name))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
             return
         }
@@ -69,8 +72,10 @@ public struct EatActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("EatActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "EatActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -109,13 +114,13 @@ public struct EatActionHandler: ActionHandler {
                         stateChanges.append(pronounChange)
                     }
 
-                    message = "You eat the \(firstEdible.name) from the \(targetItem.name). Delicious!"
+                    message =
+                        "You eat the \(firstEdible.name) from the \(targetItem.name). Delicious!"
                 }
             } else {
                 message = "There's nothing edible in the \(targetItem.name)."
             }
-        }
-        else {
+        } else {
             // This shouldn't happen after validation, but handle it
             message = "You can't eat the \(targetItem.name)."
         }
