@@ -244,7 +244,7 @@ extension OutsideHouse {
                     let kitchenWindow = try await engine.item(.kitchenWindow)
                     return await ActionResult(
                         "With great effort, you open the window far enough to allow entry.",
-                        engine.setFlag(.isOpen, on: kitchenWindow)
+                        change: engine.setFlag(.isOpen, on: kitchenWindow)
                     )
                 }
             case .look where command.preposition == "through":

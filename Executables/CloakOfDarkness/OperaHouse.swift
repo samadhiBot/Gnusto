@@ -104,7 +104,7 @@ enum OperaHouse {
             } else {
                 ActionResult(
                     "Blundering around in the dark isn't a good idea!",
-                    await engine.adjustGlobal(.barMessageDisturbances, by: 2)
+                    change: await engine.adjustGlobal(.barMessageDisturbances, by: 2)
                 )
             }
         case .look, .inventory:
@@ -112,7 +112,7 @@ enum OperaHouse {
         default:
             ActionResult(
                 "In the dark? You could easily disturb something!",
-                await engine.adjustGlobal(.barMessageDisturbances, by: 1)
+                change: await engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
         }
     }
@@ -188,13 +188,12 @@ enum OperaHouse {
         let disturbedCount = await engine.global(.barMessageDisturbances) ?? 0
         await engine.requestQuit()
         if disturbedCount < 2 {
-            return ActionResult(
-                """
+            return ActionResult("""
                 The message, neatly marked in the sawdust, reads...
                 
                 "You win."
                 """,
-                await engine.updatePlayerScore(by: 1)
+                change: await engine.updatePlayerScore(by: 1)
             )
 
         } else {

@@ -515,24 +515,20 @@ extension InsideHouse {
     /// - TAKE: Enables the sword glow daemon when taken (equivalent to ENABLE <QUEUE I-SWORD -1>)
     /// - EXAMINE: Shows appropriate glow messages based on current glow state
     /// - Daemon activation: Checks current location and adjacent locations for monsters
-    static let swordHandler = ItemEventHandler { engine, event in
+    static let swordHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
             case .examine:
                 // Show glow message based on current glow level (like SWORD-FCN in ZIL)
-                let glowLevel = await engine.global(.swordGlowLevel) ?? 0
-                let baseDescription = "Your sword is glowing"
-
-                switch glowLevel {
+                switch await engine.global(.swordGlowLevel) ?? 0 {
                 case 1:
-                    return ActionResult("\(baseDescription) with a faint blue glow.")
+                    return ActionResult("Your sword is glowing with a faint blue glow.")
                 case 2:
-                    return ActionResult("\(baseDescription) very brightly.")
+                    return ActionResult("Your sword is glowing very brightly.")
                 default:
                     return ActionResult("It's just a sword.")
                 }
-
             default:
                 return nil
             }
@@ -543,14 +539,14 @@ extension InsideHouse {
                 print("🎾 Enable sword glow daemon")
                 // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
                 return ActionResult(
-                    effects: .runDaemon("swordDaemon")
+                    effect: .runDaemon("swordDaemon")
                 )
 
             case .drop:
                 // Disable sword glow daemon when dropped
                 print("🎾 Disable sword glow daemon")
                 return ActionResult(
-                    effects: .stopDaemon("swordDaemon")
+                    effect: .stopDaemon("swordDaemon")
                 )
             default:
                 return nil
@@ -592,13 +588,8 @@ extension InsideHouse {
         // Update glow level if changed
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
         if newGlowLevel != currentGlowLevel {
-            return ActionResult(
-                StateChange(
-                    entityID: .global,
-                    attribute: .globalState(attributeID: .swordGlowLevel),
-                    oldValue: currentGlowLevel == 0 ? nil : .int(currentGlowLevel),
-                    newValue: .int(newGlowLevel)
-                )
+            return await ActionResult(
+                change: engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
             )
         }
 

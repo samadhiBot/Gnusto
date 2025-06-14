@@ -58,8 +58,8 @@ public struct ActionResult: Sendable {
     ///   - effect: An optional single `SideEffect` to be triggered.
     public init(
         _ message: String? = nil,
-        _ change: StateChange? = nil,
-        _ effect: SideEffect? = nil
+        change: StateChange? = nil,
+        effect: SideEffect? = nil
     ) {
         assert(
             message != nil || change != nil || effect != nil,
@@ -68,15 +68,5 @@ public struct ActionResult: Sendable {
         self.message = message
         self.changes = if let change { [change] } else { [] }
         self.effects = if let effect { [effect] } else { [] }
-    }
-
-    /// Creates a new `ActionResult` that only contains a message for the player,
-    /// with no state changes or side effects.
-    ///
-    /// - Parameter message: The message to display to the player.
-    public init(_ message: String) {
-        self.message = message
-        self.changes = []
-        self.effects = []
     }
 }
