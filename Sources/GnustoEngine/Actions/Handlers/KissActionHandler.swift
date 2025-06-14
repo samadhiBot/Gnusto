@@ -66,27 +66,25 @@ public struct KissActionHandler: ActionHandler {
             // Kissing characters - context matters
             if targetItem.name.lowercased().contains("frog") {
                 // Fairy tale reference
-                message =
-                    "You kiss the \(targetItem.name), but it remains a frog. Apparently it's not that kind of story."
+                message = context.message(.kissFrog(frog: targetItem.name))
             } else {
                 // Other characters
-                message =
-                    "The \(targetItem.name) doesn't seem particularly receptive to your affections."
+                message = context.message(.kissCharacter(character: targetItem.name))
             }
         } else if targetItem.name.lowercased().contains("mirror") {
             // Kissing mirrors
-            message = "You kiss your reflection in the \(targetItem.name). How narcissistic!"
+            message = context.message(.kissMirror(mirror: targetItem.name))
         } else if targetItem.name.lowercased().contains("statue")
             || targetItem.name.lowercased().contains("sculpture")
         {
             // Kissing art
-            message = "You kiss the \(targetItem.name). The cold stone is not very responsive."
+            message = context.message(.kissStatue(statue: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Kissing small objects
-            message = "You kiss the \(targetItem.name). It tastes about as good as you'd expect."
+            message = context.message(.kissSmallObject(item: targetItem.name))
         } else {
             // Kissing large/fixed objects
-            message = "You can't kiss the \(targetItem.name) - it's too large and impersonal."
+            message = context.message(.kissLargeObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

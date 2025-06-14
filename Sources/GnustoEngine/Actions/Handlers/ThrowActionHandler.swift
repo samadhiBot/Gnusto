@@ -17,10 +17,12 @@ public struct ThrowActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Throw what?")
+            let message = context.message(.throwWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't throw that.")
+            let message = context.message(.cannotActOnThat(verb: "throw"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists and is held
@@ -32,7 +34,8 @@ public struct ThrowActionHandler: ActionHandler {
         // If a target is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let targetItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't throw at that.")
+                let message = context.message(.cannotActWithThat(verb: "throw at"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             _ = try await context.engine.item(targetItemID)
@@ -100,15 +103,16 @@ public struct ThrowActionHandler: ActionHandler {
             }
 
             if targetItem.hasFlag(.isCharacter) {
-                message = "You throw the \(itemToThrow.name) at the \(targetItem.name)."
+                message = context.message(
+                    .throwAtCharacter(item: itemToThrow.name, character: targetItem.name))
             } else {
-                message =
-                    "You throw the \(itemToThrow.name) at the \(targetItem.name). It bounces off harmlessly."
+                message = context.message(
+                    .throwAtObject(item: itemToThrow.name, target: targetItem.name))
             }
 
         } else {
             // General throwing - no specific target
-            message = "You throw the \(itemToThrow.name), and it falls to the ground."
+            message = context.message(.throwGeneral(item: itemToThrow.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

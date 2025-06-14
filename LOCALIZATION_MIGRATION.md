@@ -33,6 +33,8 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ AttackActionHandler - Uses `.attackNonCharacter(item:)`, `.attackWithBareHands(character:)`, etc.
 - ✅ AskActionHandler - Uses `.askWhom`, `.askAboutWhat`, validation messages
 - ✅ BurnActionHandler - Uses `.burnWhat`, `.burnToCatchFire(item:)`, `.burnJokingResponse`, etc.
+- ✅ DrinkActionHandler - Uses `.drinkWhat`, `.drinkSuccess(item:)`, `.drinkFromContainer(liquid:container:)`, etc.
+- ✅ EatActionHandler - Uses `.eatWhat`, `.eatSuccess(item:)`, `.eatFromContainer(food:container:)`, etc.
 
 **Basic Action Commands:**
 - ✅ BlowActionHandler - Uses `.blowOnLightSource(item:)`, `.blowOnFlammable(item:)`, etc.
@@ -55,27 +57,28 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ PullActionHandler - Uses `.pullWhat`, `.pullSuccess(item:)`, `.cannotPull(item:)`
 - ✅ DeflateActionHandler - Uses `.deflateWhat`, `.cannotDeflate(item:)`
 - ✅ DigActionHandler - Uses generic validation messages
-- ✅ DrinkActionHandler - Uses `.drinkWhat`, `.canOnlyDrinkLiquids`, `.nothingToDrinkIn(container:)`
-- ✅ EatActionHandler - Uses `.eatWhat`, `.canOnlyEatFood`, `.nothingToEatIn(container:)`
+- ✅ DrinkActionHandler - Uses `.drinkWhat`, `.canOnlyDrinkLiquids`, `.nothingToDrinkIn(container:)`, `.drinkSuccess(item:)`, `.drinkFromContainer(liquid:container:)`
+- ✅ EatActionHandler - Uses `.eatWhat`, `.canOnlyEatFood`, `.nothingToEatIn(container:)`, `.eatSuccess(item:)`, `.eatFromContainer(food:container:)`
 - ✅ EmptyActionHandler - Uses `.emptyWhat`, `.canOnlyEmptyContainers`
 - ✅ EnterActionHandler - Uses `.nothingHereToEnter`, `.cannotEnter(item:)`
 - ✅ ExamineActionHandler - Uses `.canOnlyActOnItems(verb:)`
 - ✅ FillActionHandler - Uses `.fillWhat`, `.cannotFillFrom(_:)`
 - ✅ FindActionHandler - Uses `.findWhat`
 - ✅ InflateActionHandler - Uses `.inflateWhat`, `.cannotInflate(item:)`
-- ✅ KickActionHandler - Uses `.kickWhat` and generic validation messages
-- ✅ KissActionHandler - Uses `.kissWhat` and generic validation messages
-- ✅ KnockActionHandler - Uses `.knockOnWhat` and context-specific responses
+- ✅ KickActionHandler - Uses `.kickWhat`, `.kickCharacter(character:)`, `.kickSmallObject(item:)`, `.kickLargeObject(item:)`
+- ✅ KissActionHandler - Uses `.kissWhat`, `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissLargeObject(item:)`
+- ✅ KnockActionHandler - Uses `.knockOnWhat`, `.knockOnOpenDoor(door:)`, `.knockOnLockedDoor(door:)`, `.knockOnClosedDoor(door:)`, `.knockOnWall(wall:)`, `.knockOnWoodenObject(item:)`, `.knockOnContainer(container:)`, `.knockOnSmallObject(item:)`, `.knockOnGenericObject(item:)`
 - ✅ LockActionHandler - Uses `.lockWhat`, `.lockWithWhat`, `.canOnlyUseItemAsKey`
 - ✅ LookActionHandler - Uses `.canOnlyLookAtItems`
 - ✅ LookInsideActionHandler - Uses `.lookInsideWhat`, `.canOnlyLookInsideItems`
 - ✅ LookUnderActionHandler - Uses `.lookUnderWhat` and generic validation messages
+- ✅ RubActionHandler - Uses `.rubWhat`, `.rubCharacter(character:)`, `.rubCleanObject(item:)`, `.rubLamp(lamp:)`, `.rubSmallObject(item:)`, `.rubGenericObject(item:)`
 
 ### 4. MessageKey Categories ✅
 
 **Question Prompts:** For missing direct/indirect objects
 - `.askWhom`, `.attackWhat`, `.burnWhat`, `.digWhat`, `.drinkWhat`, `.eatWhat`, `.emptyWhat`, etc.
-- `.fillWhat`, `.findWhat`, `.inflateWhat`, `.kickWhat`, `.kissWhat`, `.knockOnWhat`, etc.
+- `.fillWhat`, `.findWhat`, `.inflateWhat`, `.kickWhat`, `.kissWhat`, `.knockOnWhat`, `.rubWhat`, etc.
 - `.lockWhat`, `.lockWithWhat`, `.lookInsideWhat`, `.lookUnderWhat`
 
 **Validation Messages:** For invalid actions
@@ -90,6 +93,11 @@ Implemented support for atmospheric commands with multiple response options:
 - `.attackNonCharacter(item:)`, `.attackWithBareHands(character:)`, `.attackWithWeapon`
 - `.blowOnLightSource(item:)`, `.burnToCatchFire(item:)`, `.cutWithTool(item:tool:)`
 - `.jumpDangerous`, `.jumpWater(water:)`, `.jumpCharacter(character:)`, `.jumpSmallObject(item:)`, `.jumpLargeObject(item:)`
+- `.kickCharacter(character:)`, `.kickSmallObject(item:)`, `.kickLargeObject(item:)`
+- `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissLargeObject(item:)`
+- `.knockOnOpenDoor(door:)`, `.knockOnLockedDoor(door:)`, `.knockOnClosedDoor(door:)`, `.knockOnWall(wall:)`, `.knockOnWoodenObject(item:)`, `.knockOnContainer(container:)`, `.knockOnSmallObject(item:)`, `.knockOnGenericObject(item:)`
+- `.rubCharacter(character:)`, `.rubCleanObject(item:)`, `.rubLamp(lamp:)`, `.rubSmallObject(item:)`, `.rubGenericObject(item:)`
+- `.drinkSuccess(item:)`, `.drinkFromContainer(liquid:container:)`, `.eatSuccess(item:)`, `.eatFromContainer(food:container:)`
 - `.cannotDeflate(item:)`, `.cannotInflate(item:)`, `.cannotEnter(item:)`, `.cannotDrink(item:)`, `.cannotEat(item:)`
 
 **Engine Errors:** Internal error handling
@@ -99,13 +107,15 @@ Implemented support for atmospheric commands with multiple response options:
 
 ### 1. ActionHandlers Still Using Hardcoded Messages ⚠️
 
-Need to scan for and convert remaining handlers that may still have hardcoded strings:
-- **DrinkActionHandler** - Drinking and container-related messages  
-- **EatActionHandler** - Eating and container-related messages
-- **KickActionHandler** - Kicking responses with context variations
-- **KissActionHandler** - Kissing responses with context-specific variations
-- **KnockActionHandler** - Knocking responses with multiple object type variations
-- **RubActionHandler** - Rubbing responses with special cases for different objects
+Recently converted handlers (completed):
+- ✅ **DrinkActionHandler** - All drinking and container-related messages converted
+- ✅ **EatActionHandler** - All eating and container-related messages converted  
+- ✅ **KickActionHandler** - All kicking responses with context variations converted
+- ✅ **KissActionHandler** - All kissing responses with context-specific variations converted
+- ✅ **KnockActionHandler** - All knocking responses with multiple object type variations converted
+- ✅ **RubActionHandler** - All rubbing responses with special cases for different objects converted
+
+Remaining handlers that may still have hardcoded strings:
 - **ShakeActionHandler** - Shaking responses for different object types
 - **SqueezeActionHandler** - Squeezing responses with context sensitivity
 - **ThinkAboutActionHandler** - Thinking responses
@@ -209,9 +219,9 @@ return ActionResult(
 ## Next Steps
 
 1. **Priority ActionHandlers**: Convert the remaining handlers with significant hardcoded messages:
-   - DrinkActionHandler, EatActionHandler (consumption mechanics)
-   - KickActionHandler, KissActionHandler (character interaction)
-   - KnockActionHandler, RubActionHandler (object interaction with context)
+   - ✅ DrinkActionHandler, EatActionHandler (consumption mechanics) - COMPLETED
+   - ✅ KickActionHandler, KissActionHandler (character interaction) - COMPLETED
+   - ✅ KnockActionHandler, RubActionHandler (object interaction with context) - COMPLETED
    - ShakeActionHandler, SqueezeActionHandler (object manipulation)
    - ThrowActionHandler, TurnActionHandler, WaveActionHandler (action commands)
    - WearActionHandler (clothing mechanics)

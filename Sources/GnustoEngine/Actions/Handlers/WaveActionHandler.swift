@@ -16,10 +16,12 @@ public struct WaveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Wave requires a direct object (what to wave)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Wave what?")
+            let message = context.message(.waveWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't wave that.")
+            let message = context.message(.cannotActOnThat(verb: "wave"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct WaveActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate waving message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("WaveActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "WaveActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,19 +64,23 @@ public struct WaveActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Waving at characters
-            message = "You wave the \(targetItem.name) around, but it doesn't seem to appreciate being waved."
-        } else if targetItem.name.lowercased().contains("wand") || targetItem.name.lowercased().contains("staff") {
+            message = context.message(.waveCharacter(character: targetItem.name))
+        } else if targetItem.name.lowercased().contains("wand")
+            || targetItem.name.lowercased().contains("staff")
+        {
             // Waving magical items
-            message = "You wave the \(targetItem.name) dramatically, but nothing magical happens."
-        } else if targetItem.name.lowercased().contains("sword") || targetItem.name.lowercased().contains("blade") {
+            message = context.message(.waveMagicalItem(item: targetItem.name))
+        } else if targetItem.name.lowercased().contains("sword")
+            || targetItem.name.lowercased().contains("blade")
+        {
             // Waving weapons - brandishing
-            message = "You brandish the \(targetItem.name) menacingly."
+            message = context.message(.waveWeapon(weapon: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Waving small objects
-            message = "You wave the \(targetItem.name) around. It's not particularly impressive."
+            message = context.message(.waveSmallObject(item: targetItem.name))
         } else {
             // Can't wave fixed objects
-            message = "You can't wave the \(targetItem.name) around - it's not something you can pick up and wave."
+            message = context.message(.waveFixedObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

@@ -160,6 +160,24 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Remove what?" when direct object is missing in remove command
     case removeWhat
 
+    /// "Rub what?" when direct object is missing in rub command
+    case rubWhat
+
+    /// "Shake what?" when direct object is missing in shake command
+    case shakeWhat
+
+    /// "Squeeze what?" when direct object is missing in squeeze command
+    case squeezeWhat
+
+    /// "Think about what?" when direct object is missing in think about command
+    case thinkAboutWhat
+
+    /// "Throw what?" when direct object is missing in throw command
+    case throwWhat
+
+    /// "Wave what?" when direct object is missing in wave command
+    case waveWhat
+
     /// "Listen to what?" when direct object is missing in listen command
     case listenWhat
 
@@ -493,6 +511,24 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// No liquid source available to fill from
     case noLiquidSourceAvailable
 
+    /// Cannot drink from closed container
+    case cannotDrinkFromClosed(container: String)
+
+    /// Successfully drank from container
+    case drinkFromContainer(liquid: String, container: String)
+
+    /// Successfully drank item directly
+    case drinkSuccess(item: String)
+
+    /// Cannot eat from closed container
+    case cannotEatFromClosed(container: String)
+
+    /// Successfully ate from container
+    case eatFromContainer(food: String, container: String)
+
+    /// Successfully ate item directly
+    case eatSuccess(item: String)
+
     /// "There is nothing here to examine." for examine all with no examinable items
     case nothingHereToExamine
 
@@ -534,6 +570,141 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Can only empty containers
     case canOnlyEmptyContainers
+
+    /// Kick character response
+    case kickCharacter(character: String)
+
+    /// Kick small/takable object response
+    case kickSmallObject(item: String)
+
+    /// Kick large/fixed object response
+    case kickLargeObject(item: String)
+
+    /// Kiss character (frog) response
+    case kissFrog(frog: String)
+
+    /// Kiss character (general) response
+    case kissCharacter(character: String)
+
+    /// Kiss mirror response
+    case kissMirror(mirror: String)
+
+    /// Kiss statue/sculpture response
+    case kissStatue(statue: String)
+
+    /// Kiss small/takable object response
+    case kissSmallObject(item: String)
+
+    /// Kiss large/fixed object response
+    case kissLargeObject(item: String)
+
+    /// Knock on door (open) response
+    case knockOnOpenDoor(door: String)
+
+    /// Knock on door (locked) response
+    case knockOnLockedDoor(door: String)
+
+    /// Knock on door (closed) response
+    case knockOnClosedDoor(door: String)
+
+    /// Knock on wall response
+    case knockOnWall(wall: String)
+
+    /// Knock on wooden object response
+    case knockOnWoodenObject(item: String)
+
+    /// Knock on container response
+    case knockOnContainer(container: String)
+
+    /// Knock on small object response
+    case knockOnSmallObject(item: String)
+
+    /// Knock on generic object response
+    case knockOnGenericObject(item: String)
+
+    /// Rub character response
+    case rubCharacter(character: String)
+
+    /// Rub already clean object response
+    case rubCleanObject(item: String)
+
+    /// Rub lamp/lantern response
+    case rubLamp(lamp: String)
+
+    /// Rub small object response
+    case rubSmallObject(item: String)
+
+    /// Rub generic object response
+    case rubGenericObject(item: String)
+
+    /// Shake character response
+    case shakeCharacter(character: String)
+
+    /// Shake open container response
+    case shakeOpenContainer(container: String)
+
+    /// Shake closed container response
+    case shakeClosedContainer(container: String)
+
+    /// Shake bottle/liquid container response
+    case shakeLiquidContainer(container: String)
+
+    /// Shake small object response
+    case shakeSmallObject(item: String)
+
+    /// Shake fixed object response
+    case shakeFixedObject(item: String)
+
+    /// Squeeze character response
+    case squeezeCharacter(character: String)
+
+    /// Squeeze sponge response
+    case squeezeSponge(sponge: String)
+
+    /// Squeeze tube/bottle response
+    case squeezeContainer(container: String)
+
+    /// Squeeze soft object response
+    case squeezeSoftObject(item: String)
+
+    /// Squeeze hard object response
+    case squeezeHardObject(item: String)
+
+    /// Squeeze large object response
+    case squeezeLargeObject(item: String)
+
+    /// Think about self response
+    case thinkAboutSelf
+
+    /// Think about item response
+    case thinkAboutItem(item: String)
+
+    /// Think about location response
+    case thinkAboutLocation
+
+    /// Throw item at character response
+    case throwAtCharacter(item: String, character: String)
+
+    /// Throw item at object response
+    case throwAtObject(item: String, target: String)
+
+    /// Throw item (general) response
+    case throwGeneral(item: String)
+
+    /// Wave character response
+    case waveCharacter(character: String)
+
+    /// Wave magical item response
+    case waveMagicalItem(item: String)
+
+    /// Wave weapon response
+    case waveWeapon(weapon: String)
+
+    /// Wave small object response
+    case waveSmallObject(item: String)
+
+    /// Wave fixed object response
+    case waveFixedObject(item: String)
 
     /// Cannot jump across dangerous gaps
     case jumpDangerous

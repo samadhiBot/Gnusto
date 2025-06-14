@@ -16,10 +16,12 @@ public struct RubActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Rub requires a direct object (what to rub)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Rub what?")
+            let message = context.message(.rubWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't rub that.")
+            let message = context.message(.cannotActOnThat(verb: "rub"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct RubActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate rubbing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("RubActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "RubActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,19 +64,21 @@ public struct RubActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Rubbing characters might not be appropriate
-            message = "I don't think the \(targetItem.name) would appreciate being rubbed."
+            message = context.message(.rubCharacter(character: targetItem.name))
         } else if targetItem.name.lowercased().contains("clean") {
             // Already clean items
-            message = "The \(targetItem.name) is already clean."
-        } else if targetItem.name.lowercased().contains("lamp") || targetItem.name.lowercased().contains("lantern") {
+            message = context.message(.rubCleanObject(item: targetItem.name))
+        } else if targetItem.name.lowercased().contains("lamp")
+            || targetItem.name.lowercased().contains("lantern")
+        {
             // Special case for lamps - magical associations
-            message = "Rubbing the \(targetItem.name) doesn't seem to do anything. No djinn appears."
+            message = context.message(.rubLamp(lamp: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Rubbing small objects
-            message = "You rub the \(targetItem.name). It feels smooth to the touch."
+            message = context.message(.rubSmallObject(item: targetItem.name))
         } else {
             // Rubbing fixed/large objects
-            message = "You rub the \(targetItem.name), but nothing interesting happens."
+            message = context.message(.rubGenericObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

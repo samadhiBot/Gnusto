@@ -93,7 +93,7 @@ public struct EatActionHandler: ActionHandler {
             let removeChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(removeChange)
 
-            message = "You eat the \(targetItem.name). It's quite satisfying."
+            message = context.message(.eatSuccess(item: targetItem.name))
         }
         // Handle container with edible contents
         else if targetItem.hasFlag(.isContainer) {
@@ -103,7 +103,7 @@ public struct EatActionHandler: ActionHandler {
             if let firstEdible = edibleContents.first {
                 // For closed containers, can't eat from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = "You can't eat from the closed \(targetItem.name)."
+                    message = context.message(.cannotEatFromClosed(container: targetItem.name))
                 } else {
                     // Remove the first edible item from the container
                     let consumeChange = await context.engine.move(firstEdible, to: .nowhere)
@@ -114,15 +114,16 @@ public struct EatActionHandler: ActionHandler {
                         stateChanges.append(pronounChange)
                     }
 
-                    message =
-                        "You eat the \(firstEdible.name) from the \(targetItem.name). Delicious!"
+                    message = context.message(
+                        .eatFromContainer(food: firstEdible.name, container: targetItem.name)
+                    )
                 }
             } else {
-                message = "There's nothing edible in the \(targetItem.name)."
+                message = context.message(.nothingToEatIn(container: targetItem.name))
             }
         } else {
             // This shouldn't happen after validation, but handle it
-            message = "You can't eat the \(targetItem.name)."
+            message = context.message(.cannotEat(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

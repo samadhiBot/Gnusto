@@ -64,13 +64,13 @@ public struct KickActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Kicking characters is generally not advisable
-            message = "I don't think the \(targetItem.name) would appreciate that."
+            message = context.message(.kickCharacter(character: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Kicking small objects
-            message = "Kicking the \(targetItem.name) doesn't accomplish much."
+            message = context.message(.kickSmallObject(item: targetItem.name))
         } else {
             // Kicking larger, fixed objects
-            message = "Ouch! You hurt your foot kicking the \(targetItem.name)."
+            message = context.message(.kickLargeObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

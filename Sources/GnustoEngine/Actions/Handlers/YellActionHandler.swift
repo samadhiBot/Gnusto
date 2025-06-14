@@ -11,16 +11,17 @@ public struct YellActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         let responses = [
-            "You yell at the top of your lungs. Very cathartic!",
-            "You shout loudly. Your voice echoes impressively.",
-            "You holler with gusto. How invigorating!",
-            "You bellow like a bull. Quite intimidating.",
-            "You yell so loudly that your ears ring.",
-            "You shout with the passion of a thousand warriors.",
-            "You let out a mighty roar that shakes the very foundations.",
-            "You yell until you're hoarse. Worth it.",
-            "You holler like a town crier announcing important news.",
-            "You shout so loudly that distant mountains echo back."
+            "You bellow magnificently as the universe checks its watch.",
+            "You bellow with the wild abandon of one who's given up on making sense.",
+            "You bellow importantly, although the importance fails to materialize.",
+            "You holler with misplaced confidence.",
+            "You holler into the void. While the void doesn't reply, it does raise an eyebrow.",
+            "You shout with gusto. The world remains studiously unimpressed.",
+            "You shout with purpose, although the _exact_ purpose is unclear.",
+            "You shout with the determination of one who's definitely onto something, probably.",
+            "You yell as if the universe owes you money.",
+            "You yell enthusiastically while reality politely ignores you",
+            "You yell with conviction about nothing at all.",
         ]
 
         return ActionResult(

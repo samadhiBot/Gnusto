@@ -18,22 +18,24 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom("Think about what?")
+            let message = context.message(.thinkAboutWhat)
+            throw ActionResponse.custom(message)
         }
 
         switch directObjectRef {
         case .player:
-            return // Thinking about self is always valid.
+            return  // Thinking about self is always valid.
         case .item(let targetItemID):
             // 2. Check if item exists
-            let _ = try await context.engine.item(targetItemID) // Will throw if not found
+            let _ = try await context.engine.item(targetItemID)  // Will throw if not found
             // 3. Check reachability
             guard await context.engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
             }
         case .location(_):
             // For now, only allow thinking about items or the player.
-            throw ActionResponse.prerequisiteNotMet("You can only think about items or yourself.")
+            let message = context.message(.canOnlyActOnItems(verb: "think about"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -61,7 +63,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
 
         switch directObjectRef {
         case .player:
-            message = "Yes, yes, you're very important."
+            message = context.message(.thinkAboutSelf)
         case .item(let targetItemID):
             let targetItem = try await context.engine.item(targetItemID)
             // Mark as touched if not already
@@ -72,14 +74,11 @@ public struct ThinkAboutActionHandler: ActionHandler {
             if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
                 stateChanges.append(updatePronoun)
             }
-            message = """
-                You contemplate the \(targetItem.name) for a bit, \
-                but nothing fruitful comes to mind.
-                """
+            message = context.message(.thinkAboutItem(item: targetItem.name))
         case .location(_):
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.
-            message = "You ponder the location, but it remains stubbornly locational."
+            message = context.message(.thinkAboutLocation)
         }
 
         // Create result

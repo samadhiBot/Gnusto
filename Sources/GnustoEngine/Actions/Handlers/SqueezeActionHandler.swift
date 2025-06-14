@@ -16,10 +16,12 @@ public struct SqueezeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Squeeze requires a direct object (what to squeeze)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Squeeze what?")
+            let message = context.message(.squeezeWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't squeeze that.")
+            let message = context.message(.cannotActOnThat(verb: "squeeze"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct SqueezeActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate squeezing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("SqueezeActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "SqueezeActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,22 +64,26 @@ public struct SqueezeActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Squeezing characters - not advisable
-            message = "I don't think the \(targetItem.name) would appreciate being squeezed."
+            message = context.message(.squeezeCharacter(character: targetItem.name))
         } else if targetItem.name.lowercased().contains("sponge") {
             // Squeezing sponges - might get water
-            message = "You squeeze the \(targetItem.name) and water drips out."
-        } else if targetItem.name.lowercased().contains("tube") || targetItem.name.lowercased().contains("bottle") {
+            message = context.message(.squeezeSponge(sponge: targetItem.name))
+        } else if targetItem.name.lowercased().contains("tube")
+            || targetItem.name.lowercased().contains("bottle")
+        {
             // Squeezing containers
-            message = "You squeeze the \(targetItem.name) and some of its contents ooze out."
-        } else if targetItem.name.lowercased().contains("soft") || targetItem.name.lowercased().contains("pillow") {
+            message = context.message(.squeezeContainer(container: targetItem.name))
+        } else if targetItem.name.lowercased().contains("soft")
+            || targetItem.name.lowercased().contains("pillow")
+        {
             // Squeezing soft objects
-            message = "You squeeze the \(targetItem.name). It feels soft and yielding."
+            message = context.message(.squeezeSoftObject(item: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Squeezing regular small objects
-            message = "You squeeze the \(targetItem.name) as hard as you can, but it doesn't give."
+            message = context.message(.squeezeHardObject(item: targetItem.name))
         } else {
             // Can't squeeze large/fixed objects
-            message = "You can't get your arms around the \(targetItem.name) to squeeze it."
+            message = context.message(.squeezeLargeObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

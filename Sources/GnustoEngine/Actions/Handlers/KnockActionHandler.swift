@@ -65,31 +65,29 @@ public struct KnockActionHandler: ActionHandler {
         if targetItem.hasFlag(.isDoor) {
             // Knocking on doors
             if targetItem.hasFlag(.isOpen) {
-                message = "The \(targetItem.name) is already open. There's no need to knock."
+                message = context.message(.knockOnOpenDoor(door: targetItem.name))
             } else if targetItem.hasFlag(.isLocked) {
-                message =
-                    "You knock on the \(targetItem.name). There's no response from the other side."
+                message = context.message(.knockOnLockedDoor(door: targetItem.name))
             } else {
-                message = "You knock on the \(targetItem.name), but there's no answer."
+                message = context.message(.knockOnClosedDoor(door: targetItem.name))
             }
         } else if targetItem.name.lowercased().contains("wall") {
             // Knocking on walls
-            message = "You knock on the \(targetItem.name). It sounds solid."
+            message = context.message(.knockOnWall(wall: targetItem.name))
         } else if targetItem.name.lowercased().contains("wood")
             || targetItem.name.lowercased().contains("wooden")
         {
             // Knocking on wooden objects
-            message = "You knock on the \(targetItem.name). It makes a hollow wooden sound."
+            message = context.message(.knockOnWoodenObject(item: targetItem.name))
         } else if targetItem.hasFlag(.isContainer) {
             // Knocking on containers
-            message = "You knock on the \(targetItem.name). You hear a hollow sound."
+            message = context.message(.knockOnContainer(container: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Knocking on small objects
-            message =
-                "You knock on the \(targetItem.name), but it's too small to produce much of a sound."
+            message = context.message(.knockOnSmallObject(item: targetItem.name))
         } else {
             // Knocking on other objects
-            message = "You knock on the \(targetItem.name). Nothing happens."
+            message = context.message(.knockOnGenericObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

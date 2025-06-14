@@ -97,7 +97,7 @@ public struct DrinkActionHandler: ActionHandler {
             if let firstDrinkable = drinkableContents.first {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = "You can't drink the \(targetItem.name)."
+                    message = context.message(.cannotDrinkFromClosed(container: targetItem.name))
                 } else {
                     // Remove the first drinkable item from the container
                     let consumeChange = await context.engine.move(firstDrinkable, to: .nowhere)
@@ -108,11 +108,12 @@ public struct DrinkActionHandler: ActionHandler {
                         stateChanges.append(pronounChange)
                     }
 
-                    message =
-                        "You drink the \(firstDrinkable.name) from the \(targetItem.name). Refreshing!"
+                    message = context.message(
+                        .drinkFromContainer(liquid: firstDrinkable.name, container: targetItem.name)
+                    )
                 }
             } else {
-                message = "There's nothing to drink in the \(targetItem.name)."
+                message = context.message(.nothingToDrinkIn(container: targetItem.name))
             }
         }
         // Handle direct drinkable item
@@ -121,10 +122,10 @@ public struct DrinkActionHandler: ActionHandler {
             let removeChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(removeChange)
 
-            message = "You drink the \(targetItem.name). It's quite refreshing."
+            message = context.message(.drinkSuccess(item: targetItem.name))
         } else {
             // This shouldn't happen after validation, but handle it
-            message = "You can't drink the \(targetItem.name)."
+            message = context.message(.cannotDrink(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

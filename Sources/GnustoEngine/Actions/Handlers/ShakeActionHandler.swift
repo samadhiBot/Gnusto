@@ -16,10 +16,12 @@ public struct ShakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Shake what?")
+            let message = context.message(.shakeWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't shake that.")
+            let message = context.message(.cannotActOnThat(verb: "shake"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct ShakeActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate shaking message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("ShakeActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "ShakeActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,23 +64,25 @@ public struct ShakeActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Shaking characters - not advisable
-            message = "I don't think the \(targetItem.name) would appreciate being shaken."
+            message = context.message(.shakeCharacter(character: targetItem.name))
         } else if targetItem.hasFlag(.isContainer) {
             // Shaking containers might reveal contents
             if targetItem.hasFlag(.isOpen) {
-                message = "You shake the \(targetItem.name), but nothing falls out."
+                message = context.message(.shakeOpenContainer(container: targetItem.name))
             } else {
-                message = "You shake the \(targetItem.name) and hear something rattling inside."
+                message = context.message(.shakeClosedContainer(container: targetItem.name))
             }
-        } else if targetItem.name.lowercased().contains("bottle") || targetItem.name.lowercased().contains("vial") {
+        } else if targetItem.name.lowercased().contains("bottle")
+            || targetItem.name.lowercased().contains("vial")
+        {
             // Shaking liquid containers
-            message = "You shake the \(targetItem.name) and hear liquid sloshing inside."
+            message = context.message(.shakeLiquidContainer(container: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
             // Shaking small objects
-            message = "You shake the \(targetItem.name) vigorously, but nothing happens."
+            message = context.message(.shakeSmallObject(item: targetItem.name))
         } else {
             // Can't shake fixed objects
-            message = "You can't shake the \(targetItem.name) - it's firmly in place."
+            message = context.message(.shakeFixedObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)
