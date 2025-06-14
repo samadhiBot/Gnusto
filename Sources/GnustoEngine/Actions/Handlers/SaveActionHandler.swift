@@ -22,10 +22,12 @@ public struct SaveActionHandler: ActionHandler {
         do {
             // Request the engine to save the game
             try await context.engine.saveGame()
-            return ActionResult("Game saved.")
+            let message = context.message(.gameSaved)
+            return ActionResult(message)
         } catch {
             // If save fails, provide appropriate error message
-            return ActionResult("Save failed: \(error.localizedDescription)")
+            let message = context.message(.saveFailed(error: error.localizedDescription))
+            return ActionResult(message)
         }
     }
 

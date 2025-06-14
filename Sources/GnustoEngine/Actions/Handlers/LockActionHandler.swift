@@ -110,7 +110,8 @@ public struct LockActionHandler: ActionHandler {
 
         // Handle case: Already locked (validation allows this to pass through).
         if targetItem.hasFlag(.isLocked) {
-            return ActionResult("The \(targetItem.name) is already locked.")
+            let message = context.message(.alreadyLocked(item: targetItem.name))
+            return ActionResult(message)
         }
 
         // --- Lock Successful: Calculate State Changes ---

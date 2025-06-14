@@ -163,6 +163,15 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Listen to what?" when direct object is missing in listen command
     case listenWhat
 
+    /// "Wear what?" when direct object is missing in wear command
+    case wearWhat
+
+    /// "Taste what?" when direct object is missing in taste command
+    case tasteWhat
+
+    /// "Smell what?" when direct object is missing in smell command
+    case smellWhat
+
     /// "Insert into what?" for missing indirect object in insert command
     case insertIntoWhat
 
@@ -340,6 +349,9 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "You aren't holding that." when trying to drop unheld item
     case youArentHoldingThat
 
+    /// "You aren't wearing anything." for remove all with no worn items
+    case youArentWearingAnything
+
     /// "You can only X items." for type restrictions
     case youCanOnlyActOnItems(verb: String)
 
@@ -355,6 +367,9 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Success message for taking multiple items
     case youTakeMultipleItems(items: String)
+
+    /// Success message for removing multiple items
+    case youRemoveMultipleItems(items: String)
 
     // MARK: - Action-specific messages
 
@@ -486,4 +501,41 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Item is already locked
     case alreadyLocked(item: String)
+
+    /// "Time passes." for wait command
+    case timePasses
+
+    /// "That tastes about average." for taste command
+    case tastesAverage
+
+    /// "You smell nothing unusual." for smell command with no object
+    case smellNothingUnusual
+
+    /// "That smells about average." for smell command with object
+    case smellsAverage
+
+    /// "You can't smell that." for invalid smell target
+    case cannotSmellThat
+
+    /// "You can't throw yourself." for throw command with player as object
+    case cannotThrowYourself
+
+    /// Current score display message
+    case currentScore(score: Int, moves: Int)
+
+    /// Save/restore error messages
+    case saveFailed(error: String)
+    case restoreFailed(error: String)
+
+    /// "There is nothing here to push." for push all with no pushable items
+    case nothingHereToPush
+
+    /// "There is nothing here to remove." for remove all with no removable items
+    case nothingHereToRemove
+
+    /// "There is nothing here to wear." for wear all with no wearable items
+    case nothingHereToWear
+
+    /// Generic push success message
+    case pushSuccess(items: String)
 }

@@ -166,7 +166,8 @@ public struct InsertActionHandler: ActionHandler {
         guard let indirectObjectRef = context.command.indirectObject,
             case .item(let containerID) = indirectObjectRef
         else {
-            return ActionResult("Insert into what?")
+            let message = context.message(.insertIntoWhat)
+            return ActionResult(message)
         }
 
         let container = try await context.engine.item(containerID)
@@ -174,7 +175,8 @@ public struct InsertActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult("Insert what?")
+                let message = context.message(.insertWhat)
+                return ActionResult(message)
             }
         }
 
@@ -188,7 +190,8 @@ public struct InsertActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult("You can only insert items.")
+                    let message = context.message(.canOnlyActOnItems(verb: "insert"))
+                    return ActionResult(message)
                 }
             }
 

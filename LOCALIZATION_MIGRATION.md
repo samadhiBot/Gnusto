@@ -24,7 +24,7 @@ Implemented support for atmospheric commands with multiple response options:
 
 **Atmospheric Commands:**
 - ✅ BreatheActionHandler - Uses `.breatheResponses` with 5 random options
-- ✅ CryActionHandler - Uses `.cryResponses` with 10 random options  
+- ✅ CryActionHandler - Uses `.cryResponses` with 10 random options
 - ✅ DanceActionHandler - Uses `.danceResponses` with 11 random options (includes classic "Dancing is forbidden")
 - ✅ CurseActionHandler - Uses `.curseResponses` (8 options) and `.curseTargetResponses(item:)` (5 options)
 
@@ -102,7 +102,7 @@ The `GameEngine.report(_ response: ActionResponse)` method already uses MessageP
 
 Parser error messages may still use hardcoded strings - need to audit:
 - Unknown verb messages
-- Grammar error messages  
+- Grammar error messages
 - Ambiguity resolution messages
 
 ### 4. Game State Messages ⚠️
@@ -162,6 +162,18 @@ class HorrorMessageProvider: StandardMessageProvider {
 }
 ```
 
+### Ephemeral Variable Creation & Code Style
+```swift
+// Okay
+let message = context.message(.unknownEntity)
+return ActionResult(message)
+
+// Preferred
+return ActionResult(
+    context.message(.unknownEntity)
+)
+```
+
 ## Migration Benefits
 
 1. **Localization Ready**: All user-facing text centralized for translation
@@ -185,7 +197,7 @@ class HorrorMessageProvider: StandardMessageProvider {
 ```
 Gnusto/Sources/GnustoEngine/Localization/
 ├── MessageKey.swift                 # All message identifiers
-├── MessageProvider.swift            # Protocol definition  
+├── MessageProvider.swift            # Protocol definition
 ├── StandardMessageProvider.swift    # English implementation
 └── MessageProvider+Random.swift     # Random selection utilities
 

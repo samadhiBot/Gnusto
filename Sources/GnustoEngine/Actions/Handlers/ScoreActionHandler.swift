@@ -16,7 +16,8 @@ struct ScoreActionHandler: ActionHandler {
         let turnCount = await context.engine.playerMoves
 
         // The SCORE context.command only reports information, it doesn't change state.
-        return ActionResult("Your score is \(currentScore) in \(turnCount) moves.")
+        let message = context.message(.currentScore(score: currentScore, moves: turnCount))
+        return ActionResult(message)
     }
 
     // Default implementations for validate() and postProcess() are used.

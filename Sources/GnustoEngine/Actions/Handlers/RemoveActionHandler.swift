@@ -17,18 +17,19 @@ public struct RemoveActionHandler: ActionHandler {
         if context.command.isAllCommand {
             return
         }
-        
+
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet("Remove what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.removeWhat))
         }
-        
+
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Remove what?")
+            throw ActionResponse.prerequisiteNotMet(context.message(.removeWhat))
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only remove items.")
+            throw ActionResponse.prerequisiteNotMet(
+                context.message(.canOnlyActOnItems(verb: "remove")))
         }
 
         // 2. Check if the item exists and is worn by the player
@@ -62,40 +63,43 @@ public struct RemoveActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to remove)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult("Remove what?")
+                let message = context.message(.removeWhat)
+                return ActionResult(message)
             }
         }
-        
+
         var allStateChanges: [StateChange] = []
         var removedItems: [Item] = []
         var lastRemovedItem: Item?
-        
+
         // Process each object individually
         for directObjectRef in context.command.directObjects {
             guard case .item(let targetItemID) = directObjectRef else {
                 if context.command.isAllCommand {
-                    continue // Skip non-items in ALL commands
+                    continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult("You can only remove items.")
+                    return ActionResult(
+                        context.message(.canOnlyActOnItems(verb: "remove"))
+                    )
                 }
             }
-            
+
             do {
                 let targetItem = try await context.engine.item(targetItemID)
-                
+
                 // Validate this specific item for ALL commands
                 if context.command.isAllCommand {
                     // Check if item is currently worn
                     guard targetItem.hasFlag(.isWorn) else {
-                        continue // Skip items not worn in ALL commands
+                        continue  // Skip items not worn in ALL commands
                     }
-                    
+
                     // Check if item is removable (not scenery)
                     guard !targetItem.hasFlag(.omitDescription) else {
-                        continue // Skip non-removable items in ALL commands
+                        continue  // Skip non-removable items in ALL commands
                     }
                 }
-                
+
                 // --- Calculate State Changes for this item ---
                 var itemStateChanges: [StateChange] = []
 
@@ -112,7 +116,7 @@ public struct RemoveActionHandler: ActionHandler {
                 allStateChanges.append(contentsOf: itemStateChanges)
                 removedItems.append(targetItem)
                 lastRemovedItem = targetItem
-                
+
             } catch {
                 // For ALL commands, skip items that cause errors
                 if !context.command.isAllCommand {
@@ -120,7 +124,7 @@ public struct RemoveActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Update pronouns appropriately for multiple objects
         if let lastItem = lastRemovedItem {
             if removedItems.count > 1 {
@@ -137,14 +141,17 @@ public struct RemoveActionHandler: ActionHandler {
                 }
             }
         }
-        
+
         // Generate appropriate message
-        let message = if removedItems.isEmpty {
-            context.command.isAllCommand ? "You aren't wearing anything." : "Remove what?"
-        } else {
-            "You take off \(removedItems.listWithDefiniteArticles)."
-        }
-        
+        let message =
+            if removedItems.isEmpty {
+                context.command.isAllCommand
+                    ? context.message(.youArentWearingAnything) : context.message(.removeWhat)
+            } else {
+                context.message(
+                    .youRemoveMultipleItems(items: removedItems.listWithDefiniteArticles))
+            }
+
         return ActionResult(
             message: message,
             stateChanges: allStateChanges

@@ -39,6 +39,7 @@ struct TasteActionHandler: ActionHandler {
     func process(context: ActionContext) async throws -> ActionResult {
         // Validate ensures directObject is an item if present.
         // Generic response. Tasting specific items (like food) would need custom logic.
-        return ActionResult("That tastes about average.")
+        let message = context.message(.tastesAverage)
+        return ActionResult(message)
     }
 }

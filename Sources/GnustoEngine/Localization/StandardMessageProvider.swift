@@ -244,6 +244,9 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .youArentHoldingThat:
             "You aren't holding that."
 
+        case .youArentWearingAnything:
+            "You aren't wearing anything."
+
         case .youCanOnlyActOnItems(let verb):
             "You can only \(verb) items."
 
@@ -258,6 +261,9 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .youTakeMultipleItems(let items):
             "You take \(items)."
+
+        case .youRemoveMultipleItems(let items):
+            "You take off \(items)."
 
         // MARK: - Question prompts for missing objects
 
@@ -604,6 +610,54 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .alreadyLocked(let item):
             "The \(item) is already locked."
+
+        case .timePasses:
+            "Time passes."
+
+        case .tastesAverage:
+            "That tastes about average."
+
+        case .smellNothingUnusual:
+            "You smell nothing unusual."
+
+        case .smellsAverage:
+            "That smells about average."
+
+        case .cannotSmellThat:
+            "You can't smell that."
+
+        case .cannotThrowYourself:
+            "You can't throw yourself."
+
+        case .currentScore(let score, let moves):
+            "Your score is \(score) in \(moves) moves."
+
+        case .saveFailed(let error):
+            "Save failed: \(error)"
+
+        case .restoreFailed(let error):
+            "Restore failed: \(error)"
+
+        case .wearWhat:
+            "Wear what?"
+
+        case .tasteWhat:
+            "Taste what?"
+
+        case .smellWhat:
+            "Smell what?"
+
+        case .nothingHereToPush:
+            "There is nothing here to push."
+
+        case .nothingHereToRemove:
+            "There is nothing here to remove."
+
+        case .nothingHereToWear:
+            "There is nothing here to wear."
+
+        case .pushSuccess(let items):
+            "You push \(items). Nothing happens."
         }
     }
 }

@@ -52,16 +52,19 @@ public struct ThrowActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate throwing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.internalEngineError("ThrowActionHandler: directObject was nil in process.")
+            throw ActionResponse.internalEngineError(
+                "ThrowActionHandler: directObject was nil in process.")
         }
 
         // Handle self reference
         if case .player = directObjectRef {
-            return ActionResult("You can't throw yourself.")
+            let message = context.message(.cannotThrowYourself)
+            return ActionResult(message)
         }
 
         guard case .item(let itemToThrowID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("ThrowActionHandler: directObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "ThrowActionHandler: directObject was not an item in process.")
         }
 
         let itemToThrow = try await context.engine.item(itemToThrowID)
@@ -86,7 +89,8 @@ public struct ThrowActionHandler: ActionHandler {
 
         // Handle specific target throwing
         if let indirectObjectRef = context.command.indirectObject,
-           case .item(let targetItemID) = indirectObjectRef {
+            case .item(let targetItemID) = indirectObjectRef
+        {
 
             let targetItem = try await context.engine.item(targetItemID)
 
@@ -98,7 +102,8 @@ public struct ThrowActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 message = "You throw the \(itemToThrow.name) at the \(targetItem.name)."
             } else {
-                message = "You throw the \(itemToThrow.name) at the \(targetItem.name). It bounces off harmlessly."
+                message =
+                    "You throw the \(itemToThrow.name) at the \(targetItem.name). It bounces off harmlessly."
             }
 
         } else {

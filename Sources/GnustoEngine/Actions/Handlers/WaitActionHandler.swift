@@ -14,7 +14,8 @@ struct WaitActionHandler: ActionHandler {
     func process(context: ActionContext) async throws -> ActionResult {
         // Waiting is always successful and produces a standard message.
         // It doesn't change state or cause side effects directly.
-        ActionResult("Time passes.")
+        let message = context.message(.timePasses)
+        return ActionResult(message)
     }
 
     // Default implementations for validate() and postProcess() are used.

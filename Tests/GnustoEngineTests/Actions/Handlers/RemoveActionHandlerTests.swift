@@ -1,5 +1,5 @@
-import Testing
 import CustomDump
+import Testing
 
 @testable import GnustoEngine
 
@@ -42,7 +42,7 @@ struct RemoveActionHandlerTests {
         let finalCloakState = try await engine.item("cloak")
         #expect(finalCloakState.parent == .player)
         #expect(finalCloakState.hasFlag(.isWorn) == false, "Cloak should NOT have .isWorn flag")
-        #expect(finalCloakState.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag") // Ensure touched is added
+        #expect(finalCloakState.hasFlag(.isTouched) == true, "Cloak should have .isTouched flag")  // Ensure touched is added
 
         // Assert Output
         let output = await mockIO.flush()
@@ -65,7 +65,7 @@ struct RemoveActionHandlerTests {
                 entityID: .global,
                 attribute: .pronounReference(pronoun: "it"),
                 newValue: .entityReferenceSet([.item("cloak")])
-            )
+            ),
         ]
         let finalHistory = await engine.gameState.changeHistory
         expectNoDifference(finalHistory, expectedChanges)
@@ -106,7 +106,7 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        let game = MinimalGame() // Cloak doesn’t exist here
+        let game = MinimalGame()  // Cloak doesn’t exist here
         let engine = await GameEngine(
             blueprint: game,
             parser: MockParser(),
@@ -199,12 +199,12 @@ struct RemoveActionHandlerTests {
     func testRemoveAll() async throws {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
-        
+
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Act: Execute "remove all"
         let command = Command(
             verb: .remove,
@@ -213,7 +213,7 @@ struct RemoveActionHandlerTests {
             rawInput: "remove all"
         )
         await engine.execute(command: command)
-        
+
         // Assert: Should remove both items
         let output = await mockIO.flush()
         expectNoDifference(output, "You take off the boots and the cloak.")
@@ -223,22 +223,22 @@ struct RemoveActionHandlerTests {
         let updatedBoots = try await engine.item("boots")
         #expect(updatedCloak.hasFlag(.isWorn) == false)
         #expect(updatedBoots.hasFlag(.isWorn) == false)
-        
+
         // Verify items are still held
         #expect(updatedCloak.parent == .player)
         #expect(updatedBoots.parent == .player)
     }
-    
+
     @Test("REMOVE CLOAK AND BOOTS works correctly")
     func testRemoveCloakAndBoots() async throws {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
-        
+
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Act: Execute "remove cloak and boots"
         let command = Command(
             verb: .remove,
@@ -247,7 +247,7 @@ struct RemoveActionHandlerTests {
             rawInput: "remove cloak and boots"
         )
         await engine.execute(command: command)
-        
+
         // Assert: Should remove both items
         let output = await mockIO.flush()
         expectNoDifference(output, "You take off the boots and the cloak.")
@@ -258,17 +258,17 @@ struct RemoveActionHandlerTests {
         #expect(updatedCloak.hasFlag(.isWorn) == false)
         #expect(updatedBoots.hasFlag(.isWorn) == false)
     }
-    
+
     @Test("REMOVE ALL skips non-worn items")
     func testRemoveAllSkipsNonWorn() async throws {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable) // Not worn
-        
+        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
+
         let game = MinimalGame(items: [cloak, boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Act: Execute "remove all"
         let command = Command(
             verb: .remove,
@@ -277,7 +277,7 @@ struct RemoveActionHandlerTests {
             rawInput: "remove all"
         )
         await engine.execute(command: command)
-        
+
         // Assert: Should remove only the cloak
         let output = await mockIO.flush()
         expectNoDifference(output, "You take off the cloak.")
@@ -286,18 +286,18 @@ struct RemoveActionHandlerTests {
         let updatedCloak = try await engine.item("cloak")
         let updatedBoots = try await engine.item("boots")
         #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedBoots.hasFlag(.isWorn) == false) // Was already false
+        #expect(updatedBoots.hasFlag(.isWorn) == false)  // Was already false
     }
-    
+
     @Test("REMOVE ALL with no worn items")
     func testRemoveAllWithNoWornItems() async throws {
-        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable) // Not worn
-        
+        let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
+
         let game = MinimalGame(items: [boots])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Act: Execute "remove all"
         let command = Command(
             verb: .remove,
@@ -306,22 +306,24 @@ struct RemoveActionHandlerTests {
             rawInput: "remove all"
         )
         await engine.execute(command: command)
-        
+
         // Assert: Should get appropriate message
         let output = await mockIO.flush()
         expectNoDifference(output, "You aren’t wearing anything.")
     }
-    
+
     @Test("REMOVE ALL skips scenery items")
     func testRemoveAllSkipsScenery() async throws {
         let cloak = Item(id: "cloak", .name("cloak"), .in(.player), .isWearable, .isWorn)
-        let amulet = Item(id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn, .omitDescription)
-        
+        let amulet = Item(
+            id: "amulet", .name("cursed amulet"), .in(.player), .isWearable, .isWorn,
+            .omitDescription)
+
         let game = MinimalGame(items: [cloak, amulet])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-        
+
         // Act: Execute "remove all"
         let command = Command(
             verb: .remove,
@@ -330,7 +332,7 @@ struct RemoveActionHandlerTests {
             rawInput: "remove all"
         )
         await engine.execute(command: command)
-        
+
         // Assert: Should remove only the cloak (skip cursed amulet)
         let output = await mockIO.flush()
         expectNoDifference(output, "You take off the cloak.")
@@ -339,6 +341,6 @@ struct RemoveActionHandlerTests {
         let updatedCloak = try await engine.item("cloak")
         let updatedAmulet = try await engine.item("amulet")
         #expect(updatedCloak.hasFlag(.isWorn) == false)
-        #expect(updatedAmulet.hasFlag(.isWorn) == true) // Still worn (cursed)
+        #expect(updatedAmulet.hasFlag(.isWorn) == true)  // Still worn (cursed)
     }
 }

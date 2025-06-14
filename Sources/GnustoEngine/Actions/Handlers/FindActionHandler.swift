@@ -49,7 +49,8 @@ public struct FindActionHandler: ActionHandler {
 
         // Check if the player is holding it
         if targetItem.parent == .player {
-            return ActionResult("You have it.")
+            let message = context.message(.youHaveIt)
+            return ActionResult(message)
         }
 
         // Check if the item is visible in the current scope
@@ -65,14 +66,5 @@ public struct FindActionHandler: ActionHandler {
         // Item exists but isn't visible
         let message = context.message(.unknownEntity)
         return ActionResult(message)
-    }
-
-    /// Performs any post-processing after the find action completes.
-    ///
-    /// The FIND command doesn't typically require state changes or post-processing.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for find
     }
 }
