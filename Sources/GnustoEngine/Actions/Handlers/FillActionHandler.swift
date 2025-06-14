@@ -76,53 +76,54 @@ public struct FillActionHandler: ActionHandler {
         }
 
         let containerItem = try await context.engine.item(containerItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark container as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: containerItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the container
-        if let pronounChange = await context.engine.updatePronouns(to: containerItem) {
-            stateChanges.append(pronounChange)
-        }
-
-        let message: String
 
         // Handle filling from specified source
         if let indirectObjectRef = context.command.indirectObject,
             case .item(let sourceItemID) = indirectObjectRef
         {
-
             let sourceItem = try await context.engine.item(sourceItemID)
 
             // Check if source has drinkable liquid or is a water source
-            if sourceItem.hasFlag(.isDrinkable) {
-                message = context.message(
-                    .fillSuccess(container: containerItem.name, source: sourceItem.name))
-                // TODO: In a full implementation, you might create a new liquid item in the container
-            } else {
-                message = context.message(.noLiquidInSource(source: sourceItem.name))
-            }
+            let message =
+                if sourceItem.hasFlag(.isDrinkable) {
+                    context.message(
+                        .fillSuccess(container: containerItem.name, source: sourceItem.name))
+                    // TODO: In a full implementation, you might create a new liquid item in the container
+                } else {
+                    context.message(.noLiquidInSource(source: sourceItem.name))
+                }
 
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: containerItem),
+                    await context.engine.updatePronouns(to: containerItem),
+                ]
+            )
         } else {
             // No source specified - look for water sources in current location
             let currentLocationID = await context.engine.playerLocationID
             let locationItems = await context.engine.items(in: .location(currentLocationID))
             let waterSources = locationItems.filter { $0.hasFlag(.isDrinkable) }
 
-            if !waterSources.isEmpty {
-                let firstSource = waterSources.first!
-                message = context.message(
-                    .fillSuccess(container: containerItem.name, source: firstSource.name))
-                // TODO: In a full implementation, you might create a new liquid item in the container
-            } else {
-                message = context.message(.noLiquidSourceAvailable)
-            }
-        }
+            let message =
+                if !waterSources.isEmpty {
+                    let firstSource = waterSources.first!
+                    context.message(
+                        .fillSuccess(container: containerItem.name, source: firstSource.name))
+                    // TODO: In a full implementation, you might create a new liquid item in the container
+                } else {
+                    context.message(.noLiquidSourceAvailable)
+                }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: containerItem),
+                    await context.engine.updatePronouns(to: containerItem),
+                ]
+            )
+        }
     }
 
     /// Performs any post-processing after the fill action completes.

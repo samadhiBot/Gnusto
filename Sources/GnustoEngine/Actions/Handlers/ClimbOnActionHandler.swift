@@ -45,22 +45,14 @@ public struct ClimbOnActionHandler: ActionHandler {
 
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Mark the item as touched and update pronouns
-        var stateChanges: [StateChange] = []
-
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
         // Default behavior: You can't climb on most things
         let message = context.message(.climbOnFailure(item: targetItem.withDefiniteArticle))
         return ActionResult(
             message: message,
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 }

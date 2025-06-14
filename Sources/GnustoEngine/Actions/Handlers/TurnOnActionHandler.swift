@@ -94,8 +94,10 @@ public struct TurnOnActionHandler: ActionHandler {
     ///           be caught by `validate`), or errors from `context.engine.item()`.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("TurnOn: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "TurnOn: directObject was not an item in process.")
         }
         let targetItem = try await context.engine.item(targetItemID)
 
@@ -111,62 +113,28 @@ public struct TurnOnActionHandler: ActionHandler {
 
         // Check if room was dark before turning on the light
         let wasRoomDark = await context.engine.playerLocationIsLit() == false
+        let isLightSource = targetItem.hasFlag(.isLightSource)
 
-        // --- State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Ensure `.isTouched` flag is set.
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 2: Set `.isOn` flag.
-        // Validation ensures the item was off, so an update should always occur here.
-        if let update = await context.engine.setFlag(.isOn, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // --- Determine Message ---
         var messageParts: [String] = []
         messageParts.append("The \(targetItem.name) is now on.")
 
         // Check if turning on this light source illuminated a dark room
-        let isLightSource = targetItem.hasFlag(.isLightSource)
         if wasRoomDark && isLightSource {
-            // Apply state changes temporarily to check if room becomes lit
-            let tempGameState = await context.engine.gameState
-            var updatedGameState = tempGameState
-
-            // Apply the state changes to see the effect
-            for change in stateChanges {
-                try? updatedGameState.apply(change)
-            }
-
-            // Check if room is now lit with the updated state
             let currentLocation = try await context.engine.playerLocation()
             let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
 
             if !locationIsInherentlyLit {
-                // Check if this light source or others now provide light
-                let allItems = updatedGameState.items.values
-                let activeLightSources = allItems.filter { item in
-                    let isInPlayerInventory = item.parent == .player
-                    let isInCurrentLocation = item.parent == .location(currentLocation.id)
-                    let providesLight = item.hasFlag(.isLightSource)
-                    let isOn = item.hasFlag(.isOn)
-                    return (isInPlayerInventory || isInCurrentLocation) && providesLight && isOn
-                }
-
-                if !activeLightSources.isEmpty {
-                    messageParts.append("You can see your surroundings now.")
-                }
+                // This light source will provide light once turned on
+                messageParts.append("You can see your surroundings now.")
             }
         }
 
-        // --- Create Result ---
         return ActionResult(
             message: messageParts.joined(separator: "\n"),
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.setFlag(.isOn, on: targetItem),
+            ]
         )
     }
 
@@ -181,36 +149,26 @@ public struct TurnOnActionHandler: ActionHandler {
     ///   - targetItem: The flammable item to burn.
     ///   - context: The action context.
     /// - Returns: An `ActionResult` with burn-specific messaging and state changes.
-    private func processBurn(targetItem: Item, context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
-        // Ensure the item is marked as touched
-        if let touchChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchChange)
-        }
-
-        // Update pronouns
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
+    private func processBurn(targetItem: Item, context: ActionContext) async throws -> ActionResult
+    {
         // Check if the item is flammable (should always be true in this context)
         if targetItem.hasFlag(.isFlammable) {
-            // Move the item to nowhere (destroy it)
-            let destroyChange = await context.engine.move(targetItem, to: .nowhere)
-            stateChanges.append(destroyChange)
-
             return ActionResult(
                 message: "The \(targetItem.name) catches fire and burns to ashes.",
-                stateChanges: stateChanges
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                    await context.engine.move(targetItem, to: .nowhere),
+                ]
             )
         } else {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
-            let message = "You can't burn the \(targetItem.name)."
-
             return ActionResult(
-                message: message,
-                stateChanges: stateChanges
+                message: "You can't burn the \(targetItem.name).",
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                ]
             )
         }
     }

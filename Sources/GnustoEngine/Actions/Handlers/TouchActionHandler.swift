@@ -50,22 +50,18 @@ public struct TouchActionHandler: ActionHandler {
     ///           Can also throw errors from `context.engine.item()` if the item doesn't exist.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Touch: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "Touch: directObject was not an item in process.")
         }
         let targetItem = try await context.engine.item(targetItemID)
 
-        // --- State Change: Mark as Touched ---
-        var stateChanges: [StateChange] = []
-
-        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(addTouchedFlag)
-        }
-
-        // --- Create Result ---
         return ActionResult(
             message: "You feel nothing special.",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem)
+            ]
         )
     }
 }

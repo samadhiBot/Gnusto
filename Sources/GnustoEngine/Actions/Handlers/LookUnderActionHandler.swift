@@ -43,21 +43,13 @@ public struct LookUnderActionHandler: ActionHandler {
 
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Mark the item as touched and update pronouns
-        var stateChanges: [StateChange] = []
-
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
         // Default behavior: You can't see anything of interest under most things
         return ActionResult(
             message: "You find nothing of interest under \(targetItem.withDefiniteArticle).",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 }

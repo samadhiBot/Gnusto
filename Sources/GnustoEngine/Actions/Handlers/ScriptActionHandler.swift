@@ -23,12 +23,6 @@ public struct ScriptActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
-        // Set the scripting flag
-        let scriptChange = await context.engine.setGlobal(.isScripting, to: true)
-        stateChanges.append(scriptChange)
-
         // In a full implementation, this would:
         // 1. Prompt for filename
         // 2. Open transcript file
@@ -41,7 +35,9 @@ public struct ScriptActionHandler: ActionHandler {
                 Default is "transcript":
                 [Transcript recording started]
                 """,
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setGlobal(.isScripting, to: true)
+            ]
         )
     }
 

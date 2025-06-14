@@ -116,36 +116,14 @@ public struct LockActionHandler: ActionHandler {
             return ActionResult(message)
         }
 
-        // --- Lock Successful: Calculate State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Set `.isLocked` flag on target item.
-        // Validation ensures the item was not already locked and is lockable with this key.
-        if let update = await context.engine.setFlag(.isLocked, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 2: Ensure `.isTouched` flag is set on target item.
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 3: Ensure `.isTouched` flag is set on key item.
-        if let update = await context.engine.setFlag(.isTouched, on: keyItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 4: Update pronouns to refer to the target item (the one locked).
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // --- Prepare Result ---
-        let message = context.message(.lockSuccess(item: targetItem.withDefiniteArticle))
-
         return ActionResult(
-            message: message,
-            stateChanges: stateChanges
+            message: context.message(.lockSuccess(item: targetItem.withDefiniteArticle)),
+            stateChanges: [
+                await context.engine.setFlag(.isLocked, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: keyItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 

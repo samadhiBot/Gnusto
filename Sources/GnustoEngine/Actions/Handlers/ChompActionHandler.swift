@@ -65,9 +65,10 @@ public struct ChompActionHandler: ActionHandler {
         // Mark item as touched and update pronouns
         return ActionResult(
             message: message,
-            changes:
+            stateChanges: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 }

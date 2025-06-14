@@ -47,30 +47,24 @@ public struct WaveActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type and properties
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Waving at characters
+                context.message(.waveCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Generic waving response for objects
+                context.message(.waveFixedObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Waving at characters
-            message = context.message(.waveCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Generic waving response for objects
-            message = context.message(.waveFixedObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the wave action completes.

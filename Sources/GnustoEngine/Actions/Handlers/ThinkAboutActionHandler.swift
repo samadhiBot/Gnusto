@@ -58,33 +58,26 @@ public struct ThinkAboutActionHandler: ActionHandler {
             throw ActionResponse.internalEngineError("ThinkAbout: directObject was nil in process.")
         }
 
-        let message: String
-        var stateChanges: [StateChange] = []
-
         switch directObjectRef {
         case .player:
-            message = context.message(.thinkAboutSelf)
+            return ActionResult(
+                context.message(.thinkAboutSelf)
+            )
         case .item(let targetItemID):
             let targetItem = try await context.engine.item(targetItemID)
-            // Mark as touched if not already
-            if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
-                stateChanges.append(addTouchedFlag)
-            }
-            // Update pronoun
-            if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-                stateChanges.append(updatePronoun)
-            }
-            message = context.message(.thinkAboutItem(item: targetItem.withDefiniteArticle))
+            return ActionResult(
+                message: context.message(.thinkAboutItem(item: targetItem.withDefiniteArticle)),
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                ]
+            )
         case .location(_):
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.
-            message = context.message(.thinkAboutLocation)
+            return ActionResult(
+                context.message(.thinkAboutLocation)
+            )
         }
-
-        // Create result
-        return ActionResult(
-            message: message,
-            stateChanges: stateChanges
-        )
     }
 }

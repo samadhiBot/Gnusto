@@ -1,7 +1,8 @@
 import Foundation
 
 /// Handles the "SCORE" command, displaying the player's current score and turn count.
-struct ScoreActionHandler: ActionHandler {
+public struct ScoreActionHandler: ActionHandler {
+    public init() {}
     /// Processes the "SCORE" command.
     ///
     /// This action retrieves the player's current score and number of moves from the
@@ -10,14 +11,14 @@ struct ScoreActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the player's score and move count.
-    func process(context: ActionContext) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // Fetch current score and turn count
         let currentScore = await context.engine.playerScore
         let turnCount = await context.engine.playerMoves
 
-        // The SCORE context.command only reports information, it doesn't change state.
-        let message = context.message(.currentScore(score: currentScore, moves: turnCount))
-        return ActionResult(message)
+        return ActionResult(
+            context.message(.currentScore(score: currentScore, moves: turnCount))
+        )
     }
 
     // Default implementations for validate() and postProcess() are used.

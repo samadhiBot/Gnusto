@@ -91,28 +91,14 @@ public struct CloseActionHandler: ActionHandler {
             )
         }
 
-        // --- Calculate State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Set dynamic property isOpen to false
-        if let update = await context.engine.clearFlag(.isOpen, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // --- State Change: Mark as Touched ---
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // --- State Change: Update pronouns ---
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
-        }
-
         // --- Prepare Result ---
         return ActionResult(
             message: context.message(.closed),
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.clearFlag(.isOpen, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 

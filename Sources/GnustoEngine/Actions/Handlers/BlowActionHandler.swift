@@ -37,42 +37,43 @@ public struct BlowActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate blow message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
         // Handle blowing on a specific object
-        if let directObjectRef = context.command.directObject,
+        guard
+            let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
-        {
+        else {
+            // General blowing without a target
+            return ActionResult(
+                context.message(.blowGeneral)
+            )
+        }
 
-            let targetItem = try await context.engine.item(targetItemID)
+        let targetItem = try await context.engine.item(targetItemID)
 
-            // Mark item as touched
-            if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-                stateChanges.append(touchedChange)
-            }
-
-            // Update pronouns to refer to the target
-            if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-                stateChanges.append(pronounChange)
-            }
-
-            // Default behavior for blowing on objects
-            let message: String
+        // Default behavior for blowing on objects
+        let message =
             if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
                 // Blowing on lit light sources might extinguish them
-                message = context.message(.blowOnLightSource(item: targetItem.withDefiniteArticle))
-                // Note: Specific extinguishing behavior should use TurnOffActionHandler or custom logic
+                context.message(
+                    .blowOnLightSource(item: targetItem.withDefiniteArticle)
+                )
             } else if targetItem.hasFlag(.isFlammable) {
-                message = context.message(.blowOnFlammable(item: targetItem.withDefiniteArticle))
+                // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
+                context.message(
+                    .blowOnFlammable(item: targetItem.withDefiniteArticle)
+                )
             } else {
-                message = context.message(.blowOnGeneric(item: targetItem.withDefiniteArticle))
+                context.message(
+                    .blowOnGeneric(item: targetItem.withDefiniteArticle)
+                )
             }
 
-            return ActionResult(message: message, stateChanges: stateChanges)
-        } else {
-            // General blowing without a target
-            let message = context.message(.blowGeneral)
-            return ActionResult(message)
-        }
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 }

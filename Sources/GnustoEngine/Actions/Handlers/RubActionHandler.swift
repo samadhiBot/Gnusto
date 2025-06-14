@@ -47,30 +47,24 @@ public struct RubActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Rubbing characters might not be appropriate
+                context.message(.rubCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Generic rubbing response for objects
+                context.message(.rubGenericObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Rubbing characters might not be appropriate
-            message = context.message(.rubCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Generic rubbing response for objects
-            message = context.message(.rubGenericObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the rub action completes.

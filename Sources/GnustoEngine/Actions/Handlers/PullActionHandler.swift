@@ -49,28 +49,23 @@ public struct PullActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Check if item is specifically pullable
-        let message: String
-        if targetItem.hasFlag(.isPullable) {
-            message = context.message(.pullSuccess(item: targetItem.withDefiniteArticle))
-        } else {
-            // Default behavior: most things can't be pulled effectively
-            message = context.message(.cannotPull(item: targetItem.withDefiniteArticle))
-        }
+        let message =
+            if targetItem.hasFlag(.isPullable) {
+                context.message(.pullSuccess(item: targetItem.withDefiniteArticle))
+            } else {
+                // Default behavior: most things can't be pulled effectively
+                context.message(.cannotPull(item: targetItem.withDefiniteArticle))
+            }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the pull action completes.

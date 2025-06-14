@@ -51,46 +51,46 @@ public struct TieActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate tying message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("TieActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "TieActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
-        let message: String
 
         if let indirectObjectRef = context.command.indirectObject,
-           case .item(let indirectItemID) = indirectObjectRef {
+            case .item(let indirectItemID) = indirectObjectRef
+        {
             // Tie X to Y
             let indirectItem = try await context.engine.item(indirectItemID)
 
-            // Mark indirect object as touched too
-            if let indirectTouchedChange = await context.engine.setFlag(.isTouched, on: indirectItem) {
-                stateChanges.append(indirectTouchedChange)
-            }
-
-            message = try await handleTyingTogether(
+            let message = try await handleTyingTogether(
                 targetItem: targetItem,
                 indirectItem: indirectItem,
                 context: context
             )
+
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                    await context.engine.setFlag(.isTouched, on: indirectItem),
+                ]
+            )
         } else {
             // Just "TIE X" - tie the object by itself
-            message = handleTyingAlone(targetItem: targetItem)
-        }
+            let message = handleTyingAlone(targetItem: targetItem)
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                ]
+            )
+        }
     }
 
     /// Handles tying two objects together.
@@ -109,7 +109,8 @@ public struct TieActionHandler: ActionHandler {
             return "You can't tie living beings together like that."
         }
 
-        return "You don't have anything suitable to tie the \(targetItem.name) to the \(indirectItem.name) with."
+        return
+            "You don't have anything suitable to tie the \(targetItem.name) to the \(indirectItem.name) with."
     }
 
     /// Handles tying a single object.

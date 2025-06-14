@@ -58,34 +58,25 @@ public struct DeflateActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Check if currently inflated
         let isCurrentlyInflated = try await context.engine.hasFlag(.isInflated, on: targetItemID)
 
-        let message: String
-        if !isCurrentlyInflated {
-            message = context.message(.itemNotInflated(item: targetItem.withDefiniteArticle))
-        } else {
-            // Deflate the item
-            if let deflateChange = await context.engine.clearFlag(.isInflated, on: targetItem) {
-                stateChanges.append(deflateChange)
+        let message =
+            if !isCurrentlyInflated {
+                context.message(.itemNotInflated(item: targetItem.withDefiniteArticle))
+            } else {
+                context.message(.deflateSuccess(item: targetItem.withDefiniteArticle))
             }
 
-            message = context.message(.deflateSuccess(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+                await context.engine.clearFlag(.isInflated, on: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the deflate action completes.

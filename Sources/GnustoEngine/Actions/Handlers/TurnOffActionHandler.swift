@@ -66,51 +66,29 @@ public struct TurnOffActionHandler: ActionHandler {
     ///           or player location).
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("TurnOff: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "TurnOff: directObject was not an item in process.")
         }
         let targetItem = try await context.engine.item(targetItemID)
 
-        // --- State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Add .touched property change if needed
-        if targetItem.attributes[.isTouched] != true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItem.id),
-                attribute: .itemAttribute(.isTouched),
-                oldValue: targetItem.attributes[.isTouched] ?? false,
-                newValue: true,
-            ))
-        }
-
-        // Change 2: Remove .on property change (only if currently on)
-        if targetItem.attributes[.isOn] == true {
-            stateChanges.append(StateChange(
-                entityID: .item(targetItem.id),
-                attribute: .itemAttribute(.isOn),
-                oldValue: true,
-                newValue: false
-            ))
-        }
-
-        // --- Determine Message ---
+        // Check if location became dark
+        let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         var messageParts: [String] = []
         messageParts.append("The \(targetItem.name) is now off.")
 
-        // Check if location became dark
-        let isLightSourceBeingTurnedOff = targetItem.hasFlag(.isLightSource)
         if isLightSourceBeingTurnedOff {
             let currentLocation = try await context.engine.playerLocation()
 
-            // 1. Is the room inherently lit?
+            // Is the room inherently lit?
             let locationIsInherentlyLit = currentLocation.hasFlag(.inherentlyLit)
 
             if !locationIsInherentlyLit {
-                // 2. Check for other active light sources (inventory or location)
+                // Check for other active light sources (inventory or location)
                 let allItems = await context.engine.gameState.items.values
                 let otherActiveLightSources = allItems.filter { item in
-                    guard item.id != targetItem.id else { return false } // Exclude the item being turned off
+                    guard item.id != targetItem.id else { return false }
                     let isInPlayerInventory = item.parent == .player
                     let isInCurrentLocation = item.parent == .location(currentLocation.id)
                     let providesLight = item.hasFlag(.isLightSource)
@@ -124,10 +102,12 @@ public struct TurnOffActionHandler: ActionHandler {
             }
         }
 
-        // --- Create Result ---
         return ActionResult(
             message: messageParts.joined(separator: "\n"),
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.clearFlag(.isOn, on: targetItem),
+            ]
         )
     }
 }

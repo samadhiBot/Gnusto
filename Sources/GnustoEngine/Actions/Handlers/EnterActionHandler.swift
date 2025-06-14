@@ -54,7 +54,6 @@ public struct EnterActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate enter message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
         let currentLocation = try await context.engine.playerLocation()
 
         // Handle ENTER with no object - find default enterable
@@ -67,17 +66,12 @@ public struct EnterActionHandler: ActionHandler {
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
-            // Mark as touched and update pronouns
-            if let touchedChange = await context.engine.setFlag(.isTouched, on: firstEnterable) {
-                stateChanges.append(touchedChange)
-            }
-            if let pronounChange = await context.engine.updatePronouns(to: firstEnterable) {
-                stateChanges.append(pronounChange)
-            }
-
             return ActionResult(
                 message: "You enter the \(firstEnterable.name).",
-                stateChanges: stateChanges
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: firstEnterable),
+                    await context.engine.updatePronouns(to: firstEnterable),
+                ]
             )
         }
 
@@ -87,14 +81,6 @@ public struct EnterActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-
-        // Mark as touched and update pronouns
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Check if this object enables traversal (like GO command)
         for (direction, exit) in currentLocation.exits {
@@ -119,7 +105,10 @@ public struct EnterActionHandler: ActionHandler {
                     // Combine state changes from enter (touch/pronouns) with go result
                     return ActionResult(
                         message: goResult.message,
-                        stateChanges: stateChanges + goResult.stateChanges
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem),
+                            await context.engine.updatePronouns(to: targetItem),
+                        ] + goResult.stateChanges
                     )
                 } catch {
                     // If movement fails, handle the error
@@ -131,7 +120,10 @@ public struct EnterActionHandler: ActionHandler {
         // No movement enabled - basic enter behavior
         return ActionResult(
             message: "You enter the \(targetItem.name).",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 

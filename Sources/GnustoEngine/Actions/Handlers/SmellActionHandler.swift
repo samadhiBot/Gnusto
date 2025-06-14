@@ -6,7 +6,8 @@ import Foundation
 /// By default, smelling the environment or a generic item doesn't reveal anything specific.
 /// Game developers can provide more detailed smell descriptions for particular items or
 /// locations by implementing custom `ItemEventHandler` or `LocationEventHandler` logic.
-struct SmellActionHandler: ActionHandler {
+public struct SmellActionHandler: ActionHandler {
+    public init() {}
     /// Validates the "SMELL" command.
     ///
     /// If a direct object is specified (e.g., "SMELL SWORD"), this method ensures that
@@ -15,7 +16,7 @@ struct SmellActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-    func validate(context: ActionContext) async throws {
+    public func validate(context: ActionContext) async throws {
         // If a direct object is provided, it should be an item.
         if let directObjectRef = context.command.directObject {
             guard case .item(_) = directObjectRef else {
@@ -38,20 +39,20 @@ struct SmellActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default smell-related message.
-    func process(context: ActionContext) async throws -> ActionResult {
-        if let directObjectRef = context.command.directObject {
-            guard case .item(_) = directObjectRef else {
-                // This case should ideally be caught by validate.
-                let message = context.message(.cannotSmellThat)
-                return ActionResult(message)
+    public func process(context: ActionContext) async throws -> ActionResult {
+        let message =
+            if let directObjectRef = context.command.directObject {
+                guard case .item(_) = directObjectRef else {
+                    // This case should ideally be caught by validate.
+                    context.message(.cannotSmellThat)
+                }
+                // If smelling a specific item, give a generic response.
+                // Specific items could be handled by ItemEventHandler or custom handlers.
+                context.message(.smellsAverage)
+            } else {
+                context.message(.smellNothingUnusual)
             }
-            // If smelling a specific item, give a generic response.
-            // Specific items could be handled by ItemEventHandler or custom handlers.
-            let message = context.message(.smellsAverage)
-            return ActionResult(message)
-        } else {
-            let message = context.message(.smellNothingUnusual)
-            return ActionResult(message)
-        }
+
+        return ActionResult(message)
     }
 }

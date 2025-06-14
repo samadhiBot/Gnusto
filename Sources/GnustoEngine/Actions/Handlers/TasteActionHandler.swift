@@ -6,7 +6,8 @@ import Foundation
 /// By default, tasting items results in a non-specific message. Game developers can provide
 /// more detailed taste descriptions or effects for particular items (e.g., food, potions)
 /// by implementing custom `ItemEventHandler` logic.
-struct TasteActionHandler: ActionHandler {
+public struct TasteActionHandler: ActionHandler {
+    public init() {}
 
     /// Validates the "TASTE" command.
     ///
@@ -18,7 +19,7 @@ struct TasteActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Throws: `ActionResponse.custom` if no direct object is provided, or
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
-    func validate(context: ActionContext) async throws {
+    public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.custom("Taste what?")
         }
@@ -36,10 +37,11 @@ struct TasteActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default taste-related message.
-    func process(context: ActionContext) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         // Validate ensures directObject is an item if present.
         // Generic response. Tasting specific items (like food) would need custom logic.
-        let message = context.message(.tastesAverage)
-        return ActionResult(message)
+        return ActionResult(
+            context.message(.tastesAverage)
+        )
     }
 }

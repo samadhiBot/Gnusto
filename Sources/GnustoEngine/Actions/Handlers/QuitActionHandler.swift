@@ -1,13 +1,14 @@
 import Foundation
 
 /// Handles the "QUIT" (or "Q") command, allowing the player to end the game session.
-struct QuitActionHandler: ActionHandler {
+public struct QuitActionHandler: ActionHandler {
+    public init() {}
 
     // MARK: - ActionHandler Methods
 
     /// Validates the "QUIT" command.
     /// Currently, quit requires no specific validation and always proceeds.
-    func validate(context: ActionContext) async throws {
+    public func validate(context: ActionContext) async throws {
         // No validation needed for QUIT.
     }
 
@@ -18,10 +19,11 @@ struct QuitActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing the farewell message.
-    func process(context: ActionContext) async throws -> ActionResult {
+    public func process(context: ActionContext) async throws -> ActionResult {
         await context.engine.requestQuit()
 
-        let message = context.message(.goodbye)
-        return ActionResult(message)
+        return ActionResult(
+            context.message(.goodbye)
+        )
     }
 }

@@ -169,6 +169,7 @@ public enum MessageKey: Hashable, Sendable {
     case lockWithWhat
     case lookInsideWhat
     case lookUnderWhat
+    case maximumVerbosity
     case modifierMismatch(noun: String, modifiers: [String])
     case multipleObjectsNotSupported(verb: String)
     case noLiquidInSource(source: String)

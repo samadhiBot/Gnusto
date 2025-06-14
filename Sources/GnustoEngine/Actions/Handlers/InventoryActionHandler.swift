@@ -20,28 +20,23 @@ public struct InventoryActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the list of carried items or a message
     ///   indicating an empty inventory.
     public func process(context: ActionContext) async throws -> ActionResult {
-        // 1. Get inventory item snapshots
+        // Get inventory item snapshots
         let inventoryItems = await context.engine.items(in: .player)
 
-        // 2. Construct the message
-        if inventoryItems.isEmpty {
-            return ActionResult(
+        // Construct the message
+        let message =
+            if inventoryItems.isEmpty {
                 context.message(.youAreEmptyHanded)
-            )
-        } else {
-            // 3. List Items
-            let itemList = inventoryItems.sorted().map {
-                "- \($0.withIndefiniteArticle.capitalizedFirst)"
-            }.joined(separator: "\n")
-            return ActionResult(
+            } else {
+                let itemList = inventoryItems.sorted().map {
+                    "- \($0.withIndefiniteArticle.capitalizedFirst)"
+                }.joined(separator: "\n")
                 """
                 \(context.message(.youAreCarrying))
                 \(itemList.indent())
                 """
-            )
-        }
+            }
 
-        // Inventory command typically takes no game time.
-        // No state changes occur.
+        return ActionResult(message)
     }
 }

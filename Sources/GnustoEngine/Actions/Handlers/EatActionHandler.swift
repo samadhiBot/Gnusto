@@ -80,21 +80,17 @@ public struct EatActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-        var message: String
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
 
         // Handle direct edible item
         if targetItem.hasFlag(.isEdible) {
-            // Remove the edible item (it's consumed)
-            let removeChange = await context.engine.move(targetItem, to: .nowhere)
-            stateChanges.append(removeChange)
-
-            message = context.message(.eatSuccess(item: targetItem.withDefiniteArticle))
+            let message = context.message(.eatSuccess(item: targetItem.withDefiniteArticle))
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.move(targetItem, to: .nowhere),
+                ]
+            )
         }
         // Handle container with edible contents
         else if targetItem.hasFlag(.isContainer) {
@@ -104,32 +100,47 @@ public struct EatActionHandler: ActionHandler {
             if let firstEdible = edibleContents.first {
                 // For closed containers, can't eat from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = context.message(
+                    let message = context.message(
                         .cannotEatFromClosed(container: targetItem.withDefiniteArticle))
+                    return ActionResult(
+                        message: message,
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem)
+                        ]
+                    )
                 } else {
-                    // Remove the first edible item from the container
-                    let consumeChange = await context.engine.move(firstEdible, to: .nowhere)
-                    stateChanges.append(consumeChange)
-
-                    // Update pronouns to refer to the consumed food
-                    if let pronounChange = await context.engine.updatePronouns(to: firstEdible) {
-                        stateChanges.append(pronounChange)
-                    }
-
-                    message = context.message(
+                    let message = context.message(
                         .eatFromContainer(food: firstEdible.name, container: targetItem.name)
+                    )
+                    return ActionResult(
+                        message: message,
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem),
+                            await context.engine.move(firstEdible, to: .nowhere),
+                            await context.engine.updatePronouns(to: firstEdible),
+                        ]
                     )
                 }
             } else {
-                message = context.message(
+                let message = context.message(
                     .nothingToEatIn(container: targetItem.withDefiniteArticle))
+                return ActionResult(
+                    message: message,
+                    stateChanges: [
+                        await context.engine.setFlag(.isTouched, on: targetItem)
+                    ]
+                )
             }
         } else {
             // This shouldn't happen after validation, but handle it
-            message = context.message(.cannotEat(item: targetItem.withDefiniteArticle))
+            let message = context.message(.cannotEat(item: targetItem.withDefiniteArticle))
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem)
+                ]
+            )
         }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
     }
 
     /// Performs any post-processing after the eat/drink action completes.

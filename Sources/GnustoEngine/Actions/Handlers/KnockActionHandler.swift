@@ -47,39 +47,33 @@ public struct KnockActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type
-        let message: String
-
-        if targetItem.hasFlag(.isDoor) {
-            // Knocking on doors
-            if targetItem.hasFlag(.isOpen) {
-                message = context.message(.knockOnOpenDoor(door: targetItem.name))
-            } else if targetItem.hasFlag(.isLocked) {
-                message = context.message(.knockOnLockedDoor(door: targetItem.name))
+        let message =
+            if targetItem.hasFlag(.isDoor) {
+                // Knocking on doors
+                if targetItem.hasFlag(.isOpen) {
+                    context.message(.knockOnOpenDoor(door: targetItem.name))
+                } else if targetItem.hasFlag(.isLocked) {
+                    context.message(.knockOnLockedDoor(door: targetItem.name))
+                } else {
+                    context.message(.knockOnClosedDoor(door: targetItem.name))
+                }
+            } else if targetItem.hasFlag(.isContainer) {
+                // Knocking on containers
+                context.message(.knockOnContainer(container: targetItem.withDefiniteArticle))
             } else {
-                message = context.message(.knockOnClosedDoor(door: targetItem.name))
+                // Generic knocking response for objects
+                context.message(.knockOnGenericObject(item: targetItem.withDefiniteArticle))
             }
-        } else if targetItem.hasFlag(.isContainer) {
-            // Knocking on containers
-            message = context.message(.knockOnContainer(container: targetItem.withDefiniteArticle))
-        } else {
-            // Generic knocking response for objects
-            message = context.message(.knockOnGenericObject(item: targetItem.withDefiniteArticle))
-        }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the knock action completes.

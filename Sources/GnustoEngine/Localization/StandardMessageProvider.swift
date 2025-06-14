@@ -27,7 +27,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You already have \(item)."
 
         case .alreadyLocked(let item):
-            "\(item) is already locked."
+            "\(item.capitalizedFirst) is already locked."
 
         case .ambiguity(let text):
             text
@@ -84,7 +84,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You can't burn \(item)."
 
         case .burnToCatchFire(let item):
-            "\(item) catches fire and burns to ashes."
+            "\(item.capitalizedFirst) catches fire and burns to ashes."
 
         case .burnWhat:
             "Burn what?"
@@ -214,13 +214,13 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You close \(item)."
 
         case .containerAlreadyEmpty(let container):
-            "\(container) is already empty."
+            "\(container.capitalizedFirst) is already empty."
 
         case .containerIsClosed(let item):
-            "\(item) is closed."
+            "\(item.capitalizedFirst) is closed."
 
         case .containerIsOpen(let item):
-            "\(item) is already open."
+            "\(item.capitalizedFirst) is already open."
 
         case .cryResponses:
             """
@@ -267,7 +267,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You have no suitable cutting tool."
 
         case .cutToolNotSharp(let tool):
-            "\(tool) isn't sharp enough to cut anything."
+            "\(tool.capitalizedFirst) isn't sharp enough to cut anything."
 
         case .cutWhat:
             "Cut what?"
@@ -315,10 +315,10 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             reason ?? "Something is blocking the way."
 
         case .doorIsClosed(let door):
-            "\(door) door is closed."
+            "\(door.capitalizedFirst) door is closed."
 
         case .doorIsLocked(let door):
-            "\(door) is locked."
+            "\(door.capitalizedFirst) is locked."
 
         case .drinkFromContainer(let liquid, let container):
             "You drink \(liquid) from \(container). Refreshing!"
@@ -405,13 +405,13 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You can't use \(object) for that."
 
         case .itemAlreadyClosed(let item):
-            "\(item) is already closed."
+            "\(item.capitalizedFirst) is already closed."
 
         case .itemAlreadyInflated(let item):
-            "\(item) is already inflated."
+            "\(item.capitalizedFirst) is already inflated."
 
         case .itemAlreadyOpen(let item):
-            "\(item) is already open."
+            "\(item.capitalizedFirst) is already open."
 
         case .itemGivenTo(let item, let recipient):
             "You give \(item) to \(recipient)."
@@ -423,19 +423,19 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You are already wearing \(item)."
 
         case .itemIsLocked(let item):
-            "\(item) is locked."
+            "\(item.capitalizedFirst) is locked."
 
         case .itemIsNotWorn(let item):
             "You are not wearing \(item)."
 
         case .itemIsUnlocked(let item):
-            "\(item) is already unlocked."
+            "\(item.capitalizedFirst) is already unlocked."
 
         case .itemNotAccessible(let item):
             "You can't see \(item)."
 
         case .itemNotClosable(let item):
-            "\(item) is not something you can close."
+            "\(item.capitalizedFirst) is not something you can close."
 
         case .itemNotDroppable(let item):
             "You can't drop \(item)."
@@ -447,10 +447,10 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You aren't holding \(item)."
 
         case .itemNotInContainer(let item, let container):
-            "\(item) isn't in \(container)."
+            "\(item.capitalizedFirst) isn't in \(container)."
 
         case .itemNotInflated(let item):
-            "\(item) is not inflated."
+            "\(item.capitalizedFirst) is not inflated."
 
         case .itemNotInScope(let noun):
             "You can't see any '\(noun)' here."
@@ -459,13 +459,13 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You can't lock \(item)."
 
         case .itemNotOnSurface(let item, let surface):
-            "\(item) isn't on \(surface)."
+            "\(item.capitalizedFirst) isn't on \(surface)."
 
         case .itemNotOpenable(let item):
             "You can't open \(item)."
 
         case .itemNotReadable(let item):
-            "\(item) isn't something you can read."
+            "\(item.capitalizedFirst) isn't something you can read."
 
         case .itemNotRemovable(let item):
             "You can't remove \(item)."
@@ -480,7 +480,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You can't wear \(item)."
 
         case .itemTooLargeForContainer(let item, let container):
-            "\(item) won't fit in \(container)."
+            "\(item.capitalizedFirst) won't fit in \(container)."
 
         case .itsRightHere:
             "It's right here!"
@@ -509,7 +509,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "Kick what?"
 
         case .kissCharacter(let character):
-            "\(character) doesn't seem particularly receptive to your affections."
+            "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
 
         case .kissLargeObject(let item):
             "You can't kiss \(item) - it's too large and impersonal."
@@ -530,7 +530,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You knock on \(door). There's no response from the other side."
 
         case .knockOnOpenDoor(let door):
-            "\(door) is already open. There's no need to knock."
+            "\(door.capitalizedFirst) is already open. There's no need to knock."
 
         case .knockOnWhat:
             "Knock on what?"
@@ -539,7 +539,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "Listen to what?"
 
         case .lockSuccess(let item):
-            "\(item) is now locked."
+            "\(item.capitalizedFirst) is now locked."
 
         case .lockWhat:
             "Lock what?"
@@ -552,6 +552,9 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .lookUnderWhat:
             "Look under what?"
+
+        case .maximumVerbosity:
+            "Maximum verbosity."
 
         case .modifierMismatch(let noun, let modifiers):
             "I don't see any '\(modifiers.joined(separator: " ")) \(noun)' here."
@@ -746,13 +749,13 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You need \(tool) for that."
 
         case .toolNotSuitableForDigging(let tool):
-            "\(tool) isn't suitable for digging."
+            "\(tool.capitalizedFirst) isn't suitable for digging."
 
         case .turnCharacter(let character):
             "You can't turn \(character) around like an object."
 
         case .turnFixedObject(let item):
-            "\(item) doesn't seem to be designed to be turned."
+            "\(item.capitalizedFirst) doesn't seem to be designed to be turned."
 
         case .turnWhat:
             "Turn what?"
@@ -782,7 +785,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "\(verb.capitalizedFirst) what?"
 
         case .wrongKey(let key, let lock):
-            "\(key) doesn't fit \(lock)."
+            "\(key.capitalizedFirst) doesn't fit \(lock)."
 
         case .youAlreadyHaveThat:
             "You already have that."

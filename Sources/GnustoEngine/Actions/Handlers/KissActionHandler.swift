@@ -47,30 +47,24 @@ public struct KissActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched (if appropriate)
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Kissing characters
+                context.message(.kissCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Kissing objects - generic response
+                context.message(.kissLargeObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Kissing characters
-            message = context.message(.kissCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Kissing objects - generic response
-            message = context.message(.kissLargeObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the kiss action completes.

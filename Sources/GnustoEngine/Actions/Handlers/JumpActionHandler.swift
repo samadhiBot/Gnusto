@@ -38,8 +38,6 @@ public struct JumpActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate jump message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = context.command.directObject else {
             // General jumping - use random response from MessageProvider
@@ -54,26 +52,23 @@ public struct JumpActionHandler: ActionHandler {
 
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Mark as touched and update pronouns
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
         // Determine appropriate response based on object type
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Can't jump characters
+                context.message(.jumpCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Generic jumping response for objects
+                context.message(.jumpLargeObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Can't jump characters
-            message = context.message(.jumpCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Generic jumping response for objects
-            message = context.message(.jumpLargeObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the jump action completes.

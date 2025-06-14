@@ -47,30 +47,24 @@ public struct SqueezeActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type and properties
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Squeezing characters - not advisable
+                context.message(.squeezeCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Generic squeezing response for objects
+                context.message(.squeezeHardObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Squeezing characters - not advisable
-            message = context.message(.squeezeCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Generic squeezing response for objects
-            message = context.message(.squeezeHardObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the squeeze action completes.

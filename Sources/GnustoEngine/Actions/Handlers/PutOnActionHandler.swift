@@ -37,7 +37,8 @@ public struct PutOnActionHandler: ActionHandler {
             throw ActionResponse.prerequisiteNotMet("Put the \(itemToPut.name) on what?")
         }
         guard case .item(let surfaceID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only put things on items (that are surfaces).")
+            throw ActionResponse.prerequisiteNotMet(
+                "You can only put things on items (that are surfaces).")
         }
 
         // 2. Get Items (existence should be implicitly validated by parser/scope or engine.item() will throw)
@@ -50,26 +51,28 @@ public struct PutOnActionHandler: ActionHandler {
         }
 
         guard await context.engine.playerCanReach(surfaceID) else {
-             throw ActionResponse.itemNotAccessible(surfaceID)
+            throw ActionResponse.itemNotAccessible(surfaceID)
         }
 
         // Prevent putting item onto itself
         if itemToPutID == surfaceID {
-             throw ActionResponse.prerequisiteNotMet("You can't put something on itself.")
+            throw ActionResponse.prerequisiteNotMet("You can't put something on itself.")
         }
 
         // Recursive check: is the target surface inside the item we are putting?
         var currentParent = surfaceItem.parent
         while case .item(let parentItemID) = currentParent {
             if parentItemID == itemToPutID {
-                let preposition = if itemToPut.hasFlag(.isContainer) {
-                    "inside"
-                } else if itemToPut.hasFlag(.isSurface) {
-                    "on"
-                } else {
-                    "in"
-                }
-                throw ActionResponse.prerequisiteNotMet("""
+                let preposition =
+                    if itemToPut.hasFlag(.isContainer) {
+                        "inside"
+                    } else if itemToPut.hasFlag(.isSurface) {
+                        "on"
+                    } else {
+                        "in"
+                    }
+                throw ActionResponse.prerequisiteNotMet(
+                    """
                     You can't put the \(itemToPut.name) on the \(surfaceItem.name) because \
                     the \(surfaceItem.name) is \(preposition) the \(itemToPut.name).
                     """)
@@ -102,44 +105,29 @@ public struct PutOnActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Direct and Indirect objects are guaranteed to be items by validate.
         guard let directObjectRef = context.command.directObject,
-              case .item(let itemToPutID) = directObjectRef else {
+            case .item(let itemToPutID) = directObjectRef
+        else {
             throw ActionResponse.internalEngineError("PutOn: Direct object not an item in process.")
         }
         guard let indirectObjectRef = context.command.indirectObject,
-              case .item(let surfaceID) = indirectObjectRef else {
-            throw ActionResponse.internalEngineError("PutOn: Indirect object not an item in process.")
+            case .item(let surfaceID) = indirectObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "PutOn: Indirect object not an item in process.")
         }
 
         // Get snapshots (existence guaranteed by validate)
         let itemToPut = try await context.engine.item(itemToPutID)
         let surface = try await context.engine.item(surfaceID)
 
-        // --- Put Successful: Calculate State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Update item parent
-        let update = await context.engine.move(itemToPut, to: .item(surface.id))
-        stateChanges.append(update)
-
-        // Change 2: Mark item touched
-        if let update = await context.engine.setFlag(.isTouched, on: itemToPut) {
-            stateChanges.append(update)
-        }
-
-        // Change 3: Mark surface touched
-        if let update = await context.engine.setFlag(.isTouched, on: surface) {
-            stateChanges.append(update)
-        }
-
-        // Change 4: Update pronoun "it"
-        if let update = await context.engine.updatePronouns(to: itemToPut) {
-            stateChanges.append(update)
-        }
-
-        // --- Prepare Result ---
         return ActionResult(
             message: "You put the \(itemToPut.name) on the \(surface.name).",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.move(itemToPut, to: .item(surface.id)),
+                await context.engine.setFlag(.isTouched, on: itemToPut),
+                await context.engine.setFlag(.isTouched, on: surface),
+                await context.engine.updatePronouns(to: itemToPut),
+            ]
         )
     }
 }

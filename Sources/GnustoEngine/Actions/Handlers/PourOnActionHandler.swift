@@ -54,28 +54,16 @@ public struct PourOnActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate pouring message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let sourceItemID) = directObjectRef,
-              let indirectObjectRef = context.command.indirectObject,
-              case .item(let targetItemID) = indirectObjectRef else {
-            throw ActionResponse.internalEngineError("PourOnActionHandler: missing required objects in process.")
+            case .item(let sourceItemID) = directObjectRef,
+            let indirectObjectRef = context.command.indirectObject,
+            case .item(let targetItemID) = indirectObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "PourOnActionHandler: missing required objects in process.")
         }
 
         let sourceItem = try await context.engine.item(sourceItemID)
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark both items as touched
-        if let sourceTouchedChange = await context.engine.setFlag(.isTouched, on: sourceItem) {
-            stateChanges.append(sourceTouchedChange)
-        }
-        if let targetTouchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(targetTouchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on what's being poured and where
         let message = try await handlePouring(
@@ -84,7 +72,14 @@ public struct PourOnActionHandler: ActionHandler {
             context: context
         )
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: sourceItem),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Handles the actual pouring logic.
@@ -105,16 +100,19 @@ public struct PourOnActionHandler: ActionHandler {
 
         // Special cases for characters as targets
         if targetItem.hasFlag(.isCharacter) {
-            return "You pour the \(sourceItem.name) on the \(targetItem.name). They are not pleased with this treatment."
+            return
+                "You pour the \(sourceItem.name) on the \(targetItem.name). They are not pleased with this treatment."
         }
 
         // Special cases for sensitive objects
         if targetItem.hasFlag(.isDevice) {
-            return "You pour the \(sourceItem.name) on the \(targetItem.name). This probably wasn't a good idea - electronic devices and liquids don't mix well."
+            return
+                "You pour the \(sourceItem.name) on the \(targetItem.name). This probably wasn't a good idea - electronic devices and liquids don't mix well."
         }
 
         // General pouring response
-        return "You pour the \(sourceItem.name) on the \(targetItem.name). It drips off without much effect."
+        return
+            "You pour the \(sourceItem.name) on the \(targetItem.name). It drips off without much effect."
     }
 
     /// Performs any post-processing after the pour action completes.

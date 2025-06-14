@@ -75,10 +75,9 @@ public struct LookActionHandler: ActionHandler {
         // Check if this is LOOK (no direct object) or LOOK AT [object] or LOOK THROUGH [object]
         if context.command.directObject == nil {
             // LOOK (no direct object) - describe the room
-            // 1. Check for darkness FIRST
+            // Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                let message = context.message(.roomIsDark)
-                return ActionResult(message)
+                return ActionResult(context.message(.roomIsDark))
             }
 
             await context.engine.ioHandler.print(
@@ -86,7 +85,7 @@ public struct LookActionHandler: ActionHandler {
                 style: .strong
             )
 
-            // 2. Location is lit, proceed with description
+            // Location is lit, proceed with description
             return ActionResult(
                 await locationDescription(
                     try context.engine.playerLocation(),

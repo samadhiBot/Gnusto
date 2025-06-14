@@ -47,30 +47,24 @@ public struct TurnActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type
-        let message: String
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Can't turn characters
+                context.message(.turnCharacter(character: targetItem.withDefiniteArticle))
+            } else {
+                // Generic turning response for objects
+                context.message(.turnFixedObject(item: targetItem.withDefiniteArticle))
+            }
 
-        if targetItem.hasFlag(.isCharacter) {
-            // Can't turn characters
-            message = context.message(.turnCharacter(character: targetItem.withDefiniteArticle))
-        } else {
-            // Generic turning response for objects
-            message = context.message(.turnFixedObject(item: targetItem.withDefiniteArticle))
-        }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the turn action completes.

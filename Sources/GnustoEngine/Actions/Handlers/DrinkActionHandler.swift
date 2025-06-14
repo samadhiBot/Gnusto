@@ -82,13 +82,6 @@ public struct DrinkActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-        var message: String
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
 
         // Handle container first (prioritize over direct drinkable)
         if targetItem.hasFlag(.isContainer) {
@@ -98,39 +91,57 @@ public struct DrinkActionHandler: ActionHandler {
             if let firstDrinkable = drinkableContents.first {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
-                    message = context.message(
+                    let message = context.message(
                         .cannotDrinkFromClosed(container: targetItem.withDefiniteArticle))
+                    return ActionResult(
+                        message: message,
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem)
+                        ]
+                    )
                 } else {
-                    // Remove the first drinkable item from the container
-                    let consumeChange = await context.engine.move(firstDrinkable, to: .nowhere)
-                    stateChanges.append(consumeChange)
-
-                    // Update pronouns to refer to the consumed liquid
-                    if let pronounChange = await context.engine.updatePronouns(to: firstDrinkable) {
-                        stateChanges.append(pronounChange)
-                    }
-
-                    message = context.message(
+                    let message = context.message(
                         .drinkFromContainer(liquid: firstDrinkable.name, container: targetItem.name)
+                    )
+                    return ActionResult(
+                        message: message,
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem),
+                            await context.engine.move(firstDrinkable, to: .nowhere),
+                            await context.engine.updatePronouns(to: firstDrinkable),
+                        ]
                     )
                 }
             } else {
-                message = context.message(
+                let message = context.message(
                     .nothingToDrinkIn(container: targetItem.withDefiniteArticle))
+                return ActionResult(
+                    message: message,
+                    stateChanges: [
+                        await context.engine.setFlag(.isTouched, on: targetItem)
+                    ]
+                )
             }
         }
         // Handle direct drinkable item
         else if targetItem.hasFlag(.isDrinkable) {
-            // Remove the drinkable item (it's consumed)
-            let removeChange = await context.engine.move(targetItem, to: .nowhere)
-            stateChanges.append(removeChange)
-
-            message = context.message(.drinkSuccess(item: targetItem.withDefiniteArticle))
+            let message = context.message(.drinkSuccess(item: targetItem.withDefiniteArticle))
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.move(targetItem, to: .nowhere),
+                ]
+            )
         } else {
             // This shouldn't happen after validation, but handle it
-            message = context.message(.cannotDrink(item: targetItem.withDefiniteArticle))
+            let message = context.message(.cannotDrink(item: targetItem.withDefiniteArticle))
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem)
+                ]
+            )
         }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
     }
 }

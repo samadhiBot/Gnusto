@@ -6,11 +6,12 @@ import Foundation
 /// customize listening behavior by providing custom `ItemEventHandler` or
 /// `LocationEventHandler` implementations for specific items or locations if special
 /// sounds should be heard.
-struct ListenActionHandler: ActionHandler {
+public struct ListenActionHandler: ActionHandler {
+    public init() {}
 
     /// Validates the "LISTEN" command.
     /// Currently, listen requires no specific validation.
-    func validate(context: ActionContext) async throws {
+    public func validate(context: ActionContext) async throws {
         // No validation needed for LISTEN.
     }
 
@@ -21,8 +22,9 @@ struct ListenActionHandler: ActionHandler {
     ///
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with a default message.
-    func process(context: ActionContext) async throws -> ActionResult {
-        let message = context.message(.youHearNothingUnusual)
-        return ActionResult(message)
+    public func process(context: ActionContext) async throws -> ActionResult {
+        return ActionResult(
+            context.message(.youHearNothingUnusual)
+        )
     }
 }

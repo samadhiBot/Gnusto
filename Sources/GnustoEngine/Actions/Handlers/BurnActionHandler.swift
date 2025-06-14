@@ -61,30 +61,18 @@ public struct BurnActionHandler: ActionHandler {
 
         let targetItem = try await context.engine.item(itemID)
 
-        var stateChanges: [StateChange] = []
-
-        // Ensure the item is marked as touched
-        if let touchChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchChange)
-        }
-
-        // Update pronouns
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
-
         // Check if the item is flammable
         if targetItem.hasFlag(.isFlammable) {
-            // Move the item to nowhere (destroy it)
-            let destroyChange = await context.engine.move(targetItem, to: .nowhere)
-            stateChanges.append(destroyChange)
-
             let message = context.message(
                 .burnToCatchFire(item: targetItem.withDefiniteArticle.capitalizedFirst)
             )
             return ActionResult(
                 message: message,
-                stateChanges: stateChanges
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                    await context.engine.move(targetItem, to: .nowhere),
+                ]
             )
         } else {
             // Most items cannot be burned
@@ -92,7 +80,10 @@ public struct BurnActionHandler: ActionHandler {
 
             return ActionResult(
                 message: message,
-                stateChanges: stateChanges
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                ]
             )
         }
     }

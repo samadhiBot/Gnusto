@@ -47,39 +47,33 @@ public struct ShakeActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark target as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine appropriate response based on object type and properties
-        let message: String
-
-        if targetItem.hasFlag(.isCharacter) {
-            // Shaking characters might not be appropriate
-            message = context.message(.shakeCharacter(character: targetItem.withDefiniteArticle))
-        } else if targetItem.hasFlag(.isContainer) {
-            // Shaking containers might reveal contents
-            if targetItem.hasFlag(.isOpen) {
-                message = context.message(
-                    .shakeOpenContainer(container: targetItem.withDefiniteArticle))
+        let message =
+            if targetItem.hasFlag(.isCharacter) {
+                // Shaking characters might not be appropriate
+                context.message(.shakeCharacter(character: targetItem.withDefiniteArticle))
+            } else if targetItem.hasFlag(.isContainer) {
+                // Shaking containers might reveal contents
+                if targetItem.hasFlag(.isOpen) {
+                    context.message(
+                        .shakeOpenContainer(container: targetItem.withDefiniteArticle))
+                } else {
+                    context.message(
+                        .shakeClosedContainer(container: targetItem.withDefiniteArticle))
+                }
             } else {
-                message = context.message(
-                    .shakeClosedContainer(container: targetItem.withDefiniteArticle))
+                // Generic shaking response for objects
+                context.message(.shakeFixedObject(item: targetItem.withDefiniteArticle))
             }
-        } else {
-            // Generic shaking response for objects
-            message = context.message(.shakeFixedObject(item: targetItem.withDefiniteArticle))
-        }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the shake action completes.

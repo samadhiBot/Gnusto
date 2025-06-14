@@ -84,12 +84,16 @@ public struct UnlockActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Direct and Indirect objects are guaranteed to be items by validate.
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Unlock: Direct object not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "Unlock: Direct object not an item in process.")
         }
         guard let indirectObjectRef = context.command.indirectObject,
-              case .item(let keyItemID) = indirectObjectRef else {
-            throw ActionResponse.internalEngineError("Unlock: Indirect object not an item in process.")
+            case .item(let keyItemID) = indirectObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "Unlock: Indirect object not an item in process.")
         }
 
         // Get snapshots (existence guaranteed by validate)
@@ -98,35 +102,14 @@ public struct UnlockActionHandler: ActionHandler {
 
         // Validation ensures the item was locked, so no need to check again here.
 
-        // --- Unlock Successful: Calculate State Changes ---
-        var stateChanges: [StateChange] = []
-
-        // Change 1: Clear `.isLocked` flag from target item.
-        // Validation ensures the item was locked, so an update should always occur.
-        if let update = await context.engine.clearFlag(.isLocked, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 2: Ensure `.isTouched` flag is set on target item.
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 3: Ensure `.isTouched` flag is set on key item.
-        if let update = await context.engine.setFlag(.isTouched, on: keyItem) {
-            stateChanges.append(update)
-        }
-
-        // Change 4: Update pronouns to refer to the target and key.
-        if let update = await context.engine.updatePronouns(to: targetItem, keyItem) {
-            stateChanges.append(update)
-        }
-
-        // --- Prepare Result ---
-        // Manually construct definite article message
         return ActionResult(
             message: "The \(targetItem.name) is now unlocked.",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.clearFlag(.isLocked, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: keyItem),
+                await context.engine.updatePronouns(to: targetItem, keyItem),
+            ]
         )
     }
 

@@ -23,13 +23,6 @@ public struct UnscriptActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
-        // Clear the scripting flag
-        if let scriptChange = await context.engine.clearGlobal(.isScripting) {
-            stateChanges.append(scriptChange)
-        }
-
         // In a full implementation, this would:
         // 1. Close the transcript file
         // 2. Stop recording input/output
@@ -38,7 +31,9 @@ public struct UnscriptActionHandler: ActionHandler {
 
         return ActionResult(
             message: "[Transcript recording ended]",
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.clearGlobal(.isScripting)
+            ]
         )
     }
 

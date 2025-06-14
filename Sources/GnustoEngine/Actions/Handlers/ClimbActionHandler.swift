@@ -68,16 +68,6 @@ public struct ClimbActionHandler: ActionHandler {
 
         let targetItem = try await context.engine.item(targetItemID)
         let currentLocation = try await context.engine.playerLocation()
-        var stateChanges: [StateChange] = []
-
-        // Mark the item as touched and update pronouns
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Check if this object enables traversal of any exit in the current location
         // Sort directions to ensure consistent behavior when multiple exits use the same object
@@ -121,7 +111,10 @@ public struct ClimbActionHandler: ActionHandler {
                     // Combine state changes from climb (touch/pronouns) with go result
                     return ActionResult(
                         message: goResult.message,
-                        stateChanges: stateChanges + goResult.stateChanges
+                        stateChanges: [
+                            await context.engine.setFlag(.isTouched, on: targetItem),
+                            await context.engine.updatePronouns(to: targetItem),
+                        ] + goResult.stateChanges
                     )
                 } catch {
                     // If movement fails, let the engine handle the error
@@ -133,20 +126,21 @@ public struct ClimbActionHandler: ActionHandler {
         // No exit uses this object, so handle as regular climbing
 
         // Check if the item is climbable
-        if targetItem.hasFlag(.isClimbable) {
-            // Default climbable behavior - can be overridden by specific item handlers
-            let message = context.message(.climbSuccess(item: targetItem.withDefiniteArticle))
-            return ActionResult(
-                message: message,
-                stateChanges: stateChanges
-            )
-        } else {
-            // Not climbable
-            let message = context.message(.climbFailure(item: targetItem.withDefiniteArticle))
-            return ActionResult(
-                message: message,
-                stateChanges: stateChanges
-            )
-        }
+        let message =
+            if targetItem.hasFlag(.isClimbable) {
+                // Default climbable behavior - can be overridden by specific item handlers
+                context.message(.climbSuccess(item: targetItem.withDefiniteArticle))
+            } else {
+                // Not climbable
+                context.message(.climbFailure(item: targetItem.withDefiniteArticle))
+            }
+
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 }

@@ -58,24 +58,16 @@ public struct EmptyActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Get current contents of the container
         let contents = await context.engine.items(in: .item(targetItemID))
 
         let message: String
+        var contentMoveChanges: [StateChange?] = []
+
         if contents.isEmpty {
-            message = context
+            message =
+                context
                 .message(
                     .containerAlreadyEmpty(
                         container: targetItem.withDefiniteArticle.capitalizedFirst
@@ -85,10 +77,10 @@ public struct EmptyActionHandler: ActionHandler {
             // Get current location to move items to
             let currentLocationID = await context.engine.playerLocationID
 
-            // Move all contents to current location
+            // Collect move changes for all contents
             for item in contents {
-                let moveChange = await context.engine.move(item, to: .location(currentLocationID))
-                stateChanges.append(moveChange)
+                contentMoveChanges.append(
+                    await context.engine.move(item, to: .location(currentLocationID)))
             }
 
             let itemNames = contents.listWithDefiniteArticles
@@ -96,7 +88,13 @@ public struct EmptyActionHandler: ActionHandler {
                 .emptySuccess(container: targetItem.name, items: itemNames, count: contents.count))
         }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ] + contentMoveChanges
+        )
     }
 
     /// Performs any post-processing after the empty action completes.

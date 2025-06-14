@@ -72,54 +72,46 @@ public struct ThrowActionHandler: ActionHandler {
 
         let itemToThrow = try await context.engine.item(itemToThrowID)
         let currentLocationID = await context.engine.playerLocationID
-        var stateChanges: [StateChange] = []
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: itemToThrow) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the thrown item
-        if let pronounChange = await context.engine.updatePronouns(to: itemToThrow) {
-            stateChanges.append(pronounChange)
-        }
-
-        // Move the thrown item to the current location
-        let dropChange = await context.engine.move(itemToThrow, to: .location(currentLocationID))
-        stateChanges.append(dropChange)
-
-        let message: String
 
         // Handle specific target throwing
         if let indirectObjectRef = context.command.indirectObject,
             case .item(let targetItemID) = indirectObjectRef
         {
-
             let targetItem = try await context.engine.item(targetItemID)
 
-            // Mark target as touched too
-            if let targetTouchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-                stateChanges.append(targetTouchedChange)
-            }
+            let message =
+                if targetItem.hasFlag(.isCharacter) {
+                    context.message(
+                        .throwAtCharacter(
+                            item: itemToThrow.withDefiniteArticle,
+                            character: targetItem.withDefiniteArticle))
+                } else {
+                    context.message(
+                        .throwAtObject(
+                            item: itemToThrow.withDefiniteArticle,
+                            target: targetItem.withDefiniteArticle))
+                }
 
-            if targetItem.hasFlag(.isCharacter) {
-                message = context.message(
-                    .throwAtCharacter(
-                        item: itemToThrow.withDefiniteArticle,
-                        character: targetItem.withDefiniteArticle))
-            } else {
-                message = context.message(
-                    .throwAtObject(
-                        item: itemToThrow.withDefiniteArticle,
-                        target: targetItem.withDefiniteArticle))
-            }
-
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: itemToThrow),
+                    await context.engine.updatePronouns(to: itemToThrow),
+                    await context.engine.move(itemToThrow, to: .location(currentLocationID)),
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                ]
+            )
         } else {
             // General throwing - no specific target
-            message = context.message(.throwGeneral(item: itemToThrow.withDefiniteArticle))
+            return ActionResult(
+                message: context.message(.throwGeneral(item: itemToThrow.withDefiniteArticle)),
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: itemToThrow),
+                    await context.engine.updatePronouns(to: itemToThrow),
+                    await context.engine.move(itemToThrow, to: .location(currentLocationID)),
+                ]
+            )
         }
-
-        return ActionResult(message: message, stateChanges: stateChanges)
     }
 
     /// Performs any post-processing after the throw action completes.

@@ -49,29 +49,24 @@ public struct PressActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var stateChanges: [StateChange] = []
-
-        // Mark item as touched
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the target
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(pronounChange)
-        }
 
         // Check if item is pressable
-        let message: String
-        if targetItem.hasFlag(.isPressable) {
-            message = context.message(.pressSuccess(item: targetItem.withDefiniteArticle))
-            // Note: Specific press behavior should be handled by ItemEventHandlers
-        } else {
-            // Default behavior: most things can't be pressed effectively
-            message = context.message(.cannotPress(item: targetItem.withDefiniteArticle))
-        }
+        let message =
+            if targetItem.hasFlag(.isPressable) {
+                context.message(.pressSuccess(item: targetItem.withDefiniteArticle))
+                // Note: Specific press behavior should be handled by ItemEventHandlers
+            } else {
+                // Default behavior: most things can't be pressed effectively
+                context.message(.cannotPress(item: targetItem.withDefiniteArticle))
+            }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 
     /// Performs any post-processing after the press action completes.

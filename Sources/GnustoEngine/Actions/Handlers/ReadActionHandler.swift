@@ -64,77 +64,47 @@ public struct ReadActionHandler: ActionHandler {
     ///           Can also throw errors from `context.engine.item()` or `context.engine.fetch()`.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("Read: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "Read: directObject was not an item in process.")
         }
         let targetItem = try await context.engine.item(targetItemID)
-
-        // --- Auto-Taking Logic ---
-        var stateChanges: [StateChange] = []
-        var messageParts: [String] = []
 
         // Check if item needs to be auto-taken
         let isHeld = targetItem.parent == .player
         let isTakeable = targetItem.hasFlag(.isTakable)
+        let needsAutoTake = !isHeld && isTakeable
 
-        if !isHeld && isTakeable {
-            // Auto-take the item first, following classic IF conventions
-            let takeChange = await context.engine.move(targetItem, to: .player)
-            stateChanges.append(takeChange)
-            messageParts.append("(Taken)")
-        }
-
-        // --- State Change: Mark as Touched ---
-        if let addTouchedFlag = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(addTouchedFlag)
-        }
-
-        // --- State Change: Update pronoun "it" ---
-        if let updatePronoun = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(updatePronoun)
-        }
-
-        // --- Determine Read Text ---
+        // Determine read text
         let readText: String
-
-        // Fetch text from dynamic values
         do {
-            let textToRead: String? = try await context.engine.attribute(
-                .readText,
-                of: targetItem.id
-            )
-
-            // If we have dynamic text, use it
-            if let dynamicText = textToRead {
-                if dynamicText.isEmpty {
-                    readText = "There's nothing written on the \(targetItem.name)."
-                } else {
-                    readText = dynamicText
-                }
+            if let textToRead: String = try await context.engine.attribute(
+                .readText, of: targetItem.id
+            ), !textToRead.isEmpty {
+                readText = textToRead
             } else {
                 readText = "There's nothing written on the \(targetItem.name)."
             }
         } catch {
-            // Dynamic fetch failed, fall through to stored value
             readText = "There's nothing written on the \(targetItem.name)."
         }
 
-        // Add the read text to the message
-        messageParts.append(readText)
-
-        // --- Create Result ---
-        let finalMessage = messageParts.joined(separator: "\n\n")
-//        if messageParts.count > 1 {
-//            // If we have "(Taken)" and read text, put them on the same line
-//            messageParts.joined(separator: " ")
-//        } else {
-//            // Just the read text
-//            messageParts.joined(separator: "\n")
-//        }
+        // Build final message
+        let message =
+            if needsAutoTake {
+                "(Taken)\n\n\(readText)"
+            } else {
+                readText
+            }
 
         return ActionResult(
-            message: finalMessage,
-            stateChanges: stateChanges
+            message: message,
+            stateChanges: [
+                needsAutoTake ? await context.engine.move(targetItem, to: .player) : nil,
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 }

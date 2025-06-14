@@ -52,34 +52,26 @@ public struct DigActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate digging message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-        let message: String
-
         // Handle direct object if specified
         if let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         {
-
             let targetItem = try await context.engine.item(targetItemID)
+            let message = context.message(.cannotDig(item: targetItem.withDefiniteArticle))
 
-            // Mark target as touched
-            if let touchedChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-                stateChanges.append(touchedChange)
-            }
-
-            // Update pronouns to refer to the target
-            if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-                stateChanges.append(pronounChange)
-            }
-
-            message = context.message(.cannotDig(item: targetItem.withDefiniteArticle))
-
+            return ActionResult(
+                message: message,
+                stateChanges: [
+                    await context.engine.setFlag(.isTouched, on: targetItem),
+                    await context.engine.updatePronouns(to: targetItem),
+                ]
+            )
         } else {
             // General digging (no specific target)
+            let message: String
             if let indirectObjectRef = context.command.indirectObject,
                 case .item(let toolItemID) = indirectObjectRef
             {
-
                 let toolItem = try await context.engine.item(toolItemID)
 
                 if toolItem.hasFlag(.isTool) {
@@ -89,7 +81,6 @@ public struct DigActionHandler: ActionHandler {
                     message = context.message(
                         .toolNotSuitableForDigging(tool: toolItem.withDefiniteArticle))
                 }
-
             } else {
                 // Check if player has digging tools
                 let playerInventory = await context.engine.playerInventory
@@ -101,9 +92,9 @@ public struct DigActionHandler: ActionHandler {
                     message = context.message(.diggingBareHandsIneffective)
                 }
             }
-        }
 
-        return ActionResult(message: message, stateChanges: stateChanges)
+            return ActionResult(message: message)
+        }
     }
 
     /// Performs any post-processing after the "DIG" command.

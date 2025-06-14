@@ -30,7 +30,8 @@ public struct TellActionHandler: ActionHandler {
         // Check if character exists and is reachable
         let character = try await context.engine.item(characterID)
         guard character.hasFlag(.isCharacter) else {
-            throw ActionResponse.prerequisiteNotMet("You can't tell the \(character.name) about anything.")
+            throw ActionResponse.prerequisiteNotMet(
+                "You can't tell the \(character.name) about anything.")
         }
 
         guard await context.engine.playerCanReach(characterID) else {
@@ -48,23 +49,14 @@ public struct TellActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate dialogue response and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let characterID) = directObjectRef,
-              let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.internalEngineError("TellActionHandler: missing required objects in process.")
+            case .item(let characterID) = directObjectRef,
+            let indirectObjectRef = context.command.indirectObject
+        else {
+            throw ActionResponse.internalEngineError(
+                "TellActionHandler: missing required objects in process.")
         }
 
         let character = try await context.engine.item(characterID)
-        var stateChanges: [StateChange] = []
-
-        // Mark character as touched (interacted with)
-        if let touchedChange = await context.engine.setFlag(.isTouched, on: character) {
-            stateChanges.append(touchedChange)
-        }
-
-        // Update pronouns to refer to the character
-        if let pronounChange = await context.engine.updatePronouns(to: character) {
-            stateChanges.append(pronounChange)
-        }
 
         // Determine what's being told about
         let topicDescription: String
@@ -80,11 +72,15 @@ public struct TellActionHandler: ActionHandler {
         }
 
         // Default response - games can override with ItemEventHandlers
-        let message = "\(character.name.capitalizedFirst) listens politely to what you say about \(topicDescription)."
+        let message =
+            "\(character.name.capitalizedFirst) listens politely to what you say about \(topicDescription)."
 
         return ActionResult(
             message: message,
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: character),
+                await context.engine.updatePronouns(to: character),
+            ]
         )
     }
 

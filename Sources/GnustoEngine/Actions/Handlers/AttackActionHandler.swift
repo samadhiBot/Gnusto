@@ -101,9 +101,10 @@ public struct AttackActionHandler: ActionHandler {
 
         return ActionResult(
             message: message,
-            changes:
+            stateChanges: [
                 await context.engine.setFlag(.isTouched, on: targetItem),
-            await context.engine.updatePronouns(to: targetItem)
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 }

@@ -19,22 +19,12 @@ public struct VerboseActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` containing confirmation message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        var stateChanges: [StateChange] = []
-
-        // Set the verbose mode flag
-        let verboseChange = await context.engine.setGlobal(.isVerboseMode, to: true)
-        stateChanges.append(verboseChange)
-
-        // Clear brief mode if it was set
-        if await context.engine.hasGlobal(.isBriefMode) {
-            if let briefChange = await context.engine.clearGlobal(.isBriefMode) {
-                stateChanges.append(briefChange)
-            }
-        }
-
         return ActionResult(
-            message: "Verbose mode is now on. Full location descriptions will be shown every time you enter a location.",
-            stateChanges: stateChanges
+            message: context.message(.maximumVerbosity),
+            stateChanges: [
+                await context.engine.setGlobal(.isVerboseMode, to: true),
+                await context.engine.clearGlobal(.isBriefMode),
+            ]
         )
     }
 

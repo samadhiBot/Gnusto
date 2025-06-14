@@ -38,59 +38,45 @@ public struct LookInsideActionHandler: ActionHandler {
         }
 
         let targetItem = try await context.engine.item(targetItemID)
-        var allStateChanges: [StateChange] = []
 
-        // Set touched flag if not already set
-        if let touchChange = await context.engine.setFlag(.isTouched, on: targetItem) {
-            allStateChanges.append(touchChange)
-        }
+        // Determine the message based on whether item is a container
+        let message =
+            if targetItem.hasFlag(.isContainer) {
+                // For containers, provide container-specific messaging
+                let isOpen = try await context.engine.hasFlag(.isOpen, on: targetItem.id)
 
-        // Update pronouns
-        if let pronounChange = await context.engine.updatePronouns(to: targetItem) {
-            allStateChanges.append(pronounChange)
-        }
-
-        // Check if the item is a container
-        if targetItem.hasFlag(.isContainer) {
-            // For containers, provide container-specific messaging
-            let isOpen = try await context.engine.hasFlag(.isOpen, on: targetItem.id)
-
-            if !isOpen {
-                return ActionResult(
-                    message: "The \(targetItem.name) is closed.",
-                    stateChanges: allStateChanges
-                )
-            }
-
-            // Show container contents
-            let items = await context.engine.items(in: .item(targetItem.id))
-            if items.isEmpty {
-                return ActionResult(
-                    message: "The \(targetItem.name) is empty.",
-                    stateChanges: allStateChanges
-                )
+                if !isOpen {
+                    "The \(targetItem.name) is closed."
+                } else {
+                    // Show container contents
+                    let items = await context.engine.items(in: .item(targetItem.id))
+                    if items.isEmpty {
+                        "The \(targetItem.name) is empty."
+                    } else {
+                        let itemListing = items.listWithIndefiniteArticles
+                        "In the \(targetItem.name) you see \(itemListing)."
+                    }
+                }
             } else {
-                let itemListing = items.listWithIndefiniteArticles
-                return ActionResult(
-                    message: "In the \(targetItem.name) you see \(itemListing).",
-                    stateChanges: allStateChanges
+                // For non-containers, delegate to examine behavior
+                let description = try await context.engine.generateDescription(
+                    for: targetItem.id,
+                    attributeID: .description
                 )
-            }
-        } else {
-            // For non-containers, delegate to examine behavior
-            let description = try await context.engine.generateDescription(
-                for: targetItem.id,
-                attributeID: .description
-            )
 
-            let message =
                 if !description.isEmpty {
                     description
                 } else {
                     "You see nothing special inside the \(targetItem.name)."
                 }
+            }
 
-            return ActionResult(message: message, stateChanges: allStateChanges)
-        }
+        return ActionResult(
+            message: message,
+            stateChanges: [
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
+        )
     }
 }

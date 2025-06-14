@@ -98,43 +98,33 @@ public struct OpenActionHandler: ActionHandler {
             throw ActionResponse.itemAlreadyOpen(targetItemID)
         }
 
-        var stateChanges: [StateChange] = []
-
-        if let update = await context.engine.setFlag(.isOpen, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        if let update = await context.engine.setFlag(.isTouched, on: targetItem) {
-            stateChanges.append(update)
-        }
-
-        // Update pronoun
-        if let update = await context.engine.updatePronouns(to: targetItem) {
-            stateChanges.append(update)
-        }
-
         // Check if container has items inside to announce what's revealed
-        let message: String
-        if targetItem.hasFlag(.isContainer) {
-            let itemsInside = await context.engine.items(in: .item(targetItemID))
-            if !itemsInside.isEmpty {
-                // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
-                let itemList = itemsInside.sorted().listWithIndefiniteArticles
-                message = context.message(
-                    .openingRevealsContents(container: targetItem.withDefiniteArticle, contents: itemList))
+        let message =
+            if targetItem.hasFlag(.isContainer) {
+                let itemsInside = await context.engine.items(in: .item(targetItemID))
+                if !itemsInside.isEmpty {
+                    // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
+                    let itemList = itemsInside.sorted().listWithIndefiniteArticles
+                    context.message(
+                        .openingRevealsContents(
+                            container: targetItem.withDefiniteArticle, contents: itemList))
+                } else {
+                    // Container is empty, use simple message
+                    context.message(.opened(item: targetItem.withDefiniteArticle))
+                }
             } else {
-                // Container is empty, use simple message
-                message = context.message(.opened(item: targetItem.withDefiniteArticle))
+                // Not a container, use simple message
+                context.message(.opened(item: targetItem.withDefiniteArticle))
             }
-        } else {
-            // Not a container, use simple message
-            message = context.message(.opened(item: targetItem.withDefiniteArticle))
-        }
 
         // Prepare the result
         return ActionResult(
             message: message,
-            stateChanges: stateChanges
+            stateChanges: [
+                await context.engine.setFlag(.isOpen, on: targetItem),
+                await context.engine.setFlag(.isTouched, on: targetItem),
+                await context.engine.updatePronouns(to: targetItem),
+            ]
         )
     }
 
