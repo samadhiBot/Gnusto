@@ -73,7 +73,7 @@ struct PressActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't press the rock.")
+        expectNoDifference(output, "You can’t press the rock.")
     }
 
     @Test("Press with no object fails")
@@ -141,6 +141,6 @@ struct PressActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 }

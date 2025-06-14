@@ -73,7 +73,7 @@ struct PullActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't pull the rock.")
+        expectNoDifference(output, "You can’t pull the rock.")
     }
 
     @Test("Pull with no object fails")
@@ -141,6 +141,6 @@ struct PullActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can't see any such thing.")
+        expectNoDifference(output, "You can’t see any such thing.")
     }
 }

@@ -72,7 +72,7 @@ public struct DigActionHandler: ActionHandler {
                 stateChanges.append(pronounChange)
             }
 
-            message = "You can't dig the \(targetItem.name)."
+            message = context.message(.cannotDig(item: targetItem.name))
 
         } else {
             // General digging (no specific target)
@@ -83,9 +83,9 @@ public struct DigActionHandler: ActionHandler {
                 let toolItem = try await context.engine.item(toolItemID)
 
                 if toolItem.hasFlag(.isTool) {
-                    message = "You dig with the \(toolItem.name), but find nothing of interest."
+                    message = context.message(.digWithToolNothing(tool: toolItem.name))
                 } else {
-                    message = "The \(toolItem.name) isn't suitable for digging."
+                    message = context.message(.toolNotSuitableForDigging(tool: toolItem.name))
                 }
 
             } else {
@@ -94,9 +94,9 @@ public struct DigActionHandler: ActionHandler {
                 let diggingTools = playerInventory.filter { $0.hasFlag(.isTool) }
 
                 if !diggingTools.isEmpty {
-                    message = "You could try using a tool to dig with."
+                    message = context.message(.suggestUsingToolToDig)
                 } else {
-                    message = "Digging with your bare hands is ineffective."
+                    message = context.message(.diggingBareHandsIneffective)
                 }
             }
         }

@@ -532,6 +532,63 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .cannotEnter(let item):
             "You can't enter the \(item)."
 
+        case .cannotDig(let item):
+            "You can't dig the \(item)."
+
+        case .digWithToolNothing(let tool):
+            "You dig with the \(tool), but find nothing of interest."
+
+        case .toolNotSuitableForDigging(let tool):
+            "The \(tool) isn't suitable for digging."
+
+        case .suggestUsingToolToDig:
+            "You could try using a tool to dig with."
+
+        case .diggingBareHandsIneffective:
+            "Digging with your bare hands is ineffective."
+
+        case .containerAlreadyEmpty(let container):
+            "The \(container) is already empty."
+
+        case .emptySuccess(let container, let items, let count):
+            "You empty the \(container). \(items.capitalizedFirst) \(count == 1 ? "falls" : "fall") to the ground."
+
+        case .lockSuccess(let item):
+            "The \(item) is now locked."
+
+        case .pressWhat:
+            "Press what?"
+
+        case .pressSuccess(let item):
+            "You press the \(item)."
+
+        case .cannotPress(let item):
+            "You can't press the \(item)."
+
+        case .pullWhat:
+            "Pull what?"
+
+        case .pullSuccess(let item):
+            "You pull the \(item)."
+
+        case .cannotPull(let item):
+            "You can't pull the \(item)."
+
+        case .fillSuccess(let container, let source):
+            "You fill the \(container) from the \(source)."
+
+        case .noLiquidInSource(let source):
+            "There's no liquid in the \(source) to fill from."
+
+        case .noLiquidSourceAvailable:
+            "There's no source of liquid here to fill from."
+
+        case .nothingHereToExamine:
+            "There is nothing here to examine."
+
+        case .examineYourself:
+            "You are your usual self."
+
         case .nothingToDrinkIn(let container):
             "There's nothing to drink in the \(container)."
 

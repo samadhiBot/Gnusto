@@ -442,6 +442,63 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// Cannot enter this item
     case cannotEnter(item: String)
 
+    /// Cannot dig this item
+    case cannotDig(item: String)
+
+    /// Successfully dug with tool but found nothing
+    case digWithToolNothing(tool: String)
+
+    /// Tool is not suitable for digging
+    case toolNotSuitableForDigging(tool: String)
+
+    /// Suggest using a tool for digging
+    case suggestUsingToolToDig
+
+    /// Digging with bare hands is ineffective
+    case diggingBareHandsIneffective
+
+    /// Container is already empty
+    case containerAlreadyEmpty(container: String)
+
+    /// Successfully emptied container with items
+    case emptySuccess(container: String, items: String, count: Int)
+
+    /// Successfully locked item
+    case lockSuccess(item: String)
+
+    /// "Press what?" when direct object is missing in press command
+    case pressWhat
+
+    /// Successfully pressed item
+    case pressSuccess(item: String)
+
+    /// Cannot press this item
+    case cannotPress(item: String)
+
+    /// "Pull what?" when direct object is missing in pull command
+    case pullWhat
+
+    /// Successfully pulled item
+    case pullSuccess(item: String)
+
+    /// Cannot pull this item
+    case cannotPull(item: String)
+
+    /// Successfully filled container from source
+    case fillSuccess(container: String, source: String)
+
+    /// No liquid in source to fill from
+    case noLiquidInSource(source: String)
+
+    /// No liquid source available to fill from
+    case noLiquidSourceAvailable
+
+    /// "There is nothing here to examine." for examine all with no examinable items
+    case nothingHereToExamine
+
+    /// "You are your usual self." for examining self
+    case examineYourself
+
     /// Nothing drinkable in this container
     case nothingToDrinkIn(container: String)
 

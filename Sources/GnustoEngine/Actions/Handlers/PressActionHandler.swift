@@ -17,10 +17,12 @@ public struct PressActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Press requires a direct object (what to press)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Press what?")
+            let message = context.message(.pressWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only press objects.")
+            let message = context.message(.canOnlyActOnItems(verb: "press"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -40,8 +42,10 @@ public struct PressActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate press message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("PressActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "PressActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,11 +64,11 @@ public struct PressActionHandler: ActionHandler {
         // Check if item is pressable
         let message: String
         if targetItem.hasFlag(.isPressable) {
-            message = "You press the \(targetItem.name)."
+            message = context.message(.pressSuccess(item: targetItem.name))
             // Note: Specific press behavior should be handled by ItemEventHandlers
         } else {
             // Default behavior: most things can't be pressed effectively
-            message = "You can't press the \(targetItem.name)."
+            message = context.message(.cannotPress(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

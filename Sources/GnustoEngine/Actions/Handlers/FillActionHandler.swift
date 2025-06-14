@@ -99,10 +99,11 @@ public struct FillActionHandler: ActionHandler {
 
             // Check if source has drinkable liquid or is a water source
             if sourceItem.hasFlag(.isDrinkable) {
-                message = "You fill the \(containerItem.name) from the \(sourceItem.name)."
+                message = context.message(
+                    .fillSuccess(container: containerItem.name, source: sourceItem.name))
                 // TODO: In a full implementation, you might create a new liquid item in the container
             } else {
-                message = "There's no liquid in the \(sourceItem.name) to fill from."
+                message = context.message(.noLiquidInSource(source: sourceItem.name))
             }
 
         } else {
@@ -113,10 +114,11 @@ public struct FillActionHandler: ActionHandler {
 
             if !waterSources.isEmpty {
                 let firstSource = waterSources.first!
-                message = "You fill the \(containerItem.name) from the \(firstSource.name)."
+                message = context.message(
+                    .fillSuccess(container: containerItem.name, source: firstSource.name))
                 // TODO: In a full implementation, you might create a new liquid item in the container
             } else {
-                message = "There's no source of liquid here to fill from."
+                message = context.message(.noLiquidSourceAvailable)
             }
         }
 

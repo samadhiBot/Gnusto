@@ -75,7 +75,7 @@ public struct EmptyActionHandler: ActionHandler {
 
         let message: String
         if contents.isEmpty {
-            message = "The \(targetItem.name) is already empty."
+            message = context.message(.containerAlreadyEmpty(container: targetItem.name))
         } else {
             // Get current location to move items to
             let currentLocationID = await context.engine.playerLocationID
@@ -87,8 +87,8 @@ public struct EmptyActionHandler: ActionHandler {
             }
 
             let itemNames = contents.listWithDefiniteArticles
-            message =
-                "You empty the \(targetItem.name). \(itemNames.capitalizedFirst) \(contents.count == 1 ? "falls" : "fall") to the ground."
+            message = context.message(
+                .emptySuccess(container: targetItem.name, items: itemNames, count: contents.count))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

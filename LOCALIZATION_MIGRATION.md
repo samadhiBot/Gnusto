@@ -41,9 +41,18 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ CutActionHandler - Uses `.cutWhat`, `.cutWithTool(item:tool:)`, etc.
 - ✅ JumpActionHandler - Uses `.jumpResponses` for general jumping, context-specific messages for objects
 - ✅ RemoveActionHandler - Uses `.removeWhat`, `.youArentWearingAnything`, `.youRemoveMultipleItems(items:)`
+- ✅ DeflateActionHandler - Uses `.deflateWhat`, `.itemNotInflated(item:)`, `.deflateSuccess(item:)`
+- ✅ InflateActionHandler - Uses `.inflateWhat`, `.itemAlreadyInflated(item:)`, `.inflateSuccess(item:)`
 
 **Utility Commands:**
 - ✅ DebugActionHandler - Uses `.debugRequiresObject`
+- ✅ DigActionHandler - Uses `.digWhat`, `.cannotDig(item:)`, `.digWithToolNothing(tool:)`, `.toolNotSuitableForDigging(tool:)`, `.suggestUsingToolToDig`, `.diggingBareHandsIneffective`
+- ✅ EmptyActionHandler - Uses `.emptyWhat`, `.containerAlreadyEmpty(container:)`, `.emptySuccess(container:items:count:)`
+- ✅ ExamineActionHandler - Uses `.canOnlyActOnItems(verb:)`, `.nothingHereToExamine`, `.examineYourself`
+- ✅ FillActionHandler - Uses `.fillWhat`, `.fillSuccess(container:source:)`, `.noLiquidInSource(source:)`, `.noLiquidSourceAvailable`
+- ✅ LockActionHandler - Uses `.lockWhat`, `.lockWithWhat`, `.lockSuccess(item:)`
+- ✅ PressActionHandler - Uses `.pressWhat`, `.pressSuccess(item:)`, `.cannotPress(item:)`
+- ✅ PullActionHandler - Uses `.pullWhat`, `.pullSuccess(item:)`, `.cannotPull(item:)`
 - ✅ DeflateActionHandler - Uses `.deflateWhat`, `.cannotDeflate(item:)`
 - ✅ DigActionHandler - Uses generic validation messages
 - ✅ DrinkActionHandler - Uses `.drinkWhat`, `.canOnlyDrinkLiquids`, `.nothingToDrinkIn(container:)`
@@ -91,9 +100,20 @@ Implemented support for atmospheric commands with multiple response options:
 ### 1. ActionHandlers Still Using Hardcoded Messages ⚠️
 
 Need to scan for and convert remaining handlers that may still have hardcoded strings:
-- ActionHandlers with complex response logic (mostly converted validation messages)
-- Special case handlers not yet discovered
-- Any other handlers with embedded user-facing strings
+- **DrinkActionHandler** - Drinking and container-related messages  
+- **EatActionHandler** - Eating and container-related messages
+- **KickActionHandler** - Kicking responses with context variations
+- **KissActionHandler** - Kissing responses with context-specific variations
+- **KnockActionHandler** - Knocking responses with multiple object type variations
+- **RubActionHandler** - Rubbing responses with special cases for different objects
+- **ShakeActionHandler** - Shaking responses for different object types
+- **SqueezeActionHandler** - Squeezing responses with context sensitivity
+- **ThinkAboutActionHandler** - Thinking responses
+- **ThrowActionHandler** - Throwing result messages
+- **TurnActionHandler** - Turning responses for different object types
+- **WaveActionHandler** - Waving responses with object-specific behavior
+- **WearActionHandler** - Basic wear validation messages
+- Other ActionHandlers with complex response logic or embedded user-facing strings
 
 ### 2. ActionResponse Translation ⚠️
 
@@ -183,15 +203,30 @@ return ActionResult(
 4. **Maintainability**: Single source of truth for all text
 5. **Random Variety**: Atmospheric commands provide engaging variety
 6. **Testing**: Better testability with predictable message sources
+7. **Extensibility**: New MessageKey cases can be easily added for specific game needs
+8. **Performance**: Centralized message management reduces string duplication
 
 ## Next Steps
 
-1. Complete remaining ActionHandler conversions
-2. Audit and convert any remaining hardcoded strings
-3. Expand test coverage for edge cases
-4. Consider additional MessageKey categories as needed
-5. Document custom MessageProvider creation for game developers
-6. Add localization examples (Spanish, French, etc.)
+1. **Priority ActionHandlers**: Convert the remaining handlers with significant hardcoded messages:
+   - DrinkActionHandler, EatActionHandler (consumption mechanics)
+   - KickActionHandler, KissActionHandler (character interaction)
+   - KnockActionHandler, RubActionHandler (object interaction with context)
+   - ShakeActionHandler, SqueezeActionHandler (object manipulation)
+   - ThrowActionHandler, TurnActionHandler, WaveActionHandler (action commands)
+   - WearActionHandler (clothing mechanics)
+
+2. **Systematic Cleanup**: Audit and convert any remaining hardcoded strings in other handlers
+
+3. **Pattern Consolidation**: Look for common message patterns that could be generalized
+
+4. **Testing**: Expand test coverage for edge cases and ensure all converted handlers work correctly
+
+5. **Documentation**: Update MessageProvider creation guide for game developers
+
+6. **Localization Examples**: Add example implementations (Spanish, French, etc.)
+
+7. **Parser Integration**: Convert any remaining parser error messages to use MessageProvider
 
 ## File Structure
 

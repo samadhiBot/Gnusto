@@ -139,7 +139,7 @@ public struct LockActionHandler: ActionHandler {
         }
 
         // --- Prepare Result ---
-        let message = "The \(targetItem.name) is now locked."
+        let message = context.message(.lockSuccess(item: targetItem.name))
 
         return ActionResult(
             message: message,

@@ -17,10 +17,12 @@ public struct PullActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Pull requires a direct object (what to pull)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Pull what?")
+            let message = context.message(.pullWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only pull objects.")
+            let message = context.message(.canOnlyActOnItems(verb: "pull"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -40,8 +42,10 @@ public struct PullActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate pull message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("PullActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "PullActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -60,10 +64,10 @@ public struct PullActionHandler: ActionHandler {
         // Check if item is specifically pullable
         let message: String
         if targetItem.hasFlag(.isPullable) {
-            message = "You pull the \(targetItem.name)."
+            message = context.message(.pullSuccess(item: targetItem.name))
         } else {
             // Default behavior: most things can't be pulled effectively
-            message = "You can't pull the \(targetItem.name)."
+            message = context.message(.cannotPull(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)
