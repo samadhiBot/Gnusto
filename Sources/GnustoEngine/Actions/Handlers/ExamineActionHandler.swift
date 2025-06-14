@@ -46,7 +46,8 @@ public struct ExamineActionHandler: ActionHandler {
             // Allow examining self
             return
         default:
-            throw ActionResponse.prerequisiteNotMet("You can only examine items.")
+            let message = context.message(.canOnlyActOnItems(verb: "examine"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -99,7 +100,7 @@ public struct ExamineActionHandler: ActionHandler {
                     if context.command.isAllCommand {
                         // Check if player can reach the item
                         guard await context.engine.playerCanReach(targetItemID) else {
-                            continue // Skip unreachable items in ALL commands
+                            continue  // Skip unreachable items in ALL commands
                         }
                     }
 
@@ -119,8 +120,9 @@ public struct ExamineActionHandler: ActionHandler {
 
                     // Priority 1: Readable Text (Check dynamic value)
                     if targetItem.hasFlag(.isReadable),
-                       let readText: String = try? await context.engine.attribute(.readText, of: targetItem.id),
-                       !readText.isEmpty
+                        let readText: String = try? await context.engine.attribute(
+                            .readText, of: targetItem.id),
+                        !readText.isEmpty
                     {
                         itemMessages.append(readText)
                     }
@@ -131,8 +133,9 @@ public struct ExamineActionHandler: ActionHandler {
                         let contents = await context.engine.items(in: .item(targetItem.id))
                         let hasFirstDescriptions = contents.contains { item in
                             if let firstDescription = item.attributes[.firstDescription],
-                               case .string(let description) = firstDescription,
-                               !description.isEmpty {
+                                case .string(let description) = firstDescription,
+                                !description.isEmpty
+                            {
                                 return true
                             }
                             return false
@@ -177,10 +180,11 @@ public struct ExamineActionHandler: ActionHandler {
                     // Priority 4: Dynamic Long Description
                     else {
                         // Use the registry to generate the description using the item ID and key
-                        let (description, _, _) = try await context.engine.generateDescriptionWithSourceInfo(
-                            for: targetItem.id,
-                            attributeID: .description
-                        )
+                        let (description, _, _) = try await context.engine
+                            .generateDescriptionWithSourceInfo(
+                                for: targetItem.id,
+                                attributeID: .description
+                            )
                         // Always add the description for simple items, even if it's the default
                         // The "nothing special" filtering only applies to containers/surfaces that have additional info
                         itemMessages.append(description)
@@ -276,10 +280,11 @@ public struct ExamineActionHandler: ActionHandler {
         var descriptionParts: [String] = []
 
         // Start with the item's main description, using the registry with ID and key
-        let (baseDescription, wasComputed, isDefault) = try await engine.generateDescriptionWithSourceInfo(
-            for: targetItem.id,
-            attributeID: .description
-        )
+        let (baseDescription, wasComputed, isDefault) =
+            try await engine.generateDescriptionWithSourceInfo(
+                for: targetItem.id,
+                attributeID: .description
+            )
 
         // Only add the base description if it's not a default "nothing special" message
         if !isDefault {
@@ -326,10 +331,11 @@ public struct ExamineActionHandler: ActionHandler {
     /// - Returns: A string describing the surface and any items on it.
     private func describeSurface(targetItem: Item, engine: GameEngine) async throws -> String {
         // Check if a compute handler provided a custom description
-        let (baseDescription, wasComputed, isDefault) = try await engine.generateDescriptionWithSourceInfo(
-            for: targetItem.id,
-            attributeID: .description
-        )
+        let (baseDescription, wasComputed, isDefault) =
+            try await engine.generateDescriptionWithSourceInfo(
+                for: targetItem.id,
+                attributeID: .description
+            )
 
         // If a compute handler provided the description, it's complete - don't add more
         guard !wasComputed else {
@@ -351,13 +357,16 @@ public struct ExamineActionHandler: ActionHandler {
 
         for item in contents {
             if let firstDescription = item.attributes[.firstDescription],
-               case .string(let description) = firstDescription,
-               !description.isEmpty {
+                case .string(let description) = firstDescription,
+                !description.isEmpty
+            {
                 itemsWithFirstDescription.append(item)
 
                 // Check if firstDescription mentions the parent surface (smart context detection)
                 let parentKeywords = [targetItem.name.lowercased(), "table", "surface", "on the"]
-                let establishesContext = parentKeywords.contains(where: { description.lowercased().contains($0) })
+                let establishesContext = parentKeywords.contains(where: {
+                    description.lowercased().contains($0)
+                })
 
                 // If any firstDescription doesn't establish context, we can't rely on them alone
                 if !establishesContext {
@@ -376,7 +385,8 @@ public struct ExamineActionHandler: ActionHandler {
 
             for item in itemsWithFirstDescription.sorted() {
                 if let firstDescription = item.attributes[.firstDescription],
-                   case .string(let description) = firstDescription {
+                    case .string(let description) = firstDescription
+                {
                     descriptionLines.append(description)
                 }
 
@@ -388,7 +398,8 @@ public struct ExamineActionHandler: ActionHandler {
                     if isOpen || isTransparent {
                         let containerContents = await engine.items(in: .item(item.id))
                         if !containerContents.isEmpty {
-                            descriptionLines.append("""
+                            descriptionLines.append(
+                                """
                                 The \(item.name) contains \
                                 \(containerContents.sorted().listWithIndefiniteArticles).
                                 """)
@@ -411,7 +422,8 @@ public struct ExamineActionHandler: ActionHandler {
 
             // Add items without firstDescription as a combined listing
             if !itemsWithoutFirstDescription.isEmpty {
-                let surfaceItemsList = itemsWithoutFirstDescription.sorted().listWithIndefiniteArticles
+                let surfaceItemsList = itemsWithoutFirstDescription.sorted()
+                    .listWithIndefiniteArticles
                 let isAre = itemsWithoutFirstDescription.count == 1 ? "is" : "are"
                 descriptionParts.append("On the \(targetItem.name) \(isAre) \(surfaceItemsList).")
             }
@@ -419,7 +431,8 @@ public struct ExamineActionHandler: ActionHandler {
             // Add individual firstDescriptions
             for item in itemsWithFirstDescription.sorted() {
                 if let firstDescription = item.attributes[.firstDescription],
-                   case .string(let description) = firstDescription {
+                    case .string(let description) = firstDescription
+                {
                     descriptionParts.append(description)
                 }
 
@@ -431,7 +444,8 @@ public struct ExamineActionHandler: ActionHandler {
                     if isOpen || isTransparent {
                         let containerContents = await engine.items(in: .item(item.id))
                         if !containerContents.isEmpty {
-                            descriptionParts.append("""
+                            descriptionParts.append(
+                                """
                                 The \(item.name) contains \
                                 \(containerContents.sorted().listWithIndefiniteArticles).
                                 """)

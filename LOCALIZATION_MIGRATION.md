@@ -39,6 +39,7 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ ClimbActionHandler - Uses `.climbWhat`, `.climbSuccess(item:)`, `.climbFailure(item:)`
 - ✅ ClimbOnActionHandler - Uses `.climbOnWhat`, `.climbOnFailure(item:)`
 - ✅ CutActionHandler - Uses `.cutWhat`, `.cutWithTool(item:tool:)`, etc.
+- ✅ JumpActionHandler - Uses `.jumpResponses` for general jumping, context-specific messages for objects
 
 **Utility Commands:**
 - ✅ DebugActionHandler - Uses `.debugRequiresObject`
@@ -47,14 +48,25 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ DrinkActionHandler - Uses `.drinkWhat`, `.canOnlyDrinkLiquids`, `.nothingToDrinkIn(container:)`
 - ✅ EatActionHandler - Uses `.eatWhat`, `.canOnlyEatFood`, `.nothingToEatIn(container:)`
 - ✅ EmptyActionHandler - Uses `.emptyWhat`, `.canOnlyEmptyContainers`
+- ✅ EnterActionHandler - Uses `.nothingHereToEnter`, `.cannotEnter(item:)`
+- ✅ ExamineActionHandler - Uses `.canOnlyActOnItems(verb:)`
+- ✅ FillActionHandler - Uses `.fillWhat`, `.cannotFillFrom(_:)`
+- ✅ FindActionHandler - Uses `.findWhat`
 - ✅ InflateActionHandler - Uses `.inflateWhat`, `.cannotInflate(item:)`
 - ✅ KickActionHandler - Uses `.kickWhat` and generic validation messages
 - ✅ KissActionHandler - Uses `.kissWhat` and generic validation messages
+- ✅ KnockActionHandler - Uses `.knockOnWhat` and context-specific responses
+- ✅ LockActionHandler - Uses `.lockWhat`, `.lockWithWhat`, `.canOnlyUseItemAsKey`
+- ✅ LookActionHandler - Uses `.canOnlyLookAtItems`
+- ✅ LookInsideActionHandler - Uses `.lookInsideWhat`, `.canOnlyLookInsideItems`
+- ✅ LookUnderActionHandler - Uses `.lookUnderWhat` and generic validation messages
 
 ### 4. MessageKey Categories ✅
 
 **Question Prompts:** For missing direct/indirect objects
-- `.askWhom`, `.attackWhat`, `.breatheWhat`, `.burnWhat`, etc.
+- `.askWhom`, `.attackWhat`, `.burnWhat`, `.digWhat`, `.drinkWhat`, `.eatWhat`, `.emptyWhat`, etc.
+- `.fillWhat`, `.findWhat`, `.inflateWhat`, `.kickWhat`, `.kissWhat`, `.knockOnWhat`, etc.
+- `.lockWhat`, `.lockWithWhat`, `.lookInsideWhat`, `.lookUnderWhat`
 
 **Validation Messages:** For invalid actions
 - `.cannotActOnThat(verb:)`, `.cannotActWithThat(verb:)`, `.canOnlyActOnItems(verb:)`
@@ -62,11 +74,13 @@ Implemented support for atmospheric commands with multiple response options:
 
 **Atmospheric Responses:** Multi-line random selections
 - `.breatheResponses`, `.cryResponses`, `.danceResponses`, `.chompResponses`, `.curseResponses`
-- `.chompTargetResponses(item:)`, `.curseTargetResponses(item:)`
+- `.chompTargetResponses(item:)`, `.curseTargetResponses(item:)`, `.jumpResponses`
 
 **Action-Specific:** Context-aware responses
 - `.attackNonCharacter(item:)`, `.attackWithBareHands(character:)`, `.attackWithWeapon`
 - `.blowOnLightSource(item:)`, `.burnToCatchFire(item:)`, `.cutWithTool(item:tool:)`
+- `.jumpDangerous`, `.jumpWater(water:)`, `.jumpCharacter(character:)`, `.jumpSmallObject(item:)`, `.jumpLargeObject(item:)`
+- `.cannotDeflate(item:)`, `.cannotInflate(item:)`, `.cannotEnter(item:)`, `.cannotDrink(item:)`, `.cannotEat(item:)`
 
 **Engine Errors:** Internal error handling
 - `.actionHandlerMissingObjects(handler:)`, `.actionHandlerInternalError(handler:details:)`
@@ -75,18 +89,10 @@ Implemented support for atmospheric commands with multiple response options:
 
 ### 1. ActionHandlers Still Using Hardcoded Messages ⚠️
 
-Need to scan for and convert remaining handlers:
-- EnterActionHandler
-- ExamineActionHandler  
-- FillActionHandler
-- FindActionHandler
-- JumpActionHandler
-- KnockActionHandler
-- LockActionHandler
-- LookActionHandler
-- LookInsideActionHandler
-- LookUnderActionHandler
-- Plus any others with hardcoded strings
+Need to scan for and convert remaining handlers that may still have hardcoded strings:
+- ActionHandlers with complex response logic (mostly converted validation messages)
+- Special case handlers not yet discovered
+- Any other handlers with embedded user-facing strings
 
 ### 2. ActionResponse Translation ⚠️
 

@@ -11,11 +11,13 @@ public struct LookUnderActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` indicating validation success or failure.
     public func validate(context: ActionContext) async throws {
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Look under what?")
+            let message = context.message(.lookUnderWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let targetItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't look under that.")
+            let message = context.message(.cannotActOnThat(verb: "look under"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if item exists and is reachable

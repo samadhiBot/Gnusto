@@ -16,10 +16,12 @@ public struct KnockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Knock requires a direct object (what to knock on)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Knock on what?")
+            let message = context.message(.knockOnWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't knock on that.")
+            let message = context.message(.cannotActOnThat(verb: "knock on"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -38,8 +40,10 @@ public struct KnockActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate knocking message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("KnockActionHandler: directObject was not an item in process.")
+            case .item(let targetItemID) = directObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "KnockActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -63,14 +67,17 @@ public struct KnockActionHandler: ActionHandler {
             if targetItem.hasFlag(.isOpen) {
                 message = "The \(targetItem.name) is already open. There's no need to knock."
             } else if targetItem.hasFlag(.isLocked) {
-                message = "You knock on the \(targetItem.name). There's no response from the other side."
+                message =
+                    "You knock on the \(targetItem.name). There's no response from the other side."
             } else {
                 message = "You knock on the \(targetItem.name), but there's no answer."
             }
         } else if targetItem.name.lowercased().contains("wall") {
             // Knocking on walls
             message = "You knock on the \(targetItem.name). It sounds solid."
-        } else if targetItem.name.lowercased().contains("wood") || targetItem.name.lowercased().contains("wooden") {
+        } else if targetItem.name.lowercased().contains("wood")
+            || targetItem.name.lowercased().contains("wooden")
+        {
             // Knocking on wooden objects
             message = "You knock on the \(targetItem.name). It makes a hollow wooden sound."
         } else if targetItem.hasFlag(.isContainer) {
@@ -78,7 +85,8 @@ public struct KnockActionHandler: ActionHandler {
             message = "You knock on the \(targetItem.name). You hear a hollow sound."
         } else if targetItem.hasFlag(.isTakable) {
             // Knocking on small objects
-            message = "You knock on the \(targetItem.name), but it's too small to produce much of a sound."
+            message =
+                "You knock on the \(targetItem.name), but it's too small to produce much of a sound."
         } else {
             // Knocking on other objects
             message = "You knock on the \(targetItem.name). Nothing happens."

@@ -26,17 +26,21 @@ public struct LockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Lock what?")
+            let message = context.message(.lockWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only lock items.")
+            let message = context.message(.canOnlyActOnItems(verb: "lock"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
-            throw ActionResponse.prerequisiteNotMet("Lock it with what?")
+            let message = context.message(.lockWithWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only use an item as a key.")
+            let message = context.message(.canOnlyUseItemAsKey)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // 2. Get item snapshots (existence should be implicitly validated by parser/scope resolver before this point)
@@ -90,12 +94,15 @@ public struct LockActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Direct and Indirect objects are guaranteed to be items by validate.
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
+            case .item(let targetItemID) = directObjectRef
+        else {
             throw ActionResponse.internalEngineError("Lock: Direct object not an item in process.")
         }
         guard let indirectObjectRef = context.command.indirectObject,
-              case .item(let keyItemID) = indirectObjectRef else {
-            throw ActionResponse.internalEngineError("Lock: Indirect object not an item in process.")
+            case .item(let keyItemID) = indirectObjectRef
+        else {
+            throw ActionResponse.internalEngineError(
+                "Lock: Indirect object not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)

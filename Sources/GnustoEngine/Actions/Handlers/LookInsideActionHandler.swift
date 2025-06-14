@@ -9,11 +9,13 @@ public struct LookInsideActionHandler: ActionHandler {
     /// Requires a direct object that must be an item the player can reach.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Look inside what?")
+            let message = context.message(.lookInsideWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can only look inside items.")
+            let message = context.message(.canOnlyLookInsideItems)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Ensure item exists and is reachable
@@ -30,7 +32,8 @@ public struct LookInsideActionHandler: ActionHandler {
     /// By default, delegates to examine behavior with special focus on container contents.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let targetItemID) = directObjectRef else {
+            case .item(let targetItemID) = directObjectRef
+        else {
             throw ActionResponse.internalEngineError("Validation should have caught this")
         }
 
@@ -80,11 +83,12 @@ public struct LookInsideActionHandler: ActionHandler {
                 attributeID: .description
             )
 
-            let message = if !description.isEmpty {
-                description
-            } else {
-                "You see nothing special inside the \(targetItem.name)."
-            }
+            let message =
+                if !description.isEmpty {
+                    description
+                } else {
+                    "You see nothing special inside the \(targetItem.name)."
+                }
 
             return ActionResult(message: message, stateChanges: allStateChanges)
         }

@@ -19,7 +19,8 @@ public struct JumpActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't jump that.")
+            let message = context.message(.cannotActOnThat(verb: "jump"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -41,21 +42,14 @@ public struct JumpActionHandler: ActionHandler {
 
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = context.command.directObject else {
-            // Provide varied responses for atmospheric effect
-            let responses = [
-                "You jump on the spot, fruitlessly.",
-                "You jump up and down.",
-                "You leap into the air.",
-                "You bounce up and down."
-            ]
-
-            return ActionResult(
-                try await context.engine.randomElement(in: responses)
-            )
+            // General jumping - use random response from MessageProvider
+            let message = await context.engine.randomMessage(for: .jumpResponses)
+            return ActionResult(message)
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("JumpActionHandler: directObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "JumpActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -73,23 +67,25 @@ public struct JumpActionHandler: ActionHandler {
 
         if targetItem.hasFlag(.isCharacter) {
             // Can't jump characters
-            message = "You can't jump the \(targetItem.name)."
-        } else if targetItem.name.lowercased().contains("gap") ||
-                  targetItem.name.lowercased().contains("chasm") ||
-                  targetItem.name.lowercased().contains("pit") {
+            message = context.message(.jumpCharacter(character: targetItem.name))
+        } else if targetItem.name.lowercased().contains("gap")
+            || targetItem.name.lowercased().contains("chasm")
+            || targetItem.name.lowercased().contains("pit")
+        {
             // Dangerous to jump across gaps
-            message = "That would be extremely dangerous."
-        } else if targetItem.name.lowercased().contains("water") ||
-                  targetItem.name.lowercased().contains("stream") ||
-                  targetItem.name.lowercased().contains("river") {
+            message = context.message(.jumpDangerous)
+        } else if targetItem.name.lowercased().contains("water")
+            || targetItem.name.lowercased().contains("stream")
+            || targetItem.name.lowercased().contains("river")
+        {
             // Jumping water
-            message = "You can't jump across the \(targetItem.name)."
+            message = context.message(.jumpWater(water: targetItem.name))
         } else if targetItem.hasFlag(.isTakable) {
-            // Small objects
-            message = "You jump over the \(targetItem.name)."
+            // Small objects you can jump over
+            message = context.message(.jumpSmallObject(item: targetItem.name))
         } else {
-            // Large objects
-            message = "You can't jump the \(targetItem.name)."
+            // Large immovable objects
+            message = context.message(.jumpLargeObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

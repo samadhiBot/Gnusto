@@ -30,12 +30,13 @@ public struct LookActionHandler: ActionHandler {
         // If a direct object is present, it must be an item for LOOK/EXAMINE.
         guard case .item(let targetItemID) = directObjectRef else {
             // For now, only items are supported when a direct object is specified.
-            throw ActionResponse.prerequisiteNotMet("You can only look at items this way.")
+            let message = context.message(.canOnlyLookAtItems)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // EXAMINE [Item] - Ensure item exists and is reachable
         guard (try? await context.engine.item(targetItemID)) != nil else {
-            throw ActionResponse.unknownEntity(directObjectRef) // Was unknownItem
+            throw ActionResponse.unknownEntity(directObjectRef)  // Was unknownItem
         }
 
         // Check reachability using ScopeResolver
@@ -97,9 +98,9 @@ public struct LookActionHandler: ActionHandler {
             // Specific items can override this via ItemEventHandlers (like the kitchen window)
             let examineHandler = ExamineActionHandler()
             return try await examineHandler.process(context: context)
-        } else if context.command.preposition == "in" ||
-                  context.command.preposition == "inside" ||
-                  context.command.preposition == "with" {
+        } else if context.command.preposition == "in" || context.command.preposition == "inside"
+            || context.command.preposition == "with"
+        {
             // LOOK IN/INSIDE/WITH [Object] - delegate to look-inside behavior
             let lookInsideHandler = LookInsideActionHandler()
             return try await lookInsideHandler.process(context: context)
@@ -148,7 +149,7 @@ public struct LookActionHandler: ActionHandler {
 
         // Original implementation using sentence format: - RESTORE THIS
 
-                let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] }
+        let visibleItems = visibleItemIDs.compactMap { stateSnapshot.items[$0] }
 
         // Collect all items to describe: directly in location + items on surfaces/in open containers
         var allItemsToDescribe: [Item] = []
@@ -157,12 +158,16 @@ public struct LookActionHandler: ActionHandler {
         // Add items directly in the location
         allItemsToDescribe.append(contentsOf: visibleItems)
 
-                // Check for surfaces and open/transparent containers in the location
+        // Check for surfaces and open/transparent containers in the location
         // Include ALL items in location (even those with .omitDescription) to check for surfaces
-        let allItemsInLocation = stateSnapshot.items.values.filter { $0.parent == .location(location.id) }
+        let allItemsInLocation = stateSnapshot.items.values.filter {
+            $0.parent == .location(location.id)
+        }
         for item in allItemsInLocation {
-            if item.hasFlag(.isSurface) ||
-               (item.hasFlag(.isContainer) && (item.hasFlag(.isOpen) || item.hasFlag(.isTransparent))) {
+            if item.hasFlag(.isSurface)
+                || (item.hasFlag(.isContainer)
+                    && (item.hasFlag(.isOpen) || item.hasFlag(.isTransparent)))
+            {
                 let contents = stateSnapshot.items(in: .item(item.id))
 
                 // Check if any items on this surface have first descriptions
@@ -181,17 +186,21 @@ public struct LookActionHandler: ActionHandler {
                     // Use individual first descriptions for items on surfaces
                     for contentItem in contents.sorted() {
                         if let firstDescription = contentItem.attributes[.firstDescription],
-                           case .string(let fdesc) = firstDescription,
-                           !fdesc.isEmpty,
-                           !contentItem.hasFlag(.isTouched) {
+                            case .string(let fdesc) = firstDescription,
+                            !fdesc.isEmpty,
+                            !contentItem.hasFlag(.isTouched)
+                        {
                             // Use first description for untouched items on surfaces
                             surfaceFirstDescriptions.append(fdesc)
                         } else if !contentItem.hasFlag(.isTouched) {
                             // Use generic surface description for touched items without first descriptions
                             if item.hasFlag(.isSurface) {
-                                surfaceFirstDescriptions.append("On the \(item.name) is \(contentItem.withIndefiniteArticle).")
+                                surfaceFirstDescriptions.append(
+                                    "On the \(item.name) is \(contentItem.withIndefiniteArticle).")
                             } else {
-                                surfaceFirstDescriptions.append("The \(item.name) contains \(contentItem.withIndefiniteArticle).")
+                                surfaceFirstDescriptions.append(
+                                    "The \(item.name) contains \(contentItem.withIndefiniteArticle)."
+                                )
                             }
                         }
                     }
@@ -221,9 +230,10 @@ public struct LookActionHandler: ActionHandler {
                 // Use individual first descriptions for untouched direct items
                 for item in directItems.sorted() {
                     if let firstDescription = item.attributes[.firstDescription],
-                       case .string(let fdesc) = firstDescription,
-                       !fdesc.isEmpty,
-                       !item.hasFlag(.isTouched) {
+                        case .string(let fdesc) = firstDescription,
+                        !fdesc.isEmpty,
+                        !item.hasFlag(.isTouched)
+                    {
                         // Use first description for untouched items
                         descriptionLines.append(fdesc)
                     } else {

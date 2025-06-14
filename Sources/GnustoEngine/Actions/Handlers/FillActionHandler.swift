@@ -17,10 +17,12 @@ public struct FillActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Fill requires a direct object (what to fill)
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet("Fill what?")
+            let message = context.message(.fillWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let containerItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't fill that.")
+            let message = context.message(.cannotActOnThat(verb: "fill"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if container exists and is reachable
@@ -42,7 +44,8 @@ public struct FillActionHandler: ActionHandler {
         // If a source is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let sourceItemID) = indirectObjectRef else {
-                throw ActionResponse.prerequisiteNotMet("You can't fill from that.")
+                let message = context.message(.cannotFillFrom(source: "that"))
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             _ = try await context.engine.item(sourceItemID)
@@ -63,8 +66,13 @@ public struct FillActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with appropriate filling message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let directObjectRef = context.command.directObject,
-              case .item(let containerItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("FillActionHandler: directObject was not an item in process.")
+            case .item(let containerItemID) = directObjectRef
+        else {
+            let message = context.message(
+                .actionHandlerInternalError(
+                    handler: "FillActionHandler",
+                    details: "directObject was not an item in process"))
+            throw ActionResponse.internalEngineError(message)
         }
 
         let containerItem = try await context.engine.item(containerItemID)
@@ -84,7 +92,8 @@ public struct FillActionHandler: ActionHandler {
 
         // Handle filling from specified source
         if let indirectObjectRef = context.command.indirectObject,
-           case .item(let sourceItemID) = indirectObjectRef {
+            case .item(let sourceItemID) = indirectObjectRef
+        {
 
             let sourceItem = try await context.engine.item(sourceItemID)
 

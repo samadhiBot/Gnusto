@@ -22,13 +22,15 @@ public struct EnterActionHandler: ActionHandler {
                 .filter { $0.hasFlag(.isEnterable) }
 
             if enterableItems.isEmpty {
-                throw ActionResponse.prerequisiteNotMet("There's nothing here to enter.")
+                let message = context.message(.nothingHereToEnter)
+                throw ActionResponse.prerequisiteNotMet(message)
             }
-            return // Will handle selection in process
+            return  // Will handle selection in process
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet("You can't enter that.")
+            let message = context.message(.cannotActOnThat(verb: "enter"))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if target exists and is reachable
@@ -39,7 +41,8 @@ public struct EnterActionHandler: ActionHandler {
 
         // Check if item is enterable
         guard targetItem.hasFlag(.isEnterable) else {
-            throw ActionResponse.prerequisiteNotMet("You can't enter the \(targetItem.name).")
+            let message = context.message(.cannotEnter(item: targetItem.name))
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -60,7 +63,8 @@ public struct EnterActionHandler: ActionHandler {
                 .filter { $0.hasFlag(.isEnterable) }
 
             guard let firstEnterable = enterableItems.first else {
-                throw ActionResponse.prerequisiteNotMet("There's nothing here to enter.")
+                let message = context.message(.nothingHereToEnter)
+                throw ActionResponse.prerequisiteNotMet(message)
             }
 
             // Mark as touched and update pronouns
@@ -78,7 +82,8 @@ public struct EnterActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            throw ActionResponse.internalEngineError("EnterActionHandler: directObject was not an item in process.")
+            throw ActionResponse.internalEngineError(
+                "EnterActionHandler: directObject was not an item in process.")
         }
 
         let targetItem = try await context.engine.item(targetItemID)

@@ -529,7 +529,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .nothingHereToEnter:
             "There's nothing here to enter."
 
-        case .cannotFillFrom(let source):
+        case .cannotFillFrom(_):
             "You can't fill from that."
 
         case .canOnlyUseItemAsKey:
@@ -549,6 +549,29 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .canOnlyEmptyContainers:
             "You can only empty containers."
+
+        case .jumpResponses:
+            """
+            You jump on the spot, fruitlessly.
+            You jump up and down.
+            You leap into the air.
+            You bounce up and down.
+            """
+
+        case .jumpDangerous:
+            "That would be extremely dangerous."
+
+        case .jumpWater(let water):
+            "You can't jump across the \(water)."
+
+        case .jumpCharacter(let character):
+            "You can't jump the \(character)."
+
+        case .jumpSmallObject(let item):
+            "You jump over the \(item) easily."
+
+        case .jumpLargeObject(let item):
+            "You can't jump the \(item)."
         }
     }
 }

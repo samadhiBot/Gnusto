@@ -151,6 +151,9 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// "Look under what?" when indirect object is missing in look under command
     case lookUnderWhat
 
+    /// Multiple responses for jumping without target (one per line for random selection)
+    case jumpResponses
+
     /// "Insert into what?" for missing indirect object in insert command
     case insertIntoWhat
 
@@ -438,4 +441,19 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
 
     /// Can only empty containers
     case canOnlyEmptyContainers
+
+    /// Cannot jump across dangerous gaps
+    case jumpDangerous
+
+    /// Cannot jump across water
+    case jumpWater(water: String)
+
+    /// Cannot jump characters
+    case jumpCharacter(character: String)
+
+    /// Cannot jump small objects
+    case jumpSmallObject(item: String)
+
+    /// Cannot jump large immovable objects
+    case jumpLargeObject(item: String)
 }

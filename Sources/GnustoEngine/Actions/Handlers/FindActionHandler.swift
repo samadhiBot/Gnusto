@@ -18,7 +18,8 @@ public struct FindActionHandler: ActionHandler {
     /// - Throws: `ActionError` if no direct object is specified.
     public func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {
-            throw ActionResponse.prerequisiteNotMet("Find what?")
+            let message = context.message(.findWhat)
+            throw ActionResponse.prerequisiteNotMet(message)
         }
     }
 
@@ -34,11 +35,12 @@ public struct FindActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the appropriate response message.
     public func process(context: ActionContext) async throws -> ActionResult {
         guard let targetObjectID = context.command.directObject,
-              case .item(let itemID) = targetObjectID else {
+            case .item(let itemID) = targetObjectID
+        else {
             return ActionResult("You can't see any such thing here.")
         }
 
-                // Check if the item exists in the game
+        // Check if the item exists in the game
         guard let targetItem = try? await context.engine.item(itemID) else {
             return ActionResult("You can't see any such thing here.")
         }
@@ -48,7 +50,7 @@ public struct FindActionHandler: ActionHandler {
             return ActionResult("You have it.")
         }
 
-                // Check if the item is visible in the current scope
+        // Check if the item is visible in the current scope
         let currentLocation = await context.engine.playerLocationID
         let scopeResolver = ScopeResolver(engine: context.engine)
         let itemsInScope = await scopeResolver.itemsInScopeFor(locationID: currentLocation)
