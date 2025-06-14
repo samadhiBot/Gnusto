@@ -89,13 +89,4 @@ public struct AskActionHandler: ActionHandler {
                 await context.engine.updatePronouns(to: character)
         )
     }
-
-    /// Performs any post-processing after the ask action completes.
-    ///
-    /// Currently no post-processing is needed for basic asking.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for ask
-    }
 }

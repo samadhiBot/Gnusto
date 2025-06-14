@@ -94,13 +94,4 @@ public struct BurnActionHandler: ActionHandler {
             )
         }
     }
-
-    /// Performs any post-processing after the burn action completes.
-    ///
-    /// Currently no post-processing is needed for the burn action.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for burn
-    }
 }

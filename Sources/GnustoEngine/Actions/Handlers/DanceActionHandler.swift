@@ -13,9 +13,9 @@ public struct DanceActionHandler: ActionHandler {
     ) async throws -> ActionResult {
         let responses = [
             "Dancing is forbidden.", // Classic ZIL response from Cloak of Darkness
-            "You dance a little jig. How delightful!",
+            "You dance an adorable little jig.",
             "You boogie down with surprising grace.",
-            "You perform an interpretive dance. Very artistic.",
+            "You perform a modern interpretive dance.",
             "You dance like nobody's watching (which they aren't).",
             "You cut a rug with style and panache.",
             "You dance the dance of your people.",

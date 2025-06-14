@@ -84,11 +84,11 @@ public struct AttackActionHandler: ActionHandler {
                 message = "Trying to attack the \(targetItem.name) with a \(weaponItem.name) is suicidal."
             } else {
                 // Real weapon attack - placeholder for combat system
-                message = "You can't."
+                message = "Let's hope it doesn't come to that."
             }
         } else {
             // Fallback case
-            message = "You can't."
+            message = "Let's hope it doesn't come to that."
         }
 
         return ActionResult(
@@ -97,16 +97,5 @@ public struct AttackActionHandler: ActionHandler {
                 await context.engine.setFlag(.isTouched, on: targetItem),
                 await context.engine.updatePronouns(to: targetItem)
         )
-    }
-
-    /// Performs any post-processing after the attack action completes.
-    ///
-    /// Currently no post-processing is needed for basic attack behavior.
-    /// Game-specific implementations might override this for combat consequences.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for basic attack
-        // Game-specific combat systems would override this
     }
 }

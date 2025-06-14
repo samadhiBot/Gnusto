@@ -72,13 +72,4 @@ public struct BlowActionHandler: ActionHandler {
             return ActionResult("You blow air around. Nothing happens.")
         }
     }
-
-    /// Performs any post-processing after the blow action completes.
-    ///
-    /// Currently no post-processing is needed for basic blowing.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext, result: ActionResult) async throws {
-        // No post-processing needed for blow
-    }
 }

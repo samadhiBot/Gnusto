@@ -33,17 +33,11 @@ public struct BriefActionHandler: ActionHandler {
         }
 
         return ActionResult(
-            message: "Brief mode is now on. Location descriptions will be shown only when you first enter a location.",
+            message: """
+                Brief mode is now on. Location descriptions will be
+                shown only when you first enter a location.
+                """,
             stateChanges: stateChanges
         )
-    }
-
-    /// Performs any post-processing after the brief action completes.
-    ///
-    /// Currently no post-processing is needed for brief.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for brief
     }
 }
