@@ -96,7 +96,8 @@ public struct CutActionHandler: ActionHandler {
                 message = context.message(.cutWithTool(item: targetItem.name, tool: toolItem.name))
             } else {
                 // Using an inappropriate implement
-                message = context.message(.cutToolNotSharp(tool: toolItem.name))
+                message = context
+                    .message(.cutToolNotSharp(tool: toolItem.withDefiniteArticle.capitalizedFirst))
             }
 
         } else {

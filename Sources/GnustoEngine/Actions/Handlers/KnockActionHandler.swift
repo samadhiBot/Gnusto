@@ -71,22 +71,11 @@ public struct KnockActionHandler: ActionHandler {
             } else {
                 message = context.message(.knockOnClosedDoor(door: targetItem.name))
             }
-        } else if targetItem.name.lowercased().contains("wall") {
-            // Knocking on walls
-            message = context.message(.knockOnWall(wall: targetItem.name))
-        } else if targetItem.name.lowercased().contains("wood")
-            || targetItem.name.lowercased().contains("wooden")
-        {
-            // Knocking on wooden objects
-            message = context.message(.knockOnWoodenObject(item: targetItem.name))
         } else if targetItem.hasFlag(.isContainer) {
             // Knocking on containers
             message = context.message(.knockOnContainer(container: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Knocking on small objects
-            message = context.message(.knockOnSmallObject(item: targetItem.name))
         } else {
-            // Knocking on other objects
+            // Generic knocking response for objects
             message = context.message(.knockOnGenericObject(item: targetItem.name))
         }
 

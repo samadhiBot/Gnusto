@@ -65,19 +65,8 @@ public struct RubActionHandler: ActionHandler {
         if targetItem.hasFlag(.isCharacter) {
             // Rubbing characters might not be appropriate
             message = context.message(.rubCharacter(character: targetItem.name))
-        } else if targetItem.name.lowercased().contains("clean") {
-            // Already clean items
-            message = context.message(.rubCleanObject(item: targetItem.name))
-        } else if targetItem.name.lowercased().contains("lamp")
-            || targetItem.name.lowercased().contains("lantern")
-        {
-            // Special case for lamps - magical associations
-            message = context.message(.rubLamp(lamp: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Rubbing small objects
-            message = context.message(.rubSmallObject(item: targetItem.name))
         } else {
-            // Rubbing fixed/large objects
+            // Generic rubbing response for objects
             message = context.message(.rubGenericObject(item: targetItem.name))
         }
 

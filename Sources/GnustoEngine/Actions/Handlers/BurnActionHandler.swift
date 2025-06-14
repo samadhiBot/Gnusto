@@ -79,21 +79,16 @@ public struct BurnActionHandler: ActionHandler {
             let destroyChange = await context.engine.move(targetItem, to: .nowhere)
             stateChanges.append(destroyChange)
 
-            let message = context.message(.burnToCatchFire(item: targetItem.name))
+            let message = context.message(
+                .burnToCatchFire(item: targetItem.withDefiniteArticle.capitalizedFirst)
+            )
             return ActionResult(
                 message: message,
                 stateChanges: stateChanges
             )
         } else {
             // Most items cannot be burned
-            let message =
-                if targetItem.name.lowercased().contains("house")
-                    || targetItem.name.lowercased().contains("building")
-                {
-                    context.message(.burnJokingResponse)
-                } else {
-                    context.message(.burnCannotBurn(item: targetItem.name))
-                }
+            let message = context.message(.burnCannotBurn(item: targetItem.name))
 
             return ActionResult(
                 message: message,

@@ -68,23 +68,8 @@ public struct JumpActionHandler: ActionHandler {
         if targetItem.hasFlag(.isCharacter) {
             // Can't jump characters
             message = context.message(.jumpCharacter(character: targetItem.name))
-        } else if targetItem.name.lowercased().contains("gap")
-            || targetItem.name.lowercased().contains("chasm")
-            || targetItem.name.lowercased().contains("pit")
-        {
-            // Dangerous to jump across gaps
-            message = context.message(.jumpDangerous)
-        } else if targetItem.name.lowercased().contains("water")
-            || targetItem.name.lowercased().contains("stream")
-            || targetItem.name.lowercased().contains("river")
-        {
-            // Jumping water
-            message = context.message(.jumpWater(water: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Small objects you can jump over
-            message = context.message(.jumpSmallObject(item: targetItem.name))
         } else {
-            // Large immovable objects
+            // Generic jumping response for objects
             message = context.message(.jumpLargeObject(item: targetItem.name))
         }
 

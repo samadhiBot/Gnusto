@@ -206,12 +206,7 @@ public struct TurnOnActionHandler: ActionHandler {
             )
         } else {
             // Fallback message for non-flammable items (shouldn't reach here due to validation)
-            let message = if targetItem.name.lowercased().contains("house") ||
-                             targetItem.name.lowercased().contains("building") {
-                "You must be joking."
-            } else {
-                "You can't burn the \(targetItem.name)."
-            }
+            let message = "You can't burn the \(targetItem.name)."
 
             return ActionResult(
                 message: message,

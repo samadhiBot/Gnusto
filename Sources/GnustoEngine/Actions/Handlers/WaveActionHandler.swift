@@ -65,21 +65,8 @@ public struct WaveActionHandler: ActionHandler {
         if targetItem.hasFlag(.isCharacter) {
             // Waving at characters
             message = context.message(.waveCharacter(character: targetItem.name))
-        } else if targetItem.name.lowercased().contains("wand")
-            || targetItem.name.lowercased().contains("staff")
-        {
-            // Waving magical items
-            message = context.message(.waveMagicalItem(item: targetItem.name))
-        } else if targetItem.name.lowercased().contains("sword")
-            || targetItem.name.lowercased().contains("blade")
-        {
-            // Waving weapons - brandishing
-            message = context.message(.waveWeapon(weapon: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Waving small objects
-            message = context.message(.waveSmallObject(item: targetItem.name))
         } else {
-            // Can't wave fixed objects
+            // Generic waving response for objects
             message = context.message(.waveFixedObject(item: targetItem.name))
         }
 

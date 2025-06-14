@@ -5,7 +5,7 @@ extension Item {
     ///
     /// This is only useful in optional item scenarios, e.g. `item?.withDefiniteArticle ?? "it"`.
     var withDefiniteArticle: String {
-        "the \(name)"
+        hasFlag(.omitArticle) ? name : "the \(name)"
     }
 
     /// The item's name prepended with the appropriate indefinite article ("a" or "an").

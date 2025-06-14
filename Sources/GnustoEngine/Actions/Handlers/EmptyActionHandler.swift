@@ -75,7 +75,12 @@ public struct EmptyActionHandler: ActionHandler {
 
         let message: String
         if contents.isEmpty {
-            message = context.message(.containerAlreadyEmpty(container: targetItem.name))
+            message = context
+                .message(
+                    .containerAlreadyEmpty(
+                        container: targetItem.withDefiniteArticle.capitalizedFirst
+                    )
+                )
         } else {
             // Get current location to move items to
             let currentLocationID = await context.engine.playerLocationID

@@ -72,16 +72,8 @@ public struct ShakeActionHandler: ActionHandler {
             } else {
                 message = context.message(.shakeClosedContainer(container: targetItem.name))
             }
-        } else if targetItem.name.lowercased().contains("bottle")
-            || targetItem.name.lowercased().contains("vial")
-        {
-            // Shaking liquid containers
-            message = context.message(.shakeLiquidContainer(container: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Shaking small objects
-            message = context.message(.shakeSmallObject(item: targetItem.name))
         } else {
-            // Can't shake fixed objects
+            // Generic shaking response for objects
             message = context.message(.shakeFixedObject(item: targetItem.name))
         }
 

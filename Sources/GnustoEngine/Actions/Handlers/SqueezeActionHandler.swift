@@ -65,25 +65,9 @@ public struct SqueezeActionHandler: ActionHandler {
         if targetItem.hasFlag(.isCharacter) {
             // Squeezing characters - not advisable
             message = context.message(.squeezeCharacter(character: targetItem.name))
-        } else if targetItem.name.lowercased().contains("sponge") {
-            // Squeezing sponges - might get water
-            message = context.message(.squeezeSponge(sponge: targetItem.name))
-        } else if targetItem.name.lowercased().contains("tube")
-            || targetItem.name.lowercased().contains("bottle")
-        {
-            // Squeezing containers
-            message = context.message(.squeezeContainer(container: targetItem.name))
-        } else if targetItem.name.lowercased().contains("soft")
-            || targetItem.name.lowercased().contains("pillow")
-        {
-            // Squeezing soft objects
-            message = context.message(.squeezeSoftObject(item: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Squeezing regular small objects
-            message = context.message(.squeezeHardObject(item: targetItem.name))
         } else {
-            // Can't squeeze large/fixed objects
-            message = context.message(.squeezeLargeObject(item: targetItem.name))
+            // Generic squeezing response for objects
+            message = context.message(.squeezeHardObject(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

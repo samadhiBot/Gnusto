@@ -61,14 +61,14 @@ public struct GoActionHandler: ActionHandler {
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
             throw ActionResponse.directionIsBlocked(
-                context.message(.doorIsLocked(door: door.name))
+                context.message(.doorIsLocked(door: door.withDefiniteArticle.capitalizedFirst))
             )
         }
 
         // Check if the door is open
-        if !door.hasFlag(.isOpen) {
+        guard door.hasFlag(.isOpen) else {
             throw ActionResponse.directionIsBlocked(
-                context.message(.doorIsClosed(direction: direction.rawValue))
+                context.message(.doorIsClosed(door: door.withDefiniteArticle.capitalizedFirst))
             )
         }
     }

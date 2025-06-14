@@ -30,7 +30,6 @@ public enum MessageKey: Hashable, Sendable {
     case blowOnLightSource(item: String)
     case breatheResponses
     case burnCannotBurn(item: String)
-    case burnJokingResponse
     case burnToCatchFire(item: String)
     case burnWhat
     case canOnlyActOnCharacters(verb: String)
@@ -91,7 +90,7 @@ public enum MessageKey: Hashable, Sendable {
     case digWithToolNothing(tool: String)
     case diggingBareHandsIneffective
     case directionIsBlocked(reason: String?)
-    case doorIsClosed(direction: String)
+    case doorIsClosed(door: String)
     case doorIsLocked(door: String)
     case drinkFromContainer(liquid: String, container: String)
     case drinkSuccess(item: String)
@@ -150,31 +149,20 @@ public enum MessageKey: Hashable, Sendable {
     case itemTooLargeForContainer(item: String, container: String)
     case itsRightHere
     case jumpCharacter(character: String)
-    case jumpDangerous
     case jumpLargeObject(item: String)
     case jumpResponses
-    case jumpSmallObject(item: String)
-    case jumpWater(water: String)
     case kickCharacter(character: String)
     case kickLargeObject(item: String)
-    case kickSmallObject(item: String)
     case kickWhat
     case kissCharacter(character: String)
-    case kissFrog(frog: String)
     case kissLargeObject(item: String)
-    case kissMirror(mirror: String)
-    case kissSmallObject(item: String)
-    case kissStatue(statue: String)
     case kissWhat
     case knockOnClosedDoor(door: String)
     case knockOnContainer(container: String)
     case knockOnGenericObject(item: String)
     case knockOnLockedDoor(door: String)
     case knockOnOpenDoor(door: String)
-    case knockOnSmallObject(item: String)
-    case knockOnWall(wall: String)
     case knockOnWhat
-    case knockOnWoodenObject(item: String)
     case listenWhat
     case lockSuccess(item: String)
     case lockWhat
@@ -213,28 +201,19 @@ public enum MessageKey: Hashable, Sendable {
     case restoreFailed(error: String)
     case roomIsDark
     case rubCharacter(character: String)
-    case rubCleanObject(item: String)
     case rubGenericObject(item: String)
-    case rubLamp(lamp: String)
-    case rubSmallObject(item: String)
     case rubWhat
     case saveFailed(error: String)
     case shakeCharacter(character: String)
     case shakeClosedContainer(container: String)
     case shakeFixedObject(item: String)
-    case shakeLiquidContainer(container: String)
     case shakeOpenContainer(container: String)
-    case shakeSmallObject(item: String)
     case shakeWhat
     case smellNothingUnusual
     case smellWhat
     case smellsAverage
     case squeezeCharacter(character: String)
-    case squeezeContainer(container: String)
     case squeezeHardObject(item: String)
-    case squeezeLargeObject(item: String)
-    case squeezeSoftObject(item: String)
-    case squeezeSponge(sponge: String)
     case squeezeWhat
     case stateValidationFailed
     case suggestUsingToolToDig
@@ -256,21 +235,13 @@ public enum MessageKey: Hashable, Sendable {
     case toolMissing(tool: String)
     case toolNotSuitableForDigging(tool: String)
     case turnCharacter(character: String)
-    case turnDial(item: String)
     case turnFixedObject(item: String)
-    case turnHandle(item: String)
-    case turnKey(item: String)
-    case turnSmallObject(item: String)
     case turnWhat
-    case turnWheel(item: String)
     case unknownEntity
     case unknownNoun(noun: String)
     case unknownVerb(verb: String)
     case waveCharacter(character: String)
     case waveFixedObject(item: String)
-    case waveMagicalItem(item: String)
-    case waveSmallObject(item: String)
-    case waveWeapon(weapon: String)
     case waveWhat
     case wearWhat
     case whatQuestion(verb: String)

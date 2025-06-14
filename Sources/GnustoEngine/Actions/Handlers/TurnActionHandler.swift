@@ -62,30 +62,11 @@ public struct TurnActionHandler: ActionHandler {
         // Determine appropriate response based on object type
         let message: String
 
-        if targetItem.name.lowercased().contains("dial")
-            || targetItem.name.lowercased().contains("knob")
-        {
-            // Turning dials and knobs - might have mechanical effects
-            message = context.message(.turnDial(item: targetItem.name))
-        } else if targetItem.name.lowercased().contains("wheel") {
-            // Turning wheels
-            message = context.message(.turnWheel(item: targetItem.name))
-        } else if targetItem.name.lowercased().contains("handle")
-            || targetItem.name.lowercased().contains("crank")
-        {
-            // Turning handles and cranks
-            message = context.message(.turnHandle(item: targetItem.name))
-        } else if targetItem.name.lowercased().contains("key") {
-            // Turning keys - should probably use with something
-            message = context.message(.turnKey(item: targetItem.name))
-        } else if targetItem.hasFlag(.isCharacter) {
+        if targetItem.hasFlag(.isCharacter) {
             // Can't turn characters
             message = context.message(.turnCharacter(character: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Turning small objects
-            message = context.message(.turnSmallObject(item: targetItem.name))
         } else {
-            // Can't turn large/fixed objects
+            // Generic turning response for objects
             message = context.message(.turnFixedObject(item: targetItem.name))
         }
 

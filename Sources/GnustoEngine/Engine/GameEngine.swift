@@ -495,7 +495,7 @@ extension GameEngine {
         alternate: String = "that"
     ) -> String {
         if let item = try? item(itemID) {
-            "the \(item.name)"
+            item.withDefiniteArticle
         } else {
             alternate
         }

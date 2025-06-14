@@ -104,24 +104,9 @@ public struct TieActionHandler: ActionHandler {
             return "You can't tie the \(targetItem.name) to itself."
         }
 
-        // Special cases for rope-like objects
-        if targetItem.name.lowercased().contains("rope") || targetItem.name.lowercased().contains("cord") {
-            if indirectItem.name.lowercased().contains("hook") || indirectItem.name.lowercased().contains("post") {
-                return "You tie the \(targetItem.name) securely to the \(indirectItem.name)."
-            } else if indirectItem.hasFlag(.isCharacter) {
-                return "The \(indirectItem.name) doesn't seem willing to be tied up."
-            } else {
-                return "You tie the \(targetItem.name) to the \(indirectItem.name), though it doesn't seem particularly useful."
-            }
-        }
-
         // General tying attempts
         if targetItem.hasFlag(.isCharacter) || indirectItem.hasFlag(.isCharacter) {
             return "You can't tie living beings together like that."
-        }
-
-        if !targetItem.hasFlag(.isTakable) && !indirectItem.hasFlag(.isTakable) {
-            return "You can't tie those large objects together."
         }
 
         return "You don't have anything suitable to tie the \(targetItem.name) to the \(indirectItem.name) with."
@@ -129,11 +114,7 @@ public struct TieActionHandler: ActionHandler {
 
     /// Handles tying a single object.
     private func handleTyingAlone(targetItem: Item) -> String {
-        if targetItem.name.lowercased().contains("rope") || targetItem.name.lowercased().contains("cord") {
-            return "You tie a knot in the \(targetItem.name)."
-        } else if targetItem.name.lowercased().contains("laces") || targetItem.name.lowercased().contains("shoes") {
-            return "You tie the \(targetItem.name) properly."
-        } else if targetItem.hasFlag(.isCharacter) {
+        if targetItem.hasFlag(.isCharacter) {
             return "You can't tie up the \(targetItem.name) without something to tie them with."
         } else {
             return "You can't tie the \(targetItem.name) without something to tie it with."

@@ -63,27 +63,10 @@ public struct KissActionHandler: ActionHandler {
         let message: String
 
         if targetItem.hasFlag(.isCharacter) {
-            // Kissing characters - context matters
-            if targetItem.name.lowercased().contains("frog") {
-                // Fairy tale reference
-                message = context.message(.kissFrog(frog: targetItem.name))
-            } else {
-                // Other characters
-                message = context.message(.kissCharacter(character: targetItem.name))
-            }
-        } else if targetItem.name.lowercased().contains("mirror") {
-            // Kissing mirrors
-            message = context.message(.kissMirror(mirror: targetItem.name))
-        } else if targetItem.name.lowercased().contains("statue")
-            || targetItem.name.lowercased().contains("sculpture")
-        {
-            // Kissing art
-            message = context.message(.kissStatue(statue: targetItem.name))
-        } else if targetItem.hasFlag(.isTakable) {
-            // Kissing small objects
-            message = context.message(.kissSmallObject(item: targetItem.name))
+            // Kissing characters
+            message = context.message(.kissCharacter(character: targetItem.name))
         } else {
-            // Kissing large/fixed objects
+            // Kissing objects - generic response
             message = context.message(.kissLargeObject(item: targetItem.name))
         }
 

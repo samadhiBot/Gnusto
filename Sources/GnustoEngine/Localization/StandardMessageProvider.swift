@@ -27,7 +27,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You already have \(item)."
 
         case .alreadyLocked(let item):
-            "The \(item) is already locked."
+            "\(item) is already locked."
 
         case .ambiguity(let text):
             text
@@ -83,11 +83,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .burnCannotBurn(let item):
             "You can't burn the \(item)."
 
-        case .burnJokingResponse:
-            "You must be joking."
-
         case .burnToCatchFire(let item):
-            "The \(item) catches fire and burns to ashes."
+            "\(item) catches fire and burns to ashes."
 
         case .burnWhat:
             "Burn what?"
@@ -217,7 +214,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You close \(item)."
 
         case .containerAlreadyEmpty(let container):
-            "The \(container) is already empty."
+            "\(container) is already empty."
 
         case .containerIsClosed(let item):
             "\(item.capitalizedFirst) is closed."
@@ -270,7 +267,7 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             "You have no suitable cutting tool."
 
         case .cutToolNotSharp(let tool):
-            "The \(tool) isn't sharp enough to cut anything."
+            "\(tool) isn't sharp enough to cut anything."
 
         case .cutWhat:
             "Cut what?"
@@ -317,11 +314,11 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .directionIsBlocked(let reason):
             reason ?? "Something is blocking the way."
 
-        case .doorIsClosed(let direction):
-            "The \(direction) door is closed."
+        case .doorIsClosed(let door):
+            "\(door) door is closed."
 
         case .doorIsLocked(let door):
-            "The \(door) is locked."
+            "\(door) is locked."
 
         case .drinkFromContainer(let liquid, let container):
             "You drink the \(liquid) from the \(container). Refreshing!"
@@ -491,9 +488,6 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .jumpCharacter(let character):
             "You can't jump the \(character)."
 
-        case .jumpDangerous:
-            "That would be extremely dangerous."
-
         case .jumpLargeObject(let item):
             "You can't jump the \(item)."
 
@@ -505,20 +499,11 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
             You bounce up and down.
             """
 
-        case .jumpSmallObject(let item):
-            "You jump over the \(item) easily."
-
-        case .jumpWater(let water):
-            "You can't jump across the \(water)."
-
         case .kickCharacter(let character):
             "I don't think the \(character) would appreciate that."
 
         case .kickLargeObject(let item):
             "Ouch! You hurt your foot kicking the \(item)."
-
-        case .kickSmallObject(let item):
-            "Kicking the \(item) doesn't accomplish much."
 
         case .kickWhat:
             "Kick what?"
@@ -526,20 +511,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .kissCharacter(let character):
             "The \(character) doesn't seem particularly receptive to your affections."
 
-        case .kissFrog(let frog):
-            "You kiss the \(frog), but it remains a frog. Apparently it's not that kind of story."
-
         case .kissLargeObject(let item):
             "You can't kiss the \(item) - it's too large and impersonal."
-
-        case .kissMirror(let mirror):
-            "You kiss your reflection in the \(mirror). How narcissistic!"
-
-        case .kissSmallObject(let item):
-            "You kiss the \(item). It tastes about as good as you'd expect."
-
-        case .kissStatue(let statue):
-            "You kiss the \(statue). The cold stone is not very responsive."
 
         case .kissWhat:
             "Kiss what?"
@@ -559,17 +532,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .knockOnOpenDoor(let door):
             "The \(door) is already open. There's no need to knock."
 
-        case .knockOnSmallObject(let item):
-            "You knock on the \(item), but it's too small to produce much of a sound."
-
-        case .knockOnWall(let wall):
-            "You knock on the \(wall). It sounds solid."
-
         case .knockOnWhat:
             "Knock on what?"
-
-        case .knockOnWoodenObject(let item):
-            "You knock on the \(item). It makes a hollow wooden sound."
 
         case .listenWhat:
             "Listen to what?"
@@ -685,17 +649,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .rubCharacter(let character):
             "I don't think the \(character) would appreciate being rubbed."
 
-        case .rubCleanObject(let item):
-            "The \(item) is already clean."
-
         case .rubGenericObject(let item):
             "You rub the \(item), but nothing interesting happens."
-
-        case .rubLamp(let lamp):
-            "Rubbing the \(lamp) doesn't seem to do anything. No djinn appears."
-
-        case .rubSmallObject(let item):
-            "You rub the \(item). It feels smooth to the touch."
 
         case .rubWhat:
             "Rub what?"
@@ -712,14 +667,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .shakeFixedObject(let item):
             "You can't shake the \(item) - it's firmly in place."
 
-        case .shakeLiquidContainer(let container):
-            "You shake the \(container) and hear liquid sloshing inside."
-
         case .shakeOpenContainer(let container):
             "You shake the \(container), but nothing falls out."
-
-        case .shakeSmallObject(let item):
-            "You shake the \(item) vigorously, but nothing happens."
 
         case .shakeWhat:
             "Shake what?"
@@ -736,20 +685,8 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .squeezeCharacter(let character):
             "I don't think the \(character) would appreciate being squeezed."
 
-        case .squeezeContainer(let container):
-            "You squeeze the \(container) and some of its contents ooze out."
-
         case .squeezeHardObject(let item):
             "You squeeze the \(item) as hard as you can, but it doesn't give."
-
-        case .squeezeLargeObject(let item):
-            "You can't get your arms around the \(item) to squeeze it."
-
-        case .squeezeSoftObject(let item):
-            "You squeeze the \(item). It feels soft and yielding."
-
-        case .squeezeSponge(let sponge):
-            "You squeeze the \(sponge) and water drips out."
 
         case .squeezeWhat:
             "Squeeze what?"
@@ -814,26 +751,11 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .turnCharacter(let character):
             "You can't turn the \(character) around like an object."
 
-        case .turnDial(let item):
-            "You turn the \(item). It clicks into a new position."
-
         case .turnFixedObject(let item):
             "The \(item) doesn't seem to be designed to be turned."
 
-        case .turnHandle(let item):
-            "You turn the \(item). It moves with a grinding sound."
-
-        case .turnKey(let item):
-            "You can't just turn the \(item) by itself. You need to use it with something."
-
-        case .turnSmallObject(let item):
-            "You turn the \(item) around in your hands, but nothing happens."
-
         case .turnWhat:
             "Turn what?"
-
-        case .turnWheel(let item):
-            "You turn the \(item). It rotates with some effort."
 
         case .unknownEntity:
             "You can't see any such thing."
@@ -849,15 +771,6 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
 
         case .waveFixedObject(let item):
             "You can't wave the \(item) around - it's not something you can pick up and wave."
-
-        case .waveMagicalItem(let item):
-            "You wave the \(item) dramatically, but nothing magical happens."
-
-        case .waveSmallObject(let item):
-            "You wave the \(item) around. It's not particularly impressive."
-
-        case .waveWeapon(let weapon):
-            "You brandish the \(weapon) menacingly."
 
         case .waveWhat:
             "Wave what?"

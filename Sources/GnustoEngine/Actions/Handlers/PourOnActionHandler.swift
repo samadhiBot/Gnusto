@@ -99,35 +99,8 @@ public struct PourOnActionHandler: ActionHandler {
         }
 
         // Check if the source is actually pourable
-        if !sourceItem.hasFlag(.isDrinkable) && !sourceItem.name.lowercased().contains("water") &&
-           !sourceItem.name.lowercased().contains("liquid") && !sourceItem.name.lowercased().contains("oil") {
+        if !sourceItem.hasFlag(.isDrinkable) {
             return "You can't pour the \(sourceItem.name) - it's not a liquid."
-        }
-
-        // Special cases for pouring water
-        if sourceItem.name.lowercased().contains("water") {
-            if targetItem.hasFlag(.isFlammable) && targetItem.hasFlag(.isLit) {
-                // Extinguishing fire
-                return "You pour the water on the \(targetItem.name). The flames are extinguished with a hissing sound."
-            } else if targetItem.hasFlag(.isCharacter) {
-                // Pouring water on characters
-                return "You pour the water on the \(targetItem.name). They are not amused."
-            } else if targetItem.name.lowercased().contains("plant") || targetItem.name.lowercased().contains("flower") {
-                // Watering plants
-                return "You pour the water on the \(targetItem.name). It looks refreshed."
-            } else {
-                // General water pouring
-                return "You pour the water on the \(targetItem.name). It gets wet but nothing else happens."
-            }
-        }
-
-        // Special cases for pouring oil
-        if sourceItem.name.lowercased().contains("oil") {
-            if targetItem.hasFlag(.isCharacter) {
-                return "You pour the oil on the \(targetItem.name). They slip and slide around angrily."
-            } else {
-                return "You pour the oil on the \(targetItem.name). It becomes slippery and shiny."
-            }
         }
 
         // Special cases for characters as targets
