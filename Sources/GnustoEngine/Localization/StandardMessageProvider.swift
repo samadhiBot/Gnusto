@@ -514,8 +514,20 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .cannotDeflate(let item):
             "You can't deflate the \(item)."
 
+        case .itemNotInflated(let item):
+            "The \(item) is not inflated."
+
+        case .deflateSuccess(let item):
+            "You deflate the \(item)."
+
         case .cannotInflate(let item):
             "You can't inflate the \(item)."
+
+        case .itemAlreadyInflated(let item):
+            "The \(item) is already inflated."
+
+        case .inflateSuccess(let item):
+            "You inflate the \(item)."
 
         case .cannotEnter(let item):
             "You can't enter the \(item)."

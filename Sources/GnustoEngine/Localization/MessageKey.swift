@@ -424,8 +424,20 @@ public enum MessageKey: Hashable, Sendable {  // IMPORTANT: Keep cases alphabeti
     /// Cannot deflate this item
     case cannotDeflate(item: String)
 
+    /// Item is not currently inflated
+    case itemNotInflated(item: String)
+
+    /// Successfully deflated item
+    case deflateSuccess(item: String)
+
     /// Cannot inflate this item
     case cannotInflate(item: String)
+
+    /// Item is already inflated
+    case itemAlreadyInflated(item: String)
+
+    /// Successfully inflated item
+    case inflateSuccess(item: String)
 
     /// Cannot enter this item
     case cannotEnter(item: String)

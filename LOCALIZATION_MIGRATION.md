@@ -40,6 +40,7 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ ClimbOnActionHandler - Uses `.climbOnWhat`, `.climbOnFailure(item:)`
 - ✅ CutActionHandler - Uses `.cutWhat`, `.cutWithTool(item:tool:)`, etc.
 - ✅ JumpActionHandler - Uses `.jumpResponses` for general jumping, context-specific messages for objects
+- ✅ RemoveActionHandler - Uses `.removeWhat`, `.youArentWearingAnything`, `.youRemoveMultipleItems(items:)`
 
 **Utility Commands:**
 - ✅ DebugActionHandler - Uses `.debugRequiresObject`

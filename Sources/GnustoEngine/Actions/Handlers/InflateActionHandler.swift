@@ -75,14 +75,14 @@ public struct InflateActionHandler: ActionHandler {
 
         let message: String
         if isAlreadyInflated {
-            message = "The \(targetItem.name) is already inflated."
+            message = context.message(.itemAlreadyInflated(item: targetItem.name))
         } else {
             // Inflate the item
             if let inflateChange = await context.engine.setFlag(.isInflated, on: targetItem) {
                 stateChanges.append(inflateChange)
             }
 
-            message = "You inflate the \(targetItem.name)."
+            message = context.message(.inflateSuccess(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)

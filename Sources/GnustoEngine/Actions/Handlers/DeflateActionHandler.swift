@@ -75,14 +75,14 @@ public struct DeflateActionHandler: ActionHandler {
 
         let message: String
         if !isCurrentlyInflated {
-            message = "The \(targetItem.name) is not inflated."
+            message = context.message(.itemNotInflated(item: targetItem.name))
         } else {
             // Deflate the item
             if let deflateChange = await context.engine.clearFlag(.isInflated, on: targetItem) {
                 stateChanges.append(deflateChange)
             }
 
-            message = "You deflate the \(targetItem.name)."
+            message = context.message(.deflateSuccess(item: targetItem.name))
         }
 
         return ActionResult(message: message, stateChanges: stateChanges)
