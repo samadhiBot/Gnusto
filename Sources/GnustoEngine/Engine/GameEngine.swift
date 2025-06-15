@@ -56,7 +56,7 @@ public actor GameEngine: Sendable {
 
     /// The message provider for localized and customizable game text.
     /// Derived from the `GameBlueprint` used to initialize the engine.
-    public let messageProvider: MessageProvider
+    public nonisolated let messageProvider: MessageProvider
 
     /// A random number generator used throughout the game for various randomization needs.
     ///

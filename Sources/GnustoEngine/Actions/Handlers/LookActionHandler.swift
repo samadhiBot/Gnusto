@@ -30,7 +30,7 @@ public struct LookActionHandler: ActionHandler {
         // If a direct object is present, it must be an item for LOOK/EXAMINE.
         guard case .item(let targetItemID) = directObjectRef else {
             // For now, only items are supported when a direct object is specified.
-            let message = context.message(.canOnlyLookAtItems)
+            let message = context.message.canOnlyLookAtItems()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -77,7 +77,7 @@ public struct LookActionHandler: ActionHandler {
             // LOOK (no direct object) - describe the room
             // Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                return ActionResult(context.message(.roomIsDark))
+                return ActionResult(context.message.roomIsDark)
             }
 
             await context.engine.ioHandler.print(

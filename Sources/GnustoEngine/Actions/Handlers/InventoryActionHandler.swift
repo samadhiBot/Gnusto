@@ -26,13 +26,13 @@ public struct InventoryActionHandler: ActionHandler {
         // Construct the message
         var message: String {
             if inventoryItems.isEmpty {
-                return context.message(.youAreEmptyHanded)
+                return context.message.youAreEmptyHanded()
             } else {
                 let itemList = inventoryItems.sorted().map {
                     "- \($0.withIndefiniteArticle.capitalizedFirst)"
                 }.joined(separator: "\n")
                 return """
-                    \(context.message(.youAreCarrying))
+                    \(context.message.youAreCarrying)
                     \(itemList.indent())
                     """
             }

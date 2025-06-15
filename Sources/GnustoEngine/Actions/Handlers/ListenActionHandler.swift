@@ -24,7 +24,7 @@ public struct ListenActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` with a default message.
     public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
-            context.message(.youHearNothingUnusual)
+            context.message.youHearNothingUnusual()
         )
     }
 }

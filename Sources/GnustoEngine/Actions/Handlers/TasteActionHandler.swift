@@ -21,10 +21,14 @@ public struct TasteActionHandler: ActionHandler {
     ///           `ActionResponse.prerequisiteNotMet` if the direct object is not an item.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom(context.message(.tasteWhat))
+            throw ActionResponse.custom(
+                context.message.tasteWhat()
+            )
         }
         guard case .item(_) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyTasteItems))
+            throw ActionResponse.prerequisiteNotMet(
+                context.message.youCanOnlyTasteItems()
+            )
         }
         // Basic TASTE doesn't need further validation like reachability by default.
     }
@@ -41,7 +45,7 @@ public struct TasteActionHandler: ActionHandler {
         // Validate ensures directObject is an item if present.
         // Generic response. Tasting specific items (like food) would need custom logic.
         return ActionResult(
-            context.message(.tastesAverage)
+            context.message.tastesAverage()
         )
     }
 }

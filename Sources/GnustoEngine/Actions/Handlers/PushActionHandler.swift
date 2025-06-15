@@ -19,17 +19,17 @@ public struct PushActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            let message = context.message(.pushWhat)
+            let message = context.message.pushWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.pushWhat)
+            let message = context.message.pushWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "push"))
+            let message = context.message.canOnlyActOnItems(verb: "push")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -55,7 +55,7 @@ public struct PushActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to push)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message(.pushWhat)
+                let message = context.message.pushWhat()
                 return ActionResult(message)
             }
         }
@@ -70,7 +70,7 @@ public struct PushActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    let message = context.message(.canOnlyActOnItems(verb: "push"))
+                    let message = context.message.canOnlyActOnItems(verb: "push")
                     return ActionResult(message)
                 }
             }
@@ -127,9 +127,9 @@ public struct PushActionHandler: ActionHandler {
         let message =
             if pushedItems.isEmpty {
                 context.command.isAllCommand
-                    ? context.message(.nothingHereToPush) : context.message(.pushWhat)
+                    ? context.message.nothingHereToPush) : context.message.pushWhat()
             } else {
-                context.message(.pushSuccess(items: pushedItems.listWithDefiniteArticles))
+                context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }
 
         return ActionResult(

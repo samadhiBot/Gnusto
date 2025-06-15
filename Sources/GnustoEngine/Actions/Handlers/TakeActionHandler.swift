@@ -34,19 +34,19 @@ public struct TakeActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "take"))
+                context.message.whatQuestion(verb: "take")
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "take"))
+                context.message.whatQuestion(verb: "take")
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "take"))
+                context.message.youCanOnlyActOnItems(verb: "take")
             )
         }
 
@@ -57,7 +57,7 @@ public struct TakeActionHandler: ActionHandler {
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.youCanOnlyActOnItems(verb: "take"))
+                    context.message.youCanOnlyActOnItems(verb: "take")
                 )
             }
 
@@ -146,7 +146,7 @@ public struct TakeActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 throw ActionResponse.internalEngineError(
-                    context.message(.internalEngineError)
+                    context.message.internalEngineError()
                 )
             }
         }
@@ -163,7 +163,7 @@ public struct TakeActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
-                        context.message(.internalEngineError)
+                        context.message.internalEngineError()
                     )
                 }
             }
@@ -177,7 +177,7 @@ public struct TakeActionHandler: ActionHandler {
                         continue  // Skip items already held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message(.youAlreadyHaveThat)
+                            context.message.youAlreadyHaveThat()
                         )
                     }
                 }
@@ -198,7 +198,7 @@ public struct TakeActionHandler: ActionHandler {
                     guard await context.engine.playerCanCarry(targetItem) else {
                         if takenItems.isEmpty {
                             messages.append(
-                                context.message(.playerCannotCarryMore)
+                                context.message.playerCannotCarryMore()
                             )
                         }
                         break  // Stop processing if capacity is exceeded
@@ -250,13 +250,14 @@ public struct TakeActionHandler: ActionHandler {
         let message =
             if context.command.isAllCommand {
                 if takenItems.isEmpty {
-                    context.message(.thereIsNothingHereToTake)
+                    context.message.thereIsNothingHereToTake()
                 } else {
-                    context.message(
-                        .youTakeMultipleItems(items: takenItems.listWithDefiniteArticles))
+                    context.message.youTakeMultipleItems(
+                        items: takenItems.listWithDefiniteArticles
+                    )
                 }
             } else {
-                context.message(.taken)
+                context.message.taken()
             }
 
         return ActionResult(

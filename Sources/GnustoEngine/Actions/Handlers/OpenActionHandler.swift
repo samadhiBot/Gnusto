@@ -26,19 +26,19 @@ public struct OpenActionHandler: ActionHandler {
         // Check for multiple objects (not supported by OPEN)
         if context.command.directObjects.count > 1 {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.multipleObjectsNotSupported(verb: "open"))
+                context.message.multipleObjectsNotSupported(verb: "open")
             )
         }
 
         // 2. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "open"))
+                context.message.whatQuestion(verb: "open")
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "open"))
+                context.message.youCanOnlyActOnItems(verb: "open")
             )
         }
 
@@ -87,7 +87,7 @@ public struct OpenActionHandler: ActionHandler {
         else {
             // Should not be reached if validate is correct.
             throw ActionResponse.internalEngineError(
-                context.message(.internalEngineError)
+                context.message.internalEngineError()
             )
         }
 
@@ -105,17 +105,17 @@ public struct OpenActionHandler: ActionHandler {
             if !itemsInside.isEmpty {
                 // Announce what's revealed: "Opening the small mailbox reveals a leaflet."
                 let itemList = itemsInside.sorted().listWithIndefiniteArticles
-                message = context.message(
-                    .openingRevealsContents(
-                        container: targetItem.withDefiniteArticle, contents: itemList)
+                message = context.message.openingRevealsContents(
+                    container: targetItem.withDefiniteArticle,
+                    contents: itemList
                 )
             } else {
                 // Container is empty, use simple message
-                message = context.message(.opened(item: targetItem.withDefiniteArticle))
+                message = context.message.opened(item: targetItem.withDefiniteArticle)
             }
         } else {
             // Not a container, use simple message
-            message = context.message(.opened(item: targetItem.withDefiniteArticle))
+            message = context.message.opened(item: targetItem.withDefiniteArticle)
         }
 
         // Prepare the result

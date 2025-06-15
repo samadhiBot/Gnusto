@@ -16,11 +16,11 @@ public struct KnockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Knock requires a direct object (what to knock on)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.knockOnWhat)
+            let message = context.message.knockOnWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "knock on"))
+            let message = context.message.cannotActOnThat(verb: "knock on")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -53,18 +53,18 @@ public struct KnockActionHandler: ActionHandler {
             if targetItem.hasFlag(.isDoor) {
                 // Knocking on doors
                 if targetItem.hasFlag(.isOpen) {
-                    context.message(.knockOnOpenDoor(door: targetItem.name))
+                    context.message.knockOnOpenDoor(door: targetItem.name)
                 } else if targetItem.hasFlag(.isLocked) {
-                    context.message(.knockOnLockedDoor(door: targetItem.name))
+                    context.message.knockOnLockedDoor(door: targetItem.name)
                 } else {
-                    context.message(.knockOnClosedDoor(door: targetItem.name))
+                    context.message.knockOnClosedDoor(door: targetItem.name)
                 }
             } else if targetItem.hasFlag(.isContainer) {
                 // Knocking on containers
-                context.message(.knockOnContainer(container: targetItem.withDefiniteArticle))
+                context.message.knockOnContainer(container: targetItem.withDefiniteArticle)
             } else {
                 // Generic knocking response for objects
-                context.message(.knockOnGenericObject(item: targetItem.withDefiniteArticle))
+                context.message.knockOnGenericObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

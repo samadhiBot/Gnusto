@@ -17,7 +17,7 @@ public struct DigActionHandler: ActionHandler {
         // If a direct object is specified, validate it
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                let message = context.message(.cannotActOnThat(verb: "dig"))
+                let message = context.message.cannotActOnThat(verb: "dig")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -30,7 +30,7 @@ public struct DigActionHandler: ActionHandler {
         // If digging tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                let message = context.message(.cannotActWithThat(verb: "dig"))
+                let message = context.message.cannotActWithThat(verb: "dig")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -57,7 +57,7 @@ public struct DigActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         {
             let targetItem = try await context.engine.item(targetItemID)
-            let message = context.message(.cannotDig(item: targetItem.withDefiniteArticle))
+            let message = context.message.cannotDig(item: targetItem.withDefiniteArticle)
 
             return ActionResult(
                 message: message,
@@ -87,9 +87,9 @@ public struct DigActionHandler: ActionHandler {
                 let diggingTools = playerInventory.filter { $0.hasFlag(.isTool) }
 
                 if !diggingTools.isEmpty {
-                    message = context.message(.suggestUsingToolToDig)
+                    message = context.message.suggestUsingToolToDig()
                 } else {
-                    message = context.message(.diggingBareHandsIneffective)
+                    message = context.message.diggingBareHandsIneffective()
                 }
             }
 

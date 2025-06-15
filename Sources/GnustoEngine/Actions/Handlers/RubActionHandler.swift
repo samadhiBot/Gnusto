@@ -16,11 +16,11 @@ public struct RubActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Rub requires a direct object (what to rub)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.rubWhat)
+            let message = context.message.rubWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "rub"))
+            let message = context.message.cannotActOnThat(verb: "rub")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -52,10 +52,10 @@ public struct RubActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Rubbing characters might not be appropriate
-                context.message(.rubCharacter(character: targetItem.withDefiniteArticle))
+                context.message.rubCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic rubbing response for objects
-                context.message(.rubGenericObject(item: targetItem.withDefiniteArticle))
+                context.message.rubGenericObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

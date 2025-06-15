@@ -17,11 +17,11 @@ public struct ThrowActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Throw requires a direct object (what to throw)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.throwWhat)
+            let message = context.message.throwWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let itemToThrowID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "throw"))
+            let message = context.message.cannotActOnThat(verb: "throw")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -34,7 +34,7 @@ public struct ThrowActionHandler: ActionHandler {
         // If a target is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let targetItemID) = indirectObjectRef else {
-                let message = context.message(.cannotActWithThat(verb: "throw at"))
+                let message = context.message.cannotActWithThat(verb: "throw at")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -61,7 +61,7 @@ public struct ThrowActionHandler: ActionHandler {
 
         // Handle self reference
         if case .player = directObjectRef {
-            let message = context.message(.cannotThrowYourself)
+            let message = context.message.cannotThrowYourself()
             return ActionResult(message)
         }
 
@@ -81,15 +81,15 @@ public struct ThrowActionHandler: ActionHandler {
 
             let message =
                 if targetItem.hasFlag(.isCharacter) {
-                    context.message(
-                        .throwAtCharacter(
-                            item: itemToThrow.withDefiniteArticle,
-                            character: targetItem.withDefiniteArticle))
+                    context.message.throwAtCharacter(
+                        item: itemToThrow.withDefiniteArticle,
+                        character: targetItem.withDefiniteArticle
+                    )
                 } else {
-                    context.message(
-                        .throwAtObject(
-                            item: itemToThrow.withDefiniteArticle,
-                            target: targetItem.withDefiniteArticle))
+                    context.message.throwAtObject(
+                        item: itemToThrow.withDefiniteArticle,
+                        target: targetItem.withDefiniteArticle
+                    )
                 }
 
             return ActionResult(
@@ -104,7 +104,9 @@ public struct ThrowActionHandler: ActionHandler {
         } else {
             // General throwing - no specific target
             return ActionResult(
-                message: context.message(.throwGeneral(item: itemToThrow.withDefiniteArticle)),
+                message: context.message.throwGeneral(
+                    item: itemToThrow.withDefiniteArticle
+                ),
                 changes: [
                     await context.engine.setFlag(.isTouched, on: itemToThrow),
                     await context.engine.updatePronouns(to: itemToThrow),

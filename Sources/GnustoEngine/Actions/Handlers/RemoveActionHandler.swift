@@ -20,16 +20,16 @@ public struct RemoveActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.removeWhat))
+            throw ActionResponse.prerequisiteNotMet(context.message.removeWhat)
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.removeWhat))
+            throw ActionResponse.prerequisiteNotMet(context.message.removeWhat)
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.canOnlyActOnItems(verb: "remove")))
+                context.message.canOnlyActOnItems(verb: "remove"))
         }
 
         // 2. Check if the item exists and is worn by the player
@@ -63,7 +63,7 @@ public struct RemoveActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to remove)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message(.removeWhat)
+                let message = context.message.removeWhat()
                 return ActionResult(message)
             }
         }
@@ -79,7 +79,7 @@ public struct RemoveActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message(.canOnlyActOnItems(verb: "remove"))
+                        context.message.canOnlyActOnItems(verb: "remove")
                     )
                 }
             }
@@ -146,10 +146,12 @@ public struct RemoveActionHandler: ActionHandler {
         let message =
             if removedItems.isEmpty {
                 context.command.isAllCommand
-                    ? context.message(.youArentWearingAnything) : context.message(.removeWhat)
+                    ? context.message.youArentWearingAnything()
+                    : context.message.removeWhat()
             } else {
-                context.message(
-                    .youRemoveMultipleItems(items: removedItems.listWithDefiniteArticles))
+                context.message.youRemoveMultipleItems(
+                    items: removedItems.listWithDefiniteArticles
+                )
             }
 
         return ActionResult(

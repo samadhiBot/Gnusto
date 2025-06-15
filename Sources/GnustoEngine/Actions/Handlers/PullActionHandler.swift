@@ -17,11 +17,11 @@ public struct PullActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Pull requires a direct object (what to pull)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.pullWhat)
+            let message = context.message.pullWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "pull"))
+            let message = context.message.canOnlyActOnItems(verb: "pull")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -53,10 +53,10 @@ public struct PullActionHandler: ActionHandler {
         // Check if item is specifically pullable
         let message =
             if targetItem.hasFlag(.isPullable) {
-                context.message(.pullSuccess(item: targetItem.withDefiniteArticle))
+                context.message.pullSuccess(item: targetItem.withDefiniteArticle)
             } else {
                 // Default behavior: most things can't be pulled effectively
-                context.message(.cannotPull(item: targetItem.withDefiniteArticle))
+                context.message.cannotPull(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

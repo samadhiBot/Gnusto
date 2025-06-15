@@ -12,7 +12,7 @@ public struct DanceActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         // Get random response from message provider
-        let message = await context.engine.randomMessage(for: .danceResponses)
+        let message = await context.danceResponses)
         return ActionResult(message)
     }
 }

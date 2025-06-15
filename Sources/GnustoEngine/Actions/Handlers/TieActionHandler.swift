@@ -18,12 +18,12 @@ public struct TieActionHandler: ActionHandler {
         // Tie requires a direct object (what to tie)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.tieWhat)
+                context.message.tieWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.tieCannotTieThat)
+                context.message.tieCannotTieThat()
             )
         }
 
@@ -37,7 +37,7 @@ public struct TieActionHandler: ActionHandler {
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let indirectItemID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.tieCannotTieToThat)
+                    context.message.tieCannotTieToThat()
                 )
             }
 
@@ -107,15 +107,15 @@ public struct TieActionHandler: ActionHandler {
     ) async throws -> String {
         // Check if we're trying to tie something to itself
         if targetItem.id == indirectItem.id {
-            return context.message(.tieCannotTieToSelf(item: targetItem.name))
+            return context.message.tieCannotTieToSelf(item: targetItem.name)
         }
 
         // General tying attempts
         if targetItem.hasFlag(.isCharacter) || indirectItem.hasFlag(.isCharacter) {
-            return context.message(.tieCannotTieLivingBeings)
+            return context.message.tieCannotTieLivingBeings()
         }
 
-        return context.message(.tieNeedsSomethingToTieWith(item: targetItem.name))
+        return context.message.tieNeedsSomethingToTieWith(item: targetItem.name)
     }
 
     /// Handles tying a single object.
@@ -124,12 +124,12 @@ public struct TieActionHandler: ActionHandler {
         context: ActionContext
     ) -> String {
         if targetItem.hasFlag(.isCharacter) {
-            return context.message(
-                .tieNeedsSomethingToTieCharacterWith(character: targetItem.name)
+            return context.message.tieNeedsSomethingToTieCharacterWith(
+                character: targetItem.name
             )
         } else {
-            return context.message(
-                .tieNeedsSomethingToTieWith(item: targetItem.name)
+            return context.message.tieNeedsSomethingToTieWith(
+                item: targetItem.name
             )
         }
     }

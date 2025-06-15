@@ -18,7 +18,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.thinkAboutWhat)
+            let message = context.message.thinkAboutWhat()
             throw ActionResponse.custom(message)
         }
 
@@ -34,7 +34,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
             }
         case .location(_):
             // For now, only allow thinking about items or the player.
-            let message = context.message(.canOnlyActOnItems(verb: "think about"))
+            let message = context.message.canOnlyActOnItems(verb: "think about")
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -61,12 +61,12 @@ public struct ThinkAboutActionHandler: ActionHandler {
         switch directObjectRef {
         case .player:
             return ActionResult(
-                context.message(.thinkAboutSelf)
+                context.message.thinkAboutSelf()
             )
         case .item(let targetItemID):
             let targetItem = try await context.engine.item(targetItemID)
             return ActionResult(
-                message: context.message(.thinkAboutItem(item: targetItem.withDefiniteArticle)),
+                message: context.message.thinkAboutItem(item: targetItem.withDefiniteArticle),
                 changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.updatePronouns(to: targetItem),
@@ -76,7 +76,7 @@ public struct ThinkAboutActionHandler: ActionHandler {
             // Should be caught by validate if we decide not to support thinking about locations.
             // If supported, a custom message would go here.
             return ActionResult(
-                context.message(.thinkAboutLocation)
+                context.message.thinkAboutLocation()
             )
         }
     }

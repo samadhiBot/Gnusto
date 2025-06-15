@@ -16,11 +16,11 @@ public struct EatActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.eatWhat)
+            let message = context.message.eatWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyEatFood)
+            let message = context.message.canOnlyEatFood()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -53,8 +53,9 @@ public struct EatActionHandler: ActionHandler {
             let edibleContents = containerContents.filter { $0.hasFlag(.isEdible) }
 
             guard !edibleContents.isEmpty else {
-                let message = context.message(
-                    .nothingToEatIn(container: targetItem.withDefiniteArticle))
+                let message = context.message.nothingToEatIn(
+                    container: targetItem.withDefiniteArticle
+                )
                 throw ActionResponse.prerequisiteNotMet(message)
             }
             return
@@ -86,7 +87,9 @@ public struct EatActionHandler: ActionHandler {
         // Handle direct edible item
         if targetItem.hasFlag(.isEdible) {
             return ActionResult(
-                message: context.message(.eatSuccess(item: targetItem.withDefiniteArticle)),
+                message: context.message.eatSuccess(
+                    item: targetItem.withDefiniteArticle
+                ),
                 changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
@@ -102,18 +105,16 @@ public struct EatActionHandler: ActionHandler {
                 // For closed containers, can't eat from them
                 if !targetItem.hasFlag(.isOpen) {
                     return ActionResult(
-                        context.message(
-                            .cannotEatFromClosed(container: targetItem.withDefiniteArticle)
+                        context.message.cannotEatFromClosed(
+                            container: targetItem.withDefiniteArticle
                         ),
                         change: await context.engine.setFlag(.isTouched, on: targetItem)
                     )
                 } else {
                     return ActionResult(
-                        message: context.message(
-                            .eatFromContainer(
-                                food: firstEdible.withDefiniteArticle,
-                                container: targetItem.withDefiniteArticle
-                            )
+                        message: context.message.eatFromContainer(
+                            food: firstEdible.withDefiniteArticle,
+                            container: targetItem.withDefiniteArticle
                         ),
                         changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem),
@@ -124,18 +125,14 @@ public struct EatActionHandler: ActionHandler {
                 }
             } else {
                 return ActionResult(
-                    context.message(
-                        .nothingToEatIn(container: targetItem.withDefiniteArticle)
-                    ),
+                    context.message.nothingToEatIn(container: targetItem.withDefiniteArticle),
                     change: await context.engine.setFlag(.isTouched, on: targetItem)
                 )
             }
         } else {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
-                context.message(
-                    .cannotEat(item: targetItem.withDefiniteArticle)
-                ),
+                context.message.cannotEat(item: targetItem.withDefiniteArticle),
                 change: await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }

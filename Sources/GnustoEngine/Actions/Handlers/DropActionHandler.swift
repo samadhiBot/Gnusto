@@ -24,19 +24,19 @@ public struct DropActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "drop"))
+                context.message.whatQuestion(verb: "drop")
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "drop"))
+                context.message.whatQuestion(verb: "drop")
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "drop"))
+                context.message.youCanOnlyActOnItems(verb: "drop")
             )
         }
 
@@ -80,7 +80,7 @@ public struct DropActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 throw ActionResponse.internalEngineError(
-                    context.message(.internalEngineError)
+                    context.message.internalEngineError()
                 )
             }
         }
@@ -99,7 +99,7 @@ public struct DropActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     throw ActionResponse.internalEngineError(
-                        context.message(.youCanOnlyActOnItems(verb: "drop"))
+                        context.message.youCanOnlyActOnItems(verb: "drop")
                     )
                 }
             }
@@ -113,7 +113,7 @@ public struct DropActionHandler: ActionHandler {
                         continue  // Skip items not held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message(.youArentHoldingThat)
+                            context.message.youArentHoldingThat()
                         )
                     }
                 }
@@ -193,7 +193,7 @@ public struct DropActionHandler: ActionHandler {
                         .youDropMultipleItems(items: droppedItems.listWithDefiniteArticles))
                 }
             } else {
-                context.message(.dropped)
+                context.message.dropped()
             }
 
         return ActionResult(

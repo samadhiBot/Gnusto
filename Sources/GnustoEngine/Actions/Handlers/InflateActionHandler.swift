@@ -17,11 +17,11 @@ public struct InflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Inflate requires a direct object (what to inflate)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.inflateWhat)
+            let message = context.message.inflateWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "inflate"))
+            let message = context.message.canOnlyActOnItems(verb: "inflate")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -33,7 +33,7 @@ public struct InflateActionHandler: ActionHandler {
 
         // Check if item is inflatable
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message(.cannotInflate(item: targetItem.withDefiniteArticle))
+            let message = context.message.cannotInflate(item: targetItem.withDefiniteArticle)
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -50,10 +50,10 @@ public struct InflateActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            let message = context.message(
-                .actionHandlerInternalError(
-                    handler: "InflateActionHandler",
-                    details: "directObject was not an item in process"))
+            let message = context.message.actionHandlerInternalError(
+                handler: "InflateActionHandler",
+                details: "directObject was not an item in process"
+            )
             throw ActionResponse.internalEngineError(message)
         }
 
@@ -64,9 +64,9 @@ public struct InflateActionHandler: ActionHandler {
 
         let message =
             if isAlreadyInflated {
-                context.message(.itemAlreadyInflated(item: targetItem.withDefiniteArticle))
+                context.message.itemAlreadyInflated(item: targetItem.withDefiniteArticle)
             } else {
-                context.message(.inflateSuccess(item: targetItem.withDefiniteArticle))
+                context.message.inflateSuccess(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

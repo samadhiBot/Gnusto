@@ -18,7 +18,7 @@ public struct FindActionHandler: ActionHandler {
     /// - Throws: `ActionError` if no direct object is specified.
     public func validate(context: ActionContext) async throws {
         guard context.command.directObject != nil else {
-            let message = context.message(.findWhat)
+            let message = context.message.findWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -37,19 +37,19 @@ public struct FindActionHandler: ActionHandler {
         guard let targetObjectID = context.command.directObject,
             case .item(let itemID) = targetObjectID
         else {
-            let message = context.message(.unknownEntity)
+            let message = context.message.unknownEntity()
             return ActionResult(message)
         }
 
         // Check if the item exists in the game
         guard let targetItem = try? await context.engine.item(itemID) else {
-            let message = context.message(.unknownEntity)
+            let message = context.message.unknownEntity()
             return ActionResult(message)
         }
 
         // Check if the player is holding it
         if targetItem.parent == .player {
-            let message = context.message(.youHaveIt)
+            let message = context.message.youHaveIt()
             return ActionResult(message)
         }
 
@@ -59,12 +59,12 @@ public struct FindActionHandler: ActionHandler {
         let itemsInScope = await scopeResolver.itemsInScopeFor(locationID: currentLocation)
 
         if itemsInScope.contains(itemID) {
-            let message = context.message(.itsRightHere)
+            let message = context.message.itsRightHere()
             return ActionResult(message)
         }
 
         // Item exists but isn't visible
-        let message = context.message(.unknownEntity)
+        let message = context.message.unknownEntity()
         return ActionResult(message)
     }
 }

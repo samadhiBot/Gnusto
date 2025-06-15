@@ -17,11 +17,11 @@ public struct AttackActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Attack requires a direct object (what to attack)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.attackWhat)
+            let message = context.message.attackWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "attack"))
+            let message = context.message.cannotActOnThat(verb: "attack")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -34,7 +34,7 @@ public struct AttackActionHandler: ActionHandler {
         // If weapon is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let weaponItemID) = indirectObjectRef else {
-                let message = context.message(.cannotActWithThat(verb: "attack"))
+                let message = context.message.cannotActWithThat(verb: "attack")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -72,12 +72,13 @@ public struct AttackActionHandler: ActionHandler {
 
         // First check: Is target NOT a character? (ZIL: NOT FSET? PRSO ACTORBIT)
         if !targetItem.hasFlag(.isCharacter) {
-            message = context.message(.attackNonCharacter(item: targetItem.withIndefiniteArticle))
+            message = context.message.attackNonCharacter(item: targetItem.withIndefiniteArticle)
         }
         // Second check: No weapon specified OR weapon is hands (bare-handed attack)
         else if context.command.indirectObject == nil {
-            message = context.message(
-                .attackWithBareHands(character: targetItem.withIndefiniteArticle))
+            message = context.message.attackWithBareHands(
+                character: targetItem.withIndefiniteArticle
+            )
         }
         // We have a weapon - check if it's a real weapon
         else if let indirectObjectRef = context.command.indirectObject,
@@ -86,17 +87,17 @@ public struct AttackActionHandler: ActionHandler {
             let weaponItem = try await context.engine.item(weaponItemID)
 
             if !weaponItem.hasFlag(.isWeapon) {
-                message = context.message(
-                    .attackWithNonWeapon(
-                        character: targetItem.withDefiniteArticle,
-                        weapon: weaponItem.withIndefiniteArticle))
+                message = context.message.attackWithNonWeapon(
+                    character: targetItem.withDefiniteArticle,
+                    weapon: weaponItem.withIndefiniteArticle
+                )
             } else {
                 // Real weapon attack - placeholder for combat system
-                message = context.message(.attackWithWeapon)
+                message = context.message.attackWithWeapon()
             }
         } else {
             // Fallback case
-            message = context.message(.attackWithWeapon)
+            message = context.message.attackWithWeapon()
         }
 
         return ActionResult(

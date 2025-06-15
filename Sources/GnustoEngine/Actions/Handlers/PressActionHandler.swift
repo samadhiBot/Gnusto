@@ -17,11 +17,11 @@ public struct PressActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Press requires a direct object (what to press)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.pressWhat)
+            let message = context.message.pressWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "press"))
+            let message = context.message.canOnlyActOnItems(verb: "press")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -53,11 +53,11 @@ public struct PressActionHandler: ActionHandler {
         // Check if item is pressable
         let message =
             if targetItem.hasFlag(.isPressable) {
-                context.message(.pressSuccess(item: targetItem.withDefiniteArticle))
+                context.message.pressSuccess(item: targetItem.withDefiniteArticle)
                 // Note: Specific press behavior should be handled by ItemEventHandlers
             } else {
                 // Default behavior: most things can't be pressed effectively
-                context.message(.cannotPress(item: targetItem.withDefiniteArticle))
+                context.message.cannotPress(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

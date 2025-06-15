@@ -14,7 +14,7 @@ public struct WaitActionHandler: ActionHandler {
     /// - Returns: An `ActionResult` containing the message "Time passes."
     public func process(context: ActionContext) async throws -> ActionResult {
         return ActionResult(
-            context.message(.timePasses)
+            context.message.timePasses()
         )
     }
 

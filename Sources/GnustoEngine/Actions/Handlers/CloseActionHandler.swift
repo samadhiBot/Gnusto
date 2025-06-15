@@ -22,12 +22,12 @@ public struct CloseActionHandler: ActionHandler {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.whatQuestion(verb: "close"))
+                context.message.whatQuestion(verb: "close")
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "close"))
+                context.message.youCanOnlyActOnItems(verb: "close")
             )
         }
 
@@ -78,7 +78,7 @@ public struct CloseActionHandler: ActionHandler {
         else {
             // This case should ideally be caught by the validate function.
             return ActionResult(
-                context.message(.youCantDoThat)
+                context.message.youCantDoThat()
             )
         }
 
@@ -87,13 +87,13 @@ public struct CloseActionHandler: ActionHandler {
         // Handle "already closed" case detected (but not thrown) in validate
         guard try await context.engine.hasFlag(.isOpen, on: targetItem.id) else {
             return ActionResult(
-                context.message(.itemAlreadyClosed(item: targetItem.withDefiniteArticle))
+                context.message.itemAlreadyClosed(item: targetItem.withDefiniteArticle)
             )
         }
 
         // --- Prepare Result ---
         return ActionResult(
-            message: context.message(.closed),
+            message: context.message.closed(),
             changes: [
                 await context.engine.clearFlag(.isOpen, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),

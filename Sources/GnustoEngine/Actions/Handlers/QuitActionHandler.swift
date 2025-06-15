@@ -23,7 +23,7 @@ public struct QuitActionHandler: ActionHandler {
         await context.engine.requestQuit()
 
         return ActionResult(
-            context.message(.goodbye)
+            context.message.goodbye()
         )
     }
 }

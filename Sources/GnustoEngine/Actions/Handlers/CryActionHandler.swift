@@ -11,7 +11,7 @@ public struct CryActionHandler: ActionHandler {
         context: ActionContext
     ) async throws -> ActionResult {
         // Get random response from message provider
-        let message = await context.engine.randomMessage(for: .cryResponses)
+        let message = await context.message.cryResponse()
         return ActionResult(message)
     }
 }

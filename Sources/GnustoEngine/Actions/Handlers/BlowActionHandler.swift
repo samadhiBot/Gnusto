@@ -17,7 +17,7 @@ public struct BlowActionHandler: ActionHandler {
         // Blow can be used without an object (general blowing) or with an object
         if let directObjectRef = context.command.directObject {
             guard case .item(let targetItemID) = directObjectRef else {
-                let message = context.message(.canOnlyActOnItems(verb: "blow"))
+                let message = context.message.canOnlyActOnItems(verb: "blow")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -44,7 +44,7 @@ public struct BlowActionHandler: ActionHandler {
         else {
             // General blowing without a target
             return ActionResult(
-                context.message(.blowGeneral)
+                context.message.blowGeneral()
             )
         }
 
@@ -54,17 +54,17 @@ public struct BlowActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isLightSource) && targetItem.hasFlag(.isLit) {
                 // Blowing on lit light sources might extinguish them
-                context.message(
-                    .blowOnLightSource(item: targetItem.withDefiniteArticle)
+                context.message.blowOnLightSource(
+                    item: targetItem.withDefiniteArticle
                 )
             } else if targetItem.hasFlag(.isFlammable) {
                 // Specific extinguishing behavior should use TurnOffActionHandler or custom logic
-                context.message(
-                    .blowOnFlammable(item: targetItem.withDefiniteArticle)
+                context.message.blowOnFlammable(
+                    item: targetItem.withDefiniteArticle
                 )
             } else {
-                context.message(
-                    .blowOnGeneric(item: targetItem.withDefiniteArticle)
+                context.message.blowOnGeneric(
+                    item: targetItem.withDefiniteArticle
                 )
             }
 

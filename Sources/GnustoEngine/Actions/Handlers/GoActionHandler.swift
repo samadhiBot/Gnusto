@@ -24,7 +24,7 @@ public struct GoActionHandler: ActionHandler {
         // 1. Identify Direction
         guard let direction = context.command.direction else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.goWhere)
+                context.message.goWhere()
             )
         }
 
@@ -61,14 +61,14 @@ public struct GoActionHandler: ActionHandler {
         // Check if the door is locked
         if door.hasFlag(.isLocked) {
             throw ActionResponse.directionIsBlocked(
-                context.message(.doorIsLocked(door: door.withDefiniteArticle.capitalizedFirst))
+                context.message.doorIsLocked(door: door.withDefiniteArticle.capitalizedFirst)
             )
         }
 
         // Check if the door is open
         guard door.hasFlag(.isOpen) else {
             throw ActionResponse.directionIsBlocked(
-                context.message(.doorIsClosed(door: door.withDefiniteArticle.capitalizedFirst))
+                context.message.doorIsClosed(door: door.withDefiniteArticle.capitalizedFirst)
             )
         }
     }
@@ -99,7 +99,7 @@ public struct GoActionHandler: ActionHandler {
         else {
             // Should not happen if validate passed, but defensive check
             throw ActionResponse.internalEngineError(
-                context.message(.internalEngineError)
+                context.message.internalEngineError()
             )
         }
 

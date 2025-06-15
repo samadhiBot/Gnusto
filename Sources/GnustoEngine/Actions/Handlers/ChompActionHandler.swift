@@ -16,7 +16,7 @@ public struct ChompActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "chomp"))
+            let message = context.message.canOnlyActOnItems(verb: "chomp")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -37,7 +37,7 @@ public struct ChompActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         else {
             // Get random response from message provider
-            let message = await context.engine.randomMessage(for: .chompResponses)
+            let message = await context.message.chompResponse()
             return ActionResult(message)
         }
 
@@ -47,19 +47,19 @@ public struct ChompActionHandler: ActionHandler {
         let message: String
 
         if targetItem.hasFlag(.isEdible) {
-            message = context.message(.chompEdible(item: targetItem.withIndefiniteArticle))
+            message = context.message.chompEdible(item: targetItem.withIndefiniteArticle)
         } else if targetItem.hasFlag(.isPerson) || targetItem.hasFlag(.isCharacter) {
-            message = context.message(.chompPerson)
+            message = context.message.chompPerson()
         } else if targetItem.hasFlag(.isWearable) {
-            message = context.message(.chompWearable)
+            message = context.message.chompWearable()
         } else if targetItem.hasFlag(.isContainer) {
-            message = context.message(.chompContainer)
+            message = context.message.chompContainer()
         } else if targetItem.hasFlag(.isWeapon) {
-            message = context.message(.chompWeapon)
+            message = context.message.chompWeapon()
         } else {
             // Generic responses for other objects
             let theItem = targetItem.withDefiniteArticle
-            message = await context.engine.randomMessage(for: .chompTargetResponses(item: theItem))
+            message = await context.message.chompTargetResponse(item: theItem)
         }
 
         // Mark item as touched and update pronouns

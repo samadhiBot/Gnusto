@@ -188,19 +188,19 @@ System messages that may need MessageProvider integration:
 
 ### Basic Message Retrieval
 ```swift
-let message = context.message(.taken)
+let message = context.message.taken()
 // Returns: "Taken."
 ```
 
 ### Random Atmospheric Responses
 ```swift
-let message = await engine.randomMessage(for: .breatheResponses)
+let message = await breatheResponses)
 // Returns one of 5 breathing responses randomly
 ```
 
 ### Parameterized Messages
 ```swift
-let message = context.message(.attackNonCharacter(item: "box"))
+let message = context.message.attackNonCharacter(item: "box")
 // Returns: "I've known strange people, but fighting a box?"
 ```
 
@@ -221,12 +221,12 @@ class HorrorMessageProvider: StandardMessageProvider {
 ### Ephemeral Variable Creation & Code Style
 ```swift
 // Okay
-let message = context.message(.unknownEntity)
+let message = context.message.unknownEntity()
 return ActionResult(message)
 
 // Preferred
 return ActionResult(
-    context.message(.unknownEntity)
+    context.message.unknownEntity()
 )
 ```
 

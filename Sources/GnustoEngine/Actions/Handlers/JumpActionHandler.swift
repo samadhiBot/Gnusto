@@ -19,7 +19,7 @@ public struct JumpActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "jump"))
+            let message = context.message.cannotActOnThat(verb: "jump")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -41,7 +41,7 @@ public struct JumpActionHandler: ActionHandler {
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = context.command.directObject else {
             // General jumping - use random response from MessageProvider
-            let message = await context.engine.randomMessage(for: .jumpResponses)
+            let message = await context.message.jumpResponse()
             return ActionResult(message)
         }
 
@@ -56,10 +56,10 @@ public struct JumpActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Can't jump characters
-                context.message(.jumpCharacter(character: targetItem.withDefiniteArticle))
+                context.message.jumpCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic jumping response for objects
-                context.message(.jumpLargeObject(item: targetItem.withDefiniteArticle))
+                context.message.jumpLargeObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

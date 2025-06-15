@@ -17,25 +17,23 @@ public struct AskActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // ASK requires both direct object (who) and indirect object (what about)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.askWhom)
+            let message = context.message.askWhom()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard context.command.indirectObject != nil else {
-            let message = context.message(.askAboutWhat)
+            let message = context.message.askAboutWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let characterID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnCharacters(verb: "ask"))
+            let message = context.message.canOnlyActOnCharacters(verb: "ask")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         // Check if character exists and is reachable
         let character = try await context.engine.item(characterID)
         guard character.hasFlag(.isCharacter) else {
-            let message = context.message(
-                .cannotAskAboutThat(item: character.withDefiniteArticle)
-            )
+            let message = context.message.cannotAskAboutThat(item: character.withDefiniteArticle)
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -58,7 +56,7 @@ public struct AskActionHandler: ActionHandler {
             case .item(let characterID) = directObjectRef,
             let indirectObjectRef = context.command.indirectObject
         else {
-            let message = context.message(.actionHandlerMissingObjects(handler: "AskActionHandler"))
+            let message = context.message.actionHandlerMissingObjects(handler: "AskActionHandler")
             throw ActionResponse.internalEngineError(message)
         }
 

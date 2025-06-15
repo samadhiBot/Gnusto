@@ -19,19 +19,19 @@ public struct GiveActionHandler: ActionHandler {
             // Still need an indirect object (recipient)
             guard let indirectObjectRef = context.command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.giveToWhom)
+                    context.message.giveToWhom()
                 )
             }
             guard case .item(let recipientID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.youCanOnlyActOnItems(verb: "give"))
+                    context.message.youCanOnlyActOnItems(verb: "give")
                 )
             }
             // Check if recipient exists and is an actor
             let recipient = try await context.engine.item(recipientID)
             guard recipient.hasFlag(.isCharacter) else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.youCanOnlyActOnItems(verb: "give"))
+                    context.message.youCanOnlyActOnItems(verb: "give")
                 )
             }
             return
@@ -40,31 +40,31 @@ public struct GiveActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.giveWhat)
+                context.message.giveWhat()
             )
         }
 
         // 2. Ensure we have an indirect object
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.giveToWhom)
+                context.message.giveToWhom()
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.giveWhat)
+                context.message.giveWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "give"))
+                context.message.youCanOnlyActOnItems(verb: "give")
             )
         }
         guard case .item(let recipientID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "give"))
+                context.message.youCanOnlyActOnItems(verb: "give")
             )
         }
 
@@ -72,7 +72,7 @@ public struct GiveActionHandler: ActionHandler {
         let targetItem = try await context.engine.item(targetItemID)
         guard targetItem.parent == .player else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youDontHaveThat)
+                context.message.youDontHaveThat()
             )
         }
 
@@ -80,7 +80,7 @@ public struct GiveActionHandler: ActionHandler {
         let recipient = try await context.engine.item(recipientID)
         guard recipient.hasFlag(.isCharacter) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "give"))
+                context.message.youCanOnlyActOnItems(verb: "give")
             )
         }
 
@@ -106,7 +106,7 @@ public struct GiveActionHandler: ActionHandler {
             case .item(let recipientID) = indirectObjectRef
         else {
             return ActionResult(
-                context.message(.giveToWhom)
+                context.message.giveToWhom()
             )
         }
 
@@ -116,7 +116,7 @@ public struct GiveActionHandler: ActionHandler {
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
                 return ActionResult(
-                    context.message(.giveWhat)
+                    context.message.giveWhat()
                 )
             }
         }
@@ -132,7 +132,7 @@ public struct GiveActionHandler: ActionHandler {
                     continue  // Skip non-items in ALL commands
                 } else {
                     return ActionResult(
-                        context.message(.youCanOnlyActOnItems(verb: "give"))
+                        context.message.youCanOnlyActOnItems(verb: "give")
                     )
                 }
             }
@@ -146,7 +146,7 @@ public struct GiveActionHandler: ActionHandler {
                         continue  // Skip items not held in ALL commands
                     } else {
                         return ActionResult(
-                            context.message(.youDontHaveThat)
+                            context.message.youDontHaveThat()
                         )
                     }
                 }
@@ -198,12 +198,13 @@ public struct GiveActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     "You have nothing to give."
                 } else {
-                    context.message(.youDontHaveThat)
+                    context.message.youDontHaveThat()
                 }
             } else {
-                context.message(
-                    .itemGivenTo(
-                        item: givenItems.listWithDefiniteArticles, recipient: recipient.name))
+                context.message.itemGivenTo(
+                    item: givenItems.listWithDefiniteArticles,
+                    recipient: recipient.name
+                )
             }
 
         return ActionResult(

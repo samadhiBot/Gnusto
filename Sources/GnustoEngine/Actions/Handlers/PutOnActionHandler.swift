@@ -25,20 +25,20 @@ public struct PutOnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate Direct and Indirect Objects - both must be items
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.putWhat))
+            throw ActionResponse.prerequisiteNotMet(context.message.putWhat)
         }
         guard case .item(let itemToPutID) = directObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyPutItemsOnThings))
+            throw ActionResponse.prerequisiteNotMet(context.message.youCanOnlyPutItemsOnThings)
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
             // Fetch item name for a more informative message if indirect object is missing.
             let itemToPut = try await context.engine.item(itemToPutID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.putOnWhat(item: itemToPut.name)))
+                context.message.putOnWhat(item: itemToPut.name))
         }
         guard case .item(let surfaceID) = indirectObjectRef else {
-            throw ActionResponse.prerequisiteNotMet(context.message(.youCanOnlyPutThingsOnSurfaces))
+            throw ActionResponse.prerequisiteNotMet(context.message.youCanOnlyPutThingsOnSurfaces)
         }
 
         // 2. Get Items (existence should be implicitly validated by parser/scope or engine.item() will throw)
@@ -56,7 +56,7 @@ public struct PutOnActionHandler: ActionHandler {
 
         // Prevent putting item onto itself
         if itemToPutID == surfaceID {
-            throw ActionResponse.prerequisiteNotMet(context.message(.putCannotPutOnSelf))
+            throw ActionResponse.prerequisiteNotMet(context.message.putCannotPutOnSelf)
         }
 
         // Recursive check: is the target surface inside the item we are putting?

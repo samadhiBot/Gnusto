@@ -9,10 +9,10 @@
 /// - **Clear and informative**: Players understand what happened and why
 /// - **Consistent in tone**: Maintains the classic IF voice
 /// - **Respectful of ZIL traditions**: Uses familiar phrases when appropriate
-open class MessageProvider {
+open class MessageProvider: @unchecked Sendable {
     public let languageCode: String
 
-    private var randomNumberGenerator: RandomNumberGenerator
+    private let randomNumberGenerator: RandomNumberGenerator
 
     public init(
         languageCode: String = "en",
@@ -102,7 +102,7 @@ open class MessageProvider {
         "You blow on \(item), but it doesn't go out."
     }
 
-    open func breatheResponses() -> String {
+    open func breatheResponse() -> String {
         oneOf(
             "You breathe in deeply, feeling refreshed.",
             "You take a slow, calming breath.",
@@ -240,7 +240,7 @@ open class MessageProvider {
         "That would be rude, not to mention dangerous."
     }
 
-    open func chompResponses() -> String {
+    open func chompResponse() -> String {
         oneOf(
             "You chomp your teeth together menacingly.",
             "You clench your fists and gnash your teeth.",
@@ -251,7 +251,7 @@ open class MessageProvider {
         )
     }
 
-    open func chompTargetResponses(item: String) -> String {
+    open func chompTargetResponse(item: String) -> String {
         oneOf(
             "You give \(item) a tentative nibble. It tastes terrible.",
             "You chomp on \(item) experimentally. Not very satisfying.",
@@ -309,7 +309,7 @@ open class MessageProvider {
         "\(item.capitalizedFirst) is already open."
     }
 
-    open func cryResponses() -> String {
+    open func cryResponse() -> String {
         oneOf(
             "You shed a tear for the futility of it all.",
             "You weep quietly to yourself.",
@@ -324,11 +324,11 @@ open class MessageProvider {
         )
     }
 
-    open func currentScore(score: String, moves: String) -> String {
+    open func currentScore(score: Int, moves: Int) -> String {
         "Your score is \(score) in \(moves) moves."
     }
 
-    open func curseResponses() -> String {
+    open func curseResponse() -> String {
         oneOf(
             "You curse under your breath.",
             "You let out a string of colorful expletives.",
@@ -341,7 +341,7 @@ open class MessageProvider {
         )
     }
 
-    open func curseTargetResponses(item: String) -> String {
+    open func curseTargetResponse(item: String) -> String {
         oneOf(
             "You curse \(item) roundly. You feel a bit better.",
             "You let loose a string of expletives at \(item).",
@@ -375,7 +375,7 @@ open class MessageProvider {
         "You cut \(item) with \(tool)."
     }
 
-    open func danceResponses() -> String {
+    open func danceResponse() -> String {
         oneOf(
             "Dancing is forbidden.",
             "You dance an adorable little jig.",
@@ -671,7 +671,7 @@ open class MessageProvider {
         "You can't jump \(item)."
     }
 
-    open func jumpResponses() -> String {
+    open func jumpResponse() -> String {
         oneOf(
             "You jump on the spot, fruitlessly.",
             "You jump up and down.",

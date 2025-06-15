@@ -20,11 +20,11 @@ public struct CutActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Cut requires a direct object (what to cut)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.cutWhat)
+            let message = context.message.cutWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "cut"))
+            let message = context.message.cannotActOnThat(verb: "cut")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -37,7 +37,7 @@ public struct CutActionHandler: ActionHandler {
         // If cutting tool is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let toolItemID) = indirectObjectRef else {
-                let message = context.message(.cannotActWithThat(verb: "cut"))
+                let message = context.message.cannotActWithThat(verb: "cut")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -62,11 +62,9 @@ public struct CutActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            let message = context.message(
-                .actionHandlerInternalError(
-                    handler: "CutActionHandler",
-                    details: "directObject was not an item in process"
-                )
+            let message = context.message.actionHandlerInternalError(
+                handler: "CutActionHandler",
+                details: "directObject was not an item in process"
             )
             throw ActionResponse.internalEngineError(message)
         }
@@ -84,18 +82,14 @@ public struct CutActionHandler: ActionHandler {
 
             if toolItem.hasFlag(.isWeapon) || toolItem.hasFlag(.isTool) {
                 // Successfully cut with appropriate tool
-                message = context.message(
-                    .cutWithTool(
-                        item: targetItem.withDefiniteArticle,
-                        tool: toolItem.withDefiniteArticle
-                    )
+                message = context.message.cutWithTool(
+                    item: targetItem.withDefiniteArticle,
+                    tool: toolItem.withDefiniteArticle
                 )
             } else {
                 // Using an inappropriate implement
-                message = context.message(
-                    .cutToolNotSharp(
-                        tool: toolItem.withDefiniteArticle.capitalizedFirst
-                    )
+                message = context.message.cutToolNotSharp(
+                    tool: toolItem.withDefiniteArticle.capitalizedFirst
                 )
             }
 
@@ -109,14 +103,12 @@ public struct CutActionHandler: ActionHandler {
             if !cuttingTools.isEmpty {
                 let firstTool = cuttingTools.first!
                 // Auto-cut with available tool
-                message = context.message(
-                    .cutWithAutoTool(
-                        item: targetItem.withDefiniteArticle,
-                        tool: firstTool.withDefiniteArticle
-                    )
+                message = context.message.cutWithAutoTool(
+                    item: targetItem.withDefiniteArticle,
+                    tool: firstTool.withDefiniteArticle
                 )
             } else {
-                message = context.message(.cutNoSuitableTool)
+                message = context.message.cutNoSuitableTool()
             }
         }
 

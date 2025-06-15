@@ -481,10 +481,10 @@ struct MessageProviderActionTests {
         )
         let context = ActionContext(command: command, engine: engine)
 
-        let message = context.message(.taken)
+        let message = context.message.taken()
         #expect(message == "Taken.")
 
-        let customMessage = context.message(.attackWhat)
+        let customMessage = context.message.attackWhat()
         #expect(customMessage == "Attack what?")
     }
 

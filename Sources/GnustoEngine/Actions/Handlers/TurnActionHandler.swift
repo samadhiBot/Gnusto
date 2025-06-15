@@ -16,11 +16,11 @@ public struct TurnActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Turn requires a direct object (what to turn)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.turnWhat)
+            let message = context.message.turnWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "turn"))
+            let message = context.message.cannotActOnThat(verb: "turn")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -52,10 +52,10 @@ public struct TurnActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Can't turn characters
-                context.message(.turnCharacter(character: targetItem.withDefiniteArticle))
+                context.message.turnCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic turning response for objects
-                context.message(.turnFixedObject(item: targetItem.withDefiniteArticle))
+                context.message.turnFixedObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

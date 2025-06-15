@@ -17,11 +17,11 @@ public struct DrinkActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Ensure we have a direct object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.drinkWhat)
+            let message = context.message.drinkWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyDrinkLiquids)
+            let message = context.message.canOnlyDrinkLiquids()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -54,15 +54,16 @@ public struct DrinkActionHandler: ActionHandler {
             let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) }
 
             guard !drinkableContents.isEmpty else {
-                let message = context.message(
-                    .nothingToDrinkIn(container: targetItem.withDefiniteArticle))
+                let message = context.message.nothingToDrinkIn(
+                    container: targetItem.withDefiniteArticle
+                )
                 throw ActionResponse.prerequisiteNotMet(message)
             }
             return
         }
 
         // Item is neither drinkable nor a container with drinkables
-        let message = context.message(.cannotDrink(item: targetItem.withDefiniteArticle))
+        let message = context.message.cannotDrink(item: targetItem.withDefiniteArticle)
         throw ActionResponse.prerequisiteNotMet(message)
     }
 
@@ -92,8 +93,8 @@ public struct DrinkActionHandler: ActionHandler {
                 // For closed containers, can't drink from them
                 if !targetItem.hasFlag(.isOpen) {
                     return ActionResult(
-                        message: context.message(
-                            .cannotDrinkFromClosed(container: targetItem.withDefiniteArticle)
+                        message: context.message.cannotDrinkFromClosed(
+                            container: targetItem.withDefiniteArticle
                         ),
                         changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem)
@@ -101,11 +102,9 @@ public struct DrinkActionHandler: ActionHandler {
                     )
                 } else {
                     return ActionResult(
-                        message: context.message(
-                            .drinkFromContainer(
-                                liquid: firstDrinkable.withDefiniteArticle,
-                                container: targetItem.withDefiniteArticle
-                            )
+                        message: context.message.drinkFromContainer(
+                            liquid: firstDrinkable.withDefiniteArticle,
+                            container: targetItem.withDefiniteArticle
                         ),
                         changes: [
                             await context.engine.setFlag(.isTouched, on: targetItem),
@@ -128,7 +127,7 @@ public struct DrinkActionHandler: ActionHandler {
         // Handle direct drinkable item
         else if targetItem.hasFlag(.isDrinkable) {
             return ActionResult(
-                message: context.message(.drinkSuccess(item: targetItem.withDefiniteArticle)),
+                message: context.message.drinkSuccess(item: targetItem.withDefiniteArticle))
                 changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
@@ -137,7 +136,7 @@ public struct DrinkActionHandler: ActionHandler {
         } else {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
-                context.message(.cannotDrink(item: targetItem.withDefiniteArticle)),
+                context.message.cannotDrink(item: targetItem.withDefiniteArticle))
                 change: await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }

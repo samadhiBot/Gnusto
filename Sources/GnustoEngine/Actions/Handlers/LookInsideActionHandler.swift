@@ -9,12 +9,12 @@ public struct LookInsideActionHandler: ActionHandler {
     /// Requires a direct object that must be an item the player can reach.
     public func validate(context: ActionContext) async throws {
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.lookInsideWhat)
+            let message = context.message.lookInsideWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyLookInsideItems)
+            let message = context.message.canOnlyLookInsideItems()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 

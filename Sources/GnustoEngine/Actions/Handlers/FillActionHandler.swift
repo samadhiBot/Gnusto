@@ -17,11 +17,11 @@ public struct FillActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Fill requires a direct object (what to fill)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.fillWhat)
+            let message = context.message.fillWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let containerItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "fill"))
+            let message = context.message.cannotActOnThat(verb: "fill")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -44,7 +44,7 @@ public struct FillActionHandler: ActionHandler {
         // If a source is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let sourceItemID) = indirectObjectRef else {
-                let message = context.message(.cannotFillFrom(source: "that"))
+                let message = context.message.cannotFillFrom(source: "that")
                 throw ActionResponse.prerequisiteNotMet(message)
             }
 
@@ -68,10 +68,10 @@ public struct FillActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let containerItemID) = directObjectRef
         else {
-            let message = context.message(
-                .actionHandlerInternalError(
-                    handler: "FillActionHandler",
-                    details: "directObject was not an item in process"))
+            let message = context.message.actionHandlerInternalError(
+                handler: "FillActionHandler",
+                details: "directObject was not an item in process"
+            )
             throw ActionResponse.internalEngineError(message)
         }
 
@@ -90,7 +90,7 @@ public struct FillActionHandler: ActionHandler {
                         .fillSuccess(container: containerItem.name, source: sourceItem.name))
                     // TODO: In a full implementation, you might create a new liquid item in the container
                 } else {
-                    context.message(.noLiquidInSource(source: sourceItem.name))
+                    context.message.noLiquidInSource(source: sourceItem.name)
                 }
 
             return ActionResult(
@@ -107,10 +107,11 @@ public struct FillActionHandler: ActionHandler {
             let waterSources = locationItems.filter { $0.hasFlag(.isDrinkable) }
 
             let message = if waterSources.isEmpty {
-                context.message(.noLiquidSourceAvailable)
+                context.message.noLiquidSourceAvailable()
             } else {
-                context.message(
-                    .fillSuccess(container: containerItem.name, source: waterSources[0].name)
+                context.message.fillSuccess(
+                    container: containerItem.name,
+                    source: waterSources[0].name
                 )
                 // TODO: In a full implementation, you might create a new liquid item in the container
             }

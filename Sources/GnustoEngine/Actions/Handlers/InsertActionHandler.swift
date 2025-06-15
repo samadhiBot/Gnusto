@@ -34,12 +34,12 @@ public struct InsertActionHandler: ActionHandler {
             // Still need an indirect object (container)
             guard let indirectObjectRef = context.command.indirectObject else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.insertIntoWhat)
+                    context.message.insertIntoWhat()
                 )
             }
             guard case .item(let containerID) = indirectObjectRef else {
                 throw ActionResponse.prerequisiteNotMet(
-                    context.message(.youCanOnlyActOnItems(verb: "insert"))
+                    context.message.youCanOnlyActOnItems(verb: "insert")
                 )
             }
             // Check if container exists and is a container
@@ -59,12 +59,12 @@ public struct InsertActionHandler: ActionHandler {
         // 1. Validate Direct and Indirect Objects
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.insertWhat)
+                context.message.insertWhat()
             )
         }
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.insertWhat)
+                context.message.insertWhat()
             )
         }
         guard
@@ -72,20 +72,18 @@ public struct InsertActionHandler: ActionHandler {
             let itemToInsert = try? await context.engine.item(itemToInsertID)
         else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "insert"))
+                context.message.youCanOnlyActOnItems(verb: "insert")
             )
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(
-                    .insertWhere(item: itemToInsert.withDefiniteArticle)
-                )
+                context.message.insertWhere(item: itemToInsert.withDefiniteArticle)
             )
         }
         guard case .item(let containerID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyActOnItems(verb: "insert"))
+                context.message.youCanOnlyActOnItems(verb: "insert")
             )
         }
 
@@ -170,7 +168,7 @@ public struct InsertActionHandler: ActionHandler {
         guard let indirectObjectRef = context.command.indirectObject,
             case .item(let containerID) = indirectObjectRef
         else {
-            let message = context.message(.insertIntoWhat)
+            let message = context.message.insertIntoWhat()
             return ActionResult(message)
         }
 
@@ -179,7 +177,7 @@ public struct InsertActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to insert)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                let message = context.message(.insertWhat)
+                let message = context.message.insertWhat()
                 return ActionResult(message)
             }
         }
@@ -194,7 +192,7 @@ public struct InsertActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    let message = context.message(.canOnlyActOnItems(verb: "insert"))
+                    let message = context.message.canOnlyActOnItems(verb: "insert")
                     return ActionResult(message)
                 }
             }

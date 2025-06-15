@@ -20,12 +20,12 @@ public struct BurnActionHandler: ActionHandler {
     /// - Throws: `ActionError` if validation fails.
     public func validate(context: ActionContext) async throws {
         guard let targetObjectID = context.command.directObject else {
-            let message = context.message(.burnWhat)
+            let message = context.message.burnWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard case .item(let itemID) = targetObjectID else {
-            let message = context.message(.canOnlyActOnItems(verb: "burn"))
+            let message = context.message.canOnlyActOnItems(verb: "burn")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -55,7 +55,7 @@ public struct BurnActionHandler: ActionHandler {
         guard let targetObjectID = context.command.directObject,
             case .item(let itemID) = targetObjectID
         else {
-            let message = context.message(.cannotActOnThat(verb: "burn"))
+            let message = context.message.cannotActOnThat(verb: "burn")
             return ActionResult(message)
         }
 
@@ -63,8 +63,8 @@ public struct BurnActionHandler: ActionHandler {
 
         // Check if the item is flammable
         if targetItem.hasFlag(.isFlammable) {
-            let message = context.message(
-                .burnToCatchFire(item: targetItem.withDefiniteArticle.capitalizedFirst)
+            let message = context.message.burnToCatchFire(
+                item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(
                 message: message,
@@ -76,7 +76,7 @@ public struct BurnActionHandler: ActionHandler {
             )
         } else {
             // Most items cannot be burned
-            let message = context.message(.burnCannotBurn(item: targetItem.withDefiniteArticle))
+            let message = context.message.burnCannotBurn(item: targetItem.withDefiniteArticle)
 
             return ActionResult(
                 message: message,

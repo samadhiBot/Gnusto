@@ -26,12 +26,12 @@ public struct TurnOnActionHandler: ActionHandler {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.turnOnWhat)
+                context.message.turnOnWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyTurnOnItems)
+                context.message.youCanOnlyTurnOnItems()
             )
         }
 
@@ -67,14 +67,14 @@ public struct TurnOnActionHandler: ActionHandler {
 
         guard isDevice || isFlammable else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.cannotTurnOn)
+                context.message.cannotTurnOn()
             )
         }
 
         // 5. If it's a device, check if it's already on.
         if isDevice && targetItem.hasFlag(.isOn) {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.alreadyOn)
+                context.message.alreadyOn()
             )
         }
     }

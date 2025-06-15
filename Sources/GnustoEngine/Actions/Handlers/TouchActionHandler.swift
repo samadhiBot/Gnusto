@@ -19,12 +19,12 @@ public struct TouchActionHandler: ActionHandler {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.touchWhat)
+                context.message.touchWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyTouchItems)
+                context.message.youCanOnlyTouchItems()
             )
         }
 

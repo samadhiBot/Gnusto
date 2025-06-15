@@ -24,12 +24,12 @@ public struct ExamineActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.custom(context.message(.examineWhat))
+            throw ActionResponse.custom(context.message.examineWhat)
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom(context.message(.examineWhat))
+            throw ActionResponse.custom(context.message.examineWhat)
         }
 
         switch directObjectRef {
@@ -46,7 +46,7 @@ public struct ExamineActionHandler: ActionHandler {
             // Allow examining self
             return
         default:
-            let message = context.message(.canOnlyActOnItems(verb: "examine"))
+            let message = context.message.canOnlyActOnItems(verb: "examine")
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -81,7 +81,7 @@ public struct ExamineActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to examine)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message(.canOnlyActOnItems(verb: "examine")))
+                return ActionResult(context.message.canOnlyActOnItems(verb: "examine"))
             }
         }
 
@@ -212,15 +212,15 @@ public struct ExamineActionHandler: ActionHandler {
             case .player:
                 // Classic Zork response for EXAMINE SELF
                 if context.command.isAllCommand || context.command.directObjects.count > 1 {
-                    messages.append("- Yourself: \(context.message(.examineYourself))")
+                    messages.append("- Yourself: \(context.message.examineYourself))"()
                 } else {
-                    messages.append(context.message(.examineYourself))
+                    messages.append(context.message.examineYourself)
                 }
 
             default:
                 // For ALL commands, skip non-items
                 if !context.command.isAllCommand {
-                    return ActionResult(context.message(.canOnlyActOnItems(verb: "examine")))
+                    return ActionResult(context.message.canOnlyActOnItems(verb: "examine"))
                 }
             }
         }
@@ -247,7 +247,7 @@ public struct ExamineActionHandler: ActionHandler {
         let finalMessage: String
         if context.command.isAllCommand {
             if examinedItems.isEmpty && messages.isEmpty {
-                finalMessage = context.message(.nothingHereToExamine)
+                finalMessage = context.message.nothingHereToExamine()
             } else {
                 finalMessage = messages.joined(separator: "\n")
             }

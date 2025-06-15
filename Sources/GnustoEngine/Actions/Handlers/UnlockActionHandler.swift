@@ -26,23 +26,23 @@ public struct UnlockActionHandler: ActionHandler {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.unlockWhat)
+                context.message.unlockWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyUnlockItems)
+                context.message.youCanOnlyUnlockItems()
             )
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.unlockWithWhat)
+                context.message.unlockWithWhat()
             )
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyUseItemAsKey)
+                context.message.youCanOnlyUseItemAsKey()
             )
         }
 
@@ -66,7 +66,7 @@ public struct UnlockActionHandler: ActionHandler {
 
         guard targetItem.hasFlag(.isLocked) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.unlockAlreadyUnlocked(item: targetItem.name))
+                context.message.unlockAlreadyUnlocked(item: targetItem.name)
             )
         }
 

@@ -16,7 +16,7 @@ public struct CurseActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "curse"))
+            let message = context.message.canOnlyActOnItems(verb: "curse")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -43,7 +43,7 @@ public struct CurseActionHandler: ActionHandler {
             return ActionResult(message)
         } else {
             // General cursing (no object)
-            let message = await context.engine.randomMessage(for: .curseResponses)
+            let message = await context.curseResponses)
             return ActionResult(message)
         }
     }

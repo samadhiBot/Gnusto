@@ -17,11 +17,11 @@ public struct DeflateActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Deflate requires a direct object (what to deflate)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.deflateWhat)
+            let message = context.message.deflateWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "deflate"))
+            let message = context.message.canOnlyActOnItems(verb: "deflate")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -33,7 +33,7 @@ public struct DeflateActionHandler: ActionHandler {
 
         // Check if item is inflatable (which means it can also be deflated)
         guard targetItem.hasFlag(.isInflatable) else {
-            let message = context.message(.cannotDeflate(item: targetItem.withDefiniteArticle))
+            let message = context.message.cannotDeflate(item: targetItem.withDefiniteArticle)
             throw ActionResponse.prerequisiteNotMet(message)
         }
     }
@@ -50,10 +50,10 @@ public struct DeflateActionHandler: ActionHandler {
         guard let directObjectRef = context.command.directObject,
             case .item(let targetItemID) = directObjectRef
         else {
-            let message = context.message(
-                .actionHandlerInternalError(
-                    handler: "DeflateActionHandler",
-                    details: "directObject was not an item in process"))
+            let message = context.message.actionHandlerInternalError(
+                handler: "DeflateActionHandler",
+                details: "directObject was not an item in process"
+            )
             throw ActionResponse.internalEngineError(message)
         }
 
@@ -64,9 +64,9 @@ public struct DeflateActionHandler: ActionHandler {
 
         let message =
             if !isCurrentlyInflated {
-                context.message(.itemNotInflated(item: targetItem.withDefiniteArticle))
+                context.message.itemNotInflated(item: targetItem.withDefiniteArticle)
             } else {
-                context.message(.deflateSuccess(item: targetItem.withDefiniteArticle))
+                context.message.deflateSuccess(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

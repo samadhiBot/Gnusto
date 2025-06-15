@@ -18,18 +18,18 @@ public struct TellActionHandler: ActionHandler {
         // TELL requires both direct object (who) and indirect object (what about)
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.tellWhom)
+                context.message.tellWhom()
             )
         }
         guard context.command.indirectObject != nil else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.tellAboutWhat)
+                context.message.tellAboutWhat()
             )
         }
 
         guard case .item(let characterID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.tellCanOnlyTellCharacters)
+                context.message.tellCanOnlyTellCharacters()
             )
         }
 

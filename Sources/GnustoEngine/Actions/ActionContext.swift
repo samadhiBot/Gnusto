@@ -47,8 +47,8 @@ public struct ActionContext: Sendable {
 }
 
 extension ActionContext {
-    public func message(_ key: MessageKey) -> String {
-        engine.messageProvider.message(for: key)
+    public var message: MessageProvider {
+        engine.messageProvider
     }
 }
 

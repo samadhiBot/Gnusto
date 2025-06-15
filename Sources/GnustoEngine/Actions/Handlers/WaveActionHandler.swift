@@ -16,11 +16,11 @@ public struct WaveActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Wave requires a direct object (what to wave)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.waveWhat)
+            let message = context.message.waveWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "wave"))
+            let message = context.message.cannotActOnThat(verb: "wave")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -52,10 +52,10 @@ public struct WaveActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Waving at characters
-                context.message(.waveCharacter(character: targetItem.withDefiniteArticle))
+                context.message.waveCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic waving response for objects
-                context.message(.waveFixedObject(item: targetItem.withDefiniteArticle))
+                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

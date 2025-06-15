@@ -12,7 +12,7 @@ public struct UnscriptActionHandler: ActionHandler {
         // Check if scripting is currently active
         if !(await context.engine.hasGlobal(.isScripting)) {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.scriptNotOn)
+                context.message.scriptNotOn()
             )
         }
     }

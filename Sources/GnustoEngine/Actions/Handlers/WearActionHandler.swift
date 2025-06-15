@@ -21,19 +21,19 @@ public struct WearActionHandler: ActionHandler {
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.wearWhat)
+                context.message.wearWhat()
             )
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.wearWhat)
+                context.message.wearWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyWearItems)
+                context.message.youCanOnlyWearItems()
             )
         }
 
@@ -70,7 +70,7 @@ public struct WearActionHandler: ActionHandler {
         // For ALL commands, empty directObjects is valid (means nothing to wear)
         if !context.command.isAllCommand {
             guard !context.command.directObjects.isEmpty else {
-                return ActionResult(context.message(.wearWhat))
+                return ActionResult(context.message.wearWhat())
             }
         }
 
@@ -84,7 +84,7 @@ public struct WearActionHandler: ActionHandler {
                 if context.command.isAllCommand {
                     continue  // Skip non-items in ALL commands
                 } else {
-                    return ActionResult(context.message(.youCanOnlyWearItems))
+                    return ActionResult(context.message.youCanOnlyWearItems())
                 }
             }
 
@@ -155,8 +155,8 @@ public struct WearActionHandler: ActionHandler {
         let message =
             if wornItems.isEmpty {
                 context.command.isAllCommand
-                    ? context.message(.nothingHereToWear)
-                    : context.message(.wearWhat)
+                    ? context.message.nothingHereToWear()
+                    : context.message.wearWhat()
             } else {
                 "You put on \(wornItems.listWithDefiniteArticles)."
             }

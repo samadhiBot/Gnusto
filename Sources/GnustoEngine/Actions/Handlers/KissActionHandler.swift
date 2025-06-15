@@ -16,11 +16,11 @@ public struct KissActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kiss requires a direct object (what to kiss)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.kissWhat)
+            let message = context.message.kissWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "kiss"))
+            let message = context.message.cannotActOnThat(verb: "kiss")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -46,12 +46,12 @@ public struct KissActionHandler: ActionHandler {
         }
 
         if case .player = directObjectRef {
-            return ActionResult(context.message(.kissSelf))
+            return ActionResult(context.message.kissSelf())
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
             return ActionResult(
-                context.message(.kissWhat)
+                context.message.kissWhat()
             )
         }
 
@@ -61,10 +61,10 @@ public struct KissActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Kissing characters
-                context.message(.kissCharacter(character: targetItem.withDefiniteArticle))
+                context.message.kissCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Kissing objects - generic response
-                context.message(.kissObject(item: targetItem.withDefiniteArticle))
+                context.message.kissObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

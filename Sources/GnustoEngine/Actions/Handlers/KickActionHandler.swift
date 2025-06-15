@@ -16,11 +16,11 @@ public struct KickActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Kick requires a direct object (what to kick)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.kickWhat)
+            let message = context.message.kickWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "kick"))
+            let message = context.message.cannotActOnThat(verb: "kick")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -52,10 +52,10 @@ public struct KickActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Kicking characters is generally not advisable
-                context.message(.kickCharacter(character: targetItem.withDefiniteArticle))
+                context.message.kickCharacter(character: targetItem.withDefiniteArticle)
             } else {
                 // Generic kicking response for objects
-                context.message(.kickLargeObject(item: targetItem.withDefiniteArticle))
+                context.message.kickLargeObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

@@ -26,7 +26,7 @@ public struct ClimbActionHandler: ActionHandler {
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "climb"))
+            let message = context.message.cannotActOnThat(verb: "climb")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -54,15 +54,15 @@ public struct ClimbActionHandler: ActionHandler {
     public func process(context: ActionContext) async throws -> ActionResult {
         // Handle CLIMB with no object
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.climbWhat)
+            let message = context.message.climbWhat()
             return ActionResult(message)
         }
 
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(
-                .actionHandlerInternalError(
-                    handler: "ClimbActionHandler",
-                    details: "directObject was not an item in process"))
+            let message = context.message.actionHandlerInternalError(
+                handler: "ClimbActionHandler",
+                details: "directObject was not an item in process"
+            )
             throw ActionResponse.internalEngineError(message)
         }
 
@@ -128,10 +128,10 @@ public struct ClimbActionHandler: ActionHandler {
         // Check if the item is climbable
         let message = if targetItem.hasFlag(.isClimbable) {
                 // Default climbable behavior - can be overridden by specific item handlers
-                context.message(.climbSuccess(item: targetItem.withDefiniteArticle))
+                context.message.climbSuccess(item: targetItem.withDefiniteArticle)
             } else {
                 // Not climbable
-                context.message(.climbFailure(item: targetItem.withDefiniteArticle))
+                context.message.climbFailure(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

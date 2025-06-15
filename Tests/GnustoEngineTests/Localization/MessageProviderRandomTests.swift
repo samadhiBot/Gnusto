@@ -103,7 +103,7 @@ struct MessageProviderRandomTests {
             ioHandler: mockIO
         )
 
-        let message = await engine.randomMessage(for: .taken)
+        let message = await taken)
         #expect(message == "Taken.")
     }
 
@@ -128,7 +128,7 @@ struct MessageProviderRandomTests {
         // Test multiple calls to ensure we get valid responses
         var selectedMessages = Set<String>()
         for _ in 0..<20 {
-            let message = await engine.randomMessage(for: .breatheResponses)
+            let message = await breatheResponses)
             selectedMessages.insert(message)
             #expect(possibleResponses.contains(message))
         }
@@ -148,7 +148,7 @@ struct MessageProviderRandomTests {
         )
 
         let itemName = "the rusty sword"
-        let message = await engine.randomMessage(for: .curseTargetResponses(item: itemName))
+        let message = await curseTargetResponses(item: itemName))
 
         // Should contain the item name
         #expect(message.contains(itemName))

@@ -26,20 +26,20 @@ public struct LockActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Validate command structure: Need DO and IO, both must be items
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.lockWhat)
+            let message = context.message.lockWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyActOnItems(verb: "lock"))
+            let message = context.message.canOnlyActOnItems(verb: "lock")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
         guard let indirectObjectRef = context.command.indirectObject else {
-            let message = context.message(.lockWithWhat)
+            let message = context.message.lockWithWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let keyItemID) = indirectObjectRef else {
-            let message = context.message(.canOnlyUseItemAsKey)
+            let message = context.message.canOnlyUseItemAsKey()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -110,14 +110,14 @@ public struct LockActionHandler: ActionHandler {
 
         // Handle case: Already locked (validation allows this to pass through).
         if targetItem.hasFlag(.isLocked) {
-            let message = context.message(
-                .alreadyLocked(item: targetItem.withDefiniteArticle.capitalizedFirst)
+            let message = context.message.alreadyLocked(
+                item: targetItem.withDefiniteArticle.capitalizedFirst
             )
             return ActionResult(message)
         }
 
         return ActionResult(
-            message: context.message(.lockSuccess(item: targetItem.withDefiniteArticle)),
+            message: context.message.lockSuccess(item: targetItem.withDefiniteArticle),
             changes: [
                 await context.engine.setFlag(.isLocked, on: targetItem),
                 await context.engine.setFlag(.isTouched, on: targetItem),

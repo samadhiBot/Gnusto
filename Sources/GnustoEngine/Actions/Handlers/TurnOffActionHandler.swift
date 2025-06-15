@@ -22,12 +22,12 @@ public struct TurnOffActionHandler: ActionHandler {
         // 1. Get direct object and ensure it's an item
         guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.turnOffWhat)
+                context.message.turnOffWhat()
             )
         }
         guard case .item(let targetItemID) = directObjectRef else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.youCanOnlyTurnOffItems)
+                context.message.youCanOnlyTurnOffItems()
             )
         }
 
@@ -42,14 +42,14 @@ public struct TurnOffActionHandler: ActionHandler {
         // 4. Check if the item has the `.device` property.
         guard targetItem.hasFlag(.isDevice) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.cannotTurnOff)
+                context.message.cannotTurnOff()
             )
         }
 
         // 5. Check if the item is already off (lacks `.on`).
         guard targetItem.hasFlag(.isOn) else {
             throw ActionResponse.prerequisiteNotMet(
-                context.message(.alreadyOff)
+                context.message.alreadyOff()
             )
         }
     }

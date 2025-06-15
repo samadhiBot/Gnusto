@@ -17,11 +17,11 @@ public struct EmptyActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Empty requires a direct object (what to empty)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.emptyWhat)
+            let message = context.message.emptyWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.canOnlyEmptyContainers)
+            let message = context.message.canOnlyEmptyContainers()
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -66,10 +66,9 @@ public struct EmptyActionHandler: ActionHandler {
         var contentMoveChanges: [StateChange?] = []
 
         if contents.isEmpty {
-            message = context.message(
-                .containerAlreadyEmpty(
-                    container: targetItem.withDefiniteArticle.capitalizedFirst
-                )
+            message = context.message.containerAlreadyEmpty(
+                container: targetItem.withDefiniteArticle.capitalizedFirst
+            )
             )
         } else {
             // Get current location to move items to
@@ -82,8 +81,7 @@ public struct EmptyActionHandler: ActionHandler {
                 )
             }
 
-            message = context.message(
-                .emptySuccess(
+            message = context.message.emptySuccess(
                     container: targetItem.withDefiniteArticle,
                     items: contents.listWithIndefiniteArticles,
                     count: contents.count

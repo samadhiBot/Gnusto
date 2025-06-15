@@ -16,11 +16,11 @@ public struct ShakeActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // Shake requires a direct object (what to shake)
         guard let directObjectRef = context.command.directObject else {
-            let message = context.message(.shakeWhat)
+            let message = context.message.shakeWhat()
             throw ActionResponse.prerequisiteNotMet(message)
         }
         guard case .item(let targetItemID) = directObjectRef else {
-            let message = context.message(.cannotActOnThat(verb: "shake"))
+            let message = context.message.cannotActOnThat(verb: "shake")
             throw ActionResponse.prerequisiteNotMet(message)
         }
 
@@ -52,19 +52,21 @@ public struct ShakeActionHandler: ActionHandler {
         let message =
             if targetItem.hasFlag(.isCharacter) {
                 // Shaking characters might not be appropriate
-                context.message(.shakeCharacter(character: targetItem.withDefiniteArticle))
+                context.message.shakeCharacter(character: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isContainer) {
                 // Shaking containers might reveal contents
                 if targetItem.hasFlag(.isOpen) {
-                    context.message(
-                        .shakeOpenContainer(container: targetItem.withDefiniteArticle))
+                    context.message.shakeOpenContainer(
+                        container: targetItem.withDefiniteArticle
+                    )
                 } else {
-                    context.message(
-                        .shakeClosedContainer(container: targetItem.withDefiniteArticle))
+                    context.message.shakeClosedContainer(
+                        container: targetItem.withDefiniteArticle
+                    )
                 }
             } else {
                 // Generic shaking response for objects
-                context.message(.shakeFixedObject(item: targetItem.withDefiniteArticle))
+                context.message.shakeFixedObject(item: targetItem.withDefiniteArticle)
             }
 
         return ActionResult(

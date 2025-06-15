@@ -17,7 +17,7 @@ public struct ScoreActionHandler: ActionHandler {
         let turnCount = await context.engine.playerMoves
 
         return ActionResult(
-            context.message(.currentScore(score: currentScore, moves: turnCount))
+            context.message.currentScore(score: currentScore, moves: turnCount)
         )
     }
 
