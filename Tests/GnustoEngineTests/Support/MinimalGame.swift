@@ -5,7 +5,7 @@ import GnustoEngine
 public struct MinimalGame: GameBlueprint {
     public var constants: GameConstants
     public var player: Player
-    public var randomNumberGenerator: any RandomNumberGenerator { fixedGenerator }
+    public var randomNumberGenerator: FixedRandomNumberGenerator
     public var items: [Item]
     public var locations: [Location]
     public var customActionHandlers: [VerbID: ActionHandler]
@@ -15,8 +15,7 @@ public struct MinimalGame: GameBlueprint {
     public var daemons: [DaemonID: DaemonDefinition]
     public var itemComputers: [ItemID: ItemComputer]
     public var locationComputers: [LocationID: LocationComputer]
-
-    private var fixedGenerator: FixedRandomNumberGenerator
+    public var messageProvider: MessageProvider
 
     public init(
         constants: GameConstants = GameConstants(
@@ -26,7 +25,9 @@ public struct MinimalGame: GameBlueprint {
             maximumScore: 10
         ),
         player: Player = Player(in: LocationID("startRoom")),
-        randomNumberGeneratorValues: [Double] = [0.5, 0.25, 0.75, 0, 1],
+        randomNumberGenerator: FixedRandomNumberGenerator = FixedRandomNumberGenerator(
+            values: [0.1, 0.9, 0.3, 0.7, 0.5, 0.6, 0.4, 0.8, 0.2, 1.0]
+        ),
         locations: [Location] = [
             Location(
                 id: .startRoom,
@@ -56,11 +57,12 @@ public struct MinimalGame: GameBlueprint {
         fuses: [FuseID: FuseDefinition] = [:],
         daemons: [DaemonID: DaemonDefinition] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
-        locationComputers: [LocationID: LocationComputer] = [:]
+        locationComputers: [LocationID: LocationComputer] = [:],
+        messageProvider: MessageProvider? = nil
     ) {
         self.constants = constants
         self.player = player
-        self.fixedGenerator = FixedRandomNumberGenerator(values: randomNumberGeneratorValues)
+        self.randomNumberGenerator = randomNumberGenerator
         self.items = items
         self.locations = locations
         self.customActionHandlers = customActionHandlers
@@ -70,6 +72,9 @@ public struct MinimalGame: GameBlueprint {
         self.daemons = daemons
         self.itemComputers = itemComputers
         self.locationComputers = locationComputers
+        self.messageProvider = messageProvider ?? MessageProvider(
+            randomNumberGenerator: randomNumberGenerator
+        )
     }
 }
 

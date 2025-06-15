@@ -36,11 +36,11 @@ struct DanceActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You cut a rug with style and panache.
+            You dance an adorable little jig.
 
-            You boogie down with surprising grace.
+            You dance with wild abandon. Bravo!
 
-            You break into spontaneous choreography.
+            You perform a modern interpretive dance.
             """)
     }
 }

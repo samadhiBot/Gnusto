@@ -32,7 +32,7 @@ public struct InventoryActionHandler: ActionHandler {
                     "- \($0.withIndefiniteArticle.capitalizedFirst)"
                 }.joined(separator: "\n")
                 return """
-                    \(context.message.youAreCarrying)
+                    \(context.message.youAreCarrying())
                     \(itemList.indent())
                     """
             }

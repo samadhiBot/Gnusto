@@ -132,7 +132,7 @@ open class MessageProvider: @unchecked Sendable {
             "You take a slow, calming breath.",
             "The air fills your lungs. You're glad that you can breathe.",
             "You inhale deeply, then exhale slowly.",
-            "You breathe in the love... and blow out the jive.",
+            "Breathe in the love... and blow out the jive.",
         )
     }
 

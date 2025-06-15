@@ -36,11 +36,12 @@ struct CurseActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You damn everything in sight. You feel better now.
+            You curse under your breath.
+
+            You swear with the passion of a thousand frustrated
+            adventurers.
 
             You swear like a sailor. Very cathartic.
-
-            You curse fluently in several languages.
             """)
     }
 
@@ -58,7 +59,7 @@ struct CurseActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You damn the pebble to the seven hells.")
+        expectNoDifference(output, "You curse the pebble roundly. You feel a bit better.")
     }
 
     @Test("CURSE validation passes without object")

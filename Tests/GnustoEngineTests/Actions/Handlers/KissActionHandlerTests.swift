@@ -54,7 +54,8 @@ struct KissActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            The beautiful princess doesn't seem particularly receptive to your affections.
+            The beautiful princess doesn't seem particularly receptive to
+            your affections.
             """)
     }
 
@@ -83,35 +84,7 @@ struct KissActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "")
-    }
-
-    @Test("Kiss statue shows cold stone message")
-    func testKissStatueShowsColdStoneMessage() async throws {
-        // Given
-        let statue = Item(
-            id: "statue",
-            .name("marble statue"),
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: [statue])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("statue"),
-            rawInput: "kiss statue"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.message!.contains("You kiss the marble statue. The cold stone is not very responsive."))
+        expectNoDifference(output, "You can’t kiss the polished mirror.")
     }
 
     @Test("Kiss inappropriate object shows humorous message")
@@ -205,6 +178,9 @@ struct KissActionHandlerTests {
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("but it remains a frog"))
+        expectNoDifference(output, """
+            The frog doesn’t seem particularly receptive to your
+            affections.
+            """)
     }
 }

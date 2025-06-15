@@ -60,7 +60,7 @@ struct BreatheActionHandlerTests {
         let result = try await handler.process(context: context)
 
         // Then
-        #expect(result.message == "The air fills your lungs. You're glad that you can breathe.")
+        #expect(result.message == "You breathe in deeply, feeling refreshed.")
     }
 
     @Test("Breathe integration test")
@@ -81,11 +81,11 @@ struct BreatheActionHandlerTests {
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            The air fills your lungs. You’re glad that you can breathe.
+            You breathe in deeply, feeling refreshed.
+
+            Breathe in the love… and blow out the jive.
 
             You take a slow, calming breath.
-
-            You inhale deeply, then exhale slowly.
             """)
     }
 

@@ -32,7 +32,7 @@ struct CryActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You sob dramatically, and feel a little better.")
+        expectNoDifference(output, "You weep quietly to yourself.")
     }
 
     @Test("CRY returns varied responses")
@@ -48,12 +48,12 @@ struct CryActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You sob dramatically, and feel a little better.
-
-            You shed crocodile tears. Very convincing.
+            You weep quietly to yourself.
 
             You break down and cry. After a bit the world seems a little
             brighter.
+
+            You sob dramatically, and feel a little better.
             """)
     }
 }
