@@ -146,7 +146,7 @@ public protocol GameBlueprint: Sendable {
     /// - Customize the tone and style of responses
     /// - Override specific messages while inheriting sensible defaults
     ///
-    /// If not specified, the engine will use `StandardMessageProvider` with traditional
+    /// If not specified, the engine will use the built-in `MessageProvider` with traditional
     /// English interactive fiction responses.
     ///
     /// Example:

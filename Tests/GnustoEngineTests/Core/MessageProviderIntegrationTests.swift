@@ -87,29 +87,29 @@ struct MessageProviderIntegrationTests {
 
     @Test("MessageProvider parameters are properly formatted")
     func testMessageParameterFormatting() async throws {
-        let provider = StandardMessageProvider()
+        let provider = MessageProvider()
 
         // Test single parameter
         expectNoDifference(
-            provider.message(for: .itemNotTakable(item: "the golden sword")),
+            provider.itemNotTakable(item: "the golden sword"),
             "You can't take the golden sword."
         )
 
         // Test multiple parameters
         expectNoDifference(
-            provider.message(for: .itemNotInContainer(item: "the key", container: "the box")),
+            provider.itemNotInContainer(item: "the key", container: "the box"),
             "The key isn't in the box."
         )
 
         // Test parameter with capitalization
         expectNoDifference(
-            provider.message(for: .containerIsClosed(item: "the chest")),
+            provider.containerIsClosed(item: "the chest"),
             "The chest is closed."
         )
 
         // Test modifier mismatch with array
         expectNoDifference(
-            provider.message(for: .modifierMismatch(noun: "sword", modifiers: ["golden", "magical"])),
+            provider.modifierMismatch(noun: "sword", modifiers: ["golden", "magical"]),
             "I don't see any 'golden magical sword' here."
         )
     }

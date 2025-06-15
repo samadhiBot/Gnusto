@@ -6,52 +6,46 @@ import Testing
 /// Tests for the MessageProvider localization system.
 @Suite("MessageProvider Tests")
 struct MessageProviderTests {
-    @Test("StandardMessageProvider provides English messages")
-    func testStandardMessageProvider() async throws {
-        let provider = StandardMessageProvider()
+    @Test("MessageProvider provides English messages")
+    func testMessageProvider() async throws {
+        let provider = MessageProvider()
 
         #expect(provider.languageCode == "en")
 
         // Test system messages
-        #expect(provider.message(for: .roomIsDark) == "It is pitch black. You can't see a thing.")
-        #expect(provider.message(for: .nowDark) == "You are plunged into darkness.")
-        #expect(provider.message(for: .nowLit) == "You can see your surroundings now.")
+        #expect(provider.roomIsDark() == "It is pitch black. You can't see a thing.")
+        #expect(provider.nowDark() == "You are plunged into darkness.")
+        #expect(provider.nowLit() == "You can see your surroundings now.")
 
         // Test action response messages
-        #expect(provider.message(for: .playerCannotCarryMore) == "Your hands are full.")
-        #expect(provider.message(for: .itemNotTakable(item: "the rock")) == "You can't take the rock.")
-        #expect(provider.message(for: .itemAlreadyOpen(item: "the door")) == "The door is already open.")
+        #expect(provider.playerCannotCarryMore() == "Your hands are full.")
+        #expect(provider.itemNotTakable(item: "the rock") == "You can't take the rock.")
+        #expect(provider.itemAlreadyOpen(item: "the door") == "The door is already open.")
 
         // Test parse error messages
-        #expect(provider.message(for: .emptyInput) == "I beg your pardon?")
-        #expect(provider.message(for: .parseUnknownVerb(verb: "xyzzy")) == "I don't know the verb 'xyzzy'.")
-        #expect(provider.message(for: .itemNotInScope(noun: "lamp")) == "You can't see any 'lamp' here.")
+        #expect(provider.emptyInput() == "I beg your pardon?")
+        #expect(provider.parseUnknownVerb(verb: "xyzzy") == "I don't know the verb 'xyzzy'.")
+        #expect(provider.itemNotInScope(noun: "lamp") == "You can't see any 'lamp' here.")
 
         // Test custom messages
-        #expect(provider.message(for: .custom(message: "Hello world!")) == "Hello world!")
+        #expect(provider.custom(message: "Hello world!") == "Hello world!")
 
         // Test prerequisite messages
-        #expect(provider.message(for: .prerequisiteNotMet(message: "")) == "You can't do that.")
-        #expect(provider.message(for: .prerequisiteNotMet(message: "Too heavy!")) == "Too heavy!")
+        #expect(provider.prerequisiteNotMet(message: "") == "You can't do that.")
+        #expect(provider.prerequisiteNotMet(message: "Too heavy!") == "Too heavy!")
     }
 
-    struct TestMessageProvider: MessageProvider {
-        let languageCode = "en"
+    class TestMessageProvider: MessageProvider, @unchecked Sendable {
+        override func roomIsDark() -> String {
+            "The oppressive darkness surrounds you."
+        }
 
-        /// Standard provider for fallback to default messages
-        private let standard = StandardMessageProvider()
+        override func playerCannotCarryMore() -> String {
+            "You're carrying too much already."
+        }
 
-        func message(for key: MessageKey) -> String {
-            switch key {
-            case .roomIsDark:
-                "The oppressive darkness surrounds you."
-            case .playerCannotCarryMore:
-                "You're carrying too much already."
-            case .itemNotTakable(let item):
-                "You cannot pick up \(item)."
-            default:
-                standard.message(for: key)
-            }
+        override func itemNotTakable(item: String) -> String {
+            "You cannot pick up \(item)."
         }
     }
 
@@ -60,43 +54,50 @@ struct MessageProviderTests {
         let provider = TestMessageProvider()
 
         // Test overridden messages
-        #expect(provider.message(for: .roomIsDark) == "The oppressive darkness surrounds you.")
-        #expect(provider.message(for: .playerCannotCarryMore) == "You're carrying too much already.")
-        #expect(provider.message(for: .itemNotTakable(item: "the sword")) == "You cannot pick up the sword.")
+        #expect(provider.roomIsDark() == "The oppressive darkness surrounds you.")
+        #expect(provider.playerCannotCarryMore() == "You're carrying too much already.")
+        #expect(provider.itemNotTakable(item: "the sword") == "You cannot pick up the sword.")
 
         // Test non-overridden messages still use defaults
-        #expect(provider.message(for: .nowDark) == "You are plunged into darkness.")
-        #expect(provider.message(for: .emptyInput) == "I beg your pardon?")
+        #expect(provider.nowDark() == "You are plunged into darkness.")
+        #expect(provider.emptyInput() == "I beg your pardon?")
     }
 
-    struct SpanishMessageProvider: MessageProvider {
-        let languageCode = "es"
+    final class SpanishMessageProvider: MessageProvider, @unchecked Sendable {
+        init() {
+            super.init(languageCode: "es")
+        }
 
-        /// Standard provider for fallback to default messages
-        private let standard = StandardMessageProvider()
+        override func roomIsDark() -> String {
+            "Está completamente oscuro. No puedes ver nada."
+        }
 
-        func message(for key: MessageKey) -> String {
-            switch key {
-            case .roomIsDark:
-                "Está completamente oscuro. No puedes ver nada."
-            case .nowDark:
-                "Te sumerges en la oscuridad."
-            case .nowLit:
-                "Ahora puedes ver tu entorno."
-            case .playerCannotCarryMore:
-                "Tienes las manos llenas."
-            case .itemNotTakable(let item):
-                "No puedes tomar \(item)."
-            case .emptyInput:
-                "¿Perdón?"
-            case .parseUnknownVerb(let verb):
-                "No conozco el verbo '\(verb)'."
-            case .custom(let message):
-                message
-            default:
-                // Fallback to English for unimplemented messages
-                standard.message(for: key)
-            }
+        override func nowDark() -> String {
+            "Te sumerges en la oscuridad."
+        }
+
+        override func nowLit() -> String {
+            "Ahora puedes ver tu entorno."
+        }
+
+        override func playerCannotCarryMore() -> String {
+            "Tienes las manos llenas."
+        }
+
+        override func itemNotTakable(item: String) -> String {
+            "No puedes tomar \(item)."
+        }
+
+        override func emptyInput() -> String {
+            "¿Perdón?"
+        }
+
+        override func parseUnknownVerb(verb: String) -> String {
+            "No conozco el verbo '\(verb)'."
+        }
+
+        override func custom(message: String) -> String {
+            message
         }
     }
 
@@ -107,34 +108,13 @@ struct MessageProviderTests {
         #expect(provider.languageCode == "es")
 
         // Test Spanish messages
-        #expect(provider.message(for: .roomIsDark) == "Está completamente oscuro. No puedes ver nada.")
-        #expect(provider.message(for: .playerCannotCarryMore) == "Tienes las manos llenas.")
-        #expect(provider.message(for: .itemNotTakable(item: "la espada")) == "No puedes tomar la espada.")
-        #expect(provider.message(for: .emptyInput) == "¿Perdón?")
+        #expect(provider.roomIsDark() == "Está completamente oscuro. No puedes ver nada.")
+        #expect(provider.playerCannotCarryMore() == "Tienes las manos llenas.")
+        #expect(provider.itemNotTakable(item: "la espada") == "No puedes tomar la espada.")
+        #expect(provider.emptyInput() == "¿Perdón?")
 
         // Test fallback to English for unimplemented
-        #expect(provider.message(for: .itemNotDroppable(item: "the rock")).contains("can't drop"))
-    }
-
-    @Test("MessageKey hashable and equality works correctly")
-    func testMessageKeyEquality() async throws {
-        let key1: MessageKey = .roomIsDark
-        let key2: MessageKey = .roomIsDark
-        let key3: MessageKey = .nowDark
-
-        #expect(key1 == key2)
-        #expect(key1 != key3)
-
-        let key4: MessageKey = .itemNotTakable(item: "rock")
-        let key5: MessageKey = .itemNotTakable(item: "rock")
-        let key6: MessageKey = .itemNotTakable(item: "stone")
-
-        #expect(key4 == key5)
-        #expect(key4 != key6)
-
-        // Test in Set/Dictionary
-        let keySet: Set<MessageKey> = [key1, key2, key3, key4, key5, key6]
-        #expect(keySet.count == 4) // key1==key2 and key4==key5, so 4 unique keys
+        #expect(provider.itemNotDroppable(item: "the rock") == "You can't drop the rock.")
     }
 }
 
