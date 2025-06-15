@@ -6,21 +6,13 @@ import Testing
 /// Tests for MessageProvider integration with GameEngine
 @Suite("MessageProvider Integration Tests")
 struct MessageProviderIntegrationTests {
-    struct TestMessageProvider: MessageProvider {
-        let languageCode = "en"
+    class TestMessageProvider: MessageProvider, @unchecked Sendable {
+        override func roomIsDark() -> String {
+            "TEST: Custom darkness message"
+        }
 
-        /// Standard provider for fallback to default messages
-        private let standard = StandardMessageProvider()
-
-        func message(for key: MessageKey) -> String {
-            switch key {
-            case .roomIsDark:
-                "TEST: Custom darkness message"
-            case .emptyInput:
-                "TEST: Custom empty input message"
-            default:
-                standard.message(for: key)
-            }
+        override func emptyInput() -> String {
+            "TEST: Custom empty input message"
         }
     }
 
@@ -58,10 +50,10 @@ struct MessageProviderIntegrationTests {
             ioHandler: mockIO
         )
 
-        await #expect(engine.messageProvider.languageCode == "en")
+        #expect(engine.messageProvider.languageCode == "en")
 
         // Test that the engine's MessageProvider is the custom one
-        let darknessMessage = await engine.messageProvider.message(for: .roomIsDark)
+        let darknessMessage = engine.messageProvider.roomIsDark()
         #expect(darknessMessage == "TEST: Custom darkness message")
 
         // Test darkness message in actual engine behavior

@@ -69,7 +69,6 @@ public struct EmptyActionHandler: ActionHandler {
             message = context.message.containerAlreadyEmpty(
                 container: targetItem.withDefiniteArticle.capitalizedFirst
             )
-            )
         } else {
             // Get current location to move items to
             let currentLocationID = await context.engine.playerLocationID
@@ -82,10 +81,9 @@ public struct EmptyActionHandler: ActionHandler {
             }
 
             message = context.message.emptySuccess(
-                    container: targetItem.withDefiniteArticle,
-                    items: contents.listWithIndefiniteArticles,
-                    count: contents.count
-                )
+                container: targetItem.withDefiniteArticle,
+                items: contents.listWithIndefiniteArticles,
+                count: contents.count
             )
         }
 

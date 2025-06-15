@@ -217,7 +217,7 @@ extension GameBlueprint {
     }
 
     public var messageProvider: MessageProvider {
-        StandardMessageProvider()
+        MessageProvider()
     }
 
     public var randomNumberGenerator: any RandomNumberGenerator {

@@ -77,7 +77,7 @@ public struct LookActionHandler: ActionHandler {
             // LOOK (no direct object) - describe the room
             // Check for darkness FIRST
             guard await context.engine.playerLocationIsLit() else {
-                return ActionResult(context.message.roomIsDark)
+                return ActionResult(context.message.roomIsDark())
             }
 
             await context.engine.ioHandler.print(

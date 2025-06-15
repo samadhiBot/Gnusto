@@ -126,8 +126,8 @@ public struct PushActionHandler: ActionHandler {
         // Generate appropriate message
         let message =
             if pushedItems.isEmpty {
-                context.command.isAllCommand
-                    ? context.message.nothingHereToPush) : context.message.pushWhat()
+                context.command.isAllCommand ? context.message.nothingHereToPush()
+                                             : context.message.pushWhat()
             } else {
                 context.message.pushSuccess(items: pushedItems.listWithDefiniteArticles)
             }

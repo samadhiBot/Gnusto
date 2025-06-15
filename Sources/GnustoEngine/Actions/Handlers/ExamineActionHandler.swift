@@ -24,12 +24,12 @@ public struct ExamineActionHandler: ActionHandler {
 
         // 1. Ensure we have at least one direct object for non-ALL commands
         guard !context.command.directObjects.isEmpty else {
-            throw ActionResponse.custom(context.message.examineWhat)
+            throw ActionResponse.custom(context.message.examineWhat())
         }
 
         // For single object commands, validate the single object
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.custom(context.message.examineWhat)
+            throw ActionResponse.custom(context.message.examineWhat())
         }
 
         switch directObjectRef {
@@ -212,9 +212,9 @@ public struct ExamineActionHandler: ActionHandler {
             case .player:
                 // Classic Zork response for EXAMINE SELF
                 if context.command.isAllCommand || context.command.directObjects.count > 1 {
-                    messages.append("- Yourself: \(context.message.examineYourself))"()
+                    messages.append("- Yourself: \(context.message.examineYourself())")
                 } else {
-                    messages.append(context.message.examineYourself)
+                    messages.append(context.message.examineYourself())
                 }
 
             default:
