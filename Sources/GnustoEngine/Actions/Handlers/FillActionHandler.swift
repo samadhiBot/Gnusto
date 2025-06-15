@@ -44,8 +44,9 @@ public struct FillActionHandler: ActionHandler {
         // If a source is specified, validate it
         if let indirectObjectRef = context.command.indirectObject {
             guard case .item(let sourceItemID) = indirectObjectRef else {
-                let message = context.message.cannotFillFrom(source: "that")
-                throw ActionResponse.prerequisiteNotMet(message)
+                throw ActionResponse.prerequisiteNotMet(
+                    context.message.cannotFillFrom()
+                )
             }
 
             _ = try await context.engine.item(sourceItemID)
@@ -86,8 +87,10 @@ public struct FillActionHandler: ActionHandler {
             // Check if source has drinkable liquid or is a water source
             let message =
                 if sourceItem.hasFlag(.isDrinkable) {
-                    context.message(
-                        .fillSuccess(container: containerItem.name, source: sourceItem.name))
+                    context.message.fillSuccess(
+                        container: containerItem.name,
+                        source: sourceItem.name
+                    )
                     // TODO: In a full implementation, you might create a new liquid item in the container
                 } else {
                     context.message.noLiquidInSource(source: sourceItem.name)

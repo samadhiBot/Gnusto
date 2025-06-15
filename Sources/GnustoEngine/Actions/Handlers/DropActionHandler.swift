@@ -189,8 +189,9 @@ public struct DropActionHandler: ActionHandler {
                 if droppedItems.isEmpty {
                     "You have nothing to drop."
                 } else {
-                    context.message(
-                        .youDropMultipleItems(items: droppedItems.listWithDefiniteArticles))
+                    context.message.youDropMultipleItems(
+                        items: droppedItems.listWithDefiniteArticles
+                    )
                 }
             } else {
                 context.message.dropped()

@@ -115,8 +115,8 @@ public struct DrinkActionHandler: ActionHandler {
                 }
             } else {
                 return ActionResult(
-                    message: context.message(
-                        .nothingToDrinkIn(container: targetItem.withDefiniteArticle)
+                    message: context.message.nothingToDrinkIn(
+                        container: targetItem.withDefiniteArticle
                     ),
                     changes: [
                         await context.engine.setFlag(.isTouched, on: targetItem)
@@ -127,7 +127,7 @@ public struct DrinkActionHandler: ActionHandler {
         // Handle direct drinkable item
         else if targetItem.hasFlag(.isDrinkable) {
             return ActionResult(
-                message: context.message.drinkSuccess(item: targetItem.withDefiniteArticle))
+                message: context.message.drinkSuccess(item: targetItem.withDefiniteArticle),
                 changes: [
                     await context.engine.setFlag(.isTouched, on: targetItem),
                     await context.engine.move(targetItem, to: .nowhere),
@@ -136,7 +136,7 @@ public struct DrinkActionHandler: ActionHandler {
         } else {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
-                context.message.cannotDrink(item: targetItem.withDefiniteArticle))
+                context.message.cannotDrink(item: targetItem.withDefiniteArticle),
                 change: await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }

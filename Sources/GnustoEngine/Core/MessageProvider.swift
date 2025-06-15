@@ -36,7 +36,7 @@
 open class MessageProvider: @unchecked Sendable {
     public let languageCode: String
 
-    private let randomNumberGenerator: RandomNumberGenerator
+    private var randomNumberGenerator: RandomNumberGenerator
 
     public init(
         languageCode: String = "en",

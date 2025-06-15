@@ -75,11 +75,13 @@ public struct DigActionHandler: ActionHandler {
                 let toolItem = try await context.engine.item(toolItemID)
 
                 if toolItem.hasFlag(.isTool) {
-                    message = context.message(
-                        .digWithToolNothing(tool: toolItem.withDefiniteArticle))
+                    message = context.message.digWithToolNothing(
+                        tool: toolItem.withDefiniteArticle
+                    )
                 } else {
-                    message = context.message(
-                        .toolNotSuitableForDigging(tool: toolItem.withDefiniteArticle))
+                    message = context.message.toolNotSuitableForDigging(
+                        tool: toolItem.withDefiniteArticle
+                    )
                 }
             } else {
                 // Check if player has digging tools

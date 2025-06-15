@@ -319,89 +319,87 @@ extension GameEngine {
     /// `.internalEngineError` or `.stateValidationFailed`.
     private func report(_ response: ActionResponse) async {
         // Determine the user-facing message using MessageProvider
-        let messageKey: MessageKey =
-            switch response {
-            case .containerIsClosed(let item):
-                .containerIsClosed(item: TheItem(item))
-            case .containerIsOpen(let item):
-                .containerIsOpen(item: TheItem(item))
-            case .custom(let message):
-                .custom(message: message)
-            case .directionIsBlocked(let reason):
-                .directionIsBlocked(reason: reason)
-            case .internalEngineError:
-                .internalEngineError
-            case .invalidDirection:
-                .invalidDirection
-            case .invalidIndirectObject(let objectName):
-                .invalidIndirectObject(object: theThat(objectName))
-            case .invalidValue:
-                .internalEngineError  // Use general internal error for invalid value
-            case .itemAlreadyClosed(let item):
-                .itemAlreadyClosed(item: TheItem(item))
-            case .itemAlreadyOpen(let item):
-                .itemAlreadyOpen(item: TheItem(item))
-            case .itemIsAlreadyWorn(let item):
-                .itemIsAlreadyWorn(item: theThat(item))
-            case .itemIsLocked(let item):
-                .itemIsLocked(item: TheItem(item))
-            case .itemIsNotWorn(let item):
-                .itemIsNotWorn(item: theThat(item))
-            case .itemIsUnlocked(let item):
-                .itemIsUnlocked(item: TheItem(item))
-            case .itemNotAccessible(let item):
-                .itemNotAccessible(item: anySuch(item))
-            case .itemNotClosable(let item):
-                .itemNotClosable(item: TheItem(item))
-            case .itemNotDroppable(let item):
-                .itemNotDroppable(item: theThat(item))
-            case .itemNotEdible(let item):
-                .itemNotEdible(item: theThat(item))
-            case .itemNotHeld(let item):
-                .itemNotHeld(item: theThat(item))
-            case .itemNotInContainer(let item, let container):
-                .itemNotInContainer(item: TheItem(item), container: theThat(container))
-            case .itemNotLockable(let item):
-                .itemNotLockable(item: theThat(item))
-            case .itemNotOnSurface(let item, let surface):
-                .itemNotOnSurface(item: TheItem(item), surface: theThat(surface))
-            case .itemNotOpenable(let item):
-                .itemNotOpenable(item: theThat(item))
-            case .itemNotReadable(let item):
-                .itemNotReadable(item: TheItem(item))
-            case .itemNotRemovable(let item):
-                .itemNotRemovable(item: theThat(item))
-            case .itemNotTakable(let item):
-                .itemNotTakable(item: theThat(item))
-            case .itemNotUnlockable(let item):
-                .itemNotUnlockable(item: theThat(item))
-            case .itemNotWearable(let item):
-                .itemNotWearable(item: theThat(item))
-            case .itemTooLargeForContainer(let item, let container):
-                .itemTooLargeForContainer(item: TheItem(item), container: theThat(container))
-            case .playerCannotCarryMore:
-                .playerCannotCarryMore
-            case .prerequisiteNotMet(let customMessage):
-                .prerequisiteNotMet(message: customMessage)
-            case .roomIsDark:
-                .roomIsDark
-            case .stateValidationFailed:
-                .stateValidationFailed
-            case .targetIsNotAContainer(let item):
-                .targetIsNotAContainer(item: theThat(item))
-            case .targetIsNotASurface(let item):
-                .targetIsNotASurface(item: theThat(item))
-            case .toolMissing(let tool):
-                .toolMissing(tool: tool)
-            case .unknownEntity:
-                .unknownEntity
-            case .unknownVerb(let verb):
-                .unknownVerb(verb: verb)
-            case .wrongKey(let keyID, let lockID):
-                .wrongKey(key: TheItem(keyID), lock: theThat(lockID))
-            }
+        let message = switch response {
+        case .containerIsClosed(let item):
+            messageProvider.containerIsClosed(item: TheItem(item))
+        case .containerIsOpen(let item):
+            messageProvider.containerIsOpen(item: TheItem(item))
+        case .custom(let message):
+            messageProvider.custom(message: message)
+        case .directionIsBlocked(let reason):
+            messageProvider.directionIsBlocked(reason: reason)
+        case .internalEngineError:
+            messageProvider.internalEngineError()
+        case .invalidDirection:
+            messageProvider.invalidDirection()
+        case .invalidIndirectObject(let objectName):
+            messageProvider.invalidIndirectObject(object: theThat(objectName))
+        case .invalidValue:
+            messageProvider.internalEngineError()
+        case .itemAlreadyClosed(let item):
+            messageProvider.itemAlreadyClosed(item: TheItem(item))
+        case .itemAlreadyOpen(let item):
+            messageProvider.itemAlreadyOpen(item: TheItem(item))
+        case .itemIsAlreadyWorn(let item):
+            messageProvider.itemIsAlreadyWorn(item: theThat(item))
+        case .itemIsLocked(let item):
+            messageProvider.itemIsLocked(item: TheItem(item))
+        case .itemIsNotWorn(let item):
+            messageProvider.itemIsNotWorn(item: theThat(item))
+        case .itemIsUnlocked(let item):
+            messageProvider.itemIsUnlocked(item: TheItem(item))
+        case .itemNotAccessible(let item):
+            messageProvider.itemNotAccessible(item: anySuch(item))
+        case .itemNotClosable(let item):
+            messageProvider.itemNotClosable(item: TheItem(item))
+        case .itemNotDroppable(let item):
+            messageProvider.itemNotDroppable(item: theThat(item))
+        case .itemNotEdible(let item):
+            messageProvider.itemNotEdible(item: theThat(item))
+        case .itemNotHeld(let item):
+            messageProvider.itemNotHeld(item: theThat(item))
+        case .itemNotInContainer(let item, let container):
+            messageProvider.itemNotInContainer(item: TheItem(item), container: theThat(container))
+        case .itemNotLockable(let item):
+            messageProvider.itemNotLockable(item: theThat(item))
+        case .itemNotOnSurface(let item, let surface):
+            messageProvider.itemNotOnSurface(item: TheItem(item), surface: theThat(surface))
+        case .itemNotOpenable(let item):
+            messageProvider.itemNotOpenable(item: theThat(item))
+        case .itemNotReadable(let item):
+            messageProvider.itemNotReadable(item: TheItem(item))
+        case .itemNotRemovable(let item):
+            messageProvider.itemNotRemovable(item: theThat(item))
+        case .itemNotTakable(let item):
+            messageProvider.itemNotTakable(item: theThat(item))
+        case .itemNotUnlockable(let item):
+            messageProvider.itemNotUnlockable(item: theThat(item))
+        case .itemNotWearable(let item):
+            messageProvider.itemNotWearable(item: theThat(item))
+        case .itemTooLargeForContainer(let item, let container):
+            messageProvider.itemTooLargeForContainer(item: TheItem(item), container: theThat(container))
+        case .playerCannotCarryMore:
+            messageProvider.playerCannotCarryMore()
+        case .prerequisiteNotMet(let customMessage):
+            messageProvider.prerequisiteNotMet(message: customMessage)
+        case .roomIsDark:
+            messageProvider.roomIsDark()
+        case .stateValidationFailed:
+            messageProvider.stateValidationFailed()
+        case .targetIsNotAContainer(let item):
+            messageProvider.targetIsNotAContainer(item: theThat(item))
+        case .targetIsNotASurface(let item):
+            messageProvider.targetIsNotASurface(item: theThat(item))
+        case .toolMissing(let tool):
+            messageProvider.toolMissing(tool: tool)
+        case .unknownEntity:
+            messageProvider.unknownEntity()
+        case .unknownVerb(let verb):
+            messageProvider.unknownVerb(verb: verb)
+        case .wrongKey(let keyID, let lockID):
+            messageProvider.wrongKey(key: TheItem(keyID), lock: theThat(lockID))
+        }
 
-        let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
 
         // Log detailed errors separately
@@ -429,34 +427,33 @@ extension GameEngine {
     /// into textual feedback for the player when their input cannot be understood.
     /// For `.internalError` cases, it also logs detailed information.
     private func report(parseError: ParseError) async {
-        let messageKey: MessageKey =
-            switch parseError {
-            case .emptyInput:
-                .emptyInput
-            case .unknownVerb(let verb):
-                .parseUnknownVerb(verb: verb)
-            case .unknownNoun(let noun):
-                .unknownNoun(noun: noun)
-            case .itemNotInScope(let noun):
-                .itemNotInScope(noun: noun)
-            case .modifierMismatch(let noun, let modifiers):
-                .modifierMismatch(noun: noun, modifiers: modifiers)
-            case .ambiguity(let text):
-                .ambiguity(text: text)
-            case .ambiguousPronounReference(let text):
-                .ambiguousPronounReference(text: text)
-            case .badGrammar(let text):
-                .badGrammar(text: text)
-            case .pronounNotSet(let pronoun):
-                .pronounNotSet(pronoun: pronoun)
-            case .pronounRefersToOutOfScopeItem(let pronoun):
-                .pronounRefersToOutOfScopeItem(pronoun: pronoun)
-            case .internalError:
-                .internalParseError
-            }
+        let message = switch parseError {
+        case .emptyInput:
+            messageProvider.emptyInput()
+        case .unknownVerb(let verb):
+            messageProvider.parseUnknownVerb(verb: verb)
+        case .unknownNoun(let noun):
+            messageProvider.unknownNoun(noun: noun)
+        case .itemNotInScope(let noun):
+            messageProvider.itemNotInScope(noun: noun)
+        case .modifierMismatch(let noun, let modifiers):
+            messageProvider.modifierMismatch(noun: noun, modifiers: modifiers)
+        case .ambiguity(let text):
+            messageProvider.ambiguity(text: text)
+        case .ambiguousPronounReference(let text):
+            messageProvider.ambiguousPronounReference(text: text)
+        case .badGrammar(let text):
+            messageProvider.badGrammar(text: text)
+        case .pronounNotSet(let pronoun):
+            messageProvider.pronounNotSet(pronoun: pronoun)
+        case .pronounRefersToOutOfScopeItem(let pronoun):
+            messageProvider.pronounRefersToOutOfScopeItem(pronoun: pronoun)
+        case .internalError:
+            messageProvider.internalParseError()
+        }
 
-        let message = messageProvider.message(for: messageKey)
         await ioHandler.print(message)
+
         if case .internalError(let details) = parseError {
             logError("ParseError: \(details)")
         }
@@ -978,13 +975,11 @@ extension GameEngine {
 
                 if wasLitBeforeCommand && !isLitAfterCommand {
                     // Moved from lit to dark - show transition message and darkness message combined
-                    let darknessMessage = messageProvider.message(for: .roomIsDark)
-                    let transitionMessage = messageProvider.message(for: .nowDark)
                     await ioHandler.print(
                         """
-                        \(transitionMessage)
+                        \(messageProvider.nowDark())
 
-                        \(darknessMessage)
+                        \(messageProvider.roomIsDark())
                         """)
                     shouldDescribe = false  // Don't call describeCurrentLocation since we handled it
                 } else {
