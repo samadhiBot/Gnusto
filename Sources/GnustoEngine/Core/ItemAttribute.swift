@@ -290,6 +290,11 @@ extension ItemAttribute {
         ItemAttribute(id: .isPlural, rawValue: true)
     }
 
+    /// Indicates a plant that can be watered.
+    public static var isPlant: ItemAttribute {
+        ItemAttribute(id: .isPlant, rawValue: true)
+    }
+
     /// Can be pressed (like buttons, switches).
     public static var isPressable: ItemAttribute {
         ItemAttribute(id: .isPressable, rawValue: true)

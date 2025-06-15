@@ -84,8 +84,8 @@ public struct PutOnActionHandler: ActionHandler {
                     }
                 throw ActionResponse.prerequisiteNotMet(
                     context.message.putCannotPutCircular(
-                        item: itemToPut.name,
-                        container: surfaceItem.name,
+                        item: itemToPut.withDefiniteArticle,
+                        container: surfaceItem.withDefiniteArticle,
                         preposition: preposition
                     )
                 )

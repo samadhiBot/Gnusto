@@ -97,7 +97,8 @@ struct PourOnActionHandlerTests {
         let flower = Item(
             id: "flower",
             .name("flower"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isPlant
         )
 
         let game = MinimalGame(items: [water, flower])

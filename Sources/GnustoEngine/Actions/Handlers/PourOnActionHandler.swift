@@ -71,20 +71,28 @@ public struct PourOnActionHandler: ActionHandler {
         let sourceItem = try await context.engine.item(sourceItemID)
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Determine appropriate response based on what's being poured and where
+        // Determine appropriate response based on what's being poured and where.
+        // This must be done *before* creating state changes so it reflects the world
+        // state prior to the action.
         let message = try await handlePouring(
             sourceItem: sourceItem,
             targetItem: targetItem,
             context: context
         )
 
+        var changes: [StateChange?] = [
+            await context.engine.setFlag(.isTouched, on: sourceItem),
+            await context.engine.setFlag(.isTouched, on: targetItem),
+            await context.engine.updatePronouns(to: targetItem),
+        ]
+
+        if targetItem.hasFlag(.isLit) && targetItem.hasFlag(.isFlammable) {
+            changes.append(await context.engine.clearFlag(.isLit, on: targetItem))
+        }
+
         return ActionResult(
             message: message,
-            changes: [
-                await context.engine.setFlag(.isTouched, on: sourceItem),
-                await context.engine.setFlag(.isTouched, on: targetItem),
-                await context.engine.updatePronouns(to: targetItem),
-            ]
+            changes: changes
         )
     }
 
@@ -104,6 +112,21 @@ public struct PourOnActionHandler: ActionHandler {
         // Check if the source is actually pourable
         if !sourceItem.hasFlag(.isDrinkable) {
             return context.message.pourNotLiquid(item: sourceItem.withDefiniteArticle)
+        }
+
+        // Check for pouring on a lit, flammable object to extinguish it
+        if targetItem.hasFlag(.isLit) && targetItem.hasFlag(.isFlammable) {
+            return context.message.pourOnFireAndExtinguish(
+                item: sourceItem.withDefiniteArticle,
+                target: targetItem.withDefiniteArticle
+            )
+        }
+
+        if targetItem.hasFlag(.isPlant) {
+            return context.message.pourOnPlantAndRefresh(
+                item: sourceItem.withDefiniteArticle,
+                target: targetItem.withDefiniteArticle
+            )
         }
 
         // Special cases for characters as targets

@@ -143,6 +143,9 @@ public extension ItemAttributeID {
     /// PLURALBIT: Grammatically plural.
     static let isPlural = ItemAttributeID("isPlural")
 
+    /// Indicates a plant that can be watered.
+    static let isPlant = ItemAttributeID("isPlant")
+
     /// Can be pressed (like buttons, switches).
     static let isPressable = ItemAttributeID("isPressable")
 

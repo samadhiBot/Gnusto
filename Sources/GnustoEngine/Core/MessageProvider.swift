@@ -960,8 +960,16 @@ open class MessageProvider: @unchecked Sendable {
         "You pour \(item) on \(device), which probably wasn't a good idea."
     }
 
+    open func pourOnFireAndExtinguish(item: String, target: String) -> String {
+        "You pour \(item) on \(target). The flames are extinguished with a hissing sound."
+    }
+
     open func pourOnGeneric(item: String, target: String) -> String {
         "You pour \(item) on \(target)."
+    }
+
+    open func pourOnPlantAndRefresh(item: String, target: String) -> String {
+        "You pour \(item) on \(target). It looks refreshed."
     }
 
     open func pourWhat() -> String {
