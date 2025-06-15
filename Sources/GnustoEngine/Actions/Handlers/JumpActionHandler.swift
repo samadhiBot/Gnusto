@@ -41,7 +41,7 @@ public struct JumpActionHandler: ActionHandler {
         // Handle JUMP with no object - general jumping
         guard let directObjectRef = context.command.directObject else {
             // General jumping - use random response from MessageProvider
-            let message = await context.message.jumpResponse()
+            let message = context.message.jumpResponse()
             return ActionResult(message)
         }
 

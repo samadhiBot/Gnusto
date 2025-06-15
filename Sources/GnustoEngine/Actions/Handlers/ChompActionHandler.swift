@@ -37,7 +37,7 @@ public struct ChompActionHandler: ActionHandler {
             case .item(let targetItemID) = directObjectRef
         else {
             // Get random response from message provider
-            let message = await context.message.chompResponse()
+            let message = context.message.chompResponse()
             return ActionResult(message)
         }
 
@@ -59,7 +59,7 @@ public struct ChompActionHandler: ActionHandler {
         } else {
             // Generic responses for other objects
             let theItem = targetItem.withDefiniteArticle
-            message = await context.message.chompTargetResponse(item: theItem)
+            message = context.message.chompTargetResponse(item: theItem)
         }
 
         // Mark item as touched and update pronouns

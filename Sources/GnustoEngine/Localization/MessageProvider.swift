@@ -9,6 +9,30 @@
 /// - **Clear and informative**: Players understand what happened and why
 /// - **Consistent in tone**: Maintains the classic IF voice
 /// - **Respectful of ZIL traditions**: Uses familiar phrases when appropriate
+///
+/// ## Thread Safety and `@unchecked Sendable`
+///
+/// This class uses `@unchecked Sendable` as a pragmatic exception to our general rule
+/// against unchecked sendability. The decision is based on several factors:
+///
+/// **Why `@unchecked` is necessary:**
+/// - `open class` cannot conform to `Sendable` naturally (subclasses could add mutable state)
+/// - Swift's type system cannot verify sendability across arbitrary subclasses
+///
+/// **Why it's safe in this context:**
+/// - Message providers are configured once at game startup
+/// - After initialization, they operate as effectively read-only objects
+/// - The only internal state (RNG) is used for deterministic message variation
+/// - Usage is controlled within the engine's single-threaded game loop
+///
+/// **Critical requirements for subclasses:**
+/// - **MUST NOT add mutable state** (use `let` properties only)
+/// - **MUST NOT retain non-Sendable objects** beyond initialization
+/// - **MUST ensure thread safety** if overriding methods that use shared state
+/// - Consider the provider as immutable after `init()` completes
+///
+/// Alternative architectures (protocol-based, composition) were considered but imposed
+/// significant API complexity for minimal safety benefit in this controlled usage pattern.
 open class MessageProvider: @unchecked Sendable {
     public let languageCode: String
 
