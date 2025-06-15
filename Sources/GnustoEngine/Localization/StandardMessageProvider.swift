@@ -511,8 +511,11 @@ public struct StandardMessageProvider: MessageProvider, Sendable {
         case .kissCharacter(let character):
             "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
 
-        case .kissLargeObject(let item):
-            "You can't kiss \(item) - it's too large and impersonal."
+        case .kissObject(let item):
+            "You can't kiss \(item)."
+
+        case .kissSelf:
+            "You kiss yourself."
 
         case .kissWhat:
             "Kiss what?"

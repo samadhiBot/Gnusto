@@ -157,7 +157,8 @@ public enum MessageKey: Hashable, Sendable {
     case kickLargeObject(item: String)
     case kickWhat
     case kissCharacter(character: String)
-    case kissLargeObject(item: String)
+    case kissObject(item: String)
+    case kissSelf
     case kissWhat
     case knockOnClosedDoor(door: String)
     case knockOnContainer(container: String)

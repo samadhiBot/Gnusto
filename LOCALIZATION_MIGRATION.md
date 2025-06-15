@@ -66,7 +66,7 @@ Implemented support for atmospheric commands with multiple response options:
 - ✅ FindActionHandler - Uses `.findWhat`
 - ✅ InflateActionHandler - Uses `.inflateWhat`, `.cannotInflate(item:)`
 - ✅ KickActionHandler - Uses `.kickWhat`, `.kickCharacter(character:)`, `.kickSmallObject(item:)`, `.kickLargeObject(item:)`
-- ✅ KissActionHandler - Uses `.kissWhat`, `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissLargeObject(item:)`
+- ✅ KissActionHandler - Uses `.kissWhat`, `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissObject(item:)`
 - ✅ KnockActionHandler - Uses `.knockOnWhat`, `.knockOnOpenDoor(door:)`, `.knockOnLockedDoor(door:)`, `.knockOnClosedDoor(door:)`, `.knockOnWall(wall:)`, `.knockOnWoodenObject(item:)`, `.knockOnContainer(container:)`, `.knockOnSmallObject(item:)`, `.knockOnGenericObject(item:)`
 - ✅ LockActionHandler - Uses `.lockWhat`, `.lockWithWhat`, `.canOnlyUseItemAsKey`
 - ✅ LookActionHandler - Uses `.canOnlyLookAtItems`
@@ -100,7 +100,7 @@ Implemented support for atmospheric commands with multiple response options:
 - `.blowOnLightSource(item:)`, `.burnToCatchFire(item:)`, `.cutWithTool(item:tool:)`
 - `.jumpDangerous`, `.jumpWater(water:)`, `.jumpCharacter(character:)`, `.jumpSmallObject(item:)`, `.jumpLargeObject(item:)`
 - `.kickCharacter(character:)`, `.kickSmallObject(item:)`, `.kickLargeObject(item:)`
-- `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissLargeObject(item:)`
+- `.kissFrog(frog:)`, `.kissCharacter(character:)`, `.kissMirror(mirror:)`, `.kissStatue(statue:)`, `.kissSmallObject(item:)`, `.kissObject(item:)`
 - `.knockOnOpenDoor(door:)`, `.knockOnLockedDoor(door:)`, `.knockOnClosedDoor(door:)`, `.knockOnWall(wall:)`, `.knockOnWoodenObject(item:)`, `.knockOnContainer(container:)`, `.knockOnSmallObject(item:)`, `.knockOnGenericObject(item:)`
 - `.rubCharacter(character:)`, `.rubCleanObject(item:)`, `.rubLamp(lamp:)`, `.rubSmallObject(item:)`, `.rubGenericObject(item:)`
 - `.shakeCharacter(character:)`, `.shakeOpenContainer(container:)`, `.shakeClosedContainer(container:)`, `.shakeLiquidContainer(container:)`, `.shakeSmallObject(item:)`, `.shakeFixedObject(item:)`

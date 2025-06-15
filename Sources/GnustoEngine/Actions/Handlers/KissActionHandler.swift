@@ -39,11 +39,20 @@ public struct KissActionHandler: ActionHandler {
     /// - Parameter context: The `ActionContext` for the current action.
     /// - Returns: An `ActionResult` with appropriate kissing message and state changes.
     public func process(context: ActionContext) async throws -> ActionResult {
-        guard let directObjectRef = context.command.directObject,
-            case .item(let targetItemID) = directObjectRef
-        else {
+        guard let directObjectRef = context.command.directObject else {
             throw ActionResponse.internalEngineError(
-                "KissActionHandler: directObject was not an item in process.")
+                "KissActionHandler: directObject was not an item in process."
+            )
+        }
+
+        if case .player = directObjectRef {
+            return ActionResult(context.message(.kissSelf))
+        }
+
+        guard case .item(let targetItemID) = directObjectRef else {
+            return ActionResult(
+                context.message(.kissWhat)
+            )
         }
 
         let targetItem = try await context.engine.item(targetItemID)
@@ -55,7 +64,7 @@ public struct KissActionHandler: ActionHandler {
                 context.message(.kissCharacter(character: targetItem.withDefiniteArticle))
             } else {
                 // Kissing objects - generic response
-                context.message(.kissLargeObject(item: targetItem.withDefiniteArticle))
+                context.message(.kissObject(item: targetItem.withDefiniteArticle))
             }
 
         return ActionResult(
@@ -65,14 +74,5 @@ public struct KissActionHandler: ActionHandler {
                 await context.engine.updatePronouns(to: targetItem),
             ]
         )
-    }
-
-    /// Performs any post-processing after the kiss action completes.
-    ///
-    /// Currently no post-processing is needed for basic kissing.
-    ///
-    /// - Parameter context: The action context for the current action.
-    public func postProcess(context: ActionContext) async throws {
-        // No post-processing needed for kiss
     }
 }
