@@ -43,13 +43,13 @@ public struct MinimalGame: GameBlueprint {
                 .in(.location(LocationID("startRoom"))),
                 .isTakable
             ),
-            Item(
-                id: "self",
-                .name("self"),
-                .description("You are your usual self."),
-                .in(.player),
-                .omitDescription
-            )
+//            Item(
+//                id: "self",
+//                .name("self"),
+//                .description("You are your usual self."),
+//                .in(.player),
+//                .omitDescription
+//            )
         ],
         customActionHandlers: [VerbID: ActionHandler] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],

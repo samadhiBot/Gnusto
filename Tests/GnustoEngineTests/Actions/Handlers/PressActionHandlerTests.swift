@@ -108,7 +108,15 @@ struct PressActionHandlerTests {
         let otherRoom = Location(
             id: "otherRoom",
             .name("Other Room"),
-            .description("Another room.")
+            .description("Another room."),
+            .inherentlyLit
+        )
+
+        let startRoom = Location(
+            id: "startRoom",
+            .name("Start Room"),
+            .description("The start room."),
+            .inherentlyLit
         )
 
         let distantButton = Item(
@@ -119,7 +127,7 @@ struct PressActionHandlerTests {
         )
 
         let game = MinimalGame(
-            locations: [otherRoom],
+            locations: [startRoom, otherRoom],
             items: [distantButton]
         )
         let mockIO = await MockIOHandler()
