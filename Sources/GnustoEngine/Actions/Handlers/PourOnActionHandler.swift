@@ -27,7 +27,11 @@ public struct PourOnActionHandler: ActionHandler {
         guard let indirectObjectRef = context.command.indirectObject else {
             let sourceItem = try await context.engine.item(sourceItemID)
             throw ActionResponse.prerequisiteNotMet(
-                context.message.pourOn(item: sourceItem.name, target: ""))
+                context.message.pourOn(
+                    item: sourceItem.withDefiniteArticle,
+                    target: ""
+                )
+            )
         }
         guard case .item(let targetItemID) = indirectObjectRef else {
             throw ActionResponse.prerequisiteNotMet(context.message.pourCannotPourOnThat())
@@ -60,7 +64,8 @@ public struct PourOnActionHandler: ActionHandler {
             case .item(let targetItemID) = indirectObjectRef
         else {
             throw ActionResponse.internalEngineError(
-                "PourOnActionHandler: missing required objects in process.")
+                "PourOnActionHandler: missing required objects in process."
+            )
         }
 
         let sourceItem = try await context.engine.item(sourceItemID)
@@ -91,29 +96,37 @@ public struct PourOnActionHandler: ActionHandler {
     ) async throws -> String {
         // Check if we're trying to pour something on itself
         if sourceItem.id == targetItem.id {
-            return context.message.pourCannotPourItself(item: sourceItem.name)
+            return context.message.pourCannotPourItself(
+                item: sourceItem.withDefiniteArticle
+            )
         }
 
         // Check if the source is actually pourable
         if !sourceItem.hasFlag(.isDrinkable) {
-            return context.message.pourNotLiquid(item: sourceItem.name)
+            return context.message.pourNotLiquid(item: sourceItem.withDefiniteArticle)
         }
 
         // Special cases for characters as targets
         if targetItem.hasFlag(.isCharacter) {
             return context.message.pourOnCharacter(
-                item: sourceItem.name,
-                character: targetItem.name
+                item: sourceItem.withDefiniteArticle,
+                character: targetItem.withDefiniteArticle
             )
         }
 
         // Special cases for sensitive objects
         if targetItem.hasFlag(.isDevice) {
-            return context.message.pourOnDevice(item: sourceItem.name, device: targetItem.name)
+            return context.message.pourOnDevice(
+                item: sourceItem.withDefiniteArticle,
+                device: targetItem.withDefiniteArticle
+            )
         }
 
         // General pouring response
-        return context.message.pourOnGeneric(item: sourceItem.name, target: targetItem.name)
+        return context.message.pourOnGeneric(
+            item: sourceItem.withDefiniteArticle,
+            target: targetItem.withDefiniteArticle
+        )
     }
 
     /// Performs any post-processing after the pour action completes.

@@ -59,9 +59,13 @@ public struct KissActionHandler: ActionHandler {
 
         // Determine appropriate response based on object type
         let message =
+        // Kissing characters
             if targetItem.hasFlag(.isCharacter) {
-                // Kissing characters
-                context.message.kissCharacter(character: targetItem.withDefiniteArticle)
+                if targetItem.hasFlag(.isFighting) {
+                    context.message.kissEnemy(enemy: targetItem.withDefiniteArticle)
+                } else {
+                    context.message.kissCharacter(character: targetItem.withDefiniteArticle)
+                }
             } else {
                 // Kissing objects - generic response
                 context.message.kissObject(item: targetItem.withDefiniteArticle)

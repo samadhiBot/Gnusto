@@ -523,6 +523,21 @@ open class MessageProvider: @unchecked Sendable {
         "Game saved."
     }
 
+    open func giggleResponse() -> String {
+        oneOf(
+            "You giggle softly to yourself.",
+            "You chuckle with amusement.",
+            "You snicker quietly. How mischievous!",
+            "You titter like a schoolchild.",
+            "You giggle uncontrollably. How embarrassing!",
+            "You chuckle at some private joke.",
+            "You giggle with glee.",
+            "You snicker at the absurdity of it all.",
+            "You chortle with delight.",
+            "You giggle like a maniac. Very therapeutic.",
+        )
+    }
+
     open func giveToWhom() -> String {
         "Give to whom?"
     }
@@ -717,11 +732,37 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func kissCharacter(character: String) -> String {
-        "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
+        oneOf(
+            "\(character.capitalizedFirst) doesn't seem particularly receptive to your affections."
+        )
+    }
+
+    open func kissEnemy(enemy: String) -> String {
+        oneOf(
+            "You try to kiss \(enemy) mid-snarl, which seems poorly timed.",
+            "You lean in for a kiss, but \(enemy) seems more interested in eating your face.",
+            "You pucker up romantically, but \(enemy) responds with claws and teeth.",
+            "You move in for a smooch, but apparently \(enemy) is not in the mood for romance.",
+            "You lean in for a kiss while \(enemy) is actively trying to kill you.",
+            "Reading the room incorrectly, you pucker up as \(enemy) in full attack mode.",
+            "You give them a smooch, but \(enemy) remains disappointingly homicidal.",
+            "You lean in for a kiss and narrowly avoid losing your nose.",
+            "You pucker up and then immediately regret this tactical decision.",
+        )
     }
 
     open func kissObject(item: String) -> String {
-        "You can't kiss \(item)."
+        oneOf(
+            "You give \(item) a quick kiss, which fails to reveal anything significant.",
+            "You kiss \(item) experimentally, but nothing remarkable happens.",
+            "You plant a brief kiss on \(item), yet your lips learn nothing new.",
+            "You kiss \(item) once, and think you detect trace amounts of indifference.",
+            "You kiss it curiously, but your curiosity remains unsatisfied.",
+            "You briefly kiss \(item), which offers no secrets to your lips.",
+            "You give \(item) an investigative kiss. The investigation yields little.",
+            "You plant a small kiss on \(item), learning nothing your eyes hadn't already told you.",
+            "You plant a testing kiss on \(item), but the test results are inconclusive.",
+        )
     }
 
     open func kissSelf() -> String {
@@ -737,23 +778,50 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func knockOnContainer(container: String) -> String {
-        "You knock on \(container). You hear a hollow sound."
+        "Knocking on \(container) produces a hollow sound."
     }
 
     open func knockOnGenericObject(item: String) -> String {
-        "You knock on \(item). Nothing happens."
+        "You knock on \(item), but nothing happens."
     }
 
     open func knockOnLockedDoor(door: String) -> String {
-        "You knock on \(door). There's no response from the other side."
+        "You knock on \(door), but nobody's home."
     }
 
     open func knockOnOpenDoor(door: String) -> String {
-        "\(door.capitalizedFirst) is already open. There's no need to knock."
+        "No need to knock, \(door) is already open."
     }
 
     open func knockOnWhat() -> String {
         "Knock on what?"
+    }
+
+    open func laughResponse() -> String {
+        oneOf(
+            "You cackle at the futility of everything.",
+            "You chortle knowingly.",
+            "You chuckle at the meaninglessness of it all.",
+            "You giggle uncontrollably.",
+            "You laugh at the absurdity of existence.",
+            "You laugh boldly at the forces arrayed against you.",
+            "You laugh brazenly at your predicament.",
+            "You laugh courageously in spite of everything.",
+            "You laugh defiantly at fate itself.",
+            "You laugh fearlessly at the abyss.",
+            "You laugh heroically at impossible circumstances.",
+            "You laugh in the face of cosmic indifference.",
+            "You laugh in the face of danger.",
+            "You laugh in the face of overwhelming odds.",
+            "You laugh in the face of your own mortality.",
+            "You laugh with the hollow ring of someone who's given up.",
+            "You laugh with the intensity of someone who's seen too much.",
+            "You let out a mirthless chuckle.",
+            "You snicker mischievously.",
+            "You snort with amusement.",
+            "You titter politely.",
+            "You wheeze with laughter.",
+        )
     }
 
     open func listenWhat() -> String {
@@ -877,7 +945,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func pourNotLiquid(item: String) -> String {
-        "You can't pour \(item) - it's not a liquid."
+        "You can't pour \(item)."
     }
 
     open func pourOn(item: String, target: String) -> String {
@@ -889,11 +957,11 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func pourOnDevice(item: String, device: String) -> String {
-        "You pour \(item) on \(device). This probably wasn't a good idea - electronic devices and liquids don't mix well."
+        "You pour \(item) on \(device), which probably wasn't a good idea."
     }
 
     open func pourOnGeneric(item: String, target: String) -> String {
-        "You pour \(item) on \(target). It drips off without much effect."
+        "You pour \(item) on \(target)."
     }
 
     open func pourWhat() -> String {

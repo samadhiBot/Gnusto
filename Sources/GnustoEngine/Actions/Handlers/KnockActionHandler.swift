@@ -53,11 +53,11 @@ public struct KnockActionHandler: ActionHandler {
             if targetItem.hasFlag(.isDoor) {
                 // Knocking on doors
                 if targetItem.hasFlag(.isOpen) {
-                    context.message.knockOnOpenDoor(door: targetItem.name)
+                    context.message.knockOnOpenDoor(door: targetItem.withDefiniteArticle)
                 } else if targetItem.hasFlag(.isLocked) {
-                    context.message.knockOnLockedDoor(door: targetItem.name)
+                    context.message.knockOnLockedDoor(door: targetItem.withDefiniteArticle)
                 } else {
-                    context.message.knockOnClosedDoor(door: targetItem.name)
+                    context.message.knockOnClosedDoor(door: targetItem.withDefiniteArticle)
                 }
             } else if targetItem.hasFlag(.isContainer) {
                 // Knocking on containers

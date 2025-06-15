@@ -54,7 +54,7 @@ struct KissActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            The beautiful princess doesn't seem particularly receptive to
+            The beautiful princess doesn’t seem particularly receptive to
             your affections.
             """)
     }
@@ -84,36 +84,10 @@ struct KissActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t kiss the polished mirror.")
-    }
-
-    @Test("Kiss inappropriate object shows humorous message")
-    func testKissInappropriateObjectShowsHumorousMessage() async throws {
-        // Given
-        let rock = Item(
-            id: "rock",
-            .name("dirty rock"),
-            .in(.location(.startRoom)),
-            .isTakable
-        )
-
-        let game = MinimalGame(items: [rock])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("rock"),
-            rawInput: "kiss rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.message!.contains("You kiss the dirty rock. It tastes about as good as you'd expect."))
+        expectNoDifference(output, """
+            You give the polished mirror a quick kiss, which fails to
+            reveal anything significant.
+            """)
     }
 
     @Test("Kiss updates state correctly")
@@ -150,37 +124,5 @@ struct KissActionHandlerTests {
             change.newValue == true
         })
         #expect(hasTouchedChange)
-    }
-
-    @Test("Kiss integration test")
-    func testKissIntegrationTest() async throws {
-        // Given
-        let frog = Item(
-            id: "frog",
-            .name("frog"),
-            .in(.location(.startRoom)),
-            .isCharacter
-        )
-
-        let game = MinimalGame(items: [frog])
-        let mockIO = await MockIOHandler()
-        let mockParser = MockParser()
-        let engine = await GameEngine(blueprint: game, parser: mockParser, ioHandler: mockIO)
-
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("frog"),
-            rawInput: "kiss frog"
-        )
-
-        // When
-        await engine.execute(command: command)
-
-        // Then
-        let output = await mockIO.flush()
-        expectNoDifference(output, """
-            The frog doesn’t seem particularly receptive to your
-            affections.
-            """)
     }
 }

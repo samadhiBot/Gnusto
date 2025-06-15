@@ -32,7 +32,7 @@ struct GiggleActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chortle with delight.")
+        expectNoDifference(output, "You chuckle with amusement.")
     }
 
     @Test("GIGGLE returns varied responses")
@@ -48,11 +48,11 @@ struct GiggleActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You giggle uncontrollably. How embarrassing!
+            You chuckle with amusement.
 
-            You giggle with glee.
+            You giggle like a maniac. Very therapeutic.
 
-            You giggle softly to yourself.
+            You snicker quietly. How mischievous!
             """)
     }
 }
