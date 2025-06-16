@@ -969,7 +969,21 @@ public struct StandardParser: Parser {
             switch verb {
             case .take:
                 // For TAKE ALL, only include takable items not already held
-                isValidForVerb = item.hasFlag(.isTakable) && item.parent != .player
+                // AND only items that are directly accessible (not inside containers)
+                let isDirectlyAccessible = switch item.parent {
+                case .player, .nowhere:
+                    false  // Already held or not placed anywhere
+                case .location:
+                    true   // In the current location
+                case .item(let parentID):
+                    // Check if parent is a surface (accessible) or container (not accessible for take all)
+                    if let parentItem = gameState.items[parentID] {
+                        parentItem.hasFlag(.isSurface)  // Only surfaces are directly accessible
+                    } else {
+                        false
+                    }
+                }
+                isValidForVerb = item.hasFlag(.isTakable) && isDirectlyAccessible
             case .drop:
                 // For DROP ALL, only include items currently held by player
                 isValidForVerb = item.parent == .player
