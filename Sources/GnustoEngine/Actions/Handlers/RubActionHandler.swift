@@ -53,6 +53,12 @@ public struct RubActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Rubbing characters might not be appropriate
                 context.message.rubCharacter(character: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isLightSource) {
+                // Special message for light sources (lamps, lanterns)
+                context.message.rubLamp(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isTakable) {
+                // Message for a generic takable object
+                context.message.rubTakableObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic rubbing response for objects
                 context.message.rubGenericObject(item: targetItem.withDefiniteArticle)

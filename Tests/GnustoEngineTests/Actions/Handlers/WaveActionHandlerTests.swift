@@ -54,7 +54,8 @@ struct WaveActionHandlerTests {
             id: "wand",
             .name("magic wand"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isWand
         )
 
         let game = MinimalGame(items: [wand])
@@ -79,7 +80,8 @@ struct WaveActionHandlerTests {
             id: "staff",
             .name("wooden staff"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isStaff
         )
 
         let game = MinimalGame(items: [staff])
@@ -104,7 +106,8 @@ struct WaveActionHandlerTests {
             id: "sword",
             .name("sharp sword"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isWeapon
         )
 
         let game = MinimalGame(items: [sword])
@@ -129,7 +132,8 @@ struct WaveActionHandlerTests {
             id: "blade",
             .name("razor blade"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isWeapon
         )
 
         let game = MinimalGame(items: [blade])
@@ -154,7 +158,8 @@ struct WaveActionHandlerTests {
             id: "flag",
             .name("red flag"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isFlag
         )
 
         let game = MinimalGame(items: [flag])
@@ -236,7 +241,8 @@ struct WaveActionHandlerTests {
             id: "staff",
             .name("staff"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isStaff
         )
 
         let game = MinimalGame(items: [staff])

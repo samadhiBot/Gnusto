@@ -31,7 +31,8 @@ struct TieActionHandlerTests {
             id: "rope",
             .name("rope"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isRope
         )
 
         let game = MinimalGame(items: [rope])
@@ -56,7 +57,8 @@ struct TieActionHandlerTests {
             id: "cord",
             .name("cord"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isRope
         )
 
         let game = MinimalGame(items: [cord])

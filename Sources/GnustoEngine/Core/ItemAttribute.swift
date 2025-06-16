@@ -220,9 +220,29 @@ extension ItemAttribute {
         ItemAttribute(id: .isFemale, rawValue: true)
     }
 
+    /// FIGHTBIT: Is fighting.
+    public static var isFighting: ItemAttribute {
+        ItemAttribute(id: .isFighting, rawValue: true)
+    }
+
+    /// Is a flag that can be waved.
+    public static var isFlag: ItemAttribute {
+        ItemAttribute(id: .isFlag, rawValue: true)
+    }
+
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     public static var isFlammable: ItemAttribute {
         ItemAttribute(id: .isFlammable, rawValue: true)
+    }
+
+    /// Is a dial that can be turned with clicking sounds.
+    public static var isDial: ItemAttribute {
+        ItemAttribute(id: .isDial, rawValue: true)
+    }
+
+    /// Is a handle that can be turned.
+    public static var isHandle: ItemAttribute {
+        ItemAttribute(id: .isHandle, rawValue: true)
     }
 
     /// Can be inflated (like balloons, rafts, etc.).
@@ -245,9 +265,19 @@ extension ItemAttribute {
         ItemAttribute(id: .isKey, rawValue: true)
     }
 
+    /// Is a knob that can be turned with clicking sounds.
+    public static var isKnob: ItemAttribute {
+        ItemAttribute(id: .isKnob, rawValue: true)
+    }
+
     /// LIGHTBIT: Provides light when active/on.
     public static var isLightSource: ItemAttribute {
         ItemAttribute(id: .isLightSource, rawValue: true)
+    }
+
+    /// Contains liquid that can be heard when shaken.
+    public static var isLiquidContainer: ItemAttribute {
+        ItemAttribute(id: .isLiquidContainer, rawValue: true)
     }
 
     /// Indicates whether an entity is currently considered "lit".
@@ -310,9 +340,29 @@ extension ItemAttribute {
         ItemAttribute(id: .isReadable, rawValue: true)
     }
 
+    /// Is a rope-like object that can have knots tied in it.
+    public static var isRope: ItemAttribute {
+        ItemAttribute(id: .isRope, rawValue: true)
+    }
+
     /// SEARCHBIT: Can be searched.
     public static var isSearchable: ItemAttribute {
         ItemAttribute(id: .isSearchable, rawValue: true)
+    }
+
+    /// Is a soft, yielding object (like pillows, cushions).
+    public static var isSoft: ItemAttribute {
+        ItemAttribute(id: .isSoft, rawValue: true)
+    }
+
+    /// Is a sponge that can absorb and release water.
+    public static var isSponge: ItemAttribute {
+        ItemAttribute(id: .isSponge, rawValue: true)
+    }
+
+    /// Is a magical staff that can be waved.
+    public static var isStaff: ItemAttribute {
+        ItemAttribute(id: .isStaff, rawValue: true)
     }
 
     /// SURFACEBIT: Items can be placed *on* it.
@@ -355,6 +405,11 @@ extension ItemAttribute {
         ItemAttribute(id: .startsWithVowel, rawValue: true)
     }
 
+    /// Is a magical wand that can be waved.
+    public static var isWand: ItemAttribute {
+        ItemAttribute(id: .isWand, rawValue: true)
+    }
+
     /// WEAPONBIT: Is a weapon.
     public static var isWeapon: ItemAttribute {
         ItemAttribute(id: .isWeapon, rawValue: true)
@@ -363,6 +418,11 @@ extension ItemAttribute {
     /// WEARBIT: Can be worn.
     public static var isWearable: ItemAttribute {
         ItemAttribute(id: .isWearable, rawValue: true)
+    }
+
+    /// Is a wheel that can be turned with effort.
+    public static var isWheel: ItemAttribute {
+        ItemAttribute(id: .isWheel, rawValue: true)
     }
 
     /// WORNBIT: Is currently being worn.

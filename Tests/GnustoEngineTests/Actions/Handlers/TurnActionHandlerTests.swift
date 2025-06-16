@@ -30,7 +30,8 @@ struct TurnActionHandlerTests {
         let dial = Item(
             id: "dial",
             .name("metal dial"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isDial
         )
 
         let game = MinimalGame(items: [dial])
@@ -54,7 +55,8 @@ struct TurnActionHandlerTests {
         let knob = Item(
             id: "knob",
             .name("brass knob"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isKnob
         )
 
         let game = MinimalGame(items: [knob])
@@ -78,7 +80,8 @@ struct TurnActionHandlerTests {
         let wheel = Item(
             id: "wheel",
             .name("large wheel"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isWheel
         )
 
         let game = MinimalGame(items: [wheel])
@@ -102,7 +105,8 @@ struct TurnActionHandlerTests {
         let handle = Item(
             id: "handle",
             .name("door handle"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isHandle
         )
 
         let game = MinimalGame(items: [handle])
@@ -127,7 +131,8 @@ struct TurnActionHandlerTests {
             id: "key",
             .name("brass key"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isKey
         )
 
         let game = MinimalGame(items: [key])
@@ -201,7 +206,8 @@ struct TurnActionHandlerTests {
         let dial = Item(
             id: "dial",
             .name("dial"),
-            .in(.location(.startRoom))
+            .in(.location(.startRoom)),
+            .isDial
         )
 
         let game = MinimalGame(items: [dial])

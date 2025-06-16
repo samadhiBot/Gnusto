@@ -104,7 +104,8 @@ struct RubActionHandlerTests {
             id: "lamp",
             .name("brass lamp"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLightSource
         )
 
         let game = MinimalGame(items: [lamp])
@@ -129,7 +130,8 @@ struct RubActionHandlerTests {
             id: "lantern",
             .name("old lantern"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLightSource
         )
 
         let game = MinimalGame(items: [lantern])

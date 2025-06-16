@@ -83,6 +83,9 @@ public extension ItemAttributeID {
     /// DOORBIT: Functions as a door.
     static let isDoor = ItemAttributeID("isDoor")
 
+    /// Is a dial that can be turned with clicking sounds.
+    static let isDial = ItemAttributeID("isDial")
+
     /// DRINKBIT: Can be consumed as a liquid.
     static let isDrinkable = ItemAttributeID("isDrinkable")
 
@@ -101,8 +104,14 @@ public extension ItemAttributeID {
     /// FIGHTBIT: Is fighting.
     static let isFighting = ItemAttributeID("isFighting")
 
+    /// Is a flag that can be waved.
+    static let isFlag = ItemAttributeID("isFlag")
+
     /// BURNBIT / FLAMEBIT: Is flammable or burning.
     static let isFlammable = ItemAttributeID("isFlammable")
+
+    /// Is a handle that can be turned.
+    static let isHandle = ItemAttributeID("isHandle")
 
     /// Can be inflated (like balloons, rafts, etc.).
     static let isInflatable = ItemAttributeID("isInflatable")
@@ -116,8 +125,14 @@ public extension ItemAttributeID {
     /// Can be used to lock/unlock.
     static let isKey = ItemAttributeID("isKey")
 
+    /// Is a knob that can be turned with clicking sounds.
+    static let isKnob = ItemAttributeID("isKnob")
+
     /// LIGHTBIT: Provides light when active/on.
     static let isLightSource = ItemAttributeID("isLightSource")
+
+    /// Contains liquid that can be heard when shaken.
+    static let isLiquidContainer = ItemAttributeID("isLiquidContainer")
 
     /// Indicates whether an entity is currently considered "lit".
     static let isLit = ItemAttributeID("isLit")
@@ -155,8 +170,20 @@ public extension ItemAttributeID {
     /// READBIT: Can be read (implies text content).
     static let isReadable = ItemAttributeID("isReadable")
 
+    /// Is a rope-like object that can have knots tied in it.
+    static let isRope = ItemAttributeID("isRope")
+
     /// SEARCHBIT: Can be searched.
     static let isSearchable = ItemAttributeID("isSearchable")
+
+    /// Is a soft, yielding object (like pillows, cushions).
+    static let isSoft = ItemAttributeID("isSoft")
+
+    /// Is a sponge that can absorb and release water.
+    static let isSponge = ItemAttributeID("isSponge")
+
+    /// Is a magical staff that can be waved.
+    static let isStaff = ItemAttributeID("isStaff")
 
     /// SURFACEBIT: Items can be placed *on* it.
     static let isSurface = ItemAttributeID("isSurface")
@@ -182,11 +209,17 @@ public extension ItemAttributeID {
     /// VOWELBIT: Name starts with vowel (for "an").
     static let startsWithVowel = ItemAttributeID("startsWithVowel")
 
+    /// Is a magical wand that can be waved.
+    static let isWand = ItemAttributeID("isWand")
+
     /// WEAPONBIT: Is a weapon.
     static let isWeapon = ItemAttributeID("isWeapon")
 
     /// WEARBIT: Can be worn.
     static let isWearable = ItemAttributeID("isWearable")
+
+    /// Is a wheel that can be turned with effort.
+    static let isWheel = ItemAttributeID("isWheel")
 
     /// WORNBIT: Is currently being worn.
     static let isWorn = ItemAttributeID("isWorn")

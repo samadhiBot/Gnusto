@@ -48,7 +48,7 @@ public struct TurnOffActionHandler: ActionHandler {
 
         // 5. Check if the item is already off (lacks `.on`).
         guard targetItem.hasFlag(.isOn) else {
-            throw ActionResponse.prerequisiteNotMet(
+            throw ActionResponse.custom(
                 context.message.alreadyOff()
             )
         }

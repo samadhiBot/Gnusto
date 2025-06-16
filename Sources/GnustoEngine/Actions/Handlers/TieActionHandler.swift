@@ -127,6 +127,9 @@ public struct TieActionHandler: ActionHandler {
             return context.message.tieNeedsSomethingToTieCharacterWith(
                 character: targetItem.name
             )
+        } else if targetItem.hasFlag(.isRope) {
+            // Special case: tying a rope-like object creates a knot
+            return context.message.tieKnotInRope(item: targetItem.withDefiniteArticle)
         } else {
             return context.message.tieNeedsSomethingToTieWith(
                 item: targetItem.name

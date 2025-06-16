@@ -53,8 +53,20 @@ public struct WaveActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Waving at characters
                 context.message.waveCharacter(character: targetItem.withDefiniteArticle)
+            } else if !targetItem.hasFlag(.isTakable) {
+                // Fixed objects can't be waved
+                context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isWand) || targetItem.hasFlag(.isStaff) {
+                // Magical items
+                context.message.waveMagicalItem(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isWeapon) {
+                // Weapons are brandished
+                context.message.waveWeapon(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isFlag) {
+                // Flags have their own message
+                context.message.waveFlag(item: targetItem.withDefiniteArticle)
             } else {
-                // Generic waving response for objects
+                // Generic waving response for other takable objects
                 context.message.waveFixedObject(item: targetItem.withDefiniteArticle)
             }
 

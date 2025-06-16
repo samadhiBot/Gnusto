@@ -73,7 +73,7 @@ public struct TurnOnActionHandler: ActionHandler {
 
         // 5. If it's a device, check if it's already on.
         if isDevice && targetItem.hasFlag(.isOn) {
-            throw ActionResponse.prerequisiteNotMet(
+            throw ActionResponse.custom(
                 context.message.alreadyOn()
             )
         }

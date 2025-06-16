@@ -128,11 +128,18 @@ open class MessageProvider: @unchecked Sendable {
 
     open func breatheResponse() -> String {
         oneOf(
-            "You breathe in deeply, feeling refreshed.",
-            "You take a slow, calming breath.",
-            "The air fills your lungs. You're glad that you can breathe.",
-            "You inhale deeply, then exhale slowly.",
-            "Breathe in the love... and blow out the jive.",
+            "You breathe thoughtfully, pondering the miracle of atmospheric composition.",
+            "You inhale deeply, briefly grateful for the invention of oxygen.",
+            "You take a breath, marveling at your lungs' stubborn refusal to give up.",
+            "You breathe in life's very essence, which tastes faintly of confusion.",
+            "You inhale slowly, appreciating the universe's decision to include breathable air.",
+            "You take a breath, noting that it's roughly the same as the last one.",
+            "You take a tentative breath, unsure whether the atmosphere is still working.",
+            "You breathe in whatever passes for air around here.",
+            "You take a breath, tasting hints of adventure and poor ventilation.",
+            "You breathe with great purpose, although breathing tends to happen anyway.",
+            "You were already doing that, but also you continue to breathe.",
+            "'Breathe in the love... and blow out the jive...'",
         )
     }
 
@@ -889,7 +896,7 @@ open class MessageProvider: @unchecked Sendable {
     }
 
     open func nothingHereToWear() -> String {
-        "There is nothing here to wear."
+        "You have nothing to wear."
     }
 
     open func nothingSpecialAbout(item: String) -> String {
@@ -1056,8 +1063,20 @@ open class MessageProvider: @unchecked Sendable {
         "I don't think \(character) would appreciate being rubbed."
     }
 
+    open func rubCleanItem(item: String) -> String {
+        "You rub \(item). It feels smooth to the touch."
+    }
+
     open func rubGenericObject(item: String) -> String {
         "You rub \(item), but nothing interesting happens."
+    }
+
+    open func rubLamp(item: String) -> String {
+        "Rubbing \(item) doesn't seem to do anything. No djinn appears."
+    }
+
+    open func rubTakableObject(item: String) -> String {
+        "You rub \(item). It feels smooth to the touch."
     }
 
     open func rubWhat() -> String {
@@ -1088,8 +1107,16 @@ open class MessageProvider: @unchecked Sendable {
         "You can't shake \(item) - it's firmly in place."
     }
 
+    open func shakeLiquidContainer(item: String) -> String {
+        "You shake \(item) and hear liquid sloshing inside."
+    }
+
     open func shakeOpenContainer(container: String) -> String {
         "You shake \(container), but nothing falls out."
+    }
+
+    open func shakeTakableObject(item: String) -> String {
+        "You shake \(item) vigorously, but nothing happens."
     }
 
     open func shakeWhat() -> String {
@@ -1118,6 +1145,18 @@ open class MessageProvider: @unchecked Sendable {
 
     open func squeezeHardObject(item: String) -> String {
         "You squeeze \(item) as hard as you can, but it doesn't give."
+    }
+
+    open func squeezeLiquidContainer(item: String) -> String {
+        "You squeeze \(item) and some of its contents ooze out."
+    }
+
+    open func squeezeSoftObject(item: String) -> String {
+        "You squeeze \(item). It feels soft and yielding."
+    }
+
+    open func squeezeSponge(item: String) -> String {
+        "You squeeze \(item) and water drips out."
     }
 
     open func squeezeWhat() -> String {
@@ -1220,6 +1259,10 @@ open class MessageProvider: @unchecked Sendable {
         "You can't tie something to that."
     }
 
+    open func tieKnotInRope(item: String) -> String {
+        "You tie a knot in \(item)."
+    }
+
     open func tieNeedsSomethingToTieCharacterWith(character: String) -> String {
         "You can't tie up \(character) without something to tie them with."
     }
@@ -1252,8 +1295,24 @@ open class MessageProvider: @unchecked Sendable {
         "You can't turn \(character) around like an object."
     }
 
+    open func turnDial(item: String) -> String {
+        "You turn \(item). It clicks into a new position."
+    }
+
     open func turnFixedObject(item: String) -> String {
-        "\(item.capitalizedFirst) doesn't seem to be designed to be turned."
+        "\(item) doesn't seem to be designed to be turned."
+    }
+
+    open func turnHandle(item: String) -> String {
+        "You turn \(item). It moves with a grinding sound."
+    }
+
+    open func turnKey(item: String) -> String {
+        "You can't just turn \(item) by itself. You need to use it with something."
+    }
+
+    open func turnKnob(item: String) -> String {
+        "You turn \(item). It clicks into a new position."
     }
 
     open func turnOffWhat() -> String {
@@ -1264,8 +1323,16 @@ open class MessageProvider: @unchecked Sendable {
         "Turn on what?"
     }
 
+    open func turnRegularObject(item: String) -> String {
+        "You turn \(item) around in your hands, but nothing happens."
+    }
+
     open func turnWhat() -> String {
         "Turn what?"
+    }
+
+    open func turnWheel(item: String) -> String {
+        "You turn \(item). It rotates with some effort."
     }
 
     open func unknownEntity() -> String {
@@ -1298,6 +1365,18 @@ open class MessageProvider: @unchecked Sendable {
 
     open func waveFixedObject(item: String) -> String {
         "You can't wave \(item) around - it's not something you can pick up and wave."
+    }
+
+    open func waveFlag(item: String) -> String {
+        "You wave \(item) around. It's not particularly impressive."
+    }
+
+    open func waveMagicalItem(item: String) -> String {
+        "You wave \(item) dramatically, but nothing magical happens."
+    }
+
+    open func waveWeapon(item: String) -> String {
+        "You brandish \(item) menacingly."
     }
 
     open func waveWhat() -> String {
@@ -1430,7 +1509,14 @@ open class MessageProvider: @unchecked Sendable {
 }
 
 extension MessageProvider {
-    private func oneOf(_ responses: String...) -> String {
+    /// Returns one of a collection of responses at random.
+    ///
+    /// For testing purposes, a deterministic random number generator can specified when
+    /// initializing the MessageProvider. By default the SystemRandomNumberGenerator is used.
+    ///
+    /// - Parameter responses: A collection of responses.
+    /// - Returns: A randomly selected response.
+    public func oneOf(_ responses: String...) -> String {
         responses.randomElement(using: &randomNumberGenerator) ?? internalEngineError()
     }
 }

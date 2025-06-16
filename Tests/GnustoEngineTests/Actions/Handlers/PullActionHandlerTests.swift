@@ -108,7 +108,16 @@ struct PullActionHandlerTests {
         let otherRoom = Location(
             id: "otherRoom",
             .name("Other Room"),
-            .description("Another room.")
+            .description("Another room."),
+            .inherentlyLit
+        )
+
+        // The default startRoom in MinimalGame is lit. We need a dark one.
+        let startRoom = Location(
+            id: "startRoom",
+            .name("Start Room"),
+            .description("The start room."),
+            .inherentlyLit
         )
 
         let distantRope = Item(
@@ -119,7 +128,7 @@ struct PullActionHandlerTests {
         )
 
         let game = MinimalGame(
-            locations: [otherRoom],
+            locations: [startRoom, otherRoom],
             items: [distantRope]
         )
         let mockIO = await MockIOHandler()

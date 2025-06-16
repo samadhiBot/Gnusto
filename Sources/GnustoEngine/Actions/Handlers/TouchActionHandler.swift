@@ -18,7 +18,7 @@ public struct TouchActionHandler: ActionHandler {
     public func validate(context: ActionContext) async throws {
         // 1. Ensure we have a direct object and it's an item
         guard let directObjectRef = context.command.directObject else {
-            throw ActionResponse.prerequisiteNotMet(
+            throw ActionResponse.custom(
                 context.message.touchWhat()
             )
         }

@@ -42,14 +42,7 @@ public struct MinimalGame: GameBlueprint {
                 .name("pebble"),
                 .in(.location(LocationID("startRoom"))),
                 .isTakable
-            ),
-//            Item(
-//                id: "self",
-//                .name("self"),
-//                .description("You are your usual self."),
-//                .in(.player),
-//                .omitDescription
-//            )
+            )
         ],
         customActionHandlers: [VerbID: ActionHandler] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],

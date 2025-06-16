@@ -31,7 +31,8 @@ struct SqueezeActionHandlerTests {
             id: "sponge",
             .name("wet sponge"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isSponge
         )
 
         let game = MinimalGame(items: [sponge])
@@ -56,7 +57,8 @@ struct SqueezeActionHandlerTests {
             id: "tube",
             .name("toothpaste tube"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLiquidContainer
         )
 
         let game = MinimalGame(items: [tube])
@@ -81,7 +83,8 @@ struct SqueezeActionHandlerTests {
             id: "bottle",
             .name("plastic bottle"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLiquidContainer
         )
 
         let game = MinimalGame(items: [bottle])
@@ -106,7 +109,8 @@ struct SqueezeActionHandlerTests {
             id: "pillow",
             .name("soft pillow"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isSoft
         )
 
         let game = MinimalGame(items: [pillow])
@@ -181,7 +185,8 @@ struct SqueezeActionHandlerTests {
             id: "sponge",
             .name("sponge"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isSponge
         )
 
         let game = MinimalGame(items: [sponge])
@@ -214,7 +219,8 @@ struct SqueezeActionHandlerTests {
             id: "tube",
             .name("tube"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLiquidContainer
         )
 
         let game = MinimalGame(items: [tube])

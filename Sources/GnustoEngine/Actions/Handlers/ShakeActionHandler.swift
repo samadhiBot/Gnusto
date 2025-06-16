@@ -53,6 +53,9 @@ public struct ShakeActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Shaking characters might not be appropriate
                 context.message.shakeCharacter(character: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isLiquidContainer) {
+                // Special message for liquid containers
+                context.message.shakeLiquidContainer(item: targetItem.withDefiniteArticle)
             } else if targetItem.hasFlag(.isContainer) {
                 // Shaking containers might reveal contents
                 if targetItem.hasFlag(.isOpen) {
@@ -64,6 +67,9 @@ public struct ShakeActionHandler: ActionHandler {
                         container: targetItem.withDefiniteArticle
                     )
                 }
+            } else if targetItem.hasFlag(.isTakable) {
+                // Message for a generic takable object
+                context.message.shakeTakableObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic shaking response for objects
                 context.message.shakeFixedObject(item: targetItem.withDefiniteArticle)

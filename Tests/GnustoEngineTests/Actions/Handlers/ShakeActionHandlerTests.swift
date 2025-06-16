@@ -57,7 +57,8 @@ struct ShakeActionHandlerTests {
             id: "bottle",
             .name("glass bottle"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLiquidContainer
         )
 
         let game = MinimalGame(items: [bottle])
@@ -82,7 +83,8 @@ struct ShakeActionHandlerTests {
             id: "vial",
             .name("small vial"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isLiquidContainer
         )
 
         let game = MinimalGame(items: [vial])

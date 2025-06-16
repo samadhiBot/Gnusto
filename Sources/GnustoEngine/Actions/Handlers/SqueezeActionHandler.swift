@@ -53,6 +53,15 @@ public struct SqueezeActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Squeezing characters - not advisable
                 context.message.squeezeCharacter(character: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isSponge) {
+                // Special message for sponges
+                context.message.squeezeSponge(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isLiquidContainer) {
+                // Special message for liquid containers
+                context.message.squeezeLiquidContainer(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isSoft) {
+                // Special message for soft objects
+                context.message.squeezeSoftObject(item: targetItem.withDefiniteArticle)
             } else {
                 // Generic squeezing response for objects
                 context.message.squeezeHardObject(item: targetItem.withDefiniteArticle)

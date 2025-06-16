@@ -1,5 +1,6 @@
+import CustomDump
+import GnustoEngine
 import Testing
-@testable import GnustoEngine
 
 /// Tests for the SingActionHandler.
 @Suite("SingActionHandler Tests")
@@ -24,34 +25,34 @@ struct SingActionHandlerTests {
     @Test("SING command")
     func testSing() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = SingActionHandler()
         let command = Command(verb: .sing, rawInput: "sing")
-        let context = ActionContext(command: command, engine: engine)
 
-        let result = try await handler.process(context: context)
+        // Act
+        await engine.execute(command: command)
 
-        #expect(result.message != nil)
-        #expect(result.message!.contains("sing") || result.message!.contains("hum"))
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, "You belt out a rousing chorus. Bravo!")
     }
 
     @Test("SING returns varied responses")
     func testSingVariedResponses() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let handler = SingActionHandler()
         let command = Command(verb: .sing, rawInput: "sing")
-        let context = ActionContext(command: command, engine: engine)
 
-        var responses: Set<String> = []
+        // Act
+        await engine.execute(command: command)
+        await engine.execute(command: command)
+        await engine.execute(command: command)
 
-        // Run multiple times to check for variety
-        for _ in 0..<10 {
-            let result = try await handler.process(context: context)
-            if let message = result.message {
-                responses.insert(message)
-            }
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            You hum the theme from an old adventure game.
 
-        // Should have at least some variety in responses
-        #expect(responses.count >= 1)
+            You sing a song of your people.
+
+            You vocalize with surprising talent.
+            """)
     }
 }

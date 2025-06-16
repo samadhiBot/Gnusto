@@ -53,8 +53,26 @@ public struct TurnActionHandler: ActionHandler {
             if targetItem.hasFlag(.isCharacter) {
                 // Can't turn characters
                 context.message.turnCharacter(character: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isKey) {
+                // Keys need to be used with something
+                context.message.turnKey(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isDial) {
+                // Dials click into position
+                context.message.turnDial(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isKnob) {
+                // Knobs click into position
+                context.message.turnKnob(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isWheel) {
+                // Wheels rotate with effort
+                context.message.turnWheel(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isHandle) {
+                // Handles move with grinding sound
+                context.message.turnHandle(item: targetItem.withDefiniteArticle)
+            } else if targetItem.hasFlag(.isTakable) {
+                // Regular takable objects can be turned in hands
+                context.message.turnRegularObject(item: targetItem.withDefiniteArticle)
             } else {
-                // Generic turning response for objects
+                // Fixed objects can't be turned
                 context.message.turnFixedObject(item: targetItem.withDefiniteArticle)
             }
 
