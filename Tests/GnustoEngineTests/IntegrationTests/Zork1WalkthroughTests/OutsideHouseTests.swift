@@ -271,7 +271,9 @@ struct OutsideHouseTests {
             "take garlic",
             "take bottle",
             "examine bottle",
+            "examine water",
             "drink water",
+            "examine bottle",
             "inventory"
         )
         let engine = await GameEngine(
@@ -314,8 +316,14 @@ struct OutsideHouseTests {
             > examine bottle
             The glass bottle contains a quantity of water.
 
+            > examine water
+            It’s just water.
+
             > drink water
-            I don’t know the verb ‘drink’.
+            You drink the quantity of water. It’s quite refreshing.
+
+            > examine bottle
+            The glass bottle is empty.
 
             > inventory
             You are carrying:
