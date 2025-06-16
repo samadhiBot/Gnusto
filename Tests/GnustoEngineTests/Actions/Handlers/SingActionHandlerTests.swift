@@ -32,7 +32,7 @@ struct SingActionHandlerTests {
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You belt out a rousing chorus. Bravo!")
+        expectNoDifference(output, "You hum a tune under your breath.")
     }
 
     @Test("SING returns varied responses")
@@ -48,11 +48,11 @@ struct SingActionHandlerTests {
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You hum the theme from an old adventure game.
+            You hum a tune under your breath.
 
-            You sing a song of your people.
+            You sing so beautifully that birds gather to listen.
 
-            You vocalize with surprising talent.
+            You warble melodiously. Very soothing.
             """)
     }
 }
