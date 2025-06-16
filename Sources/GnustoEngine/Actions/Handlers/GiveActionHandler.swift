@@ -203,7 +203,7 @@ public struct GiveActionHandler: ActionHandler {
             } else {
                 context.message.itemGivenTo(
                     item: givenItems.listWithDefiniteArticles,
-                    recipient: recipient.name
+                    recipient: recipient.withDefiniteArticle
                 )
             }
 

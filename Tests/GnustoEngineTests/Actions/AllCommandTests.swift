@@ -288,7 +288,7 @@ struct AllCommandTests {
 
         // Assert: Appropriate message
         let output = await mockIO.flush()
-        #expect(output == "You aren’t carrying anything.")
+        #expect(output == "You have nothing to drop.")
 
         // Assert: No state changes
         #expect(await engine.gameState.changeHistory.isEmpty)
