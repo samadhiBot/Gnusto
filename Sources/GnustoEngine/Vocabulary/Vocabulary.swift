@@ -238,7 +238,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .go,
-            synonyms: "walk", "run", "proceed",
+            synonyms: "walk", "run", "proceed", "stroll", "hike", "head", "move", "travel",
             syntax: [SyntaxRule(.verb, .direction)],
             requiresLight: false
         ),
@@ -893,16 +893,6 @@ public struct Vocabulary: Codable, Equatable, Sendable {
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
-            ],
-            requiresLight: false
-        ),
-
-        Verb(
-            id: .walk,
-            synonyms: "stroll", "hike",
-            syntax: [
-                SyntaxRule(.verb),
-                SyntaxRule(.verb, .direction)
             ],
             requiresLight: false
         ),

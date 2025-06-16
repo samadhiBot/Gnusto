@@ -345,6 +345,4 @@ struct ThrowActionHandlerTests {
         }
         #expect(moveChange != nil)
     }
-
-
 }

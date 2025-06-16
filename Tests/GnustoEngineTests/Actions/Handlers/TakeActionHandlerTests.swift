@@ -717,7 +717,6 @@ struct TakeActionHandlerTests {
         expectNoDifference(changeHistory.sorted(), expectedChanges)
     }
 
-
     @Test("Take item at exact capacity")
     func testTakeItemAtExactCapacity() async throws {
         // Arrange: Player has capacity 10, holds item size 7, tries to take item size 3

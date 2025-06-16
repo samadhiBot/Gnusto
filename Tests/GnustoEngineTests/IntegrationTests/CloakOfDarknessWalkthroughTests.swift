@@ -173,7 +173,7 @@ struct CloakOfDarknessWalkthroughTests {
             In the dark? You could easily disturb something!
 
             > shout
-            I don’t know the verb ‘shout’.
+            In the dark? You could easily disturb something!
 
             > walk east
             Blundering around in the dark isn’t a good idea!

@@ -150,7 +150,6 @@ public struct StandardParser: Parser {
             }
         }
 
-
         // Ensure at least one verb was matched
         guard !matchedVerbIDs.isEmpty else {
             // No known single or multi-word verb/synonym found

@@ -544,14 +544,14 @@ extension InsideHouse {
                 print("🎾 Enable sword glow daemon")
                 // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
                 return ActionResult(
-                    effect: .runDaemon("swordDaemon")
+                    .runDaemon("swordDaemon")
                 )
 
             case .drop:
                 // Disable sword glow daemon when dropped
                 print("🎾 Disable sword glow daemon")
                 return ActionResult(
-                    effect: .stopDaemon("swordDaemon")
+                    .stopDaemon("swordDaemon")
                 )
             default:
                 return nil
@@ -594,7 +594,7 @@ extension InsideHouse {
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
         if newGlowLevel != currentGlowLevel {
             return await ActionResult(
-                change: engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
+                engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
             )
         }
 
