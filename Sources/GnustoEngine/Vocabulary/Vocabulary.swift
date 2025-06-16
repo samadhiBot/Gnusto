@@ -772,7 +772,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .enter,
-            synonyms: "go in", "get in",
+            synonyms: "get in",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
@@ -782,7 +782,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .exit,
-            synonyms: "go out", "get out", "leave",
+            synonyms: "get out", "leave",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
@@ -802,7 +802,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .climbDown,
-            synonyms: "climb down", "go down",
+            synonyms: "climb down",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)
@@ -812,7 +812,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .climbUp,
-            synonyms: "climb up", "go up",
+            synonyms: "climb up",
             syntax: [
                 SyntaxRule(.verb),
                 SyntaxRule(.verb, .directObject)

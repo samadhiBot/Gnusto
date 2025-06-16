@@ -175,7 +175,7 @@ struct StandardParserTests {
         ]
 
         // 6. Build Vocabulary using defaults + game-specific items/verbs
-        vocabulary = .build(items: allItems)
+        vocabulary = .build(items: allItems, locations: locations)
 
         // 7. Build GameState using the new factory method
         gameState = GameState(
@@ -191,7 +191,7 @@ struct StandardParserTests {
         #expect(gameState.items["sword"]?.parent == .location(roomID))
         #expect(gameState.items["coin"]?.parent == .item("backpack"))
         #expect(gameState.items["book"]?.parent == .item("table"))
-        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren’t parented by this initializer
+        #expect(gameState.items["rug"]?.parent == .nowhere) // Globals aren't parented by this initializer
         #expect(gameState.pronouns["it"] == [.item("box")])
     }
 
@@ -224,18 +224,20 @@ struct StandardParserTests {
     @Test("Parse Unknown Verb")
     func testParseUnknownVerb() async throws {
         let result = parser.parse(
-            input: "umbuggen",
+            input: "qwerty",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: ParseError.unknownVerb("umbuggen")))
+        #expect(result.isFailure(matching: ParseError.unknownVerb("qwerty")))
 
         let resultWithNoise = parser.parse(
-            input: "the jump the",
+            input: "the qwerty the",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(resultWithNoise.isFailure(matching: ParseError.unknownVerb("jump")))
+        #expect(throws: ParseError.unknownVerb("qwerty")) {
+            try resultWithNoise.get()
+        }
     }
 
     @Test("Parse Simple Verb - Known")
@@ -525,13 +527,13 @@ struct StandardParserTests {
 
     @Test("Filter Fails (Adjective Mismatch)")
     func testFilterFailsAdjectiveMismatch() async throws {
-        // "lantern" is in scope (brass one), but "wooden" doesn’t match.
+        // "lantern" is in scope (brass one), but "wooden" doesn't match.
         let result = parser.parse(
             input: "take wooden lantern",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        // Should fail because modifiers don’t match, not because noun is unknown.
+        // Should fail because modifiers don't match, not because noun is unknown.
         #expect(result.isFailure(matching: .modifierMismatch(noun: "lantern", modifiers: ["wooden"])))
     }
 
@@ -941,7 +943,7 @@ struct StandardParserTests {
 
     @Test("Noun Not In Scope")
     func testNounNotInScope() async {
-        // Lamp exists in vocab, but isn’t in the room or held by player
+        // Lamp exists in vocab, but isn't in the room or held by player
         // Create a custom state where the lamp is explicitly out of scope
         var itemsDict = gameState.items // Base items copy
         itemsDict[lampID]?.attributes[.parentEntity] = .parentEntity(.nowhere) // Move lamp out of scope
@@ -1026,13 +1028,13 @@ struct StandardParserTests {
 
     @Test("Extract Noun/Mods - Only Unknown Word")
     func testExtractNounModsOnlyUnknown() async throws {
-        // "look umbuggen" - Should now parse with look verb and attempt resolution
+        // "look qwerty" - Should now parse with look verb and attempt resolution
         let result = parser.parse(
-            input: "look umbuggen",
+            input: "look qwerty",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        #expect(result.isFailure(matching: .unknownNoun("umbuggen")))
+        #expect(result.isFailure(matching: .unknownNoun("qwerty")))
     }
 
     @Test("Extract Noun/Mods - Only Modifier")
