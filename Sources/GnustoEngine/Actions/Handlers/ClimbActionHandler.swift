@@ -84,28 +84,23 @@ public struct ClimbActionHandler: ActionHandler {
                 if targetItem.parent == .nowhere,
                    currentLocation.localGlobals.contains(targetItemID) == false {
                     return ActionResult(
-                        message: """
-                                There \(targetItem.hasFlag(.isPlural) ? "are" : "is")
-                                no \(targetItem.name) here.
-                                """
+                        context.message.youSeeNo(item: targetItem.name)
                     )
                 }
-            }
 
-            // Execute movement in the appropriate direction
-            let goCommand = Command(
-                verb: .go,
-                direction: direction,
-                rawInput: "go \(direction.rawValue)"
-            )
+                // Execute movement in the appropriate direction
+                let goCommand = Command(
+                    verb: .go,
+                    direction: direction,
+                    rawInput: "go \(direction.rawValue)"
+                )
 
-            let goHandler = GoActionHandler()
-            let goContext = ActionContext(
-                command: goCommand,
-                engine: context.engine
-            )
+                let goHandler = GoActionHandler()
+                let goContext = ActionContext(
+                    command: goCommand,
+                    engine: context.engine
+                )
 
-            do {
                 try await goHandler.validate(context: goContext)
                 let goResult = try await goHandler.process(context: goContext)
 
@@ -117,9 +112,6 @@ public struct ClimbActionHandler: ActionHandler {
                         await context.engine.updatePronouns(to: targetItem),
                     ] + goResult.changes
                 )
-            } catch {
-                // If movement fails, let the engine handle the error
-                throw error
             }
         }
 

@@ -1549,6 +1549,10 @@ open class MessageProvider: @unchecked Sendable {
         "You take off \(items)."
     }
 
+    open func youSeeNo(item: String) -> String {
+        "You see no \(item) here."
+    }
+
     open func youTakeMultipleItems(items: String) -> String {
         "You take \(items)."
     }

@@ -147,6 +147,9 @@ struct ItemMechanicsTests {
             > drink water
             You drink the quantity of water. It’s quite refreshing.
 
+            > examine bottle
+            The glass bottle is empty.
+
             > inventory
             You are carrying:
             - A glass bottle
