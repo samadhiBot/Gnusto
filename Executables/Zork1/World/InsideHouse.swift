@@ -254,7 +254,8 @@ extension InsideHouse {
         .description("It's just water."),
         .synonyms("water", "h2o", "liquid"),
         .in(.item(.bottle)),
-        .isTakable
+        .isTakable,
+        .isEdible
     )
 
     static let woodenDoor = Item(

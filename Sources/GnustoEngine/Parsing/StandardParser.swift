@@ -1025,73 +1025,22 @@ public struct StandardParser: Parser {
         in gameState: GameState,
         requiredConditions: ObjectCondition
     ) -> [ItemID: Item] {
-        var candidates: [ItemID: Item] = [:]
         let currentLocationID = gameState.player.currentLocationID
-        let allItems = gameState.items
 
-        let mustBeHeld = requiredConditions.contains(.held)
-        let mustBeInRoom = requiredConditions.contains(.inRoom)
-        let mustBeOnGround = requiredConditions.contains(.onGround)
-        let mustBePerson = requiredConditions.contains(.person)
-        let mustBeContainer = requiredConditions.contains(.container)
+        // Use ReachabilityUtils for consistent scope resolution, but don't filter by light
+        // The parser historically doesn't enforce strict light conditions like ScopeResolver
+        let reachableItems = ReachabilityUtils.itemsReachableByPlayer(in: gameState)
 
-        func checkItemConditions(_ item: Item) -> Bool {
-            if mustBePerson && !item.hasFlag(.isPerson) { return false }
-            if mustBeContainer && !item.hasFlag(.isContainer) { return false }
-            return true
-        }
-
-        func gatherRecursive(parentEntity: ParentEntity, currentDepth: Int = 0, maxDepth: Int = 5) {
-            guard currentDepth <= maxDepth else { return }
-
-            for item in allItems.values where item.parent == parentEntity {
-                if checkItemConditions(item) {
-                    var meetsScopeCondition = false
-                    if mustBeHeld { meetsScopeCondition = (item.parent == .player) }
-                    else if mustBeOnGround { meetsScopeCondition = (item.parent == .location(currentLocationID)) }
-                    else if mustBeInRoom {
-                        let isGlobal = gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false
-                        meetsScopeCondition = (item.parent == .location(currentLocationID) || isGlobal)
-                    }
-                    else {
-                         if item.parent == .player || item.parent == .location(currentLocationID) { meetsScopeCondition = true }
-                         else if case .item(let containerID) = item.parent {
-                             if let container = allItems[containerID],
-                                (container.parent == .player || container.parent == .location(currentLocationID)) {
-                                 let isContainerOpen = container.attributes[.isOpen]?.toBool ?? false
-                                 if (container.hasFlag(.isContainer) && isContainerOpen) || container.hasFlag(.isSurface) {
-                                     meetsScopeCondition = true
-                                 }
-                             }
-                         } else if gameState.locations[currentLocationID]?.localGlobals.contains(item.id) ?? false {
-                              meetsScopeCondition = true
-                         }
-                    }
-
-                    if meetsScopeCondition {
-                        candidates[item.id] = item
-                    }
-                }
-
-                let isContainerOpen = item.attributes[.isOpen]?.toBool ?? false
-                if (item.hasFlag(.isContainer) && isContainerOpen) || item.hasFlag(.isSurface) {
-                     gatherRecursive(parentEntity: .item(item.id), currentDepth: currentDepth + 1)
-                }
-            }
-        }
-
-        gatherRecursive(parentEntity: .player)
-        gatherRecursive(parentEntity: .location(currentLocationID))
-
-        if mustBeInRoom || (!mustBeHeld && !mustBeOnGround) {
-            if let location = gameState.locations[currentLocationID] {
-                for itemID in location.localGlobals {
-                    if let globalItem = allItems[itemID],
-                       checkItemConditions(globalItem),
-                       !globalItem.hasFlag(.isInvisible) {
-                        candidates[itemID] = globalItem
-                    }
-                }
+        // Filter by parser-specific conditions
+        var candidates: [ItemID: Item] = [:]
+        for (itemID, item) in reachableItems {
+            if ReachabilityUtils.itemMeetsConditions(
+                item,
+                requiredConditions: requiredConditions,
+                currentLocationID: currentLocationID,
+                gameState: gameState
+            ) {
+                candidates[itemID] = item
             }
         }
 

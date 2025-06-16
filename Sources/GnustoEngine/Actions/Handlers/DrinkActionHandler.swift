@@ -28,8 +28,8 @@ public struct DrinkActionHandler: ActionHandler {
         // Check if item exists
         let targetItem = try await context.engine.item(targetItemID)
 
-        // Check if the item is directly drinkable
-        if targetItem.hasFlag(.isDrinkable) {
+        // Check if the item is directly drinkable (either isDrinkable or isEdible for ZIL compatibility)
+        if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
             // Direct drinkable item - check reachability
             guard await context.engine.playerCanReach(targetItemID) else {
                 throw ActionResponse.itemNotAccessible(targetItemID)
@@ -49,9 +49,9 @@ public struct DrinkActionHandler: ActionHandler {
                 throw ActionResponse.containerIsClosed(targetItemID)
             }
 
-            // Check if container has drinkable contents
+            // Check if container has drinkable contents (either isDrinkable or isEdible for ZIL compatibility)
             let containerContents = await context.engine.items(in: .item(targetItemID))
-            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) }
+            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible) }
 
             guard !drinkableContents.isEmpty else {
                 let message = context.message.nothingToDrinkIn(
@@ -87,7 +87,7 @@ public struct DrinkActionHandler: ActionHandler {
         // Handle container first (prioritize over direct drinkable)
         if targetItem.hasFlag(.isContainer) {
             let containerContents = await context.engine.items(in: .item(targetItemID))
-            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) }
+            let drinkableContents = containerContents.filter { $0.hasFlag(.isDrinkable) || $0.hasFlag(.isEdible) }
 
             if let firstDrinkable = drinkableContents.first {
                 // For closed containers, can't drink from them
@@ -124,8 +124,8 @@ public struct DrinkActionHandler: ActionHandler {
                 )
             }
         }
-        // Handle direct drinkable item
-        else if targetItem.hasFlag(.isDrinkable) {
+        // Handle direct drinkable item (either isDrinkable or isEdible for ZIL compatibility)
+        else if targetItem.hasFlag(.isDrinkable) || targetItem.hasFlag(.isEdible) {
             return ActionResult(
                 message: context.message.drinkSuccess(item: targetItem.withDefiniteArticle),
                 changes: [

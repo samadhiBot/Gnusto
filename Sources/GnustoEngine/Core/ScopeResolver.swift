@@ -21,40 +21,29 @@ public struct ScopeResolver: Sendable {
     /// - Returns: `true` if the location is lit, `false` otherwise.
     public func isLocationLit(locationID: LocationID) async -> Bool {
         let gameState = await engine.gameState
-        guard let location = gameState.locations[locationID] else {
-            // Location not found, cannot determine lit status. Defaulting to dark.
-            return false
-        }
 
-        // 1. Check if the location is inherently lit.
-        if location.hasFlag(.inherentlyLit) {
+        // Use shared utility for basic lighting checks
+        if ReachabilityUtils.isLocationLit(locationID, in: gameState) {
             return true
         }
 
-        // 2. Check if the location has the dynamic .isLit flag set (e.g., by hooks).
-        if location.hasFlag(.isLit) {
-            return true
-        }
-
-        // 3. Check if the player is carrying an active light source.
+        // Add async-enhanced checks for dynamic light source states
         let playerInventory = gameState.items(in: .player)
-        let playerHasActiveLight = playerInventory.contains { item in
-            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
-        }
-        if playerHasActiveLight {
-            return true
+        for item in playerInventory where item.hasFlag(.isLightSource) {
+            let isDynamicallyOn = (try? await engine.attribute(.isOn, of: item.id)) ?? false
+            if isDynamicallyOn {
+                return true
+            }
         }
 
-        // 4. Check if there is an active light source directly in the location.
         let itemsInLocation = gameState.items.values.filter { $0.parent == .location(locationID) }
-        let locationHasActiveLight = itemsInLocation.contains { item in
-            item.hasFlag(.isLightSource) && item.hasFlag(.isOn)
-        }
-        if locationHasActiveLight {
-            return true
+        for item in itemsInLocation where item.hasFlag(.isLightSource) {
+            let isDynamicallyOn = (try? await engine.attribute(.isOn, of: item.id)) ?? false
+            if isDynamicallyOn {
+                return true
+            }
         }
 
-        // 5. Otherwise, the location is dark.
         return false
     }
 
@@ -138,59 +127,70 @@ public struct ScopeResolver: Sendable {
     /// - Returns: A Set of IDs for items reachable by the player.
     public func itemsReachableByPlayer() async -> Set<ItemID> {
         let gameState = await engine.gameState
-        var reachableItems = Set<ItemID>()
-        var processedContainers = Set<ItemID>() // Prevent infinite loops with nested containers
+        let currentLocationID = gameState.player.currentLocationID
 
-        // Add initially reachable items (inventory)
+        // Check if the current location is lit - this is critical for reachability
+        let isLit = await isLocationLit(locationID: currentLocationID)
+
+        var reachableItems = Set<ItemID>()
+        var processedContainers = Set<ItemID>()
+
+        // 1. Add inventory items (always reachable regardless of lighting)
         let inventoryItems = gameState.items.values.filter { $0.parent == .player }
         reachableItems.formUnion(inventoryItems.map(\.id))
 
-        // Add initially reachable items (in scope in location - includes scenery for interaction)
-        let itemsInScopeInLocation = await self.itemsInScopeFor(
-            locationID: gameState.player.currentLocationID
-        )
-        reachableItems.formUnion(itemsInScopeInLocation)
+        // 2. Add items in current location only if lit
+        if isLit {
+            // Add items directly in the location
+            let locationItems = gameState.items.values.filter { $0.parent == .location(currentLocationID) }
+            reachableItems.formUnion(locationItems.map(\.id))
 
-        // Now, process containers and surfaces among the currently reachable items
-        var itemsToCheck = reachableItems // Copy the set to iterate while potentially modifying reachableItems
+            // Add local globals for the current location
+            if let location = gameState.locations[currentLocationID] {
+                for globalItemID in location.localGlobals {
+                    if let globalItem = gameState.items[globalItemID],
+                       !globalItem.hasFlag(.isInvisible) {
+                        reachableItems.insert(globalItemID)
+                    }
+                }
+            }
+        }
+
+        // 3. Process containers and surfaces recursively
+        var itemsToCheck = reachableItems
 
         while !itemsToCheck.isEmpty {
             let currentItemID = itemsToCheck.removeFirst()
             guard let currentItem = gameState.items[currentItemID] else { continue }
 
-            // A) Check if it's an accessible container
+            // Check if it's an accessible container
             if currentItem.hasFlag(.isContainer) && !processedContainers.contains(currentItem.id) {
                 processedContainers.insert(currentItem.id)
-                // Check dynamic property for open state
-                let isOpen: Bool = (
+
+                // Check both static and dynamic open state
+                let isOpenStatic = currentItem.attributes[.isOpen]?.toBool ?? false
+                let isOpenDynamic: Bool = (
                     try? await engine.attribute(.isOpen, of: currentItem.id)
                 ) ?? false
                 let isTransparent = currentItem.hasFlag(.isTransparent)
-                if isOpen || isTransparent {
-                    // Find items directly inside this container
+
+                if isOpenStatic || isOpenDynamic || isTransparent {
                     let itemsInside = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
                     let insideIDs = itemsInside.map(\.id)
 
-                    // Add newly found items to reachable set
                     let newlyReachable = Set(insideIDs).subtracting(reachableItems)
                     reachableItems.formUnion(newlyReachable)
-
-                    // Add newly found items (potential containers/surfaces) to the queue
                     itemsToCheck.formUnion(newlyReachable)
                 }
             }
 
-            // B) Check if it's a surface
+            // Check if it's a surface
             if currentItem.hasFlag(.isSurface) {
-                // Find items directly on this surface
                 let itemsOnSurface = gameState.items.values.filter { $0.parent == .item(currentItem.id) }
                 let onSurfaceIDs = itemsOnSurface.map(\.id)
 
-                // Add newly found items to reachable set
                 let newlyReachable = Set(onSurfaceIDs).subtracting(reachableItems)
                 reachableItems.formUnion(newlyReachable)
-
-                // Add newly found items (potential containers/surfaces) to the queue
                 itemsToCheck.formUnion(newlyReachable)
             }
         }

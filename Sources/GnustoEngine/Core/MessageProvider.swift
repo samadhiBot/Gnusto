@@ -1087,6 +1087,21 @@ open class MessageProvider: @unchecked Sendable {
         "Save failed: \(error)"
     }
 
+    open func screamResponse() -> String {
+        oneOf(
+            "You scream at the top of your lungs. Very therapeutic!",
+            "You shriek like a banshee.",
+            "You let out a blood-curdling scream.",
+            "You screech with primal fury.",
+            "You howl like a wounded animal.",
+            "You scream until your voice is hoarse.",
+            "You emit a piercing shriek that echoes through the area.",
+            "You scream with the passion of a thousand frustrated souls.",
+            "You let loose a scream that would wake the dead.",
+            "You scream so loudly that birds flee from nearby trees.",
+        )
+    }
+
     open func scriptAlreadyOn() -> String {
         "Scripting is already on."
     }
@@ -1408,6 +1423,22 @@ open class MessageProvider: @unchecked Sendable {
 
     open func wrongKey(key: String, lock: String) -> String {
         "\(key.capitalizedFirst) doesn't fit \(lock)."
+    }
+
+    open func yellResponse() -> String {
+        oneOf(
+            "You bellow magnificently as the universe checks its watch.",
+            "You bellow with the wild abandon of one who's given up on making sense.",
+            "You bellow importantly, although the importance fails to materialize.",
+            "You holler with misplaced confidence.",
+            "You holler into the void. While the void doesn't reply, it does raise an eyebrow.",
+            "You shout with gusto. The world remains studiously unimpressed.",
+            "You shout with purpose, although the _exact_ purpose is unclear.",
+            "You shout with the determination of one who's definitely onto something, probably.",
+            "You yell as if the universe owes you money.",
+            "You yell enthusiastically while reality politely ignores you",
+            "You yell with conviction about nothing at all.",
+        )
     }
 
     open func youAlreadyHaveThat() -> String {

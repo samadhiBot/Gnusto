@@ -104,6 +104,7 @@ struct ItemMechanicsTests {
             "take bottle",
             "examine bottle",
             "drink water",
+            "examine bottle",
             "inventory"
         )
         let engine = await GameEngine(
@@ -147,7 +148,7 @@ struct ItemMechanicsTests {
             The glass bottle contains a quantity of water.
 
             > drink water
-            I don’t know the verb ‘drink’.
+            You drink the quantity of water. It’s quite refreshing.
 
             > inventory
             You are carrying:
