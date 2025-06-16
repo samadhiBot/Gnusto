@@ -80,9 +80,6 @@ enum Playback {
 
         Above the trophy case hangs an elvish sword of great antiquity.
 
-        In the trophy case is an ancient parchment which appears to be
-        a map.
-
         > take all
         You take the brass lantern and the sword.
 

@@ -43,9 +43,6 @@ struct ItemMechanicsTests {
 
             Above the trophy case hangs an elvish sword of great antiquity.
 
-            In the trophy case is an ancient parchment which appears to be
-            a map.
-
             > take all
             You take the brass lantern and the sword.
 
@@ -196,9 +193,6 @@ struct ItemMechanicsTests {
             A battery-powered brass lantern is on the trophy case.
 
             Above the trophy case hangs an elvish sword of great antiquity.
-
-            In the trophy case is an ancient parchment which appears to be
-            a map.
 
             > take the lamp
             Taken.

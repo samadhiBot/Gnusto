@@ -211,9 +211,6 @@ struct OutsideHouseTests {
 
             Above the trophy case hangs an elvish sword of great antiquity.
 
-            In the trophy case is an ancient parchment which appears to be
-            a map.
-
             > take lamp
             Taken.
 

@@ -163,8 +163,12 @@ extension InsideHouse {
             a house. Three paths leave the large clearing. One of these paths, leading
             southwest, is marked "To Stone Barrow".
             """),
-        .size(2),
-        .in(.item(.trophyCase))
+        .size(2)
+        // https://www.perplexity.ai/search/in-the-zork-1-source-code-at-h-cK9jApwqSb6EZONmBAkFqg
+        // In the historicalsource/zork1 source code, the map is in the trophy case from the start
+        // of the game. However in the final release, it only appears in the trophy case after all
+        // of the treasures have been found and deposited.
+        // .in(.item(.trophyCase))
     )
 
     static let rope = Item(
