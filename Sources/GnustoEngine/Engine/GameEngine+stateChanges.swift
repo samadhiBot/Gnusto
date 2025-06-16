@@ -204,13 +204,8 @@ extension GameEngine {
         )
     }
 
-    public func remove(_ item: Item) -> StateChange {
-        StateChange(
-            entityID: .item(item.id),
-            attribute: .itemParent,
-            oldValue: .parentEntity(item.parent),
-            newValue: .parentEntity(.nowhere)
-        )
+    public func remove(_ itemID: ItemID) throws -> StateChange {
+        try move(itemID, to: .nowhere)
     }
 
     /// Creates a `StateChange` to set a dynamic attribute on an item identified by its ID.

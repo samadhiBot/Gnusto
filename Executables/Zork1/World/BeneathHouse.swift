@@ -63,21 +63,6 @@ enum BeneathHouse {
         ]),
         .localGlobals(.chimney)
     )
-
-    static let trollRoom = Location(
-        id: .trollRoom,
-        .name("The Troll Room"),
-        .description("""
-            This is a small room with passages to the east and south and a
-            forbidding hole leading west. Bloodstains and deep scratches
-            (perhaps made by an axe) mar the walls.
-            """),
-        .exits([
-            .south: .to(.cellar),
-            // Note: EAST exit to EW-PASSAGE conditional on TROLL-FLAG
-            // Note: WEST exit to MAZE-1 conditional on TROLL-FLAG
-        ])
-    )
 }
 
 // MARK: - Items
@@ -131,21 +116,5 @@ extension BeneathHouse {
         .size(15),
         .in(.location(.gallery))
         // Note: VALUE 4, TVALUE 6, has action handler PAINTING-FCN
-    )
-
-    static let troll = Item(
-        id: .troll,
-        .name("troll"),
-        .synonyms("troll"),
-        .adjectives("nasty"),
-        .isCharacter,  // ACTORBIT
-        .isOpen,  // OPENBIT
-        .requiresTryTake,
-        .description("""
-            A nasty-looking troll, brandishing a bloody axe, blocks all passages
-            out of the room.
-            """),
-        .in(.location(.trollRoom))
-        // Note: Has action handler TROLL-FCN, STRENGTH 2
     )
 }

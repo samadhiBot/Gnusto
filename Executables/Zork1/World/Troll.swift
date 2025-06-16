@@ -32,110 +32,115 @@ enum Troll {
         ])
     )
 
-//    static let trollHandler = ItemEventHandler { engine, event in
-//        guard case .beforeTurn(let command) = event else { return nil }
-//
-//        switch command.verb {
-//            //        case .tell:
-//            //            return ActionResult("The troll isn't much of a conversationalist.")
-//
-//            //        case .examine:
-//            //            return ActionResult(
-//            //                try await engine.item(.troll).longDescription
-//            //            )
-//
-//        case .give, .drop:
-//            guard let object = command.directObject else {
-//                return nil
-//            }
-//            let objectName = try await engine.item(object).name
-//
-//            // Handle giving/throwing the axe to the troll
-//            let isPlayerHoldingAxe = try engine.playerIsHolding(.axe)
-//
-//            if object == .axe && isPlayerHoldingAxe {
-//                return ActionResult(
-//                    message: "The troll scratches his head in confusion, then takes the axe.",
-//                    changes:
-//                        try await engine.setFlag(.isFighting, on: .troll),
-//                    try await engine.move(.axe, to: .item(.troll))
-//                )
-//            }
-//
-//            // Handle giving/throwing the troll or axe itself
-//            if object == .troll || object == .axe {
-//                return ActionResult(
-//                    "You would have to get the \(objectName) first, and that seems unlikely."
-//                )
-//            }
-//
-//            // Handle other objects
-//            let baseMessage = if command.verb == .drop {
-//                "The troll, who is remarkably coordinated, catches the \(objectName)"
-//            } else {
-//                "The troll, who is not overly proud, graciously accepts the gift"
-//            }
-//
-//            // Handle weapons
-//            if [.knife, .sword, .axe].contains(object) {
-//                if engine.randomPercentage() <= 20 {
+    static let trollHandler = ItemEventHandler { engine, event -> ActionResult? in
+        guard case .beforeTurn(let command) = event else { return nil }
+
+        switch command.verb {
+            //        case .tell:
+            //            return ActionResult("The troll isn't much of a conversationalist.")
+
+            //        case .examine:
+            //            return ActionResult(
+            //                try await engine.item(.troll).longDescription
+            //            )
+
+        case .give, .drop:
+            guard case .item(let object) = command.directObject else {
+                return nil
+            }
+            let objectName = try await engine.item(object).name
+
+            // Handle giving/throwing the axe to the troll
+            let isPlayerHoldingAxe = await engine.playerIsHolding(.axe)
+
+            if object == .axe && isPlayerHoldingAxe {
+                return ActionResult(
+                    message: "The troll scratches his head in confusion, then takes the axe.",
+                    changes: [
+                        try await engine.setFlag(.isFighting, on: .troll),
+                        try await engine.move(.axe, to: .item(.troll))
+                    ]
+                )
+            }
+
+            // Handle giving/throwing the troll or axe itself
+            if object == .troll || object == .axe {
+                return ActionResult(
+                    "You would have to get the \(objectName) first, and that seems unlikely."
+                )
+            }
+
+            // Handle other objects
+            let baseMessage = if command.verb == .drop {
+                "The troll, who is remarkably coordinated, catches the \(objectName)"
+            } else {
+                "The troll, who is not overly proud, graciously accepts the gift"
+            }
+
+            // Handle weapons
+            if [.knife, .sword, .axe].contains(object) {
+                if await engine.randomPercentage() <= 20 {
 //                    try await engine.item(.troll).handleMode(.dead)
-//                    try await engine.setFlag(.trollFlag)
-//                    return ActionResult(
-//                        message: """
-//                            \(baseMessage) and eats it hungrily. Poor troll,
-//                            he dies from an internal hemorrhage and his carcass
-//                            disappears in a sinister black fog.
-//                            """,
-//                        changes:
-//                            try await engine.remove(.troll),
-//                        try await engine.remove(object),
-//                    )
-//                } else {
-//                    return ActionResult(
-//                        message: """
-//                            \(baseMessage) and, being for the moment sated, throws it back.
-//                            Fortunately, the troll has poor control, and the \(objectName)
-//                            falls to the floor. He does not look pleased.
-//                            """,
-//                        changes:
-//                            try await engine.move(object, to: .location(.trollRoom)),
-//                        try await engine.setFlag(.isFighting, on: .troll)
-//                    )
-//                }
-//            } else {
-//                try await engine.removeCarefully(object)
-//                return ActionResult("""
-//                    \(baseMessage) and not having the most discriminating
-//                    tastes, gleefully eats it.
-//                    """)
-//            }
-//
-//        case .take, .move:
-//            return ActionResult("""
-//                The troll spits in your face, grunting "Better luck next time"
-//                in a rather barbarous accent.
-//                """)
-//
-//        case .push:
-//            return ActionResult("The troll laughs at your puny gesture.")
-//
-//        case .listen:
-//            return ActionResult("""
-//                Every so often the troll says something, probably
-//                uncomplimentary, in his guttural tongue.
-//                """)
-//
-//        case .thinkAbout:
-//            if try await engine.hasFlag(.trollFlag) {
-//                return ActionResult("Unfortunately, the troll can't hear you.")
-//            }
-//            return nil
-//
-//        default:
-//            return nil
-//        }
-//    }
+                    return ActionResult(
+                        message: """
+                            \(baseMessage) and eats it hungrily. Poor troll,
+                            he dies from an internal hemorrhage and his carcass
+                            disappears in a sinister black fog.
+                            """,
+                        changes: [
+                            await engine.setFlag(.trollFlag),
+                            try await engine.remove(.troll),
+                            try await engine.remove(object),
+                        ]
+                    )
+                } else {
+                    return ActionResult(
+                        message: """
+                            \(baseMessage) and, being for the moment sated, throws it back.
+                            Fortunately, the troll has poor control, and the \(objectName)
+                            falls to the floor. He does not look pleased.
+                            """,
+                        changes: [
+                            try await engine.move(object, to: .location(.trollRoom)),
+                            try await engine.setFlag(.isFighting, on: .troll)
+                        ]
+                    )
+                }
+            } else {
+                return ActionResult(
+                    """
+                    \(baseMessage) and not having the most discriminating
+                    tastes, gleefully eats it.
+                    """,
+                    change: try await engine.remove(object)
+                )
+            }
+
+        case .take, .move:
+            return ActionResult("""
+                The troll spits in your face, grunting "Better luck next time"
+                in a rather barbarous accent.
+                """)
+
+        case .push:
+            return ActionResult("The troll laughs at your puny gesture.")
+
+        case .listen:
+            return ActionResult("""
+                Every so often the troll says something, probably
+                uncomplimentary, in his guttural tongue.
+                """)
+
+        case .thinkAbout:
+            if try await engine.hasFlag(.trollFlag) {
+                return ActionResult("Unfortunately, the troll can't hear you.")
+            }
+            return nil
+
+        default:
+            return nil
+        }
+    }
 }
 
 /*

@@ -751,7 +751,7 @@ extension GameEngine {
 
         // --- Try Object Action Handlers ---
 
-        // 1. Check Direct Object Handler
+        // 1. Check Direct Object Handler (singular)
         if case .item(let doItemID) = command.directObject,
             let itemHandler = itemEventHandlers[doItemID]
         {
@@ -766,6 +766,31 @@ extension GameEngine {
             } catch let response {
                 actionResponse = response
                 actionHandled = true  // Treat error as handled to prevent default handler
+            }
+        }
+
+        // 1b. Check Direct Objects Handlers (plural) for multi-item commands
+        if !actionHandled, actionResponse == nil, !command.directObjects.isEmpty {
+            for directObjectRef in command.directObjects {
+                guard case .item(let doItemID) = directObjectRef,
+                      let itemHandler = itemEventHandlers[doItemID] else {
+                    continue
+                }
+
+                do {
+                    if let result = try await itemHandler.handle(self, .beforeTurn(command)) {
+                        // Object handler returned a result, process it
+                        if try await processActionResult(result) {
+                            return  // Object handler handled everything
+                        }
+                    }
+                } catch let response {
+                    actionResponse = response
+                    actionHandled = true  // Treat error as handled to prevent default handler
+                    break  // Stop processing other objects if one throws an error
+                }
+
+                if shouldQuit { return }
             }
         }
 
@@ -869,7 +894,7 @@ extension GameEngine {
 
         // --- Item AfterTurn Hooks ---
 
-        // 1. Check Direct Object AfterTurn Handler
+        // 1. Check Direct Object AfterTurn Handler (singular)
         if case .item(let doItemID) = command.directObject,
             let itemHandler = itemEventHandlers[doItemID]
         {
@@ -883,6 +908,28 @@ extension GameEngine {
                 logWarning("Error in direct object afterTurn handler: \(error)")
             }
             if shouldQuit { return }
+        }
+
+        // 1b. Check Direct Objects AfterTurn Handlers (plural) for multi-item commands
+        if !command.directObjects.isEmpty {
+            for directObjectRef in command.directObjects {
+                guard case .item(let doItemID) = directObjectRef,
+                      let itemHandler = itemEventHandlers[doItemID] else {
+                    continue
+                }
+
+                do {
+                    if let result = try await itemHandler.handle(self, .afterTurn(command)),
+                        try await processActionResult(result)
+                    {
+                        return
+                    }
+                } catch {
+                    logWarning("Error in direct object afterTurn handler: \(error)")
+                }
+
+                if shouldQuit { return }
+            }
         }
 
         // 2. Check Indirect Object AfterTurn Handler
