@@ -39,7 +39,7 @@ public struct ActionResult: Sendable {
         effects: [SideEffect?] = []
     ) {
         assert(
-            message != nil || !changes.isEmpty || !effects.isEmpty,
+            message?.isEmpty == false || !changes.isEmpty || !effects.isEmpty,
             "ActionResults must contain at least one message, StateChange, or SideEffect"
         )
         self.message = message
@@ -47,64 +47,29 @@ public struct ActionResult: Sendable {
         self.effects = effects.compactMap(\.self)
     }
 
-    /// Creates a new `ActionResult` with optional single state change and side effect.
-    ///
-    /// This is a convenience initializer for common cases where an action results in at most
-    /// one state change and/or one side effect.
+    /// Creates a new `ActionResult` with a message and optional state changes.
     ///
     /// - Parameters:
-    ///   - message: An optional message to display to the player.
-    ///   - change: An optional single `StateChange` to be applied.
-    ///   - effect: An optional single `SideEffect` to be triggered.
+    ///   - message: The message to display to the player.
+    ///   - changes: Optional `StateChange`s to be applied.
     public init(
         _ message: String,
-        change: StateChange? = nil,
-        effect: SideEffect? = nil
+        _ changes: StateChange?...
     ) {
-        assert(
-            !message.isEmpty || change != nil || effect != nil,
-            "ActionResults must contain at least one message, StateChange, or SideEffect"
-        )
-        self.message = message
-        self.changes = if let change { [change] } else { [] }
-        self.effects = if let effect { [effect] } else { [] }
+        self.init(message: message, changes: changes)
     }
 
-    /// Creates a new `ActionResult` with optional single state change and side effect.
+    /// Creates a new `ActionResult` with only state changes (no message).
     ///
-    /// This is a convenience initializer for common cases where an action results in at most
-    /// one state change and/or one side effect.
-    ///
-    /// - Parameters:
-    ///   - message: An optional message to display to the player.
-    ///   - change: An optional single `StateChange` to be applied.
-    ///   - effect: An optional single `SideEffect` to be triggered.
+    /// - Parameter changes: Optional `StateChange`s to be applied.
     public init(_ changes: StateChange?...) {
-        assert(
-            !changes.isEmpty,
-            "ActionResults must contain at least one message, StateChange, or SideEffect"
-        )
-        self.message = nil
-        self.changes = changes.compactMap(\.self)
-        self.effects = []
+        self.init(changes: changes)
     }
 
-    /// Creates a new `ActionResult` with optional single state change and side effect.
+    /// Creates a new `ActionResult` with only side effects (no message).
     ///
-    /// This is a convenience initializer for common cases where an action results in at most
-    /// one state change and/or one side effect.
-    ///
-    /// - Parameters:
-    ///   - message: An optional message to display to the player.
-    ///   - change: An optional single `StateChange` to be applied.
-    ///   - effect: An optional single `SideEffect` to be triggered.
+    /// - Parameter effects: Optional `SideEffect`s to be triggered.
     public init(_ effects: SideEffect?...) {
-        assert(
-            !effects.isEmpty,
-            "ActionResults must contain at least one message, StateChange, or SideEffect"
-        )
-        self.message = nil
-        self.changes = []
-        self.effects = effects.compactMap(\.self)
+        self.init(effects: effects)
     }
 }

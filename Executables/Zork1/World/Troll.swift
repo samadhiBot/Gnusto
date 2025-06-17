@@ -6,10 +6,6 @@ enum Troll {
         .name("troll"),
         .synonyms("troll"),
         .adjectives("nasty"),
-        .description("""
-            A nasty-looking troll, brandishing a bloody axe,
-            blocks all passages out of the room.
-            """),
         .in(.location(.trollRoom)),
         .isCharacter,
         .isOpen,
@@ -32,17 +28,29 @@ enum Troll {
         ])
     )
 
+    static let trollComputer = ItemComputer { attribute, state in
+        switch attribute {
+        case .description, .firstDescription:
+            .string("""
+                A nasty-looking troll, brandishing a bloody axe, blocks all
+                passages out of the room.                    
+                """)
+        default:
+            nil
+        }
+    }
+
     static let trollHandler = ItemEventHandler { engine, event -> ActionResult? in
         guard case .beforeTurn(let command) = event else { return nil }
 
         switch command.verb {
-            //        case .tell:
-            //            return ActionResult("The troll isn't much of a conversationalist.")
+        case .tell:
+            return ActionResult("The troll isn't much of a conversationalist.")
 
-            //        case .examine:
-            //            return ActionResult(
-            //                try await engine.item(.troll).longDescription
-            //            )
+        case .examine:
+            return ActionResult(
+                try await engine.item(.troll).attributes.description
+            )
 
         case .give, .drop:
             guard case .item(let object) = command.directObject else {
@@ -112,7 +120,7 @@ enum Troll {
                     \(baseMessage) and not having the most discriminating
                     tastes, gleefully eats it.
                     """,
-                    change: try await engine.remove(object)
+                    try await engine.remove(object)
                 )
             }
 

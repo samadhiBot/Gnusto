@@ -104,7 +104,7 @@ enum OperaHouse {
             } else {
                 ActionResult(
                     "Blundering around in the dark isn't a good idea!",
-                    change: await engine.adjustGlobal(.barMessageDisturbances, by: 2)
+                    await engine.adjustGlobal(.barMessageDisturbances, by: 2)
                 )
             }
         case .look, .inventory:
@@ -112,14 +112,14 @@ enum OperaHouse {
         default:
             ActionResult(
                 "In the dark? You could easily disturb something!",
-                change: await engine.adjustGlobal(.barMessageDisturbances, by: 1)
+                await engine.adjustGlobal(.barMessageDisturbances, by: 1)
             )
         }
     }
 
     // MARK: - Item event handlers
 
-    static let cloakHandler = ItemEventHandler { engine, event in
+    static let cloakHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -139,14 +139,12 @@ enum OperaHouse {
                 return nil
             }
             switch command.verb {
-            case .drop,
-                    .putOn:
-                var changes = [StateChange]()
+            case .drop, .putOn:
+                var changes = [
+                    try await engine.setFlag(.isLit, on: engine.location(.bar))
+                ]
                 if await engine.playerScore < 1 {
                     changes.append(await engine.updatePlayerScore(by: 1))
-                }
-                if let lightenBar = try await engine.setFlag(.isLit, on: engine.location(.bar)) {
-                    changes.append(lightenBar)
                 }
                 return ActionResult(changes: changes)
             case .take:
@@ -195,7 +193,7 @@ enum OperaHouse {
 
                 "You win."
                 """,
-                change: await engine.updatePlayerScore(by: 1)
+                await engine.updatePlayerScore(by: 1)
             )
 
         } else {

@@ -238,7 +238,7 @@ extension OutsideHouse {
                     let kitchenWindow = try await engine.item(.kitchenWindow)
                     return await ActionResult(
                         "With great effort, you open the window far enough to allow entry.",
-                        change: engine.setFlag(.isOpen, on: kitchenWindow)
+                        engine.setFlag(.isOpen, on: kitchenWindow)
                     )
                 }
             case .look where command.preposition == "through":
@@ -320,19 +320,16 @@ extension OutsideHouse {
                     let isWindowOpen = try await engine.hasFlag(.isOpen, on: .kitchenWindow)
                     if isWindowOpen {
                         // Move player to kitchen
-                        let moveChange = StateChange(
-                            entityID: .player,
-                            attribute: .playerLocation,
-                            oldValue: .locationID(currentLocation),
-                            newValue: .locationID(.kitchen)
+                        return ActionResult(
+                            nil,
+                            await engine.movePlayer(to: .location(.kitchen))
                         )
-                        return ActionResult(moveChange)
                     } else {
                         // Update pronoun to refer to kitchen window
                         let kitchenWindow = try await engine.item(.kitchenWindow)
                         return ActionResult(
                             "The window is closed.",
-                            change: await engine.updatePronouns(to: kitchenWindow)
+                            await engine.updatePronouns(to: kitchenWindow)
                         )
                     }
                 } else {

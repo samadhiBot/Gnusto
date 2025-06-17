@@ -29,6 +29,11 @@ struct UndergroundTests {
             forbidding hole leading west. Bloodstains and deep scratches
             (perhaps made by an axe) mar the walls.
 
+            A nasty-looking troll, brandishing a bloody axe, blocks all
+            passages out of the room.
+
+            Your sword is glowing very brightly.
+
             >
             Goodbye!
             """)

@@ -108,7 +108,7 @@ public struct EatActionHandler: ActionHandler {
                         context.message.cannotEatFromClosed(
                             container: targetItem.withDefiniteArticle
                         ),
-                        change: await context.engine.setFlag(.isTouched, on: targetItem)
+                        await context.engine.setFlag(.isTouched, on: targetItem)
                     )
                 } else {
                     return ActionResult(
@@ -126,14 +126,14 @@ public struct EatActionHandler: ActionHandler {
             } else {
                 return ActionResult(
                     context.message.nothingToEatIn(container: targetItem.withDefiniteArticle),
-                    change: await context.engine.setFlag(.isTouched, on: targetItem)
+                    await context.engine.setFlag(.isTouched, on: targetItem)
                 )
             }
         } else {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
                 context.message.cannotEat(item: targetItem.withDefiniteArticle),
-                change: await context.engine.setFlag(.isTouched, on: targetItem)
+                await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }
     }

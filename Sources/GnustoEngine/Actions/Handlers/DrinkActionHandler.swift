@@ -137,7 +137,7 @@ public struct DrinkActionHandler: ActionHandler {
             // This shouldn't happen after validation, but handle it
             return ActionResult(
                 context.message.cannotDrink(item: targetItem.withDefiniteArticle),
-                change: await context.engine.setFlag(.isTouched, on: targetItem)
+                await context.engine.setFlag(.isTouched, on: targetItem)
             )
         }
     }

@@ -203,6 +203,18 @@ extension GameEngine {
             newValue: .parentEntity(newParent)
         )
     }
+    
+    /// <#Description#>
+    /// - Parameter newParent: <#newParent description#>
+    /// - Returns: <#description#>
+    public func movePlayer(to newParent: ParentEntity) -> StateChange {
+        StateChange(
+            entityID: .player,
+            attribute: .itemParent,
+            oldValue: .parentEntity(.location(playerLocationID)),
+            newValue: .parentEntity(newParent)
+        )
+    }
 
     public func remove(_ itemID: ItemID) throws -> StateChange {
         try move(itemID, to: .nowhere)

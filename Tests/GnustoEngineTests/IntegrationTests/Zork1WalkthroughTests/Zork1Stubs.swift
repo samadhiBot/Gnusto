@@ -98,8 +98,6 @@ enum Playback {
 
         It is pitch black. You are likely to be eaten by a grue.
 
-        Your sword is glowing with a faint blue glow.
-
         > light the lantern
         The brass lantern is now on. You can see your surroundings now.
 
@@ -108,5 +106,7 @@ enum Playback {
         You are in a dark and damp cellar with a narrow passageway
         leading north, and a crawlway to the south. On the west is the
         bottom of a steep metal ramp which is unclimbable.
+        
+        Your sword is glowing with a faint blue glow.
         """
 }

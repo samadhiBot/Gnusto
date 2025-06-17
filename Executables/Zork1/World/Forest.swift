@@ -357,7 +357,7 @@ extension Forest {
                     if grate.hasFlag(.isOpen) {
                         return ActionResult(
                             "The grating is closed.",
-                            change: try await engine.clearFlag(.isOpen, on: .grate)
+                            try await engine.clearFlag(.isOpen, on: .grate)
                         )
                     } else {
                         return ActionResult("The grating is already closed.")
@@ -371,7 +371,7 @@ extension Forest {
                 if currentLocation == .gratingRoom {
                     return ActionResult(
                         "The grate is locked.",
-                        change: await engine.setFlag(.isLocked, on: try await engine.item(.grate))
+                        await engine.setFlag(.isLocked, on: try await engine.item(.grate))
                     )
                 } else if currentLocation == .gratingClearing {
                     return ActionResult("You can't lock it from this side.")
@@ -394,7 +394,7 @@ extension Forest {
                     if currentLocation == .gratingRoom {
                         return ActionResult(
                             "The grate is unlocked.",
-                            change: await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
+                            await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
                         )
                     } else if currentLocation == .gratingClearing {
                         return ActionResult("You can't reach the lock from here.")
@@ -417,7 +417,7 @@ extension Forest {
                         }
                         return ActionResult(
                             message,
-                            change: await engine.setFlag(.isOpen, on: try await engine.item(.grate))
+                            await engine.setFlag(.isOpen, on: try await engine.item(.grate))
                         )
                     } else {
                         return ActionResult("The grating is already open.")
@@ -446,7 +446,7 @@ extension Forest {
                 if currentLocation == .gratingRoom {
                     return ActionResult(
                         "The grate is unlocked.",
-                        change: await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
+                        await engine.clearFlag(.isLocked, on: try await engine.item(.grate))
                     )
                 } else if currentLocation == .gratingClearing {
                     return ActionResult("You can't reach the lock from here.")
