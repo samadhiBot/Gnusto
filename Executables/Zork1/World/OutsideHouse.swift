@@ -223,11 +223,14 @@ extension OutsideHouse {
             case .take: ActionResult("The boards are securely fastened.")
             default: nil
             }
-        case .afterTurn: nil
+        case .afterTurn:
+            return nil
+        case .characterMode:
+            return nil
         }
     }
 
-    static let kitchenWindowHandler = ItemEventHandler { engine, event in
+    static let mailboxHandler = ItemEventHandler { engine, event in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -261,7 +264,10 @@ extension OutsideHouse {
             case .take: ActionResult("It is securely anchored.")
             default: nil
             }
-        case .afterTurn: nil
+        case .afterTurn:
+            return nil
+        case .characterMode:
+            return nil
         }
     }
 
@@ -344,6 +350,8 @@ extension OutsideHouse {
             }
 
         case .afterTurn:
+            return nil
+        case .characterMode:
             return nil
         }
     }

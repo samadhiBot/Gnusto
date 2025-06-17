@@ -8,15 +8,16 @@ enum Forest {
     static let canyonView = Location(
         id: .canyonView,
         .name("Canyon View"),
-        .description("""
+        .description(
+            """
             You are in a clearing, with a forest surrounding you on all
             sides. A path leads south.
             """),
-//        .exits([:]),
-//            .down: .blocked("GRATING PUZZLE"),
-//            .east: .to(.forest2),
-//            .south: .to(.forestPath),
-//            .west: .to(.forest1),
+        //        .exits([:]),
+        //            .down: .blocked("GRATING PUZZLE"),
+        //            .east: .to(.forest2),
+        //            .south: .to(.forestPath),
+        //            .west: .to(.forest1),
         .inherentlyLit,
         .localGlobals(.forest)
     )
@@ -24,7 +25,8 @@ enum Forest {
     static let clearing = Location(
         id: .clearing,
         .name("Clearing"),
-        .description("""
+        .description(
+            """
             You are in a small clearing in a well marked forest path that
             extends to the east and west.
             """),
@@ -42,7 +44,8 @@ enum Forest {
     static let forest1 = Location(
         id: .forest1,
         .name("Forest"),
-        .description("""
+        .description(
+            """
             This is a forest, with trees in all directions. To the east,
             there appears to be sunlight.
             """),
@@ -59,7 +62,8 @@ enum Forest {
     static let forest2 = Location(
         id: .forest2,
         .name("Forest"),
-        .description("""
+        .description(
+            """
             This is a dimly lit forest, with large trees all around.
             """),
         .exits([
@@ -75,7 +79,8 @@ enum Forest {
     static let forest3 = Location(
         id: .forest3,
         .name("Forest"),
-        .description("""
+        .description(
+            """
             This is a dimly lit forest, with large trees all around.
             """),
         .exits([
@@ -91,7 +96,8 @@ enum Forest {
     static let forestPath = Location(
         id: .forestPath,
         .name("Forest Path"),
-        .description("""
+        .description(
+            """
             This is a path winding through a dimly lit forest. The path heads
             north-south here. One particularly large tree with some low branches
             stands at the edge of the path.
@@ -101,7 +107,7 @@ enum Forest {
             .north: .to(.gratingClearing),
             .east: .to(.forest2),
             .south: .to(.northOfHouse),
-            .west: .to(.forest1)
+            .west: .to(.forest1),
         ]),
         .inherentlyLit,
         .localGlobals(.songbird, .whiteHouse, .forest)
@@ -110,10 +116,10 @@ enum Forest {
     static let gratingClearing = Location(
         id: .gratingClearing,
         .name("Clearing"),
-//        .description("""
-//            You are in a clearing, with a forest surrounding you on all sides.
-//            A path leads south.
-//            """),
+        //        .description("""
+        //            You are in a clearing, with a forest surrounding you on all sides.
+        //            A path leads south.
+        //            """),
         .exits([
             .east: .to(.forest2),
             .west: .to(.forest1),
@@ -143,12 +149,13 @@ enum Forest {
     static let upATree = Location(
         id: .upATree,
         .name("Up a Tree"),
-        .description("""
+        .description(
+            """
             You are about 10 feet above the ground nestled among some large branches.
             The nearest branch above you is above your reach.
             """),
         .exits([
-            .down: .to(.forestPath),
+            .down: .to(.forestPath)
             // Note: UP exit has custom message
         ]),
         .inherentlyLit,
@@ -160,7 +167,8 @@ enum Forest {
     static let egg = Item(
         id: .egg,
         .name("jewel-encrusted egg"),
-        .description("""
+        .description(
+            """
             The egg is about the size of a large duck egg. It is covered with fine gold and
             inlaid with lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged
             and can be opened and closed. The egg appears to be closed.
@@ -311,35 +319,38 @@ extension Forest {
         switch event {
         case .beforeTurn(let command):
             if command.verb == .move {
-                // Check if grate is already revealed
-                let isGrateInvisible = try await engine.hasFlag(.isInvisible, on: .grate)
+                // Check if grate is invisible
+                let grate = try await engine.item(.grate)
+                let isGrateInvisible = grate.hasFlag(.isInvisible)
 
                 var changes: [StateChange] = []
 
+                // Reveal the grate if it's currently invisible
                 if isGrateInvisible {
-                    // Reveal the grate - this is the LEAVES-APPEAR functionality
-                    let grate = try await engine.item(.grate)
-                    if let grateChange = await engine.clearFlag(.isInvisible, on: grate) {
-                        changes.append(grateChange)
-                    }
+                    changes.append(try await engine.clearFlag(.isInvisible, on: .grate))
                 }
 
                 // Update the leaves description to show they've been disturbed
                 let leaves = try await engine.item(.pileOfLeaves)
-                if let leavesChange = await engine.setAttribute(.firstDescription, on: leaves, to: .string("On the ground is a pile of leaves.")) {
+                if let leavesChange = await engine.setAttribute(
+                    .firstDescription, on: leaves, to: .string("On the ground is a pile of leaves.")
+                ) {
                     changes.append(leavesChange)
                 }
 
-                let message = if isGrateInvisible {
-                    "In disturbing the pile of leaves, a grating is revealed."
-                } else {
-                    "Done."
-                }
+                let message =
+                    if isGrateInvisible {
+                        "In disturbing the pile of leaves, a grating is revealed."
+                    } else {
+                        "Done."
+                    }
 
                 return ActionResult(message: message, changes: changes)
             }
             return nil
         case .afterTurn:
+            return nil
+        case .characterMode:
             return nil
         }
     }
@@ -381,8 +392,9 @@ extension Forest {
 
             case .open:
                 if let indirectObject = command.indirectObject,
-                   case .item(let keyItemID) = indirectObject,
-                   keyItemID == .keys {
+                    case .item(let keyItemID) = indirectObject,
+                    keyItemID == .keys
+                {
                     // OPEN GRATE WITH KEYS -> handle as unlock
                     let currentLocation = await engine.playerLocationID
                     let playerHasKeys = await engine.items(in: .player).contains { $0.id == .keys }
@@ -410,11 +422,12 @@ extension Forest {
                 if !isLocked {
                     let isOpen = try await engine.hasFlag(.isOpen, on: .grate)
                     if !isOpen {
-                        let message = if currentLocation == .gratingClearing {
-                            "The grating opens."
-                        } else {
-                            "The grating opens to reveal trees above you."
-                        }
+                        let message =
+                            if currentLocation == .gratingClearing {
+                                "The grating opens."
+                            } else {
+                                "The grating opens to reveal trees above you."
+                            }
                         return ActionResult(
                             message,
                             await engine.setFlag(.isOpen, on: try await engine.item(.grate))
@@ -428,8 +441,9 @@ extension Forest {
 
             case .unlock:
                 guard let indirectObject = command.indirectObject,
-                      case .item(let keyItemID) = indirectObject,
-                      keyItemID == .keys else {
+                    case .item(let keyItemID) = indirectObject,
+                    keyItemID == .keys
+                else {
                     if let indirectObject = command.indirectObject {
                         return ActionResult("Can you unlock a grating with that?")
                     }
@@ -458,6 +472,8 @@ extension Forest {
                 return nil
             }
         case .afterTurn:
+            return nil
+        case .characterMode:
             return nil
         }
     }

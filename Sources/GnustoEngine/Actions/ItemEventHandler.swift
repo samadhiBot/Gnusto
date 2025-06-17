@@ -50,7 +50,7 @@ public enum ItemEvent: Sendable {
     /*
     /// Called when the item is first created or loaded into the game.
     case onInitialize
-
+    
     /// Called when the item is destroyed or removed from the game.
     case onDestroy
      */

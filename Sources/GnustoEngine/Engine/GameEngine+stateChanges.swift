@@ -67,11 +67,12 @@ extension GameEngine {
     ///                    If empty, "it" will be used and will refer to an empty set.
     /// - Returns: A `StateChange` to update the pronoun reference, or `nil` if no change is needed.
     public func updatePronouns(to items: Item...) -> StateChange? {
-        let pronoun = switch items.count {
-        case 0: "it"
-        case 1: items[0].hasFlag(.isPlural) ? "them" : "it"
-        default: "them"
-        }
+        let pronoun =
+            switch items.count {
+            case 0: "it"
+            case 1: items[0].hasFlag(.isPlural) ? "them" : "it"
+            default: "them"
+            }
         let newEntityReferences = Set(items.map { EntityReference.item($0.id) })
         let oldEntityReferences = gameState.pronouns[pronoun]
 
@@ -97,7 +98,8 @@ extension GameEngine {
     ///   - lastItem: The last item processed (for "it" pronoun)
     ///   - allItems: All items processed (for "them" pronoun)
     /// - Returns: An array of `StateChange`s to update both pronouns, or empty array if no changes needed.
-    public func updatePronounsForMultipleObjects(lastItem: Item, allItems: [Item]) -> [StateChange] {
+    public func updatePronounsForMultipleObjects(lastItem: Item, allItems: [Item]) -> [StateChange]
+    {
         var changes: [StateChange] = []
 
         // Update "it" to refer to the last item
@@ -203,7 +205,7 @@ extension GameEngine {
             newValue: .parentEntity(newParent)
         )
     }
-    
+
     /// <#Description#>
     /// - Parameter newParent: <#newParent description#>
     /// - Returns: <#description#>
@@ -516,7 +518,9 @@ extension GameEngine {
     ///   - description: The new description text.
     /// - Returns: A `StateChange` to set the description, or `nil` if it wouldn't change.
     /// - Throws: `GameEngineError` if the location with the given ID cannot be found.
-    public func setDescription(on locationID: LocationID, to description: String) throws -> StateChange? {
+    public func setDescription(on locationID: LocationID, to description: String) throws
+        -> StateChange?
+    {
         try setDescription(on: location(locationID), to: description)
     }
 
