@@ -580,7 +580,7 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .attack,
-            synonyms: "fight", "hit", "kill", "slay",
+            synonyms: "fight", "hit", "kill", "slay", "stab",
             syntax: [
                 SyntaxRule(.verb, .directObject),
                 SyntaxRule(
@@ -913,8 +913,9 @@ public struct Vocabulary: Codable, Equatable, Sendable {
 
         Verb(
             id: .tell,
-            synonyms: "inform", "say to",
+            synonyms: "inform", "say to", "talk",
             syntax: [
+                SyntaxRule(.verb, .directObject),  // For "talk to troll" or "tell troll"
                 SyntaxRule(
                     pattern: [.verb, .directObject, .preposition, .indirectObject],
                     requiredPreposition: "about"

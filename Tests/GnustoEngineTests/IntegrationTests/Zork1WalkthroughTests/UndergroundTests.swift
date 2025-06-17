@@ -44,15 +44,12 @@ struct UndergroundTests {
         let mockIO = await MockIOHandler(
             Moves.enterUnderground,
             "north",
-            "east",
-            "east",
-            "look",
-            "west",
-            "west",
-            "south",
-            "south",
-            "east",
-            "look"
+            "walk east",
+            "go north",
+            "head west",
+            "talk to the troll",
+            "take the troll",
+            "stab the troll",
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -72,53 +69,35 @@ struct UndergroundTests {
             forbidding hole leading west. Bloodstains and deep scratches
             (perhaps made by an axe) mar the walls.
 
-            > east
-            — East-West Passage —
+            A nasty-looking troll, brandishing a bloody axe, blocks all
+            passages out of the room.
 
-            This is a narrow east-west passageway. There is a narrow
-            stairway leading down at the north end of the room.
+            Your sword is glowing very brightly.
 
-            > east
-            — Round Room —
+            > walk east
+            The troll fends you off with a menacing gesture.
 
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            > go north
+            You can’t go that way.
 
-            > look
-            — Round Room —
+            > head west
+            The troll fends you off with a menacing gesture.
 
-            This is a circular stone room with passages in all directions.
-            Several of them have unfortunate endings.
+            > talk to the troll
+            The troll isn’t much of a conversationalist.
 
-            > west
-            — East-West Passage —
-            
-            > west
-            — Troll Room —
-            
-            > south
-            — Cellar —
-            
-            > south
-            — East of Chasm —
+            > take the troll
+            The troll spits in your face, grunting “Better luck next time”
+            in a rather barbarous accent.
 
-            You are on the east edge of a chasm, the bottom of which cannot
-            be seen. A narrow passage goes north, and the path you are on
-            continues to the east.
+            > stab the troll
+            The troll takes a fatal blow and slumps to the floor dead.
 
-            > east
-            — Gallery —
+            Almost as soon as the troll breathes his last breath, a cloud
+            of sinister black fog envelops him, and when the fog lifts, the
+            carcass has disappeared.
 
-            This is an art gallery. Most of the paintings have been stolen
-            by vandals with exceptional taste. The vandals left through
-            either the north or west exits.
-
-            > look
-            — Gallery —
-
-            This is an art gallery. Most of the paintings have been stolen
-            by vandals with exceptional taste. The vandals left through
-            either the north or west exits.
+            Your sword is no longer glowing.
 
             >
             Goodbye!

@@ -33,7 +33,7 @@ enum Troll {
         case .description, .firstDescription:
             .string("""
                 A nasty-looking troll, brandishing a bloody axe, blocks all
-                passages out of the room.                    
+                passages out of the room.
                 """)
         default:
             nil
@@ -47,9 +47,27 @@ enum Troll {
         case .tell:
             return ActionResult("The troll isn't much of a conversationalist.")
 
-        case .examine:
+//        case .examine:
+//            return ActionResult(
+//                try await engine.attribute(.description, of: .troll) ?? "A troll is here."
+//            )
+
+        case .attack:
+            // Handle attacking the troll - it dies
             return ActionResult(
-                try await engine.item(.troll).attributes.description
+                message: """
+                    The troll takes a fatal blow and slumps to the floor dead.
+
+                    Almost as soon as the troll breathes his last breath, a cloud 
+                    of sinister black fog envelops him, and when the fog lifts, 
+                    the carcass has disappeared.
+
+                    Your sword is no longer glowing.
+                    """,
+                changes: [
+                    await engine.setFlag(.trollFlag),
+                    try await engine.remove(.troll),
+                ]
             )
 
         case .give, .drop:
@@ -140,11 +158,33 @@ enum Troll {
                 """)
 
         case .thinkAbout:
-            if try await engine.hasFlag(.trollFlag) {
+            if await engine.hasFlag(.trollFlag) {
                 return ActionResult("Unfortunately, the troll can't hear you.")
             }
             return nil
 
+        default:
+            return nil
+        }
+    }
+
+            static let trollRoomHandler = LocationEventHandler { engine, event -> ActionResult? in
+        guard case .beforeTurn(let command) = event else { return nil }
+
+        // Only block movement if the troll is alive (not removed)
+        guard let troll = try? await engine.item(.troll),
+              troll.parent == .location(.trollRoom)
+        else {
+            return nil // Troll is dead/gone, allow movement
+        }
+
+        switch command.verb {
+        case .go:
+            // Block east and west movement when troll is alive
+            if let direction = command.direction, [.east, .west].contains(direction) {
+                return ActionResult("The troll fends you off with a menacing gesture.")
+            }
+            return nil // Allow other directions (south to cellar)
         default:
             return nil
         }
