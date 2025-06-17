@@ -235,7 +235,7 @@ extension GameEngine {
         (try await attribute(attributeID, of: itemID)) == true
     }
 
-    /// Retrieves an immutable copy (snapshot) of a specific item from the current game state.
+    /// Retrieves an immutable copy of a specific item from the current game state.
     ///
     /// - Parameter id: The `ItemID` of the item to retrieve.
     /// - Returns: An `Item` struct representing a snapshot of the specified item.

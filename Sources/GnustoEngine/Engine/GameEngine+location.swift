@@ -81,16 +81,24 @@ extension GameEngine {
     public func isLocationLit(at locationID: LocationID) async -> Bool {
         await scopeResolver.isLocationLit(locationID: locationID)
     }
-    
-    /// <#Description#>
-    /// - Parameter locationID: <#locationID description#>
-    /// - Returns: <#description#>
+
+    /// Retrieves all items that are directly visible within a specific location.
+    ///
+    /// This method uses the `ScopeResolver` to determine which items are visible in the given
+    /// location, considering lighting conditions and item properties. Items that are invisible
+    /// or marked to omit from descriptions are excluded. The method returns full `Item` objects
+    /// rather than just their IDs.
+    ///
+    /// - Parameter locationID: The unique identifier of the location to check for visible items.
+    /// - Returns: An array of `Item` objects that are directly visible in the specified location.
+    /// - Throws: An error if there are issues retrieving item data from the game state.
     public func itemsInLocation(_ locationID: LocationID) async throws -> [Item] {
-        let visibleItemIDs = await scopeResolver.visibleItemsIn(locationID: locationID)
-        return try visibleItemIDs.compactMap(item(_:))
+        try await scopeResolver
+            .visibleItemsIn(locationID: locationID)
+            .compactMap(item(_:))
     }
 
-    /// Retrieves an immutable copy (snapshot) of a specific location from the current game state.
+    /// Retrieves an immutable copy of a specific location from the current game state.
     ///
     /// - Parameter id: The `LocationID` of the location to retrieve.
     /// - Returns: A `Location` struct representing a snapshot of the specified location.
@@ -284,22 +292,22 @@ extension GameEngine {
             let directItems = visibleItems.filter { !$0.hasFlag(.omitDescription) }
             if !directItems.isEmpty {
                 // Check if any direct items have firstDescription and haven't been touched
-                let hasFirstDescriptions = directItems.contains { item in
-                    guard
-                        let firstDescription = item.attributes[.firstDescription],
-                        case .string(let description) = firstDescription,
-                        !description.isEmpty
-                    else {
-                        return false
+                var hasFirstDescriptions = false
+                for item in directItems {
+                    let firstDescription: String? = try await attribute(.firstDescription, of: item.id)
+                    if let description = firstDescription,
+                       !description.isEmpty,
+                       !item.hasFlag(.isTouched) {
+                        hasFirstDescriptions = true
+                        break
                     }
-                    return !item.hasFlag(.isTouched)
                 }
 
                 if hasFirstDescriptions {
                     // Use individual first descriptions for untouched direct items
                     for item in directItems.sorted() {
-                        if let firstDescription = item.attributes[.firstDescription],
-                           case .string(let description) = firstDescription,
+                        let firstDescription: String? = try await attribute(.firstDescription, of: item.id)
+                        if let description = firstDescription,
                            !description.isEmpty,
                            !item.hasFlag(.isTouched) {
                             // Use first description for untouched items
@@ -327,22 +335,22 @@ extension GameEngine {
                     let contents = gameState.items(in: .item(item.id))
 
                     // Check if any items on this surface have first descriptions
-                    let hasFirstDescriptions = contents.contains { item in
-                        guard
-                            let firstDescription = item.attributes[.firstDescription],
-                            case .string(let description) = firstDescription,
-                            !description.isEmpty
-                        else {
-                            return false
+                    var hasFirstDescriptions = false
+                    for contentItem in contents {
+                        let firstDescription: String? = try await attribute(.firstDescription, of: contentItem.id)
+                        if let description = firstDescription,
+                           !description.isEmpty,
+                           !contentItem.hasFlag(.isTouched) {
+                            hasFirstDescriptions = true
+                            break
                         }
-                        return !item.hasFlag(.isTouched)
                     }
 
                     if hasFirstDescriptions {
                         // Use individual first descriptions for items on surfaces
                         for contentItem in contents.sorted() {
-                            if let firstDescription = contentItem.attributes[.firstDescription],
-                               case .string(let fdesc) = firstDescription,
+                            let firstDescription: String? = try await attribute(.firstDescription, of: contentItem.id)
+                            if let fdesc = firstDescription,
                                !fdesc.isEmpty,
                                !contentItem.hasFlag(.isTouched) {
                                 // Use first description for untouched items on surfaces

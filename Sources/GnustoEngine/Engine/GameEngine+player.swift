@@ -41,7 +41,7 @@ extension GameEngine {
         playerInventory.contains { $0.id == itemID }
     }
 
-    /// Returns an immutable copy (snapshot) of the player's current location.
+    /// Returns an immutable copy of the player's current location.
     ///
     /// - Returns: A `Location` struct for the player's current location.
     /// - Throws: An `ActionResponse.internalEngineError` if the player's location ID
