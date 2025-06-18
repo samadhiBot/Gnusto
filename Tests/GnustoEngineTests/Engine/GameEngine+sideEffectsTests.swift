@@ -16,7 +16,7 @@ struct GameEngineSideEffectsTests {
     // MARK: - Helper Methods
 
     private func createTestEngine() async -> GameEngine {
-        let testFuseDefinition = FuseDefinition(initialTurns: 3) { engine in
+        let testFuse = Fuse(initialTurns: 3) { engine in
             // Test fuse action - return ActionResult with side effect to set flag
             let sideEffect = SideEffect.scheduleEvent(
                 .global,
@@ -25,7 +25,7 @@ struct GameEngineSideEffectsTests {
             return ActionResult(message: "The fuse exploded!", effects: [sideEffect])
         }
 
-        let testDaemonDefinition = DaemonDefinition() { engine in
+        let testDaemon = Daemon() { engine in
             // Test daemon action - increment a counter using state changes
             let change = await engine.adjustGlobal("daemonTicks", by: 1)
             return ActionResult(
@@ -34,7 +34,7 @@ struct GameEngineSideEffectsTests {
             )
         }
 
-        let anotherFuseDefinition = FuseDefinition(initialTurns: 5) { engine in
+        let anotherFuse = Fuse(initialTurns: 5) { engine in
             // Another test fuse action - return state change via ActionResult
             if let change = await engine.setFlag("messageDelivered") {
                 return ActionResult(
@@ -45,7 +45,7 @@ struct GameEngineSideEffectsTests {
             return nil
         }
 
-        let anotherDaemonDefinition = DaemonDefinition() { engine in
+        let anotherDaemon = Daemon() { engine in
             // Another test daemon action - return state change via ActionResult
             if let change = await engine.setFlag("musicPlaying") {
                 return ActionResult(
@@ -58,12 +58,12 @@ struct GameEngineSideEffectsTests {
 
         let gameBlueprint = MinimalGame(
             fuses: [
-                testFuseID: testFuseDefinition,
-                anotherFuseID: anotherFuseDefinition
+                testFuseID: testFuse,
+                anotherFuseID: anotherFuse
             ],
             daemons: [
-                testDaemonID: testDaemonDefinition,
-                anotherDaemonID: anotherDaemonDefinition
+                testDaemonID: testDaemon,
+                anotherDaemonID: anotherDaemon
             ]
         )
         let mockIO = await MockIOHandler()

@@ -126,7 +126,7 @@ Gnusto includes a build tool plugin that **eliminates virtually all boilerplate 
 - **Discovers ID Patterns:** Scans `Location(id: .foyer, ...)` and generates `LocationID.foyer` extensions
 - **Aggregates Content:** Collects all your items and locations from multiple area files
 - **Wires Event Handlers:** Automatically connects your ItemEventHandlers and LocationEventHandlers
-- **Sets Up Time Registry:** Discovers and registers FuseDefinitions and DaemonDefinitions
+- **Sets Up Time Registry:** Discovers and registers Fuses and Daemons
 - **Handles Custom Actions:** Integrates custom ActionHandler implementations
 
 This means you can focus purely on creating your game world without worrying about the connection logic!

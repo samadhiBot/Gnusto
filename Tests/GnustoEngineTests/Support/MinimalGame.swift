@@ -11,8 +11,8 @@ public struct MinimalGame: GameBlueprint {
     public var customActionHandlers: [VerbID: ActionHandler]
     public var itemEventHandlers: [ItemID: ItemEventHandler]
     public var locationEventHandlers: [LocationID: LocationEventHandler]
-    public var fuses: [FuseID: FuseDefinition]
-    public var daemons: [DaemonID: DaemonDefinition]
+    public var fuses: [FuseID: Fuse]
+    public var daemons: [DaemonID: Daemon]
     public var itemComputers: [ItemID: ItemComputer]
     public var locationComputers: [LocationID: LocationComputer]
     public var messageProvider: MessageProvider
@@ -47,8 +47,8 @@ public struct MinimalGame: GameBlueprint {
         customActionHandlers: [VerbID: ActionHandler] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
-        fuses: [FuseID: FuseDefinition] = [:],
-        daemons: [DaemonID: DaemonDefinition] = [:],
+        fuses: [FuseID: Fuse] = [:],
+        daemons: [DaemonID: Daemon] = [:],
         itemComputers: [ItemID: ItemComputer] = [:],
         locationComputers: [LocationID: LocationComputer] = [:],
         messageProvider: MessageProvider? = nil

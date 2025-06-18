@@ -1,18 +1,17 @@
 import Foundation
 
-/// Defines the behavior of a timed event, known as a "fuse", scheduled to occur
-/// after a specific number of game turns.
+/// Defines the behavior of a timed event, known as a "fuse", scheduled to occur after a
+/// specific number of game turns.
 ///
-/// Fuses are classic ZIL features used to implement delayed actions or events.
-/// For example, a fuse might be lit on a stick of dynamite, causing an explosion
-/// after a set number of turns, or a magical spell might wear off after a duration.
+/// Fuses are classic ZIL features used to implement delayed actions or events. For example,
+/// a fuse might be lit on a stick of dynamite, causing an explosion after a set number of
+/// turns, or a magical spell might wear off after a duration.
 ///
-/// You create `FuseDefinition` instances and register them with the
-/// `GameBlueprint` when setting up your game.
-/// To start a timed event, you would then use a game command or side effect to activate
-/// the fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.
-/// When the turn counter for an active fuse reaches zero, its `action` is executed.
-public struct FuseDefinition: Sendable {
+/// You create `Fuse` instances and register them with the `GameBlueprint` when setting up your
+/// game. To start a timed event, you would then use a game command or side effect t activate the
+/// fuse by its ID, at which point the `GameEngine` begins tracking its `initialTurns`.  When the
+/// turn counter for an active fuse reaches zero, its `action` is executed.
+public struct Fuse: Sendable {
     /// The initial number of game turns from when the fuse is activated until it triggers.
     /// This must be a positive integer.
     public let initialTurns: Int
@@ -31,8 +30,8 @@ public struct FuseDefinition: Sendable {
     ///
     /// - Parameter engine: The `GameEngine` instance, providing access to game state and
     ///                     mutation methods.
-    /// - Returns: An optional `ActionResult` containing a message and/or side effects, or `nil`
-    ///            for silent execution.
+    /// - Returns: An optional `ActionResult` containing a message and/or side effects,
+    ///            or `nil` for silent execution.
     public var action: @Sendable (GameEngine) async -> ActionResult?
 
     /// Initializes a new fuse definition.

@@ -18,8 +18,8 @@ struct GameData {
     var itemComputeHandlers: Set<String> = []
     var locationComputeHandlers: Set<String> = []
     var customActionHandlers: Set<String> = []
-    var fuseDefinitions: Set<String> = []
-    var daemonDefinitions: Set<String> = []
+    var fuses: Set<String> = []
+    var daemons: Set<String> = []
 
     // Item and location property collections
     var items: Set<String> = []

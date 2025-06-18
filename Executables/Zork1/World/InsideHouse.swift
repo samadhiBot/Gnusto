@@ -566,7 +566,7 @@ extension InsideHouse {
     /// - Level 0: No monsters nearby (no glow)
     /// - Level 1: Monster in adjacent location (faint blue glow)
     /// - Level 2: Monster in current location (very bright glow)
-    static let swordDaemon = DaemonDefinition { engine in
+    static let swordDaemon = Daemon { engine in
         let currentLocation = try await engine.playerLocation()
         var newGlowLevel = 0
 

@@ -73,10 +73,10 @@ public protocol GameBlueprint: Sendable {
     /// after a set number of turns, or a magical spell might wear off after a duration.
     ///
     /// The `GameEngine` uses these definitions to manage active fuses throughout the game.
-    /// The key is a `FuseID` and the value is the corresponding `FuseDefinition`.
+    /// The key is a `FuseID` and the value is the corresponding `Fuse`.
     ///
     /// The default implementation provides an empty dictionary.
-    var fuses: [FuseID: FuseDefinition] { get }
+    var fuses: [FuseID: Fuse] { get }
 
     /// Definitions for background processes (daemons) that run periodically.
     ///
@@ -86,10 +86,10 @@ public protocol GameBlueprint: Sendable {
     /// to gradually dim, or check if a certain game condition triggers a special event.
     ///
     /// The `GameEngine` uses these definitions to manage active daemons throughout the game.
-    /// The key is a `DaemonID` and the value is the corresponding `DaemonDefinition`.
+    /// The key is a `DaemonID` and the value is the corresponding `Daemon`.
     ///
     /// The default implementation provides an empty dictionary.
-    var daemons: [DaemonID: DaemonDefinition] { get }
+    var daemons: [DaemonID: Daemon] { get }
 
     /// Custom compute handlers for dynamic item attributes.
     ///
@@ -200,11 +200,11 @@ extension GameBlueprint {
         [:]
     }
 
-    public var fuses: [FuseID: FuseDefinition] {
+    public var fuses: [FuseID: Fuse] {
         [:]
     }
 
-    public var daemons: [DaemonID: DaemonDefinition] {
+    public var daemons: [DaemonID: Daemon] {
         [:]
     }
 

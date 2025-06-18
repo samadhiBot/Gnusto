@@ -132,7 +132,7 @@ The bureaucratic encounter introduces time pressure and custom interactions:
 
 ```swift
 // Fuse: Butter softening creates urgency
-let butterSoftening = FuseDefinition(id: "butterSoftening", initialTurns: 20) { engine in
+let butterSoftening = Fuse(id: "butterSoftening", initialTurns: 20) { engine in
     await engine.ioHandler.print("The butter is becoming dangerously soft in the warm sun!")
     let change = StateChange(
         entityId: .item("butterCrock"),
@@ -143,7 +143,7 @@ let butterSoftening = FuseDefinition(id: "butterSoftening", initialTurns: 20) { 
 }
 
 // Daemon: Official's increasing impatience
-let impatientOfficial = DaemonDefinition(id: "impatientOfficial", frequency: 3) { engine in
+let impatientOfficial = Daemon(id: "impatientOfficial", frequency: 3) { engine in
     let patience = await engine.getGlobalFlag("officialPatience")
     if patience > 0 {
         let messages = [
@@ -158,7 +158,7 @@ let impatientOfficial = DaemonDefinition(id: "impatientOfficial", frequency: 3) 
 }
 
 // Daemon: Workshop atmosphere
-let workshopAmbience = DaemonDefinition(id: "workshopAmbience", frequency: 5) { engine in
+let workshopAmbience = Daemon(id: "workshopAmbience", frequency: 5) { engine in
     let messages = [
         "Magical apparatus bubbles quietly in the workshop.",
         "Ancient tomes rustle their pages in a mystical breeze.",
@@ -256,7 +256,7 @@ let bureaucraticCheckpointHandler = LocationEventHandler { engine, event in
 
 ### Learning Outcomes
 
-- Time-based event management (`FuseDefinition`, `DaemonDefinition`)
+- Time-based event management (`Fuse`, `Daemon`)
 - Custom action handler implementation
 - Dynamic location and item behaviors
 - Complex state tracking and conditional logic

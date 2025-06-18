@@ -23,8 +23,6 @@ struct HumorousCommandsIntegrationTests {
 
     @Test("All humorous commands are registered in GameEngine")
     func testHumorousCommandsRegistered() async throws {
-        let (engine, mockIO) = await createTestEngine()
-
         // Test that all humorous commands are available in the default handlers
         let defaultHandlers = GameEngine.defaultActionHandlers
 
@@ -41,7 +39,7 @@ struct HumorousCommandsIntegrationTests {
 
     @Test("Humorous commands work in dark rooms")
     func testHumorousCommandsInDark() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         // All humorous commands should work in dark rooms since they have requiresLight: false
         let vocabulary = await engine.gameState.vocabulary
@@ -57,7 +55,7 @@ struct HumorousCommandsIntegrationTests {
 
     @Test("All humorous commands return messages")
     func testAllHumorousCommandsReturnMessages() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let handlers: [(VerbID, ActionHandler)] = [
             (.chomp, ChompActionHandler()),

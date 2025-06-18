@@ -31,13 +31,13 @@ extension GlobalID {
     static let score = GlobalID("score")
 }
 
-// From: FuseDefinition(id: .timer, ...)
+// From: Fuse(id: .timer, ...)
 // Generates:
 extension FuseID {
     static let timer = FuseID("timer")
 }
 
-// From: DaemonDefinition(id: .ambientSound, ...)
+// From: Daemon(id: .ambientSound, ...)
 // Generates:
 extension DaemonID {
     static let ambientSound = DaemonID("ambientSound")
@@ -203,8 +203,8 @@ The plugin recognizes these patterns automatically:
 
 ### Time-Based Event Patterns
 
-- `let timerFuse = FuseDefinition(id: .timer, ...)`
-- `let ambientDaemon = DaemonDefinition(id: .ambient, ...)`
+- `let timerFuse = Fuse(id: .timer, ...)`
+- `let ambientDaemon = Daemon(id: .ambient, ...)`
 
 ## Advanced Features
 

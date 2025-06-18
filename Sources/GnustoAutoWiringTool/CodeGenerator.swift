@@ -137,7 +137,7 @@ struct CodeGenerator {
             }
 
             // Only generate extension if there's content
-            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || !gameData.itemComputeHandlers.isEmpty || !gameData.locationComputeHandlers.isEmpty || !gameData.daemonDefinitions.isEmpty || !gameData.fuseDefinitions.isEmpty || hasComputeHandlersToGenerate(gameData) {
+            if !gameData.items.isEmpty || !gameData.locations.isEmpty || !gameData.itemEventHandlers.isEmpty || !gameData.locationEventHandlers.isEmpty || !gameData.itemComputeHandlers.isEmpty || !gameData.locationComputeHandlers.isEmpty || !gameData.daemons.isEmpty || !gameData.fuses.isEmpty || hasComputeHandlersToGenerate(gameData) {
                 output.append("extension \(gameBlueprintType) {")
 
                 // Generate items property
@@ -305,8 +305,8 @@ struct CodeGenerator {
                 }
 
                 // Generate daemons property
-                if !gameData.daemonDefinitions.isEmpty {
-                    extensionLines.append("    var daemons: [DaemonID: DaemonDefinition] {")
+                if !gameData.daemons.isEmpty {
+                    extensionLines.append("    var daemons: [DaemonID: Daemon] {")
 
                     // Create area instances within this property if needed
                     for areaType in areaInstances.sorted() {
@@ -318,7 +318,7 @@ struct CodeGenerator {
                     }
 
                     // Check if we have any mapped daemon definitions before generating the return statement
-                    let mappedDaemons = gameData.daemonDefinitions.filter { daemon in
+                    let mappedDaemons = gameData.daemons.filter { daemon in
                         gameData.handlerToAreaMap[daemon] != nil
                     }
 
@@ -329,10 +329,10 @@ struct CodeGenerator {
                     } else {
                         extensionLines.append("        \(returnStatement)[")
 
-                        for daemonProperty in gameData.daemonDefinitions.sorted() {
+                        for daemonProperty in gameData.daemons.sorted() {
                             if let areaType = gameData.handlerToAreaMap[daemonProperty] {
                                 let isStatic = gameData.propertyIsStatic[daemonProperty] ?? true
-                                // Use property name directly as daemon ID (since DaemonDefinition no longer has embedded ID)
+                                // Use property name directly as daemon ID (since Daemon no longer has embedded ID)
                                 let daemonID = daemonProperty
 
                                 if isStatic {
@@ -353,8 +353,8 @@ struct CodeGenerator {
                 }
 
                 // Generate fuses property
-                if !gameData.fuseDefinitions.isEmpty {
-                    extensionLines.append("    var fuses: [FuseID: FuseDefinition] {")
+                if !gameData.fuses.isEmpty {
+                    extensionLines.append("    var fuses: [FuseID: Fuse] {")
 
                     // Create area instances within this property if needed
                     for areaType in areaInstances.sorted() {
@@ -366,7 +366,7 @@ struct CodeGenerator {
                     }
 
                     // Check if we have any mapped fuse definitions before generating the return statement
-                    let mappedFuses = gameData.fuseDefinitions.filter { fuse in
+                    let mappedFuses = gameData.fuses.filter { fuse in
                         gameData.handlerToAreaMap[fuse] != nil
                     }
 
@@ -377,10 +377,10 @@ struct CodeGenerator {
                     } else {
                         extensionLines.append("        \(returnStatement)[")
 
-                        for fuseProperty in gameData.fuseDefinitions.sorted() {
+                        for fuseProperty in gameData.fuses.sorted() {
                             if let areaType = gameData.handlerToAreaMap[fuseProperty] {
                                 let isStatic = gameData.propertyIsStatic[fuseProperty] ?? true
-                                // Use property name directly as fuse ID (since FuseDefinition no longer has embedded ID)
+                                // Use property name directly as fuse ID (since Fuse no longer has embedded ID)
                                 let fuseID = fuseProperty
 
                                 if isStatic {

@@ -83,11 +83,11 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
 - **Accessibility**:
   - Illustrating how the resolver determines which items are in scope for interaction (player's inventory, current location, accessible containers).
 
-### 5. Time-Based Events and Daemons (`FuseDefinition`, `DaemonDefinition`, `GameEngine.tickClock`)
+### 5. Time-Based Events and Daemons (`Fuse`, `Daemon`, `GameEngine.tickClock`)
 
-- **Daemons (`DaemonDefinition`)**:
+- **Daemons (`Daemon`)**:
   - Creating background processes that run each turn or at set intervals (e.g., lantern dimming progressively, atmospheric messages, NPC behavior).
-- **Fuses (`FuseDefinition`)**:
+- **Fuses (`Fuse`)**:
   - Implementing delayed, one-time events (e.g., a final lantern warning before it goes out, a timed puzzle element, a trap triggering).
   - Showing how these are scheduled and processed by `GameEngine.tickClock`.
 
@@ -108,10 +108,10 @@ This Demo Kit aims to showcase the comprehensive capabilities of the Gnusto Inte
   - Registering custom `ActionHandler` implementations for new verbs.
   - Providing game-specific `ItemEventHandler` and `LocationEventHandler` instances to tailor interactions with specific entities.
   - Supplying the game's `Vocabulary`.
-  - Configuring the `TimeRegistry` with `FuseDefinition`s and `DaemonDefinition`s.
+  - Configuring the `TimeRegistry` with `Fuse`s and `Daemon`s.
   - Providing `DynamicAttributeProvider`s for complex, stateful item/location properties.
 - **TimeRegistry (via `GameBlueprint`)**:
-  - Registering custom `FuseDefinition`s (for timed, one-off events) and `DaemonDefinition`s (for recurring background processes).
+  - Registering custom `Fuse`s (for timed, one-off events) and `Daemon`s (for recurring background processes).
 
 ### 8. Advanced Gameplay Mechanics (Illustrative Examples)
 

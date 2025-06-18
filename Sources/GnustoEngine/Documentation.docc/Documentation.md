@@ -124,7 +124,7 @@ Gnusto is built with game creators in mind, offering features that simplify deve
 - **Dynamic Content:** Create living worlds with state-driven descriptions and behaviors using ``ItemEventHandler``s and ``LocationEventHandler``s.
 - **Rich Action System:** A flexible pipeline processes player commands, allowing for complex interactions and easy customization of game verbs.
 - **Smart `Parser`:** Gnusto's parser understands natural language, supporting synonyms, adjectives, and complex sentence structures.
-- **Comprehensive `GameState` management:** Easily track and modify game progress, item states, player attributes, and timed events (``FuseDefinition``s and ``DaemonDefinition``s).
+- **Comprehensive `GameState` management:** Easily track and modify game progress, item states, player attributes, and timed events (``Fuse``s and ``Daemon``s).
 - **Extensible Architecture:** The engine is designed for modularity. Add custom behaviors, new actions, or even entirely new systems without fighting the core framework.
 
 ## Automatic ID Generation and Game Setup
@@ -137,7 +137,7 @@ When you include the GnustoAutoWiringPlugin in your game project, it automatical
 
 - **Generates ID Extensions**: Scans patterns like `Location(id: .foyer, ...)` and creates `static let foyer = LocationID("foyer")`
 - **Discovers Event Handlers**: Finds your ``ItemEventHandler`` and ``LocationEventHandler`` definitions and wires them up automatically
-- **Sets Up Time Registry**: Discovers ``FuseDefinition`` and ``DaemonDefinition`` instances and registers them
+- **Sets Up Time Registry**: Discovers ``Fuse`` and ``Daemon`` instances and registers them
 - **Aggregates Game Content**: Collects all your items and locations from multiple area files and provides them to your `GameBlueprint`
 - **Handles Custom Actions**: Discovers custom ``ActionHandler`` implementations and integrates them
 

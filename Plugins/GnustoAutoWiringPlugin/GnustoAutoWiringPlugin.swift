@@ -10,8 +10,8 @@ import PackagePlugin
 /// - `Location(id: .someID, ...)` → `LocationID.someID`
 /// - `Item(id: .someID, ...)` → `ItemID.someID`
 /// - `GlobalID("key")` or global state patterns → `GlobalID.key`
-/// - `FuseDefinition(id: .someID, ...)` → `FuseID.someID`
-/// - `DaemonDefinition(id: .someID, ...)` → `DaemonID.someID`
+/// - `Fuse(id: .someID, ...)` → `FuseID.someID`
+/// - `Daemon(id: .someID, ...)` → `DaemonID.someID`
 /// - Custom `VerbID("verb")` patterns → `VerbID.verb`
 ///
 /// **Event Handler Discovery:**

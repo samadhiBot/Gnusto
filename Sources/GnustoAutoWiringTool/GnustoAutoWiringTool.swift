@@ -95,8 +95,8 @@ extension GnustoAutoWiringTool {
         merged.gameBlueprintTypes.formUnion(source.gameBlueprintTypes)
         merged.gameAreaTypes.formUnion(source.gameAreaTypes)
         merged.customActionHandlers.formUnion(source.customActionHandlers)
-        merged.fuseDefinitions.formUnion(source.fuseDefinitions)
-        merged.daemonDefinitions.formUnion(source.daemonDefinitions)
+        merged.fuses.formUnion(source.fuses)
+        merged.daemons.formUnion(source.daemons)
 
         merged.items.formUnion(source.items)
         merged.locations.formUnion(source.locations)
@@ -124,8 +124,8 @@ extension GnustoAutoWiringTool {
         print("  🧮 Item Compute Handlers: \(gameData.itemComputeHandlers.sorted().joined(separator: ", "))")
         print("  🏗️  Location Compute Handlers: \(gameData.locationComputeHandlers.sorted().joined(separator: ", "))")
         print("  🎬 Custom Action Handlers: \(gameData.customActionHandlers.sorted().joined(separator: ", "))")
-        print("  🧨 Fuse Definitions: \(gameData.fuseDefinitions.sorted().joined(separator: ", "))")
-        print("  👿 Daemon Definitions: \(gameData.daemonDefinitions.sorted().joined(separator: ", "))")
+        print("  🧨 Fuse Definitions: \(gameData.fuses.sorted().joined(separator: ", "))")
+        print("  👿 Daemon Definitions: \(gameData.daemons.sorted().joined(separator: ", "))")
         print("  📦 Item Properties: \(gameData.items.sorted().joined(separator: ", "))")
         print("  📍 Location Properties: \(gameData.locations.sorted().joined(separator: ", "))")
     }

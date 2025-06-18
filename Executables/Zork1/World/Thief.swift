@@ -155,7 +155,7 @@ enum Thief {
     // MARK: - Movement Daemon
 
     /// Advanced movement daemon that makes the thief wander throughout the dungeon
-    static let thiefMovementDaemon = DaemonDefinition(frequency: 3) { engine in
+    static let thiefMovementDaemon = Daemon(frequency: 3) { engine in
         // Only move if thief is alive
         let thief = try await engine.item(.thief)
         guard case .location(let thiefLocation) = thief.parent else {
@@ -192,7 +192,7 @@ enum Thief {
     // MARK: - Theft Daemon
 
     /// Sophisticated theft daemon with treasure evaluation
-    static let thiefTheftDaemon = DaemonDefinition(frequency: 1) { engine in
+    static let thiefTheftDaemon = Daemon(frequency: 1) { engine in
         // Only attempt theft if thief is in same location as player
         let thief = try await engine.item(.thief)
         let playerLocationID = await engine.playerLocationID

@@ -168,10 +168,10 @@ class GameDataCollector {
                             extractComputeHandlerData(from: propertyName, type: .location, isStatic: isStatic)
                         } else if functionName == "Player" {
                             extractPlayerLocationData(from: functionCall)
-                        } else if functionName == "FuseDefinition" {
-                            extractFuseDefinitionData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
-                        } else if functionName == "DaemonDefinition" {
-                            extractDaemonDefinitionData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                        } else if functionName == "Fuse" {
+                            extractFuseData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
+                        } else if functionName == "Daemon" {
+                            extractDaemonData(from: functionCall, propertyName: propertyName, isStatic: isStatic)
                         }
                     }
                 }
@@ -345,15 +345,15 @@ class GameDataCollector {
         }
     }
 
-    private func extractFuseDefinitionData(
+    private func extractFuseData(
         from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
-        // Since FuseDefinition no longer takes an ID parameter, we derive the ID from the property name
+        // Since Fuse no longer takes an ID parameter, we derive the ID from the property name
         // e.g., "explodingFuse" -> "explodingFuse"
         gameData.fuseIDs.insert(propertyName)
-        gameData.fuseDefinitions.insert(propertyName)
+        gameData.fuses.insert(propertyName)
 
         // Map this fuse definition to its area type
         if let areaType = currentAreaType {
@@ -362,15 +362,15 @@ class GameDataCollector {
         }
     }
 
-    private func extractDaemonDefinitionData(
+    private func extractDaemonData(
         from functionCall: FunctionCallExprSyntax,
         propertyName: String,
         isStatic: Bool
     ) {
-        // Since DaemonDefinition no longer takes an ID parameter, we derive the ID from the property name
+        // Since Daemon no longer takes an ID parameter, we derive the ID from the property name
         // e.g., "swordDaemon" -> "swordDaemon"
         gameData.daemonIDs.insert(propertyName)
-        gameData.daemonDefinitions.insert(propertyName)
+        gameData.daemons.insert(propertyName)
 
         // Map this daemon definition to its area type
         if let areaType = currentAreaType {

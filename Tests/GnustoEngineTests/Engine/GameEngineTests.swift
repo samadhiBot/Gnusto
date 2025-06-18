@@ -793,7 +793,7 @@ struct GameEngineTests {
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
-        let fuseDef = FuseDefinition(initialTurns: 2) { gameEngineParameter in
+        let fuseDef = Fuse(initialTurns: 2) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
             // It captures 'mockIO' (@MainActor) and 'stateHolder' (actor).
 
@@ -843,7 +843,7 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testDaemonDef = DaemonDefinition(frequency: 3) { gameEngineParameter in
+        let testDaemonDef = Daemon(frequency: 3) { gameEngineParameter in
             // This closure is @Sendable and runs on the GameEngine actor context.
             await stateHolder.increment()
 
@@ -883,11 +883,11 @@ struct GameEngineTests {
         let mockParser = MockParser()
         let stateHolder = TestStateHolder()
 
-        let testFuse = FuseDefinition(initialTurns: 3) { _ in
+        let testFuse = Fuse(initialTurns: 3) { _ in
             await stateHolder.markFlag()
             return ActionResult("Fuse! [\(await stateHolder.getFlag())]")
         }
-        let testDaemon = DaemonDefinition(frequency: 2) { _ in
+        let testDaemon = Daemon(frequency: 2) { _ in
             await stateHolder.increment()
             return ActionResult("Daemon! [\(await stateHolder.getCount())]")
         }

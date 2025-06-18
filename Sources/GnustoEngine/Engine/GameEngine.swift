@@ -70,11 +70,11 @@ public actor GameEngine: Sendable {
 
     /// Definitions for timed events (fuses) that trigger after a set number of turns.
     /// These are derived from the `GameBlueprint` used to initialize the engine.
-    public let fuseDefinitions: [FuseID: FuseDefinition]
+    public let fuses: [FuseID: Fuse]
 
     /// Definitions for background processes (daemons) that run periodically.
     /// These are derived from the `GameBlueprint` used to initialize the engine.
-    public let daemonDefinitions: [DaemonID: DaemonDefinition]
+    public let daemons: [DaemonID: Daemon]
 
     /// Storage for item compute handlers.
     /// These are initialized from the `GameBlueprint`.
@@ -136,8 +136,8 @@ public actor GameEngine: Sendable {
         self.constants = blueprint.constants
         self.messageProvider = blueprint.messageProvider
         self.randomNumberGenerator = blueprint.randomNumberGenerator
-        self.fuseDefinitions = blueprint.fuses
-        self.daemonDefinitions = blueprint.daemons
+        self.fuses = blueprint.fuses
+        self.daemons = blueprint.daemons
 
         // Build vocabulary with custom verbs if not provided
         let gameVocabulary: Vocabulary
@@ -545,13 +545,13 @@ extension GameEngine {
     /// 1. **Fuses**: Iterates through all `activeFuses` in `gameState`.
     ///    - Decrements the turn counter for each active fuse.
     ///    - If a fuse's counter reaches zero or less:
-    ///        - Retrieves the corresponding `FuseDefinition` from the `GameBlueprint`.
+    ///        - Retrieves the corresponding `Fuse` from the `GameBlueprint`.
     ///        - Executes the fuse's `action` closure, passing the `GameEngine` instance.
     ///        - Removes the fuse from `activeFuses` in `gameState`.
     ///        - If the fuse's `repeats` flag is `true`, it reactivates the fuse by adding it
     ///          back to `activeFuses` with its `initialTurns` count.
     /// 2. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
-    ///    - Retrieves the corresponding `DaemonDefinition` from the `GameBlueprint`.
+    ///    - Retrieves the corresponding `Daemon` from the `GameBlueprint`.
     ///    - Executes the daemon's `action` closure, passing the `GameEngine` instance.
     ///
     /// Fuse and daemon actions can modify game state, print messages (by returning an `ActionResult`
@@ -561,10 +561,10 @@ extension GameEngine {
         let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
-        // Explicitly define the action type to match FuseDefinition.action
+        // Explicitly define the action type to match Fuse.action
         typealias FuseActionType = @Sendable (GameEngine) async -> ActionResult?
         var expiredFuseIDsToExecute:
-            [(id: FuseID, action: FuseActionType, definition: FuseDefinition)] = []
+            [(id: FuseID, action: FuseActionType, definition: Fuse)] = []
 
         // Iterate over a copy of keys from gameState.activeFuses for safe modification
         let activeFuseIDsInState = Array(gameState.activeFuses.keys)
@@ -589,9 +589,9 @@ extension GameEngine {
             }
 
             if newTurns <= 0 {
-                guard let definition = fuseDefinitions[fuseID] else {
+                guard let definition = fuses[fuseID] else {
                     print(
-                        "TickClock Error: No FuseDefinition found for expiring fuse ID '\(fuseID)'. Cannot execute."
+                        "TickClock Error: No Fuse found for expiring fuse ID '\(fuseID)'. Cannot execute."
                     )
                     let removeChangeOnError = StateChange(
                         entityID: .global,
@@ -662,7 +662,7 @@ extension GameEngine {
         // Daemons are only checked against gameState.activeDaemons, no direct state change here.
         for daemonID in gameState.activeDaemons {
             // Get definition from registry
-            guard let definition = daemonDefinitions[daemonID] else {
+            guard let definition = daemons[daemonID] else {
                 print(
                     "Warning: Active daemon '\(daemonID)' has no definition in registry. Skipping.")
                 continue
