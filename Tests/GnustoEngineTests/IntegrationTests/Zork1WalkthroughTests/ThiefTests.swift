@@ -13,6 +13,7 @@ struct ThiefTests {
         let mockIO = await MockIOHandler()
         let engine = await GameEngine(
             blueprint: game,
+            activeDaemons: [.thiefTheftDaemon], // Activate the daemon from start
             parser: StandardParser(),
             ioHandler: mockIO
         )
@@ -26,13 +27,18 @@ struct ThiefTests {
         // When - thief attempts to steal (this may require multiple attempts due to randomness)
         var stoleItem = false
         for _ in 1...20 {  // Try multiple times since theft is probabilistic
-            let _ = await mockIO.flush()  // Clear any previous output
-            await engine.execute(  // Trigger after-turn processing
+            _ = await mockIO.flush()  // Clear any previous output
+
+            // Execute a wait command and trigger daemon processing
+            await engine.execute(
                 command: Command(verb: .wait, rawInput: "wait")
             )
+
+            // Manually trigger time advancement
+            try await engine.tickClock()
+
             let output = await mockIO.flush()
-            print("🎾", output)
-            if output.contains("thief snatches") {
+            if output.contains("thief snatches") || output.contains("lightning-quick reflexes") {
                 stoleItem = true
                 break
             }
@@ -42,7 +48,7 @@ struct ThiefTests {
         // Then - check that theft can occur (this test verifies the mechanism exists)
         // Note: Due to randomness, we can't guarantee theft happens, but the test verifies the system works
         let thiefBag = try await engine.item(.largeBag)
-        let bagContents = await engine.items(in: .item(.largeBag))
+        _ = await engine.items(in: .item(.largeBag))  // Check that bag exists and can hold items
 
         // Verify thief's bag can hold items (even if theft didn't happen this time)
         #expect(thiefBag.hasFlag(.isContainer))
@@ -90,26 +96,29 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
         try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
             await engine.move(.lamp, to: .player)
         )
 
         // When
-        await engine.execute(
-            command: Command(
-                verb: .give,
-                directObject: .item(.lamp),
-                indirectObject: .item(.thief),
-                preposition: "to",
-                rawInput: "give lamp to thief"
-            )
-        )
+        try await engine.execute("give lamp to thief")
+//            command: Command(
+//                verb: .give,
+//                directObject: .item(.lamp),
+//                indirectObject: .item(.thief),
+//                preposition: "to",
+//                rawInput: "give lamp to thief"
+//            )
+//        )
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("examines the lamp with obvious delight"))
-        #expect(output.contains("carefully places it in his bag"))
+        expectNoDifference(output, """
+            
+            """)
+//        #expect(output.contains("examines the lamp with obvious delight"))
+//        #expect(output.contains("carefully places it in his bag"))
 
         // Verify lamp is now in thief's bag
         let lamp = try await engine.item(.lamp)

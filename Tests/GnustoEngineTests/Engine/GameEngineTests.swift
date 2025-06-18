@@ -123,7 +123,8 @@ struct GameEngineTests {
         #expect(finalMoves == 1, "Turn counter should increment even on parse error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.changeHistory() == [
+        let changeHistory = await engine.changeHistory()
+        expectNoDifference(changeHistory, [
             StateChange(
                 entityID: .location(.startRoom),
                 attribute: .locationAttribute(.isVisited),
@@ -221,20 +222,20 @@ struct GameEngineTests {
         #expect(processCalled == true, "MockActionHandler.process should have been called")
         let commandReceived = await mockTakeHandler.getLastCommandReceived()
         #expect(commandReceived?.verb == "take")
-            #expect(commandReceived?.directObject == .item("startItem"))
+        #expect(commandReceived?.directObject == .item("startItem"))
 
         // Check turn counter incremented
         let finalMoves = await engine.playerMoves
         #expect(finalMoves == 1, "Turn counter should increment even on action error")
 
         // Check change history only contains 1st room visit and move increment
-        #expect(await engine.changeHistory() == [
+        let changeHistory = await engine.changeHistory()
+        expectNoDifference(changeHistory, [
             StateChange(
                 entityID: .location(.startRoom),
                 attribute: .locationAttribute(.isVisited),
-                newValue: true
-            ),
-            StateChange(
+                newValue: true,
+            ), StateChange(
                 entityID: .player,
                 attribute: .playerMoves,
                 oldValue: 0,
@@ -817,21 +818,8 @@ struct GameEngineTests {
         )
 
         // Act: Simulate 3 turns to trigger the fuse (turn 1: countdown to 1, turn 2: countdown to 0 and trigger)
-        try await engine.apply(StateChange(
-            entityID: .player,
-            attribute: .playerMoves,
-            oldValue: .int(0),
-            newValue: .int(1)
-        ))
-        await engine.tickClock() // Turn 1: fuse goes from 2 to 1
-
-        try await engine.apply(StateChange(
-            entityID: .player,
-            attribute: .playerMoves,
-            oldValue: .int(1),
-            newValue: .int(2)
-        ))
-        await engine.tickClock() // Turn 2: fuse goes from 1 to 0 and triggers
+        try await engine.tickClock() // Turn 1: fuse goes from 2 to 1
+        try await engine.tickClock() // Turn 2: fuse goes from 1 to 0 and triggers
 
         // Assert: Fuse should have triggered
         #expect(await stateHolder.getFlag() == true)
@@ -863,14 +851,8 @@ struct GameEngineTests {
 
         // Act: Run engine for 7 turns to test daemon frequency (every 3 turns)
         // Turns 0,1,2: no daemon run, Turn 3: daemon runs (1st time), Turn 6: daemon runs (2nd time)
-        for turn in 1...7 {
-            try await engine.apply(StateChange(
-                entityID: .player,
-                attribute: .playerMoves,
-                oldValue: .int(turn - 1),
-                newValue: .int(turn)
-            ))
-            await engine.tickClock()
+        for _ in 1...7 {
+            try await engine.tickClock()
         }
 
         // Assert: Daemon should have run 2 times (turns 3 and 6)
@@ -907,19 +889,13 @@ struct GameEngineTests {
         )
 
         // Act: Run for 6 turns
-        // Turn 0: Initial state
+        // Turn 1: Initial state
         // Turn 2: Daemon runs (1st time)
         // Turn 3: Fuse triggers
         // Turn 4: Daemon runs (2nd time)
         // Turn 6: Daemon runs (3rd time)
-        for turn in 1...6 {
-            try await engine.apply(StateChange(
-                entityID: .player,
-                attribute: .playerMoves,
-                oldValue: .int(turn - 1),
-                newValue: .int(turn)
-            ))
-            await engine.tickClock()
+        for _ in 1...6 {
+            try await engine.tickClock()
         }
 
         // Assert: Fuse should have triggered and daemon should have run 3 times

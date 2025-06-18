@@ -35,7 +35,7 @@ public actor GameEngine: Sendable {
     /// The parser responsible for interpreting raw player input strings into
     /// structured `Command` objects that the engine can understand and execute.
     /// This is primarily used internally by the engine during the game loop.
-    private let parser: Parser
+    let parser: Parser
 
     /// The handler for all input and output operations, such as reading player commands
     /// and displaying game text. Game developers usually do not interact with this
@@ -239,9 +239,9 @@ extension GameEngine {
     public func requestQuit() {
         self.shouldQuit = true
     }
+}
 
-    // MARK: Private helpers
-
+extension GameEngine {
     /// Processes a single turn of the game, including clock ticks, player input, parsing, and command execution.
     ///
     /// This method orchestrates the core sequence of events within a single game turn:
@@ -260,10 +260,7 @@ extension GameEngine {
     /// 6. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
     ///
     /// Errors during turn processing are logged.
-    private func processTurn() async throws {
-        // --- Tick the Clock (Fuses & Daemons) ---
-        await tickClock()
-
+    func processTurn() async throws {
         if shouldQuit { return }  // Clock tick might trigger quit
 
         // 1. Get Player Input
@@ -273,32 +270,23 @@ extension GameEngine {
             return
         }
 
-        // Basic quit command check (can be expanded)
+        // 2. Basic quit command check (can be expanded)
         if input.lowercased() == "quit" {
             shouldQuit = true
             return
         }
 
-        // 2. Parse Input
-        let vocabulary = gameState.vocabulary
+        // 3. Tick the Clock (Fuses & Daemons) and increment the turn counter
+        try await tickClock()
+
+        // 4. Parse Input
         let parseResult = parser.parse(
             input: input,
-            vocabulary: vocabulary,
+            vocabulary: gameState.vocabulary,
             gameState: gameState
         )
 
-        // Increment turn counter AFTER clock tick and BEFORE command execution
-        let moves = gameState.player.moves
-        try gameState.apply(
-            StateChange(
-                entityID: .player,
-                attribute: .playerMoves,
-                oldValue: .int(moves),
-                newValue: .int(moves + 1)
-            )
-        )
-
-        // 3. Execute Command or Handle Error
+        // 5. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
             if command.verb == .quit || shouldQuit { return }
@@ -317,13 +305,13 @@ extension GameEngine {
     ///
     /// It also logs more detailed information for certain critical errors like
     /// `.internalEngineError` or `.stateValidationFailed`.
-    private func report(_ response: ActionResponse) async {
+    func report(_ response: ActionResponse) async {
         // Determine the user-facing message using MessageProvider
         let message = switch response {
         case .containerIsClosed(let item):
-            messageProvider.containerIsClosed(item: TheItem(item))
+            messageProvider.containerIsClosed(item: the(item))
         case .containerIsOpen(let item):
-            messageProvider.containerIsOpen(item: TheItem(item))
+            messageProvider.containerIsOpen(item: the(item))
         case .custom(let message):
             messageProvider.custom(message: message)
         case .directionIsBlocked(let reason):
@@ -337,21 +325,21 @@ extension GameEngine {
         case .invalidValue:
             messageProvider.internalEngineError()
         case .itemAlreadyClosed(let item):
-            messageProvider.itemAlreadyClosed(item: TheItem(item))
+            messageProvider.itemAlreadyClosed(item: the(item))
         case .itemAlreadyOpen(let item):
-            messageProvider.itemAlreadyOpen(item: TheItem(item))
+            messageProvider.itemAlreadyOpen(item: the(item))
         case .itemIsAlreadyWorn(let item):
             messageProvider.itemIsAlreadyWorn(item: theThat(item))
         case .itemIsLocked(let item):
-            messageProvider.itemIsLocked(item: TheItem(item))
+            messageProvider.itemIsLocked(item: the(item))
         case .itemIsNotWorn(let item):
             messageProvider.itemIsNotWorn(item: theThat(item))
         case .itemIsUnlocked(let item):
-            messageProvider.itemIsUnlocked(item: TheItem(item))
+            messageProvider.itemIsUnlocked(item: the(item))
         case .itemNotAccessible(let item):
             messageProvider.itemNotAccessible(item: anySuch(item))
         case .itemNotClosable(let item):
-            messageProvider.itemNotClosable(item: TheItem(item))
+            messageProvider.itemNotClosable(item: the(item))
         case .itemNotDroppable(let item):
             messageProvider.itemNotDroppable(item: theThat(item))
         case .itemNotEdible(let item):
@@ -359,15 +347,15 @@ extension GameEngine {
         case .itemNotHeld(let item):
             messageProvider.itemNotHeld(item: theThat(item))
         case .itemNotInContainer(let item, let container):
-            messageProvider.itemNotInContainer(item: TheItem(item), container: theThat(container))
+            messageProvider.itemNotInContainer(item: the(item), container: theThat(container))
         case .itemNotLockable(let item):
             messageProvider.itemNotLockable(item: theThat(item))
         case .itemNotOnSurface(let item, let surface):
-            messageProvider.itemNotOnSurface(item: TheItem(item), surface: theThat(surface))
+            messageProvider.itemNotOnSurface(item: the(item), surface: theThat(surface))
         case .itemNotOpenable(let item):
             messageProvider.itemNotOpenable(item: theThat(item))
         case .itemNotReadable(let item):
-            messageProvider.itemNotReadable(item: TheItem(item))
+            messageProvider.itemNotReadable(item: the(item))
         case .itemNotRemovable(let item):
             messageProvider.itemNotRemovable(item: theThat(item))
         case .itemNotTakable(let item):
@@ -377,7 +365,7 @@ extension GameEngine {
         case .itemNotWearable(let item):
             messageProvider.itemNotWearable(item: theThat(item))
         case .itemTooLargeForContainer(let item, let container):
-            messageProvider.itemTooLargeForContainer(item: TheItem(item), container: theThat(container))
+            messageProvider.itemTooLargeForContainer(item: the(item), container: theThat(container))
         case .playerCannotCarryMore:
             messageProvider.playerCannotCarryMore()
         case .prerequisiteNotMet(let customMessage):
@@ -397,7 +385,7 @@ extension GameEngine {
         case .unknownVerb(let verb):
             messageProvider.unknownVerb(verb: verb)
         case .wrongKey(let keyID, let lockID):
-            messageProvider.wrongKey(key: TheItem(keyID), lock: theThat(lockID))
+            messageProvider.wrongKey(key: the(keyID), lock: theThat(lockID))
         }
 
         await ioHandler.print(message)
@@ -426,7 +414,7 @@ extension GameEngine {
     /// This method is used internally by the engine to translate `ParseError` enum cases
     /// into textual feedback for the player when their input cannot be understood.
     /// For `.internalError` cases, it also logs detailed information.
-    private func report(parseError: ParseError) async {
+    func report(parseError: ParseError) async {
         let message = switch parseError {
         case .emptyInput:
             messageProvider.emptyInput()
@@ -462,7 +450,7 @@ extension GameEngine {
     /// Displays the status line (e.g., current location, score, and turn count)
     /// to the player via the `IOHandler`.
     /// This is called automatically at the start of each turn before `processTurn()`.
-    private func showStatus() async {
+    func showStatus() async {
         guard let currentLocation = gameState.locations[playerLocationID] else { return }
         await ioHandler.showStatusLine(
             roomName: currentLocation.name,
@@ -523,7 +511,7 @@ extension GameEngine {
     ///   - itemID: The item ID.
     ///   - alternate: An alternate reference to the item.
     /// - Returns: `The {name}` of an item (capitalized), or alternate if name is unknown.
-    private func TheItem(
+    private func the(
         _ itemID: ItemID,
         alternate: String = "That"
     ) -> String {
@@ -540,9 +528,9 @@ extension GameEngine {
 extension GameEngine {
     /// Advances the game clock by one tick, processing all active fuses and daemons.
     ///
-    /// This method is called automatically at the beginning of each player turn by `processTurn()`.
-    /// It performs the following actions:
-    /// 1. **Fuses**: Iterates through all `activeFuses` in `gameState`.
+    /// This method can be called to advance game time by one turn. It performs the following actions:
+    /// 1. **Turn Increment**: Increments the player's move counter to advance game time.
+    /// 2. **Fuses**: Iterates through all `activeFuses` in `gameState`.
     ///    - Decrements the turn counter for each active fuse.
     ///    - If a fuse's counter reaches zero or less:
     ///        - Retrieves the corresponding `Fuse` from the `GameBlueprint`.
@@ -550,14 +538,24 @@ extension GameEngine {
     ///        - Removes the fuse from `activeFuses` in `gameState`.
     ///        - If the fuse's `repeats` flag is `true`, it reactivates the fuse by adding it
     ///          back to `activeFuses` with its `initialTurns` count.
-    /// 2. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
+    /// 3. **Daemons**: Iterates through all `activeDaemons` in `gameState`.
     ///    - Retrieves the corresponding `Daemon` from the `GameBlueprint`.
     ///    - Executes the daemon's `action` closure, passing the `GameEngine` instance.
     ///
     /// Fuse and daemon actions can modify game state, print messages (by returning an `ActionResult`
     /// that the engine then processes), or even set `shouldQuit` to end the game.
     /// Errors during fuse/daemon definition lookup or action execution are logged.
-    func tickClock() async {
+    func tickClock() async throws {
+        // Increment turn counter FIRST so daemons can see the correct turn number
+        let moves = gameState.player.moves
+        try gameState.apply(
+            StateChange(
+                entityID: .player,
+                attribute: .playerMoves,
+                oldValue: .int(moves),
+                newValue: .int(moves + 1)
+            )
+        )
         let currentTurn = gameState.player.moves
 
         // --- Process Fuses ---
@@ -582,11 +580,7 @@ extension GameEngine {
                 oldValue: .int(currentTurns),
                 newValue: .int(newTurns)
             )
-            do {
-                try gameState.apply(updateChange)
-            } catch {
-                print("TickClock Error: Failed to apply fuse turn update for \(fuseID): \(error)")
-            }
+            try gameState.apply(updateChange)
 
             if newTurns <= 0 {
                 guard let definition = fuses[fuseID] else {
@@ -599,13 +593,7 @@ extension GameEngine {
                         oldValue: .int(newTurns),
                         newValue: .int(0)
                     )
-                    do {
-                        try gameState.apply(removeChangeOnError)
-                    } catch {
-                        print(
-                            "TickClock Error: Failed to apply fuse removal (on definition error) for \(fuseID): \(error)"
-                        )
-                    }
+                    try gameState.apply(removeChangeOnError)
                     continue
                 }
                 expiredFuseIDsToExecute.append(
@@ -617,22 +605,14 @@ extension GameEngine {
                     oldValue: .int(newTurns),
                     newValue: .int(0)
                 )
-                do {
-                    try gameState.apply(removeChange)
-                } catch {
-                    print("TickClock Error: Failed to apply fuse removal for \(fuseID): \(error)")
-                }
+                try gameState.apply(removeChange)
             }
         }
 
         // Execute actions of expired fuses AFTER all state changes for this tick's expirations are processed
         for fuseToExecute in expiredFuseIDsToExecute {
             if let actionResult = await fuseToExecute.action(self) {
-                do {
-                    _ = try await processActionResult(actionResult)
-                } catch {
-                    logError("Error processing fuse '\(fuseToExecute.id)' action result: \(error)")
-                }
+                _ = try await processActionResult(actionResult)
             }
 
             // Handle fuse repetition
@@ -646,13 +626,7 @@ extension GameEngine {
                     oldValue: nil,
                     newValue: .int(fuseToExecute.definition.initialTurns)
                 )
-                do {
-                    try gameState.apply(restartChange)
-                } catch {
-                    logError(
-                        "TickClock Error: Failed to restart repeating fuse \(fuseToExecute.id): \(error)"
-                    )
-                }
+                try gameState.apply(restartChange)
             }
 
             if shouldQuit { return }
@@ -672,12 +646,8 @@ extension GameEngine {
             // Skip execution on turn 0 and run only on turns where currentTurn % frequency == 0
             if currentTurn > 0 && currentTurn % definition.frequency == 0 {
                 // Execute the daemon's action
-                do {
-                    if let actionResult = try await definition.action(self) {
-                        _ = try await processActionResult(actionResult)
-                    }
-                } catch {
-                    logError("Error processing daemon '\(daemonID)' action result: \(error)")
+                if let actionResult = try await definition.action(self) {
+                    _ = try await processActionResult(actionResult)
                 }
                 if shouldQuit { return }
             }
@@ -1381,46 +1351,3 @@ extension GameEngine {
     }
 }
 
-#if DEBUG
-
-    // MARK: - Internal State Mutation (Testing & Engine Use Only)
-
-    extension GameEngine {
-        /// Applies a `StateChange` directly to the game state.
-        ///
-        /// > Important: **Internal/Test Use Only**: This method is provided for internal engine
-        ///   operations and testing scenarios where direct state manipulation is necessary. Game
-        ///   developers should use the action handler system (`ActionResult.changes`) rather
-        ///   than calling this method directly.
-        ///
-        /// This method bypasses the normal action handler pipeline, including:
-        /// - Before/after turn event handlers
-        /// - Action validation
-        /// - Side effect processing
-        ///
-        /// Use this method only when:
-        /// - Setting up test scenarios that require specific game states
-        /// - Internal engine operations that need direct state access
-        /// - Implementing low-level engine functionality
-        ///
-        /// - Parameter change: The `StateChange` to apply to the game state.
-        /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
-        func apply(_ changes: StateChange?...) async throws {
-            for change in changes.compactMap(\.self) {
-                try await applyWithDynamicValidation(change)
-            }
-        }
-
-        /// Retrieves the complete history of all `StateChange`s applied to the `gameState`
-        /// since the game started or the state was last loaded.
-        ///
-        /// This can be useful for debugging or advanced game mechanics that need to inspect
-        /// past state transitions.
-        ///
-        /// - Returns: An array of `StateChange` objects, in the order they were applied.
-        func changeHistory() -> [StateChange] {
-            gameState.changeHistory
-        }
-    }
-
-#endif

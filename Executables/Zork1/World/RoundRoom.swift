@@ -130,16 +130,7 @@ extension RoundRoom {
         // Note: Has action handler CRACK-FCN
     )
 
-    static let largeBag = Item(
-        id: .largeBag,
-        .name("large bag"),
-        .synonyms("bag"),
-        .adjectives("large", "thiefs"),
-        .requiresTryTake,
-        .omitDescription,
-        .in(.item(.thief))
-        // Note: Has action handler LARGE-BAG-F
-    )
+    // Note: largeBag is now defined in Thief.swift to keep thief-related items together
 
     static let platinumBar = Item(
         id: .platinumBar,

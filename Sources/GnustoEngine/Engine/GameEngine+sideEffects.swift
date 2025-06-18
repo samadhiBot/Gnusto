@@ -1,13 +1,15 @@
 // MARK: - State Change & Side Effect Application
 
 extension GameEngine {
-    /// Applies a single state change to the game state by forwarding to the central `GameState.apply` method.
-    /// - Parameter change: The `StateChange` to apply.
-    /// - Parameter gameState: The GameState instance to modify (passed as inout).
-    /// - Throws: An error if the change cannot be applied (forwarded from `GameState.apply`).
-    private func applyStateChange(_ change: StateChange, gameState: inout GameState) throws {
-        // Forward directly to GameState's apply method, modifying the inout parameter.
-        try gameState.apply(change)
+    /// Processes side effects from an ActionResult.
+    ///
+    /// This method is called by the main action processing pipeline to handle any side effects
+    /// that were generated as part of an action's execution.
+    ///
+    /// - Parameter effects: An array of `SideEffect` objects to process.
+    /// - Throws: An error if any side effect cannot be processed.
+    func processSideEffects(_ effects: SideEffect...) async throws {
+        try await processSideEffects(effects)
     }
 
     /// Processes side effects from an ActionResult.
