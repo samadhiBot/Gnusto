@@ -97,7 +97,7 @@ private func handleTrollCommand(engine: GameEngine, command: Command) async thro
                 """,
             changes: [
                 try await engine.remove(.troll),
-            ].compactMap { $0 }
+            ]
         )
 
     case .give, .drop:
@@ -107,12 +107,14 @@ private func handleTrollCommand(engine: GameEngine, command: Command) async thro
         let objectName = try await engine.item(object).name
 
         return try await handleTrollGiveOrDrop(
-            engine: engine, object: object, objectName: objectName,
-            isDropCommand: command.verb == .drop)
+            engine: engine,
+            object: object,
+            objectName: objectName,
+            isDropCommand: command.verb == .drop
+        )
 
     case .take, .move:
-        return ActionResult(
-            """
+        return ActionResult("""
             The troll spits in your face, grunting "Better luck next time"
             in a rather barbarous accent.
             """)
@@ -121,8 +123,7 @@ private func handleTrollCommand(engine: GameEngine, command: Command) async thro
         return ActionResult("The troll laughs at your puny gesture.")
 
     case .listen:
-        return ActionResult(
-            """
+        return ActionResult("""
             Every so often the troll says something, probably
             uncomplimentary, in his guttural tongue.
             """)
@@ -153,11 +154,9 @@ private func handleTrollGiveOrDrop(
 
     if object == .axe && isPlayerHoldingAxe {
         return ActionResult(
-            message: "The troll scratches his head in confusion, then takes the axe.",
-            changes: [
-                try await engine.setFlag(.isFighting, on: .troll),
-                try await engine.move(.axe, to: .item(.troll)),
-            ].compactMap { $0 }
+            "The troll scratches his head in confusion, then takes the axe.",
+            try await engine.setFlag(.isFighting, on: .troll),
+            try await engine.move(.axe, to: .item(.troll)),
         )
     }
 
@@ -180,33 +179,26 @@ private func handleTrollGiveOrDrop(
     if await engine.isEffectiveWeapon(object) {
         let outcome = await engine.randomCombatOutcome()
         if outcome <= 20 {
-            return ActionResult(
-                message: """
-                    \(baseMessage) and eats it hungrily. Poor troll,
-                    he dies from an internal hemorrhage and his carcass
-                    disappears in a sinister black fog.
-                    """,
-                changes: [
-                    try await engine.remove(.troll),
-                    try await engine.remove(object),
-                ].compactMap { $0 }
+            return ActionResult("""
+                \(baseMessage) and eats it hungrily. Poor troll,
+                he dies from an internal hemorrhage and his carcass
+                disappears in a sinister black fog.
+                """,
+                try await engine.remove(.troll),
+                try await engine.remove(object),
             )
         } else {
-            return ActionResult(
-                message: """
-                    \(baseMessage) and, being for the moment sated, throws it back.
-                    Fortunately, the troll has poor control, and the \(objectName)
-                    falls to the floor. He does not look pleased.
-                    """,
-                changes: [
-                    try await engine.move(object, to: .location(.trollRoom)),
-                    try await engine.setFlag(.isFighting, on: .troll),
-                ].compactMap { $0 }
+            return ActionResult("""
+                \(baseMessage) and, being for the moment sated, throws it back.
+                Fortunately, the troll has poor control, and the \(objectName)
+                falls to the floor. He does not look pleased.
+                """,
+                try await engine.move(object, to: .location(.trollRoom)),
+                try await engine.setFlag(.isFighting, on: .troll),
             )
         }
     } else {
-        return ActionResult(
-            """
+        return ActionResult("""
             \(baseMessage) and not having the most discriminating
             tastes, gleefully eats it.
             """,
@@ -246,45 +238,36 @@ extension Troll {
     ) async throws -> ActionResult {
         switch outcome {
         case .victory(let message):
-            return ActionResult(
-                message: """
-                    \(message)
+            return ActionResult("""
+                \(message)
 
-                    Almost as soon as the troll breathes his last breath, a cloud
-                    of sinister black fog envelops him, and when the fog lifts,
-                    the carcass has disappeared.
-                    """,
-                changes: [
-                    try await engine.remove(.troll),
-                    // Clear fighting state from any weapons
-                    try await engine.clearFlag(.isFighting, on: .sword),
-                ].compactMap { $0 }
+                Almost as soon as the troll breathes his last breath, a cloud
+                of sinister black fog envelops him, and when the fog lifts,
+                the carcass has disappeared.
+                """,
+                try await engine.remove(.troll),
+                // Clear fighting state from any weapons
+                try await engine.clearFlag(.isFighting, on: .sword),
             )
 
         case .defeat(let message):
-            return ActionResult(
-                message: """
-                    \(message)
+            return ActionResult("""
+                \(message)
 
-                    The troll stands over your fallen form, grunting what might
-                    be satisfaction in his guttural tongue.
-                    """,
-                changes: [
-                    try await engine.setFlag(.isFighting, on: .troll),
-                    // Set player to wounded state (game-specific mechanic)
-                ].compactMap { $0 }
+                The troll stands over your fallen form, grunting what might
+                be satisfaction in his guttural tongue.
+                """,
+                try await engine.setFlag(.isFighting, on: .troll),
+                // Set player to wounded state (game-specific mechanic)
             )
 
         case .draw(let message):
-            return ActionResult(
-                message: """
-                    \(message)
+            return ActionResult("""
+                \(message)
 
-                    You both circle each other warily, weapons at the ready.
-                    """,
-                changes: [
-                    try await engine.setFlag(.isFighting, on: .troll),
-                ].compactMap { $0 }
+                You both circle each other warily, weapons at the ready.
+                """,
+                try await engine.setFlag(.isFighting, on: .troll),
             )
 
         case .ineffective(let message):

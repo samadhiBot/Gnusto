@@ -157,13 +157,13 @@ enum Thief {
     /// Advanced movement daemon that makes the thief wander throughout the dungeon
     static let thiefMovementDaemon = DaemonDefinition(frequency: 3) { engine in
         // Only move if thief is alive
-        guard let thief = try? await engine.item(.thief),
-              case .location(let currentLocationID) = thief.parent else {
+        let thief = try await engine.item(.thief)
+        guard case .location(let thiefLocation) = thief.parent else {
             return nil
         }
 
         // Choose a new location to move to
-        let availableLocations = thiefMovementLocations.filter { $0 != currentLocationID }
+        let availableLocations = thiefMovementLocations.filter { $0 != thiefLocation }
         guard let newLocationID = availableLocations.randomElement() else {
             return nil
         }
@@ -173,9 +173,9 @@ enum Thief {
 
         // Determine if player sees the movement
         let playerLocation = await engine.playerLocationID
-        var message = ""
+        var message: String?
 
-        if playerLocation == currentLocationID {
+        if playerLocation == thiefLocation {
             // Player sees thief leaving
             message = "The thief, looking furtively about, slips away into the shadows."
         } else if playerLocation == newLocationID {
@@ -183,11 +183,10 @@ enum Thief {
             message = "A suspicious-looking individual emerges from the shadows, eyeing you warily."
         }
 
-        if message.isEmpty {
-            return ActionResult(changes: [moveResult].compactMap { $0 })
-        } else {
-            return ActionResult(message, moveResult)
-        }
+        return ActionResult(
+            message: message,
+            changes: [moveResult]
+        )
     }
 
     // MARK: - Theft Daemon

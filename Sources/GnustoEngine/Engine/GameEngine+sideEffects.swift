@@ -105,20 +105,20 @@ extension GameEngine {
 
     /// Checks if an item can be used as an effective weapon against a target.
     /// Returns true if the item has the weapon flag or is a recognized combat tool.
-    public func isEffectiveWeapon(_ itemID: ItemID) async -> Bool {
-        guard let targetItem = try? await item(itemID) else { return false }
+    public func isEffectiveWeapon(_ itemID: ItemID) -> Bool {
+        guard let targetItem = try? item(itemID) else { return false }
         return targetItem.hasFlag(.isWeapon) || targetItem.hasFlag(.isTool)
     }
 
     /// Determines if a character is currently in combat state.
-    public func isInCombat(_ itemID: ItemID) async -> Bool {
-        guard let targetItem = try? await item(itemID) else { return false }
+    public func isInCombat(_ itemID: ItemID) -> Bool {
+        guard let targetItem = try? item(itemID) else { return false }
         return targetItem.hasFlag(.isFighting) && targetItem.hasFlag(.isCharacter)
     }
 
     /// Generates a random combat outcome based on percentage chance.
     /// Common pattern in ZIL fighting systems.
-    public func randomCombatOutcome() async -> Int {
-        await randomPercentage()
+    public func randomCombatOutcome() -> Int {
+        randomPercentage()
     }
 }
