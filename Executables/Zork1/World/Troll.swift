@@ -178,8 +178,8 @@ private func handleTrollGiveOrDrop(
     // Handle weapons using engine helper
     if await engine.isEffectiveWeapon(object) {
         let outcome = await engine.randomCombatOutcome()
-        if outcome <= 20 {
-            return ActionResult("""
+        return if outcome <= 20 {
+            ActionResult("""
                 \(baseMessage) and eats it hungrily. Poor troll,
                 he dies from an internal hemorrhage and his carcass
                 disappears in a sinister black fog.
@@ -188,7 +188,7 @@ private func handleTrollGiveOrDrop(
                 try await engine.remove(object),
             )
         } else {
-            return ActionResult("""
+            ActionResult("""
                 \(baseMessage) and, being for the moment sated, throws it back.
                 Fortunately, the troll has poor control, and the \(objectName)
                 falls to the floor. He does not look pleased.
@@ -219,15 +219,15 @@ extension Troll {
         let isEffectiveWeapon = await engine.isEffectiveWeapon(weapon)
         let outcome = await engine.randomCombatOutcome()
 
-        switch (isEffectiveWeapon, outcome) {
+        return switch (isEffectiveWeapon, outcome) {
         case (true, 0...30):
-            return .victory("The troll succumbs to your superior weaponry!")
+            .victory("The troll succumbs to your superior weaponry!")
         case (true, 31...60):
-            return .draw("The troll blocks your attack with his axe!")
+            .draw("The troll blocks your attack with his axe!")
         case (true, _):
-            return .defeat("The troll's axe finds its mark. You are defeated!")
+            .defeat("The troll's axe finds its mark. You are defeated!")
         case (false, _):
-            return .ineffective("Your \(weapon) proves ineffective against the troll.")
+            .ineffective("Your \(weapon) proves ineffective against the troll.")
         }
     }
 
@@ -238,7 +238,7 @@ extension Troll {
     ) async throws -> ActionResult {
         switch outcome {
         case .victory(let message):
-            return ActionResult("""
+            ActionResult("""
                 \(message)
 
                 Almost as soon as the troll breathes his last breath, a cloud
@@ -251,7 +251,7 @@ extension Troll {
             )
 
         case .defeat(let message):
-            return ActionResult("""
+            ActionResult("""
                 \(message)
 
                 The troll stands over your fallen form, grunting what might
@@ -262,7 +262,7 @@ extension Troll {
             )
 
         case .draw(let message):
-            return ActionResult("""
+            ActionResult("""
                 \(message)
 
                 You both circle each other warily, weapons at the ready.
@@ -271,7 +271,7 @@ extension Troll {
             )
 
         case .ineffective(let message):
-            return ActionResult(message)
+            ActionResult(message)
         }
     }
 }

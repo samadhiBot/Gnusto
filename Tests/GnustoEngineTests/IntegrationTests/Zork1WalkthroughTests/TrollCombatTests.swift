@@ -182,19 +182,34 @@ func testTrollCombatResponses() async throws {
     // When & Then - test each outcome type
     let victoryResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
-        outcome: .victory("Test victory")
+        outcome: .victory("Victory")
     )
-    #expect(victoryResult.message?.contains("cloud of sinister black fog") == true)
+    expectNoDifference(victoryResult.message, """
+        Victory
+
+        Almost as soon as the troll breathes his last breath, a cloud
+        of sinister black fog envelops him, and when the fog lifts,
+        the carcass has disappeared.
+        """)
 
     let drawResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
-        outcome: .draw("Test draw")
+        outcome: .draw("Draw")
     )
-    #expect(drawResult.message?.contains("circle each other warily") == true)
+    expectNoDifference(drawResult.message, """
+        Draw
+
+        You both circle each other warily, weapons at the ready.
+        """)
 
     let defeatResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
-        outcome: .defeat("Test defeat")
+        outcome: .defeat("Defeat")
     )
-    #expect(defeatResult.message?.contains("stands over your fallen form") == true)
+    expectNoDifference(defeatResult.message, """
+        Defeat
+
+        The troll stands over your fallen form, grunting what might
+        be satisfaction in his guttural tongue.
+        """)
 }

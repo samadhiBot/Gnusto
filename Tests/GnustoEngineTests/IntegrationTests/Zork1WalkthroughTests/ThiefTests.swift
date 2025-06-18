@@ -1,3 +1,4 @@
+import CustomDump
 import Testing
 
 @testable import GnustoEngine
@@ -27,12 +28,10 @@ struct ThiefTests {
         for _ in 1...20 {  // Try multiple times since theft is probabilistic
             let _ = await mockIO.flush()  // Clear any previous output
             await engine.execute(  // Trigger after-turn processing
-                command: Command(
-                    verb: .wait,
-                    rawInput: "wait"
-                )
+                command: Command(verb: .wait, rawInput: "wait")
             )
             let output = await mockIO.flush()
+            print("🎾", output)
             if output.contains("thief snatches") {
                 stoleItem = true
                 break
