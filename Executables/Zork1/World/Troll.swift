@@ -49,11 +49,8 @@ enum Troll {
 
         case .afterTurn:
             return nil
-
-
         }
     }
-}
 
     static let trollRoomHandler = LocationEventHandler { engine, event -> ActionResult? in
         guard case .beforeTurn(let command) = event else { return nil }
@@ -179,10 +176,10 @@ private func handleTrollGiveOrDrop(
             "The troll, who is not overly proud, graciously accepts the gift"
         }
 
-    // Handle weapons
-    let weaponItems: [ItemID] = [.knife, .sword, .axe]
-    if weaponItems.contains(object) {
-        if await engine.randomPercentage() <= 20 {
+    // Handle weapons using engine helper
+    if await engine.isEffectiveWeapon(object) {
+        let outcome = await engine.randomCombatOutcome()
+        if outcome <= 20 {
             return ActionResult(
                 message: """
                     \(baseMessage) and eats it hungrily. Poor troll,
@@ -216,4 +213,90 @@ private func handleTrollGiveOrDrop(
             try await engine.remove(object)
         )
     }
+}
+
+// MARK: - Enhanced Combat Mechanics
+
+/// Enhanced troll combat system with more sophisticated mechanics
+extension Troll {
+    /// Determines the outcome of a weapon attack on the troll
+    static func evaluateWeaponAttack(
+        engine: GameEngine,
+        weapon: ItemID
+    ) async throws -> CombatOutcome {
+        let isEffectiveWeapon = await engine.isEffectiveWeapon(weapon)
+        let outcome = await engine.randomCombatOutcome()
+
+        switch (isEffectiveWeapon, outcome) {
+        case (true, 0...30):
+            return .victory("The troll succumbs to your superior weaponry!")
+        case (true, 31...60):
+            return .draw("The troll blocks your attack with his axe!")
+        case (true, _):
+            return .defeat("The troll's axe finds its mark. You are defeated!")
+        case (false, _):
+            return .ineffective("Your \(weapon) proves ineffective against the troll.")
+        }
+    }
+
+    /// Handles troll reaction to being attacked
+    static func handleTrollCombatResponse(
+        engine: GameEngine,
+        outcome: CombatOutcome
+    ) async throws -> ActionResult {
+        switch outcome {
+        case .victory(let message):
+            return ActionResult(
+                message: """
+                    \(message)
+
+                    Almost as soon as the troll breathes his last breath, a cloud
+                    of sinister black fog envelops him, and when the fog lifts,
+                    the carcass has disappeared.
+                    """,
+                changes: [
+                    try await engine.remove(.troll),
+                    // Clear fighting state from any weapons
+                    try await engine.clearFlag(.isFighting, on: .sword),
+                ].compactMap { $0 }
+            )
+
+        case .defeat(let message):
+            return ActionResult(
+                message: """
+                    \(message)
+
+                    The troll stands over your fallen form, grunting what might
+                    be satisfaction in his guttural tongue.
+                    """,
+                changes: [
+                    try await engine.setFlag(.isFighting, on: .troll),
+                    // Set player to wounded state (game-specific mechanic)
+                ].compactMap { $0 }
+            )
+
+        case .draw(let message):
+            return ActionResult(
+                message: """
+                    \(message)
+
+                    You both circle each other warily, weapons at the ready.
+                    """,
+                changes: [
+                    try await engine.setFlag(.isFighting, on: .troll),
+                ].compactMap { $0 }
+            )
+
+        case .ineffective(let message):
+            return ActionResult(message)
+        }
+    }
+}
+
+/// Combat outcome types for the enhanced fighting system
+enum CombatOutcome {
+    case victory(String)
+    case defeat(String)
+    case draw(String)
+    case ineffective(String)
 }
