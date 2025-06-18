@@ -315,19 +315,21 @@ extension Forest {
         }
     }
 
-    static let pileOfLeavesHandler = ItemEventHandler { engine, event in
+    static let pileOfLeavesHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             if command.verb == .move {
                 // Check if grate is invisible
                 let grate = try await engine.item(.grate)
                 let isGrateInvisible = grate.hasFlag(.isInvisible)
-
-                var changes: [StateChange] = []
-
+                
+                var changes: [StateChange?] = []
+                
                 // Reveal the grate if it's currently invisible
                 if isGrateInvisible {
-                    changes.append(try await engine.clearFlag(.isInvisible, on: .grate))
+                    changes.append(
+                        try await engine.clearFlag(.isInvisible, on: .grate)
+                    )
                 }
 
                 // Update the leaves description to show they've been disturbed
@@ -349,8 +351,6 @@ extension Forest {
             }
             return nil
         case .afterTurn:
-            return nil
-        case .characterMode:
             return nil
         }
     }
@@ -472,8 +472,6 @@ extension Forest {
                 return nil
             }
         case .afterTurn:
-            return nil
-        case .characterMode:
             return nil
         }
     }

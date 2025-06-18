@@ -1,5 +1,6 @@
 import Testing
-import GnustoEngine
+
+@testable import GnustoEngine
 @testable import Zork1
 
 /// Tests for the sophisticated Zork 1 thief implementation
@@ -10,24 +11,35 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
         // Position player in round room with thief and give player a valuable item
-        try await engine.teleportPlayer(to: .roundRoom)
-        try await engine.debugAddItem(id: .sword, name: "sword", parent: .player)
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
+            await engine.move(.sword, to: .player)
+        )
 
         // When - thief attempts to steal (this may require multiple attempts due to randomness)
         var stoleItem = false
         for _ in 1...20 {  // Try multiple times since theft is probabilistic
-            await mockIO.flush()  // Clear any previous output
-            try await engine.processCommand("wait")  // Trigger after-turn processing
-
+            let _ = await mockIO.flush()  // Clear any previous output
+            await engine.execute(  // Trigger after-turn processing
+                command: Command(
+                    verb: .wait,
+                    rawInput: "wait"
+                )
+            )
             let output = await mockIO.flush()
             if output.contains("thief snatches") {
                 stoleItem = true
                 break
             }
         }
+        #expect(stoleItem == true)
 
         // Then - check that theft can occur (this test verifies the mechanism exists)
         // Note: Due to randomness, we can't guarantee theft happens, but the test verifies the system works
@@ -43,9 +55,15 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.apply(
+            try await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
         try await engine.processCommand("examine thief")
@@ -62,9 +80,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
         try await engine.debugAddItem(id: .lamp, name: "lamp", parent: .player)
 
         // When
@@ -85,9 +107,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
         try await engine.debugAddItem(id: .garlic, name: "garlic", parent: .player)
 
         // When
@@ -108,9 +134,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("attack thief")
@@ -127,9 +157,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("tell thief about treasure")
@@ -145,9 +179,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("take thief")
@@ -163,9 +201,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("examine stiletto")
@@ -181,9 +223,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("examine bag")
@@ -199,9 +245,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
         try await engine.processCommand("take stiletto")
@@ -219,9 +269,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
         // Give player multiple items of different values
         try await engine.debugAddItem(id: .leaflet, name: "leaflet", parent: .player) // Low value
         try await engine.debugAddItem(id: .diamond, name: "diamond", parent: .player) // High value
@@ -257,9 +311,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
         let initialThiefLocation = try await engine.item(.thief).parent
 
         // When - wait several turns to trigger movement daemon
@@ -288,9 +346,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // Force thief to move to another location
         try await engine.move(.thief, to: .location(.northSouthPassage))
@@ -310,9 +372,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
         try await engine.debugAddItem(id: .sword, name: "sword", parent: .player)
 
         // When
@@ -330,9 +396,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // Force a combat victory by removing thief directly (simulating death)
         try await engine.remove(.thief)
@@ -358,7 +428,11 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
         let initialScore = await engine.playerScore
 
@@ -379,9 +453,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // Simulate getting stiletto somehow
         try await engine.move(.stiletto, to: .player)
@@ -400,9 +478,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // Give player multiple high-value items to increase theft chance
         try await engine.debugAddItem(id: .diamond, name: "diamond", parent: .player)
@@ -435,9 +517,13 @@ struct ThiefTests {
         // Given
         let game = Zork1()
         let mockIO = await MockIOHandler()
-        let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+        let engine = await GameEngine(
+            blueprint: game,
+            parser: StandardParser(),
+            ioHandler: mockIO
+        )
 
-        try await engine.teleportPlayer(to: .roundRoom)
+        try await engine.movePlayer(to: .location(.roundRoom))
 
         // When - attack multiple times to potentially see different outcomes
         var combatResponses: Set<String> = []

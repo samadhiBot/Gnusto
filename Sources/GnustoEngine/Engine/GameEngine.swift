@@ -1405,8 +1405,10 @@ extension GameEngine {
         ///
         /// - Parameter change: The `StateChange` to apply to the game state.
         /// - Throws: Re-throws any errors from `GameState.apply()`, including validation failures.
-        func apply(_ change: StateChange) async throws {
-            try await applyWithDynamicValidation(change)
+        func apply(_ changes: StateChange?...) async throws {
+            for change in changes.compactMap(\.self) {
+                try await applyWithDynamicValidation(change)
+            }
         }
 
         /// Retrieves the complete history of all `StateChange`s applied to the `gameState`

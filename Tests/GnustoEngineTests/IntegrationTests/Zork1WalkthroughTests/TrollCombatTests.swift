@@ -1,5 +1,7 @@
+import CustomDump
 import Testing
-import GnustoEngine
+
+@testable import GnustoEngine
 @testable import Zork1
 
 @Test("Troll blocks movement in troll room")
@@ -7,13 +9,25 @@ func testTrollBlocksMovement() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: mockIO
+    )
 
     // Position player in troll room with live troll
-    try await engine.teleportPlayer(to: .trollRoom)
+    try await engine.apply(
+        await engine.movePlayer(to: .location(.trollRoom)),
+    )
 
     // When - try to go east (should be blocked)
-    try await engine.processCommand("go east")
+    await engine.execute(
+        command: Command(
+            verb: .go,
+            direction: .east,
+            rawInput: "go east"
+        )
+    )
 
     // Then
     let output = await mockIO.flush()
@@ -25,18 +39,30 @@ func testTrollAllowsMovementWhenDead() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: mockIO
+    )
 
     // Position player in troll room and kill troll
-    try await engine.teleportPlayer(to: .trollRoom)
-    try await engine.remove(.troll)
+    try await engine.apply(
+        await engine.movePlayer(to: .location(.trollRoom)),
+        try await engine.remove(.troll)
+    )
+
 
     // When - try to go east (should work now)
-    try await engine.processCommand("go east")
+    await engine.execute(
+        command: Command(
+            verb: .go,
+            direction: .east,
+            rawInput: "go east"
+        )
+    )
 
     // Then - player should move successfully
-    let currentLocation = await engine.playerLocation()
-    #expect(currentLocation.id == .eastWestPassage)
+    #expect(await engine.playerLocationID == .eastWestPassage)
 }
 
 @Test("Giving weapon to troll has random outcomes")
@@ -44,20 +70,36 @@ func testGivingWeaponToTroll() async throws {
     // Given
     let game = Zork1()
     let mockIO = await MockIOHandler()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: mockIO)
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: mockIO
+    )
 
     // Set up scenario: player has sword, is with troll
-    try await engine.teleportPlayer(to: .trollRoom)
-    try await engine.move(.sword, to: .player)
+    try await engine.apply(
+        await engine.movePlayer(to: .location(.trollRoom)),
+        try await engine.move(.sword, to: .player)
+    )
 
     // When - give sword to troll multiple times (testing randomness)
     var outcomes: [String] = []
     for _ in 0..<10 {
         // Reset state
-        try await engine.move(.sword, to: .player)
-        try await engine.clearFlag(.isFighting, on: .troll)
+        try await engine.apply(
+            try await engine.move(.sword, to: .player),
+            try await engine.clearFlag(.isFighting, on: .troll)
+        )
 
-        try await engine.processCommand("give sword to troll")
+        await engine.execute(
+            command: Command(
+                verb: .give,
+                directObject: .item(.sword),
+                indirectObject: .item(.troll),
+                preposition: "to",
+                rawInput: "give sword to troll"
+            )
+        )
         let output = await mockIO.flush()
         outcomes.append(output)
     }
@@ -71,12 +113,16 @@ func testGivingWeaponToTroll() async throws {
 func testWeaponEffectivenessEvaluation() async throws {
     // Given
     let game = Zork1()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: MockIOHandler())
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: MockIOHandler()
+    )
 
     // When - test different weapon types
     let swordEffective = await engine.isEffectiveWeapon(.sword)
     let knifeEffective = await engine.isEffectiveWeapon(.knife)
-    let leafEffective = await engine.isEffectiveWeapon(.leaflet)
+    let leafEffective = await engine.isEffectiveWeapon(.advertisement)
 
     // Then
     #expect(swordEffective == true, "Sword should be an effective weapon")
@@ -88,7 +134,11 @@ func testWeaponEffectivenessEvaluation() async throws {
 func testCombatOutcomePatterns() async throws {
     // Given
     let game = Zork1()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: MockIOHandler())
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: MockIOHandler()
+    )
 
     // When - evaluate weapon attack outcomes
     var outcomes: [CombatOutcome] = []
@@ -123,24 +173,28 @@ func testCombatOutcomePatterns() async throws {
 func testTrollCombatResponses() async throws {
     // Given
     let game = Zork1()
-    let engine = GameEngine(game: game, parser: StandardParser(vocabulary: game.vocabulary), ioHandler: MockIOHandler())
+    let engine = await GameEngine(
+        blueprint: game,
+        parser: StandardParser(),
+        ioHandler: MockIOHandler()
+    )
 
     // When & Then - test each outcome type
     let victoryResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
         outcome: .victory("Test victory")
     )
-    #expect(victoryResult.message.contains("cloud of sinister black fog"))
+    #expect(victoryResult.message?.contains("cloud of sinister black fog") == true)
 
     let drawResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
         outcome: .draw("Test draw")
     )
-    #expect(drawResult.message.contains("circle each other warily"))
+    #expect(drawResult.message?.contains("circle each other warily") == true)
 
     let defeatResult = try await Troll.handleTrollCombatResponse(
         engine: engine,
         outcome: .defeat("Test defeat")
     )
-    #expect(defeatResult.message.contains("stands over your fallen form"))
+    #expect(defeatResult.message?.contains("stands over your fallen form") == true)
 }

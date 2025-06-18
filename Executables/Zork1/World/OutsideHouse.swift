@@ -216,21 +216,19 @@ extension OutsideHouse {
 // MARK: - Event handlers
 
 extension OutsideHouse {
-    static let boardsHandler = ItemEventHandler { engine, event in
+    static let boardsHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
-            case .take: ActionResult("The boards are securely fastened.")
-            default: nil
+            case .take: return ActionResult("The boards are securely fastened.")
+            default: return nil
             }
         case .afterTurn:
-            return nil
-        case .characterMode:
             return nil
         }
     }
 
-    static let mailboxHandler = ItemEventHandler { engine, event in
+    static let mailboxHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -251,23 +249,11 @@ extension OutsideHouse {
                 } else {
                     return ActionResult("You can see what appears to be a kitchen.")
                 }
+            case .take:
+                return ActionResult("It is securely anchored.")
             default: return nil
             }
         case .afterTurn: return nil
-        }
-    }
-
-    static let mailboxHandler = ItemEventHandler { engine, event in
-        switch event {
-        case .beforeTurn(let command):
-            switch command.verb {
-            case .take: ActionResult("It is securely anchored.")
-            default: nil
-            }
-        case .afterTurn:
-            return nil
-        case .characterMode:
-            return nil
         }
     }
 
@@ -350,8 +336,6 @@ extension OutsideHouse {
             }
 
         case .afterTurn:
-            return nil
-        case .characterMode:
             return nil
         }
     }

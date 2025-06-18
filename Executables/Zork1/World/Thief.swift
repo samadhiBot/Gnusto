@@ -172,7 +172,7 @@ enum Thief {
         let moveResult = try await engine.move(.thief, to: .location(newLocationID))
 
         // Determine if player sees the movement
-        let playerLocation = try await engine.playerLocationID
+        let playerLocation = await engine.playerLocationID
         var message = ""
 
         if playerLocation == currentLocationID {
@@ -195,12 +195,14 @@ enum Thief {
     /// Sophisticated theft daemon with treasure evaluation
     static let thiefTheftDaemon = DaemonDefinition(frequency: 1) { engine in
         // Only attempt theft if thief is in same location as player
-        guard let thief = try? await engine.item(.thief),
-              case .location(let thiefLocationID) = thief.parent,
-              thiefLocationID == await engine.playerLocationID else {
+        let thief = try await engine.item(.thief)
+        let playerLocationID = await engine.playerLocationID
+        guard
+            case .location(let thiefLocationID) = thief.parent,
+            thiefLocationID == playerLocationID
+        else {
             return nil
         }
-
         return try await attemptSophisticatedTheft(engine: engine)
     }
 }
@@ -247,30 +249,30 @@ private func handleThiefAfterTurn(engine: GameEngine) async throws -> ActionResu
 // MARK: - Give/Drop Handling
 
 private func handleGiveToThief(engine: GameEngine, command: Command) async throws -> ActionResult? {
-    guard case .item(let object) = command.directObject else {
+    guard case .item(let itemID) = command.directObject else {
         return nil
     }
 
-    let objectName = try await engine.item(object).name
+    let item = try await engine.item(itemID)
 
     // Enhanced treasure evaluation
-    let treasureValue = await evaluateTreasureValue(engine: engine, itemID: object)
+    let treasureValue = evaluateTreasureValue(of: item)
 
     if treasureValue > 0 {
         return ActionResult(
             message: """
-                The thief examines the \(objectName) with obvious delight and
+                The thief examines the \(item.name) with obvious delight and
                 carefully places it in his bag, giving you a grudging nod of
                 acknowledgment.
                 """,
             changes: [
-                try await engine.move(object, to: .item(.largeBag))
+                try await engine.move(itemID, to: .item(.largeBag))
             ].compactMap { $0 }
         )
     } else {
         return ActionResult(
             """
-            The thief examines the \(objectName) briefly, then shakes his head
+            The thief examines the \(item.name) briefly, then shakes his head
             with obvious disdain. "I only deal in quality merchandise," he mutters.
             """
         )
@@ -402,7 +404,7 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
 
     // Enhanced theft targeting - prioritize most valuable items
     let targetableItems = playerItems.compactMap { item -> (ItemID, Int)? in
-        let value = await evaluateTreasureValue(engine: engine, itemID: item.id)
+        let value = evaluateTreasureValue(of: item)
         return value > 0 ? (item.id, value) : nil
     }.sorted { $0.1 > $1.1 } // Sort by value, highest first
 
@@ -439,7 +441,7 @@ private func thiefStealsRandomItem(engine: GameEngine) async throws -> StateChan
 
     // Prefer valuable items, but will take anything in combat
     let valuableItems = playerItems.filter { item in
-        await evaluateTreasureValue(engine: engine, itemID: item.id) > 0
+        evaluateTreasureValue(of: item) > 0
     }
 
     let targetItems = valuableItems.isEmpty ? playerItems : valuableItems
@@ -451,9 +453,7 @@ private func thiefStealsRandomItem(engine: GameEngine) async throws -> StateChan
 // MARK: - Treasure Scoring Integration
 
 /// Evaluates the treasure value of an item for thief interest and scoring
-private func evaluateTreasureValue(engine: GameEngine, itemID: ItemID) async -> Int {
-    guard let item = try? await engine.item(itemID) else { return 0 }
-
+private func evaluateTreasureValue(of item: Item) -> Int {
     // High-value treasures (worth 10+ points in trophy case)
     let highValueTreasures: [ItemID] = [
         .skull, .potOfGold, .diamond, .bracelet, .platinumBar
@@ -475,10 +475,10 @@ private func evaluateTreasureValue(engine: GameEngine, itemID: ItemID) async -> 
     ]
 
     return switch true {
-    case highValueTreasures.contains(itemID): 10
-    case mediumValueTreasures.contains(itemID): 6
-    case lowValueTreasures.contains(itemID): 3
-    case valuableWeapons.contains(itemID): 4
+    case highValueTreasures.contains(item.id): 10
+    case mediumValueTreasures.contains(item.id): 6
+    case lowValueTreasures.contains(item.id): 3
+    case valuableWeapons.contains(item.id): 4
     case item.hasFlag(.isWeapon): 2
     case item.name.lowercased().contains("treasure"): 5
     default: 0
@@ -492,7 +492,7 @@ private func updateTreasureScoring(engine: GameEngine) async -> StateChange? {
     var totalValue = 0
 
     for item in bagContents {
-        totalValue += await evaluateTreasureValue(engine: engine, itemID: item.id)
+        totalValue += evaluateTreasureValue(of: item)
     }
 
     if totalValue > 0 {
@@ -504,7 +504,7 @@ private func updateTreasureScoring(engine: GameEngine) async -> StateChange? {
 
 /// Drops thief possessions when defeated
 private func dropThiefPossessions(engine: GameEngine) async throws -> StateChange? {
-    let currentLocation = try await engine.playerLocationID
+    let currentLocation = await engine.playerLocationID
 
     // Move thief's possessions to current location
     return try await engine.move(.largeBag, to: .location(currentLocation))

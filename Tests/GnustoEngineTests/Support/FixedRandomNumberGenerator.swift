@@ -20,7 +20,7 @@ import Foundation
 /// var cyclingGenerator = FixedRandomNumberGenerator(values: [0.1, 0.5, 0.9])
 ///
 /// // Use with GameEngine for deterministic testing
-/// let engine = GameEngine(
+/// let engine = await GameEngine(
 ///     blueprint: gameBlueprint,
 ///     randomNumberGenerator: generator,
 ///     // ... other parameters
