@@ -8,12 +8,12 @@ struct ListenActionHandlerTests {
     let handler = ListenActionHandler()
 
     // MARK: - Setup Helper
-    
+
     private func createTestEngine() async -> GameEngine {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        
+
         return await GameEngine(
             blueprint: game,
             parser: mockParser,
@@ -53,10 +53,10 @@ struct ListenActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "You hear nothing unusual.")
         #expect(result.changes.isEmpty) // LISTEN should not modify state
@@ -92,13 +92,13 @@ struct ListenActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Validate
         try await handler.validate(context: context)
-        
+
         // Process
         let result = try await handler.process(context: context)
-        
+
         // Verify complete workflow
         #expect(result.message == "You hear nothing unusual.")
         #expect(result.changes.isEmpty)
@@ -108,13 +108,13 @@ struct ListenActionHandlerTests {
     @Test("LISTEN does not affect game state")
     func testListenDoesNotAffectGameState() async throws {
         let engine = await createTestEngine()
-        
+
         // Capture initial state
         let initialState = await engine.gameState
         let initialScore = initialState.player.score
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
-        
+
         let command = Command(
             verb: .listen,
             rawInput: "listen"
@@ -143,7 +143,7 @@ struct ListenActionHandlerTests {
             newValue: 100
         )
         try await engine.apply(scoreChange)
-        
+
         let command = Command(
             verb: .listen,
             rawInput: "listen"
@@ -165,11 +165,11 @@ struct ListenActionHandlerTests {
             .description("A very quiet room.")
         )
         let location2 = Location(
-            id: "location2", 
+            id: "location2",
             .name("Noisy Room"),
             .description("A potentially noisy room.")
         )
-        
+
         let game = MinimalGame(locations: [location1, location2])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -193,7 +193,7 @@ struct ListenActionHandlerTests {
         let moveChange = StateChange(
             entityID: .player,
             attribute: .playerLocation,
-            newValue: .locationID("location2")
+            newValue: .parentEntity(.location("location2"))
         )
         try await engine.apply(moveChange)
 
@@ -234,10 +234,10 @@ struct ListenActionHandlerTests {
         // Execute LISTEN multiple times
         await engine.execute(command: command)
         let firstOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let secondOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let thirdOutput = await mockIO.flush()
 
@@ -255,7 +255,7 @@ struct ListenActionHandlerTests {
             .description("A completely dark room.")
             // No .inherentlyLit, so it should be dark
         )
-        
+
         let player = Player(in: "dark_room")
         let game = MinimalGame(
             player: player,
@@ -290,7 +290,7 @@ struct ListenActionHandlerTests {
             .description("A loudly ticking clock."),
             .in(.location(.startRoom))
         )
-        
+
         let game = MinimalGame(items: [noisyItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -312,4 +312,4 @@ struct ListenActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "You hear nothing unusual.")
     }
-} 
+}

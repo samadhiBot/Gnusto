@@ -318,7 +318,7 @@ extension OutsideHouse {
                         // Move player to kitchen
                         return ActionResult(
                             nil,
-                            await engine.movePlayer(to: .location(.kitchen))
+                            await engine.movePlayer(to: .kitchen)
                         )
                     } else {
                         // Update pronoun to refer to kitchen window

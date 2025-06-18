@@ -111,8 +111,8 @@ public struct GoActionHandler: ActionHandler {
                 StateChange(
                     entityID: .player,
                     attribute: .playerLocation,
-                    oldValue: .locationID(currentLocation.id),
-                    newValue: .locationID(destinationID)
+                    oldValue: .parentEntity(.location(currentLocation.id)),
+                    newValue: .parentEntity(.location(destinationID))
                 )
             ]
         )

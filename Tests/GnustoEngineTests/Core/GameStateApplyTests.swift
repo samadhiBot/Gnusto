@@ -955,8 +955,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityID: .player,
             attribute: .playerLocation,
-            oldValue: .locationID(initialLocation),
-            newValue: .locationID(newLocation)
+            oldValue: .parentEntity(.location(initialLocation)),
+            newValue: .parentEntity(.location(newLocation))
         )
 
         // When
@@ -978,8 +978,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityID: .player,
             attribute: .playerLocation,
-            oldValue: .locationID(incorrectOldLocation),
-            newValue: .locationID(newLocation)
+            oldValue: .parentEntity(.location(incorrectOldLocation)),
+            newValue: .parentEntity(.location(newLocation))
         )
 
         // When & Then
@@ -1016,8 +1016,8 @@ struct GameStateApplyTests {
         let change = StateChange(
             entityID: .player,
             attribute: .playerLocation,
-            oldValue: .locationID(initialLocation),
-            newValue: .locationID(invalidNewLocation)
+            oldValue: .parentEntity(.location(initialLocation)),
+            newValue: .parentEntity(.location(invalidNewLocation))
         )
 
         // When & Then

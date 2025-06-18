@@ -8,12 +8,12 @@ struct SmellActionHandlerTests {
     let handler = SmellActionHandler()
 
     // MARK: - Setup Helper
-    
+
     private func createTestEngine() async -> GameEngine {
         let game = MinimalGame()
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
-        
+
         return await GameEngine(
             blueprint: game,
             parser: mockParser,
@@ -50,7 +50,7 @@ struct SmellActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -106,7 +106,7 @@ struct SmellActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -159,10 +159,10 @@ struct SmellActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "You smell nothing unusual.")
         #expect(result.changes.isEmpty) // SMELL should not modify state
@@ -178,7 +178,7 @@ struct SmellActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -197,10 +197,10 @@ struct SmellActionHandlerTests {
             command: command,
             engine: engine
         )
-        
+
         // Process the command directly
         let result = try await handler.process(context: context)
-        
+
         // Verify result
         #expect(result.message == "That smells about average.")
         #expect(result.changes.isEmpty) // SMELL should not modify state
@@ -210,13 +210,13 @@ struct SmellActionHandlerTests {
     @Test("SMELL does not affect game state")
     func testSmellDoesNotAffectGameState() async throws {
         let engine = await createTestEngine()
-        
+
         // Capture initial state
         let initialState = await engine.gameState
         let initialScore = initialState.player.score
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
-        
+
         let command = Command(
             verb: .smell,
             rawInput: "smell"
@@ -241,11 +241,11 @@ struct SmellActionHandlerTests {
             .description("A beautiful garden filled with roses.")
         )
         let location2 = Location(
-            id: "kitchen", 
+            id: "kitchen",
             .name("Kitchen"),
             .description("A kitchen with various cooking smells.")
         )
-        
+
         let game = MinimalGame(locations: [location1, location2])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -269,7 +269,7 @@ struct SmellActionHandlerTests {
         let moveChange = StateChange(
             entityID: .player,
             attribute: .playerLocation,
-            newValue: .locationID("kitchen")
+            newValue: .parentEntity(.location("kitchen"))
         )
         try await engine.apply(moveChange)
 
@@ -288,7 +288,7 @@ struct SmellActionHandlerTests {
             .isTakable,
             .in(.location(.startRoom))
         )
-        
+
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -323,10 +323,10 @@ struct SmellActionHandlerTests {
         // Execute SMELL multiple times
         await engine.execute(command: command)
         let firstOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let secondOutput = await mockIO.flush()
-        
+
         await engine.execute(command: command)
         let thirdOutput = await mockIO.flush()
 
@@ -345,7 +345,7 @@ struct SmellActionHandlerTests {
             .isTakable,
             .in(.player)
         )
-        
+
         let game = MinimalGame(items: [testItem])
         let mockIO = await MockIOHandler()
         let mockParser = MockParser()
@@ -377,7 +377,7 @@ struct SmellActionHandlerTests {
             .description("A pitch black cave.")
             // No .inherentlyLit, so it should be dark
         )
-        
+
         let player = Player(in: "dark_cave")
         let game = MinimalGame(
             player: player,
@@ -403,4 +403,4 @@ struct SmellActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, "You smell nothing unusual.")
     }
-} 
+}

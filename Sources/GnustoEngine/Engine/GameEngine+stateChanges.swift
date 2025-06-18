@@ -206,13 +206,27 @@ extension GameEngine {
         )
     }
 
-    /// <#Description#>
-    /// - Parameter newParent: <#newParent description#>
-    /// - Returns: <#description#>
+    /// Creates a `StateChange` to move the player to a specific location.
+    ///
+    /// - Parameter locationID: The destination location ID.
+    /// - Returns: A `StateChange` to move the player to the specified location.
+    public func movePlayer(to locationID: LocationID) -> StateChange {
+        StateChange(
+            entityID: .player,
+            attribute: .playerLocation,
+            oldValue: .parentEntity(.location(playerLocationID)),
+            newValue: .parentEntity(.location(locationID))
+        )
+    }
+
+    /// Creates a `StateChange` to move the player to a specified parent entity.
+    ///
+    /// - Parameter newParent: The destination parent entity.
+    /// - Returns: A `StateChange` to move the player to the specified parent.
     public func movePlayer(to newParent: ParentEntity) -> StateChange {
         StateChange(
             entityID: .player,
-            attribute: .itemParent,
+            attribute: .playerLocation,
             oldValue: .parentEntity(.location(playerLocationID)),
             newValue: .parentEntity(newParent)
         )
