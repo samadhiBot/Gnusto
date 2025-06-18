@@ -228,7 +228,7 @@ extension OutsideHouse {
         }
     }
 
-    static let mailboxHandler = ItemEventHandler { engine, event -> ActionResult? in
+    static let kitchenWindowHandler = ItemEventHandler { engine, event -> ActionResult? in
         switch event {
         case .beforeTurn(let command):
             switch command.verb {
@@ -249,11 +249,15 @@ extension OutsideHouse {
                 } else {
                     return ActionResult("You can see what appears to be a kitchen.")
                 }
-            case .take:
-                return ActionResult("It is securely anchored.")
             default: return nil
             }
         case .afterTurn: return nil
+        }
+    }
+
+    static let mailboxHandler = ItemEventHandler { engine, event -> ActionResult? in
+        event.whenBeforeTurn(verb: .take) {
+            ActionResult("It is securely anchored.")
         }
     }
 

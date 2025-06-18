@@ -54,4 +54,15 @@ public enum ItemEvent: Sendable {
     /// Called when the item is destroyed or removed from the game.
     case onDestroy
      */
+
+    public func whenBeforeTurn(
+        verb verbID: VerbID,
+        result: () -> ActionResult?
+    ) -> ActionResult? {
+        if case .beforeTurn(let command) = self, command.verb == verbID {
+            result()
+        } else {
+            nil
+        }
+    }
 }
