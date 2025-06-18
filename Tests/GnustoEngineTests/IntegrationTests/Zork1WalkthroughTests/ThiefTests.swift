@@ -5,7 +5,6 @@ import Testing
 
 /// Tests for the sophisticated Zork 1 thief implementation
 struct ThiefTests {
-
     @Test("Thief can steal valuable items from player")
     func testThiefStealsValuableItems() async throws {
         // Given
@@ -62,11 +61,17 @@ struct ThiefTests {
         )
 
         try await engine.apply(
-            try await engine.movePlayer(to: .location(.roundRoom))
+            await engine.movePlayer(to: .location(.roundRoom))
         )
 
         // When
-        try await engine.processCommand("examine thief")
+        await engine.execute(
+            command: Command(
+                verb: .examine,
+                directObject: .item(.thief),
+                rawInput: "examine thief"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -87,10 +92,20 @@ struct ThiefTests {
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
-        try await engine.debugAddItem(id: .lamp, name: "lamp", parent: .player)
+        try await engine.apply(
+            await engine.move(.lamp, to: .player)
+        )
 
         // When
-        try await engine.processCommand("give lamp to thief")
+        await engine.execute(
+            command: Command(
+                verb: .give,
+                directObject: .item(.lamp),
+                indirectObject: .item(.thief),
+                preposition: "to",
+                rawInput: "give lamp to thief"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -114,10 +129,20 @@ struct ThiefTests {
         )
 
         try await engine.movePlayer(to: .location(.roundRoom))
-        try await engine.debugAddItem(id: .garlic, name: "garlic", parent: .player)
+        try await engine.apply(
+            await engine.move(.garlic, to: .player)
+        )
 
         // When
-        try await engine.processCommand("give garlic to thief")
+        await engine.execute(
+            command: Command(
+                verb: .give,
+                directObject: .item(.garlic),
+                indirectObject: .item(.thief),
+                preposition: "to",
+                rawInput: "give garlic to thief"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -143,7 +168,13 @@ struct ThiefTests {
         try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
-        try await engine.processCommand("attack thief")
+        await engine.execute(
+            command: Command(
+                verb: .attack,
+                directObject: .item(.thief),
+                rawInput: "attack thief"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -166,7 +197,13 @@ struct ThiefTests {
         try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
-        try await engine.processCommand("tell thief about treasure")
+        await engine.execute(
+            command: Command(
+                verb: .tell,
+                directObject: .item(.thief),
+                rawInput: "tell thief about treasure"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -188,7 +225,13 @@ struct ThiefTests {
         try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
-        try await engine.processCommand("take thief")
+        await engine.execute(
+            command: Command(
+                verb: .take,
+                directObject: .item(.thief),
+                rawInput: "take thief"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -210,7 +253,13 @@ struct ThiefTests {
         try await engine.movePlayer(to: .location(.roundRoom))
 
         // When
-        try await engine.processCommand("examine stiletto")
+        await engine.execute(
+            command: Command(
+                verb: .examine,
+                directObject: .item(.stiletto),
+                rawInput: "examine stiletto"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -229,10 +278,18 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
-        try await engine.processCommand("examine bag")
+        await engine.execute(
+            command: Command(
+                verb: .examine,
+                directObject: .item(.largeBag),
+                rawInput: "examine bag"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -251,10 +308,18 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
-        try await engine.processCommand("take stiletto")
+        await engine.execute(
+            command: Command(
+                verb: .take,
+                directObject: .item(.stiletto),
+                rawInput: "take stiletto"
+            )
+        )
 
         // Then
         let output = await mockIO.flush()
@@ -275,10 +340,12 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
-        // Give player multiple items of different values
-        try await engine.debugAddItem(id: .leaflet, name: "leaflet", parent: .player) // Low value
-        try await engine.debugAddItem(id: .diamond, name: "diamond", parent: .player) // High value
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
+            // Give player multiple items of different values
+            await engine.move(ItemID("leaflet"), to: .player), // Low value
+            await engine.move(.diamond, to: .player) // High value
+        )
 
         // When - attempt theft multiple times
         var theftOccurred = false
@@ -286,7 +353,12 @@ struct ThiefTests {
 
         for _ in 1...30 {
             await mockIO.flush()
-            try await engine.processCommand("wait")
+            await engine.execute(
+                command: Command(
+                    verb: .wait,
+                    rawInput: "wait"
+                )
+            )
             let output = await mockIO.flush()
 
             if output.contains("thief snatches") {
@@ -317,13 +389,20 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
         let initialThiefLocation = try await engine.item(.thief).parent
 
         // When - wait several turns to trigger movement daemon
         for _ in 1...10 {
             await mockIO.flush()
-            try await engine.processCommand("wait")
+            await engine.execute(
+                command: Command(
+                    verb: .wait,
+                    rawInput: "wait"
+                )
+            )
         }
 
         // Then - thief might have moved (daemon runs every 3 turns)
@@ -352,14 +431,20 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // Force thief to move to another location
-        try await engine.move(.thief, to: .location(.northSouthPassage))
+        try await engine.apply(
+            await engine.move(.thief, to: .location(.northSouthPassage))
+        )
         await mockIO.flush() // Clear any move message
 
         // When - move thief back to player's location
-        try await engine.move(.thief, to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.move(.thief, to: .location(.roundRoom))
+        )
 
         // Then - should potentially see atmospheric arrival message
         // (This is testing the infrastructure exists)
@@ -378,11 +463,21 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
-        try await engine.debugAddItem(id: .sword, name: "sword", parent: .player)
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
+            await engine.move(.sword, to: .player)
+        )
 
         // When
-        try await engine.processCommand("attack thief with sword")
+        await engine.execute(
+            command: Command(
+                verb: .attack,
+                directObject: .item(.thief),
+                indirectObject: .item(.sword),
+                preposition: "with",
+                rawInput: "attack thief with sword"
+            )
+        )
 
         // Then - should get enhanced combat response
         let output = await mockIO.flush()
@@ -402,10 +497,14 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // Force a combat victory by removing thief directly (simulating death)
-        try await engine.remove(.thief)
+        try await engine.apply(
+            await engine.remove(.thief)
+        )
 
         // When - check if possessions are handled
         let bagLocation = try await engine.item(.largeBag).parent
@@ -437,10 +536,14 @@ struct ThiefTests {
         let initialScore = await engine.playerScore
 
         // Put valuable item in thief's bag
-        try await engine.move(.diamond, to: .item(.largeBag))
+        try await engine.apply(
+            await engine.move(.diamond, to: .item(.largeBag))
+        )
 
         // When - defeat thief (simulate by removing)
-        try await engine.remove(.thief)
+        try await engine.apply(
+            await engine.remove(.thief)
+        )
 
         // Then - score should potentially increase when treasures are recovered
         // (This tests the infrastructure exists even if specific scoring varies)
@@ -459,13 +562,25 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // Simulate getting stiletto somehow
-        try await engine.move(.stiletto, to: .player)
+        try await engine.apply(
+            await engine.move(.stiletto, to: .player)
+        )
 
         // When
-        try await engine.processCommand("give stiletto to thief")
+        await engine.execute(
+            command: Command(
+                verb: .give,
+                directObject: .item(.stiletto),
+                indirectObject: .item(.thief),
+                preposition: "to",
+                rawInput: "give stiletto to thief"
+            )
+        )
 
         // Then - thief should handle this appropriately
         let output = await mockIO.flush()
@@ -484,18 +599,24 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
-
-        // Give player multiple high-value items to increase theft chance
-        try await engine.debugAddItem(id: .diamond, name: "diamond", parent: .player)
-        try await engine.debugAddItem(id: .skull, name: "skull", parent: .player)
-        try await engine.debugAddItem(id: .potOfGold, name: "pot of gold", parent: .player)
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
+            // Give player multiple high-value items to increase theft chance
+            await engine.move(.diamond, to: .player),
+            await engine.move(.skull, to: .player),
+            await engine.move(.potOfGold, to: .player)
+        )
 
         // When - wait for sophisticated theft algorithm
         var attemptedTheft = false
         for _ in 1...25 {
             await mockIO.flush()
-            try await engine.processCommand("wait")
+            await engine.execute(
+                command: Command(
+                    verb: .wait,
+                    rawInput: "wait"
+                )
+            )
             let output = await mockIO.flush()
 
             if output.contains("thief") && (output.contains("snatches") || output.contains("steals")) {
@@ -523,14 +644,22 @@ struct ThiefTests {
             ioHandler: mockIO
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When - attack multiple times to potentially see different outcomes
         var combatResponses: Set<String> = []
 
         for attempt in 1...5 {
             await mockIO.flush()
-            try await engine.processCommand("attack thief")
+            await engine.execute(
+                command: Command(
+                    verb: .attack,
+                    directObject: .item(.thief),
+                    rawInput: "attack thief"
+                )
+            )
             let output = await mockIO.flush()
 
             if !output.isEmpty {
@@ -541,7 +670,9 @@ struct ThiefTests {
             let thiefExists = (try? await engine.item(.thief)) != nil
             if !thiefExists {
                 // Respawn thief for next test
-                try await engine.debugAddItem(id: .thief, name: "thief", parent: .location(.roundRoom))
+                try await engine.apply(
+                    await engine.move(.thief, to: .location(.roundRoom))
+                )
             }
         }
 
