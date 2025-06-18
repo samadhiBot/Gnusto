@@ -594,15 +594,12 @@ struct ClimbActionHandlerTests {
         )
 
         // Create game with standard constants
-        let customConstants = GameConstants(
-            storyTitle: "Test Game",
-            introduction: "A test",
-            release: "1.0",
-            maximumScore: 10
-        )
+        let storyTitle = "Test Game"
+        let introduction = "A test"
+        let release = "1.0"
+        let maximumScore = 10
 
         let game = MinimalGame(
-            constants: customConstants,
             player: Player(in: "kitchen"),
             locations: [kitchen, attic],
             items: [stairs]

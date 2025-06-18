@@ -3,7 +3,11 @@ import GnustoEngine
 /// A minimal game implementation for testing purposes.
 /// Provides sensible defaults that can be overridden in individual tests.
 public struct MinimalGame: GameBlueprint {
-    public var constants: GameConstants
+    public let storyTitle = "Minimal Game"
+    public let introduction = "Welcome to the Minimal Game!"
+    public let release = "0.0.1"
+    public let maximumScore = 10
+
     public var player: Player
     public var randomNumberGenerator: FixedRandomNumberGenerator
     public var items: [Item]
@@ -18,12 +22,6 @@ public struct MinimalGame: GameBlueprint {
     public var messageProvider: MessageProvider
 
     public init(
-        constants: GameConstants = GameConstants(
-            storyTitle: "Minimal Game",
-            introduction: "Welcome to the Minimal Game!",
-            release: "0.0.1",
-            maximumScore: 10
-        ),
         player: Player = Player(in: LocationID("startRoom")),
         randomNumberGenerator: FixedRandomNumberGenerator = FixedRandomNumberGenerator(
             values: [0.1, 0.9, 0.3, 0.7, 0.5, 0.6, 0.4, 0.8, 0.2, 1.0]
@@ -53,7 +51,6 @@ public struct MinimalGame: GameBlueprint {
         locationComputers: [LocationID: LocationComputer] = [:],
         messageProvider: MessageProvider? = nil
     ) {
-        self.constants = constants
         self.player = player
         self.randomNumberGenerator = randomNumberGenerator
         self.items = items

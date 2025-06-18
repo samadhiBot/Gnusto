@@ -19,12 +19,10 @@ struct MessageProviderIntegrationTests {
     @Test("GameEngine uses custom MessageProvider from GameBlueprint")
     func testEngineUsesCustomMessageProvider() async throws {
         struct TestGame: GameBlueprint {
-            let constants = GameConstants(
-                storyTitle: "Test Game",
-                introduction: "A test",
-                release: "1.0",
-                maximumScore: 10
-            )
+            let storyTitle = "Test Game"
+            let introduction = "A test"
+            let release = "1.0"
+            let maximumScore = 10
 
             let player = Player(in: "void")
 

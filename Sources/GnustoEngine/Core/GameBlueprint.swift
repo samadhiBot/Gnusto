@@ -12,12 +12,21 @@ import Foundation
 /// can then be aggregated and provided to the relevant properties of your `GameBlueprint`
 /// implementation (e.g., `items`, `locations`, `itemEventHandlers`, `locationEventHandlers`).
 public protocol GameBlueprint: Sendable {
-    /// The core metadata constants for the game.
-    ///
-    /// Provide an instance of `GameConstants` here, which includes details like
-    /// the story title, introduction, release information, and maximum score.
-    /// This information is often displayed to the player at the start of the game.
-    var constants: GameConstants { get }
+    /// The full title of the game (e.g., "ZORK I: The Great Underground Empire").
+    /// This is typically displayed by the `GameEngine` when the game starts.
+    var storyTitle: String { get }
+
+    /// An introductory text, often including a brief premise, version information, or byline.
+    /// This is displayed by the `GameEngine` after the `storyTitle` when the game starts.
+    var introduction: String { get }
+
+    /// A version or release identifier for the game (e.g., "Release 1 / Serial number 880720").
+    /// This can be part of the `introduction` or used separately as needed.
+    var release: String { get }
+
+    /// The maximum achievable score in the game. This is used by score-reporting actions
+    /// and can be used by the game to determine if the player has "won".
+    var maximumScore: Int { get }
 
     /// An object representing the player character, containing their current status, inventory,
     /// score, location, etc.

@@ -19,9 +19,24 @@ import Logging
 ///   factory methods in `GameEngine+changes.swift`) and then applying them,
 ///   or by using higher-level convenience mutation methods (e.g., in
 ///   `GameEngine+stateMutation.swift`).
-/// - Access game-wide `GameConstants`.
 /// - Trigger output to the player (usually by returning an `ActionResult` with a message).
 public actor GameEngine: Sendable {
+    /// The full title of the game (e.g., "ZORK I: The Great Underground Empire").
+    /// This is typically displayed when the game starts.
+    let storyTitle: String
+
+    /// An introductory text, often including a brief premise, version information, or byline.
+    /// This is displayed after the `storyTitle` when the game starts.
+    let introduction: String
+
+    /// A version or release identifier for the game (e.g., "Release 1 / Serial number 880720").
+    /// This can be part of the `introduction` or used separately as needed.
+    let release: String
+
+    /// The maximum achievable score in the game. This is used by score-reporting actions
+    /// and can be used by the game to determine if the player has "won".
+    let maximumScore: Int
+
     /// The current, mutable state of the entire game world.
     ///
     /// This `GameState` object holds all information about locations, items, the player,
@@ -49,10 +64,6 @@ public actor GameEngine: Sendable {
     /// This is used internally by various engine methods (e.g., `playerCanReach(_:)`)
     /// to resolve scope.
     lazy var scopeResolver = ScopeResolver(engine: self)
-
-    /// The game-specific constants, such as title, introduction, and maximum score,
-    /// derived from the `GameBlueprint` used to initialize the engine.
-    public let constants: GameConstants
 
     /// The message provider for localized and customizable game text.
     /// Derived from the `GameBlueprint` used to initialize the engine.
@@ -133,11 +144,14 @@ public actor GameEngine: Sendable {
         parser: Parser,
         ioHandler: IOHandler
     ) async {
-        self.constants = blueprint.constants
+        self.daemons = blueprint.daemons
+        self.fuses = blueprint.fuses
+        self.introduction = blueprint.introduction
+        self.maximumScore = blueprint.maximumScore
         self.messageProvider = blueprint.messageProvider
         self.randomNumberGenerator = blueprint.randomNumberGenerator
-        self.fuses = blueprint.fuses
-        self.daemons = blueprint.daemons
+        self.release = blueprint.release
+        self.storyTitle = blueprint.storyTitle
 
         // Build vocabulary with custom verbs if not provided
         let gameVocabulary: Vocabulary
@@ -197,7 +211,7 @@ extension GameEngine {
     /// This method is the primary entry point for beginning and playing the game.
     /// It performs the following sequence:
     /// 1. Sets up the `IOHandler` (e.g., preparing the console or UI).
-    /// 2. Prints the game's title and introduction message (from `GameConstants`).
+    /// 2. Prints the game's title and introduction message.
     /// 3. Marks the player's starting location as visited and describes it.
     /// 4. Enters the main turn-based loop, which continues until `shouldQuit` becomes `true`.
     ///    Each iteration of the loop involves:
@@ -209,8 +223,8 @@ extension GameEngine {
     /// it is intended to be the engine's top-level execution flow.
     public func run() async {
         await ioHandler.setup()
-        await ioHandler.print(constants.storyTitle, style: .strong)
-        await ioHandler.print(constants.introduction)
+        await ioHandler.print(storyTitle, style: .strong)
+        await ioHandler.print(introduction)
 
         do {
             // Describe the starting location with full description

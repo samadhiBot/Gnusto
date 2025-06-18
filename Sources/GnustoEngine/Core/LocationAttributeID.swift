@@ -36,12 +36,6 @@ public extension LocationAttributeID {
 
     /// The shorter description used in lists or brief mentions (ZIL `SDESC`).
     static let shortDescription = LocationAttributeID("shortDescription")
-
-//    /// Text that can be read from an item (ZIL `RTEXT/TEXT`).
-//    static let readText = LocationAttributeID("readText")
-//
-//    /// Text that can be read from an item while holding it (ZILF `TEXT-HELD`).
-//    static let readWhileHeldText = LocationAttributeID("readWhileHeldText")
 }
 
 // MARK: - Location Flags

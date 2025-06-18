@@ -131,13 +131,10 @@ struct ScannerTests {
             import GnustoEngine
 
             struct AutoWiringTestGame: GameBlueprint {
-                let constants = GameConstants(
-                    storyTitle: "Auto-Wiring Test Game",
-                    introduction: "Testing auto-wiring plugin scenarios...",
-                    release: "1",
-                    maximumScore: 100
-                )
-
+                let storyTitle = "Auto-Wiring Test Game"
+                let introduction = "Testing auto-wiring plugin scenarios..."
+                let release = "1"
+                let maximumScore = 100
                 var player: Player {
                     Player(in: .livingRoom)
                 }
@@ -240,13 +237,11 @@ struct ScannerTests {
             }
 
             struct TestGame: GameBlueprint {
-                let constants = GameConstants(
-                    storyTitle: "Test Game",
-                    introduction: "A simple test game.",
-                    release: "1",
-                    maximumScore: 100
-                )
-
+                let storyTitle = "Test Game"
+                let introduction = "A simple test game."
+                let release = "1"
+                let maximumScore = 100
+                
                 var player: Player {
                     Player(in: .room)
                 }

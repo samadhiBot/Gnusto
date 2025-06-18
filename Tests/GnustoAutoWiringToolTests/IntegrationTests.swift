@@ -58,7 +58,10 @@ struct IntegrationTests {
             }
 
             struct CloakOfDarkness: GameBlueprint {
-                let constants = GameConstants(storyTitle: "Cloak of Darkness", introduction: "A brief test.", release: "1", maximumScore: 2)
+                let storyTitle = "Cloak of Darkness"
+                let introduction = "A brief test."
+                let release = "1"
+                let maximumScore = 2
                 var player: Player { Player(in: .foyer) }
             }
             """
