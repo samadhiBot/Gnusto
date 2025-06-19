@@ -5,41 +5,35 @@ import Testing
 
 @Suite("DrinkActionHandler Tests")
 struct DrinkActionHandlerTests {
-    let handler = DrinkActionHandler()
 
     @Test("Drink validates missing direct object")
     func testDrinkValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .drink,
-            rawInput: "drink"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Drink what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("drink")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink
+            Drink what?
+            """)
     }
 
     @Test("Drink validates item not found")
     func testDrinkValidatesItemNotFound() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .drink,
-            directObject: .item("nonexistent"),
-            rawInput: "drink nonexistent"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("nonexistent")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("drink nonexistent")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink nonexistent
+            You can't see any nonexistent here.
+            """)
     }
 
     @Test("Drink validates item not reachable")
@@ -52,21 +46,18 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: distantWater)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("distant_water"),
-            rawInput: "drink distant water"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_water")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("drink distant water")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink distant water
+            You can't see any distant water here.
+            """)
     }
 
     @Test("Drink drinkable item succeeds")
@@ -79,22 +70,19 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: water)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("water"),
-            rawInput: "drink water"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("drink water")
 
         // Then
-        #expect(result.message!.contains("You drink the water. It's quite refreshing."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink water
+            You drink the water. It's quite refreshing.
+            """)
     }
 
     @Test("Drink non-drinkable item fails")
@@ -106,22 +94,19 @@ struct DrinkActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: rock)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("rock"),
-            rawInput: "drink rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("drink rock")
 
         // Then
-        #expect(result.message!.contains("You can't drink the rock."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink rock
+            You can't drink the rock.
+            """)
     }
 
     @Test("Drink from container succeeds")
@@ -143,22 +128,19 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: bottle, wine)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("bottle"),
-            rawInput: "drink bottle"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("drink bottle")
 
         // Then
-        #expect(result.message!.contains("You drink the wine from the bottle. Refreshing!"))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink bottle
+            You drink the wine from the bottle. Refreshing!
+            """)
     }
 
     @Test("Drink from closed container fails")
@@ -179,22 +161,19 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: closedBottle, juice)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("closed_bottle"),
-            rawInput: "drink closed bottle"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("drink closed bottle")
 
         // Then
-        #expect(result.message!.contains("You can't drink the closed bottle."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink closed bottle
+            You can't drink from the closed bottle while it's closed.
+            """)
     }
 
     @Test("Drink item and check state changes")
@@ -207,30 +186,21 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, _) = await GameEngine.test(
+        let (engine, mockIO) = await GameEngine.test(
             blueprint: MinimalGame(items: water)
         )
 
-        let command = Command(
-            verb: .drink,
-            directObject: .item("water"),
-            rawInput: "drink water"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("drink water")
 
-        // Apply the state changes to the engine
-        for change in result.changes {
-            try await engine.apply(change)
-        }
-
-        // Then - Check that the item was removed (moved to .nowhere) and touched
-        #expect(result.changes.count >= 2)
-
-        // Check that water was consumed (removed from game)
+        // Then - Check that the item was consumed (removed from game)
         let finalWater = try await engine.item("water")
         #expect(finalWater.parent == .nowhere)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > drink water
+            You drink the water. It's quite refreshing.
+            """)
     }
 }

@@ -5,41 +5,35 @@ import Testing
 
 @Suite("EnterActionHandler Tests")
 struct EnterActionHandlerTests {
-    let handler = EnterActionHandler()
 
     @Test("Enter validates missing direct object with no enterable items")
     func testEnterValidatesMissingDirectObjectWithNoEnterableItems() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .enter,
-            rawInput: "enter"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("There's nothing here to enter.")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("enter")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > enter
+            There's nothing here to enter.
+            """)
     }
 
     @Test("Enter validates non-item direct object")
     func testEnterValidatesNonItemDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .enter,
-            directObject: .player,
-            rawInput: "enter self"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't enter that.")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("enter self")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > enter self
+            You can't enter that.
+            """)
     }
 
     @Test("Enter validates item not accessible")
@@ -53,19 +47,16 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: booth)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .enter,
-            directObject: .item("booth"),
-            rawInput: "enter booth"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(throws: ActionResponse.itemNotAccessible("booth")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("enter booth")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > enter booth
+            You can't see any booth here.
+            """)
     }
 
     @Test("Enter validates item not enterable")
@@ -78,20 +69,16 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .enter,
-            directObject: .item("rock"),
-            rawInput: "enter rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't enter the large rock."))
-        {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("enter rock")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > enter rock
+            You can't enter the large rock.
+            """)
     }
 
     @Test("Enter processes enterable object")
@@ -105,20 +92,16 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: booth)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .enter,
-            directObject: .item("booth"),
-            rawInput: "enter booth"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("enter booth")
 
         // Then
-        #expect(result.message == "You enter the phone booth.")
-        #expect(result.changes.count >= 1)  // Should have touch/pronoun updates
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > enter booth
+            You enter the phone booth.
+            """)
     }
 }

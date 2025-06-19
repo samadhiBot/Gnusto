@@ -5,23 +5,20 @@ import Testing
 
 @Suite("KissActionHandler Tests")
 struct KissActionHandlerTests {
-    let handler = KissActionHandler()
 
     @Test("Kiss validates missing direct object")
     func testKissValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .kiss,
-            rawInput: "kiss"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Kiss what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("kiss")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kiss
+            Kiss what?
+            """)
     }
 
     @Test("Kiss character shows appropriate message")
@@ -37,22 +34,14 @@ struct KissActionHandlerTests {
         let game = MinimalGame(items: princess)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("princess"),
-            rawInput: "kiss princess"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("kiss princess")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
-            The beautiful princess doesn’t seem particularly receptive to
-            your affections.
+        expectNoDifference(output, """
+            > kiss princess
+            The beautiful princess doesn't seem particularly receptive to your affections.
             """)
     }
 
@@ -70,12 +59,10 @@ struct KissActionHandlerTests {
             You kiss it curiously, but your curiosity remains unsatisfied.
 
             > kiss the pebble
-            You plant a brief kiss on the pebble, yet your lips learn
-            nothing new.
+            You plant a brief kiss on the pebble, yet your lips learn nothing new.
 
             > kiss the pebble
-            You plant a small kiss on the pebble, learning nothing your
-            eyes hadn’t already told you.
+            You plant a small kiss on the pebble, learning nothing your eyes hadn't already told you.
             """)
     }
 
@@ -90,7 +77,7 @@ struct KissActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > kiss myself
-            You can’t kiss that.
+            You can't kiss that.
             """)
     }
 
@@ -104,26 +91,19 @@ struct KissActionHandlerTests {
         )
 
         let game = MinimalGame(items: mirror)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("mirror"),
-            rawInput: "kiss mirror"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("kiss mirror")
 
-        // Then
-        #expect(result.changes.count >= 1)
+        // Then - Check that the item was touched
+        let finalMirror = try await engine.item("mirror")
+        #expect(finalMirror.hasFlag(.isTouched))
 
-        // Should have touched the item
-        let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("mirror") && change.attribute == .itemAttribute(.isTouched)
-                && change.newValue == true
-        })
-        #expect(hasTouchedChange)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kiss mirror
+            You kiss it curiously, but your curiosity remains unsatisfied.
+            """)
     }
 }

@@ -5,20 +5,20 @@ import Testing
 
 @Suite("TieActionHandler Tests")
 struct TieActionHandlerTests {
-    let handler = TieActionHandler()
 
     @Test("Tie validates missing direct object")
     func testTieValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .tie, rawInput: "tie")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Tie what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("tie")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tie
+            Tie what?
+            """)
     }
 
     @Test("Tie rope alone shows knot message")
@@ -33,16 +33,17 @@ struct TieActionHandlerTests {
         )
 
         let game = MinimalGame(items: rope)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .tie, directObject: .item("rope"), rawInput: "tie rope")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("tie rope")
 
         // Then
-        #expect(result.message!.contains("You tie a knot in the rope."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tie rope
+            You tie a knot in the rope.
+            """)
     }
 
     @Test("Tie integration test")
@@ -59,13 +60,14 @@ struct TieActionHandlerTests {
         let game = MinimalGame(items: cord)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .tie, directObject: .item("cord"), rawInput: "tie cord")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("tie cord")
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You tie a knot in the cord."))
+        expectNoDifference(output, """
+            > tie cord
+            You tie a knot in the cord.
+            """)
     }
 }

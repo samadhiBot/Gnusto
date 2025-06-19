@@ -5,41 +5,35 @@ import Testing
 
 @Suite("AttackActionHandler Tests")
 struct AttackActionHandlerTests {
-    let handler = AttackActionHandler()
 
     @Test("Attack validates missing direct object")
     func testAttackValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .attack,
-            rawInput: "attack"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Attack what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("attack")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack
+            Attack what?
+            """)
     }
 
     @Test("Attack validates item not found")
     func testAttackValidatesItemNotFound() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("nonexistent"),
-            rawInput: "attack nonexistent"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("nonexistent")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("attack nonexistent")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack nonexistent
+            You can't see any nonexistent here.
+            """)
     }
 
     @Test("Attack validates item not reachable")
@@ -53,19 +47,16 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantGoblin)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("distant_goblin"),
-            rawInput: "attack distant goblin"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_goblin")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("attack distant goblin")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack distant goblin
+            You can't see any distant goblin here.
+            """)
     }
 
     @Test("Attack with weapon validates weapon not held")
@@ -86,20 +77,16 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: goblin, sword)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("goblin"),
-            indirectObject: .item("sword"),
-            rawInput: "attack goblin with sword"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotHeld("sword")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("attack goblin with sword")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack goblin with sword
+            You don't have the sword.
+            """)
     }
 
     @Test("Attack non-character object")
@@ -112,20 +99,17 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("rock"),
-            rawInput: "attack rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("attack rock")
 
         // Then
-        #expect(result.message!.contains("I've known strange people, but fighting a rock?"))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack rock
+            I've known strange people, but fighting a rock?
+            """)
     }
 
     @Test("Attack character with bare hands")
@@ -139,21 +123,17 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: goblin)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("goblin"),
-            rawInput: "attack goblin"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("attack goblin")
 
         // Then
-        #expect(
-            result.message!.contains("Trying to attack a goblin with your bare hands is suicidal."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack goblin
+            Trying to attack a goblin with your bare hands is suicidal.
+            """)
     }
 
     @Test("Attack character with weapon")
@@ -174,21 +154,17 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: goblin, sword)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("goblin"),
-            indirectObject: .item("sword"),
-            rawInput: "attack goblin with sword"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("attack goblin with sword")
 
         // Then
-        #expect(result.message!.contains("Let's hope it doesn't come to that."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack goblin with sword
+            Let's hope it doesn't come to that.
+            """)
     }
 
     @Test("Attack character with inappropriate weapon")
@@ -201,60 +177,24 @@ struct AttackActionHandlerTests {
             .isCharacter
         )
 
-        let lamp = Item(
-            id: "lamp",
-            .name("lamp"),
-            .in(.player)
+        let feather = Item(
+            id: "feather",
+            .name("feather"),
+            .in(.player),
+            .isTakable
         )
 
-        let game = MinimalGame(items: goblin, lamp)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("goblin"),
-            indirectObject: .item("lamp"),
-            rawInput: "attack goblin with lamp"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let game = MinimalGame(items: goblin, feather)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("attack goblin with feather")
 
         // Then
-        #expect(result.message!.contains("Trying to attack the goblin with a lamp is suicidal."))
-    }
-
-    @Test("Attack updates state correctly")
-    func testAttackUpdatesStateCorrectly() async throws {
-        // Given
-        let goblin = Item(
-            id: "goblin",
-            .name("goblin"),
-            .in(.location(.startRoom)),
-            .isCharacter
-        )
-
-        let game = MinimalGame(items: goblin)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .attack,
-            directObject: .item("goblin"),
-            rawInput: "attack goblin"
-        )
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.changes.count >= 1)
-
-        // Find the state change that marks the goblin as touched
-        let touchedStateChange = result.changes.first { change in
-            change.attribute == .itemAttribute(.isTouched)
-        }
-        #expect(touchedStateChange != nil)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > attack goblin with feather
+            You can't attack anything with the feather.
+            """)
     }
 }

@@ -5,20 +5,20 @@ import Testing
 
 @Suite("RubActionHandler Tests")
 struct RubActionHandlerTests {
-    let handler = RubActionHandler()
 
     @Test("Rub validates missing direct object")
     func testRubValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .rub, rawInput: "rub")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Rub what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("rub")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub
+            Rub what?
+            """)
     }
 
     @Test("Rub validates item not reachable")
@@ -31,16 +31,16 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantSphere)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .rub, directObject: .item("distant_sphere"), rawInput: "rub distant sphere")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_sphere")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("rub distant sphere")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub distant sphere
+            You can't see any distant sphere here.
+            """)
     }
 
     @Test("Rub character shows appropriate message")
@@ -54,16 +54,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: cat)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("cat"), rawInput: "rub cat")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub cat")
 
         // Then
-        #expect(result.message!.contains("I don't think the cat would appreciate being rubbed."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub cat
+            I don't think the cat would appreciate being rubbed.
+            """)
     }
 
     @Test("Rub clean item shows already clean message")
@@ -77,16 +78,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: mirror)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("mirror"), rawInput: "rub mirror")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub mirror")
 
         // Then
-        #expect(result.message!.contains("You rub the mirror. It feels smooth to the touch."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub mirror
+            You rub the mirror. It feels smooth to the touch.
+            """)
     }
 
     @Test("Rub lamp shows djinn message")
@@ -101,18 +103,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: lamp)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("lamp"), rawInput: "rub lamp")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub lamp")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "Rubbing the brass lamp doesn't seem to do anything. No djinn appears."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub lamp
+            Rubbing the brass lamp doesn't seem to do anything. No djinn appears.
+            """)
     }
 
     @Test("Rub lantern shows djinn message")
@@ -127,18 +128,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: lantern)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("lantern"), rawInput: "rub lantern")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub lantern")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "Rubbing the old lantern doesn't seem to do anything. No djinn appears."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub lantern
+            Rubbing the old lantern doesn't seem to do anything. No djinn appears.
+            """)
     }
 
     @Test("Rub takable object shows smooth touch message")
@@ -152,16 +152,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: stone)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("stone"), rawInput: "rub stone")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub stone")
 
         // Then
-        #expect(result.message!.contains("You rub the smooth stone. It feels smooth to the touch."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub stone
+            You rub the smooth stone. It feels smooth to the touch.
+            """)
     }
 
     @Test("Rub fixed object shows nothing happens message")
@@ -174,17 +175,17 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: wall)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("wall"), rawInput: "rub wall")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("rub wall")
 
         // Then
-        #expect(
-            result.message!.contains("You rub the stone wall, but nothing interesting happens."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > rub wall
+            You rub the stone wall, but nothing interesting happens.
+            """)
     }
 
     @Test("Rub updates state correctly")
@@ -198,45 +199,19 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: orb)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .rub, directObject: .item("orb"), rawInput: "rub orb")
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.changes.count >= 1)
-
-        // Should have touched the item
-        let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("orb") && change.attribute == .itemAttribute(.isTouched)
-                && change.newValue == true
-        })
-        #expect(hasTouchedChange)
-    }
-
-    @Test("Rub integration test")
-    func testRubIntegrationTest() async throws {
-        // Given
-        let crystal = Item(
-            id: "crystal",
-            .name("crystal"),
-            .in(.location(.startRoom)),
-            .isTakable
-        )
-
-        let game = MinimalGame(items: crystal)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .rub, directObject: .item("crystal"), rawInput: "rub crystal")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("rub orb")
 
-        // Then
+        // Then - Check state was updated
+        let finalOrb = try await engine.item("orb")
+        #expect(finalOrb.hasFlag(.isTouched))
+
         let output = await mockIO.flush()
-        #expect(output.contains("You rub the crystal. It feels smooth to the touch."))
+        expectNoDifference(output, """
+            > rub orb
+            You rub the crystal orb. It feels smooth to the touch.
+            """)
     }
 }

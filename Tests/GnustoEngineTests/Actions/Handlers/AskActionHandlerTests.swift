@@ -10,17 +10,16 @@ struct AskActionHandlerTests {
     @Test("Ask requires direct object")
     func testAskRequiresDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .ask, rawInput: "ask")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When/Then
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("Ask whom?")
-        ) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("ask")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > ask
+            Ask whom?
+            """)
     }
 
     @Test("Ask requires indirect object")
@@ -29,47 +28,37 @@ struct AskActionHandlerTests {
         let character = Item(
             id: "wizard",
             .name("old wizard"),
+            .in(.location(.startRoom)),
             .isCharacter
         )
         let game = MinimalGame(items: character)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .ask,
-            directObject: .item("wizard"),
-            rawInput: "ask wizard"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("Ask about what?")
-        ) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("ask wizard")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > ask wizard
+            Ask about what?
+            """)
     }
 
     @Test("Ask requires character as direct object")
     func testAskRequiresCharacter() async throws {
         // Given
-        let rock = Item(id: "rock", .name("rock"))
+        let rock = Item(id: "rock", .name("rock"), .in(.location(.startRoom)))
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .ask,
-            directObject: .item("rock"),
-            indirectObject: .item("rock"),
-            rawInput: "ask rock about rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("You can't ask the rock about that.")
-        ) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("ask rock about rock")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > ask rock about rock
+            You can't ask the rock about that.
+            """)
     }
 
     @Test("Ask character about item")
@@ -89,22 +78,15 @@ struct AskActionHandlerTests {
         let game = MinimalGame(items: wizard, crystal)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .ask,
-            directObject: .item("wizard"),
-            indirectObject: .item("crystal"),
-            rawInput: "ask wizard about crystal"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("ask wizard about crystal")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            "Old wizard doesn’t seem to know anything about a magic crystal."
-        )
+        expectNoDifference(output, """
+            > ask wizard about crystal
+            Old wizard doesn't seem to know anything about a magic crystal.
+            """)
     }
 
     @Test("Ask character about player")
@@ -119,19 +101,15 @@ struct AskActionHandlerTests {
         let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .ask,
-            directObject: .item("wizard"),
-            indirectObject: .player,
-            rawInput: "ask wizard about me"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("ask wizard about me")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "Old wizard doesn’t seem to know anything about you.")
+        expectNoDifference(output, """
+            > ask wizard about me
+            Old wizard doesn't seem to know anything about you.
+            """)
     }
 
     @Test("Ask character about location")
@@ -146,19 +124,15 @@ struct AskActionHandlerTests {
         let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .ask,
-            directObject: .item("wizard"),
-            indirectObject: .location(.startRoom),
-            rawInput: "ask wizard about room"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("ask wizard about room")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "Old wizard doesn’t seem to know anything about any Void.")
+        expectNoDifference(output, """
+            > ask wizard about room
+            Old wizard doesn't seem to know anything about any Void.
+            """)
     }
 
     @Test("Ask inaccessible character fails")
@@ -173,18 +147,14 @@ struct AskActionHandlerTests {
         let game = MinimalGame(items: wizard)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .ask,
-            directObject: .item("wizard"),
-            indirectObject: .item("wizard"),
-            rawInput: "ask wizard about wizard"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("ask wizard about wizard")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > ask wizard about wizard
+            You can't see any wizard here.
+            """)
     }
 }

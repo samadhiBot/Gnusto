@@ -125,24 +125,53 @@ struct BlowActionHandlerTests {
 
     @Test("BLOW command without object")
     func testBlowCommandNoObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .blow, rawInput: "blow")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isTakable,
+            .in(.player)
+        )
+
+        let candle = Item(
+            id: "candle",
+            .name("candle"),
+            .isLightSource,
+            .isLit,
+            .isTakable,
+            .in(.location(.startRoom))
+        )
+
+        let game = MinimalGame(
+            items: balloon, candle
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("blow")
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You blow air around. Nothing happens.")
+        expectNoDifference(output, """
+            > blow
+            You blow air around. Nothing happens.
+            """)
     }
 
     @Test("BLOW command on object")
     func testBlowCommandOnObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .blow, directObject: .item("balloon"), rawInput: "blow balloon")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(items: balloon)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("blow balloon")
 
         // Verify balloon is marked as touched
         let balloonAfter = try await engine.item("balloon")
@@ -150,33 +179,57 @@ struct BlowActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("You blow on the balloon"))
+        expectNoDifference(output, """
+            > blow balloon
+            You blow on the balloon, but nothing interesting happens.
+            """)
     }
 
     @Test("BLOW command on lit light source")
     func testBlowOnLitLightSource() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .blow, directObject: .item("candle"), rawInput: "blow candle")
+        let candle = Item(
+            id: "candle",
+            .name("candle"),
+            .isLightSource,
+            .isLit,
+            .isTakable,
+            .in(.location(.startRoom))
+        )
+
+        let game = MinimalGame(items: candle)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("blow candle")
 
-        // Verify candle is marked as touched
+        // Verify candle is marked as touched and no longer lit
         let candleAfter = try await engine.item("candle")
         #expect(candleAfter.hasFlag(.isTouched))
+        #expect(!candleAfter.hasFlag(.isLit))
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("You blow on the candle") && output.contains("go out"))
+        expectNoDifference(output, """
+            > blow candle
+            You blow on the candle and it goes out.
+            """)
     }
 
     @Test("BLOW command on flammable object")
     func testBlowOnFlammableObject() async throws {
-        let (engine, mockIO) = await createTestEngineWithFlammableItem()
-        let command = Command(verb: .blow, directObject: .item("paper"), rawInput: "blow paper")
+        let paper = Item(
+            id: "paper",
+            .name("paper"),
+            .isFlammable,
+            .isTakable,
+            .in(.location(.startRoom))
+        )
+
+        let game = MinimalGame(items: paper)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("blow paper")
 
         // Verify paper is marked as touched
         let paperAfter = try await engine.item("paper")
@@ -184,19 +237,58 @@ struct BlowActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("Blowing on the paper has no effect"))
+        expectNoDifference(output, """
+            > blow paper
+            Blowing on the paper has no effect.
+            """)
     }
 
     @Test("BLOW command on inaccessible item")
     func testBlowInaccessibleItem() async throws {
-        let (engine, mockIO) = await createTestEngineWithDistantItem()
-        let command = Command(verb: .blow, directObject: .item("distantBalloon"), rawInput: "blow distant balloon")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isTakable,
+            .in(.player)
+        )
+
+        let distantBalloon = Item(
+            id: "distantBalloon",
+            .name("distant balloon"),
+            .isTakable,
+            .in(.location("anotherRoom"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing blow commands."),
+            .inherentlyLit
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .description("A distant room."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: balloon, distantBalloon
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("blow distant balloon")
 
         // Check that an error message was displayed
         let output = await mockIO.flush()
-        #expect(output.contains("any such thing") || output.contains("not accessible") || output.contains("can't see"))
+        expectNoDifference(output, """
+            > blow distant balloon
+            You can't see any distant balloon here.
+            """)
     }
 }

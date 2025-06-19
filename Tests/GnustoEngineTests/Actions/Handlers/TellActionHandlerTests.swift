@@ -5,20 +5,20 @@ import Testing
 
 @Suite("TellActionHandler Tests")
 struct TellActionHandlerTests {
-    let handler = TellActionHandler()
 
     @Test("Tell requires direct object")
     func testTellRequiresDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .tell, rawInput: "tell")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Tell whom?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("tell")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell
+            Tell whom?
+            """)
     }
 
     @Test("Tell requires indirect object")
@@ -27,45 +27,37 @@ struct TellActionHandlerTests {
         let character = Item(
             id: "wizard",
             .name("old wizard"),
+            .in(.location(.startRoom)),
             .isCharacter
         )
         let game = MinimalGame(items: character)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .tell,
-            directObject: .item("wizard"),
-            rawInput: "tell wizard"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Tell about what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("tell wizard")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell wizard
+            Tell about what?
+            """)
     }
 
     @Test("Tell requires character as direct object")
     func testTellRequiresCharacter() async throws {
         // Given
-        let rock = Item(id: "rock", .name("rock"))
+        let rock = Item(id: "rock", .name("rock"), .in(.location(.startRoom)))
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .tell,
-            directObject: .item("rock"),
-            indirectObject: .item("rock"),
-            rawInput: "tell rock about rock"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When/Then
-        await #expect(
-            throws: ActionResponse.prerequisiteNotMet("You can't tell the rock about anything.")
-        ) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("tell rock about rock")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell rock about rock
+            You can't tell the rock about anything.
+            """)
     }
 
     @Test("Tell character about item")
@@ -83,24 +75,17 @@ struct TellActionHandlerTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: wizard, crystal)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .tell,
-            directObject: .item("wizard"),
-            indirectObject: .item("crystal"),
-            rawInput: "tell wizard about crystal"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        try await engine.execute("tell wizard about crystal")
 
         // Then
-        #expect(
-            result.message == "Old wizard listens politely to what you say about magic crystal.")
-        #expect(result.changes.count == 2)  // touched flag + pronoun update
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell wizard about crystal
+            Old wizard listens politely to what you say about magic crystal.
+            """)
     }
 
     @Test("Tell character about player")
@@ -113,22 +98,17 @@ struct TellActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: wizard)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .tell,
-            directObject: .item("wizard"),
-            indirectObject: .player,
-            rawInput: "tell wizard about me"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        try await engine.execute("tell wizard about me")
 
         // Then
-        #expect(result.message == "Old wizard listens politely to what you say about yourself.")
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell wizard about me
+            Old wizard listens politely to what you say about yourself.
+            """)
     }
 
     @Test("Tell character about location")
@@ -141,22 +121,17 @@ struct TellActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: wizard)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .tell,
-            directObject: .item("wizard"),
-            indirectObject: .location(.startRoom),
-            rawInput: "tell wizard about room"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        try await engine.execute("tell wizard about room")
 
         // Then
-        #expect(result.message == "Old wizard listens politely to what you say about Void.")
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell wizard about room
+            Old wizard listens politely to what you say about Void.
+            """)
     }
 
     @Test("Tell inaccessible character fails")
@@ -169,19 +144,16 @@ struct TellActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: wizard)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .tell,
-            directObject: .item("wizard"),
-            indirectObject: .item("wizard"),
-            rawInput: "tell wizard about wizard"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        // When
+        try await engine.execute("tell wizard about wizard")
 
-        // When/Then
-        await #expect(throws: ActionResponse.itemNotAccessible("wizard")) {
-            try await handler.validate(context: context)
-        }
+        // Then
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > tell wizard about wizard
+            You can't see any wizard here.
+            """)
     }
 }

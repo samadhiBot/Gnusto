@@ -22,17 +22,13 @@ struct InventoryActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .inventory,
-            rawInput: "inventory"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("inventory")
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            > inventory
             You are carrying:
             - An antique lamp
             - A brass key
@@ -57,16 +53,14 @@ struct InventoryActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .inventory,
-            rawInput: "inventory"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("inventory")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You are empty-handed.")
+        expectNoDifference(output, """
+            > inventory
+            You are empty-handed.
+            """)
     }
 }

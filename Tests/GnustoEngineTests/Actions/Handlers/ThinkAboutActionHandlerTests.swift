@@ -9,42 +9,31 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT without object is rejected")
     func testThinkAboutWithoutObject() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .thinkAbout,
-            rawInput: "think about"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("think about")
 
-        // Should throw validation error for missing direct object
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for missing direct object")
-        } catch {
-            // Expected - should require a direct object
-        }
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > think about
+            Think about what?
+            """)
     }
 
     @Test("THINK ABOUT SELF produces specific message")
     func testThinkAboutSelf() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .player,
-            rawInput: "think about self"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("think about self")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Yes, yes, you’re very important.")
+        expectNoDifference(output, """
+            > think about self
+            Yes, yes, you're very important.
+            """)
     }
 
     @Test("THINK ABOUT with reachable item produces specific message")
@@ -60,46 +49,52 @@ struct ThinkAboutActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .item("puzzle"),
-            rawInput: "think about puzzle"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("think about puzzle")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
-            You contemplate the mysterious puzzle for a bit, but nothing
-            fruitful comes to mind.
+        expectNoDifference(output, """
+            > think about puzzle
+            You contemplate the mysterious puzzle for a bit, but nothing fruitful comes to mind.
             """)
     }
 
     @Test("THINK ABOUT with location is rejected")
     func testThinkAboutWithLocation() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .thinkAbout,
-            directObject: .location(.startRoom),
-            rawInput: "think about room"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
+        // Act
+        try await engine.execute("think about room")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > think about room
+            You can only think about yourself or specific items.
+            """)
+    }
+
+    @Test("THINK ABOUT with unreachable item")
+    func testThinkAboutWithUnreachableItem() async throws {
+        let testItem = Item(
+            id: "key",
+            .name("golden key"),
+            .description("A beautifully crafted golden key."),
+            .isTakable,
+            .in(.nowhere)
         )
 
-        // Should throw validation error for location
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for location direct object")
-        } catch {
-            // Expected - should reject location objects
-        }
+        let game = MinimalGame(items: testItem)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act
+        try await engine.execute("think about key")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > think about key
+            You can't see any golden key here.
+            """)
     }
 
     @Test("THINK ABOUT validation succeeds for player")
@@ -311,9 +306,9 @@ struct ThinkAboutActionHandlerTests {
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, "Yes, yes, you’re very important.")
-        expectNoDifference(secondOutput, "Yes, yes, you’re very important.")
-        expectNoDifference(thirdOutput, "Yes, yes, you’re very important.")
+        expectNoDifference(firstOutput, "Yes, yes, you're very important.")
+        expectNoDifference(secondOutput, "Yes, yes, you're very important.")
+        expectNoDifference(thirdOutput, "Yes, yes, you're very important.")
     }
 
     @Test("THINK ABOUT works in dark room")

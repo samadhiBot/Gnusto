@@ -4,29 +4,19 @@ import Testing
 
 @Suite("BurnActionHandler")
 struct BurnActionHandlerTests {
-    @Test("BURN without object uses MessageProvider for error")
+    @Test("BURN without object")
     func testBurnWithoutObject() async throws {
-        let (engine, _) = await GameEngine.test()
-        let handler = BurnActionHandler()
-        let command = Command(
-            verb: .burn,
-            rawInput: "burn"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
-        await #expect(throws: ActionResponse.self) {
-            try await handler.validate(context: context)
-        }
+        // Act
+        try await engine.execute("burn")
 
-        do {
-            try await handler.validate(context: context)
-        } catch let error as ActionResponse {
-            if case .prerequisiteNotMet(let message) = error {
-                #expect(message == "Burn what?")
-            } else {
-                Issue.record("Expected prerequisiteNotMet error")
-            }
-        }
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > burn
+            Burn what?
+            """)
     }
 
     @Test("BURN command")
@@ -50,8 +40,7 @@ struct BurnActionHandlerTests {
             The leaflet catches fire and burns to ashes.
 
             > burn leaflet
-            You can’t see the leaflet.
+            You can't see the leaflet.
             """)
     }
-
 }

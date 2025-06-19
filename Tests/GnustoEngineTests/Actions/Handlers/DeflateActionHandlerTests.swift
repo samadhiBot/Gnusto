@@ -111,24 +111,44 @@ struct DeflateActionHandlerTests {
 
     @Test("DEFLATE command without object")
     func testDeflateCommandNoObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .deflate, rawInput: "deflate")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isInflatable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(items: balloon)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("deflate")
 
         // Check the output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Deflate what?")
+        expectNoDifference(output, """
+            > deflate
+            Deflate what?
+            """)
     }
 
     @Test("DEFLATE command on inflated object")
     func testDeflateInflatedObject() async throws {
-        let (engine, mockIO) = await createTestEngineWithInflatedBalloon()
-        let command = Command(verb: .deflate, directObject: .item("balloon"), rawInput: "deflate balloon")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isInflatable,
+            .isInflated,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(items: balloon)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("deflate balloon")
 
         // Verify balloon is no longer inflated and is marked as touched
         let balloonAfter = try await engine.item("balloon")
@@ -137,16 +157,27 @@ struct DeflateActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("deflate") && output.contains("balloon"))
+        expectNoDifference(output, """
+            > deflate balloon
+            You deflate the balloon.
+            """)
     }
 
     @Test("DEFLATE command on non-inflated object")
     func testDeflateNonInflatedObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .deflate, directObject: .item("balloon"), rawInput: "deflate balloon")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isInflatable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let game = MinimalGame(items: balloon)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("deflate balloon")
 
         // Verify balloon is marked as touched
         let balloonAfter = try await engine.item("balloon")
@@ -154,19 +185,60 @@ struct DeflateActionHandlerTests {
 
         // Check the output
         let output = await mockIO.flush()
-        #expect(output.contains("already deflated") || output.contains("not inflated"))
+        expectNoDifference(output, """
+            > deflate balloon
+            The balloon is already deflated.
+            """)
     }
 
     @Test("DEFLATE command on inaccessible item")
     func testDeflateInaccessibleItem() async throws {
-        let (engine, mockIO) = await createTestEngineWithDistantItem()
-        let command = Command(verb: .deflate, directObject: .item("distantBalloon"), rawInput: "deflate distant balloon")
+        let balloon = Item(
+            id: "balloon",
+            .name("balloon"),
+            .isInflatable,
+            .isTakable,
+            .in(.player)
+        )
+
+        let distantBalloon = Item(
+            id: "distantBalloon",
+            .name("distant balloon"),
+            .isInflatable,
+            .isTakable,
+            .in(.location("anotherRoom"))
+        )
+
+        let testRoom = Location(
+            id: "testRoom",
+            .name("Test Room"),
+            .description("A room for testing deflate commands."),
+            .inherentlyLit
+        )
+
+        let anotherRoom = Location(
+            id: "anotherRoom",
+            .name("Another Room"),
+            .description("A distant room."),
+            .inherentlyLit
+        )
+
+        let game = MinimalGame(
+            player: Player(in: "testRoom"),
+            locations: testRoom, anotherRoom,
+            items: balloon, distantBalloon
+        )
+
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Execute the command through the full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("deflate distant balloon")
 
         // Check that an error message was displayed
         let output = await mockIO.flush()
-        #expect(output.contains("any such thing") || output.contains("not accessible") || output.contains("can't see"))
+        expectNoDifference(output, """
+            > deflate distant balloon
+            You can't see any distant balloon here.
+            """)
     }
 }

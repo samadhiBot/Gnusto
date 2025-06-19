@@ -5,20 +5,20 @@ import Testing
 
 @Suite("WaveActionHandler Tests")
 struct WaveActionHandlerTests {
-    let handler = WaveActionHandler()
 
     @Test("Wave validates missing direct object")
     func testWaveValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .wave, rawInput: "wave")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Wave what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("wave")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave
+            Wave what?
+            """)
     }
 
     @Test("Wave validates item not reachable")
@@ -31,16 +31,16 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantWand)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .wave, directObject: .item("distant_wand"), rawInput: "wave distant wand")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_wand")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("wave distant wand")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave distant wand
+            You can't see any distant wand here.
+            """)
     }
 
     @Test("Wave wand shows magical message")
@@ -55,18 +55,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: wand)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave wand")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You wave the magic wand dramatically, but nothing magical happens."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave wand
+            You wave the magic wand dramatically, but nothing magical happens.
+            """)
     }
 
     @Test("Wave staff shows magical message")
@@ -81,18 +80,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: staff)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("staff"), rawInput: "wave staff")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave staff")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You wave the wooden staff dramatically, but nothing magical happens."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave staff
+            You wave the wooden staff dramatically, but nothing magical happens.
+            """)
     }
 
     @Test("Wave sword shows brandish message")
@@ -107,16 +105,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: sword)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("sword"), rawInput: "wave sword")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave sword")
 
         // Then
-        #expect(result.message!.contains("You brandish the sharp sword menacingly."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave sword
+            You brandish the sharp sword menacingly.
+            """)
     }
 
     @Test("Wave blade shows brandish message")
@@ -131,16 +130,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: blade)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("blade"), rawInput: "wave blade")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave blade")
 
         // Then
-        #expect(result.message!.contains("You brandish the razor blade menacingly."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave blade
+            You brandish the razor blade menacingly.
+            """)
     }
 
     @Test("Wave flag shows appropriate message")
@@ -155,18 +155,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: flag)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("flag"), rawInput: "wave flag")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave flag")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You wave the red flag around. It's not particularly impressive."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave flag
+            You wave the red flag around. It's not particularly impressive.
+            """)
     }
 
     @Test("Wave fixed object shows different message")
@@ -179,19 +178,17 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: tree)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("tree"), rawInput: "wave tree")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("wave tree")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You can't wave the large tree around - it's not something you can pick up and wave."
-            ))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > wave tree
+            You can't wave the large tree around - it's not something you can pick up and wave.
+            """)
     }
 
     @Test("Wave updates state correctly")
@@ -199,52 +196,26 @@ struct WaveActionHandlerTests {
         // Given
         let wand = Item(
             id: "wand",
-            .name("wand"),
+            .name("magic wand"),
             .in(.location(.startRoom)),
-            .isTakable
+            .isTakable,
+            .isWand
         )
 
         let game = MinimalGame(items: wand)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.changes.count >= 1)
-
-        // Should have touched the item
-        let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("wand") && change.attribute == .itemAttribute(.isTouched)
-                && change.newValue == true
-        })
-        #expect(hasTouchedChange)
-    }
-
-    @Test("Wave integration test")
-    func testWaveIntegrationTest() async throws {
-        // Given
-        let staff = Item(
-            id: "staff",
-            .name("staff"),
-            .in(.location(.startRoom)),
-            .isTakable,
-            .isStaff
-        )
-
-        let game = MinimalGame(items: staff)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .wave, directObject: .item("staff"), rawInput: "wave staff")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("wave wand")
 
-        // Then
+        // Then - Check that the item was touched
+        let finalWand = try await engine.item("wand")
+        #expect(finalWand.hasFlag(.isTouched))
+
         let output = await mockIO.flush()
-        expectNoDifference(output, "You wave the staff dramatically, but nothing magical happens.")
+        expectNoDifference(output, """
+            > wave wand
+            You wave the magic wand dramatically, but nothing magical happens.
+            """)
     }
 }

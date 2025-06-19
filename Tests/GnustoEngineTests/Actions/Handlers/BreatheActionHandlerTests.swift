@@ -10,37 +10,31 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no direct object allowed")
     func testBreatheValidatesNoDirectObjectAllowed() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .breathe,
-            directObject: .item("something"),
-            rawInput: "breathe something"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't breathe that.")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("breathe something")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe something
+            You can't breathe that.
+            """)
     }
 
     @Test("Breathe validates no indirect object allowed")
     func testBreatheValidatesNoIndirectObjectAllowed() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .breathe,
-            indirectObject: .item("something"),
-            rawInput: "breathe with something"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("You can't breathe that.")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("breathe with something")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > breathe with something
+            You can't breathe that.
+            """)
     }
 
     @Test("Breathe succeeds with basic command")
@@ -55,8 +49,7 @@ struct BreatheActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You take a breath, noting that it’s roughly the same as the
-            last one.
+            You take a breath, noting that it's roughly the same as the last one.
             """)
     }
 
@@ -66,24 +59,19 @@ struct BreatheActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test()
 
         // When
-        try await engine.execute("breathe")
-        try await engine.execute("breathe")
-        try await engine.execute("breathe")
+        try await engine.execute("breathe", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > breathe
-            You take a breath, noting that it’s roughly the same as the
-            last one.
+            You take a breath, noting that it's roughly the same as the last one.
 
             > breathe
-            You take a breath, noting that it’s roughly the same as the
-            last one.
+            You take a breath, noting that it's roughly the same as the last one.
 
             > breathe
-            You take a tentative breath, unsure whether the atmosphere is
-            still working.
+            You take a tentative breath, unsure whether the atmosphere is still working.
             """)
     }
 

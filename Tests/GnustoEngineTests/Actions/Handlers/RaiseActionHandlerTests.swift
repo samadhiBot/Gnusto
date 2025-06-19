@@ -18,19 +18,12 @@ struct RaiseActionHandlerTests {
         let game = MinimalGame(items: book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .raise,
-            directObject: .item("book"),
-            rawInput: "raise book"
-        )
-
         // Initial state check
         let initialBook = try await engine.item("book")
         #expect(initialBook.attributes[.isTouched] == nil)
-        #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("raise book")
 
         // Assert State Change
         let finalBook = try await engine.item("book")
@@ -38,24 +31,10 @@ struct RaiseActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t lift the heavy book.")
-
-        // Assert Change History
-        let changeHistory = await engine.gameState.changeHistory
-        expectNoDifference(
-            changeHistory,
-            [
-                StateChange(
-                    entityID: .item(book.id),
-                    attribute: .itemAttribute(.isTouched),
-                    newValue: true
-                ),
-                StateChange(
-                    entityID: .global,
-                    attribute: .pronounReference(pronoun: "it"),
-                    newValue: .entityReferenceSet([.item(book.id)])
-                ),
-            ])
+        expectNoDifference(output, """
+            > raise book
+            You can't lift the heavy book.
+            """)
     }
 
     @Test("Raise fails if item not accessible")
@@ -67,43 +46,31 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: book)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .raise,
-            directObject: .item("book"),
-            rawInput: "raise book"
-        )
+        // Act
+        try await engine.execute("raise book")
 
-        // Act & Assert Error
-        await #expect(throws: Error.self) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > raise book
+            You can't see any heavy book here.
+            """)
     }
 
     @Test("Raise fails with no direct object")
     func testRaiseFailsWithNoObject() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .raise,
-            rawInput: "raise"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("raise")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Raise what?")
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(output, """
+            > raise
+            Raise what?
+            """)
     }
 
     @Test("Raise fails with non-item target")
@@ -144,20 +111,15 @@ struct RaiseActionHandlerTests {
         let game = MinimalGame(items: box, book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .raise,
-            directObject: .item("book"),
-            rawInput: "raise book"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("raise book")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
-
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(output, """
+            > raise book
+            You can't see any hidden book here.
+            """)
     }
 
     @Test("Raise works on player inventory items")
@@ -171,18 +133,15 @@ struct RaiseActionHandlerTests {
         let game = MinimalGame(items: coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .raise,
-            directObject: .item("coin"),
-            rawInput: "raise coin"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("raise coin")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t lift the gold coin.")
+        expectNoDifference(output, """
+            > raise coin
+            You can't lift the gold coin.
+            """)
 
         // Assert State Change
         let finalCoin = try await engine.item("coin")

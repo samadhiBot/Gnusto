@@ -5,20 +5,20 @@ import Testing
 
 @Suite("TurnActionHandler Tests")
 struct TurnActionHandlerTests {
-    let handler = TurnActionHandler()
 
     @Test("Turn validates missing direct object")
     func testTurnValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .turn, rawInput: "turn")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Turn what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("turn")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn
+            Turn what?
+            """)
     }
 
     @Test("Turn dial shows clicking message")
@@ -32,16 +32,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: dial)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn dial")
 
         // Then
-        #expect(result.message!.contains("You turn the metal dial. It clicks into a new position."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn dial
+            You turn the metal dial. It clicks into a new position.
+            """)
     }
 
     @Test("Turn knob shows clicking message")
@@ -55,16 +56,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: knob)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("knob"), rawInput: "turn knob")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn knob")
 
         // Then
-        #expect(result.message!.contains("You turn the brass knob. It clicks into a new position."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn knob
+            You turn the brass knob. It clicks into a new position.
+            """)
     }
 
     @Test("Turn wheel shows grinding message")
@@ -78,16 +80,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: wheel)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("wheel"), rawInput: "turn wheel")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn wheel")
 
         // Then
-        #expect(result.message!.contains("You turn the large wheel. It rotates with some effort."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn wheel
+            You turn the large wheel. It rotates with some effort.
+            """)
     }
 
     @Test("Turn handle shows appropriate message")
@@ -101,17 +104,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: handle)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("handle"), rawInput: "turn handle")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn handle")
 
         // Then
-        #expect(
-            result.message!.contains("You turn the door handle. It moves with a grinding sound."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn handle
+            You turn the door handle. It moves with a grinding sound.
+            """)
     }
 
     @Test("Turn key shows guidance message")
@@ -126,18 +129,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: key)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("key"), rawInput: "turn key")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn key")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You can't just turn the brass key by itself. You need to use it with something."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn key
+            You can't just turn the brass key by itself. You need to use it with something.
+            """)
     }
 
     @Test("Turn character shows prevention message")
@@ -151,16 +153,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: cat)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("cat"), rawInput: "turn cat")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn cat")
 
         // Then
-        #expect(result.message!.contains("You can't turn the fluffy cat around like an object."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn cat
+            You can't turn the fluffy cat around like an object.
+            """)
     }
 
     @Test("Turn regular object shows default message")
@@ -174,18 +177,17 @@ struct TurnActionHandlerTests {
         )
 
         let game = MinimalGame(items: book)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .turn, directObject: .item("book"), rawInput: "turn book")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("turn book")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You turn the old book around in your hands, but nothing happens."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > turn book
+            You turn the old book around in your hands, but nothing happens.
+            """)
     }
 
     @Test("Turn integration test")
@@ -201,13 +203,14 @@ struct TurnActionHandlerTests {
         let game = MinimalGame(items: dial)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .turn, directObject: .item("dial"), rawInput: "turn dial")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("turn dial")
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You turn the dial."))
+        expectNoDifference(output, """
+            > turn dial
+            You turn the dial. It clicks into a new position.
+            """)
     }
 }

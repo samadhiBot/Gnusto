@@ -18,20 +18,17 @@ struct TouchActionHandlerTests {
         let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .touch,
-            directObject: .item("rock"),
-            rawInput: "touch rock"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("touch rock")
 
         // Assert
         let finalItemState = try await engine.item("rock")
         #expect(finalItemState.hasFlag(.isTouched) == true, "Item should gain .touched property")
         let output = await mockIO.flush()
-        expectNoDifference(output, "You feel nothing special.")
+        expectNoDifference(output, """
+            > touch rock
+            You feel nothing special.
+            """)
     }
 
     @Test("Touch item successfully held")
@@ -46,42 +43,31 @@ struct TouchActionHandlerTests {
         let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .touch,
-            directObject: .item("key"),
-            rawInput: "touch key"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("touch key")
 
         // Assert
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You feel nothing special.")
+        expectNoDifference(output, """
+            > touch key
+            You feel nothing special.
+            """)
     }
 
     @Test("Touch fails with no direct object")
     func testTouchFailsWithNoObject() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .touch,
-            rawInput: "touch"
-        )
-
         // Act & Assert
-        await #expect(throws: ActionResponse.custom("Touch what?")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        try await engine.execute("touch")
+
         let output = await mockIO.flush()
-        #expect(output.isEmpty)
+        expectNoDifference(output, """
+            > touch
+            Touch what?
+            """)
     }
 
     @Test("Touch fails item not accessible")
@@ -92,23 +78,16 @@ struct TouchActionHandlerTests {
             .in(.nowhere)
         )
         let game = MinimalGame(items: figurine)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .touch,
-            directObject: .item("figurine"),
-            rawInput: "touch figurine"
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act & Assert
-        await #expect(throws: ActionResponse.itemNotAccessible("figurine")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        try await engine.execute("touch figurine")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > touch figurine
+            You can't see any jade figurine here.
+            """)
     }
 
     @Test("Touch item successfully in open container")
@@ -129,20 +108,17 @@ struct TouchActionHandlerTests {
         let game = MinimalGame(items: box, gem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .touch,
-            directObject: .item("gem"),
-            rawInput: "touch gem"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("touch gem")
 
         // Assert
         let finalItemState = try await engine.item("gem")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You feel nothing special.")
+        expectNoDifference(output, """
+            > touch gem
+            You feel nothing special.
+            """)
     }
 
     @Test("Touch item successfully on surface")
@@ -162,20 +138,17 @@ struct TouchActionHandlerTests {
         let game = MinimalGame(items: table, book)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .touch,
-            directObject: .item("book"),
-            rawInput: "touch book"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("touch book")
 
         // Assert
         let finalItemState = try await engine.item("book")
         #expect(finalItemState.hasFlag(.isTouched) == true)
         let output = await mockIO.flush()
-        expectNoDifference(output, "You feel nothing special.")
+        expectNoDifference(output, """
+            > touch book
+            You feel nothing special.
+            """)
     }
 
     @Test("Touch fails item in closed container")
@@ -193,24 +166,17 @@ struct TouchActionHandlerTests {
             .in(.item("chest"))
         )
         let game = MinimalGame(items: chest, coin)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(chest.attributes[.isOpen] == nil)  // Verify closed
 
-        let command = Command(
-            verb: .touch,
-            directObject: .item("coin"),
-            rawInput: "touch coin"
-        )
-
         // Act & Assert
-        await #expect(throws: ActionResponse.itemNotAccessible("coin")) {
-            try await handler.validate(
-                context: ActionContext(
-                    command: command,
-                    engine: engine
-                )
-            )
-        }
+        try await engine.execute("touch coin")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > touch coin
+            You can't see any gold coin here.
+            """)
     }
 }

@@ -5,35 +5,35 @@ import Testing
 
 @Suite("KickActionHandler Tests")
 struct KickActionHandlerTests {
-    let handler = KickActionHandler()
 
     @Test("Kick validates missing direct object")
     func testKickValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .kick, rawInput: "kick")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Kick what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("kick")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick
+            Kick what?
+            """)
     }
 
     @Test("Kick validates item not found")
     func testKickValidatesItemNotFound() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .kick, directObject: .item("nonexistent"), rawInput: "kick nonexistent")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("nonexistent")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("kick nonexistent")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick nonexistent
+            You can't see any nonexistent here.
+            """)
     }
 
     @Test("Kick validates item not reachable")
@@ -46,16 +46,16 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantRock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .kick, directObject: .item("distant_rock"), rawInput: "kick distant rock")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_rock")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("kick distant rock")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick distant rock
+            You can't see any distant rock here.
+            """)
     }
 
     @Test("Kick character shows appropriate message")
@@ -69,16 +69,17 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: goblin)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .kick, directObject: .item("goblin"), rawInput: "kick goblin")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("kick goblin")
 
         // Then
-        #expect(result.message!.contains("I don't think the goblin would appreciate that."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick goblin
+            I don't think the goblin would appreciate that.
+            """)
     }
 
     @Test("Kick takable object shows appropriate message")
@@ -92,16 +93,17 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: ball)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .kick, directObject: .item("ball"), rawInput: "kick ball")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("kick ball")
 
         // Then
-        #expect(result.message!.contains("Ouch! You hurt your foot kicking the ball."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick ball
+            Ouch! You hurt your foot kicking the ball.
+            """)
     }
 
     @Test("Kick fixed object shows hurt foot message")
@@ -114,16 +116,17 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: wall)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .kick, directObject: .item("wall"), rawInput: "kick wall")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("kick wall")
 
         // Then
-        #expect(result.message!.contains("Ouch! You hurt your foot kicking the wall."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kick wall
+            Ouch! You hurt your foot kicking the wall.
+            """)
     }
 
     @Test("Kick updates state correctly")
@@ -136,45 +139,19 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .kick, directObject: .item("rock"), rawInput: "kick rock")
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.changes.count >= 1)
-
-        // Should have touched the item
-        let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("rock") && change.attribute == .itemAttribute(.isTouched)
-                && change.newValue == true
-        })
-        #expect(hasTouchedChange)
-    }
-
-    @Test("Kick integration test")
-    func testKickIntegrationTest() async throws {
-        // Given
-        let box = Item(
-            id: "box",
-            .name("box"),
-            .in(.location(.startRoom)),
-            .isTakable
-        )
-
-        let game = MinimalGame(items: box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .kick, directObject: .item("box"), rawInput: "kick box")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("kick rock")
 
-        // Then
+        // Then - Check state was updated
+        let finalRock = try await engine.item("rock")
+        #expect(finalRock.hasFlag(.isTouched))
+
         let output = await mockIO.flush()
-        expectNoDifference(output, "Ouch! You hurt your foot kicking the box.")
+        expectNoDifference(output, """
+            > kick rock
+            Ouch! You hurt your foot kicking the rock.
+            """)
     }
 }

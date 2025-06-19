@@ -16,6 +16,27 @@ struct ChompActionHandlerTests {
 
     // MARK: - Tests
 
+    @Test("CHOMP command")
+    func testChomp() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Act
+        try await engine.execute("chomp", times: 3)
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > chomp
+            You chomp at the air, but there's nothing to bite.
+
+            > chomp
+            You gnaw hopefully, but nothing's within range.
+
+            > chomp
+            You snap your jaws like a hungry predator.
+            """)
+    }
+
     @Test("CHOMP without object")
     func testChompWithoutObject() async throws {
         let (engine, mockIO) = await createTestEngine()
@@ -42,7 +63,7 @@ struct ChompActionHandlerTests {
         let output = await mockIO.flush()
         expectNoDifference(output, """
             > chomp the pebble
-            You bite the pebble. Your teeth don’t make much of an
+            You bite the pebble. Your teeth don't make much of an
             impression.
             """)
     }

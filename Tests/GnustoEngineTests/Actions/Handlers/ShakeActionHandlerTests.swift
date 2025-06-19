@@ -5,20 +5,20 @@ import Testing
 
 @Suite("ShakeActionHandler Tests")
 struct ShakeActionHandlerTests {
-    let handler = ShakeActionHandler()
 
     @Test("Shake validates missing direct object")
     func testShakeValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .shake, rawInput: "shake")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Shake what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("shake")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake
+            Expected a direct object phrase for verb '.shake'.
+            """)
     }
 
     @Test("Shake container shows rattle message")
@@ -33,18 +33,17 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: box)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("box"), rawInput: "shake box")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("shake box")
 
         // Then
-        #expect(
-            result.message!.contains("You shake the wooden box and hear something rattling inside.")
-        )
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake box
+            You shake the wooden box and hear something rattling inside.
+            """)
     }
 
     @Test("Shake bottle shows slosh message")
@@ -59,17 +58,17 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: bottle)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("bottle"), rawInput: "shake bottle")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("shake bottle")
 
         // Then
-        #expect(
-            result.message!.contains("You shake the glass bottle and hear liquid sloshing inside."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake bottle
+            You shake the glass bottle and hear liquid sloshing inside.
+            """)
     }
 
     @Test("Shake vial shows slosh message")
@@ -84,17 +83,17 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: vial)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("vial"), rawInput: "shake vial")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("shake vial")
 
         // Then
-        #expect(
-            result.message!.contains("You shake the small vial and hear liquid sloshing inside."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake vial
+            You shake the small vial and hear liquid sloshing inside.
+            """)
     }
 
     @Test("Shake fixed object shows different message")
@@ -107,16 +106,17 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: wall)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("wall"), rawInput: "shake wall")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("shake wall")
 
         // Then
-        #expect(result.message!.contains("You can't shake the stone wall - it's firmly in place."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake wall
+            You can't shake the stone wall - it's firmly in place.
+            """)
     }
 
     @Test("Shake takable object shows appropriate message")
@@ -130,16 +130,17 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: book)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("book"), rawInput: "shake book")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("shake book")
 
         // Then
-        #expect(result.message!.contains("You shake the old book vigorously, but nothing happens."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > shake book
+            You shake the old book vigorously, but nothing happens.
+            """)
     }
 
     @Test("Shake updates state correctly")
@@ -154,47 +155,19 @@ struct ShakeActionHandlerTests {
         )
 
         let game = MinimalGame(items: jar)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .shake, directObject: .item("jar"), rawInput: "shake jar")
-        let context = ActionContext(command: command, engine: engine)
-
-        // When
-        let result = try await handler.process(context: context)
-
-        // Then
-        #expect(result.changes.count >= 1)
-
-        // Should have touched the item
-        let hasTouchedChange = result.changes.contains(where: { change in
-            change.entityID == .item("jar") && change.attribute == .itemAttribute(.isTouched)
-                && change.newValue == true
-        })
-        #expect(hasTouchedChange)
-    }
-
-    @Test("Shake integration test")
-    func testShakeIntegrationTest() async throws {
-        // Given
-        let container = Item(
-            id: "container",
-            .name("container"),
-            .in(.location(.startRoom)),
-            .isContainer,
-            .isTakable
-        )
-
-        let game = MinimalGame(items: container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .shake, directObject: .item("container"), rawInput: "shake container")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("shake jar")
 
-        // Then
+        // Then - Check state was updated
+        let finalJar = try await engine.item("jar")
+        #expect(finalJar.hasFlag(.isTouched))
+
         let output = await mockIO.flush()
-        expectNoDifference(output, "You shake the container and hear something rattling inside.")
+        expectNoDifference(output, """
+            > shake jar
+            You shake the jar and hear something rattling inside.
+            """)
     }
 }

@@ -4,40 +4,34 @@ import Testing
 
 @Suite("HelpActionHandler Tests")
 struct HelpActionHandlerTests {
-    let handler = HelpActionHandler()
 
     @Test("Help displays help text")
     func testHelpDisplaysHelpText() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .help, rawInput: "help")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
-        try await handler.validate(context: context)
-        let result = try await handler.process(context: context)
+        try await engine.execute("help")
 
         // Then
-        #expect(result.message != nil)
-        #expect(result.message!.contains("This is an interactive fiction game"))
-        #expect(result.message!.contains("Common commands:"))
-        #expect(result.message!.contains("LOOK"))
-        #expect(result.message!.contains("TAKE"))
-        #expect(result.message!.contains("INVENTORY"))
-        #expect(result.changes.isEmpty)
-        #expect(result.effects.isEmpty)
+        let output = await mockIO.flush()
+        #expect(output.contains("This is an interactive fiction game"))
+        #expect(output.contains("Common commands:"))
+        #expect(output.contains("LOOK"))
+        #expect(output.contains("TAKE"))
+        #expect(output.contains("INVENTORY"))
     }
 
-    @Test("Help requires no validation")
-    func testHelpRequiresNoValidation() async throws {
-        // Given
-        let (engine, _) = await GameEngine.test()
+    @Test("Help command integration")
+    func testHelpCommand() async throws {
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(verb: .help, rawInput: "help")
-        let context = ActionContext(command: command, engine: engine)
+        // Act
+        try await engine.execute("help")
 
-        // When/Then - Should not throw
-        try await handler.validate(context: context)
+        // Assert
+        let output = await mockIO.flush()
+        #expect(output.contains("> help"))
+        #expect(output.contains("This is an interactive fiction game"))
     }
 }

@@ -5,20 +5,20 @@ import Testing
 
 @Suite("PourOnActionHandler Tests")
 struct PourOnActionHandlerTests {
-    let handler = PourOnActionHandler()
 
     @Test("Pour validates missing direct object")
     func testPourValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .pourOn, rawInput: "pour")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Pour what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("pour")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > pour
+            Pour what?
+            """)
     }
 
     @Test("Pour validates missing indirect object")
@@ -32,15 +32,16 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: water)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .pourOn, directObject: .item("water"), rawInput: "pour water")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Pour the water on what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("pour water")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > pour water
+            Pour the water on what?
+            """)
     }
 
     @Test("Pour water on fire extinguishes flames")
@@ -61,28 +62,21 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: water, torch)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .pourOn,
-            directObject: .item("water"),
-            indirectObject: .item("torch"),
-            rawInput: "pour water on torch"
-        )
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("pour water on torch")
 
         // Then
-        #expect(
-            result.message!.contains(
-                "You pour the water on the torch. The flames are extinguished with a hissing sound."
-            ))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > pour water on torch
+            You pour the water on the torch. The flames are extinguished with a hissing sound.
+            """)
     }
 
-    @Test("Pour integration test")
-    func testPourIntegrationTest() async throws {
+    @Test("Pour water on plant")
+    func testPourWaterOnPlant() async throws {
         // Given
         let water = Item(
             id: "water",
@@ -100,18 +94,14 @@ struct PourOnActionHandlerTests {
         let game = MinimalGame(items: water, flower)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .pourOn,
-            directObject: .item("water"),
-            indirectObject: .item("flower"),
-            rawInput: "pour water on flower"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("pour water on flower")
 
         // Then
         let output = await mockIO.flush()
-        #expect(output.contains("You pour the water on the flower. It looks refreshed."))
+        expectNoDifference(output, """
+            > pour water on flower
+            You pour the water on the flower. It looks refreshed.
+            """)
     }
 }

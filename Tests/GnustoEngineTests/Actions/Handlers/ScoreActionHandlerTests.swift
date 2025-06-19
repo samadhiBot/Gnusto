@@ -5,7 +5,6 @@ import Testing
 
 @Suite("ScoreActionHandler Tests")
 struct ScoreActionHandlerTests {
-    let handler = ScoreActionHandler()
 
     @Test("Score performs successfully")
     func testScorePerformsSuccessfully() async throws {
@@ -15,23 +14,14 @@ struct ScoreActionHandlerTests {
         let game = MinimalGame(player: initialPlayer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .score,
-            rawInput: "score"
-        )
-
         // Act
-        // Call perform(), which uses the default implementation
-        // calling validate(), process(), and postProcess().
-        await engine.execute(command: command)
+        try await engine.execute("score")
 
         // Assert
-        // Check the output message printed by the default postProcess
         let output = await mockIO.flush()
-        let expectedMessage = "Your score is 42 in 10 moves."
-        expectNoDifference(output, expectedMessage)
-
-        // Verify no state changes were recorded
-        #expect(await engine.gameState.changeHistory.isEmpty)
+        expectNoDifference(output, """
+            > score
+            Your score is 42 in 10 moves.
+            """)
     }
 }

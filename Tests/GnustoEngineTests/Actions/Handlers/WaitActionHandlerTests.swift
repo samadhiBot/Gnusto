@@ -5,27 +5,21 @@ import Testing
 
 @Suite("WaitActionHandler Tests")
 struct WaitActionHandlerTests {
-    let handler = WaitActionHandler()
 
     @Test("Wait performs successfully")
     func testWaitPerformsSuccessfully() async throws {
-        // Arrange
+        // Given
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .wait,
-            rawInput: "wait"
-        )
-
         // Act
-        // We call perform(), which uses the default implementation
-        // calling validate(), process(), and postProcess().
-        await engine.execute(command: command)
+        try await engine.execute("wait")
 
         // Assert
-        // The default postProcess should print the message from the ActionResult.
         let output = await mockIO.flush()
-        expectNoDifference(output, "Time passes.")
+        expectNoDifference(output, """
+            > wait
+            Time passes.
+            """)
     }
 
     // Removed testWaitProcessReturnsCorrectResult due to Sendable complexities

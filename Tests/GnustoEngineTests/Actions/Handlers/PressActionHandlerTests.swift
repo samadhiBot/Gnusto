@@ -5,7 +5,6 @@ import Testing
 
 @Suite("PressActionHandler")
 struct PressActionHandlerTests {
-    let handler = PressActionHandler()
 
     @Test("Press pressable button successfully")
     func testPressPressableButtonSuccessfully() async throws {
@@ -20,21 +19,18 @@ struct PressActionHandlerTests {
         let game = MinimalGame(items: button)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .press,
-            directObject: .item("button"),
-            rawInput: "press button"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("press button")
 
         // Assert
         let finalButtonState = try await engine.item("button")
         #expect(finalButtonState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You press the button.")
+        expectNoDifference(output, """
+            > press button
+            You press the button.
+            """)
     }
 
     @Test("Press non-pressable item fails")
@@ -50,18 +46,15 @@ struct PressActionHandlerTests {
         let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .press,
-            directObject: .item("rock"),
-            rawInput: "press rock"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("press rock")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t press the rock.")
+        expectNoDifference(output, """
+            > press rock
+            You can't press the rock.
+            """)
     }
 
     @Test("Press with no object fails")
@@ -69,18 +62,15 @@ struct PressActionHandlerTests {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .press,
-            directObject: nil,
-            rawInput: "press"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("press")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "Press what?")
+        expectNoDifference(output, """
+            > press
+            Press what?
+            """)
     }
 
     @Test("Press unreachable button fails")
@@ -113,17 +103,14 @@ struct PressActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .press,
-            directObject: .item("distantButton"),
-            rawInput: "press distant button"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("press distant button")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > press distant button
+            You can't see any distant button here.
+            """)
     }
 }

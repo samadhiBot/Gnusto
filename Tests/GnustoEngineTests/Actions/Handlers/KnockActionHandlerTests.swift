@@ -5,20 +5,20 @@ import Testing
 
 @Suite("KnockActionHandler Tests")
 struct KnockActionHandlerTests {
-    let handler = KnockActionHandler()
 
     @Test("Knock validates missing direct object")
     func testKnockValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .knock, rawInput: "knock")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Knock on what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("knock")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > knock
+            Knock on what?
+            """)
     }
 
     @Test("Knock door shows appropriate message")
@@ -34,14 +34,15 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: door)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("knock door")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You knock on the wooden door, but there’s no answer.")
+        expectNoDifference(output, """
+            > knock door
+            You knock on the wooden door, but there's no answer.
+            """)
     }
 
     @Test("Knock wall shows sound message")
@@ -56,14 +57,15 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: wall)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .knock, directObject: .item("wall"), rawInput: "knock wall")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("knock wall")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You knock on the stone wall, but nothing happens.")
+        expectNoDifference(output, """
+            > knock wall
+            You knock on the stone wall, but nothing happens.
+            """)
     }
 
     @Test("Knock container shows hollow sound")
@@ -79,14 +81,15 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: chest)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .knock, directObject: .item("chest"), rawInput: "knock chest")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("knock chest")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Knocking on the wooden chest produces a hollow sound.")
+        expectNoDifference(output, """
+            > knock chest
+            Knocking on the wooden chest produces a hollow sound.
+            """)
     }
 
     @Test("Knock integration test")
@@ -103,13 +106,14 @@ struct KnockActionHandlerTests {
         let game = MinimalGame(items: door)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("knock door")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "No need to knock, the door is already open.")
+        expectNoDifference(output, """
+            > knock door
+            No need to knock, the door is already open.
+            """)
     }
 }
