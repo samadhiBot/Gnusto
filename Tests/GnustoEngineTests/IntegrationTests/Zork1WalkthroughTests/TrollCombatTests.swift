@@ -140,11 +140,20 @@ func testCombatOutcomePatterns() async throws {
         ioHandler: MockIOHandler()
     )
 
+    let command = Command(
+        verb: .attack,
+        directObject: .item(.troll),
+        indirectObject: .item(.sword),
+        preposition: "with",
+        rawInput: "attack the troll with the sword"
+    )
+
     // When - evaluate weapon attack outcomes
     var outcomes: [CombatOutcome] = []
     for _ in 0..<50 {
-        let outcome = try await Troll.evaluateWeaponAttack(engine: engine, weapon: .sword)
-        outcomes.append(outcome)
+        if let outcome = try await Troll.evaluateWeaponAttack(engine: engine, command: command) {
+            outcomes.append(outcome)
+        }
     }
 
     // Then - should have distribution of different outcome types

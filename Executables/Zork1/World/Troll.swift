@@ -42,53 +42,45 @@ enum Troll {
 
     static let trollHandler = ItemEventHandler { engine, event -> ActionResult? in
         guard case .beforeTurn(let command) = event else { return nil }
-
-        return switch command.verb {
+        
+        switch command.verb {
         case .tell:
-            ActionResult("The troll isn't much of a conversationalist.")
-
+            return ActionResult("The troll isn't much of a conversationalist.")
+            
         case .attack:
-            // Handle attacking the troll - it dies (simplified version)
-            ActionResult(
-                """
-                The troll takes a fatal blow and slumps to the floor dead.
-                
-                Almost as soon as the troll breathes his last breath, a cloud
-                of sinister black fog envelops him, and when the fog lifts,
-                the carcass has disappeared.
-                
-                Your sword is no longer glowing.
-                """,
-                try await engine.remove(.troll)
+            guard let outcome = try await evaluateWeaponAttack(
+                engine: engine,
+                command: command
+            ) else { return nil }
+
+            return try await handleTrollCombatResponse(
+                engine: engine,
+                outcome: outcome
             )
 
         case .give, .drop:
-            try await handleTrollGiveOrDrop(
+            return try await handleTrollGiveOrDrop(
                 engine: engine,
                 command: command
             )
-
+            
         case .take, .move:
-            ActionResult("""
+            return ActionResult("""
                 The troll spits in your face, grunting "Better luck next time"
                 in a rather barbarous accent.
                 """)
 
         case .push:
-            ActionResult("The troll laughs at your puny gesture.")
+            return ActionResult("The troll laughs at your puny gesture.")
 
         case .listen:
-            ActionResult("""
+            return ActionResult("""
                 Every so often the troll says something, probably
                 uncomplimentary, in his guttural tongue.
                 """)
 
-        case .thinkAbout:
-            // Simplified - just return nil for now since trollFlag isn't auto-generated
-            nil
-
         default:
-            nil
+            return nil
         }
     }
 
@@ -192,11 +184,11 @@ extension Troll {
     /// Determines the outcome of a weapon attack on the troll
     static func evaluateWeaponAttack(
         engine: GameEngine,
-        weapon: ItemID
-    ) async throws -> CombatOutcome {
+        command: Command
+    ) async throws -> CombatOutcome? {
+        guard case .item(let weapon) = command.indirectObject else { return nil }
         let isEffectiveWeapon = await engine.isEffectiveWeapon(weapon)
         let outcome = await engine.randomPercentage()
-
         return switch (isEffectiveWeapon, outcome) {
         case (true, 0...30):
             .victory("The troll succumbs to your superior weaponry!")

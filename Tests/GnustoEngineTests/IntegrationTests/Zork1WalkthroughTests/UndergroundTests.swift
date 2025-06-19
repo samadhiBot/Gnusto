@@ -49,7 +49,8 @@ struct UndergroundTests {
             "head west",
             "talk to the troll",
             "take the troll",
-            "stab the troll",
+            "attack the troll",
+            "stab the troll with the sword",
             "head west"
         )
         let engine = await GameEngine(
@@ -101,14 +102,17 @@ struct UndergroundTests {
 
             Your sword is glowing very brightly.
 
-            > stab the troll
-            The troll takes a fatal blow and slumps to the floor dead.
+            > attack the troll
+            Trying to attack a troll with your bare hands is suicidal.
+
+            Your sword is glowing very brightly.
+
+            > stab the troll with the sword
+            The troll succumbs to your superior weaponry!
 
             Almost as soon as the troll breathes his last breath, a cloud
             of sinister black fog envelops him, and when the fog lifts, the
             carcass has disappeared.
-
-            Your sword is no longer glowing.
 
             > head west
             — Maze —
