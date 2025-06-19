@@ -92,9 +92,9 @@ enum Playback {
         descending into darkness.
 
         > down
-        You have moved into a dark place.
-
         The trap door crashes shut, and you hear someone barring it.
+        
+        You have moved into a dark place.
 
         It is pitch black. You are likely to be eaten by a grue.
 

@@ -541,7 +541,6 @@ extension InsideHouse {
         case .afterTurn(let command):
             switch command.verb {
             case .take:
-                print("🎾 Enable sword glow daemon")
                 // Enable sword glow daemon when taken (like SWORD-FCN in ZIL)
                 return ActionResult(
                     .runDaemon("swordDaemon")
@@ -549,7 +548,6 @@ extension InsideHouse {
 
             case .drop:
                 // Disable sword glow daemon when dropped
-                print("🎾 Disable sword glow daemon")
                 return ActionResult(
                     .stopDaemon("swordDaemon")
                 )
@@ -571,16 +569,18 @@ extension InsideHouse {
         var newGlowLevel = 0
 
         // Check for monsters in current location (highest priority)
-        let currentLocationItems = try await engine.itemsInLocation(currentLocation.id)
+        let currentLocationItems = try await engine.allItemsInLocation(currentLocation.id)
         let monstersInCurrentLocation = currentLocationItems.filter { $0.isMonster }
 
         if !monstersInCurrentLocation.isEmpty {
             newGlowLevel = 2 // Very bright glow
         } else {
             // Check adjacent locations for monsters
-            for exit in currentLocation.exits.values {
-                guard let destination = exit.destinationID else { continue }
-                let adjacentLocationItems = try await engine.itemsInLocation(destination)
+            for (_, exit) in currentLocation.exits {
+                guard let destination = exit.destinationID else {
+                    continue
+                }
+                let adjacentLocationItems = try await engine.allItemsInLocation(destination)
                 let monstersInAdjacentLocation = adjacentLocationItems.filter { $0.isMonster }
 
                 if !monstersInAdjacentLocation.isEmpty {

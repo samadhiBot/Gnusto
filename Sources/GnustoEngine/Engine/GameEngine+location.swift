@@ -82,7 +82,23 @@ extension GameEngine {
         await scopeResolver.isLocationLit(locationID: locationID)
     }
 
-    /// Retrieves all items that are directly visible within a specific location.
+    /// Retrieves all items that are physically in a location, regardless of lighting or visibility.
+    ///
+    /// This method is used when you need to know about all items that exist in a location,
+    /// regardless of whether the player can see them (due to darkness, invisibility, etc.).
+    /// This is useful for systems like the sword glow daemon that need to detect monsters
+    /// even in dark locations.
+    ///
+    /// - Parameter locationID: The unique identifier of the location to check.
+    /// - Returns: An array of `Item` objects that are physically present in the specified location.
+    /// - Throws: An error if there are issues retrieving item data from the game state.
+    public func allItemsInLocation(_ locationID: LocationID) async throws -> [Item] {
+        gameState.items.values
+            .filter { $0.parent == .location(locationID) }
+            .sorted { $0.id.rawValue < $1.id.rawValue }
+    }
+
+    /// Retrieves all items that are directly visible to the player in a location.
     ///
     /// This method uses the `ScopeResolver` to determine which items are visible in the given
     /// location, considering lighting conditions and item properties. Items that are invisible
