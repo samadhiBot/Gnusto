@@ -6,7 +6,7 @@ import Testing
 struct BurnActionHandlerTests {
     @Test("BURN without object uses MessageProvider for error")
     func testBurnWithoutObject() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
         let handler = BurnActionHandler()
         let command = Command(
             verb: .burn,
@@ -41,11 +41,16 @@ struct BurnActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("burn pebble", times: 3)
+        try await engine.execute("burn leaflet", times: 2)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
+            > burn leaflet
+            The leaflet catches fire and burns to ashes.
+
+            > burn leaflet
+            You can’t see the leaflet.
             """)
     }
 

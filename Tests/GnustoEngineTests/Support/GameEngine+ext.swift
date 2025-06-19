@@ -59,6 +59,7 @@ extension GameEngine {
         )
 
         for _ in 0..<times {
+            _ = await ioHandler.readLine(prompt: input)
             switch parseResult {
             case .success(let command):
                 if command.verb == .quit || shouldQuit { return }

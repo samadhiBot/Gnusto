@@ -112,6 +112,8 @@ final class MockIOHandler: IOHandler {
                 } else {
                     actualTranscript += "\n"
                 }
+            } else if call.style == .input {
+                actualTranscript += "> \(call.text)\n"
             } else if call.style != .input {
                 actualTranscript += call.text
                 if call.newline {

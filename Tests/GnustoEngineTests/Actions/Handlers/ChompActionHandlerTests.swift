@@ -19,46 +19,31 @@ struct ChompActionHandlerTests {
     @Test("CHOMP without object")
     func testChompWithoutObject() async throws {
         let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .chomp, rawInput: "chomp")
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("chomp")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chomp your teeth together menacingly.")
+        expectNoDifference(output, """
+            > chomp
+            You chomp at the air for everyone to see.
+            """)
     }
 
     @Test("CHOMP with object")
     func testChompWithObject() async throws {
         let (engine, mockIO) = await createTestEngine()
 
-        let command = Command(
-            verb: .chomp,
-            directObject: .item(.startItem),
-            rawInput: "chomp the pebble"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("chomp the pebble")
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You give the pebble a tentative nibble. It tastes terrible.
+            > chomp the pebble
+            You bite the pebble. Your teeth don’t make much of an
+            impression.
             """)
-    }
-
-    @Test("CHOMP validation passes without object")
-    func testChompValidationWithoutObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .chomp, rawInput: "chomp")
-
-        // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You chomp your teeth together menacingly.")
     }
 }
