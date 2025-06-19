@@ -25,4 +25,7 @@ struct Zork1: GameBlueprint {
     var messageProvider: MessageProvider {
         ZorkMessageProvider()
     }
+
+    // Note: All game content registration (items, locations, handlers, etc.)
+    // is automatically handled by GnustoAutoWiringPlugin
 }
