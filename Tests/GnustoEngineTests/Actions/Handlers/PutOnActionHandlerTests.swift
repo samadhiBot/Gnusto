@@ -255,7 +255,7 @@ struct PutOnActionHandlerTests {
             .name("Other"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: room1, room2], items: [book, table)
+        let game = MinimalGame(locations: room1, room2, items: book, table)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 

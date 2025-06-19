@@ -98,8 +98,10 @@ extension GameEngine {
     ///   - lastItem: The last item processed (for "it" pronoun)
     ///   - allItems: All items processed (for "them" pronoun)
     /// - Returns: An array of `StateChange`s to update both pronouns, or empty array if no changes needed.
-    public func updatePronounsForMultipleObjects(lastItem: Item, allItems: [Item]) -> [StateChange]
-    {
+    public func updatePronounsForMultipleObjects(
+        lastItem: Item,
+        allItems: [Item]
+    ) -> [StateChange] {
         var changes: [StateChange] = []
 
         // Update "it" to refer to the last item

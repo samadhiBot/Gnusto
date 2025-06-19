@@ -534,7 +534,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )  // Assuming lit for test
 
-        let game = MinimalGame(locations: room], items: [itemToInsert, container)
+        let game = MinimalGame(locations: room, items: itemToInsert, container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -590,7 +590,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: room], items: [container)
+        let game = MinimalGame(locations: room, items: container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -641,7 +641,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: room1, room2], items: [itemToInsert, container)
+        let game = MinimalGame(locations: room1, room2, items: itemToInsert, container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -684,7 +684,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: room], items: [itemToInsert, target)
+        let game = MinimalGame(locations: room, items: itemToInsert, target)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -729,7 +729,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: room], items: [itemToInsert, container)
+        let game = MinimalGame(locations: room, items: itemToInsert, container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -834,7 +834,7 @@ struct InsertActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: room], items: [itemToInsert, container)
+        let game = MinimalGame(locations: room, items: itemToInsert, container)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(await engine.gameState.changeHistory.isEmpty)

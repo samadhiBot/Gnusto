@@ -442,7 +442,10 @@ struct ReadActionHandlerTests {
             .isReadable
         )
         let game = MinimalGame(
-            player: Player(in: darkRoom.id), locations: darkRoom], items: [scroll)
+            player: Player(in: darkRoom.id),
+            locations: darkRoom,
+            items: scroll
+        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
@@ -477,7 +480,10 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(
-            player: Player(in: darkRoom.id), locations: darkRoom], items: [glowingTablet)
+            player: Player(in: darkRoom.id),
+            locations: darkRoom,
+            items: glowingTablet
+        )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 

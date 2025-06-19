@@ -837,13 +837,10 @@ struct TakeActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Parse and execute "take coin from bag"
-        let vocabulary = Vocabulary.build(items: container, coin)
-        let gameState = await engine.gameState
-
         let parseResult = await engine.parser.parse(
             input: "take coin from bag",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
 
         guard case .success(let command) = parseResult else {
@@ -893,13 +890,10 @@ struct TakeActionHandlerTests {
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Try to parse and execute "take coin from box" (coin is in bag, not box)
-        let vocabulary = Vocabulary.build(items: bag, box, coin)
-        let gameState = await engine.gameState
-
         let parseResult = await engine.parser.parse(
             input: "take coin from box",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
 
         guard case .success(let command) = parseResult else {

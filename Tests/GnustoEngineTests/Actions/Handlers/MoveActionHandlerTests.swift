@@ -39,8 +39,7 @@ struct MoveActionHandlerTests {
     @Test("Move object not present")
     func testMoveObjectNotPresent() async throws {
         // Given
-        let game = MinimalGame(items: [])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .move,
@@ -85,8 +84,7 @@ struct MoveActionHandlerTests {
     @Test("Move without direct object")
     func testMoveWithoutDirectObject() async throws {
         // Given
-        let game = MinimalGame(items: [])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .move,

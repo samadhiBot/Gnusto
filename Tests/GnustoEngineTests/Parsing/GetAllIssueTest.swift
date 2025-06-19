@@ -30,13 +30,10 @@ struct GetAllIssueTests {
         )
 
         // Act: Parse "get all" directly
-        let vocabulary = Vocabulary.build(items: basket, jug)
-        let gameState = await engine.gameState
-
         let result = await engine.parser.parse(
             input: "get all",
-            vocabulary: vocabulary,
-            gameState: gameState
+            vocabulary: engine.gameState.vocabulary,
+            gameState: engine.gameState
         )
 
         // Assert: Should successfully parse without "all all" error

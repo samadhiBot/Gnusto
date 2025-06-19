@@ -356,8 +356,7 @@ struct MultipleObjectTests {
 
     @Test("ALL with no applicable items handles gracefully")
     func testAllWithNoApplicableItems() async throws {
-        let game = MinimalGame(items: [])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act: Execute "take all" when there's nothing to take
         let command = Command(

@@ -8,7 +8,7 @@ struct InventoryActionHandlerTests {
     @Test("Inventory shows items held")
     func testInventoryShowsItemsHeld() async throws {
         let game = MinimalGame(
-            items: [
+            items:
                 Item(
                     id: "brassKey",
                     .name("brass key"),
@@ -18,8 +18,7 @@ struct InventoryActionHandlerTests {
                     id: "antiqueLamp",
                     .name("antique lamp"),
                     .in(.player)
-                ),
-            ]
+                )
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -44,7 +43,7 @@ struct InventoryActionHandlerTests {
     @Test("Inventory shows empty message")
     func testInventoryShowsEmptyMessage() async throws {
         let game = MinimalGame(
-            items: [
+            items:
                 Item(
                     id: "key",
                     .name("brass key"),
@@ -54,8 +53,7 @@ struct InventoryActionHandlerTests {
                     id: "lamp",
                     .name("brass lamp"),
                     .in(.location(.startRoom))
-                ),
-            ]
+                )
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

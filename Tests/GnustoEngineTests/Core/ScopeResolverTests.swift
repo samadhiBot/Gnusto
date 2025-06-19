@@ -120,8 +120,7 @@ struct ScopeResolverTests {
 
     @Test("Location is dark if location ID does not exist")
     func testIsLitNonExistentLocation() async throws {
-        let game = MinimalGame(locations: [])
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test()
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: "badRoom") == false)
