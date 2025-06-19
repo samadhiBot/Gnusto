@@ -25,11 +25,7 @@ struct LockActionHandlerTests {
         )
 
         let game = MinimalGame(items: [initialBox, initialKey])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Check initial state
         let initialBoxSnapshot = try await engine.item("box")
@@ -82,11 +78,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -118,11 +110,7 @@ struct LockActionHandlerTests {
             .isLockable
         )
         let game = MinimalGame(items: [box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -160,11 +148,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -213,11 +197,7 @@ struct LockActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(locations: [room1, room2], items: [box, key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -251,11 +231,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [pebble, key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -294,11 +270,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, wrongKey])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -338,11 +310,7 @@ struct LockActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialBoxSnapshot = try await engine.item("box")
         #expect(initialBoxSnapshot.hasFlag(.isLocked) == true) // Qualified
         #expect(await engine.gameState.changeHistory.isEmpty)

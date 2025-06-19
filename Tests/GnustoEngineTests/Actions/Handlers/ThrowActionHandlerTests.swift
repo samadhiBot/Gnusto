@@ -10,8 +10,7 @@ struct ThrowActionHandlerTests {
     @Test("Throw validates missing direct object")
     func testThrowValidatesMissingDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, rawInput: "throw")
         let context = ActionContext(command: command, engine: engine)
@@ -32,8 +31,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("rock"), rawInput: "throw rock")
         let context = ActionContext(command: command, engine: engine)
@@ -54,8 +52,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -87,8 +84,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, distantTarget])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -114,8 +110,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)
@@ -140,8 +135,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, target])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -165,8 +159,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)
@@ -194,8 +187,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, wall])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -229,8 +221,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball, troll])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -265,8 +256,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [knife, goblin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -286,8 +276,7 @@ struct ThrowActionHandlerTests {
     @Test("Throw self reference")
     func testThrowSelfReference() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .throwItem,
@@ -313,8 +302,7 @@ struct ThrowActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .throwItem, directObject: .item("ball"), rawInput: "throw ball")
         let context = ActionContext(command: command, engine: engine)

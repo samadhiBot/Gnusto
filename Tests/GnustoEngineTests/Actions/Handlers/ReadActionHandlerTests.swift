@@ -18,11 +18,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .read,
@@ -62,11 +58,7 @@ struct ReadActionHandlerTests {
             locations: [litRoom],
             items: [sign]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .read,
@@ -87,11 +79,7 @@ struct ReadActionHandlerTests {
     @Test("Read fails with no direct object")
     func testReadFailsWithNoObject() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -124,11 +112,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [scroll])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -158,11 +142,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -204,11 +184,7 @@ struct ReadActionHandlerTests {
             locations: [darkRoom],
             items: [map]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -243,11 +219,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [blankPaper])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .read,
@@ -288,11 +260,7 @@ struct ReadActionHandlerTests {
             locations: [darkRoom],
             items: [glowingTablet]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .read,
@@ -322,11 +290,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [scroll])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("scroll").hasFlag(.isTouched) == false)
 
         let command = Command(
@@ -359,11 +323,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [note])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("note").hasFlag(.isTouched) == false)
 
         let command = Command(
@@ -395,11 +355,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tablet])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
         let command = Command(
@@ -431,11 +387,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
         let game = MinimalGame(items: [book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("book"),
@@ -459,11 +411,7 @@ struct ReadActionHandlerTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("rock"),
@@ -494,11 +442,7 @@ struct ReadActionHandlerTests {
             .isReadable
         )
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [scroll])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("scroll"),
@@ -532,11 +476,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(player: Player(in: darkRoom.id), locations: [darkRoom], items: [glowingTablet])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("tablet").hasFlag(.isTouched) == false)
 
         let command = Command(
@@ -560,11 +500,7 @@ struct ReadActionHandlerTests {
     @Test("Read item requires direct object")
     func testReadRequiresDirectObject() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
         let command = Command(
             verb: .read,
             rawInput: "read"
@@ -598,11 +534,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [box, note])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("note"),
@@ -640,11 +572,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [chest, letter])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("letter"),
@@ -682,11 +610,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [lockedBox, secret])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .read,
             directObject: .item("secret"),

@@ -6,23 +6,9 @@ import Testing
 /// Tests for the DanceActionHandler.
 @Suite("DanceActionHandler Tests")
 struct DanceActionHandlerTests {
-
-    // MARK: - Test Setup
-
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-        return (engine, mockIO)
-    }
-
-    // MARK: - Tests
-
     @Test("DANCE command")
     func testDance() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
         let command = Command(verb: .dance, rawInput: "dance")
 
         // Act

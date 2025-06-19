@@ -16,11 +16,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .raise,
@@ -69,7 +65,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [book])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .raise,
@@ -144,7 +140,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, book])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .raise,
@@ -171,11 +167,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [coin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .raise,

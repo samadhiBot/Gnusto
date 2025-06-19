@@ -36,12 +36,8 @@ struct BlowActionHandlerTests {
             items: [balloon, candle]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -84,12 +80,8 @@ struct BlowActionHandlerTests {
             items: [balloon, candle, paper]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         return (engine, mockIO)
     }
@@ -129,12 +121,8 @@ struct BlowActionHandlerTests {
             items: [balloon, distantBalloon]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         return (engine, mockIO)
     }

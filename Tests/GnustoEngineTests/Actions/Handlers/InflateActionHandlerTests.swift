@@ -36,12 +36,7 @@ struct InflateActionHandlerTests {
             items: [balloon, inflatedBalloon, coin]
         )
 
-        let mockParser = MockParser()
-
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }

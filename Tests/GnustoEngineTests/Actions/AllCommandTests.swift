@@ -33,8 +33,7 @@ struct AllCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key, coin, lamp])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
@@ -74,8 +73,7 @@ struct AllCommandTests {
         )
         
         let game = MinimalGame(items: [scenery])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
@@ -121,8 +119,7 @@ struct AllCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key, wall, coin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
@@ -175,8 +172,7 @@ struct AllCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 6) // Can only carry key + coin
         let game = MinimalGame(player: player, items: [key, coin, boulder])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
@@ -228,8 +224,7 @@ struct AllCommandTests {
         )
         
         let game = MinimalGame(items: [key, coin, lamp])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .drop,
@@ -266,8 +261,7 @@ struct AllCommandTests {
     @Test("DROP ALL with no held items")
     func testDropAllNoItems() async throws {
         // Arrange: Player holding nothing
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .drop,
@@ -300,8 +294,7 @@ struct AllCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,
@@ -334,8 +327,7 @@ struct AllCommandTests {
         )
         
         let game = MinimalGame(items: [key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .drop,
@@ -376,8 +368,7 @@ struct AllCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [heldKey, roomKey])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .take,

@@ -77,11 +77,7 @@ struct RemoveActionHandlerTests {
             .isWearable
         )
         let game = MinimalGame(items: [cloak])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .remove,
@@ -104,11 +100,7 @@ struct RemoveActionHandlerTests {
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
         let game = MinimalGame()  // Cloak doesn’t exist here
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .remove,
@@ -130,11 +122,7 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails with no direct object")
     func testRemoveNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, _) = await GameEngine.test()
 
         // Command with nil directObject
         let command = Command(
@@ -165,11 +153,7 @@ struct RemoveActionHandlerTests {
             .isWorn
         )
         let game = MinimalGame(items: [amulet])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .remove,
@@ -197,8 +181,7 @@ struct RemoveActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
 
         let game = MinimalGame(items: [cloak, boots])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -230,8 +213,7 @@ struct RemoveActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable, .isWorn)
 
         let game = MinimalGame(items: [cloak, boots])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove cloak and boots"
         let command = Command(
@@ -259,8 +241,7 @@ struct RemoveActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
 
         let game = MinimalGame(items: [cloak, boots])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -287,8 +268,7 @@ struct RemoveActionHandlerTests {
         let boots = Item(id: "boots", .name("boots"), .in(.player), .isWearable)  // Not worn
 
         let game = MinimalGame(items: [boots])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
         let command = Command(
@@ -312,8 +292,7 @@ struct RemoveActionHandlerTests {
             .omitDescription)
 
         let game = MinimalGame(items: [cloak, amulet])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Execute "remove all"
         let command = Command(

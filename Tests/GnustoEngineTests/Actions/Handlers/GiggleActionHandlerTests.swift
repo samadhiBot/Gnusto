@@ -9,11 +9,7 @@ struct GiggleActionHandlerTests {
     // MARK: - Test Setup
 
     func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
         return (engine, mockIO)
     }
 

@@ -10,11 +10,7 @@ struct WaitActionHandlerTests {
     @Test("Wait performs successfully")
     func testWaitPerformsSuccessfully() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .wait,

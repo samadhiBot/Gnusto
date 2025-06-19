@@ -10,7 +10,6 @@ struct ThinkAboutActionHandlerTests {
     // MARK: - Setup Helper
     
     private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
         
         return await GameEngine.test(
             blueprint: game,
@@ -44,8 +43,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT SELF produces specific message")
     func testThinkAboutSelf() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -72,11 +70,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -147,11 +141,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -200,11 +190,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -261,11 +247,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify item is not initially touched
         let initialItem = try await engine.item("book")
@@ -296,11 +278,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -319,8 +297,7 @@ struct ThinkAboutActionHandlerTests {
 
     @Test("THINK ABOUT message is consistent across multiple calls")
     func testThinkAboutConsistency() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .thinkAbout,
@@ -367,11 +344,7 @@ struct ThinkAboutActionHandlerTests {
             locations: [darkLocation],
             items: [testItem]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -401,11 +374,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -438,11 +407,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [unreachableItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -475,11 +440,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,

@@ -13,11 +13,7 @@ struct ScoreActionHandlerTests {
         // Set up initial player state
         let initialPlayer = Player(in: .startRoom, moves: 10, score: 42)
         let game = MinimalGame(player: initialPlayer)
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .score,

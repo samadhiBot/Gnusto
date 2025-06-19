@@ -10,11 +10,7 @@ struct SystemCommandActionHandlerTests {
     @Test("RESTART command quits the game with confirmation message")
     func testRestartQuitsGame() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let handler = RestartActionHandler()
         let command = Command(verb: .restart, rawInput: "restart")
@@ -34,11 +30,7 @@ struct SystemCommandActionHandlerTests {
     @Test("RESTART requires no validation")
     func testRestartValidation() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let handler = RestartActionHandler()
         let command = Command(verb: .restart, rawInput: "restart")
@@ -53,11 +45,7 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT command starts transcript recording")
     func testScriptStartsRecording() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let handler = ScriptActionHandler()
         let command = Command(verb: .script, rawInput: "script")
@@ -86,11 +74,7 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT validation fails when already scripting")
     func testScriptValidationFailsWhenAlreadyScripting() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Set scripting flag to true
         let scriptingChange = await engine.setGlobal(.isScripting, to: true)
@@ -118,11 +102,7 @@ struct SystemCommandActionHandlerTests {
     @Test("UNSCRIPT command stops transcript recording")
     func testUnscriptStopsRecording() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Set scripting flag to true first
         let scriptingChange = await engine.setGlobal(.isScripting, to: true)
@@ -152,11 +132,7 @@ struct SystemCommandActionHandlerTests {
     @Test("UNSCRIPT validation fails when not scripting")
     func testUnscriptValidationFailsWhenNotScripting() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // Ensure scripting is not active
         #expect(await engine.hasGlobal(.isScripting) == false)
@@ -183,11 +159,7 @@ struct SystemCommandActionHandlerTests {
     @Test("SCRIPT and UNSCRIPT work together correctly")
     func testScriptUnscriptIntegration() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let scriptHandler = ScriptActionHandler()
         let unscriptHandler = UnscriptActionHandler()

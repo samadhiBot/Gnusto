@@ -18,11 +18,7 @@ struct PressActionHandlerTests {
         )
 
         let game = MinimalGame(items: [button])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .press,
@@ -52,11 +48,7 @@ struct PressActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .press,
@@ -75,11 +67,7 @@ struct PressActionHandlerTests {
     @Test("Press with no object fails")
     func testPressWithNoObjectFails() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .press,
@@ -123,11 +111,7 @@ struct PressActionHandlerTests {
             locations: [startRoom, otherRoom],
             items: [distantButton]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .press,

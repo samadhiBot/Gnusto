@@ -18,11 +18,7 @@ struct PullActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pull,
@@ -52,11 +48,7 @@ struct PullActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pull,
@@ -75,11 +67,7 @@ struct PullActionHandlerTests {
     @Test("Pull with no object fails")
     func testPullWithNoObjectFails() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .pull,
@@ -124,11 +112,7 @@ struct PullActionHandlerTests {
             locations: [startRoom, otherRoom],
             items: [distantRope]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pull,

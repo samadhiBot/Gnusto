@@ -66,7 +66,6 @@ struct GameEngineSideEffectsTests {
                 anotherDaemonID: anotherDaemon
             ]
         )
-        let mockParser = MockParser()
         return await GameEngine.test(
             blueprint: gameBlueprint,
             parser: mockParser

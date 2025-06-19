@@ -6,23 +6,9 @@ import Testing
 /// Tests for the CurseActionHandler.
 @Suite("CurseActionHandler Tests")
 struct CurseActionHandlerTests {
-
-    // MARK: - Test Setup
-
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-        return (engine, mockIO)
-    }
-
-    // MARK: - Tests
-
     @Test("CURSE without object")
     func testCurseWithoutObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
         let command = Command(verb: .curse, rawInput: "curse")
 
         // Act
@@ -44,7 +30,7 @@ struct CurseActionHandlerTests {
 
     @Test("CURSE with object")
     func testCurseWithObject() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
         let command = Command(
             verb: .curse,
             directObject: .item(.startItem),
@@ -61,7 +47,7 @@ struct CurseActionHandlerTests {
 
     @Test("CURSE validation passes without object")
     func testCurseValidationWithoutObject() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
         let handler = CurseActionHandler()
         let command = Command(verb: .curse, rawInput: "curse")
         let context = ActionContext(command: command, engine: engine)

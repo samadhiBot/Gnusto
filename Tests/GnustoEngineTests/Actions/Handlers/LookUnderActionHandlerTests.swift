@@ -16,11 +16,7 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .lookUnder,
@@ -69,11 +65,7 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .lookUnder,
@@ -149,7 +141,7 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, carpet])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .lookUnder,
@@ -176,11 +168,7 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [mat])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .lookUnder,
@@ -216,11 +204,7 @@ struct LookUnderActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [table, book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .lookUnder,

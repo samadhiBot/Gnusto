@@ -37,12 +37,8 @@ struct EmptyActionHandlerTests {
             items: [box, coin]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -70,12 +66,8 @@ struct EmptyActionHandlerTests {
             items: [box]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -109,12 +101,8 @@ struct EmptyActionHandlerTests {
             items: [box, coin]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -140,12 +128,8 @@ struct EmptyActionHandlerTests {
             items: [rock]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }

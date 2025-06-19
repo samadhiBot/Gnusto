@@ -10,10 +10,12 @@ struct DrinkActionHandlerTests {
     @Test("Drink validates missing direct object")
     func testDrinkValidatesMissingDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(verb: .drink, rawInput: "drink")
+        let command = Command(
+            verb: .drink,
+            rawInput: "drink"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -25,10 +27,13 @@ struct DrinkActionHandlerTests {
     @Test("Drink validates item not found")
     func testDrinkValidatesItemNotFound() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(verb: .drink, directObject: .item("nonexistent"), rawInput: "drink nonexistent")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("nonexistent"),
+            rawInput: "drink nonexistent"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -47,11 +52,15 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [distantWater])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [distantWater])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("distant_water"), rawInput: "drink distant water")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("distant_water"),
+            rawInput: "drink distant water"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When / Then
@@ -70,11 +79,15 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [water])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [water])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("water"), rawInput: "drink water")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("water"),
+            rawInput: "drink water"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -93,11 +106,15 @@ struct DrinkActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [rock])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("rock"), rawInput: "drink rock")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("rock"),
+            rawInput: "drink rock"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -126,11 +143,15 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [bottle, wine])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [bottle, wine])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("bottle"), rawInput: "drink bottle")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("bottle"),
+            rawInput: "drink bottle"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -158,11 +179,15 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [closedBottle, juice])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [closedBottle, juice])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("closed_bottle"), rawInput: "drink closed bottle")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("closed_bottle"),
+            rawInput: "drink closed bottle"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When
@@ -182,11 +207,15 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let game = MinimalGame(items: [water])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: MinimalGame(items: [water])
+        )
 
-        let command = Command(verb: .drink, directObject: .item("water"), rawInput: "drink water")
+        let command = Command(
+            verb: .drink,
+            directObject: .item("water"),
+            rawInput: "drink water"
+        )
         let context = ActionContext(command: command, engine: engine)
 
         // When

@@ -7,27 +7,11 @@ import Testing
 struct XyzzyActionHandlerTests {
     let handler = XyzzyActionHandler()
 
-    // Expected message constants to avoid repetition and ensure consistency
-    private let expectedMarkdown = "A hollow voice says \"Fool.\""
-    private let expectedMessage = "A hollow voice says “Fool.”"
-
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
-        
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
     // MARK: - Basic Functionality Tests
 
     @Test("XYZZY command produces the expected message")
     func testXyzzyBasicFunctionality() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -39,12 +23,12 @@ struct XyzzyActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
+        expectNoDifference(output, "A hollow voice says “Fool.”")
     }
 
     @Test("XYZZY produces correct ActionResult")
     func testXyzzyActionResult() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -59,14 +43,14 @@ struct XyzzyActionHandlerTests {
         let result = try await handler.process(context: context)
         
         // Verify result
-        #expect(result.message == expectedMarkdown)
+        #expect(result.message == "A hollow voice says \"Fool.\"")
         #expect(result.changes.isEmpty) // XYZZY should not modify state
         #expect(result.effects.isEmpty) // XYZZY should not have side effects
     }
 
     @Test("XYZZY validation always succeeds")
     func testXyzzyValidationSucceeds() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -83,8 +67,7 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY with extra text still works")
     func testXyzzyWithExtraText() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -96,12 +79,12 @@ struct XyzzyActionHandlerTests {
 
         // Assert Output - should still work the same way
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
+        expectNoDifference(output, "A hollow voice says “Fool.”")
     }
 
     @Test("XYZZY full workflow integration test")
     func testXyzzyFullWorkflow() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -119,14 +102,14 @@ struct XyzzyActionHandlerTests {
         let result = try await handler.process(context: context)
         
         // Verify complete workflow
-        #expect(result.message == expectedMarkdown)
+        #expect(result.message == "A hollow voice says \"Fool.\"")
         #expect(result.changes.isEmpty)
         #expect(result.effects.isEmpty)
     }
 
     @Test("XYZZY does not affect game state")
     func testXyzzyDoesNotAffectGameState() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
         
         // Capture initial state
         let initialState = await engine.gameState
@@ -152,8 +135,7 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY works regardless of game state")
     func testXyzzyWorksInDifferentStates() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         // Modify game state
         let scoreChange = StateChange(
@@ -173,13 +155,12 @@ struct XyzzyActionHandlerTests {
 
         // Assert Output is unchanged
         let output = await mockIO.flush()
-        expectNoDifference(output, expectedMessage)
+        expectNoDifference(output, "A hollow voice says “Fool.”")
     }
 
     @Test("XYZZY message is consistent across multiple calls")
     func testXyzzyConsistency() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -197,8 +178,8 @@ struct XyzzyActionHandlerTests {
         let thirdOutput = await mockIO.flush()
 
         // All outputs should be identical
-        expectNoDifference(firstOutput, expectedMessage)
-        expectNoDifference(secondOutput, expectedMessage)
-        expectNoDifference(thirdOutput, expectedMessage)
+        expectNoDifference(firstOutput, "A hollow voice says “Fool.”")
+        expectNoDifference(secondOutput, "A hollow voice says “Fool.”")
+        expectNoDifference(thirdOutput, "A hollow voice says “Fool.”")
     }
 } 

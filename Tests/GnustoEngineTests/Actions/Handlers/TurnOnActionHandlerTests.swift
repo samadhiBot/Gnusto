@@ -19,13 +19,9 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let parseResult = parser.parse(
+        let parseResult = await engine.parser.parse(
             input: "turn on lamp",
             vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
@@ -66,11 +62,7 @@ struct TurnOnActionHandlerTests {
             locations: [darkRoom],
             items: [lamp]
         )
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify room is dark initially
         let initiallyLit = await engine.scopeResolver.isLocationLit(locationID: "darkRoom")
@@ -121,11 +113,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -160,11 +148,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -199,11 +183,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -243,11 +223,7 @@ struct TurnOnActionHandlerTests {
             locations: [darkRoom],
             items: [radio]
         )
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -285,13 +261,9 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let parseResult = parser.parse(
+        let parseResult = await engine.parser.parse(
             input: "light lamp",
             vocabulary: await engine.gameState.vocabulary,
             gameState: await engine.gameState
@@ -339,11 +311,7 @@ struct TurnOnActionHandlerTests {
             locations: [litRoom],
             items: [lamp, sword]
         )
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Verify room is lit initially (so turning on lamp shouldn't trigger description)
         let initiallyLit = await engine.playerLocationIsLit()
@@ -404,11 +372,7 @@ struct TurnOnActionHandlerTests {
             locations: [livingRoom],
             items: [lamp, sword]
         )
-        let parser = StandardParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: parser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Check initial state
         let initiallyLit = await engine.playerLocationIsLit()

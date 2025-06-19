@@ -16,11 +16,7 @@ struct TouchActionHandlerTests {
             .in(.player)
         ) // Not necessarily takable
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -48,11 +44,7 @@ struct TouchActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -72,11 +64,7 @@ struct TouchActionHandlerTests {
 
     @Test("Touch fails with no direct object")
     func testTouchFailsWithNoObject() async throws {
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .touch,
@@ -104,11 +92,7 @@ struct TouchActionHandlerTests {
             .in(.nowhere)
         )
         let game = MinimalGame(items: [figurine])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -143,11 +127,7 @@ struct TouchActionHandlerTests {
             .in(.item("box"))
         )
         let game = MinimalGame(items: [box, gem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -180,11 +160,7 @@ struct TouchActionHandlerTests {
             .in(.item("table"))
         )
         let game = MinimalGame(items: [table, book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -217,11 +193,7 @@ struct TouchActionHandlerTests {
             .in(.item("chest"))
         )
         let game = MinimalGame(items: [chest, coin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         #expect(chest.attributes[.isOpen] == nil) // Verify closed
 

@@ -10,8 +10,7 @@ struct KnockActionHandlerTests {
     @Test("Knock validates missing direct object")
     func testKnockValidatesMissingDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .knock, rawInput: "knock")
         let context = ActionContext(command: command, engine: engine)
@@ -33,8 +32,7 @@ struct KnockActionHandlerTests {
         )
 
         let game = MinimalGame(items: [door])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
 
@@ -56,8 +54,7 @@ struct KnockActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wall])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("wall"), rawInput: "knock wall")
 
@@ -80,8 +77,7 @@ struct KnockActionHandlerTests {
         )
 
         let game = MinimalGame(items: [chest])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("chest"), rawInput: "knock chest")
 
@@ -105,8 +101,7 @@ struct KnockActionHandlerTests {
         )
 
         let game = MinimalGame(items: [door])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .knock, directObject: .item("door"), rawInput: "knock door")
 

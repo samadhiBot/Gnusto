@@ -93,11 +93,7 @@ struct PutOnActionHandlerTests {
         let initialTableAttributes = initialTable.attributes
 
         let game = MinimalGame(items: [initialBook, initialTable])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -147,11 +143,7 @@ struct PutOnActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -181,11 +173,7 @@ struct PutOnActionHandlerTests {
             .in(.player)
         )
         let game = MinimalGame(items: [book])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -221,11 +209,7 @@ struct PutOnActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [book, table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -272,11 +256,7 @@ struct PutOnActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(locations: [room1, room2], items: [book, table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -313,11 +293,7 @@ struct PutOnActionHandlerTests {
             .isContainer // Not a surface
         )
         let game = MinimalGame(items: [book, box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -349,11 +325,7 @@ struct PutOnActionHandlerTests {
             .isSurface,
         )
         let game = MinimalGame(items: [table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -392,11 +364,7 @@ struct PutOnActionHandlerTests {
             .isSurface // Table is also a surface
         )
         let game = MinimalGame(items: [tray, table])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Try to put the tray onto the table (which is on the tray)

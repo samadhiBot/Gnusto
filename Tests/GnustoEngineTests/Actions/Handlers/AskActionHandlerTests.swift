@@ -31,7 +31,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [character])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -53,7 +53,7 @@ struct AskActionHandlerTests {
         // Given
         let rock = Item(id: "rock", .name("rock"))
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -86,7 +86,7 @@ struct AskActionHandlerTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [wizard, crystal])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -116,7 +116,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -143,7 +143,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -170,7 +170,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [wizard])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,

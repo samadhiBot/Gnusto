@@ -7,23 +7,9 @@ import Testing
 struct QuitActionHandlerTests {
     let handler = QuitActionHandler()
 
-    // MARK: - Setup Helper
-    
-    private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
-        
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
-    // MARK: - Basic Functionality Tests
-
     @Test("QUIT command produces the expected message")
     func testQuitBasicFunctionality() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -40,7 +26,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT produces correct ActionResult")
     func testQuitActionResult() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -62,7 +48,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT validation always succeeds")
     func testQuitValidationSucceeds() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -79,7 +65,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT requests engine to quit")
     func testQuitRequestsEngineQuit() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -102,8 +88,7 @@ struct QuitActionHandlerTests {
 
     @Test("Q alias works the same as QUIT")
     func testQAliasWorks() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit, // Q is mapped to .quit verb
@@ -123,7 +108,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT full workflow integration test")
     func testQuitFullWorkflow() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -149,8 +134,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT works regardless of game state")
     func testQuitWorksInDifferentStates() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         // Modify game state
         let scoreChange = StateChange(
@@ -178,8 +162,8 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT does not modify game state")
     func testQuitDoesNotModifyGameState() async throws {
-        let engine = await createTestEngine()
-        
+        let (engine, mockIO) = await GameEngine.test()
+
         // Capture initial state
         let initialState = await engine.gameState
         let initialScore = initialState.player.score
@@ -204,8 +188,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT with extra parameters still works")
     func testQuitWithExtraParameters() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -225,8 +208,7 @@ struct QuitActionHandlerTests {
 
     @Test("Multiple QUIT commands maintain quit state")
     func testMultipleQuitCommands() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,

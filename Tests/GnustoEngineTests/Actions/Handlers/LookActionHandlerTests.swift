@@ -66,11 +66,7 @@ struct LookActionHandlerTests {
             locations: [litRoom],
             items: [item1, item2, item3, item4]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -128,11 +124,7 @@ struct LookActionHandlerTests {
             locations: [litRoom],
             items: [item4, item3, item2, item1] // Include all 4 items, in reverse order
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -177,11 +169,7 @@ struct LookActionHandlerTests {
             locations: [darkRoom],
             items: [item1]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -227,11 +215,7 @@ struct LookActionHandlerTests {
             locations: [darkRoom],
             items: [activeLamp, item1]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         let command = Command(
@@ -271,7 +255,7 @@ struct LookActionHandlerTests {
             player: Player(in: "litRoom"),
             locations: [litRoom]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .look,
@@ -381,11 +365,7 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("rock").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -424,11 +404,7 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("pebble").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -469,11 +445,7 @@ struct LookActionHandlerTests {
         let initialAttributes = item.attributes
 
         let game = MinimalGame(items: [item])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("stone").hasFlag(.isTouched) == true)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -533,11 +505,7 @@ struct LookActionHandlerTests {
         let initialAttributes = box.attributes
 
         let game = MinimalGame(items: [box, coin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -587,11 +555,7 @@ struct LookActionHandlerTests {
         let initialAttributes = box.attributes
 
         let game = MinimalGame(items: [box, coin])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("box").hasFlag(.isTouched) == false)
         #expect(try await engine.item("box").attributes["isOpen"] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -642,11 +606,7 @@ struct LookActionHandlerTests {
         let initialAttributes = jar.attributes
 
         let game = MinimalGame(items: [jar, fly])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("jar").hasFlag(.isTouched) == false)
         #expect(try await engine.item("jar").attributes["isOpen"] == nil)
         #expect(try await engine.item("jar").attributes["isTransparent"] == true)
@@ -703,11 +663,7 @@ struct LookActionHandlerTests {
         let initialAttributes = table.attributes
 
         let game = MinimalGame(items: [table, book, candle])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("table").hasFlag(.isTouched) == false)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
@@ -761,11 +717,7 @@ struct LookActionHandlerTests {
             locations: [room1, room2],
             items: [artifact]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("artifact") == artifact)
         let reachableItems = await engine.scopeResolver.itemsReachableByPlayer()
         #expect(!reachableItems.contains("artifact")) // Not reachable
@@ -814,11 +766,7 @@ struct LookActionHandlerTests {
             locations: [office],
             items: [desk]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -860,11 +808,7 @@ struct LookActionHandlerTests {
             .in(.player)
         )
         let game = MinimalGame(items: [note])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)
         #expect(initialItemState.attributes[.isTouched] != true)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -896,11 +840,7 @@ struct LookActionHandlerTests {
 
     @Test("LOOK AT non-existent item")
     func testLookAtNonExistentItem() async throws {
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .look, // or .examine
@@ -919,11 +859,7 @@ struct LookActionHandlerTests {
     func testLookAtItemNotInScope() async throws {
         let item = Item(id: "artifact", .name("ancient artifact"), .in(.nowhere))
         let game = MinimalGame(items: [item])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .look, // or .examine

@@ -55,7 +55,6 @@ struct ConjunctionCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [sword, lantern, book, coin, gem])
-        let mockParser = MockParser()
         return await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
     }
     
@@ -63,8 +62,7 @@ struct ConjunctionCommandTests {
     
     @Test("DROP SWORD AND LANTERN drops both items")
     func testDropSwordAndLantern() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
         
         // Create the conjunction command manually for now
         let command = Command(
@@ -91,8 +89,7 @@ struct ConjunctionCommandTests {
     
     @Test("DROP SWORD, LANTERN AND BOOK drops all three items")
     func testDropThreeItemsWithCommaAndConjunction() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
         
         // Create the conjunction command manually for now
         let command = Command(
@@ -124,8 +121,7 @@ struct ConjunctionCommandTests {
     
     @Test("TAKE COIN AND GEM takes both items")
     func testTakeCoinAndGem() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
         
         // Create the conjunction command manually for now
         let command = Command(
@@ -165,7 +161,6 @@ struct ConjunctionCommandTests {
             items: [sword, lantern],
             player: player
         )
-        let parser = StandardParser()
         
         // Act: Try to parse "open sword and lantern" (OPEN doesn't support multiple objects)
         let result = parser.parse(
@@ -196,7 +191,6 @@ struct ConjunctionCommandTests {
             items: [sword],
             player: player
         )
-        let parser = StandardParser()
         
         // Act: Try to parse "drop sword and nonexistent" (nonexistent item should cause error)
         let result = parser.parse(
@@ -241,8 +235,7 @@ struct ConjunctionCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [sword, statue])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         
         // Create a command with one held and one not held item
         let command = Command(
@@ -278,7 +271,6 @@ struct ConjunctionCommandTests {
             items: [sword, lantern],
             player: player
         )
-        let parser = StandardParser()
         
         // Act: Parse "drop sword and lantern"
         let result = parser.parse(
@@ -315,7 +307,6 @@ struct ConjunctionCommandTests {
             items: [coin, gem, book],
             player: player
         )
-        let parser = StandardParser()
         
         // Act: Parse "take coin, gem and book"
         let result = parser.parse(

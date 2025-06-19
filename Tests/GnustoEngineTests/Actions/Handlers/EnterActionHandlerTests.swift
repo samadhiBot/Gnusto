@@ -10,11 +10,7 @@ struct EnterActionHandlerTests {
     @Test("Enter validates missing direct object with no enterable items")
     func testEnterValidatesMissingDirectObjectWithNoEnterableItems() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .enter,
@@ -31,11 +27,7 @@ struct EnterActionHandlerTests {
     @Test("Enter validates non-item direct object")
     func testEnterValidatesNonItemDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .enter,
@@ -61,11 +53,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,
@@ -90,11 +78,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,
@@ -120,11 +104,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,

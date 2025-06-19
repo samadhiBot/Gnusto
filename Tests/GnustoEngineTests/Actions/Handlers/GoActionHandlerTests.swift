@@ -24,11 +24,7 @@ struct GoActionHandlerTests {
         let game = MinimalGame(
             locations: [startRoom, endRoom]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -67,11 +63,7 @@ struct GoActionHandlerTests {
             player: Player(in: .startRoom),
             locations: [startRoom, endRoom]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -107,11 +99,7 @@ struct GoActionHandlerTests {
             player: Player(in: .startRoom),
             locations: [startRoom, endRoom]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -173,7 +161,7 @@ struct GoActionHandlerTests {
             // No exit north
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -221,7 +209,7 @@ struct GoActionHandlerTests {
             locations: [foyer, vault],
             items: [vaultDoor]
         )
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -346,7 +334,7 @@ struct GoActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .go,
@@ -380,11 +368,7 @@ struct GoActionHandlerTests {
             player: Player(in: "testLocation"),
             locations: [testLocation]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .go,
@@ -417,11 +401,7 @@ struct GoActionHandlerTests {
             player: Player(in: "testLocation"),
             locations: [testLocation]
         )
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .go,

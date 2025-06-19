@@ -10,7 +10,7 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb with no object asks what to climb")
     func testClimbNoObject() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .climb, rawInput: "climb")
         let context = ActionContext(
@@ -63,7 +63,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -118,7 +118,7 @@ struct ClimbActionHandlerTests {
             items: [ladder]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -166,7 +166,7 @@ struct ClimbActionHandlerTests {
             items: [rope]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -208,7 +208,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -248,7 +248,7 @@ struct ClimbActionHandlerTests {
             items: [pluralStairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -278,7 +278,7 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tree])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -311,7 +311,7 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [table])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -340,7 +340,7 @@ struct ClimbActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantTree])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -363,7 +363,7 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb nonexistent item fails validation")
     func testClimbNonexistentItem() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -386,7 +386,7 @@ struct ClimbActionHandlerTests {
 
     @Test("Climb non-item entity")
     func testClimbNonItemEntity() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -442,7 +442,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -483,7 +483,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climb,
@@ -537,7 +537,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
 
@@ -605,7 +605,7 @@ struct ClimbActionHandlerTests {
             items: [stairs]
         )
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .climb, directObject: .item("stairs"), rawInput: "climb stairs")
 

@@ -10,11 +10,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no direct object allowed")
     func testBreatheValidatesNoDirectObjectAllowed() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,
@@ -32,11 +28,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no indirect object allowed")
     func testBreatheValidatesNoIndirectObjectAllowed() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,
@@ -54,9 +46,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe succeeds with basic command")
     func testBreatheSucceedsWithBasicCommand() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
         try await engine.execute("breathe")
@@ -72,9 +62,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe integration test")
     func testBreatheIntegrationTest() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
         try await engine.execute("breathe")
@@ -98,11 +86,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validation passes with no objects")
     func testBreatheValidationPassesWithNoObjects() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,

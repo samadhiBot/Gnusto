@@ -10,7 +10,6 @@ struct SmellActionHandlerTests {
     // MARK: - Setup Helper
 
     private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
 
         return await GameEngine.test(
             blueprint: game,
@@ -22,8 +21,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL without object produces expected message")
     func testSmellWithoutObject() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .smell,
@@ -49,11 +47,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -103,11 +97,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -173,11 +163,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -238,11 +224,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(locations: [location1, location2])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -279,11 +261,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -299,8 +277,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL message is consistent across multiple calls")
     func testSmellConsistency() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .smell,
@@ -334,11 +311,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -368,11 +341,7 @@ struct SmellActionHandlerTests {
             player: player,
             locations: [darkLocation]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,

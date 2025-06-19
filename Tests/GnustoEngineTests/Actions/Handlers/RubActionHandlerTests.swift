@@ -10,8 +10,7 @@ struct RubActionHandlerTests {
     @Test("Rub validates missing direct object")
     func testRubValidatesMissingDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .rub, rawInput: "rub")
         let context = ActionContext(command: command, engine: engine)
@@ -32,8 +31,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantSphere])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("distant_sphere"), rawInput: "rub distant sphere")
         let context = ActionContext(command: command, engine: engine)
@@ -55,8 +53,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [cat])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("cat"), rawInput: "rub cat")
         let context = ActionContext(command: command, engine: engine)
@@ -79,8 +76,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [mirror])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("mirror"), rawInput: "rub mirror")
         let context = ActionContext(command: command, engine: engine)
@@ -104,8 +100,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [lamp])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("lamp"), rawInput: "rub lamp")
         let context = ActionContext(command: command, engine: engine)
@@ -129,8 +124,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [lantern])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("lantern"), rawInput: "rub lantern")
         let context = ActionContext(command: command, engine: engine)
@@ -153,8 +147,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [stone])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("stone"), rawInput: "rub stone")
         let context = ActionContext(command: command, engine: engine)
@@ -176,8 +169,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wall])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("wall"), rawInput: "rub wall")
         let context = ActionContext(command: command, engine: engine)
@@ -200,8 +192,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [orb])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("orb"), rawInput: "rub orb")
         let context = ActionContext(command: command, engine: engine)
@@ -232,8 +223,7 @@ struct RubActionHandlerTests {
         )
 
         let game = MinimalGame(items: [crystal])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .rub, directObject: .item("crystal"), rawInput: "rub crystal")
 

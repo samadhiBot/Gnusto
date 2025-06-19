@@ -7,23 +7,11 @@ import Testing
 struct ListenActionHandlerTests {
     let handler = ListenActionHandler()
 
-    // MARK: - Setup Helper
-
-    private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
-
-        return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
-    }
-
     // MARK: - Basic Functionality Tests
 
     @Test("LISTEN command produces the expected message")
     func testListenBasicFunctionality() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -40,7 +28,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN produces correct ActionResult")
     func testListenActionResult() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -62,7 +50,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN validation always succeeds")
     func testListenValidationSucceeds() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -79,7 +67,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN full workflow integration test")
     func testListenFullWorkflow() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -104,7 +92,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN does not affect game state")
     func testListenDoesNotAffectGameState() async throws {
-        let engine = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
 
         // Capture initial state
         let initialState = await engine.gameState
@@ -130,8 +118,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN works regardless of game state")
     func testListenWorksInDifferentStates() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         // Modify game state
         let scoreChange = StateChange(
@@ -168,11 +155,7 @@ struct ListenActionHandlerTests {
         )
 
         let game = MinimalGame(locations: [location1, location2])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .listen,
@@ -200,8 +183,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN with extra text still works")
     func testListenWithExtraText() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -218,8 +200,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN message is consistent across multiple calls")
     func testListenConsistency() async throws {
-        let engine = await createTestEngine()
-        let mockIO = engine.ioHandler as! MockIOHandler
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -256,11 +237,7 @@ struct ListenActionHandlerTests {
             player: player,
             locations: [darkLocation]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .listen,
@@ -285,11 +262,7 @@ struct ListenActionHandlerTests {
         )
 
         let game = MinimalGame(items: [noisyItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .listen,

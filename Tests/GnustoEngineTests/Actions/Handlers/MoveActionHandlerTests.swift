@@ -17,11 +17,7 @@ struct MoveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [leaves])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -44,11 +40,7 @@ struct MoveActionHandlerTests {
     func testMoveObjectNotPresent() async throws {
         // Given
         let game = MinimalGame(items: [])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -74,11 +66,7 @@ struct MoveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [leaves])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -98,11 +86,7 @@ struct MoveActionHandlerTests {
     func testMoveWithoutDirectObject() async throws {
         // Given
         let game = MinimalGame(items: [])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -127,11 +111,7 @@ struct MoveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [key])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -167,11 +147,7 @@ struct MoveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [key, box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,
@@ -206,11 +182,7 @@ struct MoveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [key, box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .move,

@@ -18,11 +18,7 @@ struct CloseActionHandlerTests {
             .isOpen // Start open
         )
         let game = MinimalGame(items: [box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .close,
@@ -80,11 +76,7 @@ struct CloseActionHandlerTests {
             // Starts closed by default (no .isOpen)
         )
         let game = MinimalGame(items: [box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .close,
@@ -112,11 +104,7 @@ struct CloseActionHandlerTests {
             // isContainer/isOpenable are false by default
         )
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .close,
@@ -146,11 +134,7 @@ struct CloseActionHandlerTests {
             .isOpen // Start open
         )
         let game = MinimalGame(items: [box])
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: MockParser(),
-            ioHandler: await MockIOHandler()
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(
             verb: .close,

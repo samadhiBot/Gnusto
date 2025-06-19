@@ -10,8 +10,7 @@ struct PourOnActionHandlerTests {
     @Test("Pour validates missing direct object")
     func testPourValidatesMissingDirectObject() async throws {
         // Given
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test()
 
         let command = Command(verb: .pourOn, rawInput: "pour")
         let context = ActionContext(command: command, engine: engine)
@@ -33,8 +32,7 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: [water])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .pourOn, directObject: .item("water"), rawInput: "pour water")
         let context = ActionContext(command: command, engine: engine)
@@ -63,8 +61,7 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: [water, torch])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pourOn,
@@ -98,8 +95,7 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: [water, flower])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pourOn,

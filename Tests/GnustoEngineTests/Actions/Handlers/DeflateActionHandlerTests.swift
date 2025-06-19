@@ -29,12 +29,8 @@ struct DeflateActionHandlerTests {
             items: [balloon]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -62,12 +58,8 @@ struct DeflateActionHandlerTests {
             items: [balloon]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }
@@ -109,12 +101,8 @@ struct DeflateActionHandlerTests {
             items: [balloon, distantBalloon]
         )
 
-        let mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         return (engine, mockIO)
     }

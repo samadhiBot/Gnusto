@@ -8,7 +8,7 @@ struct DebugActionHandlerTests {
 
     // MARK: - Setup Helper
     
-    private func createTestEngine() async -> GameEngine {
+    private func createTestEngine() async -> (GameEngine, MockIOHandler) {
         let testItem = Item(
             id: "test_item",
             .name("test item"),
@@ -25,17 +25,12 @@ struct DebugActionHandlerTests {
                 .north: .to("other_location")
             ])
         )
-        
-        let game = MinimalGame(
-            locations: [testLocation],
-            items: [testItem]
-        )
-        
-        let mockParser = MockParser()
-        
+
         return await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
+            blueprint: MinimalGame(
+                locations: [testLocation],
+                items: [testItem]
+            )
         )
     }
     
@@ -43,7 +38,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG fails with no direct object")
     func testValidationFailsWithNoDirectObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -63,7 +58,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG validates player successfully")
     func testValidationSucceedsForPlayer() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -82,7 +77,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG validates existing item successfully")
     func testValidationSucceedsForExistingItem() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -101,7 +96,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG validates existing location successfully")
     func testValidationSucceedsForExistingLocation() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -120,7 +115,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG fails for non-existent item")
     func testValidationFailsForNonExistentItem() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -141,7 +136,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG fails for non-existent location")
     func testValidationFailsForNonExistentLocation() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -164,7 +159,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG player produces formatted output")
     func testProcessPlayerDebug() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let mockIO = engine.ioHandler as! MockIOHandler
 
         let command = Command(
@@ -186,7 +181,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG item produces formatted output")
     func testProcessItemDebug() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let mockIO = engine.ioHandler as! MockIOHandler
 
         let command = Command(
@@ -208,7 +203,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG location produces formatted output")
     func testProcessLocationDebug() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let mockIO = engine.ioHandler as! MockIOHandler
 
         let command = Command(
@@ -230,7 +225,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG process fails with no direct object")
     func testProcessFailsWithNoDirectObject() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -252,7 +247,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG process fails for non-existent item in snapshot")
     func testProcessFailsForNonExistentItemInSnapshot() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -273,7 +268,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG process fails for non-existent location in snapshot")
     func testProcessFailsForNonExistentLocationInSnapshot() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -296,7 +291,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG command full workflow for player")
     func testFullWorkflowForPlayer() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -322,7 +317,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG command full workflow for item")
     func testFullWorkflowForItem() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -348,7 +343,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG command full workflow for location")
     func testFullWorkflowForLocation() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -376,7 +371,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG output is properly formatted with code blocks")
     func testOutputFormatting() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         let command = Command(
             verb: .debug,
@@ -401,7 +396,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG output contains meaningful entity data")
     func testOutputContainsMeaningfulData() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         // Test item debug
         let itemCommand = Command(
@@ -452,11 +447,7 @@ struct DebugActionHandlerTests {
         )
         
         let game = MinimalGame(items: [complexItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         
         let command = Command(
             verb: .debug,
@@ -491,11 +482,7 @@ struct DebugActionHandlerTests {
         )
         
         let game = MinimalGame(locations: [complexLocation])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         
         let command = Command(
             verb: .debug,
@@ -516,7 +503,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG works with player that has modified state")
     func testDebugModifiedPlayer() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
         let mockIO = engine.ioHandler as! MockIOHandler
 
         // Modify player state
@@ -555,7 +542,7 @@ struct DebugActionHandlerTests {
     
     @Test("DEBUG validation and process errors are consistent")
     func testValidationAndProcessErrorConsistency() async throws {
-        let engine = await createTestEngine()
+        let (engine, _) = await createTestEngine()
 
         // Test with non-existent item
         let command = Command(

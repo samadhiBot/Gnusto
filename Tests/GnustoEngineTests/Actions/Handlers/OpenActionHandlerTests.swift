@@ -60,11 +60,7 @@ struct OpenActionHandlerTests {
         )
 
         let game = MinimalGame(items: [closedBox])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check
         let initialBoxState = try await engine.item("box")
@@ -113,11 +109,7 @@ struct OpenActionHandlerTests {
         )
 
         let game = MinimalGame(items: [closedBox])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Initial state check
         let initialBoxState = try await engine.item("box")
@@ -154,11 +146,7 @@ struct OpenActionHandlerTests {
     @Test("Open fails with no direct object")
     func testOpenFailsWithNoObject() async throws {
         // Arrange
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test()
         let command = Command(
             verb: .open,
             rawInput: "open"
@@ -185,8 +173,7 @@ struct OpenActionHandlerTests {
             // Don’t need .isOpen here, it's not reachable anyway
         )
         let game = MinimalGame(items: [box])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: mockParser, ioHandler: mockIO)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .open,
             directObject: .item("box"),
@@ -215,11 +202,7 @@ struct OpenActionHandlerTests {
         ) // No .openable
 
         let game = MinimalGame(items: [rock])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .open,
@@ -251,11 +234,7 @@ struct OpenActionHandlerTests {
         )
 
         let game = MinimalGame(items: [openBox])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .open,
@@ -287,11 +266,7 @@ struct OpenActionHandlerTests {
         ) // Locked
 
         let game = MinimalGame(items: [lockedChest])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .open,

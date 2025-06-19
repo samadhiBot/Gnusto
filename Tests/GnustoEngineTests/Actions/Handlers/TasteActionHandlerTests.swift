@@ -10,7 +10,6 @@ struct TasteActionHandlerTests {
     // MARK: - Setup Helper
     
     private func createTestEngine() async -> GameEngine {
-        let mockParser = MockParser()
         
         return await GameEngine.test(
             blueprint: game,
@@ -31,11 +30,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -107,11 +102,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -138,11 +129,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -174,11 +161,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
         
         // Capture initial state
         let initialState = await engine.gameState
@@ -214,11 +197,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -243,11 +222,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -282,11 +257,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -325,11 +296,7 @@ struct TasteActionHandlerTests {
             locations: [darkLocation],
             items: [testItem]
         )
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -356,11 +323,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -403,11 +366,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [liquidItem, solidItem])
-        let mockParser = MockParser()
-        let (engine, mockIO) = await GameEngine.test(
-            blueprint: game,
-            parser: mockParser
-        )
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Test tasting liquid
         let waterCommand = Command(
