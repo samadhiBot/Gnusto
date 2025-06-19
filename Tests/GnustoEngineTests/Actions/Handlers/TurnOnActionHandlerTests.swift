@@ -60,8 +60,8 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [lamp]
+            locations: darkRoom,
+            items: lamp
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -223,8 +223,8 @@ struct TurnOnActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [radio]
+            locations: darkRoom,
+            items: radio
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -311,8 +311,8 @@ struct TurnOnActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: litRoom.id),
-            locations: [litRoom],
-            items: [lamp, sword]
+            locations: litRoom,
+            items: lamp, sword
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -374,8 +374,8 @@ struct TurnOnActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: livingRoom.id),
-            locations: [livingRoom],
-            items: [lamp, sword]
+            locations: livingRoom,
+            items: lamp, sword
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

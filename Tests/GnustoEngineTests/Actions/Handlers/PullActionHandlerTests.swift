@@ -109,8 +109,8 @@ struct PullActionHandlerTests {
         )
 
         let game = MinimalGame(
-            locations: [startRoom, otherRoom],
-            items: [distantRope]
+            locations: startRoom, otherRoom,
+            items: distantRope
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

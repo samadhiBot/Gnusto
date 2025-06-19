@@ -22,7 +22,7 @@ struct GoActionHandlerTests {
         )
 
         let game = MinimalGame(
-            locations: [startRoom, endRoom]
+            locations: startRoom, endRoom
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -61,7 +61,7 @@ struct GoActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
-            locations: [startRoom, endRoom]
+            locations: startRoom, endRoom
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -97,7 +97,7 @@ struct GoActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
-            locations: [startRoom, endRoom]
+            locations: startRoom, endRoom
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -134,7 +134,7 @@ struct GoActionHandlerTests {
             .description("A long hall."),
             .inherentlyLit
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, hall])
+        let game = MinimalGame(player: Player(in: "foyer"), locations: foyer, hall)
         let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         let command = Command(
@@ -160,7 +160,7 @@ struct GoActionHandlerTests {
             .inherentlyLit
             // No exit north
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
+        let game = MinimalGame(player: Player(in: "foyer"), locations: foyer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -206,8 +206,8 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "foyer"),
-            locations: [foyer, vault],
-            items: [vaultDoor]
+            locations: foyer, vault,
+            items: vaultDoor
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -247,7 +247,7 @@ struct GoActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "foyer"),
-            locations: [foyer, garden]
+            locations: foyer, garden
         )
         let (engine, _) = await GameEngine.test(
             blueprint: game,
@@ -294,7 +294,7 @@ struct GoActionHandlerTests {
             description: "A beautiful garden.",
             isLit: true
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer, garden]) // Pass initial foyer
+        let game = MinimalGame(player: Player(in: "foyer"), locations: foyer, garden) // Pass initial foyer
         let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler())
 
         // Set the condition flag to true by applying a state change
@@ -333,7 +333,7 @@ struct GoActionHandlerTests {
             .description("A grand foyer."),
             .inherentlyLit
         )
-        let game = MinimalGame(player: Player(in: "foyer"), locations: [foyer])
+        let game = MinimalGame(player: Player(in: "foyer"), locations: foyer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -366,7 +366,7 @@ struct GoActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testLocation"),
-            locations: [testLocation]
+            locations: testLocation
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -399,7 +399,7 @@ struct GoActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testLocation"),
-            locations: [testLocation]
+            locations: testLocation
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 

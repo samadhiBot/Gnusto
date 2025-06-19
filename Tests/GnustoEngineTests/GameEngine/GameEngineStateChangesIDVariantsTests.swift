@@ -206,7 +206,7 @@ struct GameEngineStateChangesIDVariantsTests {
             .name("Test Location"),
             .testLocationAttrFlag
         )
-        let game = MinimalGame(locations: [location])
+        let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -238,7 +238,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testLocation",
             .name("Test Location")
         )
-        let game = MinimalGame(locations: [location])
+        let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -259,7 +259,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testLocation",
             .name("Test Location")
         )
-        let game = MinimalGame(locations: [location])
+        let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When
@@ -283,7 +283,7 @@ struct GameEngineStateChangesIDVariantsTests {
             id: "testLocation",
             .name("Test Location")
         )
-        let game = MinimalGame(locations: [location])
+        let game = MinimalGame(locations: location)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // When

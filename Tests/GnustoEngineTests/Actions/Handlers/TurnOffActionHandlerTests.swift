@@ -25,8 +25,8 @@ struct TurnOffActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "room"),
-            locations: [room],
-            items: [lamp]
+            locations: room,
+            items: lamp
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -67,8 +67,8 @@ struct TurnOffActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "room"),
-            locations: [room],
-            items: [book]
+            locations: room,
+            items: book
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -98,7 +98,7 @@ struct TurnOffActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "room"),
-            locations: [room]
+            locations: room
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -170,8 +170,8 @@ struct TurnOffActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [lamp]
+            locations: darkRoom,
+            items: lamp
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -323,8 +323,8 @@ struct TurnOffActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [lamp]
+            locations: darkRoom,
+            items: lamp
         )
         // Use the real parser to test alias resolution
         let (engine, mockIO) = await GameEngine.test(
@@ -377,8 +377,8 @@ struct TurnOffActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [lamp]
+            locations: darkRoom,
+            items: lamp
         )
         // Use the real parser to test alias resolution
         let (engine, mockIO) = await GameEngine.test(

@@ -79,7 +79,7 @@ let change = StateChange(entityId: .global, propertyKey: .gameSpecificState(key:
 // Use Swift Testing with @MainActor tests
 @Test("Test description")
 func testSomething() async throws {
-    let game = MinimalGame(items: [item])
+    let game = MinimalGame(items: item)
     let mockIO = await MockIOHandler()
     let engine = GameEngine(game: game, parser: MockParser(), ioHandler: mockIO)
 

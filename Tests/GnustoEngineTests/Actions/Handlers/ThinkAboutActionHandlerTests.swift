@@ -336,8 +336,8 @@ struct ThinkAboutActionHandlerTests {
         let player = Player(in: "dark_chamber")
         let game = MinimalGame(
             player: player,
-            locations: [darkLocation],
-            items: [testItem]
+            locations: darkLocation,
+            items: testItem
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

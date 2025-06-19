@@ -15,7 +15,7 @@ struct ScopeResolverTests {
     @Test("Location is dark if not inherentlyLit and no light source")
     func testIsLitDarkNoSource() async throws {
         let darkRoom = Location(id: .startRoom)
-        let game = MinimalGame(locations: [darkRoom])
+        let game = MinimalGame(locations: darkRoom)
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
@@ -53,8 +53,8 @@ struct ScopeResolverTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [inactiveLamp]
+            locations: darkRoom,
+            items: inactiveLamp
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
@@ -91,8 +91,8 @@ struct ScopeResolverTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [inactiveLamp]
+            locations: darkRoom,
+            items: inactiveLamp
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
@@ -201,8 +201,8 @@ struct ScopeResolverTests {
         // Initialize game with the dark room and item
         let game = MinimalGame(
             player: player,
-            locations: [darkRoom],
-            items: [item]
+            locations: darkRoom,
+            items: item
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
@@ -354,8 +354,8 @@ struct ScopeResolverTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [locationItem]
+            locations: darkRoom,
+            items: locationItem
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
@@ -519,8 +519,8 @@ struct ScopeResolverTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [openBox, itemInBox]
+            locations: darkRoom,
+            items: openBox, itemInBox
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
@@ -548,8 +548,8 @@ struct ScopeResolverTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [inactiveLamp, item]
+            locations: darkRoom,
+            items: inactiveLamp, item
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver

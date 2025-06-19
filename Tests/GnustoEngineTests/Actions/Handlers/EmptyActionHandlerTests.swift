@@ -33,8 +33,8 @@ struct EmptyActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [box, coin]
+            locations: testRoom,
+            items: box, coin
         )
 
 
@@ -62,8 +62,8 @@ struct EmptyActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [box]
+            locations: testRoom,
+            items: box
         )
 
 
@@ -97,8 +97,8 @@ struct EmptyActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [box, coin]
+            locations: testRoom,
+            items: box, coin
         )
 
 
@@ -124,8 +124,8 @@ struct EmptyActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [rock]
+            locations: testRoom,
+            items: rock
         )
 
 

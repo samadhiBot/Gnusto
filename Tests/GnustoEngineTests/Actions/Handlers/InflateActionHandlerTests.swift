@@ -33,7 +33,7 @@ struct InflateActionHandlerTests {
         )
 
         let game = MinimalGame(
-            items: [balloon, inflatedBalloon, coin]
+            items: balloon, inflatedBalloon, coin
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

@@ -91,8 +91,8 @@ struct ExamineActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: roomID),
-            locations: [room],
-            items: [item]
+            locations: room,
+            items: item
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)
@@ -139,8 +139,8 @@ struct ExamineActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(
-            locations: [startRoom, farRoom],
-            items: [item],
+            locations: startRoom, farRoom,
+            items: item,
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -180,8 +180,8 @@ struct ExamineActionHandlerTests {
             .inherentlyLit
         )
         let game = MinimalGame(
-            locations: [startRoom, farRoom],
-            items: [item],
+            locations: startRoom, farRoom,
+            items: item,
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -239,7 +239,7 @@ struct ExamineActionHandlerTests {
             .synonyms("ball")
         )
         let game = MinimalGame(
-            items: [item1, item2],
+            items: item1, item2,
         )
         let (engine, _) = await GameEngine.test(
             blueprint: game
@@ -287,7 +287,7 @@ struct ExamineActionHandlerTests {
             .in(.player)
         )
         let game = MinimalGame(
-            items: [item],
+            items: item,
             itemEventHandlers: [
                 "magicMirror": ItemEventHandler { engine, command in
                     ActionResult("You see your reflection in the magic mirror.")
@@ -332,8 +332,8 @@ struct ExamineActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: roomID),
-            locations: [room],
-            items: [item]
+            locations: room,
+            items: item
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)

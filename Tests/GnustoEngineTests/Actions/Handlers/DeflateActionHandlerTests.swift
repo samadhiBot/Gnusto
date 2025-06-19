@@ -25,8 +25,8 @@ struct DeflateActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [balloon]
+            locations: testRoom,
+            items: balloon
         )
 
 
@@ -54,8 +54,8 @@ struct DeflateActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [balloon]
+            locations: testRoom,
+            items: balloon
         )
 
 
@@ -97,8 +97,8 @@ struct DeflateActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom, anotherRoom],
-            items: [balloon, distantBalloon]
+            locations: testRoom, anotherRoom,
+            items: balloon, distantBalloon
         )
 
 

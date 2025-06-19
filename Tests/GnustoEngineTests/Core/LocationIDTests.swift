@@ -182,7 +182,7 @@ struct LocationIDTests {
     @Test("LocationID ExpressibleByStringLiteral Usage")
     func testExpressibleByStringLiteral() throws {
         // These should all work due to ExpressibleByStringLiteral
-        let locations: [LocationID] = [
+        let locations: LocationID = [
             "kitchen",
             "garden",
             "library"
@@ -283,11 +283,11 @@ struct LocationIDTests {
 
     @Test("LocationID Array Operations")
     func testArrayOperations() throws {
-        var locations: [LocationID] = ["kitchen", "garden"]
+        var locations: LocationID] = ["kitchen", "garden"
         locations.append("library")
         locations.insert("attic", at: 1)
 
-        let expectedLocations: [LocationID] = ["kitchen", "attic", "garden", "library"]
+        let expectedlocations: LocationID] = ["kitchen", "attic", "garden", "library"
         #expect(locations == expectedLocations)
     }
 

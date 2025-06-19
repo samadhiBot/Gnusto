@@ -32,7 +32,7 @@ struct AllCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key, coin, lamp])
+        let game = MinimalGame(player: player, items: key, coin, lamp)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -118,7 +118,7 @@ struct AllCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key, wall, coin])
+        let game = MinimalGame(player: player, items: key, wall, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -171,7 +171,7 @@ struct AllCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 6)  // Can only carry key + coin
-        let game = MinimalGame(player: player, items: [key, coin, boulder])
+        let game = MinimalGame(player: player, items: key, coin, boulder)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -294,7 +294,7 @@ struct AllCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [key])
+        let game = MinimalGame(player: player, items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -368,7 +368,7 @@ struct AllCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [heldKey, roomKey])
+        let game = MinimalGame(player: player, items: heldKey, roomKey)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

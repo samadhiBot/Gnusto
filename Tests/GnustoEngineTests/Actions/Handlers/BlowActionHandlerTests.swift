@@ -32,8 +32,8 @@ struct BlowActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [balloon, candle]
+            locations: testRoom,
+            items: balloon, candle
         )
 
 
@@ -76,8 +76,8 @@ struct BlowActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom],
-            items: [balloon, candle, paper]
+            locations: testRoom,
+            items: balloon, candle, paper
         )
 
         return await GameEngine.test(blueprint: game)
@@ -114,8 +114,8 @@ struct BlowActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "testRoom"),
-            locations: [testRoom, anotherRoom],
-            items: [balloon, distantBalloon]
+            locations: testRoom, anotherRoom,
+            items: balloon, distantBalloon
         )
 
         return await GameEngine.test(blueprint: game)

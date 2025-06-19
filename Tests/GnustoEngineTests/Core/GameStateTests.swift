@@ -82,8 +82,8 @@ struct GameStateTests {
 
     // Helper to create a consistent initial state for tests
     func createInitialState(
-        locations: [Location]? = nil,
-        items: [Item]? = nil
+        locations: Location? = nil,
+        items: Item? = nil
     ) -> GameState {
         let startRoom = Location(
             id: .startRoom,
@@ -99,7 +99,7 @@ struct GameStateTests {
             locations: locations ?? [startRoom],
             items: items ?? [testItem],
             player: Player(in: .startRoom),
-            vocabulary: Vocabulary.build(items: [testItem]),
+            vocabulary: Vocabulary.build(items: testItem),
             pronouns: ["it": [.item("testItem")]],
             activeFuses: ["testFuse": 10],
             activeDaemons: ["testDaemon"],
@@ -463,7 +463,7 @@ struct GameStateTests {
             .description("Original Desc")
         )
         var state = createInitialState(
-            locations: [testLoc]
+            locations: testLoc
         )
 
         let change = StateChange(
@@ -493,7 +493,7 @@ struct GameStateTests {
             .inherentlyLit
         )
         var state = createInitialState(
-            locations: [testLoc]
+            locations: testLoc
         )
 
         let change = StateChange(
@@ -518,7 +518,7 @@ struct GameStateTests {
             .description("Original Desc")
         )
         var state = createInitialState(
-            locations: [testLoc]
+            locations: testLoc
         )
 
         let change = StateChange(
@@ -547,7 +547,7 @@ struct GameStateTests {
             .description("Initial Room Desc")
         )
         var state = createInitialState(
-            locations: [updatedStartRoom]
+            locations: updatedStartRoom
         )
 
         // Try to change a property, but provide the wrong oldValue

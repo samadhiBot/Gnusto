@@ -24,8 +24,8 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation],
-            items: [testItem]
+            locations: testLocation,
+            items: testItem
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -70,8 +70,8 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation],
-            items: [testItem],
+            locations: testLocation,
+            items: testItem,
             itemComputers: [
                 "testItem": ItemComputer { attributeID, gameState in
                     switch attributeID {
@@ -98,7 +98,7 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation],
+            locations: testLocation,
             locationComputers: [
                 "testLocation": LocationComputer { attributeID, gameState in
                     switch attributeID {
@@ -135,8 +135,8 @@ struct DynamicPropertyTests {
 
         let game = MinimalGame(
             player: Player(in: testLocation.id),
-            locations: [testLocation],
-            items: [testItem],
+            locations: testLocation,
+            items: testItem,
             itemComputers: [
                 "magicSword": ItemComputer { attributeID, gameState in
                     switch attributeID {
@@ -176,7 +176,7 @@ struct DynamicPropertyTests {
 
         let game = MinimalGame(
             player: Player(in: testLocation.id),
-            locations: [testLocation],
+            locations: testLocation,
             locationComputers: [
                 "testLocation": LocationComputer { attributeID, gameState in
                     switch attributeID {
@@ -218,8 +218,8 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation],
-            items: [testItem],
+            locations: testLocation,
+            items: testItem,
             itemComputers: [
                 "testItem": ItemComputer { attributeID, gameState in
                     throw ActionResponse.internalEngineError("Test error")
@@ -250,8 +250,8 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation],
-            items: [testItem]
+            locations: testLocation,
+            items: testItem
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 
@@ -271,7 +271,7 @@ struct DynamicPropertyTests {
         )
 
         let game = MinimalGame(
-            locations: [testLocation]
+            locations: testLocation
         )
         let (engine, _) = await GameEngine.test(blueprint: game)
 

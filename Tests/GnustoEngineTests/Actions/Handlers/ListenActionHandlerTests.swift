@@ -154,7 +154,7 @@ struct ListenActionHandlerTests {
             .description("A potentially noisy room.")
         )
 
-        let game = MinimalGame(locations: [location1, location2])
+        let game = MinimalGame(locations: location1, location2)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -235,7 +235,7 @@ struct ListenActionHandlerTests {
         let player = Player(in: "dark_room")
         let game = MinimalGame(
             player: player,
-            locations: [darkLocation]
+            locations: darkLocation
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

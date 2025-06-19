@@ -24,7 +24,7 @@ struct GameEngineTests {
         )
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom]
+            locations: darkRoom
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -155,8 +155,8 @@ struct GameEngineTests {
             .inherentlyLit
         )
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [pebble],
+            locations: startRoom,
+            items: pebble,
             customActionHandlers: [.take: mockTakeHandler]
         )
 
@@ -259,8 +259,8 @@ struct GameEngineTests {
             .isTakable
         )
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [pebble],
+            locations: startRoom,
+            items: pebble,
             customActionHandlers: [.look: mockLookHandler]
         )
 
@@ -324,8 +324,8 @@ struct GameEngineTests {
             .isTakable
         )
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [pebble],
+            locations: startRoom,
+            items: pebble,
             customActionHandlers: [
                 .look: mockLookHandler,
                 .take: mockTakeHandler,
@@ -495,8 +495,8 @@ struct GameEngineTests {
         )
 
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [pebble],
+            locations: startRoom,
+            items: pebble,
             customActionHandlers: [
                 // Only mock inventory
                 .inventory: mockInventoryHandler
@@ -657,8 +657,8 @@ struct GameEngineTests {
             .inherentlyLit
         )
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [lamp],
+            locations: startRoom,
+            items: lamp,
             // Use customActionHandlers directly with the ActionHandler
             customActionHandlers: [
                 "activate": mockActionHandler
@@ -880,7 +880,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: startRoom)
 
         let command = Command(
             verb: .go,
@@ -908,7 +908,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [pebble])
+        let game = MinimalGame(locations: startRoom], items: [pebble)
 
         #expect(game.items.find(.startItem)?.attributes[.isTakable] == nil)
 
@@ -938,7 +938,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [pebble])
+        let game = MinimalGame(locations: startRoom], items: [pebble)
 
         #expect(game.items.find(.startItem)?.parent == .location(.startRoom))
 
@@ -975,7 +975,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: startRoom], items: [itemToPut, target)
 
         let command = Command(
             verb: .insert,
@@ -1005,7 +1005,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: startRoom], items: [item)
 
         let command = Command(
             verb: .open,
@@ -1034,7 +1034,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: startRoom], items: [item)
 
         let command = Command(
             verb: .wear,
@@ -1076,7 +1076,7 @@ struct GameEngineTests {
             .inherentlyLit
         )
         let game = MinimalGame(
-            player: player, locations: [startRoom], items: [itemHeld, itemToTake])
+            player: player, locations: startRoom], items: [itemHeld, itemToTake)
 
         let command = Command(
             verb: .take,
@@ -1109,7 +1109,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: startRoom], items: [itemToPut, target)
 
         let command = Command(
             verb: .insert,
@@ -1144,7 +1144,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [itemToPut, target])
+        let game = MinimalGame(locations: startRoom], items: [itemToPut, target)
 
         let command = Command(
             verb: .putOn,
@@ -1174,7 +1174,7 @@ struct GameEngineTests {
             .exits([.north: blockedExit]),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: startRoom)
 
         let command = Command(
             verb: .go,
@@ -1205,7 +1205,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [container])
+        let game = MinimalGame(locations: startRoom], items: [container)
 
         let command = Command(
             verb: .close,
@@ -1244,7 +1244,7 @@ struct GameEngineTests {
             .inherentlyLit
         )
         let player = Player(in: .startRoom)
-        let game = MinimalGame(player: player, locations: [startRoom], items: [container, key])
+        let game = MinimalGame(player: player, locations: startRoom], items: [container, key)
 
         let command = Command(
             verb: .unlock,
@@ -1274,7 +1274,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: startRoom], items: [item)
 
         let command = Command(
             verb: .close,
@@ -1303,7 +1303,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: startRoom], items: [item)
 
         let command = Command(
             verb: .drop,
@@ -1334,7 +1334,7 @@ struct GameEngineTests {
             .name("Start Room"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom], items: [item])
+        let game = MinimalGame(locations: startRoom], items: [item)
 
         let command = Command(
             verb: .remove,
@@ -1362,7 +1362,7 @@ struct GameEngineTests {
             .exits([.up: conditionalExit]),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [startRoom])
+        let game = MinimalGame(locations: startRoom)
 
         let command = Command(
             verb: .go,
@@ -1392,8 +1392,8 @@ struct GameEngineTests {
             .description("A dark, dark room.")
         )
         let game = MinimalGame(
-            locations: [startRoom],
-            items: [item]
+            locations: startRoom,
+            items: item
         )
 
         #expect(
@@ -1438,7 +1438,7 @@ struct GameEngineTests {
         )
         let player = Player(in: .startRoom)
         let game = MinimalGame(
-            player: player, locations: [startRoom], items: [container, wrongKey])
+            player: player, locations: startRoom], items: [container, wrongKey)
 
         let command = Command(
             verb: .unlock,
@@ -1503,7 +1503,7 @@ struct GameEngineTests {
 
         // Setup game with the mock handler
         let game = MinimalGame(
-            items: [lamp],
+            items: lamp,
             customActionHandlers: [testVerb: mockHandler]
         )
 
@@ -1623,7 +1623,7 @@ struct GameEngineTests {
 
         let changes = await engine.updatePronounsForMultipleObjects(
             lastItem: item3,
-            allItems: [item1, item2, item3]
+            allitems: item1, item2, item3
         )
 
         // Should return two changes: one for "it" and one for "them"

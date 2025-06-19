@@ -60,8 +60,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "kitchen")
         let game = MinimalGame(
             player: player,
-            locations: [kitchen, attic],
-            items: [stairs]
+            locations: kitchen, attic,
+            items: stairs
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -115,8 +115,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "top")
         let game = MinimalGame(
             player: player,
-            locations: [topRoom, bottomRoom],
-            items: [ladder]
+            locations: topRoom, bottomRoom,
+            items: ladder
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -163,8 +163,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "middle")
         let game = MinimalGame(
             player: player,
-            locations: [middleRoom, topRoom, bottomRoom],
-            items: [rope]
+            locations: middleRoom, topRoom, bottomRoom,
+            items: rope
         )
 
         let (engine, _) = await GameEngine.test(blueprint: game)
@@ -205,8 +205,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "room")
         let game = MinimalGame(
             player: player,
-            locations: [room],
-            items: [stairs]
+            locations: room,
+            items: stairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -245,8 +245,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "room")
         let game = MinimalGame(
             player: player,
-            locations: [room],
-            items: [pluralStairs]
+            locations: room,
+            items: pluralStairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -439,8 +439,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "room")
         let game = MinimalGame(
             player: player,
-            locations: [room, attic],
-            items: [stairs]
+            locations: room, attic,
+            items: stairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -480,8 +480,8 @@ struct ClimbActionHandlerTests {
         let player = Player(in: "room")
         let game = MinimalGame(
             player: player,
-            locations: [room],
-            items: [stairs]
+            locations: room,
+            items: stairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -528,8 +528,8 @@ struct ClimbActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "kitchen"),
-            locations: [kitchen, attic],
-            items: [stairs]
+            locations: kitchen, attic,
+            items: stairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
@@ -598,8 +598,8 @@ struct ClimbActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "kitchen"),
-            locations: [kitchen, livingRoom],
-            items: [stairs]
+            locations: kitchen, livingRoom,
+            items: stairs
         )
 
         let (engine, mockIO) = await GameEngine.test(blueprint: game)

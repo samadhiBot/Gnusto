@@ -29,8 +29,8 @@ struct DebugActionHandlerTests {
 
         return await GameEngine.test(
             blueprint: MinimalGame(
-                locations: [testLocation],
-                items: [testItem]
+                locations: testLocation,
+                items: testItem
             )
         )
     }
@@ -488,7 +488,7 @@ struct DebugActionHandlerTests {
             .inherentlyLit
         )
 
-        let game = MinimalGame(locations: [complexLocation])
+        let game = MinimalGame(locations: complexLocation)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(

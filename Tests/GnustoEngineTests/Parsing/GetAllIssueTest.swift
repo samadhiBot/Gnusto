@@ -25,12 +25,12 @@ struct GetAllIssueTests {
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
                 player: Player(in: .startRoom, carryingCapacity: 20),
-                items: [basket, jug]
+                items: basket, jug
             )
         )
 
         // Act: Parse "get all" directly
-        let vocabulary = Vocabulary.build(items: [basket, jug])
+        let vocabulary = Vocabulary.build(items: basket, jug)
         let gameState = await engine.gameState
 
         let result = await engine.parser.parse(

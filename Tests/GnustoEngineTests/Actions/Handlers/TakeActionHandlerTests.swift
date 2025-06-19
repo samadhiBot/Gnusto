@@ -103,7 +103,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [testItem])
+        let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -476,7 +476,7 @@ struct TakeActionHandlerTests {
         )
         // Player with capacity 0
         let player = Player(in: .startRoom, carryingCapacity: 0)
-        let game = MinimalGame(player: player, items: [heavyItem])
+        let game = MinimalGame(player: player, items: heavyItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .take,
@@ -515,7 +515,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [testItem])
+        let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -572,7 +572,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [surfaceItem, itemOnSurface])
+        let game = MinimalGame(player: player, items: surfaceItem, itemOnSurface)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -625,7 +625,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [testItem])
+        let game = MinimalGame(player: player, items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -687,7 +687,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [heldItem, itemToTake])
+        let game = MinimalGame(player: player, items: heldItem, itemToTake)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -741,7 +741,7 @@ struct TakeActionHandlerTests {
         // Define player with capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [container, itemInContainer])
+        let game = MinimalGame(player: player, items: container, itemInContainer)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -788,7 +788,7 @@ struct TakeActionHandlerTests {
         // Define player with low capacity
         let player = Player(in: .startRoom, carryingCapacity: 10)
 
-        let game = MinimalGame(player: player, items: [itemHeld, itemToTake])
+        let game = MinimalGame(player: player, items: itemHeld, itemToTake)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
@@ -833,11 +833,11 @@ struct TakeActionHandlerTests {
         )
 
         let player = Player(in: .startRoom)
-        let game = MinimalGame(player: player, items: [container, coin])
+        let game = MinimalGame(player: player, items: container, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Parse and execute "take coin from bag"
-        let vocabulary = Vocabulary.build(items: [container, coin])
+        let vocabulary = Vocabulary.build(items: container, coin)
         let gameState = await engine.gameState
 
         let parseResult = await engine.parser.parse(
@@ -889,11 +889,11 @@ struct TakeActionHandlerTests {
         )
 
         let player = Player(in: .startRoom)
-        let game = MinimalGame(player: player, items: [bag, box, coin])
+        let game = MinimalGame(player: player, items: bag, box, coin)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act: Try to parse and execute "take coin from box" (coin is in bag, not box)
-        let vocabulary = Vocabulary.build(items: [bag, box, coin])
+        let vocabulary = Vocabulary.build(items: bag, box, coin)
         let gameState = await engine.gameState
 
         let parseResult = await engine.parser.parse(

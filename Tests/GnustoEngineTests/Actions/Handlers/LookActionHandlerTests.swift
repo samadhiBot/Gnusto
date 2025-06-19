@@ -63,8 +63,8 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
-            locations: [litRoom],
-            items: [item1, item2, item3, item4]
+            locations: litRoom,
+            items: item1, item2, item3, item4
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -123,8 +123,8 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
-            locations: [litRoom],
-            items: [item4, item3, item2, item1]  // Include all 4 items, in reverse order
+            locations: litRoom,
+            items: item4, item3, item2, item1  // Include all 4 items, in reverse order
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -170,8 +170,8 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "darkRoom"),
-            locations: [darkRoom],
-            items: [item1]
+            locations: darkRoom,
+            items: item1
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -216,8 +216,8 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: darkRoom.id),
-            locations: [darkRoom],
-            items: [activeLamp, item1]
+            locations: darkRoom,
+            items: activeLamp, item1
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
@@ -259,7 +259,7 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: "litRoom"),
-            locations: [litRoom]
+            locations: litRoom
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
@@ -302,7 +302,7 @@ struct LookActionHandlerTests {
         // MinimalGame takes flags as variadic arguments
         let game = MinimalGame(
             player: Player(in: dynamicRoom.id),
-            locations: [dynamicRoom],
+            locations: dynamicRoom,
             locationComputers: [
                 dynamicRoom.id: LocationComputer { attributeID, gameState in
                     let isFlagOn = gameState.globalState[specialFlag] == true
@@ -744,8 +744,8 @@ struct LookActionHandlerTests {
 
         let game = MinimalGame(
             player: Player(in: .startRoom),
-            locations: [room1, room2],
-            items: [artifact]
+            locations: room1, room2,
+            items: artifact
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(try await engine.item("artifact") == artifact)
@@ -793,8 +793,8 @@ struct LookActionHandlerTests {
         )
         let game = MinimalGame(
             player: Player(in: roomID),
-            locations: [office],
-            items: [desk]
+            locations: office,
+            items: desk
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         let initialItemState = try await engine.item(itemID)

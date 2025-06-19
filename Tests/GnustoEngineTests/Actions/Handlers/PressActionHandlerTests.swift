@@ -108,8 +108,8 @@ struct PressActionHandlerTests {
         )
 
         let game = MinimalGame(
-            locations: [startRoom, otherRoom],
-            items: [distantButton]
+            locations: startRoom, otherRoom,
+            items: distantButton
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 

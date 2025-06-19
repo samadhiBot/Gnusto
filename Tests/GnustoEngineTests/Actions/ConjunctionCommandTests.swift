@@ -56,7 +56,7 @@ struct ConjunctionCommandTests {
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(
             player: player,
-            items: [sword, lantern, book, coin, gem]
+            items: sword, lantern, book, coin, gem
         )
         return await GameEngine.test(blueprint: game)
     }
@@ -228,7 +228,7 @@ struct ConjunctionCommandTests {
         )
 
         let player = Player(in: .startRoom, carryingCapacity: 20)
-        let game = MinimalGame(player: player, items: [sword, statue])
+        let game = MinimalGame(player: player, items: sword, statue)
         let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Create a command with one held and one not held item

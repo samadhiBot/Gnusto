@@ -196,7 +196,7 @@ struct LockActionHandlerTests {
             .name("Other"),
             .inherentlyLit
         )
-        let game = MinimalGame(locations: [room1, room2], items: [box, key])
+        let game = MinimalGame(locations: room1, room2], items: [box, key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
