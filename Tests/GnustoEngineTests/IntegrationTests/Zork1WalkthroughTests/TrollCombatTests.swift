@@ -94,7 +94,7 @@ func testGivingWeaponToTroll() async throws {
 @Test("Enhanced combat system evaluates weapon effectiveness")
 func testWeaponEffectivenessEvaluation() async throws {
     // Given
-    let (engine, mockIO) = await GameEngine.test(
+    let (engine, _) = await GameEngine.test(
         blueprint: Zork1()
     )
     let sword = try await engine.item(.sword)
@@ -115,7 +115,7 @@ func testWeaponEffectivenessEvaluation() async throws {
 @Test("Combat outcomes follow ZIL patterns")
 func testCombatOutcomePatterns() async throws {
     // Given
-    let (engine, mockIO) = await GameEngine.test(
+    let (engine, _) = await GameEngine.test(
         blueprint: Zork1()
     )
     let command = Command(
@@ -160,7 +160,7 @@ func testCombatOutcomePatterns() async throws {
 @Test("Troll responds appropriately to different combat outcomes")
 func testTrollCombatResponses() async throws {
     // Given
-    let (engine, mockIO) = await GameEngine.test(
+    let (engine, _) = await GameEngine.test(
         blueprint: Zork1()
     )
 

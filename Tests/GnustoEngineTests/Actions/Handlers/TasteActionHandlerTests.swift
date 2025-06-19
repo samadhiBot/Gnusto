@@ -92,7 +92,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -119,7 +119,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,
@@ -151,8 +151,8 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-        
+        let (engine, _) = await GameEngine.test(blueprint: game)
+
         // Capture initial state
         let initialState = await engine.gameState
         let initialScore = initialState.player.score
@@ -313,7 +313,7 @@ struct TasteActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .taste,

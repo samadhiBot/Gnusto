@@ -113,7 +113,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -148,7 +148,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,
@@ -183,7 +183,7 @@ struct TurnOnActionHandlerTests {
             .isTakable,
         )
         let game = MinimalGame(items: [lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOn,

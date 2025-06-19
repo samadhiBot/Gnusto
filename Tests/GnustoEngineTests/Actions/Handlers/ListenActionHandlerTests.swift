@@ -28,7 +28,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN produces correct ActionResult")
     func testListenActionResult() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -50,7 +50,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN validation always succeeds")
     func testListenValidationSucceeds() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -67,7 +67,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN full workflow integration test")
     func testListenFullWorkflow() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .listen,
@@ -92,7 +92,7 @@ struct ListenActionHandlerTests {
 
     @Test("LISTEN does not affect game state")
     func testListenDoesNotAffectGameState() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         // Capture initial state
         let initialState = await engine.gameState

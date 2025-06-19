@@ -182,8 +182,7 @@ struct ConjunctionCommandTests {
     func testConjunctionWithNonExistentItem() async throws {
         // Create test setup directly
         let sword = Item(id: "sword", .name("sword"), .in(.player), .isTakable)
-        let player = Player(in: .startRoom)
-        
+
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [sword])
         )
@@ -231,7 +230,7 @@ struct ConjunctionCommandTests {
         
         let player = Player(in: .startRoom, carryingCapacity: 20)
         let game = MinimalGame(player: player, items: [sword, statue])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         
         // Create a command with one held and one not held item
         let command = Command(

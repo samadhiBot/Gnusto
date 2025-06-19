@@ -10,7 +10,7 @@ struct AttackActionHandlerTests {
     @Test("Attack validates missing direct object")
     func testAttackValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .attack,
@@ -27,7 +27,7 @@ struct AttackActionHandlerTests {
     @Test("Attack validates item not found")
     func testAttackValidatesItemNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .attack,
@@ -53,7 +53,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantGoblin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -86,7 +86,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin, sword])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -112,7 +112,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -139,7 +139,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -173,7 +173,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin, sword])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -207,7 +207,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin, lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,
@@ -235,7 +235,7 @@ struct AttackActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .attack,

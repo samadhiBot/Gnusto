@@ -766,7 +766,7 @@ struct GameEngineTests {
             fuses: ["testFuse": fuseDef]
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 2], // Start with 2 turns remaining
         )
@@ -794,7 +794,7 @@ struct GameEngineTests {
         let game = MinimalGame(
             daemons: ["testDaemon": testDaemonDef]
         )
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game,
             activeDaemons: ["testDaemon"], // Start daemon immediately
         )
@@ -828,7 +828,7 @@ struct GameEngineTests {
             daemons: ["testDaemon": testDaemon]
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game,
             activeFuses: ["testFuse": 3], // Start fuse with 3 turns
             activeDaemons: ["testDaemon"], // Start daemon immediately
@@ -1504,7 +1504,7 @@ struct GameEngineTests {
 
     @Test("applyPronounChange updates game state correctly")
     func testApplyPronounChange_Success() async throws {
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1546,7 +1546,7 @@ struct GameEngineTests {
             id: "testItem",
             .name("Test Item")
         )
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [item]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1566,7 +1566,7 @@ struct GameEngineTests {
     func testUpdatePronounsMultiple() async throws {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()
@@ -1587,7 +1587,7 @@ struct GameEngineTests {
         let item1 = Item(id: "item1", .name("Item One"))
         let item2 = Item(id: "item2", .name("Item Two"))
         let item3 = Item(id: "item3", .name("Item Three"))
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [item1, item2, item3]),
             parser: MockParser(),
             ioHandler: await MockIOHandler()

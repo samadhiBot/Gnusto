@@ -77,7 +77,7 @@ struct RemoveActionHandlerTests {
             .isWearable
         )
         let game = MinimalGame(items: [cloak])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .remove,
@@ -99,8 +99,8 @@ struct RemoveActionHandlerTests {
 
     @Test("Remove fails if item not held")
     func testRemoveItemNotHeld() async throws {
-        let game = MinimalGame()  // Cloak doesn’t exist here
-        let (engine, mockIO) = await GameEngine.test()
+        // Cloak doesn’t exist here
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .remove,
@@ -153,7 +153,7 @@ struct RemoveActionHandlerTests {
             .isWorn
         )
         let game = MinimalGame(items: [amulet])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .remove,

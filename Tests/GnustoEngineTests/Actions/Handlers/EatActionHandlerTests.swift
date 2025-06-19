@@ -10,7 +10,7 @@ struct EatActionHandlerTests {
     @Test("Eat validates missing direct object")
     func testEatValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .eat, rawInput: "eat")
         let context = ActionContext(command: command, engine: engine)
@@ -24,7 +24,7 @@ struct EatActionHandlerTests {
     @Test("Eat validates item not found")
     func testEatValidatesItemNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .eat, directObject: .item("nonexistent"), rawInput: "eat nonexistent")
         let context = ActionContext(command: command, engine: engine)
@@ -46,7 +46,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantApple])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("distant_apple"), rawInput: "eat distant apple")
         let context = ActionContext(command: command, engine: engine)
@@ -68,7 +68,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [apple])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
         let context = ActionContext(command: command, engine: engine)
@@ -90,7 +90,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("rock"), rawInput: "eat rock")
         let context = ActionContext(command: command, engine: engine)
@@ -121,7 +121,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [lunchBox, sandwich])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("lunch_box"), rawInput: "eat lunch box")
         let context = ActionContext(command: command, engine: engine)
@@ -152,7 +152,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [emptyBox, water])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("empty_box"), rawInput: "eat empty box")
         let context = ActionContext(command: command, engine: engine)
@@ -175,7 +175,7 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: [apple])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
         let context = ActionContext(command: command, engine: engine)

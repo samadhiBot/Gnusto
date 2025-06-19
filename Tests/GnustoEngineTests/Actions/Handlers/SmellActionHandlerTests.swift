@@ -87,7 +87,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,
@@ -153,7 +153,7 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .smell,

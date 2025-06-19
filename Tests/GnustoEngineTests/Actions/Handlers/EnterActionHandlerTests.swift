@@ -10,7 +10,7 @@ struct EnterActionHandlerTests {
     @Test("Enter validates missing direct object with no enterable items")
     func testEnterValidatesMissingDirectObjectWithNoEnterableItems() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .enter,
@@ -27,7 +27,7 @@ struct EnterActionHandlerTests {
     @Test("Enter validates non-item direct object")
     func testEnterValidatesNonItemDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .enter,
@@ -53,7 +53,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,
@@ -78,7 +78,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,
@@ -104,7 +104,7 @@ struct EnterActionHandlerTests {
         )
 
         let game = MinimalGame(items: [booth])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .enter,

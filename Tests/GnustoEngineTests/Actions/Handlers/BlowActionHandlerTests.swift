@@ -80,10 +80,7 @@ struct BlowActionHandlerTests {
             items: [balloon, candle, paper]
         )
 
-
-        let (engine, mockIO) = await GameEngine.test()
-
-        return (engine, mockIO)
+        return await GameEngine.test(blueprint: game)
     }
 
     private func createTestEngineWithDistantItem() async -> (GameEngine, MockIOHandler) {
@@ -121,10 +118,7 @@ struct BlowActionHandlerTests {
             items: [balloon, distantBalloon]
         )
 
-
-        let (engine, mockIO) = await GameEngine.test()
-
-        return (engine, mockIO)
+        return await GameEngine.test(blueprint: game)
     }
 
     // MARK: - Tests

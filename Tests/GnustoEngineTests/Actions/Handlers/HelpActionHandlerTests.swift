@@ -9,7 +9,7 @@ struct HelpActionHandlerTests {
     @Test("Help displays help text")
     func testHelpDisplaysHelpText() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .help, rawInput: "help")
         let context = ActionContext(command: command, engine: engine)
@@ -32,7 +32,7 @@ struct HelpActionHandlerTests {
     @Test("Help requires no validation")
     func testHelpRequiresNoValidation() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .help, rawInput: "help")
         let context = ActionContext(command: command, engine: engine)

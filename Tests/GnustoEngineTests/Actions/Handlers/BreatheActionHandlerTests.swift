@@ -10,7 +10,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no direct object allowed")
     func testBreatheValidatesNoDirectObjectAllowed() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,
@@ -28,7 +28,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validates no indirect object allowed")
     func testBreatheValidatesNoIndirectObjectAllowed() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,
@@ -86,7 +86,7 @@ struct BreatheActionHandlerTests {
     @Test("Breathe validation passes with no objects")
     func testBreatheValidationPassesWithNoObjects() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .breathe,

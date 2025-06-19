@@ -112,7 +112,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [scroll])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -142,7 +142,7 @@ struct ReadActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(
@@ -184,7 +184,7 @@ struct ReadActionHandlerTests {
             locations: [darkRoom],
             items: [map]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let handler = ReadActionHandler()
         let command = Command(

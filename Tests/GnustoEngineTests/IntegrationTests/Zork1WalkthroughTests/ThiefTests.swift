@@ -125,8 +125,8 @@ struct ThiefTests {
             blueprint: game
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
         try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom)),
             await engine.move(.garlic, to: .player)
         )
 
@@ -159,7 +159,9 @@ struct ThiefTests {
             blueprint: game
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
         await engine.execute(
@@ -185,7 +187,9 @@ struct ThiefTests {
             blueprint: game
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
         await engine.execute(
@@ -210,7 +214,9 @@ struct ThiefTests {
             blueprint: game
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
         await engine.execute(
@@ -235,7 +241,9 @@ struct ThiefTests {
             blueprint: game
         )
 
-        try await engine.movePlayer(to: .location(.roundRoom))
+        try await engine.apply(
+            await engine.movePlayer(to: .location(.roundRoom))
+        )
 
         // When
         await engine.execute(
@@ -328,7 +336,7 @@ struct ThiefTests {
         var stolenItem: String = ""
 
         for _ in 1...30 {
-            await mockIO.flush()
+            _ = await mockIO.flush()
             await engine.execute(
                 command: Command(
                     verb: .wait,
@@ -365,11 +373,10 @@ struct ThiefTests {
         try await engine.apply(
             await engine.movePlayer(to: .location(.roundRoom))
         )
-        let initialThiefLocation = try await engine.item(.thief).parent
 
         // When - wait several turns to trigger movement daemon
         for _ in 1...10 {
-            await mockIO.flush()
+            _ = await mockIO.flush()
             await engine.execute(
                 command: Command(
                     verb: .wait,
@@ -409,7 +416,7 @@ struct ThiefTests {
         try await engine.apply(
             await engine.move(.thief, to: .location(.northSouthPassage))
         )
-        await mockIO.flush() // Clear any move message
+        _ = await mockIO.flush() // Clear any move message
 
         // When - move thief back to player's location
         try await engine.apply(
@@ -457,7 +464,7 @@ struct ThiefTests {
     func testCombatVictoryDropsPossessions() async throws {
         // Given
         let game = Zork1()
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game
         )
 
@@ -490,7 +497,7 @@ struct ThiefTests {
     func testTreasureScoringIntegration() async throws {
         // Given
         let game = Zork1()
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game
         )
 
@@ -565,7 +572,7 @@ struct ThiefTests {
         // When - wait for sophisticated theft algorithm
         var attemptedTheft = false
         for _ in 1...25 {
-            await mockIO.flush()
+            _ = await mockIO.flush()
             await engine.execute(
                 command: Command(
                     verb: .wait,
@@ -603,8 +610,8 @@ struct ThiefTests {
         // When - attack multiple times to potentially see different outcomes
         var combatResponses: Set<String> = []
 
-        for attempt in 1...5 {
-            await mockIO.flush()
+        for _ in 1...5 {
+            _ = await mockIO.flush()
             await engine.execute(
                 command: Command(
                     verb: .attack,

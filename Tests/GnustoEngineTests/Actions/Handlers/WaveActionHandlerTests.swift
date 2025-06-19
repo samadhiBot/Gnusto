@@ -10,7 +10,7 @@ struct WaveActionHandlerTests {
     @Test("Wave validates missing direct object")
     func testWaveValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .wave, rawInput: "wave")
         let context = ActionContext(command: command, engine: engine)
@@ -31,7 +31,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantWand])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("distant_wand"), rawInput: "wave distant wand")
         let context = ActionContext(command: command, engine: engine)
@@ -54,7 +54,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wand])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
         let context = ActionContext(command: command, engine: engine)
@@ -78,7 +78,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [staff])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("staff"), rawInput: "wave staff")
         let context = ActionContext(command: command, engine: engine)
@@ -102,7 +102,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [sword])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("sword"), rawInput: "wave sword")
         let context = ActionContext(command: command, engine: engine)
@@ -126,7 +126,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [blade])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("blade"), rawInput: "wave blade")
         let context = ActionContext(command: command, engine: engine)
@@ -150,7 +150,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [flag])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("flag"), rawInput: "wave flag")
         let context = ActionContext(command: command, engine: engine)
@@ -172,7 +172,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [tree])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("tree"), rawInput: "wave tree")
         let context = ActionContext(command: command, engine: engine)
@@ -195,7 +195,7 @@ struct WaveActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wand])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .wave, directObject: .item("wand"), rawInput: "wave wand")
         let context = ActionContext(command: command, engine: engine)

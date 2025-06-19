@@ -33,7 +33,7 @@ struct TieActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope])
-        let (engine, _) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .tie, directObject: .item("rope"), rawInput: "tie rope")
         let context = ActionContext(command: command, engine: engine)

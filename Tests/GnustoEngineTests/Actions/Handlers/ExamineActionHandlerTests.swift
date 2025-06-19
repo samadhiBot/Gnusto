@@ -241,7 +241,7 @@ struct ExamineActionHandlerTests {
         let game = MinimalGame(
             items: [item1, item2],
         )
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: game
         )
         #expect(await engine.gameState.changeHistory.isEmpty)

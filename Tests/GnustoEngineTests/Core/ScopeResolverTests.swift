@@ -5,7 +5,7 @@ import Testing
 struct ScopeResolverTests {
     @Test("Location is lit if inherentlyLit property is present")
     func testIsLitInherentlyLit() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
@@ -15,7 +15,7 @@ struct ScopeResolverTests {
     func testIsLitDarkNoSource() async throws {
         let darkRoom = Location(id: .startRoom)
         let game = MinimalGame(locations: [darkRoom])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == false)
@@ -31,7 +31,7 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
@@ -55,7 +55,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp]
         )
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
@@ -70,7 +70,7 @@ struct ScopeResolverTests {
             .isOn
         )
         let game = MinimalGame(items: [activeLamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
@@ -93,7 +93,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: darkRoom.id) == false)
@@ -109,7 +109,7 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [activeLamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: .startRoom) == true)
@@ -118,7 +118,7 @@ struct ScopeResolverTests {
     @Test("Location is dark if location ID does not exist")
     func testIsLitNonExistentLocation() async throws {
         let game = MinimalGame(locations: [])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         await #expect(resolver.isLocationLit(locationID: "badRoom") == false)
@@ -138,7 +138,7 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, invisibleItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
@@ -163,7 +163,7 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [visibleItem, sceneryItem, invisibleItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         // visibleItemsIn should exclude scenery
@@ -201,7 +201,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [item]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         // No need to modify state after initialization
@@ -230,7 +230,7 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
@@ -256,7 +256,7 @@ struct ScopeResolverTests {
             .isInvisible
         )
         let game = MinimalGame(items: [activeLamp, visibleItem, invisibleItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: .startRoom)
@@ -266,7 +266,7 @@ struct ScopeResolverTests {
 
     @Test("No items visible if location ID does not exist")
     func testVisibleItemsNonExistentLocation() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: "badRoom")
@@ -314,7 +314,7 @@ struct ScopeResolverTests {
             .isTakable
         )
         let game = MinimalGame(items: [inventoryItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -329,7 +329,7 @@ struct ScopeResolverTests {
             .in(.location(.startRoom))
         )
         let game = MinimalGame(items: [locationItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -354,7 +354,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [locationItem]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -376,7 +376,7 @@ struct ScopeResolverTests {
             .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -397,7 +397,7 @@ struct ScopeResolverTests {
             .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -421,7 +421,7 @@ struct ScopeResolverTests {
             .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -443,7 +443,7 @@ struct ScopeResolverTests {
             .in(.item(openBox.id))
         )
         let game = MinimalGame(items: [openBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -464,7 +464,7 @@ struct ScopeResolverTests {
             .in(.item(closedBox.id))
         )
         let game = MinimalGame(items: [closedBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -488,7 +488,7 @@ struct ScopeResolverTests {
             .in(.item(transparentBox.id))
         )
         let game = MinimalGame(items: [transparentBox, itemInBox])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -519,7 +519,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [openBox, itemInBox]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()
@@ -548,7 +548,7 @@ struct ScopeResolverTests {
             locations: [darkRoom],
             items: [inactiveLamp, item]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let visibleIDs = await resolver.visibleItemsIn(locationID: darkRoom.id)
@@ -564,7 +564,7 @@ struct ScopeResolverTests {
             .omitDescription
         )
         let game = MinimalGame(items: [sceneryItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let resolver = await engine.scopeResolver
 
         let reachable = await resolver.itemsReachableByPlayer()

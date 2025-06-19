@@ -10,7 +10,7 @@ struct PourOnActionHandlerTests {
     @Test("Pour validates missing direct object")
     func testPourValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .pourOn, rawInput: "pour")
         let context = ActionContext(command: command, engine: engine)
@@ -32,7 +32,7 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: [water])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .pourOn, directObject: .item("water"), rawInput: "pour water")
         let context = ActionContext(command: command, engine: engine)
@@ -61,7 +61,7 @@ struct PourOnActionHandlerTests {
         )
 
         let game = MinimalGame(items: [water, torch])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .pourOn,

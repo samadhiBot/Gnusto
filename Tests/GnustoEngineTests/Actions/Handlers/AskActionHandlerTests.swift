@@ -9,7 +9,7 @@ struct AskActionHandlerTests {
     @Test("Ask requires direct object")
     func testAskRequiresDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .ask, rawInput: "ask")
         let context = ActionContext(command: command, engine: engine)
@@ -31,7 +31,7 @@ struct AskActionHandlerTests {
             .isCharacter
         )
         let game = MinimalGame(items: [character])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,
@@ -53,7 +53,7 @@ struct AskActionHandlerTests {
         // Given
         let rock = Item(id: "rock", .name("rock"))
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .ask,

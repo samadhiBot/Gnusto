@@ -129,7 +129,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -178,7 +178,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -235,7 +235,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         // Verify item is not initially touched
         let initialItem = try await engine.item("book")
@@ -362,7 +362,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [testItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,
@@ -395,7 +395,7 @@ struct ThinkAboutActionHandlerTests {
         )
         
         let game = MinimalGame(items: [unreachableItem])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .thinkAbout,

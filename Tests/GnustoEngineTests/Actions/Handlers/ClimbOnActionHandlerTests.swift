@@ -16,7 +16,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [chair])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,
@@ -144,7 +144,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [box, ladder])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,
@@ -171,7 +171,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [rope])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,
@@ -196,7 +196,7 @@ struct ClimbOnActionHandlerTests {
             // Not takable - immovable
         )
         let game = MinimalGame(items: [tree])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,
@@ -228,7 +228,7 @@ struct ClimbOnActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [table, stool])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .climbOn,

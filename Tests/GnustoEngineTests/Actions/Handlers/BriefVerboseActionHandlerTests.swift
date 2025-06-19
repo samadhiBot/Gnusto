@@ -10,7 +10,7 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief sets brief mode")
     func testBriefSetsBriefMode() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .brief, rawInput: "brief")
         let context = ActionContext(command: command, engine: engine)
@@ -31,7 +31,7 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief clears verbose mode if set")
     func testBriefClearsVerboseMode() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         // First set verbose mode
         let verboseChange = await engine.setGlobal(.isVerboseMode, to: true)
@@ -55,7 +55,7 @@ struct BriefVerboseActionHandlerTests {
     @Test("Verbose sets verbose mode")
     func testVerboseSetVerboseMode() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .verbose, rawInput: "verbose")
         let context = ActionContext(command: command, engine: engine)
@@ -76,7 +76,7 @@ struct BriefVerboseActionHandlerTests {
     @Test("Verbose clears brief mode if set")
     func testVerboseClearsBriefMode() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         // First set brief mode
         let briefChange = await engine.setGlobal(.isBriefMode, to: true)
@@ -100,7 +100,7 @@ struct BriefVerboseActionHandlerTests {
     @Test("Brief and verbose require no validation")
     func testBriefVerboseRequireNoValidation() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let briefCommand = Command(verb: .brief, rawInput: "brief")
         let verboseCommand = Command(verb: .verbose, rawInput: "verbose")

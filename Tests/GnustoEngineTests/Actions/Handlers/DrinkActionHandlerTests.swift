@@ -10,7 +10,7 @@ struct DrinkActionHandlerTests {
     @Test("Drink validates missing direct object")
     func testDrinkValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .drink,
@@ -27,7 +27,7 @@ struct DrinkActionHandlerTests {
     @Test("Drink validates item not found")
     func testDrinkValidatesItemNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .drink,
@@ -52,7 +52,7 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [distantWater])
         )
 
@@ -79,7 +79,7 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [water])
         )
 
@@ -106,7 +106,7 @@ struct DrinkActionHandlerTests {
             .in(.location(.startRoom))
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [rock])
         )
 
@@ -143,7 +143,7 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [bottle, wine])
         )
 
@@ -179,7 +179,7 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [closedBottle, juice])
         )
 
@@ -207,7 +207,7 @@ struct DrinkActionHandlerTests {
             .isDrinkable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [water])
         )
 

@@ -22,7 +22,7 @@ struct GetAllIssueTests {
             .size(3)
         )
         
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
                 player: Player(in: .startRoom, carryingCapacity: 20),
                 items: [basket, jug]

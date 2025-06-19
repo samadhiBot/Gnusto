@@ -28,7 +28,7 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY produces correct ActionResult")
     func testXyzzyActionResult() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -50,7 +50,7 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY validation always succeeds")
     func testXyzzyValidationSucceeds() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -84,7 +84,7 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY full workflow integration test")
     func testXyzzyFullWorkflow() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .xyzzy,
@@ -109,8 +109,8 @@ struct XyzzyActionHandlerTests {
 
     @Test("XYZZY does not affect game state")
     func testXyzzyDoesNotAffectGameState() async throws {
-        let (engine, mockIO) = await GameEngine.test()
-        
+        let (engine, _) = await GameEngine.test()
+
         // Capture initial state
         let initialState = await engine.gameState
         let initialScore = initialState.player.score

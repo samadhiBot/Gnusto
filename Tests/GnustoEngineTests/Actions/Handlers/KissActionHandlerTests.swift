@@ -10,7 +10,7 @@ struct KissActionHandlerTests {
     @Test("Kiss validates missing direct object")
     func testKissValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .kiss,
@@ -93,7 +93,7 @@ struct KissActionHandlerTests {
         )
 
         let game = MinimalGame(items: [mirror])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .kiss,

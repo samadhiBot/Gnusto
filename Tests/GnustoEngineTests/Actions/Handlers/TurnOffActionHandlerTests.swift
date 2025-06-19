@@ -67,7 +67,7 @@ struct TurnOffActionHandlerTests {
             locations: [room],
             items: [book]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOff,
@@ -97,7 +97,7 @@ struct TurnOffActionHandlerTests {
             player: Player(in: "room"),
             locations: [room]
         )
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOff,
@@ -211,7 +211,7 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: [lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .turnOff,
@@ -247,7 +247,7 @@ struct TurnOffActionHandlerTests {
             .size(10)
         )
         let game = MinimalGame(items: [lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .turnOff,
             directObject: .item("lamp"),

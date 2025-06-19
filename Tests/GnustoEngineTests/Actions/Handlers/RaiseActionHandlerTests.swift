@@ -65,7 +65,7 @@ struct RaiseActionHandlerTests {
             .isTakable
         )
         let game = MinimalGame(items: [book])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .raise,

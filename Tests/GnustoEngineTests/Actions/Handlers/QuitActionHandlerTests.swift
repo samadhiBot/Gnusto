@@ -26,7 +26,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT produces correct ActionResult")
     func testQuitActionResult() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -48,7 +48,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT validation always succeeds")
     func testQuitValidationSucceeds() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -65,7 +65,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT requests engine to quit")
     func testQuitRequestsEngineQuit() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -108,7 +108,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT full workflow integration test")
     func testQuitFullWorkflow() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(
             verb: .quit,
@@ -162,7 +162,7 @@ struct QuitActionHandlerTests {
 
     @Test("QUIT does not modify game state")
     func testQuitDoesNotModifyGameState() async throws {
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         // Capture initial state
         let initialState = await engine.gameState

@@ -41,7 +41,10 @@ struct MessageProviderIntegrationTests {
         let game = TestGame()
         var mockParser = MockParser()
 
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test(
+            blueprint: game,
+            parser: mockParser
+        )
 
         #expect(engine.messageProvider.languageCode == "en")
 

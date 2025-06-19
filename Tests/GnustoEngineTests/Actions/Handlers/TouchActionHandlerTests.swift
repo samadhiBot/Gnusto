@@ -92,7 +92,7 @@ struct TouchActionHandlerTests {
             .in(.nowhere)
         )
         let game = MinimalGame(items: [figurine])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .touch,
@@ -193,7 +193,7 @@ struct TouchActionHandlerTests {
             .in(.item("chest"))
         )
         let game = MinimalGame(items: [chest, coin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         #expect(chest.attributes[.isOpen] == nil) // Verify closed
 

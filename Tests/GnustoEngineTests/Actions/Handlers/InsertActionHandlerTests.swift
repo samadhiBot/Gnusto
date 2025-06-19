@@ -1138,7 +1138,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
         )
         let game = MinimalGame(items: [coin, box])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1177,7 +1177,7 @@ struct InsertActionHandlerTests {
             .isOpen,
         )
         let game = MinimalGame(items: [coin, box])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1213,7 +1213,7 @@ struct InsertActionHandlerTests {
             .in(.location(.startRoom)),
         )
         let game = MinimalGame(items: [coin, statue])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1251,7 +1251,7 @@ struct InsertActionHandlerTests {
             .isOpenable,
         )
         let game = MinimalGame(items: [coin, box])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("coin"),
@@ -1292,7 +1292,7 @@ struct InsertActionHandlerTests {
             .capacity(5)
         )
         let game = MinimalGame(items: [boulder, box])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
+        let (engine, _) = await GameEngine.test(blueprint: game, parser: MockParser(), ioHandler: await MockIOHandler()) // Use instance engine
         let command = Command(
             verb: .insert,
             directObject: .item("boulder"),
@@ -1326,7 +1326,7 @@ struct InsertActionHandlerTests {
             .isOpen,
         )
         let game = MinimalGame(items: [bag])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
         let command = Command(
             verb: .insert,
             directObject: .item("bag"),
@@ -1374,7 +1374,7 @@ struct InsertActionHandlerTests {
         )
 
         let game = MinimalGame(items: [boxA, boxB])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .insert,

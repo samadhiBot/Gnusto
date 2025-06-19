@@ -10,7 +10,7 @@ struct CutActionHandlerTests {
     @Test("Cut validates missing direct object")
     func testCutValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .cut, rawInput: "cut")
         let context = ActionContext(command: command, engine: engine)
@@ -24,7 +24,7 @@ struct CutActionHandlerTests {
     @Test("Cut validates item not found")
     func testCutValidatesItemNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .cut, directObject: .item("nonexistent"), rawInput: "cut nonexistent")
         let context = ActionContext(command: command, engine: engine)
@@ -45,7 +45,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantRope])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .cut, directObject: .item("distant_rope"), rawInput: "cut distant rope")
         let context = ActionContext(command: command, engine: engine)
@@ -73,7 +73,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, knife])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .cut,
@@ -106,7 +106,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, knife])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .cut,
@@ -140,7 +140,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, scissors])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .cut,
@@ -174,7 +174,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, knife])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .cut, directObject: .item("rope"), rawInput: "cut rope")
         let context = ActionContext(command: command, engine: engine)
@@ -202,7 +202,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, lamp])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .cut, directObject: .item("rope"), rawInput: "cut rope")
         let context = ActionContext(command: command, engine: engine)
@@ -231,7 +231,7 @@ struct CutActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rope, knife])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .cut,

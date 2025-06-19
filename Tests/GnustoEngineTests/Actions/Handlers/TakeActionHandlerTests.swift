@@ -927,7 +927,7 @@ struct TakeActionHandlerTests {
             .isTakable
         )
 
-        let (engine, mockIO) = await GameEngine.test(
+        let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(items: [bag, coin])
         )
 

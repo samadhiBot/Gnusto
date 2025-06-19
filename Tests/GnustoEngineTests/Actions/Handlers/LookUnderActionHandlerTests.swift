@@ -65,7 +65,7 @@ struct LookUnderActionHandlerTests {
             .isSurface
         )
         let game = MinimalGame(items: [table])
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(
             verb: .lookUnder,

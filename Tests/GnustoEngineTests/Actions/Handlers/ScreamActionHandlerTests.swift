@@ -4,19 +4,10 @@ import Testing
 /// Tests for the ScreamActionHandler.
 @Suite("ScreamActionHandler Tests")
 struct ScreamActionHandlerTests {
-
-    // MARK: - Test Setup
-
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.test()
-        return (engine, mockIO)
-    }
-
-    // MARK: - Tests
-
     @Test("SCREAM command")
     func testScream() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
+
         let handler = ScreamActionHandler()
         let command = Command(verb: .scream, rawInput: "scream")
         let context = ActionContext(command: command, engine: engine)
@@ -29,7 +20,8 @@ struct ScreamActionHandlerTests {
 
     @Test("SCREAM returns varied responses")
     func testScreamVariedResponses() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let (engine, _) = await GameEngine.test()
+
         let handler = ScreamActionHandler()
         let command = Command(verb: .scream, rawInput: "scream")
         let context = ActionContext(command: command, engine: engine)

@@ -10,7 +10,7 @@ struct KickActionHandlerTests {
     @Test("Kick validates missing direct object")
     func testKickValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .kick, rawInput: "kick")
         let context = ActionContext(command: command, engine: engine)
@@ -24,7 +24,7 @@ struct KickActionHandlerTests {
     @Test("Kick validates item not found")
     func testKickValidatesItemNotFound() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .kick, directObject: .item("nonexistent"), rawInput: "kick nonexistent")
         let context = ActionContext(command: command, engine: engine)
@@ -45,7 +45,7 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [distantRock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("distant_rock"), rawInput: "kick distant rock")
         let context = ActionContext(command: command, engine: engine)
@@ -67,7 +67,7 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [goblin])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("goblin"), rawInput: "kick goblin")
         let context = ActionContext(command: command, engine: engine)
@@ -90,7 +90,7 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [ball])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("ball"), rawInput: "kick ball")
         let context = ActionContext(command: command, engine: engine)
@@ -112,7 +112,7 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [wall])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("wall"), rawInput: "kick wall")
         let context = ActionContext(command: command, engine: engine)
@@ -134,7 +134,7 @@ struct KickActionHandlerTests {
         )
 
         let game = MinimalGame(items: [rock])
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+        let (engine, _) = await GameEngine.test(blueprint: game)
 
         let command = Command(verb: .kick, directObject: .item("rock"), rawInput: "kick rock")
         let context = ActionContext(command: command, engine: engine)

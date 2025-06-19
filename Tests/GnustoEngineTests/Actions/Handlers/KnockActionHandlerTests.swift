@@ -10,7 +10,7 @@ struct KnockActionHandlerTests {
     @Test("Knock validates missing direct object")
     func testKnockValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, mockIO) = await GameEngine.test()
+        let (engine, _) = await GameEngine.test()
 
         let command = Command(verb: .knock, rawInput: "knock")
         let context = ActionContext(command: command, engine: engine)
