@@ -91,7 +91,10 @@ public struct StandardParser: Parser {
         let tokens = tokenize(input: input)
 
         // 2. Remove Noise Words
-        let significantTokens = removeNoise(tokens: tokens, noiseWords: vocabulary.noiseWords)
+        let significantTokens = removeNoise(
+            tokens: tokens,
+            noiseWords: vocabulary.noiseWords
+        )
 
         // 3. Handle Single-Word Direction Command (e.g., "NORTH", "N")
         if significantTokens.count == 1,
@@ -99,9 +102,12 @@ public struct StandardParser: Parser {
            let direction = vocabulary.directions[directionWord]
         {
             // Assume a default movement verb like 'go'
-            // TODO: Make the default movement verb configurable or a constant
-            let defaultGoVerbID = VerbID("go") // Placeholder
-            let command = Command(verb: defaultGoVerbID, direction: direction, rawInput: input)
+            let defaultGoVerbID = VerbID.go
+            let command = Command(
+                verb: defaultGoVerbID,
+                direction: direction,
+                rawInput: input
+            )
             return .success(command)
         }
 

@@ -3,7 +3,7 @@ import Foundation
 struct SeededGenerator: RandomNumberGenerator {
     private var state: UInt64
 
-    init(seed: UInt64 = 42) {
+    init(seed: UInt64 = 71) {
         self.state = seed
     }
 
