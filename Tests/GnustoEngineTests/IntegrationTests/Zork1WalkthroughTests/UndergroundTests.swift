@@ -23,8 +23,6 @@ struct UndergroundTests {
             \(Playback.enterUnderground)
 
             > north
-            Your sword is glowing very brightly.
-
             — Troll Room —
 
             This is a small room with passages to the east and south and a
