@@ -590,18 +590,21 @@ extension InsideHouse {
             }
         }
 
-        // Update glow level if changed and print message
+        // Always update the glow level and show message if glowing
         let currentGlowLevel = await engine.global(.swordGlowLevel) ?? 0
-        if newGlowLevel != currentGlowLevel {
-            let message = switch newGlowLevel {
-            case 1:
-                "Your sword is glowing with a faint blue glow."
-            case 2:
-                "Your sword is glowing very brightly."
-            default:
-                "" // Level 0 - no message when glow stops
-            }
 
+        // Determine the glow message based on current level
+        let message = switch newGlowLevel {
+        case 1:
+            "Your sword is glowing with a faint blue glow."
+        case 2:
+            "Your sword is glowing very brightly."
+        default:
+            "" // Level 0 - no message when not glowing
+        }
+
+        // Update the glow level if it changed
+        if newGlowLevel != currentGlowLevel {
             if message.isEmpty {
                 return await ActionResult(
                     engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
@@ -612,6 +615,9 @@ extension InsideHouse {
                     engine.setGlobal(.swordGlowLevel, to: newGlowLevel)
                 )
             }
+        } else if !message.isEmpty {
+            // Level didn't change but sword is still glowing - show the message
+            return ActionResult(message)
         }
 
         return nil
