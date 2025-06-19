@@ -92,11 +92,13 @@ enum Playback {
         descending into darkness.
 
         > down
-        The trap door crashes shut, and you hear someone barring it.
-
         You have moved into a dark place.
 
+        The trap door crashes shut, and you hear someone barring it.
+
         It is pitch black. You are likely to be eaten by a grue.
+
+        Your sword is glowing with a faint blue glow.
 
         > light the lantern
         The brass lantern is now on. You can see your surroundings now.

@@ -256,26 +256,25 @@ extension GameEngine {
 }
 
 extension GameEngine {
-    /// Processes a single turn of the game, including clock ticks, player input, parsing, and command execution.
+    /// Processes a single turn of the game, including player input, parsing, command execution, and clock ticks.
     ///
     /// This method orchestrates the core sequence of events within a single game turn:
-    /// 1. Advances game time by calling `tickClock()`, which processes active fuses and daemons.
-    ///    If `tickClock()` sets `shouldQuit` (e.g., a fuse ends the game), the turn ends.
-    /// 2. Prompts the player for input via the `IOHandler`.
+    /// 1. Prompts the player for input via the `IOHandler`.
     ///    If input is `nil` (e.g., EOF) or explicitly "quit", `shouldQuit` is set, and the turn ends.
-    /// 3. Parses the player's input string into a structured `Command` using the `parser`.
-    /// 4. Increments the player's move counter in `gameState`.
-    /// 5. If parsing is successful:
+    /// 2. Parses the player's input string into a structured `Command` using the `parser`.
+    /// 3. If parsing is successful:
     ///    a. If the command is to quit or `shouldQuit` is set, the turn ends.
     ///    b. Calls `execute(command:)` to process the command through event and action handlers.
     ///    c. If the command was a movement command (`.go`) to an unvisited room, or a command
     ///       that changed the light state (e.g., `.turnOn`, `.turnOff` a light source), it then
     ///       calls `describeCurrentLocation()`.
-    /// 6. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
+    /// 4. Advances game time by calling `tickClock()`, which processes active fuses and daemons.
+    ///    If `tickClock()` sets `shouldQuit` (e.g., a fuse ends the game), the turn ends.
+    /// 5. If parsing fails, reports the `ParseError` to the player via `report(parseError:)`.
     ///
     /// Errors during turn processing are logged.
     func processTurn() async throws {
-        if shouldQuit { return }  // Clock tick might trigger quit
+        if shouldQuit { return }
 
         // 1. Get Player Input
         guard let input = await ioHandler.readLine(prompt: "> ") else {
@@ -290,25 +289,30 @@ extension GameEngine {
             return
         }
 
-        // 3. Tick the Clock (Fuses & Daemons) and increment the turn counter
-        try await tickClock()
-
-        // 4. Parse Input
+        // 3. Parse Input
         let parseResult = parser.parse(
             input: input,
             vocabulary: gameState.vocabulary,
             gameState: gameState
         )
 
-        // 5. Execute Command or Handle Error
+        // 4. Execute Command or Handle Error
         switch parseResult {
         case .success(let command):
             if command.verb == .quit || shouldQuit { return }
-
             await execute(command: command)
 
         case .failure(let error):
             await report(parseError: error)
+        }
+
+        // 5. Timed events happen AFTER the player's action is complete (or failed).
+        if !shouldQuit {
+            do {
+                try await tickClock()
+            } catch {
+                logError("Error processing timed events: \(error)")
+            }
         }
     }
 
@@ -1364,4 +1368,3 @@ extension GameEngine {
         )
     }
 }
-
