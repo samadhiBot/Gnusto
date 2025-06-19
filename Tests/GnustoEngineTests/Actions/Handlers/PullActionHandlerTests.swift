@@ -20,21 +20,18 @@ struct PullActionHandlerTests {
         let game = MinimalGame(items: rope)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .pull,
-            directObject: .item("rope"),
-            rawInput: "pull rope"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("pull rope")
 
         // Assert
         let finalRopeState = try await engine.item("rope")
         #expect(finalRopeState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "You pull the rope.")
+        expectNoDifference(output, """
+            > pull rope
+            You pull the rope.
+            """)
     }
 
     @Test("Pull non-pullable item fails")
@@ -50,18 +47,15 @@ struct PullActionHandlerTests {
         let game = MinimalGame(items: rock)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .pull,
-            directObject: .item("rock"),
-            rawInput: "pull rock"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("pull rock")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t pull the rock.")
+        expectNoDifference(output, """
+            > pull rock
+            You can't pull the rock.
+            """)
     }
 
     @Test("Pull with no object fails")
@@ -69,18 +63,15 @@ struct PullActionHandlerTests {
         // Arrange
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .pull,
-            directObject: nil,
-            rawInput: "pull"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("pull")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "Pull what?")
+        expectNoDifference(output, """
+            > pull
+            Pull what?
+            """)
     }
 
     @Test("Pull unreachable rope fails")
@@ -114,17 +105,14 @@ struct PullActionHandlerTests {
         )
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .pull,
-            directObject: .item("distantRope"),
-            rawInput: "pull distant rope"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("pull distant rope")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > pull distant rope
+            You can't see any distant rope here.
+            """)
     }
 }

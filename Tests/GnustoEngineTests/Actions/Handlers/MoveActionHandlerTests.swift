@@ -5,7 +5,6 @@ import Testing
 
 @Suite("MoveActionHandler Tests")
 struct MoveActionHandlerTests {
-    let handler = MoveActionHandler()
 
     @Test("Move simple object (reachable)")
     func testMoveSimpleObjectReachable() async throws {
@@ -19,21 +18,18 @@ struct MoveActionHandlerTests {
         let game = MinimalGame(items: leaves)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("leaves"),
-            rawInput: "move leaves"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move leaves")
 
         // Then
         let finalItemState = try await engine.item("leaves")
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "Moving the pile of leaves doesn’t accomplish anything.")
+        expectNoDifference(output, """
+            > move leaves
+            Moving the pile of leaves doesn't accomplish anything.
+            """)
     }
 
     @Test("Move object not present")
@@ -41,18 +37,15 @@ struct MoveActionHandlerTests {
         // Given
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("leaves"),
-            rawInput: "move leaves"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move leaves")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > move leaves
+            You can't see any pile of leaves here.
+            """)
     }
 
     @Test("Move object not reachable")
@@ -67,18 +60,15 @@ struct MoveActionHandlerTests {
         let game = MinimalGame(items: leaves)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("leaves"),
-            rawInput: "move leaves"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move leaves")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > move leaves
+            You can't see any pile of leaves here.
+            """)
     }
 
     @Test("Move without direct object")
@@ -86,17 +76,15 @@ struct MoveActionHandlerTests {
         // Given
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .move,
-            rawInput: "move"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "Move what?")
+        expectNoDifference(output, """
+            > move
+            Move what?
+            """)
     }
 
     @Test("Move held item")
@@ -111,21 +99,18 @@ struct MoveActionHandlerTests {
         let game = MinimalGame(items: key)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("key"),
-            rawInput: "move key"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move key")
 
         // Then
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "Moving the brass key doesn’t accomplish anything.")
+        expectNoDifference(output, """
+            > move key
+            Moving the brass key doesn't accomplish anything.
+            """)
     }
 
     @Test("Move object in container (open)")
@@ -147,21 +132,18 @@ struct MoveActionHandlerTests {
         let game = MinimalGame(items: key, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("key"),
-            rawInput: "move key"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move key")
 
         // Then
         let finalItemState = try await engine.item("key")
         #expect(finalItemState.hasFlag(.isTouched) == true)
 
         let output = await mockIO.flush()
-        expectNoDifference(output, "Moving the brass key doesn’t accomplish anything.")
+        expectNoDifference(output, """
+            > move key
+            Moving the brass key doesn't accomplish anything.
+            """)
     }
 
     @Test("Move object in closed container")
@@ -182,17 +164,14 @@ struct MoveActionHandlerTests {
         let game = MinimalGame(items: key, box)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .move,
-            directObject: .item("key"),
-            rawInput: "move key"
-        )
-
         // When
-        await engine.execute(command: command)
+        try await engine.execute("move key")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            > move key
+            You can't see any brass key here.
+            """)
     }
 }

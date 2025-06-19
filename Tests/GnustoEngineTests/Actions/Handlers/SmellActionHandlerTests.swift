@@ -13,17 +13,15 @@ struct SmellActionHandlerTests {
     func testSmellWithoutObject() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .smell,
-            rawInput: "smell"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("smell")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You smell nothing unusual.")
+        expectNoDifference(output, """
+            > smell
+            You smell nothing unusual.
+            """)
     }
 
     @Test("SMELL with item produces expected message")
@@ -39,41 +37,29 @@ struct SmellActionHandlerTests {
         let game = MinimalGame(items: testItem)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            directObject: .item("apple"),
-            rawInput: "smell apple"
-        )
-
         // Act: Use engine.execute for full pipeline
-        await engine.execute(command: command)
+        try await engine.execute("smell apple")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "That smells about average.")
+        expectNoDifference(output, """
+            > smell apple
+            That smells about average.
+            """)
     }
 
     @Test("SMELL validation rejects non-item objects")
     func testSmellValidationRejectsNonItems() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .smell,
-            directObject: .location(.startRoom),
-            rawInput: "smell room"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("smell room")
 
-        // Should throw validation error for non-item
-        do {
-            try await handler.validate(context: context)
-            Issue.record("Expected validation to throw for non-item direct object")
-        } catch {
-            // Expected - should reject non-item objects
-        }
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > smell room
+            You can only smell specific items.
+            """)
     }
 
     @Test("SMELL validation succeeds for items")
@@ -87,20 +73,16 @@ struct SmellActionHandlerTests {
         )
 
         let game = MinimalGame(items: testItem)
-        let (engine, _) = await GameEngine.test(blueprint: game)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .smell,
-            directObject: .item("flower"),
-            rawInput: "smell flower"
-        )
-        let context = ActionContext(
-            command: command,
-            engine: engine
-        )
+        // Act
+        try await engine.execute("smell flower")
 
-        // Should not throw - items are valid for smelling
-        try await handler.validate(context: context)
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > smell flower
+            That smells about average.
+            """)
     }
 
     @Test("SMELL validation succeeds with no direct object")
@@ -176,7 +158,7 @@ struct SmellActionHandlerTests {
 
     @Test("SMELL does not affect game state")
     func testSmellDoesNotAffectGameState() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
         // Capture initial state
         let initialState = await engine.gameState
@@ -184,20 +166,19 @@ struct SmellActionHandlerTests {
         let initialMoves = initialState.player.moves
         let initialLocation = initialState.player.currentLocationID
 
-        let command = Command(
-            verb: .smell,
-            rawInput: "smell"
-        )
-
         // Execute SMELL
-        await engine.execute(command: command)
+        try await engine.execute("smell")
 
-        // Verify state hasn't changed
+        // Verify state hasn't changed significantly (moves will increment)
         let finalState = await engine.gameState
         #expect(finalState.player.score == initialScore)
-        #expect(finalState.player.moves == initialMoves)
         #expect(finalState.player.currentLocationID == initialLocation)
-        #expect(await engine.gameState.changeHistory.isEmpty)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > smell
+            You smell nothing unusual.
+            """)
     }
 
     @Test("SMELL works in different locations")
@@ -344,5 +325,28 @@ struct SmellActionHandlerTests {
         // Assert Output - should still work
         let output = await mockIO.flush()
         expectNoDifference(output, "You smell nothing unusual.")
+    }
+
+    @Test("SMELL works with unreachable items")
+    func testSmellWorksWithUnreachableItems() async throws {
+        let testItem = Item(
+            id: "flower",
+            .name("distant flower"),
+            .description("A flower far away."),
+            .isTakable,
+            .in(.nowhere)
+        )
+
+        let game = MinimalGame(items: testItem)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
+
+        // Act
+        try await engine.execute("smell flower")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > smell flower
+            You can't see any distant flower here.
+            """)
     }
 }

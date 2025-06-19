@@ -5,35 +5,35 @@ import Testing
 
 @Suite("EatActionHandler Tests")
 struct EatActionHandlerTests {
-    let handler = EatActionHandler()
 
     @Test("Eat validates missing direct object")
     func testEatValidatesMissingDirectObject() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(verb: .eat, rawInput: "eat")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.prerequisiteNotMet("Eat what?")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("eat")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat
+            Eat what?
+            """)
     }
 
     @Test("Eat validates item not found")
     func testEatValidatesItemNotFound() async throws {
         // Given
-        let (engine, _) = await GameEngine.test()
-
-        let command = Command(
-            verb: .eat, directObject: .item("nonexistent"), rawInput: "eat nonexistent")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test()
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("nonexistent")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("eat nonexistent")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat nonexistent
+            You can't see any nonexistent here.
+            """)
     }
 
     @Test("Eat validates item not reachable")
@@ -47,16 +47,16 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: distantApple)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .eat, directObject: .item("distant_apple"), rawInput: "eat distant apple")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When / Then
-        await #expect(throws: ActionResponse.itemNotAccessible("distant_apple")) {
-            try await handler.validate(context: context)
-        }
+        try await engine.execute("eat distant apple")
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat distant apple
+            You can't see any distant apple here.
+            """)
     }
 
     @Test("Eat edible item succeeds")
@@ -70,16 +70,17 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: apple)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("eat apple")
 
         // Then
-        #expect(result.message!.contains("You eat the apple. It's quite satisfying."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat apple
+            You eat the apple. It's quite satisfying.
+            """)
     }
 
     @Test("Eat non-edible item fails")
@@ -92,16 +93,17 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: rock)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .eat, directObject: .item("rock"), rawInput: "eat rock")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("eat rock")
 
         // Then
-        #expect(result.message!.contains("You can't eat the rock."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat rock
+            You can't eat the rock.
+            """)
     }
 
     @Test("Eat from container succeeds")
@@ -123,17 +125,17 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: lunchBox, sandwich)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .eat, directObject: .item("lunch_box"), rawInput: "eat lunch box")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("eat lunch box")
 
         // Then
-        #expect(result.message!.contains("You eat the sandwich from the lunch box."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat lunch box
+            You eat the sandwich from the lunch box.
+            """)
     }
 
     @Test("Eat from empty container fails")
@@ -144,28 +146,21 @@ struct EatActionHandlerTests {
             .name("empty box"),
             .in(.location(.startRoom)),
             .isContainer,
-            .isDrinkable
+            .isOpen
         )
 
-        let water = Item(
-            id: "water",
-            .name("water"),
-            .in(.item("empty_box")),
-            .isDrinkable
-        )
-
-        let game = MinimalGame(items: emptyBox, water)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .eat, directObject: .item("empty_box"), rawInput: "eat empty box")
-        let context = ActionContext(command: command, engine: engine)
+        let game = MinimalGame(items: emptyBox)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("eat empty box")
 
         // Then
-        #expect(result.message!.contains("There's nothing to eat in the empty box."))
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat empty box
+            There's nothing to eat in the empty box.
+            """)
     }
 
     @Test("Eat item and check state changes")
@@ -179,24 +174,19 @@ struct EatActionHandlerTests {
         )
 
         let game = MinimalGame(items: apple)
-        let (engine, _) = await GameEngine.test(blueprint: game)
-
-        let command = Command(verb: .eat, directObject: .item("apple"), rawInput: "eat apple")
-        let context = ActionContext(command: command, engine: engine)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // When
-        let result = try await handler.process(context: context)
+        try await engine.execute("eat apple")
 
-        // Apply the state changes to the engine
-        for change in result.changes {
-            try await engine.apply(change)
-        }
-
-        // Then - Check that the item was removed (moved to .nowhere) and touched
-        #expect(result.changes.count >= 2)
-
-        // Check that apple was consumed (removed from game)
+        // Then - Check that the item was consumed (removed from game)
         let finalApple = try await engine.item("apple")
         #expect(finalApple.parent == .nowhere)
+
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > eat apple
+            You eat the apple. It's quite satisfying.
+            """)
     }
 }
