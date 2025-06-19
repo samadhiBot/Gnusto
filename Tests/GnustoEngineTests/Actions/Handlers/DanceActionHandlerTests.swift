@@ -9,21 +9,21 @@ struct DanceActionHandlerTests {
     @Test("DANCE command")
     func testDance() async throws {
         let (engine, mockIO) = await GameEngine.test()
-        let command = Command(verb: .dance, rawInput: "dance")
 
         // Act
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("dance", times: 3)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You dance an adorable little jig.
+            > dance
+            You cut a rug with style and panache.
 
-            You dance with wild abandon. Bravo!
-
+            > dance
             You perform a modern interpretive dance.
+
+            > dance
+            You break into spontaneous choreography.
             """)
     }
 }

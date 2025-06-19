@@ -5,47 +5,39 @@ import Testing
 /// Tests for the GiggleActionHandler.
 @Suite("GiggleActionHandler Tests")
 struct GiggleActionHandlerTests {
-
-    // MARK: - Test Setup
-
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.test()
-        return (engine, mockIO)
-    }
-
-    // MARK: - Tests
-
     @Test("GIGGLE command")
     func testGiggle() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .giggle, rawInput: "giggle")
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        await engine.execute(command: command)
-
-        // Assert
-        let output = await mockIO.flush()
-        expectNoDifference(output, "You chuckle with amusement.")
-    }
-
-    @Test("GIGGLE returns varied responses")
-    func testGiggleVariedResponses() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .giggle, rawInput: "giggle")
-
-        // Act
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("giggle")
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You chuckle with amusement.
+            > giggle
+            You giggle uncontrollably. How embarrassing!
+            """)
+    }
 
-            You giggle like a maniac. Very therapeutic.
+    @Test("GIGGLE returns varied responses")
+    func testGiggleVariedResponses() async throws {
+        let (engine, mockIO) = await GameEngine.test()
 
+        // Act
+        try await engine.execute("giggle", times: 3)
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > giggle
+            You giggle uncontrollably. How embarrassing!
+
+            > giggle
             You snicker quietly. How mischievous!
+
+            > giggle
+            You chortle with delight.
             """)
     }
 }

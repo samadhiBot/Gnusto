@@ -1,42 +1,44 @@
+import CustomDump
 import Testing
+
 @testable import GnustoEngine
 
 /// Tests for the ScreamActionHandler.
 @Suite("ScreamActionHandler Tests")
 struct ScreamActionHandlerTests {
-    @Test("SCREAM command")
-    func testScream() async throws {
-        let (engine, _) = await GameEngine.test()
-
-        let handler = ScreamActionHandler()
-        let command = Command(verb: .scream, rawInput: "scream")
-        let context = ActionContext(command: command, engine: engine)
-
-        let result = try await handler.process(context: context)
-
-        #expect(result.message != nil)
-        #expect(result.message!.contains("scream") || result.message!.contains("shriek"))
-    }
-
     @Test("SCREAM returns varied responses")
     func testScreamVariedResponses() async throws {
-        let (engine, _) = await GameEngine.test()
+        let (engine, mockIO) = await GameEngine.test()
 
-        let handler = ScreamActionHandler()
-        let command = Command(verb: .scream, rawInput: "scream")
-        let context = ActionContext(command: command, engine: engine)
+        // Act
+        try await engine.execute("scream", times: 3)
 
-        var responses: Set<String> = []
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > scream
+            You howl like a wounded animal.
 
-        // Run multiple times to check for variety
-        for _ in 0..<10 {
-            let result = try await handler.process(context: context)
-            if let message = result.message {
-                responses.insert(message)
-            }
-        }
+            > scream
+            You let out a blood-curdling scream.
 
-        // Should have at least some variety in responses
-        #expect(responses.count >= 1)
+            > scream
+            You let loose a scream that would wake the dead.
+            """)
+    }
+
+    @Test("SCREAM at an object")
+    func testScreamAtObject() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Act
+        try await engine.execute("scream at the pebble")
+
+        // Assert Output
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > scream at the pebble
+            You howl like a wounded animal.
+            """)
     }
 }

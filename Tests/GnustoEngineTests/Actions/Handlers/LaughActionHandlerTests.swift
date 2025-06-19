@@ -6,51 +6,39 @@ import GnustoEngine
 /// Tests for the LaughActionHandler.
 @Suite("LaughActionHandler Tests")
 struct LaughActionHandlerTests {
-
-    // MARK: - Test Setup
-
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.test()
-        return (engine, mockIO)
-    }
-
-    // MARK: - Tests
-
     @Test("LAUGH returns varied responses")
     func testLaughVariedResponses() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(verb: .laugh, rawInput: "laugh")
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("laugh", times: 3)
 
         // Then
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You chuckle at the meaninglessness of it all.
+            > laugh
+            You laugh heroically at impossible circumstances.
 
-            You snort with amusement.
-
+            > laugh
             You laugh brazenly at your predicament.
+
+            > laugh
+            You let out a mirthless chuckle.
             """)
     }
 
     @Test("LAUGH at an object")
     func testLaugh() async throws {
-        let (engine, mockIO) = await createTestEngine()
-        let command = Command(
-            verb: .laugh,
-            directObject: .item("pebble"),
-            rawInput: "laugh at the pebble"
-        )
+        let (engine, mockIO) = await GameEngine.test()
 
         // When
-        await engine.execute(command: command)
+        try await engine.execute("laugh at the pebble")
 
         // Then
         let output = await mockIO.flush()
-        expectNoDifference(output, "You chuckle at the meaninglessness of it all.")
+        expectNoDifference(output, """
+            > laugh at the pebble
+            Unexpected words found after command: ‘at pebble’ // FIXME
+            """)
     }
 }

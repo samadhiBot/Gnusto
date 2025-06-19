@@ -9,40 +9,37 @@ struct CurseActionHandlerTests {
     @Test("CURSE without object")
     func testCurseWithoutObject() async throws {
         let (engine, mockIO) = await GameEngine.test()
-        let command = Command(verb: .curse, rawInput: "curse")
 
         // Act
-        await engine.execute(command: command)
-        await engine.execute(command: command)
-        await engine.execute(command: command)
+        try await engine.execute("curse", times: 3)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You curse under your breath.
+            > curse
+            You curse the fates that brought you here.
 
-            You swear with the passion of a thousand frustrated
-            adventurers.
-
+            > curse
             You swear like a sailor. Very cathartic.
+
+            > curse
+            You curse fluently in several languages.
             """)
     }
 
     @Test("CURSE with object")
     func testCurseWithObject() async throws {
         let (engine, mockIO) = await GameEngine.test()
-        let command = Command(
-            verb: .curse,
-            directObject: .item(.startItem),
-            rawInput: "curse the pebble"
-        )
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("curse the pebble")
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(output, "You curse the pebble roundly. You feel a bit better.")
+        expectNoDifference(output, """
+            > curse the pebble
+            You damn the pebble to the seven hells.
+            """)
     }
 
     @Test("CURSE validation passes without object")

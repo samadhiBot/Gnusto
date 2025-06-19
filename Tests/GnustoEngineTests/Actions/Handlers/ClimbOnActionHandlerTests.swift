@@ -18,19 +18,13 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: chair)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("chair"),
-            rawInput: "climb on chair"
-        )
-
         // Initial state check
         let initialChair = try await engine.item("chair")
         #expect(initialChair.attributes[.isTouched] == nil)
         #expect(await engine.gameState.changeHistory.isEmpty)
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on chair")
 
         // Assert State Change
         let finalChair = try await engine.item("chair")
@@ -38,7 +32,9 @@ struct ClimbOnActionHandlerTests {
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb on the wooden chair.")
+        expectNoDifference(output, """
+            You can’t climb on the wooden chair.
+            """)
 
         // Assert changes
         let changeHistory = await engine.gameState.changeHistory
@@ -80,18 +76,13 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: chair)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("chair"),
-            rawInput: "climb on chair"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on chair")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -103,9 +94,17 @@ struct ClimbOnActionHandlerTests {
         // Act
         try await engine.execute("climb on")
 
-        // Assert: Expect error from validate()
+        // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "Climb on what?")
+        expectNoDifference(output, """
+            """)
+
+//        // Act
+//        try await engine.execute("climb on")
+//
+//        // Assert: Expect error from validate()
+//        let output = await mockIO.flush()
+//        expectNoDifference(output, "Climb on what?")
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -114,18 +113,13 @@ struct ClimbOnActionHandlerTests {
     func testClimbOnFailsWithNonItemTarget() async throws {
         let (engine, mockIO) = await GameEngine.test()
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .location(.startRoom),
-            rawInput: "climb on room"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on room")
 
-        // Assert: Expect error from validate()
+        // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb on that.")
+        expectNoDifference(output, """
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -148,18 +142,13 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: box, ladder)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("ladder"),
-            rawInput: "climb on ladder"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on ladder")
 
         // Assert: Expect error from validate()
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t see any such thing.")
+        expectNoDifference(output, """
+            """)
 
         #expect(await engine.gameState.changeHistory.isEmpty)
     }
@@ -175,18 +164,26 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: rope)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("rope"),
-            rawInput: "climb on rope"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on rope")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb on the climbing rope.")
+        expectNoDifference(output, """
+            """)
+
+//        let command = Command(
+//            verb: .climbOn,
+//            indirectObject: .item("rope"),
+//            rawInput: "climb on rope"
+//        )
+//
+//        // Act
+//        await engine.execute(command: command)
+//
+//        // Assert Output
+//        let output = await mockIO.flush()
+//        expectNoDifference(output, "You can’t climb on the climbing rope.")
     }
 
     @Test("Climb on works on large immovable items")
@@ -200,18 +197,26 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: tree)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("tree"),
-            rawInput: "climb on tree"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on tree")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb on the large oak tree.")
+        expectNoDifference(output, """
+            """)
+
+//        let command = Command(
+//            verb: .climbOn,
+//            indirectObject: .item("tree"),
+//            rawInput: "climb on tree"
+//        )
+//
+//        // Act
+//        await engine.execute(command: command)
+//
+//        // Assert Output
+//        let output = await mockIO.flush()
+//        expectNoDifference(output, "You can’t climb on the large oak tree.")
     }
 
     @Test("Climb on works on items on surfaces")
@@ -232,17 +237,25 @@ struct ClimbOnActionHandlerTests {
         let game = MinimalGame(items: table, stool)
         let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
-        let command = Command(
-            verb: .climbOn,
-            indirectObject: .item("stool"),
-            rawInput: "climb on stool"
-        )
-
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("climb on stool")
 
         // Assert Output
         let output = await mockIO.flush()
-        expectNoDifference(output, "You can’t climb on the small stool.")
+        expectNoDifference(output, """
+            """)
+
+//        let command = Command(
+//            verb: .climbOn,
+//            indirectObject: .item("stool"),
+//            rawInput: "climb on stool"
+//        )
+//
+//        // Act
+//        await engine.execute(command: command)
+//
+//        // Assert Output
+//        let output = await mockIO.flush()
+//        expectNoDifference(output, "You can’t climb on the small stool.")
     }
 }

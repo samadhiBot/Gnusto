@@ -1021,7 +1021,14 @@ public struct Vocabulary: Codable, Equatable, Sendable {
         Verb(
             id: .scream,
             synonyms: "shriek", "screech", "howl",
-            syntax: [SyntaxRule(.verb)],
+            syntax: [
+                SyntaxRule(.verb),
+                SyntaxRule(
+                    pattern: [.verb, .preposition, .directObject],
+                    requiredPreposition: "at"
+                ),
+            ],
+
             requiresLight: false
         ),
 

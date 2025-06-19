@@ -56,34 +56,41 @@ struct KissActionHandlerTests {
             """)
     }
 
-    @Test("Kiss mirror shows narcissism message")
-    func testKissMirrorShowsNarcissismMessage() async throws {
-        // Given
-        let mirror = Item(
-            id: "mirror",
-            .name("polished mirror"),
-            .in(.location(.startRoom))
-        )
-
-        let game = MinimalGame(items: mirror)
-        let (engine, mockIO) = await GameEngine.test(blueprint: game)
-
-        let command = Command(
-            verb: .kiss,
-            directObject: .item("mirror"),
-            rawInput: "kiss mirror"
-        )
+    @Test("Kiss object returns varied responses")
+    func testKissObject() async throws {
+        let (engine, mockIO) = await GameEngine.test()
 
         // Act
-        await engine.execute(command: command)
+        try await engine.execute("kiss the pebble", times: 3)
 
         // Assert
         let output = await mockIO.flush()
-        expectNoDifference(
-            output,
-            """
-            You give the polished mirror a quick kiss, which fails to
-            reveal anything significant.
+        expectNoDifference(output, """
+            > kiss the pebble
+            You kiss it curiously, but your curiosity remains unsatisfied.
+
+            > kiss the pebble
+            You plant a brief kiss on the pebble, yet your lips learn
+            nothing new.
+
+            > kiss the pebble
+            You plant a small kiss on the pebble, learning nothing your
+            eyes hadn’t already told you.
+            """)
+    }
+
+    @Test("Kiss self returns varied responses")
+    func testKissSelf() async throws {
+        let (engine, mockIO) = await GameEngine.test()
+
+        // Act
+        try await engine.execute("kiss myself")
+
+        // Assert
+        let output = await mockIO.flush()
+        expectNoDifference(output, """
+            > kiss myself
+            You can’t kiss that.
             """)
     }
 
