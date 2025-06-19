@@ -51,24 +51,24 @@ extension GameEngine {
         }
     }
 
-    func execute(_ input: String) async throws {
+    func execute(_ input: String, times: Int = 1) async throws {
         let parseResult = parser.parse(
             input: input,
             vocabulary: gameState.vocabulary,
             gameState: gameState
         )
 
-        // 3. Execute Command or Handle Error
-        switch parseResult {
-        case .success(let command):
-            if command.verb == .quit || shouldQuit { return }
+        for _ in 0..<times {
+            switch parseResult {
+            case .success(let command):
+                if command.verb == .quit || shouldQuit { return }
 
-            await execute(command: command)
+                await execute(command: command)
 
-        case .failure(let error):
-            await report(parseError: error)
+            case .failure(let error):
+                await report(parseError: error)
+            }
         }
-
     }
 
     /// Retrieves the complete history of all `StateChange`s applied to the `gameState`

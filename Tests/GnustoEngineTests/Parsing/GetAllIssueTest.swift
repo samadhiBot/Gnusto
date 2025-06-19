@@ -21,24 +21,24 @@ struct GetAllIssueTests {
             .isTakable,
             .size(3)
         )
-        
+
         let (engine, _) = await GameEngine.test(
             blueprint: MinimalGame(
                 player: Player(in: .startRoom, carryingCapacity: 20),
                 items: [basket, jug]
             )
         )
-        
+
         // Act: Parse "get all" directly
         let vocabulary = Vocabulary.build(items: [basket, jug])
         let gameState = await engine.gameState
-        
+
         let result = await engine.parser.parse(
             input: "get all",
             vocabulary: vocabulary,
             gameState: gameState
         )
-        
+
         // Assert: Should successfully parse without "all all" error
         switch result {
         case .success(let command):

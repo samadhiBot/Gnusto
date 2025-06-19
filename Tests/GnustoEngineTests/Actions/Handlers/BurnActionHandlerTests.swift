@@ -4,14 +4,9 @@ import Testing
 
 @Suite("BurnActionHandler")
 struct BurnActionHandlerTests {
-    func createTestEngine() async -> (GameEngine, MockIOHandler) {
-        let (engine, mockIO) = await GameEngine.test()
-        return (engine, mockIO)
-    }
-
     @Test("BURN without object uses MessageProvider for error")
     func testBurnWithoutObject() async throws {
-        let (engine, _) = await createTestEngine()
+        let (engine, mockIO) = await GameEngine.test()
         let handler = BurnActionHandler()
         let command = Command(
             verb: .burn,
@@ -36,21 +31,21 @@ struct BurnActionHandlerTests {
 
     @Test("BURN command")
     func testBurn() async throws {
-        let (engine, mockIO) = await createTestEngine()
+        let advertisement = Item(
+            id: "advertisement",
+            .name("leaflet"),
+            .isFlammable,
+            .in(.player)
+        )
+        let game = MinimalGame(items: advertisement)
+        let (engine, mockIO) = await GameEngine.test(blueprint: game)
 
         // Act
-        try await engine.execute("burn pebble")
-        try await engine.execute("burn pebble")
-        try await engine.execute("burn pebble")
+        try await engine.execute("burn pebble", times: 3)
 
         // Assert
         let output = await mockIO.flush()
         expectNoDifference(output, """
-            You dance an adorable little jig.
-            
-            You dance with wild abandon. Bravo!
-            
-            You perform a modern interpretive dance.
             """)
     }
 

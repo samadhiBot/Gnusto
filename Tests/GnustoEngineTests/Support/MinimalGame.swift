@@ -22,22 +22,8 @@ public struct MinimalGame: GameBlueprint {
 
     public init(
         player: Player = Player(in: LocationID("startRoom")),
-        locations: [Location] = [
-            Location(
-                id: .startRoom,
-                .name("Void"),
-                .description("An empty void."),
-                .inherentlyLit
-            )
-        ],
-        items: [Item] = [
-            Item(
-                id: .startItem,
-                .name("pebble"),
-                .in(.location(LocationID("startRoom"))),
-                .isTakable
-            )
-        ],
+        locations: Location...,
+        items: Item...,
         customActionHandlers: [VerbID: ActionHandler] = [:],
         itemEventHandlers: [ItemID: ItemEventHandler] = [:],
         locationEventHandlers: [LocationID: LocationEventHandler] = [:],
@@ -48,8 +34,22 @@ public struct MinimalGame: GameBlueprint {
         messageProvider: MessageProvider? = nil
     ) {
         self.player = player
-        self.items = items
-        self.locations = locations
+        self.items = items.isEmpty ? [
+            Item(
+                id: .startItem,
+                .name("pebble"),
+                .in(.location(LocationID("startRoom"))),
+                .isTakable
+            ),
+        ] : items
+        self.locations = locations.isEmpty ? [
+            Location(
+                id: .startRoom,
+                .name("Void"),
+                .description("An empty void."),
+                .inherentlyLit
+            )
+        ] : locations
         self.customActionHandlers = customActionHandlers
         self.itemEventHandlers = itemEventHandlers
         self.locationEventHandlers = locationEventHandlers
