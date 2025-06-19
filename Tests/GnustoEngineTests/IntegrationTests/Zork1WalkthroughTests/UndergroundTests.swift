@@ -49,7 +49,8 @@ struct UndergroundTests {
             "head west",
             "talk to the troll",
             "take the troll",
-            "stab the troll"
+            "stab the troll",
+            "head west"
         )
         let engine = await GameEngine(
             blueprint: Zork1(),
@@ -77,18 +78,28 @@ struct UndergroundTests {
             > walk east
             The troll fends you off with a menacing gesture.
 
+            Your sword is glowing very brightly.
+
             > go north
             You can’t go that way.
+
+            Your sword is glowing very brightly.
 
             > head west
             The troll fends you off with a menacing gesture.
 
+            Your sword is glowing very brightly.
+
             > talk to the troll
             The troll isn’t much of a conversationalist.
+
+            Your sword is glowing very brightly.
 
             > take the troll
             The troll spits in your face, grunting “Better luck next time”
             in a rather barbarous accent.
+
+            Your sword is glowing very brightly.
 
             > stab the troll
             The troll takes a fatal blow and slumps to the floor dead.
@@ -98,6 +109,11 @@ struct UndergroundTests {
             carcass has disappeared.
 
             Your sword is no longer glowing.
+
+            > head west
+            — Maze —
+
+            This is part of a maze of twisty little passages, all alike.
 
             >
             Goodbye!

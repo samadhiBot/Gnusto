@@ -297,7 +297,7 @@ private func examineThief(engine: GameEngine) async throws -> ActionResult {
 
 /// Enhanced combat evaluation considering thief's skill
 private func evaluateThiefCombat(engine: GameEngine) async throws -> ThiefCombatOutcome {
-    let baseOutcome = await engine.randomCombatOutcome()
+    let baseOutcome = await engine.randomPercentage()
     let playerWeapon = await getPlayerBestWeapon(engine: engine)
 
     // Adjust odds based on player's weapon
@@ -413,7 +413,7 @@ private func attemptSophisticatedTheft(engine: GameEngine) async throws -> Actio
     let hasHighValueItems = targetableItems.contains { $0.1 >= 5 }
     let theftChance = hasHighValueItems ? 35 : 25
 
-    let outcome = await engine.randomCombatOutcome()
+    let outcome = await engine.randomPercentage()
     guard outcome <= theftChance else { return nil }
 
     // Target the most valuable item

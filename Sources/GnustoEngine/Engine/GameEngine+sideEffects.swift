@@ -117,10 +117,4 @@ extension GameEngine {
         guard let targetItem = try? item(itemID) else { return false }
         return targetItem.hasFlag(.isFighting) && targetItem.hasFlag(.isCharacter)
     }
-
-    /// Generates a random combat outcome based on percentage chance.
-    /// Common pattern in ZIL fighting systems.
-    public func randomCombatOutcome() -> Int {
-        randomPercentage()
-    }
 }
